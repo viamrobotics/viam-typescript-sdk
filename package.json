@@ -1,0 +1,23 @@
+{
+  "name": "viam-typescript-sdk",
+  "version": "0.0.1",
+  "description": "## (In)stability Notice",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viamrobotics/viam-typescript-sdk.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/viamrobotics/viam-typescript-sdk/issues"
+  },
+  "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
+  "devDependencies": {
+    "ts-protoc-gen": "^0.15.0",
+    "tslib": "^2.4.1"
+  }
+}
