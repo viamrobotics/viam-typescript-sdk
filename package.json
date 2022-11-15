@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "rollup": "rollup -c ./etc/rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,6 +17,12 @@
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
   "devDependencies": {
+    "@improbable-eng/grpc-web": "^0.15.0",
+    "@rollup/plugin-alias": "^4.0.2",
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "rollup": "^3.3.0",
+    "rollup-plugin-copy": "^3.4.0",
     "ts-protoc-gen": "^0.15.0",
     "tslib": "^2.4.1"
   }
