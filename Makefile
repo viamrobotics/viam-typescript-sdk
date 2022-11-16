@@ -1,7 +1,7 @@
 PATH_WITH_TOOLS="`pwd`/node_modules/.bin:${PATH}"
 
 build: buf
-	npm run build
+	NODE_OPTIONS="--max-old-space-size=16384" npm run build
 
 buf:
 	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/googleapis/googleapis
