@@ -7,7 +7,10 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
 
     steps:
       - name: Checkout
