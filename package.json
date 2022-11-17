@@ -5,6 +5,12 @@
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
   "types": "./dist/main.d.js",
+  "exports": {
+    ".": {
+      "import": "./dist/main.js",
+      "require": "./dist/main.umd.js"
+    }
+  },
   "scripts": {
     "build": "vite build",
     "rollup": "rollup -c ./etc/rollup.config.js",
