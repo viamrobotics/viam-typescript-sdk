@@ -1,5 +1,5 @@
 {
-  "name": "viam-typescript-sdk",
+  "name": "@viamrobotics/sdk",
   "version": "0.0.1",
   "description": "",
   "main": "./dist/main.umd.js",
