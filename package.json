@@ -8,6 +8,7 @@
   "scripts": {
     "build": "vite build",
     "rollup": "rollup -c ./etc/rollup.config.js",
+    "lint": "eslint --ext .ts ./src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +25,9 @@
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
+    "eslint": "^8.27.0",
     "rollup": "^3.3.0",
     "rollup-plugin-copy": "^3.4.0",
     "ts-protoc-gen": "^0.15.0",
