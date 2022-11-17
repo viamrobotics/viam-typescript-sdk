@@ -18,10 +18,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install and Build
-        run: |
-          npm ci --audit=false --legacy-peer-deps
-          make build
+      - name: Build
+        run: make build
 
       - name: Publish
         uses: JS-DevTools/npm-publish@v1
