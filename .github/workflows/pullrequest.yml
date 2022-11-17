@@ -21,3 +21,6 @@ jobs:
 
       - name: NPM Check
         run: npm run check
+
+      - name: Build
+        run: make build
