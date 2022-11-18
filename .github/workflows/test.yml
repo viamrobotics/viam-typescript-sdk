@@ -13,8 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Lint
-        run: make lint
+      - uses: bufbuild/buf-setup-action@v1.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
         run: make build
+
+      - name: Lint
+        run: make lint

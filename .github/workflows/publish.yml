@@ -17,6 +17,10 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: bufbuild/buf-setup-action@v1.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build
         run: make build
 
