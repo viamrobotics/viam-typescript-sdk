@@ -7,7 +7,7 @@
   "types": "./dist/main.d.js",
   "exports": {
     ".": {
-      "import": "./dist/main.js",
+      "import": "./dist/main.es.js",
       "require": "./dist/main.umd.js"
     }
   },
