@@ -1,0 +1,14 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml@main
+
+  publish:
+    needs: test
+    uses: ./.github/workflows/publish.yml@main
