@@ -1,7 +1,7 @@
 PATH_WITH_TOOLS="`pwd`/node_modules/.bin:${PATH}"
 
 install:
-	npm ci --audit=false --legacy-peer-deps
+	npm ci --audit=false
 
 lint: install
 	npm run lint
