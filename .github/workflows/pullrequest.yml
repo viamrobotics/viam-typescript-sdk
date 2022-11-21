@@ -7,5 +7,4 @@ on:
 
 jobs:
   test:
-    # TODO: lock to @main branch before merging
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test.yml@main
