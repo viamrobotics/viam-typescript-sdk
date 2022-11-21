@@ -17,12 +17,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: bufbuild/buf-setup-action@v1.8.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build
-        run: make build
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build'
 
       - name: Publish
         uses: JS-DevTools/npm-publish@v1
