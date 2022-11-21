@@ -11,7 +11,7 @@ lint: install
 	npm run check
 
 install-buf:
-	./etc/install_buf.sh
+	./etc/install_buf.sh $(BUF_BIN)
 
 buf: install install-buf
 	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/googleapis/googleapis

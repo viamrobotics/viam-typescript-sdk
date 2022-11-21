@@ -2,7 +2,13 @@
 
 # Substitute BIN for your bin directory.
 # Substitute VERSION for the current released version.
-BIN="$(pwd)/bin"
+
+if [[ -z "$1" ]]; then
+    echo "please provide an installation direction"
+    exit 1
+fi
+
+BIN="$1"
 VERSION="1.9.0"
 
 mkdir -p "$BIN"
