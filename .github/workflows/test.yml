@@ -1,0 +1,19 @@
+name: Test
+
+on:
+  workflow_call:
+
+jobs:
+  build_and_lint:
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and lint
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build lint'
