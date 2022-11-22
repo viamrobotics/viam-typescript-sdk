@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
-  "types": "./dist/main.d.js",
+  "types": "./dist/main.d.ts",
   "exports": {
     ".": {
       "import": "./dist/main.es.js",
