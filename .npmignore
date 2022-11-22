@@ -1,0 +1,13 @@
+.github
+.vscode
+node_modules
+prime
+scripts
+src
+bin
+.eslintrc.js
+index.html
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+!dist
