@@ -1,10 +1,14 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
-  "types": "./dist/main.d.js",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "dist/main.*",
+    "dist/gen/**/*.esm.d.ts"
+  ],
   "exports": {
     ".": {
       "import": "./dist/main.es.js",
