@@ -7,8 +7,8 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/test.yml@main
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@main
 
   publish:
     needs: test
-    uses: ./.github/workflows/publish.yml@main
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/publish.yml@main
