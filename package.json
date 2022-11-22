@@ -6,7 +6,8 @@
   "module": "./dist/main.es.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "dist"
+    "dist/main.*",
+    "dist/gen/**/*.esm.d.ts"
   ],
   "exports": {
     ".": {
