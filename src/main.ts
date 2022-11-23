@@ -1,3 +1,4 @@
+import Client from './Client'
 import armApi from './gen/component/arm/v1/arm_pb.esm'
 import baseApi from './gen/component/base/v1/base_pb.esm'
 import boardApi from './gen/component/board/v1/board_pb.esm'
@@ -37,26 +38,9 @@ export {
   sensorsApi,
   slamApi,
   visionApi,
-  streamApi
+  streamApi,
+  Client
 }
 
-export { ArmServiceClient } from './gen/component/arm/v1/arm_pb_service.esm'
-export { BaseServiceClient } from './gen/component/base/v1/base_pb_service.esm'
-export { BoardServiceClient } from './gen/component/board/v1/board_pb_service.esm'
-export { CameraServiceClient } from './gen/component/camera/v1/camera_pb_service.esm'
-export { GantryServiceClient } from './gen/component/gantry/v1/gantry_pb_service.esm'
-export { GenericServiceClient } from './gen/component/generic/v1/generic_pb_service.esm'
-export { GripperServiceClient } from './gen/component/gripper/v1/gripper_pb_service.esm'
-export { InputControllerServiceClient } from './gen/component/inputcontroller/v1/input_controller_pb_service.esm'
-export { MotorServiceClient } from './gen/component/motor/v1/motor_pb_service.esm'
-export { MovementSensorServiceClient } from './gen/component/movementsensor/v1/movementsensor_pb_service.esm'
-export { ServoServiceClient } from './gen/component/servo/v1/servo_pb_service.esm'
-export { RobotServiceClient } from './gen/robot/v1/robot_pb_service.esm'
-export type { ServiceError } from './gen/robot/v1/robot_pb_service.esm'
-export { MotionServiceClient } from './gen/service/motion/v1/motion_pb_service.esm'
-export { NavigationServiceClient } from './gen/service/navigation/v1/navigation_pb_service.esm'
-export { RobotService } from './gen/robot/v1/robot_pb_service.esm'
-export { SensorsServiceClient } from './gen/service/sensors/v1/sensors_pb_service.esm'
-export { SLAMServiceClient } from './gen/service/slam/v1/slam_pb_service.esm'
-export { VisionServiceClient } from './gen/service/vision/v1/vision_pb_service.esm'
-export { StreamServiceClient } from './gen/proto/stream/v1/stream_pb_service.esm'
+// It doesn't matter which ServiceError we export really.
+export { RobotService, type ServiceError } from './gen/robot/v1/robot_pb_service.esm'
