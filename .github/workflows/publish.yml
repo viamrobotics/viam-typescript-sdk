@@ -1,16 +1,18 @@
-name: NPM Publish @viamrobotics/sdk
+name: NPM Publish
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  workflow_call:
+  secrets:
+      NPM_TOKEN:
+        required: true
 
 jobs:
   publish:
-    runs-on: [x64, qemu-host]
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: [self-hosted, x64]
     container:
-      image: ghcr.io/viamrobotics/canon:amd64-cache
-      options: --platform linux/amd64
+      image: ghcr.io/viamrobotics/canon:amd64
 
     steps:
       - name: Checkout
@@ -18,9 +20,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install, Build, and Publish
+      - name: Build
         run: |
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build'
-          npm install -g @jsdevtools/npm-publish
-          npm-publish --token=${{ secrets.NPM_TOKEN }}
+
+      - name: Publish
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}

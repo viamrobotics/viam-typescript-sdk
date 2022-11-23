@@ -12,3 +12,5 @@ jobs:
   publish:
     needs: test
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/publish.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
