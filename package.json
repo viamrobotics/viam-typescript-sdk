@@ -1,6 +1,6 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
@@ -18,7 +18,7 @@
   "scripts": {
     "build": "vite build",
     "check": "npm-check --production",
-    "lint": "eslint --ext .ts ./src",
+    "lint": "eslint './src/**/*.{ts,js}' --fix --ignore-pattern 'gen/'",
     "rollup": "rollup -c ./etc/rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typecheck": "tsc --noEmit"
@@ -32,6 +32,9 @@
     "url": "https://github.com/viamrobotics/viam-typescript-sdk/issues"
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
+  "dependencies": {
+    "@viamrobotics/rpc": "^0.1.31"
+  },
   "devDependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
     "@rollup/plugin-alias": "^4.0.2",
@@ -47,7 +50,7 @@
     "rollup-plugin-copy": "^3.4.0",
     "ts-protoc-gen": "^0.15.0",
     "tslib": "^2.4.1",
-    "typescript": "<4.9.0",
+    "typescript": "<4.9.3",
     "vite": "^3.2.4",
     "vite-plugin-dts": "^1.7.1"
   }
