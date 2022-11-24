@@ -16,6 +16,7 @@ import { RobotServiceClient } from './gen/robot/v1/robot_pb_service.esm'
 import { SLAMServiceClient } from './gen/service/slam/v1/slam_pb_service.esm'
 import { SensorsServiceClient } from './gen/service/sensors/v1/sensors_pb_service.esm'
 import { ServoServiceClient } from './gen/component/servo/v1/servo_pb_service.esm'
+import SessionManager from './SessionManager'
 import { StreamServiceClient } from './gen/proto/stream/v1/stream_pb_service.esm'
 import { VisionServiceClient } from './gen/service/vision/v1/vision_pb_service.esm'
 import type { grpc } from '@improbable-eng/grpc-web'
@@ -27,9 +28,15 @@ interface WebRTCOptions {
   rtcConfig: RTCConfiguration | undefined
 }
 
+interface SessionOptions {
+  disabled: boolean
+}
+
 export default class Client {
   private readonly serviceHost: string
   private readonly webrtcOptions: WebRTCOptions | undefined
+  private readonly sessionOptions: SessionOptions | undefined
+  private sessionManager: SessionManager
 
   private peerConn: RTCPeerConnection | undefined
 
@@ -79,9 +86,20 @@ export default class Client {
 
   private slamServiceClient: SLAMServiceClient | undefined
 
-  constructor (serviceHost: string, webrtcOptions?: WebRTCOptions) {
+  constructor (serviceHost: string, webrtcOptions?: WebRTCOptions, sessionOptions?: SessionOptions) {
     this.serviceHost = serviceHost
     this.webrtcOptions = webrtcOptions
+    this.sessionOptions = sessionOptions
+    this.sessionManager = new SessionManager(serviceHost, (opts: grpc.TransportOptions): grpc.Transport => {
+      if (!this.transportFactory) {
+        throw new Error(Client.notConnectedYetStr)
+      }
+      return this.transportFactory(opts)
+    })
+  }
+
+  get sessionId () {
+    return this.sessionManager.sessionID
   }
 
   private static readonly notConnectedYetStr = 'not connected yet'
@@ -222,6 +240,7 @@ export default class Client {
       this.peerConn.close()
       this.peerConn = undefined
     }
+    this.sessionManager.reset()
   }
 
   public async connect (authEntity = this.savedAuthEntity, creds = this.savedCreds) {
@@ -242,6 +261,12 @@ export default class Client {
       this.peerConn.close()
       this.peerConn = undefined
     }
+
+    /*
+     * TODO(RSDK-887): no longer reset if we are reusing authentication material; otherwise our session
+     * and authentication context will no longer match.
+     */
+    this.sessionManager.reset()
 
     try {
       const opts: DialOptions = {
@@ -319,26 +344,29 @@ export default class Client {
         this.transportFactory = await dialDirect(this.serviceHost, opts)
       }
 
-      this.streamServiceClient = new StreamServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.robotServiceClient = new RobotServiceClient(this.serviceHost, { transport: this.transportFactory })
+      const clientTransportFactory = this.sessionOptions?.disabled ? this.transportFactory : this.sessionManager.transportFactory
+      const grpcOptions = { transport: clientTransportFactory }
+
+      this.streamServiceClient = new StreamServiceClient(this.serviceHost, grpcOptions)
+      this.robotServiceClient = new RobotServiceClient(this.serviceHost, grpcOptions)
       // eslint-disable-next-line no-warning-comments
       // TODO(RSDK-144): these should be created as needed
-      this.armServiceClient = new ArmServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.baseServiceClient = new BaseServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.boardServiceClient = new BoardServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.cameraServiceClient = new CameraServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.gantryServiceClient = new GantryServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.genericServiceClient = new GenericServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.gripperServiceClient = new GripperServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.movementSensorServiceClient = new MovementSensorServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.inputControllerServiceClient = new InputControllerServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.motorServiceClient = new MotorServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.navigationServiceClient = new NavigationServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.motionServiceClient = new MotionServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.visionServiceClient = new VisionServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.sensorsServiceClient = new SensorsServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.servoServiceClient = new ServoServiceClient(this.serviceHost, { transport: this.transportFactory })
-      this.slamServiceClient = new SLAMServiceClient(this.serviceHost, { transport: this.transportFactory })
+      this.armServiceClient = new ArmServiceClient(this.serviceHost, grpcOptions)
+      this.baseServiceClient = new BaseServiceClient(this.serviceHost, grpcOptions)
+      this.boardServiceClient = new BoardServiceClient(this.serviceHost, grpcOptions)
+      this.cameraServiceClient = new CameraServiceClient(this.serviceHost, grpcOptions)
+      this.gantryServiceClient = new GantryServiceClient(this.serviceHost, grpcOptions)
+      this.genericServiceClient = new GenericServiceClient(this.serviceHost, grpcOptions)
+      this.gripperServiceClient = new GripperServiceClient(this.serviceHost, grpcOptions)
+      this.movementSensorServiceClient = new MovementSensorServiceClient(this.serviceHost, grpcOptions)
+      this.inputControllerServiceClient = new InputControllerServiceClient(this.serviceHost, grpcOptions)
+      this.motorServiceClient = new MotorServiceClient(this.serviceHost, grpcOptions)
+      this.navigationServiceClient = new NavigationServiceClient(this.serviceHost, grpcOptions)
+      this.motionServiceClient = new MotionServiceClient(this.serviceHost, grpcOptions)
+      this.visionServiceClient = new VisionServiceClient(this.serviceHost, grpcOptions)
+      this.sensorsServiceClient = new SensorsServiceClient(this.serviceHost, grpcOptions)
+      this.servoServiceClient = new ServoServiceClient(this.serviceHost, grpcOptions)
+      this.slamServiceClient = new SLAMServiceClient(this.serviceHost, grpcOptions)
     } finally {
       this.connectResolve?.()
       this.connectResolve = undefined
