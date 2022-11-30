@@ -89,6 +89,10 @@ export default class SessionManager {
       })
     }
 
+    /*
+     * This lint is correct but it makes our lives easier to refer to a boolean in
+     * case in the future we make this toggleable (e.g. foreground).
+     */
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.backgroundHeartbeat && window.Worker) {
       const url = window.URL.createObjectURL(timeoutBlob)
