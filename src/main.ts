@@ -43,4 +43,4 @@ export {
 }
 
 // It doesn't matter which ServiceError we export really.
-export { RobotService, type ServiceError } from './gen/robot/v1/robot_pb_service.esm'
+export type { ResponseStream, ServiceError } from './gen/robot/v1/robot_pb_service.esm'
