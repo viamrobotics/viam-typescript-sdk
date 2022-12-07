@@ -26,3 +26,6 @@ build: buf
 	# once we migrate to protobuf-es, since that generator should produce
 	# much smaller javascript bundles.
 	NODE_OPTIONS="--max-old-space-size=16384" npm run build
+
+pack: build
+	npm pack
