@@ -5,8 +5,8 @@ import type {
 
 export interface Properties {
   supportsPcd: boolean;
-  intrinsicParameters: IntrinsicParameters.AsObject;
-  distortionParameters: DistortionParameters.AsObject;
+  intrinsicParameters?: IntrinsicParameters.AsObject;
+  distortionParameters?: DistortionParameters.AsObject;
 }
 
 export enum MimeType {
@@ -18,8 +18,8 @@ export enum MimeType {
 }
 
 export interface Camera {
-  // GetImage: (name: string, mimeType: MimeType) => Promise<Uint8Array | string>;
+  getImage: (name: string, mimeType: MimeType) => Promise<Uint8Array>;
   renderFrame: (name: string, mimeType: MimeType) => Promise<Blob>;
   getPointCloud: (name: string) => Promise<Uint8Array>;
-  // GetProperties: (name: string) => Promise<Properties>;
+  getProperties: (name: string) => Promise<Properties>;
 }
