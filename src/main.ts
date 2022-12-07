@@ -1,4 +1,5 @@
 import * as Camera from './components/camera/Camera'
+import { CameraClient } from './components/camera/Client'
 import Client from './Client'
 // TODO: remove these exports once RDK stops using them
 import { RobotService } from './gen/robot/v1/robot_pb_service.esm'
@@ -44,6 +45,7 @@ export {
   visionApi,
   streamApi,
   Camera,
+  CameraClient,
   Client,
   RobotService
 }

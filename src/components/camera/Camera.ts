@@ -18,8 +18,8 @@ export enum MimeType {
 }
 
 export interface Camera {
-  getImage: (name: string, mimeType: MimeType) => Promise<Uint8Array>;
-  renderFrame: (name: string, mimeType: MimeType) => Promise<Blob>;
-  getPointCloud: (name: string) => Promise<Uint8Array>;
-  getProperties: (name: string) => Promise<Properties>;
+  getImage: (mimeType: MimeType) => Promise<Uint8Array>;
+  renderFrame: (mimeType: MimeType) => Promise<Blob>;
+  getPointCloud: () => Promise<Uint8Array>;
+  getProperties: () => Promise<Properties>;
 }

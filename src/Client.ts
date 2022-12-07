@@ -3,7 +3,7 @@ import { dialDirect, dialWebRTC } from '@viamrobotics/rpc'
 import { ArmServiceClient } from './gen/component/arm/v1/arm_pb_service.esm'
 import { BaseServiceClient } from './gen/component/base/v1/base_pb_service.esm'
 import { BoardServiceClient } from './gen/component/board/v1/board_pb_service.esm'
-import { CameraClient } from './components/camera/Client'
+import { CameraServiceClient } from './gen/component/camera/v1/camera_pb_service.esm'
 import { GantryServiceClient } from './gen/component/gantry/v1/gantry_pb_service.esm'
 import { GenericServiceClient } from './gen/component/generic/v1/generic_pb_service.esm'
 import { GripperServiceClient } from './gen/component/gripper/v1/gripper_pb_service.esm'
@@ -60,7 +60,7 @@ export default class Client {
 
   private boardServiceClient: BoardServiceClient | undefined
 
-  private cameraServiceClient: CameraClient | undefined
+  private cameraServiceClient: CameraServiceClient | undefined
 
   private gantryServiceClient: GantryServiceClient | undefined
 
@@ -391,7 +391,7 @@ export default class Client {
         this.serviceHost,
         grpcOptions
       )
-      this.cameraServiceClient = new CameraClient(
+      this.cameraServiceClient = new CameraServiceClient(
         this.serviceHost,
         grpcOptions
       )

@@ -1,19 +1,22 @@
 import { type Camera, MimeType, Properties } from './Camera'
-import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm'
+import type Client from '../../Client'
 import cameraApi from '../../gen/component/camera/v1/camera_pb.esm'
 import { grpc } from '@improbable-eng/grpc-web'
 
 export class CameraClient implements Camera {
-  private client: CameraServiceClient | undefined
+  private client: Client | undefined
+  private readonly name: string
 
   // TODO: update interface parameters
-  constructor (serviceHost: string, options?: grpc.RpcOptions) {
-    this.client = new CameraServiceClient(serviceHost, options)
+  constructor (client: Client, name: string) {
+    // , serviceHost: string, options?: grpc.RpcOptions) {
+    this.client = client
+    this.name = name
   }
 
-  getImage (name: string, mimeType: MimeType): Promise<Uint8Array> {
+  getImage (mimeType: MimeType): Promise<Uint8Array> {
     const request = new cameraApi.GetImageRequest()
-    request.setName(name)
+    request.setName(this.name)
     request.setMimeType(mimeType)
 
     return new Promise((resolve, reject) => {
@@ -23,23 +26,27 @@ export class CameraClient implements Camera {
         return
       }
 
-      this.client.getImage(request, new grpc.Metadata(), (error, response) => {
-        if (error) {
-          return reject(error)
+      this.client.cameraService.getImage(
+        request,
+        new grpc.Metadata(),
+        (error, response) => {
+          if (error) {
+            return reject(error)
+          }
+          if (!response) {
+            // TODO: improve error message?
+            return reject(new Error('no response'))
+          }
+          const bytes = response.getImage_asU8()
+          return resolve(bytes)
         }
-        if (!response) {
-          // TODO: improve error message?
-          return reject(new Error('no response'))
-        }
-        const bytes = response.getImage_asU8()
-        return resolve(bytes)
-      })
+      )
     })
   }
 
-  renderFrame (name: string, mimeType: MimeType): Promise<Blob> {
+  renderFrame (mimeType: MimeType): Promise<Blob> {
     const request = new cameraApi.GetPointCloudRequest()
-    request.setName(name)
+    request.setName(this.name)
     request.setMimeType(mimeType)
 
     return new Promise((resolve, reject) => {
@@ -49,7 +56,7 @@ export class CameraClient implements Camera {
         return
       }
 
-      this.client.renderFrame(
+      this.client.cameraService.renderFrame(
         request,
         new grpc.Metadata(),
         (error, response) => {
@@ -67,9 +74,9 @@ export class CameraClient implements Camera {
     })
   }
 
-  getPointCloud (name: string): Promise<Uint8Array> {
+  getPointCloud (): Promise<Uint8Array> {
     const request = new cameraApi.GetPointCloudRequest()
-    request.setName(name)
+    request.setName(this.name)
     request.setMimeType(MimeType.PCD)
 
     return new Promise((resolve, reject) => {
@@ -79,7 +86,7 @@ export class CameraClient implements Camera {
         return
       }
 
-      this.client.getPointCloud(
+      this.client.cameraService.getPointCloud(
         request,
         new grpc.Metadata(),
         (error, response) => {
@@ -97,9 +104,9 @@ export class CameraClient implements Camera {
     })
   }
 
-  getProperties (name: string): Promise<Properties> {
+  getProperties (): Promise<Properties> {
     const request = new cameraApi.GetPropertiesRequest()
-    request.setName(name)
+    request.setName(this.name)
 
     return new Promise((resolve, reject) => {
       if (!this.client) {
@@ -108,7 +115,7 @@ export class CameraClient implements Camera {
         return
       }
 
-      this.client.getProperties(
+      this.client.cameraService.getProperties(
         request,
         new grpc.Metadata(),
         (error, response) => {
