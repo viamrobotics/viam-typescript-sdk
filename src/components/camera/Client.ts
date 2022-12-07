@@ -11,7 +11,8 @@ export class CameraClient implements Camera {
     this.client = new CameraServiceClient(serviceHost, options)
   }
 
-  getPointCloud (name: string): Promise<Uint8Array | string> {
+  // GetPointCloud (name: string): Promise<Uint8Array> {
+  getPointCloud (name: string): Promise<Uint8Array> {
     const request = new cameraApi.GetPointCloudRequest()
     request.setName(name)
     request.setMimeType(MimeType.PCD)
