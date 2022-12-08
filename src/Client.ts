@@ -3,7 +3,6 @@ import { dialDirect, dialWebRTC } from '@viamrobotics/rpc'
 import { ArmServiceClient } from './gen/component/arm/v1/arm_pb_service.esm'
 import { BaseServiceClient } from './gen/component/base/v1/base_pb_service.esm'
 import { BoardServiceClient } from './gen/component/board/v1/board_pb_service.esm'
-import { CameraServiceClient } from './gen/component/camera/v1/camera_pb_service.esm'
 import { GantryServiceClient } from './gen/component/gantry/v1/gantry_pb_service.esm'
 import { GenericServiceClient } from './gen/component/generic/v1/generic_pb_service.esm'
 import { GripperServiceClient } from './gen/component/gripper/v1/gripper_pb_service.esm'
@@ -59,8 +58,6 @@ export default class Client {
   private baseServiceClient: BaseServiceClient | undefined
 
   private boardServiceClient: BoardServiceClient | undefined
-
-  private cameraServiceClient: CameraServiceClient | undefined
 
   private gantryServiceClient: GantryServiceClient | undefined
 
@@ -148,13 +145,6 @@ export default class Client {
     return this.boardServiceClient
   }
 
-  get cameraService () {
-    if (!this.cameraServiceClient) {
-      throw new Error(Client.notConnectedYetStr)
-    }
-    return this.cameraServiceClient
-  }
-
   get gantryService () {
     if (!this.gantryServiceClient) {
       throw new Error(Client.notConnectedYetStr)
@@ -237,6 +227,21 @@ export default class Client {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.slamServiceClient
+  }
+
+  get serviceConnection () {
+    const clientTransportFactory = this.sessionOptions?.disabled
+      ? this.transportFactory
+      : this.sessionManager.transportFactory
+
+    if (!clientTransportFactory) {
+      throw new Error(Client.notConnectedYetStr)
+    }
+    const grpcOptions = { transport: clientTransportFactory }
+    return {
+      grpcOptions,
+      serviceHost: this.serviceHost,
+    }
   }
 
   public async disconnect () {
@@ -388,10 +393,6 @@ export default class Client {
         grpcOptions
       )
       this.boardServiceClient = new BoardServiceClient(
-        this.serviceHost,
-        grpcOptions
-      )
-      this.cameraServiceClient = new CameraServiceClient(
         this.serviceHost,
         grpcOptions
       )
