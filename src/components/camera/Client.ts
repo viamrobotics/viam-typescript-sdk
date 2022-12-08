@@ -1,8 +1,37 @@
 import { type Camera, MimeType, Properties } from './Camera'
-import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm'
+import {
+  CameraServiceClient,
+  type ServiceError
+} from '../../gen/component/camera/v1/camera_pb_service.esm'
 import type Client from '../../Client'
 import cameraApi from '../../gen/component/camera/v1/camera_pb.esm'
 import { grpc } from '@improbable-eng/grpc-web'
+
+type Callback<T> = (error: ServiceError | null, response: T | null) => void;
+
+type ServiceFunc<Req, Resp> = (
+  request: Req,
+  metadata: grpc.Metadata,
+  callback: Callback<Resp>
+) => void;
+
+const promisify = function <Req, Resp> (
+  func: ServiceFunc<Req, Resp>,
+  request: Req
+): Promise<Resp> {
+  return new Promise((resolve, reject) => {
+    func(request, new grpc.Metadata(), (error, response) => {
+      if (error) {
+        return reject(error)
+      }
+      if (!response) {
+        // TODO: improve error message?
+        return reject(new Error('no response'))
+      }
+      return resolve(response)
+    })
+  })
+}
 
 export class CameraClient implements Camera {
   private client: Client | undefined
@@ -82,34 +111,21 @@ export class CameraClient implements Camera {
     })
   }
 
-  getPointCloud (): Promise<Uint8Array> {
+  async getPointCloud (): Promise<Uint8Array> {
+    if (!this.cameraService) {
+      // TODO: improve error message?
+      throw new Error('not connected yet')
+    }
+
     const request = new cameraApi.GetPointCloudRequest()
     request.setName(this.name)
     request.setMimeType(MimeType.PCD)
 
-    return new Promise((resolve, reject) => {
-      if (!this.cameraService) {
-        // TODO: improve error message?
-        reject(new Error('not connected yet'))
-        return
-      }
-
-      this.cameraService.getPointCloud(
-        request,
-        new grpc.Metadata(),
-        (error, response) => {
-          if (error) {
-            return reject(error)
-          }
-          if (!response) {
-            // TODO: improve error message?
-            return reject(new Error('no response'))
-          }
-          const result = response.getPointCloud_asU8()
-          return resolve(result)
-        }
-      )
-    })
+    const response = await promisify<
+      cameraApi.GetPointCloudRequest,
+      cameraApi.GetPointCloudResponse
+    >(this.cameraService.getPointCloud, request)
+    return response.getPointCloud_asU8()
   }
 
   getProperties (): Promise<Properties> {
