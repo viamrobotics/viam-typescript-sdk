@@ -3,10 +3,10 @@ import {
   CameraServiceClient,
   type ServiceError
 } from '../../gen/component/camera/v1/camera_pb_service.esm'
-import type { HttpBody } from '../../gen/google/api/http_pb'
 import type Client from '../../Client'
-import cameraApi from '../../gen/component/camera/v1/camera_pb.esm'
+import type { HttpBody } from '../../gen/google/api/httpbody_pb'
 import { grpc } from '@improbable-eng/grpc-web'
+import pb from '../../gen/component/camera/v1/camera_pb.esm'
 
 type Callback<T> = (error: ServiceError | null, response: T | null) => void;
 
@@ -50,73 +50,58 @@ export class CameraClient implements Camera {
     return new CameraServiceClient(serviceHost, grpcOptions)
   }
 
-  getImage (mimeType: MimeType): Promise<Uint8Array> {
-    const request = new cameraApi.GetImageRequest()
+  async getImage (mimeType: MimeType): Promise<Uint8Array> {
+    const cameraService = this.cameraService
+    const request = new pb.GetImageRequest()
     request.setName(this.name)
     request.setMimeType(mimeType)
 
-    return new Promise((resolve, reject) => {
-      this.cameraService.getImage(
-        request,
-        new grpc.Metadata(),
-        (error, response) => {
-          if (error) {
-            return reject(error)
-          }
-          if (!response) {
-            return reject(new Error('no response'))
-          }
-          const bytes = response.getImage_asU8()
-          return resolve(bytes)
-        }
-      )
-    })
+    const response = await promisify<pb.GetImageRequest, pb.GetImageResponse>(
+      cameraService.getImage.bind(cameraService),
+      request
+    )
+
+    return response.getImage_asU8()
   }
 
   async renderFrame (mimeType: MimeType): Promise<Blob> {
     const cameraService = this.cameraService
-    const request = new cameraApi.GetPointCloudRequest()
+    const request = new pb.GetPointCloudRequest()
     request.setName(this.name)
     request.setMimeType(mimeType)
 
-    const response = await promisify<cameraApi.RenderFrameRequest, HttpBody>(
+    const response = await promisify<pb.RenderFrameRequest, HttpBody>(
       cameraService.renderFrame.bind(cameraService),
       request
     )
+
     return new Blob([response.getData_asU8()], { type: mimeType })
   }
 
   async getPointCloud (): Promise<Uint8Array> {
     const cameraService = this.cameraService
-    const request = new cameraApi.GetPointCloudRequest()
+    const request = new pb.GetPointCloudRequest()
     request.setName(this.name)
     request.setMimeType(MimeType.PCD)
 
     const response = await promisify<
-      cameraApi.GetPointCloudRequest,
-      cameraApi.GetPointCloudResponse
+      pb.GetPointCloudRequest,
+      pb.GetPointCloudResponse
     >(cameraService.getPointCloud.bind(cameraService), request)
+
     return response.getPointCloud_asU8()
   }
 
-  getProperties (): Promise<Properties> {
-    const request = new cameraApi.GetPropertiesRequest()
+  async getProperties (): Promise<Properties> {
+    const cameraService = this.cameraService
+    const request = new pb.GetPropertiesRequest()
     request.setName(this.name)
 
-    return new Promise((resolve, reject) => {
-      this.cameraService.getProperties(
-        request,
-        new grpc.Metadata(),
-        (error, response) => {
-          if (error) {
-            return reject(error)
-          }
-          if (!response) {
-            return reject(new Error('no response'))
-          }
-          return resolve(response.toObject())
-        }
-      )
-    })
+    const response = await promisify<
+      pb.GetPropertiesRequest,
+      pb.GetPropertiesResponse
+    >(cameraService.getProperties.bind(cameraService), request)
+
+    return response.toObject()
   }
 }
