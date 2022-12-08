@@ -1,37 +1,9 @@
 import { type Camera, MimeType, Properties } from './Camera'
-import {
-  CameraServiceClient,
-  type ServiceError
-} from '../../gen/component/camera/v1/camera_pb_service.esm'
+import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm'
 import type Client from '../../Client'
 import type { HttpBody } from '../../gen/google/api/httpbody_pb'
-import { grpc } from '@improbable-eng/grpc-web'
 import pb from '../../gen/component/camera/v1/camera_pb.esm'
-
-type Callback<T> = (error: ServiceError | null, response: T | null) => void;
-
-type ServiceFunc<Req, Resp> = (
-  request: Req,
-  metadata: grpc.Metadata,
-  callback: Callback<Resp>
-) => void;
-
-const promisify = function <Req, Resp> (
-  func: ServiceFunc<Req, Resp>,
-  request: Req
-): Promise<Resp> {
-  return new Promise((resolve, reject) => {
-    func(request, new grpc.Metadata(), (error, response) => {
-      if (error) {
-        return reject(error)
-      }
-      if (!response) {
-        return reject(new Error('no response'))
-      }
-      return resolve(response)
-    })
-  })
-}
+import { promisify } from '../../utils'
 
 export class CameraClient implements Camera {
   private client: Client | undefined
