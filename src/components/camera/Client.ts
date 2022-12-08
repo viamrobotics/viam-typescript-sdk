@@ -124,7 +124,7 @@ export class CameraClient implements Camera {
     const response = await promisify<
       cameraApi.GetPointCloudRequest,
       cameraApi.GetPointCloudResponse
-    >(this.cameraService.getPointCloud, request)
+    >(this.cameraService.getPointCloud.bind(this), request)
     return response.getPointCloud_asU8()
   }
 
