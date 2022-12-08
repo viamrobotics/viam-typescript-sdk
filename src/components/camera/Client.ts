@@ -35,7 +35,6 @@ const promisify = function <Req, Resp> (
 export class CameraClient implements Camera {
   private client: Client | undefined
   private readonly name: string
-  public options: grpc.RpcOptions | undefined
 
   constructor (client: Client, name: string) {
     this.client = client
