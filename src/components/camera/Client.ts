@@ -1,13 +1,44 @@
 import { type Camera, MimeType, Properties } from './Camera'
-import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm'
+import {
+  CameraServiceClient,
+  type ServiceError
+} from '../../gen/component/camera/v1/camera_pb_service.esm'
 import type Client from '../../Client'
 import cameraApi from '../../gen/component/camera/v1/camera_pb.esm'
 import { grpc } from '@improbable-eng/grpc-web'
 
+type Callback<T> = (error: ServiceError | null, response: T | null) => void;
+
+type ServiceFunc<Req, Resp> = (
+  request: Req,
+  metadata: grpc.Metadata,
+  callback: Callback<Resp>
+) => void;
+
+const promisify = function <Req, Resp> (
+  func: ServiceFunc<Req, Resp>,
+  request: Req
+): Promise<Resp> {
+  return new Promise((resolve, reject) => {
+    func(request, new grpc.Metadata(), (error, response) => {
+      if (error) {
+        return reject(error)
+      }
+      if (!response) {
+        // TODO: improve error message?
+        return reject(new Error('no response'))
+      }
+      return resolve(response)
+    })
+  })
+}
+
 export class CameraClient implements Camera {
   private client: Client | undefined
   private readonly name: string
+  public options: grpc.RpcOptions | undefined
 
+  // TODO: update interface parameters
   constructor (client: Client, name: string) {
     this.client = client
     this.name = name
@@ -15,7 +46,7 @@ export class CameraClient implements Camera {
 
   private get cameraService () {
     if (!this.client) {
-      throw new Error('not connected yet')
+      return undefined
     }
     const { grpcOptions, serviceHost } = this.client.serviceConnection
     return new CameraServiceClient(serviceHost, grpcOptions)
@@ -27,6 +58,12 @@ export class CameraClient implements Camera {
     request.setMimeType(mimeType)
 
     return new Promise((resolve, reject) => {
+      if (!this.cameraService) {
+        // TODO: improve error message?
+        reject(new Error('not connected yet'))
+        return
+      }
+
       this.cameraService.getImage(
         request,
         new grpc.Metadata(),
@@ -35,6 +72,7 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
+            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           const bytes = response.getImage_asU8()
@@ -50,6 +88,12 @@ export class CameraClient implements Camera {
     request.setMimeType(mimeType)
 
     return new Promise((resolve, reject) => {
+      if (!this.cameraService) {
+        // TODO: improve error message?
+        reject(new Error('not connected yet'))
+        return
+      }
+
       this.cameraService.renderFrame(
         request,
         new grpc.Metadata(),
@@ -58,6 +102,7 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
+            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           const bytes = response.getData_asU8()
@@ -67,27 +112,22 @@ export class CameraClient implements Camera {
     })
   }
 
-  getPointCloud (): Promise<Uint8Array> {
+  async getPointCloud (): Promise<Uint8Array> {
+    const cameraService = this.cameraService
+    if (!cameraService) {
+      // TODO: improve error message?
+      throw new Error('not connected yet')
+    }
+
     const request = new cameraApi.GetPointCloudRequest()
     request.setName(this.name)
     request.setMimeType(MimeType.PCD)
 
-    return new Promise((resolve, reject) => {
-      this.cameraService.getPointCloud(
-        request,
-        new grpc.Metadata(),
-        (error, response) => {
-          if (error) {
-            return reject(error)
-          }
-          if (!response) {
-            return reject(new Error('no response'))
-          }
-          const result = response.getPointCloud_asU8()
-          return resolve(result)
-        }
-      )
-    })
+    const response = await promisify<
+      cameraApi.GetPointCloudRequest,
+      cameraApi.GetPointCloudResponse
+    >(cameraService.getPointCloud.bind(cameraService), request)
+    return response.getPointCloud_asU8()
   }
 
   getProperties (): Promise<Properties> {
@@ -95,6 +135,12 @@ export class CameraClient implements Camera {
     request.setName(this.name)
 
     return new Promise((resolve, reject) => {
+      if (!this.cameraService) {
+        // TODO: improve error message?
+        reject(new Error('not connected yet'))
+        return
+      }
+
       this.cameraService.getProperties(
         request,
         new grpc.Metadata(),
@@ -103,6 +149,7 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
+            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           return resolve(response.toObject())
