@@ -3,6 +3,7 @@ import {
   CameraServiceClient,
   type ServiceError
 } from '../../gen/component/camera/v1/camera_pb_service.esm'
+import type { HttpBody } from '../../gen/google/api/http_pb'
 import type Client from '../../Client'
 import cameraApi from '../../gen/component/camera/v1/camera_pb.esm'
 import { grpc } from '@improbable-eng/grpc-web'
@@ -72,27 +73,17 @@ export class CameraClient implements Camera {
     })
   }
 
-  renderFrame (mimeType: MimeType): Promise<Blob> {
+  async renderFrame (mimeType: MimeType): Promise<Blob> {
+    const cameraService = this.cameraService
     const request = new cameraApi.GetPointCloudRequest()
     request.setName(this.name)
     request.setMimeType(mimeType)
 
-    return new Promise((resolve, reject) => {
-      this.cameraService.renderFrame(
-        request,
-        new grpc.Metadata(),
-        (error, response) => {
-          if (error) {
-            return reject(error)
-          }
-          if (!response) {
-            return reject(new Error('no response'))
-          }
-          const bytes = response.getData_asU8()
-          return resolve(new Blob([bytes], { type: mimeType }))
-        }
-      )
-    })
+    const response = await promisify<cameraApi.RenderFrameRequest, HttpBody>(
+      cameraService.renderFrame.bind(cameraService),
+      request
+    )
+    return new Blob([response.getData_asU8()], { type: mimeType })
   }
 
   async getPointCloud (): Promise<Uint8Array> {
