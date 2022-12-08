@@ -8,7 +8,6 @@ export class CameraClient implements Camera {
   private client: Client | undefined
   private readonly name: string
 
-  // TODO: update interface parameters
   constructor (client: Client, name: string) {
     this.client = client
     this.name = name
@@ -16,7 +15,7 @@ export class CameraClient implements Camera {
 
   private get cameraService () {
     if (!this.client) {
-      return undefined
+      throw new Error('not connected yet')
     }
     const { grpcOptions, serviceHost } = this.client.serviceConnection
     return new CameraServiceClient(serviceHost, grpcOptions)
@@ -28,12 +27,6 @@ export class CameraClient implements Camera {
     request.setMimeType(mimeType)
 
     return new Promise((resolve, reject) => {
-      if (!this.cameraService) {
-        // TODO: improve error message?
-        reject(new Error('not connected yet'))
-        return
-      }
-
       this.cameraService.getImage(
         request,
         new grpc.Metadata(),
@@ -42,7 +35,6 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
-            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           const bytes = response.getImage_asU8()
@@ -58,12 +50,6 @@ export class CameraClient implements Camera {
     request.setMimeType(mimeType)
 
     return new Promise((resolve, reject) => {
-      if (!this.cameraService) {
-        // TODO: improve error message?
-        reject(new Error('not connected yet'))
-        return
-      }
-
       this.cameraService.renderFrame(
         request,
         new grpc.Metadata(),
@@ -72,7 +58,6 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
-            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           const bytes = response.getData_asU8()
@@ -88,12 +73,6 @@ export class CameraClient implements Camera {
     request.setMimeType(MimeType.PCD)
 
     return new Promise((resolve, reject) => {
-      if (!this.cameraService) {
-        // TODO: improve error message?
-        reject(new Error('not connected yet'))
-        return
-      }
-
       this.cameraService.getPointCloud(
         request,
         new grpc.Metadata(),
@@ -102,7 +81,6 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
-            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           const result = response.getPointCloud_asU8()
@@ -117,12 +95,6 @@ export class CameraClient implements Camera {
     request.setName(this.name)
 
     return new Promise((resolve, reject) => {
-      if (!this.cameraService) {
-        // TODO: improve error message?
-        reject(new Error('not connected yet'))
-        return
-      }
-
       this.cameraService.getProperties(
         request,
         new grpc.Metadata(),
@@ -131,7 +103,6 @@ export class CameraClient implements Camera {
             return reject(error)
           }
           if (!response) {
-            // TODO: improve error message?
             return reject(new Error('no response'))
           }
           return resolve(response.toObject())
