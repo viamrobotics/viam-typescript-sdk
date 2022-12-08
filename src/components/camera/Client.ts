@@ -36,6 +36,7 @@ const promisify = function <Req, Resp> (
 export class CameraClient implements Camera {
   private client: Client | undefined
   private readonly name: string
+  public options: grpc.RpcOptions | undefined
 
   // TODO: update interface parameters
   constructor (client: Client, name: string) {
@@ -48,7 +49,12 @@ export class CameraClient implements Camera {
       return undefined
     }
     const { grpcOptions, serviceHost } = this.client.serviceConnection
-    return new CameraServiceClient(serviceHost, grpcOptions)
+    // HACK, necessary for promisify to work?
+    this.options = grpcOptions
+    const client = new CameraServiceClient(serviceHost, grpcOptions)
+    // HACK, necessary for promisify to work?
+    client.options = grpcOptions
+    return client
   }
 
   getImage (mimeType: MimeType): Promise<Uint8Array> {
@@ -112,7 +118,8 @@ export class CameraClient implements Camera {
   }
 
   async getPointCloud (): Promise<Uint8Array> {
-    if (!this.cameraService) {
+    const cameraService = this.cameraService
+    if (!cameraService) {
       // TODO: improve error message?
       throw new Error('not connected yet')
     }
@@ -124,7 +131,7 @@ export class CameraClient implements Camera {
     const response = await promisify<
       cameraApi.GetPointCloudRequest,
       cameraApi.GetPointCloudResponse
-    >(this.cameraService.getPointCloud.bind(this), request)
+    >(cameraService.getPointCloud.bind(cameraService), request)
     return response.getPointCloud_asU8()
   }
 
