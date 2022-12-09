@@ -27,5 +27,9 @@ build: buf
 	# much smaller javascript bundles.
 	NODE_OPTIONS="--max-old-space-size=16384" npm run build
 
+# LOCAL DEVELOPMENT HELPERS
+
+# build and create a tarball from a package - useful for local testing,
+# inspecting what is included in the final distribution, and local publishing.
 pack: build
 	npm pack
