@@ -1,14 +1,14 @@
 
 export interface Motor {
-  setPower(power: number,direction: string):any;
-      
-  goFor(rpm:number,direction:string,revolutions:number):any;
-    
-  goTo(rpm:number, position:number):any;
-    
-  motorStop() :any
-  
-  getProperties () :any;
+  setPower(power: number, direction: string):Promise<Object>;
 
-  getPosition():any
+  goFor(rpm:number, direction:string, revolutions:number):Promise<Object>;
+
+  goTo(rpm:number, position:number):Promise<Object>;
+
+  motorStop() :Promise<Object>
+
+  getProperties() :Promise<boolean>;
+
+  getPosition():Promise<number>;
 }

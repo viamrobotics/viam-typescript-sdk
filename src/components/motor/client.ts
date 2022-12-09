@@ -1,11 +1,9 @@
-import { grpc } from '@improbable-eng/grpc-web';
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm'
-import type { ServiceError } from "../../gen/robot/v1/robot_pb_service.esm";
 import { motorApi } from '../../main';
 import type { Motor } from './motor';
+import { Promisify, rcLogConditionally } from '../ComponentUtils';
 
-
-class MotorClient implements Motor {
+export class MotorClient implements Motor {
     private mc: MotorServiceClient
     private name: string;
 
@@ -15,82 +13,85 @@ class MotorClient implements Motor {
     }
 
     async setPower (power: number,direction: string){
-        
         const powerPct = power * setDirection(direction) / 100;
-        
         const req = new motorApi.SetPowerRequest();
         req.setName(this.name);
         req.setPowerPct(powerPct);
-      
         rcLogConditionally(req);
-        this.mc.setPower(req, new grpc.Metadata(), displayError)
+
+        let resultProm = await Promisify
+        <motorApi.SetPowerRequest,motorApi.SetPowerResponse>
+        (this.mc.setPower,req)
+
+        return resultProm.toObject()
       };
       
     async goFor(rpm:number,direction:string,revolutions:number){
+        
         const req = new motorApi.GoForRequest();
         req.setName(this.name);
         req.setRpm(rpm * setDirection(direction));
         req.setRevolutions(revolutions);
-      
         rcLogConditionally(req);
-        this.mc.goFor(req, new grpc.Metadata(), displayError);
+
+        let resultProm = await Promisify
+        <motorApi.GoForRequest,motorApi.GoForResponse>
+        (this.mc.goFor, req);
+
+        return resultProm.toObject()
       };
       
     async goTo(rpm:number, position:number){
+        
         const req = new motorApi.GoToRequest();
         req.setName(this.name);
         req.setRpm(rpm);
         req.setPositionRevolutions(position);
-      
         rcLogConditionally(req);
-        this.mc.goTo(req, new grpc.Metadata(), displayError);
+
+        let resultProm = await Promisify
+        <motorApi.GoToRequest,motorApi.GoToResponse>
+        (this.mc.goTo,req)
+
+        return resultProm.toObject()
       };
       
     async motorStop() {
+
         const req = new motorApi.StopRequest();
         req.setName(this.name);
-      
         rcLogConditionally(req);
-        this.mc.stop(req, new grpc.Metadata(), displayError);
+
+        let resultProm = await Promisify
+        <motorApi.StopRequest,motorApi.StopResponse>
+        (this.mc.stop, req)
+
+        return resultProm.toObject()
       };
     
     async getProperties () {
         const req = new motorApi.GetPropertiesRequest();
         req.setName(this.name)
-        rcLogConditionally(req)
-        this.mc.getProperties(req, new grpc.Metadata(),callback)
+
+        let resultProm = await Promisify
+        <motorApi.GetPropertiesRequest,motorApi.GetPropertiesResponse>
+        (this.mc.getProperties,req)
+
+        return resultProm.getPositionReporting()
     }
 
     async getPosition() {
         const req = new motorApi.GetPositionRequest();
         req.setName(this.name)
-        this.mc.getPosition(req, new grpc.Metadata(), callback)
-        callback.
+
+        rcLogConditionally(req)
+        let resultProm = await Promisify
+        <motorApi.GetPositionRequest,motorApi.GetPositionResponse>
+        (this.mc.getPosition,req)
+        
+        return resultProm.getPosition()
     }
 }
-
-export const callback = (error: ServiceError | null, res: motorApi.GetPropertiesResponse| null ) => (){
-
-}
-
-// function meow(error: ServiceError | null, res: motorApi.GetPropertiesResponse| null ): (motorApi.GetPropertiesResponse| null ){
-//     return  res
-// }
-
-
-
-export const displayError = (error: ServiceError | null) => {
-    if (error) {
-      console.error(error);
-    }
-  };
-
-  export const rcLogConditionally = (req: unknown) => {
-    if (window) {
-      console.log('gRPC call:', req);
-    }
-  };
-
 
 function setDirection(value: string):number {
     switch (value) {
