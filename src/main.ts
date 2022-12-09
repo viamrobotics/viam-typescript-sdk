@@ -1,7 +1,9 @@
 import * as Camera from './components/camera/Camera'
 import { CameraClient } from './components/camera/Client'
 import Client from './Client'
-// TODO: remove these exports once RDK stops using them
+
+// eslint-disable-next-line no-warning-comments
+// TODO(RSDK-1017): remove this export once RDK stops using it directly
 import { RobotService } from './gen/robot/v1/robot_pb_service.esm'
 
 import armApi from './gen/component/arm/v1/arm_pb.esm'
@@ -55,4 +57,3 @@ export type {
   ResponseStream,
   ServiceError
 } from './gen/robot/v1/robot_pb_service.esm'
-
