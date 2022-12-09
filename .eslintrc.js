@@ -71,6 +71,6 @@ module.exports = {
     'semi': ['error', 'never'],
 
     '@typescript-eslint/prefer-for-of': 'off',
-    '@typescript-eslint/no-shadow': ['error'],
+    '@typescript-eslint/no-shadow': ['error'], // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358
   },
 }
