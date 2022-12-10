@@ -6,7 +6,7 @@ import pb from '../../gen/component/camera/v1/camera_pb.esm'
 import { promisify } from '../../utils'
 
 export class CameraClient implements Camera {
-  private client: Client | undefined
+  private client: Client
   private readonly name: string
 
   constructor (client: Client, name: string) {
@@ -15,11 +15,7 @@ export class CameraClient implements Camera {
   }
 
   private get cameraService () {
-    if (!this.client) {
-      throw new Error('not connected yet')
-    }
-    const { grpcOptions, serviceHost } = this.client.serviceConnection
-    return new CameraServiceClient(serviceHost, grpcOptions)
+    return this.client.createServiceClient(CameraServiceClient)
   }
 
   async getImage (mimeType: MimeType): Promise<Uint8Array> {

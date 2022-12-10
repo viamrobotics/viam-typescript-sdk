@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial'
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc'
 import { ArmServiceClient } from './gen/component/arm/v1/arm_pb_service.esm'
@@ -29,6 +30,10 @@ interface WebRTCOptions {
 
 interface SessionOptions {
   disabled: boolean
+}
+
+abstract class ServiceClient {
+  constructor (public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 export default class Client {
@@ -220,7 +225,7 @@ export default class Client {
     return this.slamServiceClient
   }
 
-  get serviceConnection () {
+  createServiceClient<T extends ServiceClient> (SC: new (serviceHost: string, options?: grpc.RpcOptions) => T): T {
     const clientTransportFactory = this.sessionOptions?.disabled
       ? this.transportFactory
       : this.sessionManager.transportFactory
@@ -229,10 +234,7 @@ export default class Client {
       throw new Error(Client.notConnectedYetStr)
     }
     const grpcOptions = { transport: clientTransportFactory }
-    return {
-      grpcOptions,
-      serviceHost: this.serviceHost,
-    }
+    return new SC(this.serviceHost, grpcOptions)
   }
 
   public async disconnect () {
