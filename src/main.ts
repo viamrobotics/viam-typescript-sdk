@@ -1,4 +1,7 @@
+import * as Camera from './components/camera/Camera'
+import { CameraClient } from './components/camera/Client'
 import Client from './Client'
+
 import armApi from './gen/component/arm/v1/arm_pb.esm'
 import baseApi from './gen/component/base/v1/base_pb.esm'
 import boardApi from './gen/component/board/v1/board_pb.esm'
@@ -39,8 +42,13 @@ export {
   slamApi,
   visionApi,
   streamApi,
+  Camera,
+  CameraClient,
   Client
 }
 
 // It doesn't matter which ServiceError we export really.
-export type { ResponseStream, ServiceError } from './gen/robot/v1/robot_pb_service.esm'
+export type {
+  ResponseStream,
+  ServiceError
+} from './gen/robot/v1/robot_pb_service.esm'

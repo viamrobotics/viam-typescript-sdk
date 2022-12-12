@@ -1,9 +1,9 @@
+/* eslint-disable max-classes-per-file */
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial'
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc'
 import { ArmServiceClient } from './gen/component/arm/v1/arm_pb_service.esm'
 import { BaseServiceClient } from './gen/component/base/v1/base_pb_service.esm'
 import { BoardServiceClient } from './gen/component/board/v1/board_pb_service.esm'
-import { CameraServiceClient } from './gen/component/camera/v1/camera_pb_service.esm'
 import { GantryServiceClient } from './gen/component/gantry/v1/gantry_pb_service.esm'
 import { GenericServiceClient } from './gen/component/generic/v1/generic_pb_service.esm'
 import { GripperServiceClient } from './gen/component/gripper/v1/gripper_pb_service.esm'
@@ -30,6 +30,10 @@ interface WebRTCOptions {
 
 interface SessionOptions {
   disabled: boolean
+}
+
+abstract class ServiceClient {
+  constructor (public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 export default class Client {
@@ -59,8 +63,6 @@ export default class Client {
   private baseServiceClient: BaseServiceClient | undefined
 
   private boardServiceClient: BoardServiceClient | undefined
-
-  private cameraServiceClient: CameraServiceClient | undefined
 
   private gantryServiceClient: GantryServiceClient | undefined
 
@@ -137,13 +139,6 @@ export default class Client {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.boardServiceClient
-  }
-
-  get cameraService () {
-    if (!this.cameraServiceClient) {
-      throw new Error(Client.notConnectedYetStr)
-    }
-    return this.cameraServiceClient
   }
 
   get gantryService () {
@@ -228,6 +223,18 @@ export default class Client {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.slamServiceClient
+  }
+
+  createServiceClient<T extends ServiceClient> (SC: new (serviceHost: string, options?: grpc.RpcOptions) => T): T {
+    const clientTransportFactory = this.sessionOptions?.disabled
+      ? this.transportFactory
+      : this.sessionManager.transportFactory
+
+    if (!clientTransportFactory) {
+      throw new Error(Client.notConnectedYetStr)
+    }
+    const grpcOptions = { transport: clientTransportFactory }
+    return new SC(this.serviceHost, grpcOptions)
   }
 
   public async disconnect () {
@@ -354,7 +361,6 @@ export default class Client {
       this.armServiceClient = new ArmServiceClient(this.serviceHost, grpcOptions)
       this.baseServiceClient = new BaseServiceClient(this.serviceHost, grpcOptions)
       this.boardServiceClient = new BoardServiceClient(this.serviceHost, grpcOptions)
-      this.cameraServiceClient = new CameraServiceClient(this.serviceHost, grpcOptions)
       this.gantryServiceClient = new GantryServiceClient(this.serviceHost, grpcOptions)
       this.genericServiceClient = new GenericServiceClient(this.serviceHost, grpcOptions)
       this.gripperServiceClient = new GripperServiceClient(this.serviceHost, grpcOptions)
