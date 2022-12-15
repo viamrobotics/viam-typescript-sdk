@@ -14,77 +14,78 @@ export class BaseClient implements Base {
     this.name = name
   }
 
-  private get baseClient () {
+  private get baseService () {
     return this.client
   }
 
   async moveStraight (distanceMm: number, mmPerSec: number, extra = {}) {
-    const bc = this.baseClient
-    const req = new baseApi.MoveStraightRequest()
-    req.setName(this.name)
-    req.setMmPerSec(mmPerSec)
-    req.setDistanceMm(distanceMm)
-    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const resultProm = await promisify<baseApi.MoveStraightRequest, baseApi.MoveStraightResponse>(
-      bc.moveStraight.bind(bc),
-      req
+    const baseService = this.baseService
+    const request = new baseApi.MoveStraightRequest()
+    request.setName(this.name)
+    request.setMmPerSec(mmPerSec)
+    request.setDistanceMm(distanceMm)
+    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+
+    const response = await promisify<baseApi.MoveStraightRequest, baseApi.MoveStraightResponse>(
+      baseService.moveStraight.bind(baseService),
+      request
     )
-    return resultProm
+    return response
   }
 
   async spin (angleDeg:number, degsPerSec:number, extra = {}) {
-    const bc = this.baseClient
-    const req = new baseApi.SpinRequest()
-    req.setName(this.name)
-    req.setAngleDeg(angleDeg)
-    req.setDegsPerSec(degsPerSec)
-    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const resultProm = await promisify<baseApi.SpinRequest, baseApi.SpinResponse>(
-      bc.spin.bind(bc),
-      req
+    const baseService = this.baseService
+    const request = new baseApi.SpinRequest()
+    request.setName(this.name)
+    request.setAngleDeg(angleDeg)
+    request.setDegsPerSec(degsPerSec)
+    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const response = await promisify<baseApi.SpinRequest, baseApi.SpinResponse>(
+      baseService.spin.bind(baseService),
+      request
     )
 
-    return resultProm
+    return response
   }
   async setPower (linear:commonApi.Vector3, angular:commonApi.Vector3, extra = {}) {
-    const bc = this.baseClient
-    const req = new baseApi.SetPowerRequest()
-    req.setName(this.name)
-    req.setLinear(linear)
-    req.setAngular(angular)
-    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const resultProm = await promisify<baseApi.SetPowerRequest, baseApi.SetPowerResponse>(
-      bc.setPower.bind(bc),
-      req
+    const baseService = this.baseService
+    const request = new baseApi.SetPowerRequest()
+    request.setName(this.name)
+    request.setLinear(linear)
+    request.setAngular(angular)
+    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const response = await promisify<baseApi.SetPowerRequest, baseApi.SetPowerResponse>(
+      baseService.setPower.bind(baseService),
+      request
     )
 
-    return resultProm
+    return response
   }
 
   async setVelocity (linear:commonApi.Vector3, angular:commonApi.Vector3, extra = {}) {
-    const bc = this.baseClient
-    const req = new baseApi.SetVelocityRequest()
-    req.setName(this.name)
-    req.setLinear(linear)
-    req.setAngular(angular)
-    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const resultProm = await promisify<baseApi.SetVelocityRequest, baseApi.SetVelocityResponse>(
-      bc.setVelocity.bind(bc),
-      req
+    const baseService = this.baseService
+    const request = new baseApi.SetVelocityRequest()
+    request.setName(this.name)
+    request.setLinear(linear)
+    request.setAngular(angular)
+    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const response = await promisify<baseApi.SetVelocityRequest, baseApi.SetVelocityResponse>(
+      baseService.setVelocity.bind(baseService),
+      request
     )
 
-    return resultProm
+    return response
   }
 
   async stop (extra = {}) {
-    const bc = this.baseClient
-    const req = new baseApi.StopRequest()
-    req.setName(this.name)
-    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const resultProm = await promisify<baseApi.StopRequest, baseApi.StopResponse>(
-      bc.stop.bind(bc),
-      req
+    const baseService = this.baseService
+    const request = new baseApi.StopRequest()
+    request.setName(this.name)
+    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const response = await promisify<baseApi.StopRequest, baseApi.StopResponse>(
+      baseService.stop.bind(baseService),
+      request
     )
-    return resultProm
+    return response
   }
 }
