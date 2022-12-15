@@ -1,109 +1,123 @@
+import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb'
+import type Client from '../../Client'
+import type { Motor } from './Motor'
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm'
-import { motorApi } from '../../main';
-import type { Motor } from './motor';
-import { Promisify, rcLogConditionally } from '../ComponentUtils';
+import { motorApi } from '../../main'
+import { promisify } from '../../utils'
 
 export class MotorClient implements Motor {
-    private mc: MotorServiceClient
-    private name: string;
+  private client: MotorServiceClient
+  private name: string
 
-    constructor(serviceHost: string, name:string){
-        this.mc = new MotorServiceClient(serviceHost);
-        this.name = name;
-    }
+  constructor (client: Client, name:string) {
+    this.client = client.createServiceClient(MotorServiceClient)
+    this.name = name
+  }
 
-    async setPower (power: number,direction: string){
-        const powerPct = power * setDirection(direction) / 100;
-        const req = new motorApi.SetPowerRequest();
-        req.setName(this.name);
-        req.setPowerPct(powerPct);
-        rcLogConditionally(req);
+  private get motorClient () {
+    return this.client
+  }
 
-        let resultProm = await Promisify
-        <motorApi.SetPowerRequest,motorApi.SetPowerResponse>
-        (this.mc.setPower,req)
+  async setPower (power: number, extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.SetPowerRequest()
+    req.setName(this.name)
+    req.setPowerPct(power)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.SetPowerRequest, motorApi.SetPowerResponse>(
+      mc.setPower.bind(mc),
+      req
+    )
+    return result
+  }
 
-        return resultProm.toObject()
-      };
-      
-    async goFor(rpm:number,direction:string,revolutions:number){
-        
-        const req = new motorApi.GoForRequest();
-        req.setName(this.name);
-        req.setRpm(rpm * setDirection(direction));
-        req.setRevolutions(revolutions);
-        rcLogConditionally(req);
+  async goFor (rpm:number, revolutions:number, extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.GoForRequest()
+    req.setName(this.name)
+    req.setRpm(rpm)
+    req.setRevolutions(revolutions)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.GoForRequest, motorApi.GoForResponse>(
+      mc.goFor.bind(mc),
+      req
+    )
+    return result
+  }
 
-        let resultProm = await Promisify
-        <motorApi.GoForRequest,motorApi.GoForResponse>
-        (this.mc.goFor, req);
+  async goTo (rpm:number, positionRevolutions:number, extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.GoToRequest()
+    req.setName(this.name)
+    req.setRpm(rpm)
+    req.setPositionRevolutions(positionRevolutions)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.GoToRequest, motorApi.GoToResponse>(
+      mc.goTo.bind(mc),
+      req
+    )
+    return result
+  }
 
-        return resultProm.toObject()
-      };
-      
-    async goTo(rpm:number, position:number){
-        
-        const req = new motorApi.GoToRequest();
-        req.setName(this.name);
-        req.setRpm(rpm);
-        req.setPositionRevolutions(position);
-        rcLogConditionally(req);
+  async resetZeroPosition (offset:number, extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.ResetZeroPositionRequest()
+    req.setName(this.name)
+    req.setOffset(offset)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.ResetZeroPositionRequest, motorApi.ResetZeroPositionResponse>(
+      mc.resetZeroPosition.bind(mc),
+      req
+    )
+    return result
+  }
 
-        let resultProm = await Promisify
-        <motorApi.GoToRequest,motorApi.GoToResponse>
-        (this.mc.goTo,req)
+  async motorStop (extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.StopRequest()
+    req.setName(this.name)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.StopRequest, motorApi.StopResponse>(
+      mc.stop.bind(mc),
+      req
+    )
+    return result
+  }
 
-        return resultProm.toObject()
-      };
-      
-    async motorStop() {
+  async getProperties (extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.GetPropertiesRequest()
+    req.setName(this.name)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.GetPropertiesRequest, motorApi.GetPropertiesResponse>(
+      mc.getProperties.bind(mc),
+      req
+    )
+    return { positionReporting: result.getPositionReporting() }
+  }
 
-        const req = new motorApi.StopRequest();
-        req.setName(this.name);
-        rcLogConditionally(req);
+  async getPosition (extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.GetPositionRequest()
+    req.setName(this.name)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.GetPositionRequest, motorApi.GetPositionResponse>(
+      mc.getPosition.bind(mc),
+      req
+    )
+    return result.getPosition()
+  }
 
-        let resultProm = await Promisify
-        <motorApi.StopRequest,motorApi.StopResponse>
-        (this.mc.stop, req)
-
-        return resultProm.toObject()
-      };
-    
-    async getProperties () {
-        const req = new motorApi.GetPropertiesRequest();
-        req.setName(this.name)
-
-        let resultProm = await Promisify
-        <motorApi.GetPropertiesRequest,motorApi.GetPropertiesResponse>
-        (this.mc.getProperties,req)
-
-        return resultProm.getPositionReporting()
-    }
-
-    async getPosition() {
-        const req = new motorApi.GetPositionRequest();
-        req.setName(this.name)
-
-        rcLogConditionally(req)
-        let resultProm = await Promisify
-        <motorApi.GetPositionRequest,motorApi.GetPositionResponse>
-        (this.mc.getPosition,req)
-        
-        return resultProm.getPosition()
-    }
+  async isPowered (extra = {}) {
+    const mc = this.motorClient
+    const req = new motorApi.IsPoweredRequest()
+    req.setName(this.name)
+    req.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+    const result = await promisify<motorApi.IsPoweredRequest, motorApi.IsPoweredResponse>(
+      mc.isPowered.bind(mc),
+      req
+    )
+    return [result.getIsOn(), result.getPowerPct()]
+  }
 }
 
-function setDirection(value: string):number {
-    switch (value) {
-      case 'Forwards': {
-        return  1;
-      }
-      case 'Backwards': {
-        return  -1;
-        
-      }
-      default: {
-        return  1;
-      }
-    }
-  };
