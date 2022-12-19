@@ -117,7 +117,7 @@ export class MotorClient implements Motor {
       motorService.isPowered.bind(motorService),
       request
     )
-    return [response.getIsOn(), response.getPowerPct()]
+    return [response.getIsOn(), response.getPowerPct()] as const
   }
 }
 

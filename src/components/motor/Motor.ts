@@ -13,5 +13,5 @@ export interface Motor {
   motorStop(extra?:Map<string, any>) :Promise<motorApi.StopResponse>;
   getProperties(extra?:Map<string, any>) :Promise<Properties>;
   getPosition(extra?:Map<string, any>):Promise<number>;
-  isPowered(extra?:Map<string, any>):Promise<(number | boolean)[]>;
+  isPowered(extra?:Map<string, any>):Promise<readonly [boolean, number]>;
 }
