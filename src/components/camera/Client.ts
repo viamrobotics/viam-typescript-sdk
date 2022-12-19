@@ -1,4 +1,4 @@
-import { type Camera, MimeType, Properties } from './Camera'
+import { type Camera, MimeType } from './Camera'
 import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm'
 import type Client from '../../Client'
 import type { HttpBody } from '../../gen/google/api/httpbody_pb'
@@ -6,19 +6,19 @@ import pb from '../../gen/component/camera/v1/camera_pb.esm'
 import { promisify } from '../../utils'
 
 export class CameraClient implements Camera {
-  private client: Client
+  private client: CameraServiceClient
   private readonly name: string
 
   constructor (client: Client, name: string) {
-    this.client = client
+    this.client = client.createServiceClient(CameraServiceClient)
     this.name = name
   }
 
   private get cameraService () {
-    return this.client.createServiceClient(CameraServiceClient)
+    return this.client
   }
 
-  async getImage (mimeType: MimeType): Promise<Uint8Array> {
+  async getImage (mimeType: MimeType) {
     const cameraService = this.cameraService
     const request = new pb.GetImageRequest()
     request.setName(this.name)
@@ -32,7 +32,7 @@ export class CameraClient implements Camera {
     return response.getImage_asU8()
   }
 
-  async renderFrame (mimeType: MimeType): Promise<Blob> {
+  async renderFrame (mimeType: MimeType) {
     const cameraService = this.cameraService
     const request = new pb.GetPointCloudRequest()
     request.setName(this.name)
@@ -46,7 +46,7 @@ export class CameraClient implements Camera {
     return new Blob([response.getData_asU8()], { type: mimeType })
   }
 
-  async getPointCloud (): Promise<Uint8Array> {
+  async getPointCloud () {
     const cameraService = this.cameraService
     const request = new pb.GetPointCloudRequest()
     request.setName(this.name)
@@ -60,7 +60,7 @@ export class CameraClient implements Camera {
     return response.getPointCloud_asU8()
   }
 
-  async getProperties (): Promise<Properties> {
+  async getProperties () {
     const cameraService = this.cameraService
     const request = new pb.GetPropertiesRequest()
     request.setName(this.name)
