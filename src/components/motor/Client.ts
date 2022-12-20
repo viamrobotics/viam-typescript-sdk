@@ -9,7 +9,7 @@ export class MotorClient implements Motor {
   private client: MotorServiceClient
   private name: string
 
-  constructor (client: Client, name:string) {
+  constructor (client: Client, name: string) {
     this.client = client.createServiceClient(MotorServiceClient)
     this.name = name
   }
@@ -31,7 +31,7 @@ export class MotorClient implements Motor {
     return response
   }
 
-  async goFor (rpm:number, revolutions:number, extra = {}) {
+  async goFor (rpm: number, revolutions: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.GoForRequest()
     request.setName(this.name)
@@ -45,7 +45,7 @@ export class MotorClient implements Motor {
     return response
   }
 
-  async goTo (rpm:number, positionRevolutions:number, extra = {}) {
+  async goTo (rpm: number, positionRevolutions: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.GoToRequest()
     request.setName(this.name)
@@ -59,7 +59,7 @@ export class MotorClient implements Motor {
     return response
   }
 
-  async resetZeroPosition (offset:number, extra = {}) {
+  async resetZeroPosition (offset: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.ResetZeroPositionRequest()
     request.setName(this.name)

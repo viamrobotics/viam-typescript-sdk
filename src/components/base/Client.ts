@@ -9,7 +9,7 @@ export class BaseClient implements Base {
   private client: BaseServiceClient
   private name: string
 
-  constructor (client: Client, name:string) {
+  constructor (client: Client, name: string) {
     this.client = client.createServiceClient(BaseServiceClient)
     this.name = name
   }
@@ -33,7 +33,7 @@ export class BaseClient implements Base {
     return response
   }
 
-  async spin (angleDeg:number, degsPerSec:number, extra = {}) {
+  async spin (angleDeg: number, degsPerSec: number, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.SpinRequest()
     request.setName(this.name)
@@ -47,7 +47,7 @@ export class BaseClient implements Base {
 
     return response
   }
-  async setPower (linear:commonApi.Vector3, angular:commonApi.Vector3, extra = {}) {
+  async setPower (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.SetPowerRequest()
     request.setName(this.name)
@@ -62,7 +62,7 @@ export class BaseClient implements Base {
     return response
   }
 
-  async setVelocity (linear:commonApi.Vector3, angular:commonApi.Vector3, extra = {}) {
+  async setVelocity (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.SetVelocityRequest()
     request.setName(this.name)
