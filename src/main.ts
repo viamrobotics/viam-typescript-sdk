@@ -6,6 +6,7 @@ import { BaseClient } from './components/base/Client'
 import { CameraClient } from './components/camera/Client'
 import Client from './Client'
 import { MotorClient } from './components/motor/Client'
+import { StreamClient } from './extra/stream/Client'
 
 import armApi from './gen/component/arm/v1/arm_pb.esm'
 import baseApi from './gen/component/base/v1/base_pb.esm'
@@ -53,7 +54,8 @@ export {
   BaseClient,
   CameraClient,
   Client,
-  MotorClient
+  MotorClient,
+  StreamClient
 }
 
 // It doesn't matter which ServiceError we export really.

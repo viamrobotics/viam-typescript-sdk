@@ -1,6 +1,6 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
@@ -8,6 +8,7 @@
   "files": [
     "dist/Client.*",
     "dist/components/**/*.d.ts",
+    "dist/extra/**/*.d.ts",
     "dist/main.*",
     "dist/gen/**/*.esm.d.ts",
     "dist/gen/**/*.d.ts"
