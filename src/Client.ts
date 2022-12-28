@@ -17,7 +17,6 @@ import { SLAMServiceClient } from './gen/service/slam/v1/slam_pb_service.esm'
 import { SensorsServiceClient } from './gen/service/sensors/v1/sensors_pb_service.esm'
 import { ServoServiceClient } from './gen/component/servo/v1/servo_pb_service.esm'
 import SessionManager from './SessionManager'
-import { StreamServiceClient } from './gen/proto/stream/v1/stream_pb_service.esm'
 import { VisionServiceClient } from './gen/service/vision/v1/vision_pb_service.esm'
 import type { grpc } from '@improbable-eng/grpc-web'
 
@@ -53,8 +52,6 @@ export default class Client {
   private savedAuthEntity: string | undefined
 
   private savedCreds: Credentials | undefined
-
-  private streamServiceClient: StreamServiceClient | undefined
 
   private robotServiceClient: RobotServiceClient | undefined
 
@@ -105,13 +102,6 @@ export default class Client {
   }
 
   private static readonly notConnectedYetStr = 'not connected yet'
-
-  get streamService () {
-    if (!this.streamServiceClient) {
-      throw new Error(Client.notConnectedYetStr)
-    }
-    return this.streamServiceClient
-  }
 
   get robotService () {
     if (!this.robotServiceClient) {
@@ -354,7 +344,6 @@ export default class Client {
       const clientTransportFactory = this.sessionOptions?.disabled ? this.transportFactory : this.sessionManager.transportFactory
       const grpcOptions = { transport: clientTransportFactory }
 
-      this.streamServiceClient = new StreamServiceClient(this.serviceHost, grpcOptions)
       this.robotServiceClient = new RobotServiceClient(this.serviceHost, grpcOptions)
       // eslint-disable-next-line no-warning-comments
       // TODO(RSDK-144): these should be created as needed
