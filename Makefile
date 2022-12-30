@@ -13,6 +13,7 @@ install:
 	npm ci --audit=false
 
 lint: install
+	npm run format
 	npm run lint
 	npm run typecheck
 	npm run check
