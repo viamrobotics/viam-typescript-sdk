@@ -9,16 +9,16 @@ export class CameraClient implements Camera {
   private client: CameraServiceClient
   private readonly name: string
 
-  constructor (client: Client, name: string) {
+  constructor(client: Client, name: string) {
     this.client = client.createServiceClient(CameraServiceClient)
     this.name = name
   }
 
-  private get cameraService () {
+  private get cameraService() {
     return this.client
   }
 
-  async getImage (mimeType: MimeType) {
+  async getImage(mimeType: MimeType) {
     const cameraService = this.cameraService
     const request = new pb.GetImageRequest()
     request.setName(this.name)
@@ -32,7 +32,7 @@ export class CameraClient implements Camera {
     return response.getImage_asU8()
   }
 
-  async renderFrame (mimeType: MimeType) {
+  async renderFrame(mimeType: MimeType) {
     const cameraService = this.cameraService
     const request = new pb.GetPointCloudRequest()
     request.setName(this.name)
@@ -46,7 +46,7 @@ export class CameraClient implements Camera {
     return new Blob([response.getData_asU8()], { type: mimeType })
   }
 
-  async getPointCloud () {
+  async getPointCloud() {
     const cameraService = this.cameraService
     const request = new pb.GetPointCloudRequest()
     request.setName(this.name)
@@ -60,7 +60,7 @@ export class CameraClient implements Camera {
     return response.getPointCloud_asU8()
   }
 
-  async getProperties () {
+  async getProperties() {
     const cameraService = this.cameraService
     const request = new pb.GetPropertiesRequest()
     request.setName(this.name)

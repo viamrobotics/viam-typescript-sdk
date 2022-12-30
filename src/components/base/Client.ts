@@ -4,21 +4,20 @@ import type { Base } from './Base'
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.esm'
 import { promisify } from '../../utils'
 
-
 export class BaseClient implements Base {
   private client: BaseServiceClient
   private name: string
 
-  constructor (client: Client, name: string) {
+  constructor(client: Client, name: string) {
     this.client = client.createServiceClient(BaseServiceClient)
     this.name = name
   }
 
-  private get baseService () {
+  private get baseService() {
     return this.client
   }
 
-  async moveStraight (distanceMm: number, mmPerSec: number, extra = {}) {
+  async moveStraight(distanceMm: number, mmPerSec: number, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.MoveStraightRequest()
     request.setName(this.name)
@@ -26,14 +25,14 @@ export class BaseClient implements Base {
     request.setDistanceMm(distanceMm)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
 
-    const response = await promisify<baseApi.MoveStraightRequest, baseApi.MoveStraightResponse>(
-      baseService.moveStraight.bind(baseService),
-      request
-    )
+    const response = await promisify<
+      baseApi.MoveStraightRequest,
+      baseApi.MoveStraightResponse
+    >(baseService.moveStraight.bind(baseService), request)
     return response
   }
 
-  async spin (angleDeg: number, degsPerSec: number, extra = {}) {
+  async spin(angleDeg: number, degsPerSec: number, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.SpinRequest()
     request.setName(this.name)
@@ -47,37 +46,45 @@ export class BaseClient implements Base {
 
     return response
   }
-  async setPower (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
+  async setPower(
+    linear: commonApi.Vector3,
+    angular: commonApi.Vector3,
+    extra = {}
+  ) {
     const baseService = this.baseService
     const request = new baseApi.SetPowerRequest()
     request.setName(this.name)
     request.setLinear(linear)
     request.setAngular(angular)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const response = await promisify<baseApi.SetPowerRequest, baseApi.SetPowerResponse>(
-      baseService.setPower.bind(baseService),
-      request
-    )
+    const response = await promisify<
+      baseApi.SetPowerRequest,
+      baseApi.SetPowerResponse
+    >(baseService.setPower.bind(baseService), request)
 
     return response
   }
 
-  async setVelocity (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
+  async setVelocity(
+    linear: commonApi.Vector3,
+    angular: commonApi.Vector3,
+    extra = {}
+  ) {
     const baseService = this.baseService
     const request = new baseApi.SetVelocityRequest()
     request.setName(this.name)
     request.setLinear(linear)
     request.setAngular(angular)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
-    const response = await promisify<baseApi.SetVelocityRequest, baseApi.SetVelocityResponse>(
-      baseService.setVelocity.bind(baseService),
-      request
-    )
+    const response = await promisify<
+      baseApi.SetVelocityRequest,
+      baseApi.SetVelocityResponse
+    >(baseService.setVelocity.bind(baseService), request)
 
     return response
   }
 
-  async stop (extra = {}) {
+  async stop(extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.StopRequest()
     request.setName(this.name)

@@ -10,11 +10,18 @@ export default class SessionTransport implements grpc.Transport {
   private mdProm: Promise<void> | undefined
   private mdPromResolve: (() => void) | undefined
 
-  constructor (opts: grpc.TransportOptions, innerFactory: grpc.TransportFactory, sessionManager: SessionManager) {
+  constructor(
+    opts: grpc.TransportOptions,
+    innerFactory: grpc.TransportFactory,
+    sessionManager: SessionManager
+  ) {
     const actualOnEnd = opts.onEnd
     opts.onEnd = (err?: Error) => {
       if (err && err instanceof GRPCError) {
-        if (err.code === grpc.Code.InvalidArgument && err.grpcMessage === 'SESSION_EXPIRED') {
+        if (
+          err.code === grpc.Code.InvalidArgument &&
+          err.grpcMessage === 'SESSION_EXPIRED'
+        ) {
           this.sessionManager.reset()
         }
       }
@@ -22,9 +29,17 @@ export default class SessionTransport implements grpc.Transport {
     }
     const actualOnHeaders = opts.onHeaders
     opts.onHeaders = (headers: grpc.Metadata, status: number) => {
-      const gStatus = headers.has('grpc-status') ? headers.get('grpc-status') : undefined
-      if (gStatus && gStatus.length === 1 && gStatus[0] === `${grpc.Code.InvalidArgument}`) {
-        const gMsg = headers.has('grpc-message') ? headers.get('grpc-message') : undefined
+      const gStatus = headers.has('grpc-status')
+        ? headers.get('grpc-status')
+        : undefined
+      if (
+        gStatus &&
+        gStatus.length === 1 &&
+        gStatus[0] === `${grpc.Code.InvalidArgument}`
+      ) {
+        const gMsg = headers.has('grpc-message')
+          ? headers.get('grpc-message')
+          : undefined
         if (gMsg && gMsg.length === 1 && gMsg[0] === 'SESSION_EXPIRED') {
           this.sessionManager.reset()
         }
@@ -39,28 +54,30 @@ export default class SessionTransport implements grpc.Transport {
     })
   }
 
-  public start (metadata: grpc.Metadata) {
-    this.sessionManager.getSessionMetadata().then((md) => {
-      md.forEach((key: string, values: string | string[]) => {
-        metadata.set(key, values)
+  public start(metadata: grpc.Metadata) {
+    this.sessionManager
+      .getSessionMetadata()
+      .then((md) => {
+        md.forEach((key: string, values: string | string[]) => {
+          metadata.set(key, values)
+        })
+        this.transport.start(metadata)
+        this.mdPromResolve?.()
       })
-      this.transport.start(metadata)
-      this.mdPromResolve?.()
-    })
       .catch((err) => {
         this.opts.onEnd(err)
       })
   }
 
-  public sendMessage (msgBytes: Uint8Array) {
+  public sendMessage(msgBytes: Uint8Array) {
     this.mdProm?.then(() => this.transport.sendMessage(msgBytes))
   }
 
-  public finishSend () {
+  public finishSend() {
     this.mdProm?.then(() => this.transport.finishSend())
   }
 
-  public cancel () {
+  public cancel() {
     this.transport.cancel()
   }
 }
