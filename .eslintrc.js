@@ -9,6 +9,7 @@ module.exports = {
     'eslint:all',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/strict',
+    'prettier',
   ],
   ignorePatterns: ['*.d.ts'],
   overrides: [],
