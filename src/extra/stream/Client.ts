@@ -9,16 +9,16 @@ export class StreamClient implements Stream {
   private client: StreamServiceClient
   private readonly options: Options
 
-  constructor (client: Client, options: Options = {}) {
+  constructor(client: Client, options: Options = {}) {
     this.client = client.createServiceClient(StreamServiceClient)
     this.options = options
   }
 
-  private get streamService () {
+  private get streamService() {
     return this.client
   }
 
-  async add (name: string) {
+  async add(name: string) {
     const streamService = this.streamService
     const request = new pb.AddStreamRequest()
     request.setName(name)
@@ -31,7 +31,7 @@ export class StreamClient implements Stream {
     )
   }
 
-  async remove (name: string) {
+  async remove(name: string) {
     const streamService = this.streamService
     const request = new pb.RemoveStreamRequest()
     request.setName(name)

@@ -5,23 +5,22 @@ import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.e
 import type { Options } from '../../types'
 import { promisify } from '../../utils'
 
-
 export class BaseClient implements Base {
   private client: BaseServiceClient
   private readonly name: string
   private readonly options: Options
 
-  constructor (client: Client, name: string, options: Options = {}) {
+  constructor(client: Client, name: string, options: Options = {}) {
     this.client = client.createServiceClient(BaseServiceClient)
     this.name = name
     this.options = options
   }
 
-  private get baseService () {
+  private get baseService() {
     return this.client
   }
 
-  async moveStraight (distanceMm: number, mmPerSec: number, extra = {}) {
+  async moveStraight(distanceMm: number, mmPerSec: number, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.MoveStraightRequest()
     request.setName(this.name)
@@ -37,7 +36,7 @@ export class BaseClient implements Base {
     )
   }
 
-  async spin (angleDeg: number, degsPerSec: number, extra = {}) {
+  async spin(angleDeg: number, degsPerSec: number, extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.SpinRequest()
     request.setName(this.name)
@@ -52,7 +51,11 @@ export class BaseClient implements Base {
       request
     )
   }
-  async setPower (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
+  async setPower(
+    linear: commonApi.Vector3,
+    angular: commonApi.Vector3,
+    extra = {}
+  ) {
     const baseService = this.baseService
     const request = new baseApi.SetPowerRequest()
     request.setName(this.name)
@@ -68,7 +71,11 @@ export class BaseClient implements Base {
     )
   }
 
-  async setVelocity (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
+  async setVelocity(
+    linear: commonApi.Vector3,
+    angular: commonApi.Vector3,
+    extra = {}
+  ) {
     const baseService = this.baseService
     const request = new baseApi.SetVelocityRequest()
     request.setName(this.name)
@@ -84,7 +91,7 @@ export class BaseClient implements Base {
     )
   }
 
-  async stop (extra = {}) {
+  async stop(extra = {}) {
     const baseService = this.baseService
     const request = new baseApi.StopRequest()
     request.setName(this.name)

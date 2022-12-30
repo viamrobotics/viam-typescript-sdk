@@ -11,17 +11,17 @@ export class MotorClient implements Motor {
   private readonly name: string
   private readonly options: Options
 
-  constructor (client: Client, name: string, options: Options = {}) {
+  constructor(client: Client, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MotorServiceClient)
     this.name = name
     this.options = options
   }
 
-  private get motorService () {
+  private get motorService() {
     return this.client
   }
 
-  async setPower (power: number, extra = {}) {
+  async setPower(power: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.SetPowerRequest()
     request.setName(this.name)
@@ -36,7 +36,7 @@ export class MotorClient implements Motor {
     )
   }
 
-  async goFor (rpm: number, revolutions: number, extra = {}) {
+  async goFor(rpm: number, revolutions: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.GoForRequest()
     request.setName(this.name)
@@ -52,7 +52,7 @@ export class MotorClient implements Motor {
     )
   }
 
-  async goTo (rpm: number, positionRevolutions: number, extra = {}) {
+  async goTo(rpm: number, positionRevolutions: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.GoToRequest()
     request.setName(this.name)
@@ -68,7 +68,7 @@ export class MotorClient implements Motor {
     )
   }
 
-  async resetZeroPosition (offset: number, extra = {}) {
+  async resetZeroPosition(offset: number, extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.ResetZeroPositionRequest()
     request.setName(this.name)
@@ -77,13 +77,13 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    await promisify<motorApi.ResetZeroPositionRequest, motorApi.ResetZeroPositionResponse>(
-      motorService.resetZeroPosition.bind(motorService),
-      request
-    )
+    await promisify<
+      motorApi.ResetZeroPositionRequest,
+      motorApi.ResetZeroPositionResponse
+    >(motorService.resetZeroPosition.bind(motorService), request)
   }
 
-  async motorStop (extra = {}) {
+  async motorStop(extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.StopRequest()
     request.setName(this.name)
@@ -97,7 +97,7 @@ export class MotorClient implements Motor {
     )
   }
 
-  async getProperties (extra = {}) {
+  async getProperties(extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.GetPropertiesRequest()
     request.setName(this.name)
@@ -105,14 +105,14 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.GetPropertiesRequest, motorApi.GetPropertiesResponse>(
-      motorService.getProperties.bind(motorService),
-      request
-    )
+    const response = await promisify<
+      motorApi.GetPropertiesRequest,
+      motorApi.GetPropertiesResponse
+    >(motorService.getProperties.bind(motorService), request)
     return { positionReporting: response.getPositionReporting() }
   }
 
-  async getPosition (extra = {}) {
+  async getPosition(extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.GetPositionRequest()
     request.setName(this.name)
@@ -120,14 +120,14 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.GetPositionRequest, motorApi.GetPositionResponse>(
-      motorService.getPosition.bind(motorService),
-      request
-    )
+    const response = await promisify<
+      motorApi.GetPositionRequest,
+      motorApi.GetPositionResponse
+    >(motorService.getPosition.bind(motorService), request)
     return response.getPosition()
   }
 
-  async isPowered (extra = {}) {
+  async isPowered(extra = {}) {
     const motorService = this.motorService
     const request = new motorApi.IsPoweredRequest()
     request.setName(this.name)
@@ -135,11 +135,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.IsPoweredRequest, motorApi.IsPoweredResponse>(
-      motorService.isPowered.bind(motorService),
-      request
-    )
+    const response = await promisify<
+      motorApi.IsPoweredRequest,
+      motorApi.IsPoweredResponse
+    >(motorService.isPowered.bind(motorService), request)
     return [response.getIsOn(), response.getPowerPct()] as const
   }
 }
-

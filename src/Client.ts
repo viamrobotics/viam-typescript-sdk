@@ -32,7 +32,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor (public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 export default class Client {
@@ -85,137 +85,146 @@ export default class Client {
 
   private slamServiceClient: SLAMServiceClient | undefined
 
-  constructor (serviceHost: string, webrtcOptions?: WebRTCOptions, sessionOptions?: SessionOptions) {
+  constructor(
+    serviceHost: string,
+    webrtcOptions?: WebRTCOptions,
+    sessionOptions?: SessionOptions
+  ) {
     this.serviceHost = serviceHost
     this.webrtcOptions = webrtcOptions
     this.sessionOptions = sessionOptions
-    this.sessionManager = new SessionManager(serviceHost, (opts: grpc.TransportOptions): grpc.Transport => {
-      if (!this.transportFactory) {
-        throw new Error(Client.notConnectedYetStr)
+    this.sessionManager = new SessionManager(
+      serviceHost,
+      (opts: grpc.TransportOptions): grpc.Transport => {
+        if (!this.transportFactory) {
+          throw new Error(Client.notConnectedYetStr)
+        }
+        return this.transportFactory(opts)
       }
-      return this.transportFactory(opts)
-    })
+    )
   }
 
-  get sessionId () {
+  get sessionId() {
     return this.sessionManager.sessionID
   }
 
   private static readonly notConnectedYetStr = 'not connected yet'
 
-  get robotService () {
+  get robotService() {
     if (!this.robotServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.robotServiceClient
   }
 
-  get armService () {
+  get armService() {
     if (!this.armServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.armServiceClient
   }
 
-  get baseService () {
+  get baseService() {
     if (!this.baseServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.baseServiceClient
   }
 
-  get boardService () {
+  get boardService() {
     if (!this.boardServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.boardServiceClient
   }
 
-  get gantryService () {
+  get gantryService() {
     if (!this.gantryServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.gantryServiceClient
   }
 
-  get genericService () {
+  get genericService() {
     if (!this.genericServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.genericServiceClient
   }
 
-  get gripperService () {
+  get gripperService() {
     if (!this.gripperServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.gripperServiceClient
   }
 
-  get movementSensorService () {
+  get movementSensorService() {
     if (!this.movementSensorServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.movementSensorServiceClient
   }
 
-  get inputControllerService () {
+  get inputControllerService() {
     if (!this.inputControllerServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.inputControllerServiceClient
   }
 
-  get motorService () {
+  get motorService() {
     if (!this.motorServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.motorServiceClient
   }
 
-  get navigationService () {
+  get navigationService() {
     if (!this.navigationServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.navigationServiceClient
   }
 
-  get motionService () {
+  get motionService() {
     if (!this.motionServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.motionServiceClient
   }
 
-  get visionService () {
+  get visionService() {
     if (!this.visionServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.visionServiceClient
   }
 
-  get sensorsService () {
+  get sensorsService() {
     if (!this.sensorsServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.sensorsServiceClient
   }
 
-  get servoService () {
+  get servoService() {
     if (!this.servoServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.servoServiceClient
   }
 
-  get slamService () {
+  get slamService() {
     if (!this.slamServiceClient) {
       throw new Error(Client.notConnectedYetStr)
     }
     return this.slamServiceClient
   }
 
-  createServiceClient<T extends ServiceClient> (SC: new (serviceHost: string, options?: grpc.RpcOptions) => T): T {
+  createServiceClient<T extends ServiceClient>(
+    SC: new (serviceHost: string, options?: grpc.RpcOptions) => T
+  ): T {
     const clientTransportFactory = this.sessionOptions?.disabled
       ? this.transportFactory
       : this.sessionManager.transportFactory
@@ -227,7 +236,7 @@ export default class Client {
     return new SC(this.serviceHost, grpcOptions)
   }
 
-  public async disconnect () {
+  public async disconnect() {
     while (this.connecting) {
       // eslint-disable-next-line no-await-in-loop
       await this.connecting
@@ -240,7 +249,10 @@ export default class Client {
     this.sessionManager.reset()
   }
 
-  public async connect (authEntity = this.savedAuthEntity, creds = this.savedCreds) {
+  public async connect(
+    authEntity = this.savedAuthEntity,
+    creds = this.savedCreds
+  ) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -286,7 +298,11 @@ export default class Client {
           opts.webrtcOptions.signalingCredentials = opts.credentials
         }
 
-        const webRTCConn = await dialWebRTC(this.webrtcOptions.signalingAddress || this.serviceHost, this.webrtcOptions.host, opts)
+        const webRTCConn = await dialWebRTC(
+          this.webrtcOptions.signalingAddress || this.serviceHost,
+          this.webrtcOptions.host,
+          opts
+        )
 
         /*
          * Lint disabled because we know that we are the only code to
@@ -303,10 +319,14 @@ export default class Client {
             throw new Error('expected event stream to exist')
           }
           const streamName = eventStream.id
-          const streamContainers = document.querySelectorAll(`[data-stream="${streamName}"]`)
+          const streamContainers = document.querySelectorAll(
+            `[data-stream="${streamName}"]`
+          )
 
           for (const streamContainer of streamContainers) {
-            const mediaElement = document.createElement(kind) as HTMLAudioElement | HTMLVideoElement
+            const mediaElement = document.createElement(kind) as
+              | HTMLAudioElement
+              | HTMLVideoElement
             mediaElement.srcObject = eventStream
             mediaElement.autoplay = true
             if (mediaElement instanceof HTMLVideoElement) {
@@ -321,9 +341,13 @@ export default class Client {
             streamContainer.append(mediaElement)
           }
 
-          const streamPreviewContainers = document.querySelectorAll(`[data-stream-preview="${streamName}"]`)
+          const streamPreviewContainers = document.querySelectorAll(
+            `[data-stream-preview="${streamName}"]`
+          )
           for (const streamContainer of streamPreviewContainers) {
-            const mediaElementPreview = document.createElement(kind) as HTMLAudioElement | HTMLVideoElement
+            const mediaElementPreview = document.createElement(kind) as
+              | HTMLAudioElement
+              | HTMLVideoElement
             mediaElementPreview.srcObject = eventStream
             mediaElementPreview.autoplay = true
             if (mediaElementPreview instanceof HTMLVideoElement) {
@@ -341,27 +365,77 @@ export default class Client {
         this.transportFactory = await dialDirect(this.serviceHost, opts)
       }
 
-      const clientTransportFactory = this.sessionOptions?.disabled ? this.transportFactory : this.sessionManager.transportFactory
+      const clientTransportFactory = this.sessionOptions?.disabled
+        ? this.transportFactory
+        : this.sessionManager.transportFactory
       const grpcOptions = { transport: clientTransportFactory }
 
-      this.robotServiceClient = new RobotServiceClient(this.serviceHost, grpcOptions)
+      this.robotServiceClient = new RobotServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
       // eslint-disable-next-line no-warning-comments
       // TODO(RSDK-144): these should be created as needed
-      this.armServiceClient = new ArmServiceClient(this.serviceHost, grpcOptions)
-      this.baseServiceClient = new BaseServiceClient(this.serviceHost, grpcOptions)
-      this.boardServiceClient = new BoardServiceClient(this.serviceHost, grpcOptions)
-      this.gantryServiceClient = new GantryServiceClient(this.serviceHost, grpcOptions)
-      this.genericServiceClient = new GenericServiceClient(this.serviceHost, grpcOptions)
-      this.gripperServiceClient = new GripperServiceClient(this.serviceHost, grpcOptions)
-      this.movementSensorServiceClient = new MovementSensorServiceClient(this.serviceHost, grpcOptions)
-      this.inputControllerServiceClient = new InputControllerServiceClient(this.serviceHost, grpcOptions)
-      this.motorServiceClient = new MotorServiceClient(this.serviceHost, grpcOptions)
-      this.navigationServiceClient = new NavigationServiceClient(this.serviceHost, grpcOptions)
-      this.motionServiceClient = new MotionServiceClient(this.serviceHost, grpcOptions)
-      this.visionServiceClient = new VisionServiceClient(this.serviceHost, grpcOptions)
-      this.sensorsServiceClient = new SensorsServiceClient(this.serviceHost, grpcOptions)
-      this.servoServiceClient = new ServoServiceClient(this.serviceHost, grpcOptions)
-      this.slamServiceClient = new SLAMServiceClient(this.serviceHost, grpcOptions)
+      this.armServiceClient = new ArmServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.baseServiceClient = new BaseServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.boardServiceClient = new BoardServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.gantryServiceClient = new GantryServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.genericServiceClient = new GenericServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.gripperServiceClient = new GripperServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.movementSensorServiceClient = new MovementSensorServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.inputControllerServiceClient = new InputControllerServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.motorServiceClient = new MotorServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.navigationServiceClient = new NavigationServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.motionServiceClient = new MotionServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.visionServiceClient = new VisionServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.sensorsServiceClient = new SensorsServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.servoServiceClient = new ServoServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
+      this.slamServiceClient = new SLAMServiceClient(
+        this.serviceHost,
+        grpcOptions
+      )
     } finally {
       this.connectResolve?.()
       this.connectResolve = undefined

@@ -13,16 +13,16 @@ export class SensorClient implements Sensor {
   private readonly name: string
   private readonly options: Options
 
-  constructor (client: Client, name: string, options: Options = {}) {
+  constructor(client: Client, name: string, options: Options = {}) {
     this.client = client.createServiceClient(SensorServiceClient)
     this.name = name
     this.options = options
   }
 
-  private get sensorService () {
+  private get sensorService() {
     return this.client
   }
-  async getReadings (extra = {}) {
+  async getReadings(extra = {}) {
     const sensorService = this.sensorService
     const request = new sensorApi.GetReadingsRequest()
     request.setName(this.name)
@@ -30,10 +30,10 @@ export class SensorClient implements Sensor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<sensorApi.GetReadingsRequest, sensorApi.GetReadingsResponse>(
-      sensorService.getReadings.bind(sensorService),
-      request
-    )
+    const response = await promisify<
+      sensorApi.GetReadingsRequest,
+      sensorApi.GetReadingsResponse
+    >(sensorService.getReadings.bind(sensorService), request)
     return response
   }
 }
