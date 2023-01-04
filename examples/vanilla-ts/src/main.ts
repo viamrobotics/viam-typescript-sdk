@@ -1,4 +1,4 @@
-import { Client } from "@viamrobotics/sdk";
+import { Client, MotorClient } from "@viamrobotics/sdk";
 import type { Credentials } from "@viamrobotics/rpc/src/dial";
 
 async function connect() {
@@ -17,7 +17,14 @@ async function main() {
     console.log(error);
     return;
   }
-  console.log(client?.robotService.resourceNames);
+
+  const mc = new MotorClient(client, "motor1");
+  console.log(await mc.getPosition());
+
+  await mc.goFor(100, 10)
+
+  console.log(await mc.getPosition());
+
   return;
 }
 
