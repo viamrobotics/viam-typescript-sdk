@@ -20,6 +20,9 @@ lint: install
 install-buf: clean-buf
 	./etc/install_buf.sh $(BUF_BIN)
 
+buf-update:
+	PATH=$(PATH_WITH_TOOLS) buf mod update
+
 buf: install install-buf
 	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/googleapis/googleapis
 	PATH=$(PATH_WITH_TOOLS) buf generate ${BUF_TARGET}
