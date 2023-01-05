@@ -3,9 +3,6 @@ BUF_TARGET?=buf.build/viamrobotics/api --path common,component,robot,service
 NPM_BIN="`pwd`/node_modules/.bin"
 PATH_WITH_TOOLS="${BUF_BIN}:${NPM_BIN}:${PATH}"
 
-clean-buf:
-	rm -rf src/gen/
-
 clean-dist:
 	rm -rf dist
 
@@ -17,13 +14,17 @@ lint: install
 	npm run typecheck
 	npm run check
 
-install-buf: clean-buf
+buf-clean:
+	rm -rf src/gen/
+
+
+buf-install: buf-clean
 	./etc/install_buf.sh $(BUF_BIN)
 
 buf-update:
 	PATH=$(PATH_WITH_TOOLS) buf mod update
 
-buf: install install-buf
+buf: install buf-install
 	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/googleapis/googleapis
 	PATH=$(PATH_WITH_TOOLS) buf generate ${BUF_TARGET}
 	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/erdaniels/gostream
