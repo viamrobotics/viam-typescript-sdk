@@ -2,11 +2,10 @@ import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_
 
 import type Client from '../../Client'
 import type { Sensor } from './Sensor'
-import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service'
+import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service.esm'
 
 import { promisify } from '../../utils'
 import { sensorApi } from '../../main'
-
 
 export class SensorClient implements Sensor {
   private client: SensorServiceClient
@@ -20,7 +19,7 @@ export class SensorClient implements Sensor {
   private get sensorService () {
     return this.client
   }
-  async GetReadings (extra = {}) {
+  async getReadings (extra = {}) {
     const sensorService = this.sensorService
     const request = new sensorApi.GetReadingsRequest()
     request.setName(this.name)

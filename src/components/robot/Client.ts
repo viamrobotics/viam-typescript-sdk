@@ -22,7 +22,8 @@ export class RobotClient implements Robot {
   private get robotService () {
     return this.client
   }
-  async GetOperations () {
+
+  async getOperations () {
     const robotService = this.robotService
     const request = new robotApi.GetOperationsRequest()
     const response = await promisify<robotApi.GetOperationsRequest, robotApi.GetOperationsResponse>(
@@ -31,7 +32,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async GetSessions () {
+  async getSessions () {
     const robotService = this.robotService
     const request = new robotApi.GetSessionsRequest()
     const response = await promisify<robotApi.GetSessionsRequest, robotApi.GetSessionsResponse>(
@@ -40,7 +41,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async ResourceNames () {
+  async resourceNames () {
     const robotService = this.robotService
     const request = new robotApi.ResourceNamesRequest()
     const response = await promisify<robotApi.ResourceNamesRequest, robotApi.ResourceNamesResponse>(
@@ -49,7 +50,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async ResourceRPCSubtypes () {
+  async resourceRPCSubtypes () {
     const robotService = this.robotService
     const request = new robotApi.ResourceRPCSubtypesRequest()
     const response = await promisify<robotApi.ResourceRPCSubtypesRequest, robotApi.ResourceRPCSubtypesResponse>(
@@ -58,7 +59,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async CancelOperation (id: string) {
+  async cancelOperation (id: string) {
     const robotService = this.robotService
     const request = new robotApi.CancelOperationRequest()
     request.setId(id)
@@ -68,7 +69,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async BlockForOperation (id: string) {
+  async blockForOperation (id: string) {
     const robotService = this.robotService
     const request = new robotApi.BlockForOperationRequest()
     request.setId(id)
@@ -78,7 +79,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async DiscoverComponents (queries: DiscoveryQuery[]) {
+  async discoverComponents (queries: DiscoveryQuery[]) {
     const robotService = this.robotService
     const request = new robotApi.DiscoverComponentsRequest()
     request.setQueriesList(queries)
@@ -89,7 +90,7 @@ export class RobotClient implements Robot {
     return response
   }
 
-  async FrameSystemConfig (transforms: commonApi.Transform[]) {
+  async frameSystemConfig (transforms: commonApi.Transform[]) {
     const robotService = this.robotService
     const request = new robotApi.FrameSystemConfigRequest()
     request.setSupplementalTransformsList(transforms)
@@ -99,7 +100,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async TransformPose (source: commonApi.PoseInFrame, destination: string, supplementalTransforms: commonApi.Transform[]) {
+  async transformPose (source: commonApi.PoseInFrame, destination: string, supplementalTransforms: commonApi.Transform[]) {
     const robotService = this.robotService
     const request = new robotApi.TransformPoseRequest()
     request.setSource(source)
@@ -111,7 +112,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async TransformPCD (pointCloudPcd: Uint8Array, source: string, destination: string) {
+  async transformPCD (pointCloudPcd: Uint8Array, source: string, destination: string) {
     const robotService = this.robotService
     const request = new robotApi.TransformPCDRequest()
     request.setPointCloudPcd(pointCloudPcd)
@@ -123,7 +124,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async GetStatus (resourceNames: commonApi.ResourceName[]) {
+  async getStatus (resourceNames: commonApi.ResourceName[]) {
     const robotService = this.robotService
     const request = new robotApi.GetStatusRequest()
     request.setResourceNamesList(resourceNames)
@@ -133,7 +134,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async StreamStatus (resourceNames: commonApi.ResourceName[], duration: Duration) {
+  async streamStatus (resourceNames: commonApi.ResourceName[], duration: Duration) {
     const robotService = this.robotService
     const request = new robotApi.StreamStatusRequest()
     request.setResourceNamesList(resourceNames)
@@ -144,7 +145,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async StopAll () {
+  async stopAll () {
     const robotService = this.robotService
     const request = new robotApi.StopAllRequest()
     const response = await promisify<robotApi.StopAllRequest, robotApi.StopAllResponse>(
@@ -153,7 +154,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async StartSession (resume: string) {
+  async startSession (resume: string) {
     const robotService = this.robotService
     const request = new robotApi.StartSessionRequest()
     request.setResume(resume)
@@ -163,7 +164,7 @@ export class RobotClient implements Robot {
     )
     return response
   }
-  async SendSessionHeartbeat (id: string) {
+  async sendSessionHeartbeat (id: string) {
     const robotService = this.robotService
     const request = new robotApi.SendSessionHeartbeatRequest()
     request.setId(id)
