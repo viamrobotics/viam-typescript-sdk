@@ -2,7 +2,6 @@ import * as Base from './components/base/Base'
 import * as Board from './components/board/Board'
 import * as Camera from './components/camera/Camera'
 import * as Motor from './components/motor/Motor'
-import * as Robot from './components/robot/Robot'
 import * as Sensor from './components/sensor/Sensor'
 
 
@@ -11,7 +10,6 @@ import { BoardClient } from './components/board/Client'
 import { CameraClient } from './components/camera/Client'
 import Client from './Client'
 import { MotorClient } from './components/motor/Client'
-import { RobotClient } from './components/robot/Client'
 import { SensorClient } from './components/sensor/Client'
 import { StreamClient } from './extra/stream/Client'
 
@@ -62,13 +60,11 @@ export {
   Base,
   Board,
   Sensor,
-  Robot,
   BaseClient,
   BoardClient,
   CameraClient,
   Client,
   MotorClient,
-  RobotClient,
   SensorClient,
   StreamClient
 }
