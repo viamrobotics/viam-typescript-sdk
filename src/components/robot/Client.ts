@@ -12,11 +12,9 @@ import { robotApi } from '../../main'
 
 export class RobotClient implements Robot {
   private client: RobotServiceClient
-  private name: string
 
-  constructor (client: Client, name: string) {
+  constructor (client: Client) {
     this.client = client.createServiceClient(RobotServiceClient)
-    this.name = name
   }
 
   private get robotService () {
