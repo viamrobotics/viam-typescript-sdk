@@ -2,16 +2,19 @@ import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_
 import { Client, baseApi, commonApi } from '../../main'
 import type { Base } from './Base'
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.esm'
+import type { Options } from '../../types'
 import { promisify } from '../../utils'
 
 
 export class BaseClient implements Base {
   private client: BaseServiceClient
-  private name: string
+  private readonly name: string
+  private readonly options: Options
 
-  constructor (client: Client, name: string) {
+  constructor (client: Client, name: string, options: Options = {}) {
     this.client = client.createServiceClient(BaseServiceClient)
     this.name = name
+    this.options = options
   }
 
   private get baseService () {
@@ -25,6 +28,8 @@ export class BaseClient implements Base {
     request.setMmPerSec(mmPerSec)
     request.setDistanceMm(distanceMm)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+
+    this.options.requestLogger?.(request)
 
     const response = await promisify<baseApi.MoveStraightRequest, baseApi.MoveStraightResponse>(
       baseService.moveStraight.bind(baseService),
@@ -40,6 +45,9 @@ export class BaseClient implements Base {
     request.setAngleDeg(angleDeg)
     request.setDegsPerSec(degsPerSec)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+
+    this.options.requestLogger?.(request)
+
     const response = await promisify<baseApi.SpinRequest, baseApi.SpinResponse>(
       baseService.spin.bind(baseService),
       request
@@ -54,6 +62,9 @@ export class BaseClient implements Base {
     request.setLinear(linear)
     request.setAngular(angular)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+
+    this.options.requestLogger?.(request)
+
     const response = await promisify<baseApi.SetPowerRequest, baseApi.SetPowerResponse>(
       baseService.setPower.bind(baseService),
       request
@@ -69,6 +80,9 @@ export class BaseClient implements Base {
     request.setLinear(linear)
     request.setAngular(angular)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+
+    this.options.requestLogger?.(request)
+
     const response = await promisify<baseApi.SetVelocityRequest, baseApi.SetVelocityResponse>(
       baseService.setVelocity.bind(baseService),
       request
@@ -82,6 +96,9 @@ export class BaseClient implements Base {
     const request = new baseApi.StopRequest()
     request.setName(this.name)
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
+
+    this.options.requestLogger?.(request)
+
     const response = await promisify<baseApi.StopRequest, baseApi.StopResponse>(
       baseService.stop.bind(baseService),
       request
