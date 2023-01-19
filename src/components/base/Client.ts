@@ -31,11 +31,10 @@ export class BaseClient implements Base {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<baseApi.MoveStraightRequest, baseApi.MoveStraightResponse>(
+    await promisify<baseApi.MoveStraightRequest, baseApi.MoveStraightResponse>(
       baseService.moveStraight.bind(baseService),
       request
     )
-    return response
   }
 
   async spin (angleDeg: number, degsPerSec: number, extra = {}) {
@@ -48,12 +47,10 @@ export class BaseClient implements Base {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<baseApi.SpinRequest, baseApi.SpinResponse>(
+    await promisify<baseApi.SpinRequest, baseApi.SpinResponse>(
       baseService.spin.bind(baseService),
       request
     )
-
-    return response
   }
   async setPower (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
     const baseService = this.baseService
@@ -65,12 +62,10 @@ export class BaseClient implements Base {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<baseApi.SetPowerRequest, baseApi.SetPowerResponse>(
+    await promisify<baseApi.SetPowerRequest, baseApi.SetPowerResponse>(
       baseService.setPower.bind(baseService),
       request
     )
-
-    return response
   }
 
   async setVelocity (linear: commonApi.Vector3, angular: commonApi.Vector3, extra = {}) {
@@ -83,12 +78,10 @@ export class BaseClient implements Base {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<baseApi.SetVelocityRequest, baseApi.SetVelocityResponse>(
+    await promisify<baseApi.SetVelocityRequest, baseApi.SetVelocityResponse>(
       baseService.setVelocity.bind(baseService),
       request
     )
-
-    return response
   }
 
   async stop (extra = {}) {
@@ -99,10 +92,9 @@ export class BaseClient implements Base {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<baseApi.StopRequest, baseApi.StopResponse>(
+    await promisify<baseApi.StopRequest, baseApi.StopResponse>(
       baseService.stop.bind(baseService),
       request
     )
-    return response
   }
 }
