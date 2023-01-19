@@ -47,11 +47,10 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<boardApi.SetGPIORequest, boardApi.SetGPIOResponse>(
+    await promisify<boardApi.SetGPIORequest, boardApi.SetGPIOResponse>(
       boardService.setGPIO.bind(boardService),
       request
     )
-    return response
   }
   async getGPIO (pin: string, extra = {}) {
     const boardService = this.boardService
@@ -66,9 +65,9 @@ export class BoardClient implements Board {
       boardService.getGPIO.bind(boardService),
       request
     )
-    return response
+    return response.getHigh()
   }
-  async pWM (pin: string, extra = {}) {
+  async getPWM (pin: string, extra = {}) {
     const boardService = this.boardService
     const request = new boardApi.PWMRequest()
     request.setName(this.name)
@@ -81,7 +80,7 @@ export class BoardClient implements Board {
       boardService.pWM.bind(boardService),
       request
     )
-    return response
+    return response.getDutyCyclePct()
   }
   async setPWM (pin: string, dutyCyle: number, extra = {}) {
     const boardService = this.boardService
@@ -93,13 +92,12 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<boardApi.SetPWMRequest, boardApi.SetPWMResponse>(
+    await promisify<boardApi.SetPWMRequest, boardApi.SetPWMResponse>(
       boardService.setPWM.bind(boardService),
       request
     )
-    return response
   }
-  async pWMFrequency (pin: string, extra = {}) {
+  async getPWMFrequency (pin: string, extra = {}) {
     const boardService = this.boardService
     const request = new boardApi.PWMFrequencyRequest()
     request.setName(this.name)
@@ -112,7 +110,7 @@ export class BoardClient implements Board {
       boardService.pWMFrequency.bind(boardService),
       request
     )
-    return response
+    return response.getFrequencyHz()
   }
   async setPWMFrequency (pin: string, frequencyHz: number, extra = {}) {
     const boardService = this.boardService
@@ -124,11 +122,10 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<boardApi.SetPWMFrequencyRequest, boardApi.SetPWMFrequencyResponse>(
+    await promisify<boardApi.SetPWMFrequencyRequest, boardApi.SetPWMFrequencyResponse>(
       boardService.setPWMFrequency.bind(boardService),
       request
     )
-    return response
   }
   async readAnalogReader (boardName: string, analogReader: string, extra = {}) {
     const boardService = this.boardService
@@ -143,7 +140,7 @@ export class BoardClient implements Board {
       boardService.readAnalogReader.bind(boardService),
       request
     )
-    return response
+    return response.getValue()
   }
   async getDigitalInterruptValue (boardName: string, digitalInteruptName: string, extra = {}) {
     const boardService = this.boardService
@@ -158,6 +155,6 @@ export class BoardClient implements Board {
       boardService.getDigitalInterruptValue.bind(boardService),
       request
     )
-    return response
+    return response.getValue()
   }
 }
