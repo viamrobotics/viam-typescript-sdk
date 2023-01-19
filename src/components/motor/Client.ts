@@ -30,11 +30,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.SetPowerRequest, motorApi.SetPowerResponse>(
+    await promisify<motorApi.SetPowerRequest, motorApi.SetPowerResponse>(
       motorService.setPower.bind(motorService),
       request
     )
-    return response
   }
 
   async goFor (rpm: number, revolutions: number, extra = {}) {
@@ -47,11 +46,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.GoForRequest, motorApi.GoForResponse>(
+    await promisify<motorApi.GoForRequest, motorApi.GoForResponse>(
       motorService.goFor.bind(motorService),
       request
     )
-    return response
   }
 
   async goTo (rpm: number, positionRevolutions: number, extra = {}) {
@@ -64,11 +62,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.GoToRequest, motorApi.GoToResponse>(
+    await promisify<motorApi.GoToRequest, motorApi.GoToResponse>(
       motorService.goTo.bind(motorService),
       request
     )
-    return response
   }
 
   async resetZeroPosition (offset: number, extra = {}) {
@@ -80,11 +77,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.ResetZeroPositionRequest, motorApi.ResetZeroPositionResponse>(
+    await promisify<motorApi.ResetZeroPositionRequest, motorApi.ResetZeroPositionResponse>(
       motorService.resetZeroPosition.bind(motorService),
       request
     )
-    return response
   }
 
   async motorStop (extra = {}) {
@@ -95,11 +91,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request)
 
-    const response = await promisify<motorApi.StopRequest, motorApi.StopResponse>(
+    await promisify<motorApi.StopRequest, motorApi.StopResponse>(
       motorService.stop.bind(motorService),
       request
     )
-    return response
   }
 
   async getProperties (extra = {}) {
