@@ -1,10 +1,10 @@
-import type { baseApi, commonApi } from '../../main'
 import type { Extra } from '../../types'
+import type { commonApi } from '../../main'
 
 export interface Base {
-  moveStraight(distanceMm: number, mmPerSec: number, extra?: Extra): Promise<baseApi.MoveStraightResponse>
-  spin(angleDeg: number, degsPerSec: number, extra?: Extra): Promise<baseApi.SpinResponse>
-  setPower(linear: commonApi.Vector3, angular: commonApi.Vector3, extra?: Extra): Promise<baseApi.SetPowerResponse>
-  setVelocity(linear: commonApi.Vector3, angular: commonApi.Vector3, extra?: Extra): Promise<baseApi.SetVelocityResponse>
-  stop(extra?: Extra): Promise<baseApi.StopResponse>
+  moveStraight(distanceMm: number, mmPerSec: number, extra?: Extra): Promise<void>
+  spin(angleDeg: number, degsPerSec: number, extra?: Extra): Promise<void>
+  setPower(linear: commonApi.Vector3, angular: commonApi.Vector3, extra?: Extra): Promise<void>
+  setVelocity(linear: commonApi.Vector3, angular: commonApi.Vector3, extra?: Extra): Promise<void>
+  stop(extra?: Extra): Promise<void>
 }
