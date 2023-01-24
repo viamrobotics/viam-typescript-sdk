@@ -8,3 +8,4 @@ lint:
 deps:
   - buf.build/viamrobotics/goutils
   - buf.build/viamrobotics/api
+a
