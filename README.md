@@ -5,6 +5,10 @@
 > **Warning**
 > This is an alpha release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
 
+## Fake section
+
+...
+
 ## License 
 Copyright 2022 Viam Inc.
 
