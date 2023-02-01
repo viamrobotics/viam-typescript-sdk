@@ -24,7 +24,7 @@ function button() {
   return <HTMLButtonElement>document.getElementById("main-button");
 }
 
-// This function runs a motor named "motor1" on your robot.
+// This function runs a motor component with a given named on your robot.
 // Feel free to replace it whatever logic you want to test out!
 async function run(client: Client) {
   // Replace with the name of a motor on your robot.
