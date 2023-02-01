@@ -14,9 +14,8 @@ async function connect() {
   };
 
   const client = new Client("<HOST>");
-  await client.connect("authEntity", creds);
+  await client.connect(undefined, creds);
 
-  await client.connect();
   return client;
 }
 
