@@ -5,7 +5,11 @@
 > **Warning**
 > This is an alpha release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
 
+## Usage
+
+[The examples directory](examples) contains small apps that demonstrate how to use this SDK to operate a robot running Viam.
+
 ## License 
 Copyright 2022 Viam Inc.
 
-Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE) file
+Apache 2.0 - See [LICENSE](LICENSE) file
