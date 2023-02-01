@@ -1,11 +1,16 @@
 import * as Base from './components/base/Base'
+import * as Board from './components/board/Board'
 import * as Camera from './components/camera/Camera'
 import * as Motor from './components/motor/Motor'
+import * as Sensor from './components/sensor/Sensor'
+
 
 import { BaseClient } from './components/base/Client'
+import { BoardClient } from './components/board/Client'
 import { CameraClient } from './components/camera/Client'
 import Client from './Client'
 import { MotorClient } from './components/motor/Client'
+import { SensorClient } from './components/sensor/Client'
 import { StreamClient } from './extra/stream/Client'
 
 import armApi from './gen/component/arm/v1/arm_pb.esm'
@@ -22,6 +27,7 @@ import motorApi from './gen/component/motor/v1/motor_pb.esm'
 import movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb.esm'
 import navigationApi from './gen/service/navigation/v1/navigation_pb.esm'
 import robotApi from './gen/robot/v1/robot_pb.esm'
+import sensorApi from './gen/component/sensor/v1/sensor_pb.esm'
 import sensorsApi from './gen/service/sensors/v1/sensors_pb.esm'
 import servoApi from './gen/component/servo/v1/servo_pb.esm'
 import slamApi from './gen/service/slam/v1/slam_pb.esm'
@@ -44,6 +50,7 @@ export {
   servoApi,
   robotApi,
   navigationApi,
+  sensorApi,
   sensorsApi,
   slamApi,
   visionApi,
@@ -51,10 +58,14 @@ export {
   Camera,
   Motor,
   Base,
+  Board,
+  Sensor,
   BaseClient,
+  BoardClient,
   CameraClient,
   Client,
   MotorClient,
+  SensorClient,
   StreamClient
 }
 

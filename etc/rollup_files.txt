@@ -19,6 +19,8 @@ src/gen/component/inputcontroller/v1/input_controller_pb
 src/gen/component/inputcontroller/v1/input_controller_pb_service
 src/gen/component/motor/v1/motor_pb
 src/gen/component/motor/v1/motor_pb_service
+src/gen/component/sensor/v1/sensor_pb
+src/gen/component/sensor/v1/sensor_pb_service
 src/gen/component/servo/v1/servo_pb
 src/gen/component/servo/v1/servo_pb_service
 src/gen/robot/v1/robot_pb
