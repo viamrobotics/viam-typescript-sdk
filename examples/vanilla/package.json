@@ -1,7 +1,7 @@
 {
   "name": "@viamrobotics/sdk-ts-example",
   "version": "0.0.1",
-  "description": "quickstart example of a typescript app with viam sdk",
+  "description": "Viam SDK Quickstart",
   "scripts": {
     "watch": "esbuild ./src/main.ts --bundle --outfile=static/main.js --servedir=static",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,6 +12,6 @@
     "esbuild": "0.16.12"
   },
   "dependencies": {
-    "@viamrobotics/sdk": "^0.0.10"
+    "@viamrobotics/sdk": "^0.0.13"
   }
 }
