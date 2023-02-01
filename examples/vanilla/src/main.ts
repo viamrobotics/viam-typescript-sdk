@@ -4,14 +4,14 @@ import type { Credentials } from "@viamrobotics/rpc/src/dial";
 async function connect() {
   // You can remove this block entirely if your robot is not authenticated.
   // Otherwise, replace with an actual secret.
-  const secret = "<SECRET>"
+  const secret = "<SECRET>";
   const creds: Credentials = {
     payload: secret,
     type: "robot-location-secret",
   };
 
   // Replace with the host of your actual robot running Viam.
-  const host = "<HOST>"
+  const host = "<HOST>";
   const client = new Client(host);
 
   // Omit `creds` if your robot is not authenticated.
