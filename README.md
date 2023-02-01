@@ -7,7 +7,7 @@
 
 ## Usage
 
-See the [examples](examples) directory for examples of small apps that connect to Viam.
+[The examples directory](examples) contains small apps that demonstrate how to use this SDK to operate a robot running Viam.
 
 ## License 
 Copyright 2022 Viam Inc.
