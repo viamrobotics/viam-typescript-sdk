@@ -7,9 +7,9 @@
 
 ## Usage
 
-See the [examples](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/examples) directory for examples of small apps that connect to Viam.
+See the [examples](examples) directory for examples of small apps that connect to Viam.
 
 ## License 
 Copyright 2022 Viam Inc.
 
-Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE) file
+Apache 2.0 - See [LICENSE](LICENSE) file
