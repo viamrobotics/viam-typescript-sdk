@@ -11,7 +11,7 @@ module.exports = {
     'plugin:@typescript-eslint/strict',
     'prettier',
   ],
-  ignorePatterns: ['*.d.ts'],
+  ignorePatterns: ['*.d.ts', 'src/examples', 'src/gen'],
   overrides: [],
   parser: '@typescript-eslint/parser',
   parserOptions: {
