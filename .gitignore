@@ -108,3 +108,6 @@ src/gen/
 
 # project bin
 bin/
+
+# typedoc documentation
+docs
