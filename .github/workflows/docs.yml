@@ -3,10 +3,10 @@ name: Generate docs
 on:
   workflow_dispatch:
   push:
-    # paths:
-    #   - 'src/**'
-    #   - 'README.md'
-    branches: [RSDK-1835-document-sdk-functions]
+    paths:
+      - 'src/**'
+      - 'README.md'
+    branches: [main]
 
 jobs:
   generate-docs:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/RSDK-1835-document-sdk-functions'
+        if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs
