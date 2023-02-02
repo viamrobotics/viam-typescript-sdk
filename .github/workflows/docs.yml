@@ -3,10 +3,10 @@ name: Generate docs
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'src/**'
-      - 'README.md'
-    branches: [ main ]
+    # paths:
+    #   - 'src/**'
+    #   - 'README.md'
+    branches: [ RSDK-1835-document-sdk-functions ]
 
 jobs:
   generate-docs:
@@ -29,9 +29,9 @@ jobs:
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/RSDK-1835-document-sdk-functions'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs
           publish_branch: docs-gh_pages
-          cname: ts.viam.dev
+          # cname: ts.viam.dev
