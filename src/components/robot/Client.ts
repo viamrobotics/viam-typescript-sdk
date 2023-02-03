@@ -1,0 +1,184 @@
+import type {
+  PoseInFrame,
+  ResourceName,
+  Transform,
+} from '../../gen/common/v1/common_pb.esm';
+import type Client from '../../Client';
+import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import type { Robot } from './Robot';
+
+import { RobotServiceClient } from '../../gen/robot/v1/robot_pb_service.esm';
+import { promisify } from '../../utils';
+import proto from '../../gen/robot/v1/robot_pb.esm';
+
+export class RobotClient implements Robot {
+  private client: RobotServiceClient;
+
+  constructor(client: Client) {
+    this.client = client.createServiceClient(RobotServiceClient);
+  }
+
+  private get robotService() {
+    return this.client;
+  }
+
+  async getOperations() {
+    const robotService = this.robotService;
+    const request = new proto.GetOperationsRequest();
+    const response = await promisify<
+      proto.GetOperationsRequest,
+      proto.GetOperationsResponse
+    >(robotService.getOperations.bind(robotService), request);
+    return response;
+  }
+  async getSessions() {
+    const robotService = this.robotService;
+    const request = new proto.GetSessionsRequest();
+    const response = await promisify<
+      proto.GetSessionsRequest,
+      proto.GetSessionsResponse
+    >(robotService.getSessions.bind(robotService), request);
+    return response;
+  }
+  async resourceNames() {
+    const robotService = this.robotService;
+    const request = new proto.ResourceNamesRequest();
+    const response = await promisify<
+      proto.ResourceNamesRequest,
+      proto.ResourceNamesResponse
+    >(robotService.resourceNames.bind(robotService), request);
+    return response;
+  }
+  async resourceRPCSubtypes() {
+    const robotService = this.robotService;
+    const request = new proto.ResourceRPCSubtypesRequest();
+    const response = await promisify<
+      proto.ResourceRPCSubtypesRequest,
+      proto.ResourceRPCSubtypesResponse
+    >(robotService.resourceRPCSubtypes.bind(robotService), request);
+    return response;
+  }
+  async cancelOperation(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.CancelOperationRequest();
+    request.setId(id);
+    const response = await promisify<
+      proto.CancelOperationRequest,
+      proto.CancelOperationResponse
+    >(robotService.cancelOperation.bind(robotService), request);
+    return response;
+  }
+  async blockForOperation(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.BlockForOperationRequest();
+    request.setId(id);
+    const response = await promisify<
+      proto.BlockForOperationRequest,
+      proto.BlockForOperationResponse
+    >(robotService.blockForOperation.bind(robotService), request);
+    return response;
+  }
+  async discoverComponents(queries: proto.DiscoveryQuery[]) {
+    const robotService = this.robotService;
+    const request = new proto.DiscoverComponentsRequest();
+    request.setQueriesList(queries);
+    const response = await promisify<
+      proto.DiscoverComponentsRequest,
+      proto.DiscoverComponentsResponse
+    >(robotService.discoverComponents.bind(robotService), request);
+    return response;
+  }
+
+  async frameSystemConfig(transforms: Transform[]) {
+    const robotService = this.robotService;
+    const request = new proto.FrameSystemConfigRequest();
+    request.setSupplementalTransformsList(transforms);
+    const response = await promisify<
+      proto.FrameSystemConfigRequest,
+      proto.FrameSystemConfigResponse
+    >(robotService.frameSystemConfig.bind(robotService), request);
+    return response;
+  }
+  async transformPose(
+    source: PoseInFrame,
+    destination: string,
+    supplementalTransforms: Transform[]
+  ) {
+    const robotService = this.robotService;
+    const request = new proto.TransformPoseRequest();
+    request.setSource(source);
+    request.setDestination(destination);
+    request.setSupplementalTransformsList(supplementalTransforms);
+    const response = await promisify<
+      proto.TransformPoseRequest,
+      proto.TransformPoseResponse
+    >(robotService.transformPose.bind(robotService), request);
+    return response;
+  }
+  async transformPCD(
+    pointCloudPcd: Uint8Array,
+    source: string,
+    destination: string
+  ) {
+    const robotService = this.robotService;
+    const request = new proto.TransformPCDRequest();
+    request.setPointCloudPcd(pointCloudPcd);
+    request.setSource(source);
+    request.setDestination(destination);
+    const response = await promisify<
+      proto.TransformPCDRequest,
+      proto.TransformPCDResponse
+    >(robotService.transformPCD.bind(robotService), request);
+    return response;
+  }
+  async getStatus(resourceNames: ResourceName[]) {
+    const robotService = this.robotService;
+    const request = new proto.GetStatusRequest();
+    request.setResourceNamesList(resourceNames);
+    const response = await promisify<
+      proto.GetStatusRequest,
+      proto.GetStatusResponse
+    >(robotService.getStatus.bind(robotService), request);
+    return response;
+  }
+  async streamStatus(resourceNames: ResourceName[], duration: Duration) {
+    const robotService = this.robotService;
+    const request = new proto.StreamStatusRequest();
+    request.setResourceNamesList(resourceNames);
+    request.setEvery(duration);
+    const response = await promisify<
+      proto.StreamStatusRequest,
+      proto.StreamStatusResponse
+    >(robotService.streamStatus.bind(robotService), request);
+    return response;
+  }
+  async stopAll() {
+    const robotService = this.robotService;
+    const request = new proto.StopAllRequest();
+    const response = await promisify<
+      proto.StopAllRequest,
+      proto.StopAllResponse
+    >(robotService.stopAll.bind(robotService), request);
+    return response;
+  }
+  async startSession(resume: string) {
+    const robotService = this.robotService;
+    const request = new proto.StartSessionRequest();
+    request.setResume(resume);
+    const response = await promisify<
+      proto.StartSessionRequest,
+      proto.StartSessionResponse
+    >(robotService.startSession.bind(robotService), request);
+    return response;
+  }
+  async sendSessionHeartbeat(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.SendSessionHeartbeatRequest();
+    request.setId(id);
+    const response = await promisify<
+      proto.SendSessionHeartbeatRequest,
+      proto.SendSessionHeartbeatResponse
+    >(robotService.sendSessionHeartbeat.bind(robotService), request);
+    return response;
+  }
+}
