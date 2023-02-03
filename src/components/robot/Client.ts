@@ -54,43 +54,7 @@ export class RobotClient implements Robot {
     >(robotService.blockForOperation.bind(robotService), request);
   }
 
-  async getSessions() {
-    const robotService = this.robotService;
-    const request = new proto.GetSessionsRequest();
-    const response = await promisify<
-      proto.GetSessionsRequest,
-      proto.GetSessionsResponse
-    >(robotService.getSessions.bind(robotService), request);
-    return response;
-  }
-  async resourceNames() {
-    const robotService = this.robotService;
-    const request = new proto.ResourceNamesRequest();
-    const response = await promisify<
-      proto.ResourceNamesRequest,
-      proto.ResourceNamesResponse
-    >(robotService.resourceNames.bind(robotService), request);
-    return response;
-  }
-  async resourceRPCSubtypes() {
-    const robotService = this.robotService;
-    const request = new proto.ResourceRPCSubtypesRequest();
-    const response = await promisify<
-      proto.ResourceRPCSubtypesRequest,
-      proto.ResourceRPCSubtypesResponse
-    >(robotService.resourceRPCSubtypes.bind(robotService), request);
-    return response;
-  }
-  async discoverComponents(queries: proto.DiscoveryQuery[]) {
-    const robotService = this.robotService;
-    const request = new proto.DiscoverComponentsRequest();
-    request.setQueriesList(queries);
-    const response = await promisify<
-      proto.DiscoverComponentsRequest,
-      proto.DiscoverComponentsResponse
-    >(robotService.discoverComponents.bind(robotService), request);
-    return response;
-  }
+  // FRAME SYSTEM
 
   async frameSystemConfig(transforms: Transform[]) {
     const robotService = this.robotService;
@@ -140,6 +104,47 @@ export class RobotClient implements Robot {
       proto.TransformPCDResponse
     >(robotService.transformPCD.bind(robotService), request);
     return response.getPointCloudPcd_asU8();
+  }
+
+  // DISCOVERY
+
+  async discoverComponents(queries: proto.DiscoveryQuery[]) {
+    const robotService = this.robotService;
+    const request = new proto.DiscoverComponentsRequest();
+    request.setQueriesList(queries);
+    const response = await promisify<
+      proto.DiscoverComponentsRequest,
+      proto.DiscoverComponentsResponse
+    >(robotService.discoverComponents.bind(robotService), request);
+    return response.getDiscoveryList();
+  }
+
+  async getSessions() {
+    const robotService = this.robotService;
+    const request = new proto.GetSessionsRequest();
+    const response = await promisify<
+      proto.GetSessionsRequest,
+      proto.GetSessionsResponse
+    >(robotService.getSessions.bind(robotService), request);
+    return response;
+  }
+  async resourceNames() {
+    const robotService = this.robotService;
+    const request = new proto.ResourceNamesRequest();
+    const response = await promisify<
+      proto.ResourceNamesRequest,
+      proto.ResourceNamesResponse
+    >(robotService.resourceNames.bind(robotService), request);
+    return response;
+  }
+  async resourceRPCSubtypes() {
+    const robotService = this.robotService;
+    const request = new proto.ResourceRPCSubtypesRequest();
+    const response = await promisify<
+      proto.ResourceRPCSubtypesRequest,
+      proto.ResourceRPCSubtypesResponse
+    >(robotService.resourceRPCSubtypes.bind(robotService), request);
+    return response;
   }
 
   async getStatus(resourceNames: ResourceName[]) {

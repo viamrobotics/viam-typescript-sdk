@@ -95,12 +95,26 @@ export interface Robot {
     destination: string
   ): Promise<Uint8Array>;
 
+  // DISCOVERY
+
+  /**
+   * Get the list of discovered component configurations.
+   *
+   * @privateRemarks
+   *   TODO: this function should return an more idiomatic type instead of just
+   *   passing along a proto type.
+   * @param queries - The list of component models to discovery.
+   * @group Discovery
+   * @alpha
+   */
+  discoverComponents(
+    queries: proto.DiscoveryQuery[]
+  ): Promise<proto.Discovery[]>;
+
   getSessions(): Promise<proto.GetSessionsResponse>;
   resourceNames(): Promise<proto.ResourceNamesResponse>;
   resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtypesResponse>;
-  discoverComponents(
-    queries: proto.DiscoveryQuery[]
-  ): Promise<proto.DiscoverComponentsResponse>;
+
   getStatus(resource_names: ResourceName[]): Promise<proto.GetStatusResponse>;
   streamStatus(
     resource_names: ResourceName[],
