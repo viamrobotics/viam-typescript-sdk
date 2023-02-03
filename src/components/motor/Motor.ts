@@ -1,7 +1,7 @@
-import type { Extra } from '../../types'
+import type { Extra } from '../../types';
 
 export interface Properties {
-  positionReporting: boolean
+  positionReporting: boolean;
 }
 
 export interface Motor {
