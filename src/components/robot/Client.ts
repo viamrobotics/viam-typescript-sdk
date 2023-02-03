@@ -100,7 +100,7 @@ export class RobotClient implements Robot {
       proto.FrameSystemConfigRequest,
       proto.FrameSystemConfigResponse
     >(robotService.frameSystemConfig.bind(robotService), request);
-    return response;
+    return response.getFrameSystemConfigsList();
   }
   async transformPose(
     source: PoseInFrame,
@@ -116,24 +116,32 @@ export class RobotClient implements Robot {
       proto.TransformPoseRequest,
       proto.TransformPoseResponse
     >(robotService.transformPose.bind(robotService), request);
-    return response;
+    const result = response.getPose();
+    if (!result) {
+      // eslint-disable-next-line no-warning-comments
+      // TODO: Can the response frame be undefined or null?
+      throw new Error('no pose');
+    }
+    return result;
   }
+
   async transformPCD(
-    pointCloudPcd: Uint8Array,
+    pointCloudPCD: Uint8Array,
     source: string,
     destination: string
   ) {
     const robotService = this.robotService;
     const request = new proto.TransformPCDRequest();
-    request.setPointCloudPcd(pointCloudPcd);
+    request.setPointCloudPcd(pointCloudPCD);
     request.setSource(source);
     request.setDestination(destination);
     const response = await promisify<
       proto.TransformPCDRequest,
       proto.TransformPCDResponse
     >(robotService.transformPCD.bind(robotService), request);
-    return response;
+    return response.getPointCloudPcd_asU8();
   }
+
   async getStatus(resourceNames: ResourceName[]) {
     const robotService = this.robotService;
     const request = new proto.GetStatusRequest();

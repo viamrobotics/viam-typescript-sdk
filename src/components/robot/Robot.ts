@@ -14,8 +14,9 @@ export interface Robot {
    * Get the list of operations currently running on the robot.
    *
    * @privateRemarks
-   *   TODO: this function should return a yet-to-be-defined Operation type
-   *   instead of just returning the proto definition.
+   *   TODO: this function should return an more idiomatic type instead of just
+   *   passing along a proto type.
+   * @group Operations
    * @alpha
    */
   getOperations(): Promise<proto.Operation[]>;
@@ -24,6 +25,7 @@ export interface Robot {
    * Cancels the specified operation on the robot.
    *
    * @param id - ID of operation to kill.
+   * @group Operations
    * @alpha
    */
   cancelOperation(id: string): Promise<void>;
@@ -33,9 +35,65 @@ export interface Robot {
    * return when the specific operation has finished or has been cancelled.
    *
    * @param id (str) - ID of operation to block on.
+   * @group Operations
    * @alpha
    */
   blockForOperation(id: string): Promise<void>;
+
+  // FRAME SYSTEM
+
+  /**
+   * Get the configuration of the frame system of a given robot.
+   *
+   * @privateRemarks
+   *   TODO: this function should return an more idiomatic type instead of just
+   *   passing along a proto type.
+   * @group Frame System
+   * @alpha
+   */
+  frameSystemConfig(transform: Transform[]): Promise<proto.FrameSystemConfig[]>;
+
+  /**
+   * Transform a given source Pose from the reference frame to a new specified
+   * destination which is a reference frame.
+   *
+   * @privateRemarks
+   *   TODO: this function should return an more idiomatic type instead of just
+   *   passing along a proto type.
+   * @param query - The pose that should be transformed
+   * @param destination - The name of the reference frame to transform the given
+   * @param supplementalTransforms - Pose information on any additional
+   *   reference frames that are needed to perform the transform
+   * @group Frame System
+   * @alpha
+   */
+  transformPose(
+    source: PoseInFrame,
+    destination: string,
+    supplementalTransforms: Transform[]
+  ): Promise<PoseInFrame>;
+
+  /**
+   * Transform a given source point cloud from the reference frame to a new
+   * specified destination which is a reference frame.
+   *
+   * @param pointCloudPCD - The point clouds to transform. This should be in the
+   *   PCD format encoded into bytes:
+   *   https://pointclouds.org/documentation/tutorials/pcd_file_format.html
+   * @param source - The reference frame of the point cloud.
+   * @param destination - The reference frame into which the source data should
+   *   be transformed, if unset this defaults to the "world" reference frame. Do
+   *   not move the robot between the generation of the initial pointcloud and
+   *   the receipt of the transformed pointcloud because that will make the
+   *   transformations inaccurate.
+   * @group Frame System
+   * @alpha
+   */
+  transformPCD(
+    pointCloudPCD: Uint8Array,
+    source: string,
+    destination: string
+  ): Promise<Uint8Array>;
 
   getSessions(): Promise<proto.GetSessionsResponse>;
   resourceNames(): Promise<proto.ResourceNamesResponse>;
@@ -43,19 +101,6 @@ export interface Robot {
   discoverComponents(
     queries: proto.DiscoveryQuery[]
   ): Promise<proto.DiscoverComponentsResponse>;
-  frameSystemConfig(
-    transform: Transform[]
-  ): Promise<proto.FrameSystemConfigResponse>;
-  transformPose(
-    source: PoseInFrame,
-    destination: string,
-    supplemental_transforms: Transform[]
-  ): Promise<proto.TransformPoseResponse>;
-  transformPCD(
-    point_cloud_pcd: Uint8Array,
-    source: string,
-    destination: string
-  ): Promise<proto.TransformPCDResponse>;
   getStatus(resource_names: ResourceName[]): Promise<proto.GetStatusResponse>;
   streamStatus(
     resource_names: ResourceName[],
