@@ -154,29 +154,42 @@ export interface Robot {
   sendSessionHeartbeat(id: string): Promise<void>;
 
   /**
+   * Get a list of all resources on the robot.
+   *
    * @group Resources
    * @alpha
    */
-  resourceNames(): Promise<proto.ResourceNamesResponse>;
+  resourceNames(): Promise<ResourceName[]>;
 
   /**
+   * Get a list of all resource types.
+   *
    * @group Resources
    * @alpha
    */
-  resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtypesResponse>;
+  resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtype[]>;
 
   /**
+   * Get a list of all statuses requested. An empty request signifies all
+   * resources.
+   *
+   * @param resourceNames - The list of resources for which to receive statuses.
    * @group Status
    * @alpha
    */
-  getStatus(resource_names: ResourceName[]): Promise<proto.GetStatusResponse>;
+  getStatus(resourceNames: ResourceName[]): Promise<proto.Status[]>;
 
   /**
+   * Periodically receive the status of all statuses requested. An empty request
+   * signifies all resources.
+   *
+   * @param resourceNames - The list of resources for which to receive statuses.
+   * @param duration - How often to send a new status.
    * @group Status
    * @alpha
    */
   streamStatus(
-    resource_names: ResourceName[],
+    resourceNames: ResourceName[],
     duration: Duration
-  ): Promise<proto.StreamStatusResponse>;
+  ): Promise<proto.Status[]>;
 }

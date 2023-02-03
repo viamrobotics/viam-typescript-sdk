@@ -161,6 +161,8 @@ export class RobotClient implements Robot {
     >(robotService.sendSessionHeartbeat.bind(robotService), request);
   }
 
+  // RESOURCES
+
   async resourceNames() {
     const robotService = this.robotService;
     const request = new proto.ResourceNamesRequest();
@@ -168,8 +170,9 @@ export class RobotClient implements Robot {
       proto.ResourceNamesRequest,
       proto.ResourceNamesResponse
     >(robotService.resourceNames.bind(robotService), request);
-    return response;
+    return response.getResourcesList();
   }
+
   async resourceRPCSubtypes() {
     const robotService = this.robotService;
     const request = new proto.ResourceRPCSubtypesRequest();
@@ -177,8 +180,10 @@ export class RobotClient implements Robot {
       proto.ResourceRPCSubtypesRequest,
       proto.ResourceRPCSubtypesResponse
     >(robotService.resourceRPCSubtypes.bind(robotService), request);
-    return response;
+    return response.getResourceRpcSubtypesList();
   }
+
+  // STATUS
 
   async getStatus(resourceNames: ResourceName[]) {
     const robotService = this.robotService;
@@ -188,8 +193,9 @@ export class RobotClient implements Robot {
       proto.GetStatusRequest,
       proto.GetStatusResponse
     >(robotService.getStatus.bind(robotService), request);
-    return response;
+    return response.getStatusList();
   }
+
   async streamStatus(resourceNames: ResourceName[], duration: Duration) {
     const robotService = this.robotService;
     const request = new proto.StreamStatusRequest();
@@ -199,6 +205,6 @@ export class RobotClient implements Robot {
       proto.StreamStatusRequest,
       proto.StreamStatusResponse
     >(robotService.streamStatus.bind(robotService), request);
-    return response;
+    return response.getStatusList();
   }
 }
