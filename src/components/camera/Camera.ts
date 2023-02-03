@@ -1,12 +1,12 @@
 import type {
   DistortionParameters,
   IntrinsicParameters
-} from '../../gen/component/camera/v1/camera_pb.esm'
+} from '../../gen/component/camera/v1/camera_pb.esm';
 
 export interface Properties {
-  supportsPcd: boolean
-  intrinsicParameters?: IntrinsicParameters.AsObject
-  distortionParameters?: DistortionParameters.AsObject
+  supportsPcd: boolean;
+  intrinsicParameters?: IntrinsicParameters.AsObject;
+  distortionParameters?: DistortionParameters.AsObject;
 }
 
 export enum MimeType {
@@ -18,8 +18,8 @@ export enum MimeType {
 }
 
 export interface Camera {
-  getImage: (mimeType: MimeType) => Promise<Uint8Array>
-  renderFrame: (mimeType: MimeType) => Promise<Blob>
-  getPointCloud: () => Promise<Uint8Array>
-  getProperties: () => Promise<Properties>
+  getImage: (mimeType: MimeType) => Promise<Uint8Array>;
+  renderFrame: (mimeType: MimeType) => Promise<Blob>;
+  getPointCloud: () => Promise<Uint8Array>;
+  getProperties: () => Promise<Properties>;
 }

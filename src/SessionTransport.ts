@@ -1,37 +1,37 @@
-import { GRPCError } from '@viamrobotics/rpc'
-import type SessionManager from './SessionManager'
-import { grpc } from '@improbable-eng/grpc-web'
+import { GRPCError } from '@viamrobotics/rpc';
+import type SessionManager from './SessionManager';
+import { grpc } from '@improbable-eng/grpc-web';
 
 export default class SessionTransport implements grpc.Transport {
-  private readonly opts: grpc.TransportOptions
-  protected readonly transport: grpc.Transport
-  protected readonly sessionManager: SessionManager
+  private readonly opts: grpc.TransportOptions;
+  protected readonly transport: grpc.Transport;
+  protected readonly sessionManager: SessionManager;
 
-  private mdProm: Promise<void> | undefined
-  private mdPromResolve: (() => void) | undefined
+  private mdProm: Promise<void> | undefined;
+  private mdPromResolve: (() => void) | undefined;
 
   constructor(
     opts: grpc.TransportOptions,
     innerFactory: grpc.TransportFactory,
     sessionManager: SessionManager
   ) {
-    const actualOnEnd = opts.onEnd
+    const actualOnEnd = opts.onEnd;
     opts.onEnd = (err?: Error) => {
       if (err && err instanceof GRPCError) {
         if (
           err.code === grpc.Code.InvalidArgument &&
           err.grpcMessage === 'SESSION_EXPIRED'
         ) {
-          this.sessionManager.reset()
+          this.sessionManager.reset();
         }
       }
-      actualOnEnd(err)
-    }
-    const actualOnHeaders = opts.onHeaders
+      actualOnEnd(err);
+    };
+    const actualOnHeaders = opts.onHeaders;
     opts.onHeaders = (headers: grpc.Metadata, status: number) => {
       const gStatus = headers.has('grpc-status')
         ? headers.get('grpc-status')
-        : undefined
+        : undefined;
       if (
         gStatus &&
         gStatus.length === 1 &&
@@ -39,19 +39,19 @@ export default class SessionTransport implements grpc.Transport {
       ) {
         const gMsg = headers.has('grpc-message')
           ? headers.get('grpc-message')
-          : undefined
+          : undefined;
         if (gMsg && gMsg.length === 1 && gMsg[0] === 'SESSION_EXPIRED') {
-          this.sessionManager.reset()
+          this.sessionManager.reset();
         }
       }
-      actualOnHeaders(headers, status)
-    }
-    this.opts = opts
-    this.sessionManager = sessionManager
-    this.transport = innerFactory(opts)
+      actualOnHeaders(headers, status);
+    };
+    this.opts = opts;
+    this.sessionManager = sessionManager;
+    this.transport = innerFactory(opts);
     this.mdProm = new Promise<void>((resolve) => {
-      this.mdPromResolve = resolve
-    })
+      this.mdPromResolve = resolve;
+    });
   }
 
   public start(metadata: grpc.Metadata) {
@@ -59,25 +59,25 @@ export default class SessionTransport implements grpc.Transport {
       .getSessionMetadata()
       .then((md) => {
         md.forEach((key: string, values: string | string[]) => {
-          metadata.set(key, values)
-        })
-        this.transport.start(metadata)
-        this.mdPromResolve?.()
+          metadata.set(key, values);
+        });
+        this.transport.start(metadata);
+        this.mdPromResolve?.();
       })
       .catch((err) => {
-        this.opts.onEnd(err)
-      })
+        this.opts.onEnd(err);
+      });
   }
 
   public sendMessage(msgBytes: Uint8Array) {
-    this.mdProm?.then(() => this.transport.sendMessage(msgBytes))
+    this.mdProm?.then(() => this.transport.sendMessage(msgBytes));
   }
 
   public finishSend() {
-    this.mdProm?.then(() => this.transport.finishSend())
+    this.mdProm?.then(() => this.transport.finishSend());
   }
 
   public cancel() {
-    this.transport.cancel()
+    this.transport.cancel();
   }
 }

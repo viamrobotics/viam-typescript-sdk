@@ -69,7 +69,7 @@ module.exports = {
     'prefer-destructuring': 'off',
     'quote-props': ['error', 'consistent-as-needed'],
     'quotes': ['error', 'single'],
-    'semi': ['error', 'never'],
+    'semi': ['error', 'always'],
 
     '@typescript-eslint/prefer-for-of': 'off',
     '@typescript-eslint/no-shadow': ['error'], // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358
