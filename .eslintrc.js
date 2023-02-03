@@ -31,9 +31,9 @@ module.exports = {
     'camelcase': ['error', { properties: 'never' }],
     'comma-dangle': ['error', {
       arrays: 'always-multiline',
-      exports: 'never',
+      exports: 'only-multiline',
       functions: 'never',
-      imports: 'never',
+      imports: 'only-multiline',
       objects: 'always-multiline',
     }],
     'complexity': ['error', { max: 50 }],
@@ -70,7 +70,7 @@ module.exports = {
     'quote-props': ['error', 'consistent-as-needed'],
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
-
+    'sort-imports': ['error', { 'allowSeparatedGroups': true }],
     '@typescript-eslint/prefer-for-of': 'off',
     '@typescript-eslint/no-shadow': ['error'], // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358
     '@typescript-eslint/type-annotation-spacing': 'warn',
