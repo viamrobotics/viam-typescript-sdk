@@ -117,22 +117,41 @@ export interface Robot {
   ): Promise<proto.Discovery[]>;
 
   /**
+   * Create a new session that expects at least one heartbeat within the
+   * returned window. If the window lapses, any resources that have safety heart
+   * monitored methods, where this session was the last caller on the resource,
+   * will be stopped.
+   *
+   * @privateRemarks
+   *   TODO: this function should return an more idiomatic type instead of just
+   *   passing along a proto type.
+   * @param resume - A session ID that is used to attempt to continue a stream
+   *   after a disconnection event. If the session is not found, a new one will
+   *   be created and returned.
    * @group Sessions
    * @alpha
    */
   startSession(resume: string): Promise<proto.StartSessionResponse>;
 
   /**
+   * Get a list of active sessions.
+   *
+   * @privateRemarks
+   *   TODO: this function should return an more idiomatic type instead of just
+   *   passing along a proto type.
    * @group Sessions
    * @alpha
    */
-  getSessions(): Promise<proto.GetSessionsResponse>;
+  getSessions(): Promise<proto.Session[]>;
 
   /**
+   * Send a heartbeat to the given session. If the session has expired, a
+   * SESSION_EXPIRED error will be returned.
+   *
    * @group Sessions
    * @alpha
    */
-  sendSessionHeartbeat(id: string): Promise<proto.SendSessionHeartbeatResponse>;
+  sendSessionHeartbeat(id: string): Promise<void>;
 
   /**
    * @group Resources

@@ -128,6 +128,19 @@ export class RobotClient implements Robot {
     return response.getDiscoveryList();
   }
 
+  // SESSIONS
+
+  async startSession(resume: string) {
+    const robotService = this.robotService;
+    const request = new proto.StartSessionRequest();
+    request.setResume(resume);
+    const response = await promisify<
+      proto.StartSessionRequest,
+      proto.StartSessionResponse
+    >(robotService.startSession.bind(robotService), request);
+    return response;
+  }
+
   async getSessions() {
     const robotService = this.robotService;
     const request = new proto.GetSessionsRequest();
@@ -135,8 +148,19 @@ export class RobotClient implements Robot {
       proto.GetSessionsRequest,
       proto.GetSessionsResponse
     >(robotService.getSessions.bind(robotService), request);
-    return response;
+    return response.getSessionsList();
   }
+
+  async sendSessionHeartbeat(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.SendSessionHeartbeatRequest();
+    request.setId(id);
+    await promisify<
+      proto.SendSessionHeartbeatRequest,
+      proto.SendSessionHeartbeatResponse
+    >(robotService.sendSessionHeartbeat.bind(robotService), request);
+  }
+
   async resourceNames() {
     const robotService = this.robotService;
     const request = new proto.ResourceNamesRequest();
@@ -175,26 +199,6 @@ export class RobotClient implements Robot {
       proto.StreamStatusRequest,
       proto.StreamStatusResponse
     >(robotService.streamStatus.bind(robotService), request);
-    return response;
-  }
-  async startSession(resume: string) {
-    const robotService = this.robotService;
-    const request = new proto.StartSessionRequest();
-    request.setResume(resume);
-    const response = await promisify<
-      proto.StartSessionRequest,
-      proto.StartSessionResponse
-    >(robotService.startSession.bind(robotService), request);
-    return response;
-  }
-  async sendSessionHeartbeat(id: string) {
-    const robotService = this.robotService;
-    const request = new proto.SendSessionHeartbeatRequest();
-    request.setId(id);
-    const response = await promisify<
-      proto.SendSessionHeartbeatRequest,
-      proto.SendSessionHeartbeatResponse
-    >(robotService.sendSessionHeartbeat.bind(robotService), request);
     return response;
   }
 }
