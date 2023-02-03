@@ -8,12 +8,38 @@ import type { Extra } from '../../types';
 import type proto from '../../gen/robot/v1/robot_pb.esm';
 
 export interface Robot {
-  getOperations(): Promise<proto.GetOperationsResponse>;
+  // OPERATIONS
+
+  /**
+   * Get the list of operations currently running on the robot.
+   *
+   * @privateRemarks
+   *   TODO: this function should return a yet-to-be-defined Operation type
+   *   instead of just returning the proto definition.
+   * @alpha
+   */
+  getOperations(): Promise<proto.Operation[]>;
+
+  /**
+   * Cancels the specified operation on the robot.
+   *
+   * @param id - ID of operation to kill.
+   * @alpha
+   */
+  cancelOperation(id: string): Promise<void>;
+
+  /**
+   * Blocks on the specified operation on the robot. This function will only
+   * return when the specific operation has finished or has been cancelled.
+   *
+   * @param id (str) - ID of operation to block on.
+   * @alpha
+   */
+  blockForOperation(id: string): Promise<void>;
+
   getSessions(): Promise<proto.GetSessionsResponse>;
   resourceNames(): Promise<proto.ResourceNamesResponse>;
   resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtypesResponse>;
-  cancelOperation(id: string): Promise<proto.CancelOperationResponse>;
-  blockForOperation(id: string): Promise<proto.BlockForOperationResponse>;
   discoverComponents(
     queries: proto.DiscoveryQuery[]
   ): Promise<proto.DiscoverComponentsResponse>;

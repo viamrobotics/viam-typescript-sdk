@@ -22,6 +22,8 @@ export class RobotClient implements Robot {
     return this.client;
   }
 
+  // OPERATIONS
+
   async getOperations() {
     const robotService = this.robotService;
     const request = new proto.GetOperationsRequest();
@@ -29,8 +31,29 @@ export class RobotClient implements Robot {
       proto.GetOperationsRequest,
       proto.GetOperationsResponse
     >(robotService.getOperations.bind(robotService), request);
-    return response;
+    return response.getOperationsList();
   }
+
+  async cancelOperation(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.CancelOperationRequest();
+    request.setId(id);
+    await promisify<
+      proto.CancelOperationRequest,
+      proto.CancelOperationResponse
+    >(robotService.cancelOperation.bind(robotService), request);
+  }
+
+  async blockForOperation(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.BlockForOperationRequest();
+    request.setId(id);
+    await promisify<
+      proto.BlockForOperationRequest,
+      proto.BlockForOperationResponse
+    >(robotService.blockForOperation.bind(robotService), request);
+  }
+
   async getSessions() {
     const robotService = this.robotService;
     const request = new proto.GetSessionsRequest();
@@ -56,26 +79,6 @@ export class RobotClient implements Robot {
       proto.ResourceRPCSubtypesRequest,
       proto.ResourceRPCSubtypesResponse
     >(robotService.resourceRPCSubtypes.bind(robotService), request);
-    return response;
-  }
-  async cancelOperation(id: string) {
-    const robotService = this.robotService;
-    const request = new proto.CancelOperationRequest();
-    request.setId(id);
-    const response = await promisify<
-      proto.CancelOperationRequest,
-      proto.CancelOperationResponse
-    >(robotService.cancelOperation.bind(robotService), request);
-    return response;
-  }
-  async blockForOperation(id: string) {
-    const robotService = this.robotService;
-    const request = new proto.BlockForOperationRequest();
-    request.setId(id);
-    const response = await promisify<
-      proto.BlockForOperationRequest,
-      proto.BlockForOperationResponse
-    >(robotService.blockForOperation.bind(robotService), request);
     return response;
   }
   async discoverComponents(queries: proto.DiscoveryQuery[]) {
