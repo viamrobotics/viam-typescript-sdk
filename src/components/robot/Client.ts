@@ -54,6 +54,15 @@ export class RobotClient implements Robot {
     >(robotService.blockForOperation.bind(robotService), request);
   }
 
+  async stopAll() {
+    const robotService = this.robotService;
+    const request = new proto.StopAllRequest();
+    await promisify<proto.StopAllRequest, proto.StopAllResponse>(
+      robotService.stopAll.bind(robotService),
+      request
+    );
+  }
+
   // FRAME SYSTEM
 
   async frameSystemConfig(transforms: Transform[]) {
@@ -166,15 +175,6 @@ export class RobotClient implements Robot {
       proto.StreamStatusRequest,
       proto.StreamStatusResponse
     >(robotService.streamStatus.bind(robotService), request);
-    return response;
-  }
-  async stopAll() {
-    const robotService = this.robotService;
-    const request = new proto.StopAllRequest();
-    const response = await promisify<
-      proto.StopAllRequest,
-      proto.StopAllResponse
-    >(robotService.stopAll.bind(robotService), request);
     return response;
   }
   async startSession(resume: string) {

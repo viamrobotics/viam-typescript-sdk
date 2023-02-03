@@ -8,8 +8,6 @@ import type { Extra } from '../../types';
 import type proto from '../../gen/robot/v1/robot_pb.esm';
 
 export interface Robot {
-  // OPERATIONS
-
   /**
    * Get the list of operations currently running on the robot.
    *
@@ -40,7 +38,16 @@ export interface Robot {
    */
   blockForOperation(id: string): Promise<void>;
 
-  // FRAME SYSTEM
+  /**
+   * Cancel all current and outstanding operations for the robot and stop all
+   * actuators and movement.
+   *
+   * @param extra - Any extra parameters to pass to the components' `stop`
+   *   methods, keyed on the component's resource name.
+   * @group Operations
+   * @alpha
+   */
+  stopAll(extra?: Map<string, Extra>): Promise<void>;
 
   /**
    * Get the configuration of the frame system of a given robot.
@@ -95,8 +102,6 @@ export interface Robot {
     destination: string
   ): Promise<Uint8Array>;
 
-  // DISCOVERY
-
   /**
    * Get the list of discovered component configurations.
    *
@@ -111,16 +116,48 @@ export interface Robot {
     queries: proto.DiscoveryQuery[]
   ): Promise<proto.Discovery[]>;
 
+  /**
+   * @group Sessions
+   * @alpha
+   */
+  startSession(resume: string): Promise<proto.StartSessionResponse>;
+
+  /**
+   * @group Sessions
+   * @alpha
+   */
   getSessions(): Promise<proto.GetSessionsResponse>;
+
+  /**
+   * @group Sessions
+   * @alpha
+   */
+  sendSessionHeartbeat(id: string): Promise<proto.SendSessionHeartbeatResponse>;
+
+  /**
+   * @group Resources
+   * @alpha
+   */
   resourceNames(): Promise<proto.ResourceNamesResponse>;
+
+  /**
+   * @group Resources
+   * @alpha
+   */
   resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtypesResponse>;
 
+  /**
+   * @group Status
+   * @alpha
+   */
   getStatus(resource_names: ResourceName[]): Promise<proto.GetStatusResponse>;
+
+  /**
+   * @group Status
+   * @alpha
+   */
   streamStatus(
     resource_names: ResourceName[],
     duration: Duration
   ): Promise<proto.StreamStatusResponse>;
-  stopAll(extra?: Extra): Promise<proto.StopAllResponse>;
-  startSession(resume: string): Promise<proto.StartSessionResponse>;
-  sendSessionHeartbeat(id: string): Promise<proto.SendSessionHeartbeatResponse>;
 }
