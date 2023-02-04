@@ -1,6 +1,6 @@
 import type {
   DistortionParameters,
-  IntrinsicParameters
+  IntrinsicParameters,
 } from '../../gen/component/camera/v1/camera_pb.esm';
 
 export interface Properties {
