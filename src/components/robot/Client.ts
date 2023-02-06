@@ -3,9 +3,9 @@ import type {
   ResourceName,
   Transform,
 } from '../../gen/common/v1/common_pb.esm';
-import type Client from '../../Client';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import type { Robot } from './Robot';
+import type { grpc } from '@improbable-eng/grpc-web';
 
 import { RobotServiceClient } from '../../gen/robot/v1/robot_pb_service.esm';
 import { promisify } from '../../utils';
@@ -14,8 +14,17 @@ import proto from '../../gen/robot/v1/robot_pb.esm';
 export class RobotClient implements Robot {
   private client: RobotServiceClient;
 
-  constructor(client: Client) {
-    this.client = client.createServiceClient(RobotServiceClient);
+  // eslint-disable-next-line no-warning-comments
+  /*
+   * TODO:
+   * this constructor signature differs from the other wrappers we have
+   * implemented so far. Consider updating the rest or making it so all other
+   * wrappers are accessed through the robot wrapper.
+   */
+  constructor(serviceHost: string, transportFactory: grpc.TransportFactory) {
+    this.client = new RobotServiceClient(serviceHost, {
+      transport: transportFactory,
+    });
   }
 
   private get robotService() {
@@ -130,10 +139,12 @@ export class RobotClient implements Robot {
 
   // SESSIONS
 
-  async startSession(resume: string) {
+  async startSession(resume?: string) {
     const robotService = this.robotService;
     const request = new proto.StartSessionRequest();
-    request.setResume(resume);
+    if (resume) {
+      request.setResume(resume);
+    }
     const response = await promisify<
       proto.StartSessionRequest,
       proto.StartSessionResponse
