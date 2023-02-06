@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  build_and_lint:
+  build_lint_test:
     if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build and lint
+      - name: Build, lint, test
         run: |
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build lint test'
