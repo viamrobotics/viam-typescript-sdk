@@ -59,7 +59,6 @@ module.exports = {
     'no-continue': 'off',
     'no-extra-parens': 'off',
     'no-magic-numbers': 'off',
-    'no-negated-condition': 'off',
     'no-shadow': 'off', // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358
     'no-ternary': 'off',
     'no-undefined': 'off',
@@ -71,6 +70,7 @@ module.exports = {
     'quote-props': ['error', 'consistent-as-needed'],
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
+    'sort-keys': 'off',
     'sort-imports': ['error', { 'allowSeparatedGroups': true }],
     '@typescript-eslint/prefer-for-of': 'off',
     '@typescript-eslint/no-shadow': ['error'], // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358

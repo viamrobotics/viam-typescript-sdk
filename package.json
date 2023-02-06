@@ -26,7 +26,8 @@
     "format": "prettier --write './src/**/*.{ts,js}'",
     "lint": "eslint './src/**/*.{ts,js}' --fix",
     "rollup": "rollup -c ./etc/rollup.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
+    "@improbable-eng/grpc-web-fake-transport": "^0.15.0",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -53,6 +55,7 @@
     "eslint-config-prettier": "^8.5.0",
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.2",
+    "happy-dom": "^8.2.6",
     "npm-check": "^6.0.1",
     "prettier": "^2.8.1",
     "prettier-plugin-jsdoc": "^0.4.2",
@@ -63,6 +66,7 @@
     "typedoc": "^0.23.24",
     "typescript": "<4.9.3",
     "vite": "^3.2.4",
-    "vite-plugin-dts": "^1.7.1"
+    "vite-plugin-dts": "^1.7.1",
+    "vitest": "^0.28.4"
   }
 }

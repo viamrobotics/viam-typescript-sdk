@@ -16,4 +16,4 @@ jobs:
       - name: Build and lint
         run: |
           sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make build lint'
+          sudo -u testbot bash -lc 'make build lint test'
