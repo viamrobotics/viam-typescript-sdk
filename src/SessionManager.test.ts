@@ -44,8 +44,8 @@ describe('SessionManager', () => {
         cb({ code: grpc.Code.Unimplemented }, null);
       });
 
-    const metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({});
+    const expected = new grpc.Metadata();
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq('');
   });
 
@@ -56,11 +56,12 @@ describe('SessionManager', () => {
         cb(null, null);
       });
 
-    await expect(sm.getSessionMetadata()).rejects.toStrictEqual({
+    const expected = {
       code: grpc.Code.Internal,
       message: 'expected response to start session',
       metadata: new grpc.Metadata(),
-    });
+    };
+    await expect(sm.getSessionMetadata()).rejects.toStrictEqual(expected);
     expect(sm.sessionID).eq('');
   });
 
@@ -74,11 +75,12 @@ describe('SessionManager', () => {
         });
       });
 
-    await expect(sm.getSessionMetadata()).rejects.toStrictEqual({
+    const expected = {
       code: grpc.Code.Internal,
       message: 'expected heartbeat window in response to start session',
       metadata: new grpc.Metadata(),
-    });
+    };
+    await expect(sm.getSessionMetadata()).rejects.toStrictEqual(expected);
     expect(sm.sessionID).eq('');
   });
 
@@ -103,12 +105,12 @@ describe('SessionManager', () => {
       .fn()
       .mockImplementation(mockHealthyHeartbeat);
 
-    let metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({ 'viam-sid': [expectedSID] });
+    let expected = new grpc.Metadata({ 'viam-sid': [expectedSID] });
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq(expectedSID);
 
-    metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({ 'viam-sid': [expectedSID] });
+    expected = new grpc.Metadata({ 'viam-sid': [expectedSID] });
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq(expectedSID);
   });
 
@@ -134,14 +136,14 @@ describe('SessionManager', () => {
       .fn()
       .mockImplementation(mockHealthyHeartbeat);
 
-    let metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({ 'viam-sid': [initialSID] });
+    let expected = new grpc.Metadata({ 'viam-sid': [initialSID] });
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq(initialSID);
 
     sm.reset();
 
-    metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({ 'viam-sid': [afterResetSID] });
+    expected = new grpc.Metadata({ 'viam-sid': [afterResetSID] });
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq(afterResetSID);
   });
 
@@ -172,14 +174,14 @@ describe('SessionManager', () => {
       })
       .mockImplementation(mockHealthyHeartbeat);
 
-    let metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({ 'viam-sid': [initialSID] });
+    let expected = new grpc.Metadata({ 'viam-sid': [initialSID] });
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq(initialSID);
 
-    expect(reset).toBeCalled();
+    expect(reset).toHaveBeenCalled();
 
-    metadata = await sm.getSessionMetadata();
-    expect(metadata.headersMap).toStrictEqual({ 'viam-sid': [afterResetSID] });
+    expected = new grpc.Metadata({ 'viam-sid': [afterResetSID] });
+    await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sm.sessionID).eq(afterResetSID);
   });
 });
