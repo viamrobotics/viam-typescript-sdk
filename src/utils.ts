@@ -9,6 +9,12 @@ type ServiceFunc<Req, Resp> = (
   callback: Callback<Resp>
 ) => void;
 
+export class NoResponseError extends Error {
+  constructor() {
+    super('no response');
+  }
+}
+
 export const promisify = function <Req, Resp>(
   func: ServiceFunc<Req, Resp>,
   request: Req
@@ -19,7 +25,7 @@ export const promisify = function <Req, Resp>(
         return reject(error);
       }
       if (!response) {
-        return reject(new Error('no response'));
+        return reject(new NoResponseError());
       }
       return resolve(response);
     });

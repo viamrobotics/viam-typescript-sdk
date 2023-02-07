@@ -6,6 +6,7 @@ import type {
 import type Client from '../../Client';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import type { Robot } from './Robot';
+import type { grpc } from '@improbable-eng/grpc-web';
 
 import { RobotServiceClient } from '../../gen/robot/v1/robot_pb_service.esm';
 import { promisify } from '../../utils';
@@ -14,8 +15,20 @@ import proto from '../../gen/robot/v1/robot_pb.esm';
 export class RobotClient implements Robot {
   private client: RobotServiceClient;
 
-  constructor(client: Client) {
-    this.client = client.createServiceClient(RobotServiceClient);
+  constructor(
+    // Initialize from client
+    client?: Client,
+    // Initialize host and grpc options
+    serviceHost?: string,
+    opts?: grpc.RpcOptions
+  ) {
+    if (client) {
+      this.client = client.createServiceClient(RobotServiceClient);
+    } else if (serviceHost) {
+      this.client = new RobotServiceClient(serviceHost, opts);
+    } else {
+      throw new Error('invalid arguments');
+    }
   }
 
   private get robotService() {
@@ -130,10 +143,12 @@ export class RobotClient implements Robot {
 
   // SESSIONS
 
-  async startSession(resume: string) {
+  async startSession(resume?: string) {
     const robotService = this.robotService;
     const request = new proto.StartSessionRequest();
-    request.setResume(resume);
+    if (resume) {
+      request.setResume(resume);
+    }
     const response = await promisify<
       proto.StartSessionRequest,
       proto.StartSessionResponse
