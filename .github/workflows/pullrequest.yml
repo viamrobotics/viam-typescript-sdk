@@ -7,5 +7,4 @@ on:
 
 jobs:
   test:
-    # TODO: revert to main branch
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@RSDK-1843-add-ts-wrapper-for-robot
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@main
