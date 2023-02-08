@@ -31,8 +31,11 @@ export default class SessionManager {
 
   constructor(serviceHost: string, transportFactory: grpc.TransportFactory) {
     this.innerTransportFactory = transportFactory;
-    this.client = new RobotClient(undefined, serviceHost, {
-      transport: transportFactory,
+    this.client = new RobotClient({
+      serviceHost,
+      opts: {
+        transport: transportFactory,
+      },
     });
   }
 

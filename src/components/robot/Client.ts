@@ -3,7 +3,7 @@ import type {
   ResourceName,
   Transform,
 } from '../../gen/common/v1/common_pb.esm';
-import type Client from '../../Client';
+import Client from '../../Client';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import type { Robot } from './Robot';
 import type { grpc } from '@improbable-eng/grpc-web';
@@ -12,20 +12,29 @@ import { RobotServiceClient } from '../../gen/robot/v1/robot_pb_service.esm';
 import { promisify } from '../../utils';
 import proto from '../../gen/robot/v1/robot_pb.esm';
 
+interface ServiceHostInit {
+  serviceHost: string;
+  opts?: grpc.RpcOptions;
+}
+
+type RobotClientInit = Client | ServiceHostInit;
+
+const isClient = function (init: RobotClientInit): init is Client {
+  return init instanceof Client;
+};
+
+const isAddressInit = function (init: RobotClientInit): init is ServiceHostInit {
+  return Boolean((init as ServiceHostInit).serviceHost);
+};
+
 export class RobotClient implements Robot {
   private client: RobotServiceClient;
 
-  constructor(
-    // Initialize from client
-    client?: Client,
-    // Initialize host and grpc options
-    serviceHost?: string,
-    opts?: grpc.RpcOptions
-  ) {
-    if (client) {
-      this.client = client.createServiceClient(RobotServiceClient);
-    } else if (serviceHost) {
-      this.client = new RobotServiceClient(serviceHost, opts);
+  constructor(init: RobotClientInit) {
+    if (isClient(init)) {
+      this.client = init.createServiceClient(RobotServiceClient);
+    } else if (isAddressInit(init)) {
+      this.client = new RobotServiceClient(init.serviceHost, init.opts);
     } else {
       throw new Error('invalid arguments');
     }
