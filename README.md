@@ -7,6 +7,14 @@
 
 ## Usage
 
+### Installation
+
+```
+npm install --save @viamrobotics/sdk
+```
+
+### Examples
+
 [The examples directory](examples) contains small apps that demonstrate how to use this SDK to operate a robot running Viam.
 
 ## License 
