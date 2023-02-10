@@ -75,6 +75,7 @@ export class RobotClient implements Robot {
     >(robotService.frameSystemConfig.bind(robotService), request);
     return response.getFrameSystemConfigsList();
   }
+
   async transformPose(
     source: PoseInFrame,
     destination: string,
