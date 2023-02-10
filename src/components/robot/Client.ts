@@ -3,41 +3,19 @@ import type {
   ResourceName,
   Transform,
 } from '../../gen/common/v1/common_pb.esm';
-import Client from '../../Client';
+import type Client from '../../Client';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import type { Robot } from './Robot';
-import type { grpc } from '@improbable-eng/grpc-web';
 
 import { RobotServiceClient } from '../../gen/robot/v1/robot_pb_service.esm';
 import { promisify } from '../../utils';
 import proto from '../../gen/robot/v1/robot_pb.esm';
 
-interface ServiceHostInit {
-  serviceHost: string;
-  opts?: grpc.RpcOptions;
-}
-
-type RobotClientInit = Client | ServiceHostInit;
-
-const isClient = function (init: RobotClientInit): init is Client {
-  return init instanceof Client;
-};
-
-const isAddressInit = function (init: RobotClientInit): init is ServiceHostInit {
-  return Boolean((init as ServiceHostInit).serviceHost);
-};
-
 export class RobotClient implements Robot {
   private client: RobotServiceClient;
 
-  constructor(init: RobotClientInit) {
-    if (isClient(init)) {
-      this.client = init.createServiceClient(RobotServiceClient);
-    } else if (isAddressInit(init)) {
-      this.client = new RobotServiceClient(init.serviceHost, init.opts);
-    } else {
-      throw new Error('invalid arguments');
-    }
+  constructor(client: Client) {
+    this.client = client.createServiceClient(RobotServiceClient);
   }
 
   private get robotService() {
@@ -148,41 +126,6 @@ export class RobotClient implements Robot {
       proto.DiscoverComponentsResponse
     >(robotService.discoverComponents.bind(robotService), request);
     return response.getDiscoveryList();
-  }
-
-  // SESSIONS
-
-  async startSession(resume?: string) {
-    const robotService = this.robotService;
-    const request = new proto.StartSessionRequest();
-    if (resume) {
-      request.setResume(resume);
-    }
-    const response = await promisify<
-      proto.StartSessionRequest,
-      proto.StartSessionResponse
-    >(robotService.startSession.bind(robotService), request);
-    return response;
-  }
-
-  async getSessions() {
-    const robotService = this.robotService;
-    const request = new proto.GetSessionsRequest();
-    const response = await promisify<
-      proto.GetSessionsRequest,
-      proto.GetSessionsResponse
-    >(robotService.getSessions.bind(robotService), request);
-    return response.getSessionsList();
-  }
-
-  async sendSessionHeartbeat(id: string) {
-    const robotService = this.robotService;
-    const request = new proto.SendSessionHeartbeatRequest();
-    request.setId(id);
-    await promisify<
-      proto.SendSessionHeartbeatRequest,
-      proto.SendSessionHeartbeatResponse
-    >(robotService.sendSessionHeartbeat.bind(robotService), request);
   }
 
   // RESOURCES
