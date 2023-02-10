@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build, lint, test
+      - name: Build, lint, and test
         run: |
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build lint test'
