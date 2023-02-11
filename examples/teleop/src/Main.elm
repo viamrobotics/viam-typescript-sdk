@@ -11,10 +11,16 @@ import Json.Encode as E
 -- PORTS
 
 
+port sendMotorGoFor : E.Value -> Cmd msg
+
+
 port sendBaseMoveStraight : E.Value -> Cmd msg
 
 
-port recvGetPosition : (Int -> msg) -> Sub msg
+port sendGetPosition : () -> Cmd msg
+
+
+port recvGetPosition : (Float -> msg) -> Sub msg
 
 
 
@@ -34,7 +40,7 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { position = 0 }
-    , Cmd.none
+    , sendGetPosition ()
     )
 
 
@@ -43,7 +49,7 @@ init _ =
 
 
 type alias Model =
-    { position : Int }
+    { position : Float }
 
 
 
@@ -51,18 +57,31 @@ type alias Model =
 
 
 type Msg
-    = BaseMoveStraight
-    | RecvGetPosition Int
+    = MotorGoFor
+    | BaseMoveStraight
+    | RecvGetPosition Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        MotorGoFor ->
+            ( model, handleMotorGoFor )
+
         BaseMoveStraight ->
             ( model, handleBaseMoveStraight )
 
         RecvGetPosition position ->
             ( { model | position = position }, Cmd.none )
+
+
+handleMotorGoFor : Cmd none
+handleMotorGoFor =
+    sendMotorGoFor <|
+        E.object
+            [ ( "rpm", E.int 100 )
+            , ( "revs", E.int 10 )
+            ]
 
 
 handleBaseMoveStraight : Cmd none
@@ -104,6 +123,7 @@ view model =
         , At.style "user-select" "none"
         ]
         [ H.div [] [ H.text "position" ]
-        , H.div [] [ H.text <| String.fromInt model.position ]
-        , H.button [ Ev.onClick BaseMoveStraight ] [ H.text "GO" ]
+        , H.div [] [ H.text <| String.fromFloat model.position ]
+        , H.button [ Ev.onClick MotorGoFor ] [ H.text "Motor : Go For" ]
+        , H.button [ Ev.onClick BaseMoveStraight ] [ H.text "Base : Move Straight" ]
         ]

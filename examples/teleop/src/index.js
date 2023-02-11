@@ -30,6 +30,17 @@ const app = Elm.Main.init({
   flags: {},
 });
 
+app.ports.sendGetPosition.subscribe(async () => {
+  const position = await m1.getPosition();
+  app.ports.recvGetPosition.send(position);
+});
+
+app.ports.sendMotorGoFor.subscribe(async ({ rpm, revs }) => {
+  await m1.goFor(rpm, revs);
+  const position = await m1.getPosition();
+  app.ports.recvGetPosition.send(position);
+});
+
 app.ports.sendBaseMoveStraight.subscribe(async ({ dist, speed }) => {
   await base.moveStraight(dist, speed);
   const position = await m1.getPosition();
