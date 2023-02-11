@@ -1,0 +1,19 @@
+{
+  "name": "@viamrobotics/sdk-teleop-demo",
+  "version": "0.0.1",
+  "description": "Viam SDK tele-op demo",
+  "scripts": {
+    "start": "yarn run vite --port 3003",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Maxim Pertsov",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@viamrobotics/sdk": "^0.0.13"
+  },
+  "devDependencies": {
+    "elm": "^0.19.1-5",
+    "vite": "^3.2.5",
+    "vite-plugin-elm": "^2.7.2"
+  }
+}
