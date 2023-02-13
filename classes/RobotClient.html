@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>BaseClient | @viamrobotics/sdk</title><meta name="description" content="Documentation for @viamrobotics/sdk"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>RobotClient | @viamrobotics/sdk</title><meta name="description" content="Documentation for @viamrobotics/sdk"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script async src="../assets/search.js" id="search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,18 +13,18 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">@viamrobotics/sdk</a></li>
-<li><a href="BaseClient.html">BaseClient</a></li></ul>
-<h1>Class BaseClient</h1></div>
+<li><a href="RobotClient.html">RobotClient</a></li></ul>
+<h1>Class RobotClient</h1></div>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
-<li><span class="target">BaseClient</span></li></ul></section>
+<li><span class="target">RobotClient</span></li></ul></section>
 <section class="tsd-panel">
 <h4>Implements</h4>
 <ul class="tsd-hierarchy">
-<li><a href="../interfaces/Base.Base.html" class="tsd-signature-type" data-tsd-kind="Interface">Base</a></li></ul></section><aside class="tsd-sources">
+<li><a href="../interfaces/Robot.html" class="tsd-signature-type" data-tsd-kind="Interface">Robot</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L8">src/components/base/Client.ts:8</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L14">src/components/robot/Client.ts:14</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -32,165 +32,282 @@
 <div class="tsd-accordion-details">
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Constructors</h3>
-<div class="tsd-index-list"><a href="BaseClient.html#constructor" class="tsd-index-link tsd-kind-constructor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-512-path"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)" id="icon-512-text"></path></svg><span>constructor</span></a>
+<div class="tsd-index-list"><a href="RobotClient.html#constructor" class="tsd-index-link tsd-kind-constructor tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#4D7FFF" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-512-path"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)" id="icon-512-text"></path></svg><span>constructor</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
-<div class="tsd-index-list"><a href="BaseClient.html#client" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>client</span></a>
-<a href="BaseClient.html#name" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>name</span></a>
-<a href="BaseClient.html#options" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>options</span></a>
+<div class="tsd-index-list"><a href="RobotClient.html#client" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>client</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Accessors</h3>
-<div class="tsd-index-list"><a href="BaseClient.html#baseService" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4D4D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-262144-path"></rect><path d="M8.85 16L11.13 7.24H12.582L14.85 16H13.758L13.182 13.672H10.53L9.954 16H8.85ZM10.746 12.76H12.954L12.282 10.06C12.154 9.548 12.054 9.12 11.982 8.776C11.91 8.432 11.866 8.208 11.85 8.104C11.834 8.208 11.79 8.432 11.718 8.776C11.646 9.12 11.546 9.544 11.418 10.048L10.746 12.76Z" fill="var(--color-text)" id="icon-262144-text"></path></svg><span>base<wbr/>Service</span></a>
+<div class="tsd-index-list"><a href="RobotClient.html#robotService" class="tsd-index-link tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4D4D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-262144-path"></rect><path d="M8.85 16L11.13 7.24H12.582L14.85 16H13.758L13.182 13.672H10.53L9.954 16H8.85ZM10.746 12.76H12.954L12.282 10.06C12.154 9.548 12.054 9.12 11.982 8.776C11.91 8.432 11.866 8.208 11.85 8.104C11.834 8.208 11.79 8.432 11.718 8.776C11.646 9.12 11.546 9.544 11.418 10.048L10.746 12.76Z" fill="var(--color-text)" id="icon-262144-text"></path></svg><span>robot<wbr/>Service</span></a>
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="BaseClient.html#moveStraight" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>move<wbr/>Straight</span></a>
-<a href="BaseClient.html#setPower" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Power</span></a>
-<a href="BaseClient.html#setVelocity" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Velocity</span></a>
-<a href="BaseClient.html#spin" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>spin</span></a>
-<a href="BaseClient.html#stop" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>stop</span></a>
+<div class="tsd-index-list"><a href="RobotClient.html#blockForOperation" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>block<wbr/>For<wbr/>Operation</span></a>
+<a href="RobotClient.html#cancelOperation" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>cancel<wbr/>Operation</span></a>
+<a href="RobotClient.html#discoverComponents" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>discover<wbr/>Components</span></a>
+<a href="RobotClient.html#frameSystemConfig" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>frame<wbr/>System<wbr/>Config</span></a>
+<a href="RobotClient.html#getOperations" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Operations</span></a>
+<a href="RobotClient.html#getStatus" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>get<wbr/>Status</span></a>
+<a href="RobotClient.html#resourceNames" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>resource<wbr/>Names</span></a>
+<a href="RobotClient.html#resourceRPCSubtypes" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>resourceRPCSubtypes</span></a>
+<a href="RobotClient.html#stopAll" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>stop<wbr/>All</span></a>
+<a href="RobotClient.html#streamStatus" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>stream<wbr/>Status</span></a>
+<a href="RobotClient.html#transformPCD" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>transformPCD</span></a>
+<a href="RobotClient.html#transformPose" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>transform<wbr/>Pose</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
 <section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_BaseClient">new <wbr/>Base<wbr/>Client<span class="tsd-signature-symbol">(</span>client<span class="tsd-signature-symbol">: </span><a href="Client.html" class="tsd-signature-type" data-tsd-kind="Class">Client</a>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="BaseClient.html" class="tsd-signature-type" data-tsd-kind="Class">BaseClient</a><a href="#constructor.new_BaseClient" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_RobotClient">new <wbr/>Robot<wbr/>Client<span class="tsd-signature-symbol">(</span>client<span class="tsd-signature-symbol">: </span><a href="Client.html" class="tsd-signature-type" data-tsd-kind="Class">Client</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="RobotClient.html" class="tsd-signature-type" data-tsd-kind="Class">RobotClient</a><a href="#constructor.new_RobotClient" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>client: <a href="Client.html" class="tsd-signature-type" data-tsd-kind="Class">Client</a></h5></li>
-<li>
-<h5>name: <span class="tsd-signature-type">string</span></h5></li>
-<li>
-<h5>options: <span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol"> = {}</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <a href="BaseClient.html" class="tsd-signature-type" data-tsd-kind="Class">BaseClient</a></h4><aside class="tsd-sources">
+<h5>client: <a href="Client.html" class="tsd-signature-type" data-tsd-kind="Class">Client</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="RobotClient.html" class="tsd-signature-type" data-tsd-kind="Class">RobotClient</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L13">src/components/base/Client.ts:13</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L17">src/components/robot/Client.ts:17</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="client" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>client</span><a href="#client" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<div class="tsd-signature">client<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BaseServiceClient</span></div><aside class="tsd-sources">
+<div class="tsd-signature">client<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RobotServiceClient</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L9">src/components/base/Client.ts:9</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="name" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<div class="tsd-signature">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L10">src/components/base/Client.ts:10</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="options" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>options</span><a href="#options" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<div class="tsd-signature">options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Options</span></div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L11">src/components/base/Client.ts:11</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L15">src/components/robot/Client.ts:15</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
-<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><a id="baseService" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>base<wbr/>Service</span><a href="#baseService" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><a id="robotService" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>robot<wbr/>Service</span><a href="#robotService" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-private">
-<li class="tsd-signature" id="baseService.baseService-1"><span class="tsd-signature-symbol">get</span> baseService<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BaseServiceClient</span></li>
+<li class="tsd-signature" id="robotService.robotService-1"><span class="tsd-signature-symbol">get</span> robotService<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RobotServiceClient</span></li>
 <li class="tsd-description">
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">BaseServiceClient</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">RobotServiceClient</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L19">src/components/base/Client.ts:19</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L21">src/components/robot/Client.ts:21</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="moveStraight" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>move<wbr/>Straight</span><a href="#moveStraight" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="blockForOperation" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>block<wbr/>For<wbr/>Operation</span><a href="#blockForOperation" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="moveStraight.moveStraight-1">move<wbr/>Straight<span class="tsd-signature-symbol">(</span>distanceMm<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, mmPerSec<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#moveStraight.moveStraight-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
+<li class="tsd-signature tsd-anchor-link" id="blockForOperation.blockForOperation-1">block<wbr/>For<wbr/>Operation<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#blockForOperation.blockForOperation-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Blocks on the specified operation on the robot. This function will only
+return when the specific operation has finished or has been cancelled.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>distanceMm: <span class="tsd-signature-type">number</span></h5></li>
-<li>
-<h5>mmPerSec: <span class="tsd-signature-type">number</span></h5></li>
-<li>
-<h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
-<ul class="tsd-parameters"></ul></li></ul></div>
+<h5>id: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>(str) - ID of operation to block on.</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Base.Base.html">Base</a>.<a href="../interfaces/Base.Base.html#moveStraight">moveStraight</a></p>
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#blockForOperation">blockForOperation</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L23">src/components/base/Client.ts:23</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setPower" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>Power</span><a href="#setPower" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L47">src/components/robot/Client.ts:47</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="cancelOperation" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>cancel<wbr/>Operation</span><a href="#cancelOperation" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="setPower.setPower-1">set<wbr/>Power<span class="tsd-signature-symbol">(</span>linear<span class="tsd-signature-symbol">: </span><a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a>, angular<span class="tsd-signature-symbol">: </span><a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#setPower.setPower-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
+<li class="tsd-signature tsd-anchor-link" id="cancelOperation.cancelOperation-1">cancel<wbr/>Operation<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#cancelOperation.cancelOperation-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Cancels the specified operation on the robot.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>linear: <a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a></h5></li>
-<li>
-<h5>angular: <a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a></h5></li>
-<li>
-<h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
-<ul class="tsd-parameters"></ul></li></ul></div>
+<h5>id: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>ID of operation to kill.</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Base.Base.html">Base</a>.<a href="../interfaces/Base.Base.html#setPower">setPower</a></p>
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#cancelOperation">cancelOperation</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L54">src/components/base/Client.ts:54</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setVelocity" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>set<wbr/>Velocity</span><a href="#setVelocity" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L37">src/components/robot/Client.ts:37</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="discoverComponents" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>discover<wbr/>Components</span><a href="#discoverComponents" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="setVelocity.setVelocity-1">set<wbr/>Velocity<span class="tsd-signature-symbol">(</span>linear<span class="tsd-signature-symbol">: </span><a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a>, angular<span class="tsd-signature-symbol">: </span><a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#setVelocity.setVelocity-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
+<li class="tsd-signature tsd-anchor-link" id="discoverComponents.discoverComponents-1">discover<wbr/>Components<span class="tsd-signature-symbol">(</span>queries<span class="tsd-signature-symbol">: </span><a href="robotApi.DiscoveryQuery-1.html" class="tsd-signature-type" data-tsd-kind="Class">DiscoveryQuery</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.Discovery-1.html" class="tsd-signature-type" data-tsd-kind="Class">Discovery</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#discoverComponents.discoverComponents-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Get the list of discovered component configurations.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>linear: <a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a></h5></li>
-<li>
-<h5>angular: <a href="commonApi.Vector3-1.html" class="tsd-signature-type" data-tsd-kind="Class">Vector3</a></h5></li>
-<li>
-<h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
-<ul class="tsd-parameters"></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Base.Base.html">Base</a>.<a href="../interfaces/Base.Base.html#setVelocity">setVelocity</a></p>
+<h5>queries: <a href="robotApi.DiscoveryQuery-1.html" class="tsd-signature-type" data-tsd-kind="Class">DiscoveryQuery</a><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>The list of component models to discovery.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.Discovery-1.html" class="tsd-signature-type" data-tsd-kind="Class">Discovery</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#discoverComponents">discoverComponents</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L74">src/components/base/Client.ts:74</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="spin" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>spin</span><a href="#spin" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L121">src/components/robot/Client.ts:121</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="frameSystemConfig" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>frame<wbr/>System<wbr/>Config</span><a href="#frameSystemConfig" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="spin.spin-1">spin<span class="tsd-signature-symbol">(</span>angleDeg<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, degsPerSec<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#spin.spin-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
+<li class="tsd-signature tsd-anchor-link" id="frameSystemConfig.frameSystemConfig-1">frame<wbr/>System<wbr/>Config<span class="tsd-signature-symbol">(</span>transforms<span class="tsd-signature-symbol">: </span><a href="commonApi.Transform-1.html" class="tsd-signature-type" data-tsd-kind="Class">Transform</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.FrameSystemConfig-1.html" class="tsd-signature-type" data-tsd-kind="Class">FrameSystemConfig</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#frameSystemConfig.frameSystemConfig-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Get the configuration of the frame system of a given robot.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>angleDeg: <span class="tsd-signature-type">number</span></h5></li>
-<li>
-<h5>degsPerSec: <span class="tsd-signature-type">number</span></h5></li>
-<li>
-<h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
-<ul class="tsd-parameters"></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Base.Base.html">Base</a>.<a href="../interfaces/Base.Base.html#spin">spin</a></p>
+<h5>transforms: <a href="commonApi.Transform-1.html" class="tsd-signature-type" data-tsd-kind="Class">Transform</a><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.FrameSystemConfig-1.html" class="tsd-signature-type" data-tsd-kind="Class">FrameSystemConfig</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#frameSystemConfig">frameSystemConfig</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L39">src/components/base/Client.ts:39</a></li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="stop" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>stop</span><a href="#stop" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L68">src/components/robot/Client.ts:68</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getOperations" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Operations</span><a href="#getOperations" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="stop.stop-1">stop<span class="tsd-signature-symbol">(</span>extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#stop.stop-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
+<li class="tsd-signature tsd-anchor-link" id="getOperations.getOperations-1">get<wbr/>Operations<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.Operation-1.html" class="tsd-signature-type" data-tsd-kind="Class">Operation</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#getOperations.getOperations-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Get the list of operations currently running on the robot.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.Operation-1.html" class="tsd-signature-type" data-tsd-kind="Class">Operation</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#getOperations">getOperations</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L27">src/components/robot/Client.ts:27</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getStatus" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>get<wbr/>Status</span><a href="#getStatus" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="getStatus.getStatus-1">get<wbr/>Status<span class="tsd-signature-symbol">(</span>resourceNames<span class="tsd-signature-symbol">: </span><a href="commonApi.ResourceName-1.html" class="tsd-signature-type" data-tsd-kind="Class">ResourceName</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/robotApi.html" class="tsd-signature-type" data-tsd-kind="Namespace">robotApi</a><span class="tsd-signature-symbol">.</span><a href="robotApi.Status-1.html" class="tsd-signature-type" data-tsd-kind="Class">Status</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#getStatus.getStatus-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Get a list of all statuses requested. An empty request signifies all
+resources.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
-<ul class="tsd-parameters"></ul></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Base.Base.html">Base</a>.<a href="../interfaces/Base.Base.html#stop">stop</a></p>
+<h5>resourceNames: <a href="commonApi.ResourceName-1.html" class="tsd-signature-type" data-tsd-kind="Class">ResourceName</a><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>The list of resources for which to receive statuses.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/robotApi.html" class="tsd-signature-type" data-tsd-kind="Namespace">robotApi</a><span class="tsd-signature-symbol">.</span><a href="robotApi.Status-1.html" class="tsd-signature-type" data-tsd-kind="Class">Status</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#getStatus">getStatus</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/base/Client.ts#L94">src/components/base/Client.ts:94</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L156">src/components/robot/Client.ts:156</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="resourceNames" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>resource<wbr/>Names</span><a href="#resourceNames" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="resourceNames.resourceNames-1">resource<wbr/>Names<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ResourceName</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#resourceNames.resourceNames-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Get a list of all resources on the robot.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ResourceName</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#resourceNames">resourceNames</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L134">src/components/robot/Client.ts:134</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="resourceRPCSubtypes" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>resourceRPCSubtypes</span><a href="#resourceRPCSubtypes" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="resourceRPCSubtypes.resourceRPCSubtypes-1">resourceRPCSubtypes<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.ResourceRPCSubtype-1.html" class="tsd-signature-type" data-tsd-kind="Class">ResourceRPCSubtype</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#resourceRPCSubtypes.resourceRPCSubtypes-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Get a list of all resource types.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="robotApi.ResourceRPCSubtype-1.html" class="tsd-signature-type" data-tsd-kind="Class">ResourceRPCSubtype</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#resourceRPCSubtypes">resourceRPCSubtypes</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L144">src/components/robot/Client.ts:144</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="stopAll" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>stop<wbr/>All</span><a href="#stopAll" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="stopAll.stopAll-1">stop<wbr/>All<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#stopAll.stopAll-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Cancel all current and outstanding operations for the robot and stop all
+actuators and movement.</p>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#stopAll">stopAll</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L57">src/components/robot/Client.ts:57</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="streamStatus" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>stream<wbr/>Status</span><a href="#streamStatus" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="streamStatus.streamStatus-1">stream<wbr/>Status<span class="tsd-signature-symbol">(</span>resourceNames<span class="tsd-signature-symbol">: </span><a href="commonApi.ResourceName-1.html" class="tsd-signature-type" data-tsd-kind="Class">ResourceName</a><span class="tsd-signature-symbol">[]</span>, duration<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Duration</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/robotApi.html" class="tsd-signature-type" data-tsd-kind="Namespace">robotApi</a><span class="tsd-signature-symbol">.</span><a href="robotApi.Status-1.html" class="tsd-signature-type" data-tsd-kind="Class">Status</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#streamStatus.streamStatus-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Periodically receive the status of all statuses requested. An empty request
+signifies all resources.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>resourceNames: <a href="commonApi.ResourceName-1.html" class="tsd-signature-type" data-tsd-kind="Class">ResourceName</a><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>The list of resources for which to receive statuses.</p>
+</div></li>
+<li>
+<h5>duration: <span class="tsd-signature-type">Duration</span></h5>
+<div class="tsd-comment tsd-typography"><p>How often to send a new status.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/robotApi.html" class="tsd-signature-type" data-tsd-kind="Namespace">robotApi</a><span class="tsd-signature-symbol">.</span><a href="robotApi.Status-1.html" class="tsd-signature-type" data-tsd-kind="Class">Status</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#streamStatus">streamStatus</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L167">src/components/robot/Client.ts:167</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="transformPCD" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>transformPCD</span><a href="#transformPCD" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="transformPCD.transformPCD-1">transformPCD<span class="tsd-signature-symbol">(</span>pointCloudPCD<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Uint8Array</span>, source<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, destination<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span><a href="#transformPCD.transformPCD-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Transform a given source point cloud from the reference frame to a new
+specified destination which is a reference frame.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>pointCloudPCD: <span class="tsd-signature-type">Uint8Array</span></h5>
+<div class="tsd-comment tsd-typography"><p>The point clouds to transform. This should be in the
+  PCD format encoded into bytes:
+  <a href="https://pointclouds.org/documentation/tutorials/pcd_file_format.html">https://pointclouds.org/documentation/tutorials/pcd_file_format.html</a></p>
+</div></li>
+<li>
+<h5>source: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>The reference frame of the point cloud.</p>
+</div></li>
+<li>
+<h5>destination: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>The reference frame into which the source data should
+  be transformed, if unset this defaults to the &quot;world&quot; reference frame. Do
+  not move the robot between the generation of the initial pointcloud and
+  the receipt of the transformed pointcloud because that will make the
+  transformations inaccurate.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Uint8Array</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#transformPCD">transformPCD</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L102">src/components/robot/Client.ts:102</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="transformPose" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>transform<wbr/>Pose</span><a href="#transformPose" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="transformPose.transformPose-1">transform<wbr/>Pose<span class="tsd-signature-symbol">(</span>source<span class="tsd-signature-symbol">: </span><a href="commonApi.PoseInFrame-1.html" class="tsd-signature-type" data-tsd-kind="Class">PoseInFrame</a>, destination<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, supplementalTransforms<span class="tsd-signature-symbol">: </span><a href="commonApi.Transform-1.html" class="tsd-signature-type" data-tsd-kind="Class">Transform</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PoseInFrame</span><span class="tsd-signature-symbol">&gt;</span><a href="#transformPose.transformPose-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description"><code class="tsd-tag ts-flagAlpha">Alpha</code> 
+<div class="tsd-comment tsd-typography"><p>Transform a given source Pose from the reference frame to a new specified
+destination which is a reference frame.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>source: <a href="commonApi.PoseInFrame-1.html" class="tsd-signature-type" data-tsd-kind="Class">PoseInFrame</a></h5></li>
+<li>
+<h5>destination: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>The name of the reference frame to transform the given</p>
+</div></li>
+<li>
+<h5>supplementalTransforms: <a href="commonApi.Transform-1.html" class="tsd-signature-type" data-tsd-kind="Class">Transform</a><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>Pose information on any additional
+  reference frames that are needed to perform the transform</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">PoseInFrame</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Robot.html">Robot</a>.<a href="../interfaces/Robot.html#transformPose">transformPose</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/2db433f/src/components/robot/Client.ts#L79">src/components/robot/Client.ts:79</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -523,18 +640,23 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/visionApi.RemoveSegmenterResponse.html">Remove<wbr/>Segmenter<wbr/>Response</a></li></ul></li></ul></li></ul></div></details></nav>
 <nav class="tsd-navigation secondary menu-sticky">
 <ul>
-<li class="current tsd-kind-class"><a href="BaseClient.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-class)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-128-path"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)" id="icon-128-text"></path></svg><span>Base<wbr/>Client</span></a>
+<li class="current tsd-kind-class"><a href="RobotClient.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-class)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-128-path"></rect><path d="M11.898 16.1201C11.098 16.1201 10.466 15.8961 10.002 15.4481C9.53803 15.0001 9.30603 14.3841 9.30603 13.6001V9.64012C9.30603 8.85612 9.53803 8.24012 10.002 7.79212C10.466 7.34412 11.098 7.12012 11.898 7.12012C12.682 7.12012 13.306 7.34812 13.77 7.80412C14.234 8.25212 14.466 8.86412 14.466 9.64012H13.386C13.386 9.14412 13.254 8.76412 12.99 8.50012C12.734 8.22812 12.37 8.09212 11.898 8.09212C11.426 8.09212 11.054 8.22412 10.782 8.48812C10.518 8.75212 10.386 9.13212 10.386 9.62812V13.6001C10.386 14.0961 10.518 14.4801 10.782 14.7521C11.054 15.0161 11.426 15.1481 11.898 15.1481C12.37 15.1481 12.734 15.0161 12.99 14.7521C13.254 14.4801 13.386 14.0961 13.386 13.6001H14.466C14.466 14.3761 14.234 14.9921 13.77 15.4481C13.306 15.8961 12.682 16.1201 11.898 16.1201Z" fill="var(--color-text)" id="icon-128-text"></path></svg><span>Robot<wbr/>Client</span></a>
 <ul>
-<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="BaseClient.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-512-path"></use><use href="#icon-512-text"></use></svg>constructor</a></li>
-<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="BaseClient.html#client" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>client</a></li>
-<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="BaseClient.html#name" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>name</a></li>
-<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="BaseClient.html#options" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>options</a></li>
-<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><a href="BaseClient.html#baseService" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>base<wbr/>Service</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="BaseClient.html#moveStraight" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>move<wbr/>Straight</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="BaseClient.html#setPower" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Power</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="BaseClient.html#setVelocity" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Velocity</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="BaseClient.html#spin" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>spin</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="BaseClient.html#stop" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>stop</a></li></ul></li></ul></nav></div></div>
+<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="RobotClient.html#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-512-path"></use><use href="#icon-512-text"></use></svg>constructor</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="RobotClient.html#client" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>client</a></li>
+<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><a href="RobotClient.html#robotService" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-262144-path"></use><use href="#icon-262144-text"></use></svg>robot<wbr/>Service</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#blockForOperation" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>block<wbr/>For<wbr/>Operation</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#cancelOperation" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>cancel<wbr/>Operation</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#discoverComponents" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>discover<wbr/>Components</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#frameSystemConfig" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>frame<wbr/>System<wbr/>Config</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#getOperations" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Operations</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#getStatus" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>get<wbr/>Status</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#resourceNames" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>resource<wbr/>Names</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#resourceRPCSubtypes" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>resourceRPCSubtypes</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#stopAll" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>stop<wbr/>All</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#streamStatus" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>stream<wbr/>Status</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#transformPCD" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>transformPCD</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="RobotClient.html#transformPose" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>transform<wbr/>Pose</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>
