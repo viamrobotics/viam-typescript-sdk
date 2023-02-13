@@ -1,5 +1,5 @@
 import { Elm } from './Main.elm';
-import { Client, BaseClient, MotorClient } from '@viamrobotics/sdk';
+import { Client, BaseClient, MotorClient, commonApi } from '@viamrobotics/sdk';
 
 async function connect() {
   // You can remove this block entirely if your robot is not authenticated.
@@ -15,7 +15,13 @@ async function connect() {
   const client = new Client(host);
 
   // Omit `creds` if your robot is not authenticated.
-  await client.connect(undefined, creds);
+  try {
+    await client.connect(undefined, creds);
+  } catch (err) {
+    console.error('failed to connect');
+    console.error(err);
+    throw err;
+  }
 
   return client;
 }
@@ -45,6 +51,28 @@ connect()
 
     app.ports.sendBaseMoveStraight.subscribe(async ({ dist, speed }) => {
       await base.moveStraight(dist, speed);
+      const position = await m1.getPosition();
+      app.ports.recvGetPosition.send(position);
+    });
+
+    app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
+      console.log('linear', linear);
+      console.log('angular', angular);
+      const linearVec = new commonApi.Vector3();
+      const angularVec = new commonApi.Vector3();
+      linearVec.setY(linear);
+      angularVec.setZ(angular);
+
+      await base.setPower(linearVec, angularVec);
+
+      const position = await m1.getPosition();
+      app.ports.recvGetPosition.send(position);
+    });
+
+    app.ports.sendBaseStop.subscribe(async () => {
+      console.log('stopping');
+      await base.stop();
+
       const position = await m1.getPosition();
       app.ports.recvGetPosition.send(position);
     });

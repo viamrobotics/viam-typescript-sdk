@@ -5,6 +5,8 @@ import Html as H
 import Html.Attributes as At
 import Html.Events as Ev
 import Json.Encode as E
+import Keyboard
+import Keyboard.Arrows
 
 
 
@@ -15,6 +17,12 @@ port sendMotorGoFor : E.Value -> Cmd msg
 
 
 port sendBaseMoveStraight : E.Value -> Cmd msg
+
+
+port sendBaseSetPower : E.Value -> Cmd msg
+
+
+port sendBaseStop : () -> Cmd msg
 
 
 port sendGetPosition : () -> Cmd msg
@@ -39,7 +47,9 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { position = 0 }
+    ( { position = 0
+      , keys = []
+      }
     , sendGetPosition ()
     )
 
@@ -49,7 +59,9 @@ init _ =
 
 
 type alias Model =
-    { position : Float }
+    { position : Float
+    , keys : List Keyboard.Key
+    }
 
 
 
@@ -59,17 +71,29 @@ type alias Model =
 type Msg
     = MotorGoFor
     | BaseMoveStraight
+    | BaseSetPower
     | RecvGetPosition Float
+    | KeyMsg Keyboard.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        KeyMsg keyMsg ->
+            let
+                keys =
+                    Keyboard.update keyMsg model.keys
+            in
+            ( { model | keys = keys }, handleBaseSetPower keys )
+
         MotorGoFor ->
             ( model, handleMotorGoFor )
 
         BaseMoveStraight ->
             ( model, handleBaseMoveStraight )
+
+        BaseSetPower ->
+            ( model, handleBaseSetPower [] )
 
         RecvGetPosition position ->
             ( { model | position = position }, Cmd.none )
@@ -93,6 +117,28 @@ handleBaseMoveStraight =
             ]
 
 
+handleBaseSetPower : List Keyboard.Key -> Cmd none
+handleBaseSetPower keys =
+    let
+        { x, y } =
+            Keyboard.Arrows.wasd keys
+    in
+    if x == 0 && y == 0 then
+        sendBaseStop ()
+
+    else
+        sendBaseSetPower <|
+            E.object
+                [ ( "linear", E.float <| 0.1 * toFloat y * defaultPower )
+                , ( "angular", E.float <| 0.1 * toFloat -x * defaultPower )
+                ]
+
+
+defaultPower : number
+defaultPower =
+    50
+
+
 
 -- SUBSCRIPTIONS
 
@@ -101,6 +147,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ recvGetPosition RecvGetPosition
+        , Sub.map KeyMsg Keyboard.subscriptions
         ]
 
 
@@ -126,4 +173,5 @@ view model =
         , H.div [] [ H.text <| String.fromFloat model.position ]
         , H.button [ Ev.onClick MotorGoFor ] [ H.text "Motor : Go For" ]
         , H.button [ Ev.onClick BaseMoveStraight ] [ H.text "Base : Move Straight" ]
+        , H.button [ Ev.onClick BaseSetPower ] [ H.text "Base : Go Forward" ]
         ]
