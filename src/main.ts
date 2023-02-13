@@ -25,13 +25,14 @@ import motionApi from './gen/service/motion/v1/motion_pb.esm';
 import motorApi from './gen/component/motor/v1/motor_pb.esm';
 import movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb.esm';
 import navigationApi from './gen/service/navigation/v1/navigation_pb.esm';
-import robotApi from './gen/robot/v1/robot_pb.esm';
 import sensorApi from './gen/component/sensor/v1/sensor_pb.esm';
 import sensorsApi from './gen/service/sensors/v1/sensors_pb.esm';
 import servoApi from './gen/component/servo/v1/servo_pb.esm';
 import slamApi from './gen/service/slam/v1/slam_pb.esm';
 import streamApi from './gen/proto/stream/v1/stream_pb.esm';
 import visionApi from './gen/service/vision/v1/vision_pb.esm';
+
+export { type Robot, RobotClient, robotApi } from './components/robot';
 
 export {
   commonApi,
@@ -47,7 +48,6 @@ export {
   motionApi,
   movementSensorApi,
   servoApi,
-  robotApi,
   navigationApi,
   sensorApi,
   sensorsApi,
@@ -65,11 +65,11 @@ export {
   Client,
   MotorClient,
   SensorClient,
-  StreamClient
+  StreamClient,
 };
 
 // It doesn't matter which ServiceError we export really.
 export type {
   ResponseStream,
-  ServiceError
+  ServiceError,
 } from './gen/robot/v1/robot_pb_service.esm';
