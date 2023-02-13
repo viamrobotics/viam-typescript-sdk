@@ -6,7 +6,7 @@ import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service
 import pb from '../../gen/proto/stream/v1/stream_pb.esm';
 import { promisify } from '../../utils';
 
-export class StreamClient extends EventDispatcher implements Stream  {
+export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;
 
