@@ -12,6 +12,7 @@ import { MotionServiceClient } from './gen/service/motion/v1/motion_pb_service.e
 import { MotorServiceClient } from './gen/component/motor/v1/motor_pb_service.esm';
 import { MovementSensorServiceClient } from './gen/component/movementsensor/v1/movementsensor_pb_service.esm';
 import { NavigationServiceClient } from './gen/service/navigation/v1/navigation_pb_service.esm';
+import { RobotServiceClient } from './gen/robot/v1/robot_pb_service.esm';
 import { SLAMServiceClient } from './gen/service/slam/v1/slam_pb_service.esm';
 import { SensorsServiceClient } from './gen/service/sensors/v1/sensors_pb_service.esm';
 import { ServoServiceClient } from './gen/component/servo/v1/servo_pb_service.esm';
@@ -52,6 +53,8 @@ export default class Client {
   private savedAuthEntity: string | undefined;
 
   private savedCreds: Credentials | undefined;
+
+  private robotServiceClient: RobotServiceClient | undefined;
 
   private armServiceClient: ArmServiceClient | undefined;
 
@@ -109,6 +112,13 @@ export default class Client {
   }
 
   private static readonly notConnectedYetStr = 'not connected yet';
+
+  get robotService() {
+    if (!this.robotServiceClient) {
+      throw new Error(Client.notConnectedYetStr);
+    }
+    return this.robotServiceClient;
+  }
 
   get armService() {
     if (!this.armServiceClient) {
@@ -365,6 +375,10 @@ export default class Client {
         : this.sessionManager.transportFactory;
       const grpcOptions = { transport: clientTransportFactory };
 
+      this.robotServiceClient = new RobotServiceClient(
+        this.serviceHost,
+        grpcOptions
+      );
       // eslint-disable-next-line no-warning-comments
       // TODO(RSDK-144): these should be created as needed
       this.armServiceClient = new ArmServiceClient(
