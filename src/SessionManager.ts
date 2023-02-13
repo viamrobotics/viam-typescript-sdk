@@ -1,6 +1,6 @@
 import {
   RobotServiceClient,
-  ServiceError
+  ServiceError,
 } from './gen/robot/v1/robot_pb_service.esm';
 import { ConnectionClosedError } from '@viamrobotics/rpc';
 import SessionTransport from './SessionTransport';
