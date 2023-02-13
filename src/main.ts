@@ -25,7 +25,7 @@ import motionApi from './gen/service/motion/v1/motion_pb.esm';
 import motorApi from './gen/component/motor/v1/motor_pb.esm';
 import movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb.esm';
 import navigationApi from './gen/service/navigation/v1/navigation_pb.esm';
-import robotApi from '../gen/robot/v1/robot_pb.esm';
+import robotApi from './gen/robot/v1/robot_pb.esm';
 import sensorApi from './gen/component/sensor/v1/sensor_pb.esm';
 import sensorsApi from './gen/service/sensors/v1/sensors_pb.esm';
 import servoApi from './gen/component/servo/v1/servo_pb.esm';
