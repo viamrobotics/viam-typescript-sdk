@@ -9,6 +9,9 @@ clean-dist:
 install:
 	npm ci --audit=false
 
+test:
+	npm run test
+
 lint: install
 	npm run format
 	npm run lint
