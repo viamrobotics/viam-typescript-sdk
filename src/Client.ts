@@ -19,6 +19,7 @@ import { ServoServiceClient } from './gen/component/servo/v1/servo_pb_service.es
 import SessionManager from './SessionManager';
 import { VisionServiceClient } from './gen/service/vision/v1/vision_pb_service.esm';
 import type { grpc } from '@improbable-eng/grpc-web';
+import { events } from './events';
 
 interface WebRTCOptions {
   enabled: boolean;
@@ -314,6 +315,8 @@ export default class Client {
         this.transportFactory = webRTCConn.transportFactory;
 
         webRTCConn.peerConnection.ontrack = (event) => {
+          events.emit('track', event);
+
           const { kind } = event.track;
 
           const eventStream = event.streams[0];

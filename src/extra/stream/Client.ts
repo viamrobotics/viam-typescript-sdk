@@ -1,3 +1,4 @@
+import { EventDispatcher, events } from '../../events';
 import type Client from '../../Client';
 import type { Options } from '../../types';
 import type { Stream } from './Stream';
@@ -5,13 +6,16 @@ import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service
 import pb from '../../gen/proto/stream/v1/stream_pb.esm';
 import { promisify } from '../../utils';
 
-export class StreamClient implements Stream {
+export class StreamClient extends EventDispatcher implements Stream  {
   private client: StreamServiceClient;
   private readonly options: Options;
 
   constructor(client: Client, options: Options = {}) {
+    super();
     this.client = client.createServiceClient(StreamServiceClient);
     this.options = options;
+    
+    events.on('track', (args) => this.emit('track', args));
   }
 
   private get streamService() {
