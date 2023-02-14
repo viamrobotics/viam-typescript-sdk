@@ -26,9 +26,42 @@ async function connect() {
   return client;
 }
 
+async function connectWebRTC() {
+  const secret = import.meta.env.VITE_SECRET;
+  const creds = {
+    payload: secret,
+    type: 'robot-location-secret',
+  };
+
+  const host = import.meta.env.VITE_WEBRTC_HOST;
+  const impliedURL = host;
+  const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
+  const iceServers = JSON.parse(import.meta.env.VITE_WEBRTC_ICE_SERVERS);
+
+  const rtcConfig = { iceServers };
+  const conf = {
+    enabled: true,
+    host,
+    signalingAddress,
+    rtcConfig,
+  };
+
+  const client = new Client(impliedURL, conf);
+
+  try {
+    await client.connect(impliedURL, creds);
+  } catch (err) {
+    console.error('failed to connect');
+    console.error(err);
+    throw err;
+  }
+
+  return client;
+}
+
 // Connect and setup app
 
-connect()
+connectWebRTC()
   .then((client) => {
     const base = new BaseClient(client, 'viam_base');
     const m1 = new MotorClient(client, 'left');

@@ -140,8 +140,16 @@ view model =
         ]
         [ H.div [] [ H.text "position" ]
         , H.div [] [ H.text <| String.fromFloat model.position ]
+        , viewStreams
         , viewMovementControls model
         ]
+
+
+viewStreams : H.Html msg
+viewStreams =
+    H.div
+        [ At.attribute "data-stream" "cam" ]
+        []
 
 
 viewMovementControls : Model -> H.Html Msg
