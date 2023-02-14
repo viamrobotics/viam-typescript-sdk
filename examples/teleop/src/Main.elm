@@ -165,13 +165,68 @@ view model =
         , At.style "align-items" "center"
         , At.style "height" "100vh"
         , At.style "row-gap" "0.5rem"
-
-        -- no user selection
-        , At.style "user-select" "none"
         ]
         [ H.div [] [ H.text "position" ]
         , H.div [] [ H.text <| String.fromFloat model.position ]
-        , H.button [ Ev.onClick MotorGoFor ] [ H.text "Motor : Go For" ]
-        , H.button [ Ev.onClick BaseMoveStraight ] [ H.text "Base : Move Straight" ]
-        , H.button [ Ev.onClick BaseSetPower ] [ H.text "Base : Go Forward" ]
+        -- , H.button [ Ev.onClick MotorGoFor ] [ H.text "Motor : Go For" ]
+        -- , H.button [ Ev.onClick BaseMoveStraight ] [ H.text "Base : Move Straight" ]
+        -- , H.button [ Ev.onClick BaseSetPower ] [ H.text "Base : Go Forward" ]
+        , viewWASD model
         ]
+
+
+viewWASD : Model -> H.Html Msg
+viewWASD model =
+    let
+        _ =
+            Debug.log "pressed keys" model.keys
+    in
+    H.div
+        [ At.style "display" "grid"
+        , At.style "grid-template-columns" "repeat(3, 1fr)"
+        ]
+        [ viewKey (Keyboard.Character "") model.keys
+        , viewKey (Keyboard.Character "W") model.keys
+        , viewKey (Keyboard.Character "") model.keys
+        , viewKey (Keyboard.Character "A") model.keys
+        , viewKey (Keyboard.Character "S") model.keys
+        , viewKey (Keyboard.Character "D") model.keys
+        ]
+
+
+viewKey : Keyboard.Key -> List Keyboard.Key -> H.Html Msg
+viewKey key keys =
+    let
+        pressed =
+            List.member key keys
+
+        keyText =
+            case key of
+                Keyboard.Character char ->
+                    char
+
+                _ ->
+                    ""
+    in
+    H.div
+        [ -- flex
+          At.style "display" "flex"
+        , At.style "flex-direction" "column"
+        , At.style "justify-content" "center"
+        , At.style "align-items" "center"
+
+        -- color
+        , At.style "outline" "1px solid lightgrey"
+        , At.style "background-color" <|
+            if pressed then
+                "lightgreen"
+
+            else
+                "white"
+
+        -- size
+        , At.style "width" "50px"
+        , At.style "height" "50px"
+        , At.style "font-size" "2rem"
+        ]
+        [ H.text keyText ]
