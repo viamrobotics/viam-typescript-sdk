@@ -43,18 +43,6 @@ connect()
       app.ports.recvGetPosition.send(position);
     });
 
-    app.ports.sendMotorGoFor.subscribe(async ({ rpm, revs }) => {
-      await m1.goFor(rpm, revs);
-      const position = await m1.getPosition();
-      app.ports.recvGetPosition.send(position);
-    });
-
-    app.ports.sendBaseMoveStraight.subscribe(async ({ dist, speed }) => {
-      await base.moveStraight(dist, speed);
-      const position = await m1.getPosition();
-      app.ports.recvGetPosition.send(position);
-    });
-
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
       console.log('linear', linear);
       console.log('angular', angular);

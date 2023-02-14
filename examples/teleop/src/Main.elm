@@ -3,7 +3,6 @@ port module Main exposing (main)
 import Browser
 import Html as H
 import Html.Attributes as At
-import Html.Events as Ev
 import Json.Encode as E
 import Keyboard
 import Keyboard.Arrows
@@ -11,12 +10,6 @@ import Keyboard.Arrows
 
 
 -- PORTS
-
-
-port sendMotorGoFor : E.Value -> Cmd msg
-
-
-port sendBaseMoveStraight : E.Value -> Cmd msg
 
 
 port sendBaseSetPower : E.Value -> Cmd msg
@@ -69,10 +62,7 @@ type alias Model =
 
 
 type Msg
-    = MotorGoFor
-    | BaseMoveStraight
-    | BaseSetPower
-    | RecvGetPosition Float
+    = RecvGetPosition Float
     | KeyMsg Keyboard.Msg
 
 
@@ -86,35 +76,8 @@ update msg model =
             in
             ( { model | keys = keys }, handleBaseSetPower keys )
 
-        MotorGoFor ->
-            ( model, handleMotorGoFor )
-
-        BaseMoveStraight ->
-            ( model, handleBaseMoveStraight )
-
-        BaseSetPower ->
-            ( model, handleBaseSetPower [] )
-
         RecvGetPosition position ->
             ( { model | position = position }, Cmd.none )
-
-
-handleMotorGoFor : Cmd none
-handleMotorGoFor =
-    sendMotorGoFor <|
-        E.object
-            [ ( "rpm", E.int 100 )
-            , ( "revs", E.int 10 )
-            ]
-
-
-handleBaseMoveStraight : Cmd none
-handleBaseMoveStraight =
-    sendBaseMoveStraight <|
-        E.object
-            [ ( "dist", E.int 100 )
-            , ( "speed", E.int 100 )
-            ]
 
 
 handleBaseSetPower : List Keyboard.Key -> Cmd none
@@ -168,9 +131,6 @@ view model =
         ]
         [ H.div [] [ H.text "position" ]
         , H.div [] [ H.text <| String.fromFloat model.position ]
-        -- , H.button [ Ev.onClick MotorGoFor ] [ H.text "Motor : Go For" ]
-        -- , H.button [ Ev.onClick BaseMoveStraight ] [ H.text "Base : Move Straight" ]
-        -- , H.button [ Ev.onClick BaseSetPower ] [ H.text "Base : Go Forward" ]
         , viewWASD model
         ]
 
