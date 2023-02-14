@@ -1,5 +1,11 @@
 import { Elm } from './Main.elm';
-import { Client, BaseClient, MotorClient, commonApi } from '@viamrobotics/sdk';
+import {
+  Client,
+  BaseClient,
+  MotorClient,
+  StreamClient,
+  commonApi,
+} from '@viamrobotics/sdk';
 
 async function connect() {
   // You can remove this block entirely if your robot is not authenticated.
@@ -71,6 +77,56 @@ connectWebRTC()
       flags: {},
     });
 
+    // streams
+    const streams = new StreamClient(client);
+    streams.on('track', (event) => {
+      const eventStream = event.streams[0];
+      if (!eventStream) {
+        throw new Error('expected event stream to exist');
+      }
+      const kind = 'track';
+      const streamName = eventStream.id;
+      const streamContainers = document.querySelectorAll(
+        `[data-stream="${streamName}"]`
+      );
+
+      console.debug('stream preview containers', streamContainers);
+
+      for (const streamContainer of streamContainers) {
+        const mediaElement = document.createElement(kind);
+        mediaElement.srcObject = eventStream;
+        mediaElement.autoplay = true;
+        if (mediaElement instanceof HTMLVideoElement) {
+          mediaElement.playsInline = true;
+          mediaElement.controls = false;
+        } else {
+          mediaElement.controls = true;
+        }
+
+        const child = streamContainer.querySelector(kind);
+        child?.remove();
+        streamContainer.append(mediaElement);
+      }
+
+      const streamPreviewContainers = document.querySelectorAll(
+        `[data-stream-preview="${streamName}"]`
+      );
+      for (const streamContainer of streamPreviewContainers) {
+        const mediaElementPreview = document.createElement(kind);
+        mediaElementPreview.srcObject = eventStream;
+        mediaElementPreview.autoplay = true;
+        if (mediaElementPreview instanceof HTMLVideoElement) {
+          mediaElementPreview.playsInline = true;
+          mediaElementPreview.controls = false;
+        } else {
+          mediaElementPreview.controls = true;
+        }
+        const child = streamContainer.querySelector(kind);
+        child?.remove();
+        streamContainer.append(mediaElementPreview);
+      }
+    });
+
     app.ports.sendGetPosition.subscribe(async () => {
       const position = await m1.getPosition();
       app.ports.recvGetPosition.send(position);
@@ -97,6 +153,8 @@ connectWebRTC()
       const position = await m1.getPosition();
       app.ports.recvGetPosition.send(position);
     });
+
+    streams.add('cam');
   })
   .catch((err) => {
     console.error('something went wrong');
