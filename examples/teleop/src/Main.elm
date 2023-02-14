@@ -83,8 +83,18 @@ update msg model =
 handleBaseSetPower : List Keyboard.Key -> Cmd none
 handleBaseSetPower keys =
     let
-        { x, y } =
+        wasd =
             Keyboard.Arrows.wasd keys
+
+        arrows =
+            Keyboard.Arrows.arrows keys
+
+        { x, y } =
+            if wasd.x /= 0 || wasd.y /= 0 then
+                wasd
+
+            else
+                arrows
     in
     if x == 0 && y == 0 then
         sendBaseStop ()
@@ -126,21 +136,45 @@ view model =
         , At.style "flex-direction" "column"
         , At.style "justify-content" "center"
         , At.style "align-items" "center"
-        , At.style "height" "100vh"
         , At.style "row-gap" "0.5rem"
         ]
         [ H.div [] [ H.text "position" ]
         , H.div [] [ H.text <| String.fromFloat model.position ]
-        , viewWASD model
+        , viewMovementControls model
+        ]
+
+
+viewMovementControls : Model -> H.Html Msg
+viewMovementControls model =
+    H.div
+        [ -- flex
+          At.style "display" "flex"
+        , At.style "justify-content" "center"
+        , At.style "align-items" "center"
+        , At.style "column-gap" "0.5rem"
+        ]
+        [ viewWASD model
+        , viewArrows model
+        ]
+
+
+viewArrows : Model -> H.Html Msg
+viewArrows model =
+    H.div
+        [ At.style "display" "grid"
+        , At.style "grid-template-columns" "repeat(3, 1fr)"
+        ]
+        [ viewKey (Keyboard.Character "") model.keys
+        , viewKey Keyboard.ArrowUp model.keys
+        , viewKey (Keyboard.Character "") model.keys
+        , viewKey Keyboard.ArrowLeft model.keys
+        , viewKey Keyboard.ArrowDown model.keys
+        , viewKey Keyboard.ArrowRight model.keys
         ]
 
 
 viewWASD : Model -> H.Html Msg
 viewWASD model =
-    let
-        _ =
-            Debug.log "pressed keys" model.keys
-    in
     H.div
         [ At.style "display" "grid"
         , At.style "grid-template-columns" "repeat(3, 1fr)"
@@ -164,6 +198,18 @@ viewKey key keys =
             case key of
                 Keyboard.Character char ->
                     char
+
+                Keyboard.ArrowUp ->
+                    "▲"
+
+                Keyboard.ArrowDown ->
+                    "▼"
+
+                Keyboard.ArrowLeft ->
+                    "◄"
+
+                Keyboard.ArrowRight ->
+                    "►"
 
                 _ ->
                     ""
