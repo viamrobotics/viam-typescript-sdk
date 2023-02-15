@@ -138,18 +138,52 @@ view model =
         , At.style "align-items" "center"
         , At.style "row-gap" "0.5rem"
         ]
-        [ H.div [] [ H.text "position" ]
-        , H.div [] [ H.text <| String.fromFloat model.position ]
-        , viewStreams
+        [ H.h2 [] <| [ H.text "Tele-Op Demo" ]
+        , viewStreamControls model
+        ]
+
+
+viewStreamControls : Model -> H.Html Msg
+viewStreamControls model =
+    H.div
+        [ --flex
+          At.style "display" "flex"
+        , At.style "flex-direction" "column"
+        , At.style "justify-content" "center"
+        , At.style "align-items" "center"
+
+        -- overlay
+        , At.style "position" "relative"
+        , At.style "width" "100%"
+        , At.style "height" "100%"
+
+        -- size
+        , At.style "width" "600px"
+        , At.style "height" "480px"
+        ]
+        [ viewStreams
         , viewMovementControls model
         ]
 
 
-viewStreams : H.Html msg
+viewStreams : H.Html Msg
 viewStreams =
     H.div
-        [ At.attribute "data-stream" "cam" ]
-        []
+        [ --flex
+          At.style "display" "flex"
+        , At.style "justify-content" "center"
+        , At.style "align-items" "center"
+
+        -- overlay
+        , At.style "top" "0"
+        , At.style "position" "absolute"
+        ]
+        [ -- Camera stream inserted here
+          H.div
+            [ At.attribute "data-stream" "cam"
+            ]
+            []
+        ]
 
 
 viewMovementControls : Model -> H.Html Msg
@@ -159,7 +193,14 @@ viewMovementControls model =
           At.style "display" "flex"
         , At.style "justify-content" "center"
         , At.style "align-items" "center"
-        , At.style "column-gap" "0.5rem"
+
+        -- transparency
+        , At.style "opacity" "50%"
+
+        -- overlay
+        , At.style "position" "absolute"
+        , At.style "bottom" "5%"
+        , At.style "column-gap" "85%"
         ]
         [ viewWASD model
         , viewArrows model
