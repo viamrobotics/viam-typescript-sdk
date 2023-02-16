@@ -142,10 +142,7 @@ connectWebRTC()
     app.ports.getWifiReading.subscribe(async () => {
       const readings = await wifi.getReadings();
       // TODO: simplify readings response object
-      const level = parseInt(
-        readings.toObject().readingsMap[0][1].stringValue,
-        10
-      );
+      const level = readings.toObject().readingsMap[0][1].numberValue;
       app.ports.recvWifiReading.send(level);
     });
 

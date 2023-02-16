@@ -196,9 +196,73 @@ viewWifiSignal model =
         , At.style "z-index" "10"
 
         -- color
-        , At.style "color" "lightgreen"
+        , At.style "color" <| wifiSignalColor
+
+        --flex
+        , At.style "display" "flex"
+        , At.style "column-gap" "1rem"
         ]
-        [ H.text <| String.fromFloat model.signalLevel ]
+        [ viewWifiSignalBars model
+        , H.text <| "(" ++ String.fromFloat model.signalLevel ++ " dBm)"
+        ]
+
+
+viewWifiSignalBars : Model -> H.Html Msg
+viewWifiSignalBars model =
+    let
+        level =
+            if model.signalLevel >= -50 then
+                5
+
+            else if model.signalLevel >= -60 then
+                4
+
+            else if model.signalLevel >= -67 then
+                3
+
+            else if model.signalLevel >= -70 then
+                2
+
+            else if model.signalLevel >= -80 then
+                1
+
+            else
+                0
+    in
+    H.div
+        [ --flex
+          At.style "display" "flex"
+        , At.style "justify-content" "center"
+        , At.style "align-items" "flex-end"
+        , At.style "column-gap" "0.25rem"
+        ]
+    <|
+        List.map viewWifiSignalBar <|
+            List.map (Tuple.pair level) [ 1, 2, 3, 4, 5 ]
+
+
+viewWifiSignalBar : ( Int, Int ) -> H.Html Msg
+viewWifiSignalBar ( level, minLevel ) =
+    H.div
+        [ --flex
+          At.style "width" "5px"
+        , At.style "height" <| (String.fromFloat <| toFloat minLevel / 5.0) ++ "rem"
+        , At.style "background-color" <|
+            if level >= minLevel then
+                wifiSignalColor
+
+            else
+                "transparent"
+        , At.style "border" <| "1px solid " ++ wifiSignalColor
+        , At.style "z-index" "20"
+        ]
+    <|
+        []
+
+
+wifiSignalColor : String
+wifiSignalColor =
+    "darkgreen"
 
 
 viewStreams : H.Html Msg
@@ -306,7 +370,7 @@ viewKey key keys =
         , At.style "align-items" "center"
 
         -- color
-        , At.style "outline" "1px solid lightgrey"
+        , At.style "border" "1px solid lightgrey"
         , At.style "background-color" <|
             if pressed then
                 "lightgreen"
