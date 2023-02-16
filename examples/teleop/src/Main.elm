@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Browser
 import Html as H
 import Html.Attributes as At
+import Json.Decode as D
 import Json.Encode as E
 import Keyboard
 import Keyboard.Arrows
@@ -25,6 +26,12 @@ port getWifiReading : () -> Cmd msg
 port recvWifiReading : (Float -> msg) -> Sub msg
 
 
+port getAccelReading : () -> Cmd msg
+
+
+port recvAccelReading : (E.Value -> msg) -> Sub msg
+
+
 
 -- PROGRAM
 
@@ -43,6 +50,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { keys = []
       , signalLevel = 0
+      , acceleration = { x = 0, y = 0, z = 0 }
       }
     , Cmd.none
     )
@@ -55,7 +63,24 @@ init _ =
 type alias Model =
     { keys : List Keyboard.Key
     , signalLevel : Float
+    , acceleration : Acceleration
     }
+
+
+type alias Acceleration =
+    { x : Float
+    , y : Float
+    , z : Float
+    }
+
+
+accelerationDecoder : D.Decoder Acceleration
+accelerationDecoder =
+    D.map3
+        Acceleration
+        (D.field "x" D.float)
+        (D.field "y" D.float)
+        (D.field "x" D.float)
 
 
 
@@ -66,6 +91,8 @@ type Msg
     = KeyMsg Keyboard.Msg
     | GetWifi
     | GotWifi Float
+    | GetAcceleration
+    | GotAcceleration E.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,6 +110,17 @@ update msg model =
 
         GotWifi signalLevel ->
             ( { model | signalLevel = signalLevel }, Cmd.none )
+
+        GetAcceleration ->
+            ( model, getAccelReading () )
+
+        GotAcceleration value ->
+            case D.decodeValue accelerationDecoder value of
+                Err _ ->
+                    ( model, Cmd.none )
+
+                Ok accel ->
+                    ( { model | acceleration = accel }, Cmd.none )
 
 
 handleBaseSetPower : List Keyboard.Key -> Cmd none
@@ -124,8 +162,10 @@ defaultPower =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ recvWifiReading GotWifi
-        , Time.every 1000 (\_ -> GetWifi)
+        [ Time.every 1000 (\_ -> GetWifi)
+        , recvWifiReading GotWifi
+        , Time.every 1000 (\_ -> GetAcceleration)
+        , recvAccelReading GotAcceleration
         , Sub.map KeyMsg Keyboard.subscriptions
         ]
 
@@ -145,12 +185,12 @@ view model =
         , At.style "row-gap" "0.5rem"
         ]
         [ H.h2 [] <| [ H.text "Tele-Op Demo" ]
-        , viewStreamControls model
+        , viewHUD model
         ]
 
 
-viewStreamControls : Model -> H.Html Msg
-viewStreamControls model =
+viewHUD : Model -> H.Html Msg
+viewHUD model =
     H.div
         [ --flex
           At.style "display" "flex"
@@ -167,10 +207,42 @@ viewStreamControls model =
         , At.style "width" "600px"
         , At.style "height" "480px"
         ]
+        -- TODO: automatically make these `position:absolute`
         [ viewWifiSignal model
         , viewStreams
         , viewMovementControls model
+        , viewAcceleration model
         ]
+
+
+viewAcceleration : Model -> H.Html Msg
+viewAcceleration model =
+    H.div
+        [ -- overlay
+          At.style "top" "0"
+        , At.style "right" "0"
+        , At.style "position" "absolute"
+        , At.style "z-index" "10"
+
+        -- color
+        , At.style "color" <| statsColor
+
+        --flex
+        , At.style "display" "flex"
+        , At.style "flex-direction" "column"
+        , At.style "align-items" "flex-start"
+        , At.style "row-gap" "1rem"
+        , At.style "width" "80px"
+        ]
+        [ H.div [] [ H.text <| "X: " ++ formatAccelerationDim model.acceleration.x ]
+        , H.div [] [ H.text <| "Y: " ++ formatAccelerationDim model.acceleration.y ]
+        , H.div [] [ H.text <| "Z: " ++ formatAccelerationDim model.acceleration.z ]
+        ]
+
+
+formatAccelerationDim : Float -> String
+formatAccelerationDim dim =
+    String.fromFloat <| ((toFloat << round) (100 * dim) / 100)
 
 
 viewWifiSignal : Model -> H.Html Msg
@@ -183,7 +255,7 @@ viewWifiSignal model =
         , At.style "z-index" "10"
 
         -- color
-        , At.style "color" <| wifiSignalColor
+        , At.style "color" <| statsColor
 
         --flex
         , At.style "display" "flex"
@@ -236,20 +308,20 @@ viewWifiSignalBar ( level, minLevel ) =
         , At.style "height" <| (String.fromFloat <| toFloat minLevel / 5.0) ++ "rem"
         , At.style "background-color" <|
             if level >= minLevel then
-                wifiSignalColor
+                statsColor
 
             else
                 "transparent"
-        , At.style "border" <| "1px solid " ++ wifiSignalColor
+        , At.style "border" <| "1px solid " ++ statsColor
         , At.style "z-index" "20"
         ]
     <|
         []
 
 
-wifiSignalColor : String
-wifiSignalColor =
-    "darkgreen"
+statsColor : String
+statsColor =
+    "purple"
 
 
 viewStreams : H.Html Msg

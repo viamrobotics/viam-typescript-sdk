@@ -6,7 +6,9 @@ import {
   SensorClient,
   StreamClient,
   commonApi,
+  movementSensorApi,
 } from '@viamrobotics/sdk';
+import { grpc } from '@improbable-eng/grpc-web';
 
 async function connect() {
   // You can remove this block entirely if your robot is not authenticated.
@@ -101,6 +103,7 @@ connectWebRTC()
     const base = new BaseClient(client, 'viam_base');
     const m1 = new MotorClient(client, 'left');
     const wifi = new SensorClient(client, 'wifi');
+    const accel = new SensorClient(client, 'accelerometer');
 
     const app = Elm.Main.init({
       node: document.getElementById('main'),
@@ -115,6 +118,7 @@ connectWebRTC()
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
       console.log('linear', linear);
       console.log('angular', angular);
+      // TODO: stop requiring users to import commonApi, if possible
       const linearVec = new commonApi.Vector3();
       const angularVec = new commonApi.Vector3();
       linearVec.setY(linear);
@@ -133,6 +137,27 @@ connectWebRTC()
       // TODO: simplify readings response object
       const level = readings.toObject().readingsMap[0][1].numberValue;
       app.ports.recvWifiReading.send(level);
+    });
+
+    app.ports.getAccelReading.subscribe(async () => {
+      // TODO: add a movement sensor wrapper
+      // TODO: add a generic `get readings` wrapper
+      const req = new movementSensorApi.GetLinearAccelerationRequest();
+      req.setName('accelerometer');
+
+      client.movementSensorService.getLinearAcceleration(
+        req,
+        new grpc.Metadata(),
+        (err, resp) => {
+          if (err || !resp) {
+            return;
+          }
+
+          const linearAcceleration = resp.toObject().linearAcceleration;
+          console.debug(linearAcceleration);
+          app.ports.recvAccelReading.send(linearAcceleration);
+        }
+      );
     });
 
     // Add stream from camera
