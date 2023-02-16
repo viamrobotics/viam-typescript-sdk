@@ -6,7 +6,7 @@ import type { Sensor } from './Sensor';
 import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service.esm';
 
 import { promisify } from '../../utils';
-import { sensorApi } from '../../main';
+import sensorApi from '../../gen/component/sensor/v1/sensor_pb.esm';
 
 export class SensorClient implements Sensor {
   private client: SensorServiceClient;
@@ -34,6 +34,13 @@ export class SensorClient implements Sensor {
       sensorApi.GetReadingsRequest,
       sensorApi.GetReadingsResponse
     >(sensorService.getReadings.bind(sensorService), request);
-    return response;
+
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of response.getReadingsMap().getEntryList()) {
+      if (Array.isArray(value) && value.length === 2) {
+        result[key as string] = value[1];
+      }
+    }
+    return result;
   }
 }
