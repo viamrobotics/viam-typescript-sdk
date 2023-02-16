@@ -227,6 +227,10 @@ viewAcceleration model =
         -- color
         , At.style "color" <| statsColor
 
+        -- contrast
+        , At.style "background-color" "rgba(255,255,255,0.5)"
+        , At.style "padding" "0.25rem"
+
         --flex
         , At.style "display" "flex"
         , At.style "flex-direction" "column"
@@ -256,6 +260,11 @@ viewWifiSignal model =
 
         -- color
         , At.style "color" <| statsColor
+
+        -- contrast
+        , At.style "background-color" "rgba(255,255,255,0.5)"
+        , At.style "opacity" "50%"
+        , At.style "padding" "0.25rem"
 
         --flex
         , At.style "display" "flex"
@@ -321,7 +330,7 @@ viewWifiSignalBar ( level, minLevel ) =
 
 statsColor : String
 statsColor =
-    "purple"
+    "black"
 
 
 viewStreams : H.Html Msg
@@ -351,9 +360,6 @@ viewMovementControls model =
           At.style "display" "flex"
         , At.style "justify-content" "center"
         , At.style "align-items" "center"
-
-        -- transparency
-        , At.style "opacity" "50%"
 
         -- overlay
         , At.style "position" "absolute"
@@ -435,7 +441,7 @@ viewKey key keys =
                 "lightgreen"
 
             else
-                "white"
+                "rgba(255,255,255,0.5)"
 
         -- size
         , At.style "width" "50px"
