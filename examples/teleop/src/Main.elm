@@ -6,6 +6,7 @@ import Html.Attributes as At
 import Json.Encode as E
 import Keyboard
 import Keyboard.Arrows
+import Time
 
 
 
@@ -22,6 +23,12 @@ port sendGetPosition : () -> Cmd msg
 
 
 port recvGetPosition : (Float -> msg) -> Sub msg
+
+
+port getWifiReading : () -> Cmd msg
+
+
+port recvWifiReading : (Float -> msg) -> Sub msg
 
 
 
@@ -42,6 +49,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { position = 0
       , keys = []
+      , signalLevel = 0
       }
     , sendGetPosition ()
     )
@@ -54,6 +62,7 @@ init _ =
 type alias Model =
     { position : Float
     , keys : List Keyboard.Key
+    , signalLevel : Float
     }
 
 
@@ -64,6 +73,8 @@ type alias Model =
 type Msg
     = RecvGetPosition Float
     | KeyMsg Keyboard.Msg
+    | GetWifi
+    | GotWifi Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,6 +89,12 @@ update msg model =
 
         RecvGetPosition position ->
             ( { model | position = position }, Cmd.none )
+
+        GetWifi ->
+            ( model, getWifiReading () )
+
+        GotWifi signalLevel ->
+            ( { model | signalLevel = signalLevel }, Cmd.none )
 
 
 handleBaseSetPower : List Keyboard.Key -> Cmd none
@@ -120,6 +137,8 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ recvGetPosition RecvGetPosition
+        , recvWifiReading GotWifi
+        , Time.every 1000 (\_ -> GetWifi)
         , Sub.map KeyMsg Keyboard.subscriptions
         ]
 
@@ -161,9 +180,25 @@ viewStreamControls model =
         , At.style "width" "600px"
         , At.style "height" "480px"
         ]
-        [ viewStreams
+        [ viewWifiSignal model
+        , viewStreams
         , viewMovementControls model
         ]
+
+
+viewWifiSignal : Model -> H.Html Msg
+viewWifiSignal model =
+    H.div
+        [ -- overlay
+          At.style "top" "0"
+        , At.style "left" "0"
+        , At.style "position" "absolute"
+        , At.style "z-index" "10"
+
+        -- color
+        , At.style "color" "lightgreen"
+        ]
+        [ H.text <| String.fromFloat model.signalLevel ]
 
 
 viewStreams : H.Html Msg

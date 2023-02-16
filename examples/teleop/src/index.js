@@ -3,6 +3,7 @@ import {
   Client,
   BaseClient,
   MotorClient,
+  SensorClient,
   StreamClient,
   commonApi,
 } from '@viamrobotics/sdk';
@@ -99,6 +100,7 @@ connectWebRTC()
   .then((client) => {
     const base = new BaseClient(client, 'viam_base');
     const m1 = new MotorClient(client, 'left');
+    const wifi = new SensorClient(client, 'wifi');
 
     const app = Elm.Main.init({
       node: document.getElementById('main'),
@@ -135,6 +137,16 @@ connectWebRTC()
 
       const position = await m1.getPosition();
       app.ports.recvGetPosition.send(position);
+    });
+
+    app.ports.getWifiReading.subscribe(async () => {
+      const readings = await wifi.getReadings();
+      // TODO: simplify readings response object
+      const level = parseInt(
+        readings.toObject().readingsMap[0][1].stringValue,
+        10
+      );
+      app.ports.recvWifiReading.send(level);
     });
 
     // Add stream from camera
