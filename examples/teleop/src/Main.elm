@@ -19,12 +19,6 @@ port sendBaseSetPower : E.Value -> Cmd msg
 port sendBaseStop : () -> Cmd msg
 
 
-port sendGetPosition : () -> Cmd msg
-
-
-port recvGetPosition : (Float -> msg) -> Sub msg
-
-
 port getWifiReading : () -> Cmd msg
 
 
@@ -47,11 +41,10 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { position = 0
-      , keys = []
+    ( { keys = []
       , signalLevel = 0
       }
-    , sendGetPosition ()
+    , Cmd.none
     )
 
 
@@ -60,8 +53,7 @@ init _ =
 
 
 type alias Model =
-    { position : Float
-    , keys : List Keyboard.Key
+    { keys : List Keyboard.Key
     , signalLevel : Float
     }
 
@@ -71,8 +63,7 @@ type alias Model =
 
 
 type Msg
-    = RecvGetPosition Float
-    | KeyMsg Keyboard.Msg
+    = KeyMsg Keyboard.Msg
     | GetWifi
     | GotWifi Float
 
@@ -86,9 +77,6 @@ update msg model =
                     Keyboard.update keyMsg model.keys
             in
             ( { model | keys = keys }, handleBaseSetPower keys )
-
-        RecvGetPosition position ->
-            ( { model | position = position }, Cmd.none )
 
         GetWifi ->
             ( model, getWifiReading () )
@@ -136,8 +124,7 @@ defaultPower =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ recvGetPosition RecvGetPosition
-        , recvWifiReading GotWifi
+        [ recvWifiReading GotWifi
         , Time.every 1000 (\_ -> GetWifi)
         , Sub.map KeyMsg Keyboard.subscriptions
         ]

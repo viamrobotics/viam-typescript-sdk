@@ -112,11 +112,6 @@ connectWebRTC()
     const streams = new StreamClient(client);
     streams.on('track', onTrack);
 
-    app.ports.sendGetPosition.subscribe(async () => {
-      const position = await m1.getPosition();
-      app.ports.recvGetPosition.send(position);
-    });
-
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
       console.log('linear', linear);
       console.log('angular', angular);
@@ -126,17 +121,11 @@ connectWebRTC()
       angularVec.setZ(angular);
 
       await base.setPower(linearVec, angularVec);
-
-      const position = await m1.getPosition();
-      app.ports.recvGetPosition.send(position);
     });
 
     app.ports.sendBaseStop.subscribe(async () => {
       console.log('stopping');
       await base.stop();
-
-      const position = await m1.getPosition();
-      app.ports.recvGetPosition.send(position);
     });
 
     app.ports.getWifiReading.subscribe(async () => {
