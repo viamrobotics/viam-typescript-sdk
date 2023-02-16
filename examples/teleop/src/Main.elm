@@ -263,7 +263,6 @@ viewWifiSignal model =
 
         -- contrast
         , At.style "background-color" "rgba(255,255,255,0.5)"
-        , At.style "opacity" "50%"
         , At.style "padding" "0.25rem"
 
         --flex
