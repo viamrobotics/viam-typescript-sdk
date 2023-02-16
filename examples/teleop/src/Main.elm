@@ -80,7 +80,7 @@ accelerationDecoder =
         Acceleration
         (D.field "x" D.float)
         (D.field "y" D.float)
-        (D.field "x" D.float)
+        (D.field "z" D.float)
 
 
 
