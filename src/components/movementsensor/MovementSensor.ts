@@ -22,6 +22,6 @@ export interface MovementSensor {
   getOrientation(extra?: Extra): Promise<Orientation>;
   getPosition(extra?: Extra): Promise<Position>;
   getProperties(extra?: Extra): Promise<Properties>;
-  getAccuracy(extra?: Extra): Promise<number>;
+  getAccuracy(extra?: Extra): Promise<Record<string, number>>;
   getLinearAcceleration(extra?: Extra): Promise<Vector3D>;
 }
