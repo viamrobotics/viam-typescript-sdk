@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser
+import Dict exposing (Dict)
 import Html as H
 import Html.Attributes as At
 import Json.Decode as D
@@ -23,7 +24,7 @@ port sendBaseStop : () -> Cmd msg
 port getWifiReading : () -> Cmd msg
 
 
-port recvWifiReading : (Float -> msg) -> Sub msg
+port recvWifiReading : (E.Value -> msg) -> Sub msg
 
 
 port getAccelReading : () -> Cmd msg
@@ -49,7 +50,7 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { keys = []
-      , signalLevel = 0
+      , signalLevel = Dict.empty
       , acceleration = { x = 0, y = 0, z = 0 }
       }
     , Cmd.none
@@ -62,9 +63,14 @@ init _ =
 
 type alias Model =
     { keys : List Keyboard.Key
-    , signalLevel : Float
+    , signalLevel : Dict String Float
     , acceleration : Acceleration
     }
+
+
+signalDecoder : D.Decoder (Dict String Float)
+signalDecoder =
+    D.dict (D.field "level_dB" D.float)
 
 
 type alias Acceleration =
@@ -90,7 +96,7 @@ accelerationDecoder =
 type Msg
     = KeyMsg Keyboard.Msg
     | GetWifi
-    | GotWifi Float
+    | GotWifi E.Value
     | GetAcceleration
     | GotAcceleration E.Value
 
@@ -108,8 +114,13 @@ update msg model =
         GetWifi ->
             ( model, getWifiReading () )
 
-        GotWifi signalLevel ->
-            ( { model | signalLevel = signalLevel }, Cmd.none )
+        GotWifi value ->
+            case D.decodeValue signalDecoder value of
+                Err _ ->
+                    ( model, Cmd.none )
+
+                Ok signalLevel ->
+                    ( { model | signalLevel = signalLevel }, Cmd.none )
 
         GetAcceleration ->
             ( model, getAccelReading () )
@@ -251,46 +262,58 @@ formatAccelerationDim dim =
 
 viewWifiSignal : Model -> H.Html Msg
 viewWifiSignal model =
-    H.div
-        [ -- overlay
-          At.style "top" "0"
-        , At.style "left" "0"
-        , At.style "position" "absolute"
-        , At.style "z-index" "10"
+    case getSignalLevel model of
+        Nothing ->
+            H.text ""
 
-        -- color
-        , At.style "color" <| statsColor
+        Just signalLevel ->
+            H.div
+                [ -- overlay
+                  At.style "top" "0"
+                , At.style "left" "0"
+                , At.style "position" "absolute"
+                , At.style "z-index" "10"
 
-        -- contrast
-        , At.style "background-color" "rgba(255,255,255,0.5)"
-        , At.style "padding" "0.25rem"
+                -- color
+                , At.style "color" <| statsColor
 
-        --flex
-        , At.style "display" "flex"
-        , At.style "column-gap" "1rem"
-        ]
-        [ viewWifiSignalBars model
-        , H.text <| "(" ++ String.fromFloat model.signalLevel ++ " dBm)"
-        ]
+                -- contrast
+                , At.style "background-color" "rgba(255,255,255,0.5)"
+                , At.style "padding" "0.25rem"
+
+                --flex
+                , At.style "display" "flex"
+                , At.style "column-gap" "1rem"
+                ]
+                [ viewWifiSignalBars signalLevel
+                , H.text <| "(" ++ String.fromFloat signalLevel ++ " dBm)"
+                ]
 
 
-viewWifiSignalBars : Model -> H.Html Msg
-viewWifiSignalBars model =
+getSignalLevel : Model -> Maybe Float
+getSignalLevel { signalLevel } =
+    signalLevel
+        |> Dict.values
+        |> List.head
+
+
+viewWifiSignalBars : Float -> H.Html Msg
+viewWifiSignalBars signalLevel =
     let
         level =
-            if model.signalLevel >= -50 then
+            if signalLevel >= -50 then
                 5
 
-            else if model.signalLevel >= -60 then
+            else if signalLevel >= -60 then
                 4
 
-            else if model.signalLevel >= -67 then
+            else if signalLevel >= -67 then
                 3
 
-            else if model.signalLevel >= -70 then
+            else if signalLevel >= -70 then
                 2
 
-            else if model.signalLevel >= -80 then
+            else if signalLevel >= -80 then
                 1
 
             else
