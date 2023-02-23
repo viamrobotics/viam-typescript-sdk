@@ -1,2 +1,2 @@
 export type { Arm } from './arm/Arm';
-export { ArmClient } from './arm/client';
+export { ArmClient } from './arm/Client';
