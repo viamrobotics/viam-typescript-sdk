@@ -61,7 +61,6 @@ import type {
         request.setTo(pose);
         request.setWorldState(world);
         request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
-        // how to set the pose??
 
 
         this.options.requestLogger?.(request);
