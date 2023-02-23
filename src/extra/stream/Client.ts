@@ -14,10 +14,11 @@ export class StreamClient extends EventDispatcher implements Stream {
     super();
     this.client = client.createServiceClient(StreamServiceClient);
     this.options = options;
-    
+
     /**
-     * Currently this is emitting events for every track that we recieve.
-     * In the future we'll want to partition here and have individual events for each stream.
+     * Currently this is emitting events for every track that we recieve. In the
+     * future we'll want to partition here and have individual events for each
+     * stream.
      */
     events.on('track', (args) => this.emit('track', args));
   }
