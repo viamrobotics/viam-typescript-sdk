@@ -36,10 +36,8 @@ export class SensorClient implements Sensor {
     >(sensorService.getReadings.bind(sensorService), request);
 
     const result: Record<string, unknown> = {};
-    for (const [key, value] of response.getReadingsMap().getEntryList()) {
-      if (Array.isArray(value) && value.length === 2) {
-        result[key as string] = value[1];
-      }
+    for (const [key, value] of response.getReadingsMap().entries()) {
+      result[key] = value.toJavaScript();
     }
     return result;
   }
