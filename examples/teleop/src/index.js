@@ -3,6 +3,7 @@ import {
   Client,
   BaseClient,
   MotorClient,
+  MovementSensorClient,
   SensorClient,
   StreamClient,
   commonApi,
@@ -103,7 +104,7 @@ connectWebRTC()
     const base = new BaseClient(client, 'viam_base');
     const m1 = new MotorClient(client, 'left');
     const wifi = new SensorClient(client, 'wifi');
-    const accel = new SensorClient(client, 'accelerometer');
+    const accel = new MovementSensorClient(client, 'accelerometer');
 
     const app = Elm.Main.init({
       node: document.getElementById('main'),
@@ -139,24 +140,9 @@ connectWebRTC()
     });
 
     app.ports.getAccelReading.subscribe(async () => {
-      // TODO: add a movement sensor wrapper
-      // TODO: add a generic `get readings` wrapper
-      const req = new movementSensorApi.GetLinearAccelerationRequest();
-      req.setName('accelerometer');
-
-      client.movementSensorService.getLinearAcceleration(
-        req,
-        new grpc.Metadata(),
-        (err, resp) => {
-          if (err || !resp) {
-            return;
-          }
-
-          const linearAcceleration = resp.toObject().linearAcceleration;
-          console.debug(linearAcceleration);
-          app.ports.recvAccelReading.send(linearAcceleration);
-        }
-      );
+      const readings = await accel.getLinearAcceleration();
+      console.debug(readings);
+      app.ports.recvAccelReading.send(readings);
     });
 
     // Add stream from camera
