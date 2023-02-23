@@ -70,7 +70,7 @@ type alias Model =
 
 signalDecoder : D.Decoder (Dict String Float)
 signalDecoder =
-    D.dict (D.field "level_dB" D.float)
+    D.dict (D.field "level_dBm" D.float)
 
 
 type alias Acceleration =
