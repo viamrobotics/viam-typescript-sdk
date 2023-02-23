@@ -50,7 +50,7 @@ main =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { keys = []
-      , signalLevel = Dict.empty
+      , signalLevels = Dict.empty
       , acceleration = { x = 0, y = 0, z = 0 }
       }
     , Cmd.none
@@ -63,7 +63,7 @@ init _ =
 
 type alias Model =
     { keys : List Keyboard.Key
-    , signalLevel : Dict String Float
+    , signalLevels : Dict String Float
     , acceleration : Acceleration
     }
 
@@ -119,8 +119,8 @@ update msg model =
                 Err _ ->
                     ( model, Cmd.none )
 
-                Ok signalLevel ->
-                    ( { model | signalLevel = signalLevel }, Cmd.none )
+                Ok signalLevels ->
+                    ( { model | signalLevels = signalLevels }, Cmd.none )
 
         GetAcceleration ->
             ( model, getAccelReading () )
@@ -262,39 +262,44 @@ formatAccelerationDim dim =
 
 viewWifiSignal : Model -> H.Html Msg
 viewWifiSignal model =
-    case getSignalLevel model of
-        Nothing ->
-            H.text ""
+    H.div
+        [ -- overlay
+          At.style "top" "0"
+        , At.style "left" "0"
+        , At.style "position" "absolute"
+        , At.style "z-index" "10"
 
-        Just signalLevel ->
-            H.div
-                [ -- overlay
-                  At.style "top" "0"
-                , At.style "left" "0"
-                , At.style "position" "absolute"
-                , At.style "z-index" "10"
+        -- color
+        , At.style "color" <| statsColor
 
-                -- color
-                , At.style "color" <| statsColor
-
-                -- contrast
-                , At.style "background-color" "rgba(255,255,255,0.5)"
-                , At.style "padding" "0.25rem"
-
-                --flex
-                , At.style "display" "flex"
-                , At.style "column-gap" "1rem"
-                ]
-                [ viewWifiSignalBars signalLevel
-                , H.text <| "(" ++ String.fromFloat signalLevel ++ " dBm)"
-                ]
+        -- contrast
+        , At.style "background-color" "rgba(255,255,255,0.5)"
+        , At.style "padding" "0.25rem"
+        ]
+        [ viewSignalLevels model ]
 
 
-getSignalLevel : Model -> Maybe Float
-getSignalLevel { signalLevel } =
-    signalLevel
-        |> Dict.values
-        |> List.head
+viewSignalLevels : Model -> H.Html Msg
+viewSignalLevels { signalLevels } =
+    H.div
+        [ --flex
+          At.style "display" "flex"
+        , At.style "flex-direction" "column"
+        , At.style "row-gap" "1rem"
+        ]
+    <|
+        List.map
+            (\( iface, signalLevel ) ->
+                H.div
+                    [ --flex
+                      At.style "display" "flex"
+                    , At.style "column-gap" "1rem"
+                    ]
+                    [ viewWifiSignalBars signalLevel
+                    , H.text <| "(" ++ iface ++ ": " ++ String.fromFloat signalLevel ++ " dBm)"
+                    ]
+            )
+            (List.sortBy Tuple.first <| Dict.toList signalLevels)
 
 
 viewWifiSignalBars : Float -> H.Html Msg
