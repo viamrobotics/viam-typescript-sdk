@@ -1,9 +1,11 @@
+import * as Arm from './components/arm/Arm';
 import * as Base from './components/base/Base';
 import * as Board from './components/board/Board';
 import * as Camera from './components/camera/Camera';
 import * as Motor from './components/motor/Motor';
 import * as Sensor from './components/sensor/Sensor';
 
+import { ArmClient } from './components/arm/Client'
 import { BaseClient } from './components/base/Client';
 import { BoardClient } from './components/board/Client';
 import { CameraClient } from './components/camera/Client';
@@ -56,11 +58,13 @@ export {
   slamApi,
   visionApi,
   streamApi,
+  Arm,
   Camera,
   Motor,
   Base,
   Board,
   Sensor,
+  ArmClient,
   BaseClient,
   BoardClient,
   CameraClient,

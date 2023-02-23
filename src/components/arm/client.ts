@@ -5,7 +5,7 @@ import pb from '../../gen/component/arm/v1/arm_pb.esm';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
 import type { Options } from '../../types';
 import { promisify } from '../../utils';
-import type { Arm } from './arm';
+import type { Arm } from './Arm';
 
 export class ArmClient implements Arm {
   private client: ArmServiceClient;

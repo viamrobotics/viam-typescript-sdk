@@ -71,7 +71,7 @@ module.exports = {
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
     'sort-keys': 'off',
-    'sort-imports': ['error', { 'allowSeparatedGroups': true }],
+    'sort-imports': 'off',
     '@typescript-eslint/prefer-for-of': 'off',
     '@typescript-eslint/no-shadow': ['error'], // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358
     '@typescript-eslint/type-annotation-spacing': 'warn',
