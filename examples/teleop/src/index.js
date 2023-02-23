@@ -134,12 +134,8 @@ connectWebRTC()
 
     app.ports.getWifiReading.subscribe(async () => {
       const readings = await wifi.getReadings();
-      let result = {};
-      for (const [key, value] of readings.getReadingsMap().entries()) {
-        result[key] = value.toJavaScript();
-      }
-      console.debug(result);
-      app.ports.recvWifiReading.send(result);
+      console.debug(readings);
+      app.ports.recvWifiReading.send(readings);
     });
 
     app.ports.getAccelReading.subscribe(async () => {
