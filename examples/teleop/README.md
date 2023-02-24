@@ -11,9 +11,9 @@ Run `npm run watch` and visit `localhost:8000` in a browser.
 
 You should see an interface that looks like this after a few seconds:
 
-<TODO add picture>
+![teledemo ui](doc/teledemo-ui.png?raw=true)
 
 You may need to enable "allow audio and video" in your browser to get a live
 video stream.
 
-<TODO add picture>
+![select allow and video](doc/allow-audio-video.png?raw=true)
