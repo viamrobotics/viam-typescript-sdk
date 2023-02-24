@@ -2,14 +2,12 @@ import * as Base from './components/base/Base';
 import * as Board from './components/board/Board';
 import * as Camera from './components/camera/Camera';
 import * as Motor from './components/motor/Motor';
-import * as Sensor from './components/sensor/Sensor';
 
 import { BaseClient } from './components/base/Client';
 import { BoardClient } from './components/board/Client';
 import { CameraClient } from './components/camera/Client';
 import Client from './Client';
 import { MotorClient } from './components/motor/Client';
-import { SensorClient } from './components/sensor/Client';
 import { StreamClient } from './extra/stream/Client';
 
 import armApi from './gen/component/arm/v1/arm_pb.esm';
@@ -39,6 +37,7 @@ export {
   type MovementSensor,
   MovementSensorClient,
 } from './components/movementsensor';
+export { type Sensor, SensorClient } from './components/sensor';
 
 export {
   commonApi,
@@ -65,13 +64,11 @@ export {
   Motor,
   Base,
   Board,
-  Sensor,
   BaseClient,
   BoardClient,
   CameraClient,
   Client,
   MotorClient,
-  SensorClient,
   StreamClient,
 };
 
