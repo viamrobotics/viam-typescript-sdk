@@ -27,7 +27,7 @@ export interface Arm {
    * Move each joint of the arm based on the angles on the joint poisitons
    * parameter
    *
-   * @param jointPositions Destination joint positons
+   * @param jointPositions - Destination joint positons
    */
   MoveToJointPositions: (
     jointPositions: JointPositions,
