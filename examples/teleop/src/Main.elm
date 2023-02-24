@@ -195,7 +195,7 @@ view model =
         , At.style "align-items" "center"
         , At.style "row-gap" "0.5rem"
         ]
-        [ H.h2 [] <| [ H.text "Tele-Op Demo" ]
+        [ H.h2 [] <| [ H.text "Demo" ]
         , viewHUD model
         ]
 
