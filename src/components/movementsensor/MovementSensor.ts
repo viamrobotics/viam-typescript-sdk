@@ -1,4 +1,5 @@
 import type { Extra, Orientation, Vector3D } from '../../types';
+import type { Sensor } from '../sensor';
 
 export interface Position {
   latitude: number;
@@ -16,7 +17,7 @@ export interface Properties {
   linearAccelerationSupported: boolean;
 }
 
-export interface MovementSensor {
+interface BareMovementSensor {
   /** Get linear velocity in mm/s across x/y/z axes */
   getLinearVelocity(extra?: Extra): Promise<Vector3D>;
 
@@ -47,3 +48,5 @@ export interface MovementSensor {
   /** Get linear acceleration in mm/s/s across x/y/z axes */
   getLinearAcceleration(extra?: Extra): Promise<Vector3D>;
 }
+
+export type MovementSensor = BareMovementSensor & Sensor;

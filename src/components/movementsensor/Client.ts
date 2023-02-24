@@ -1,6 +1,7 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 import type Client from '../../Client';
 import type { MovementSensor } from './MovementSensor';
+import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service.esm';
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb.esm';
@@ -8,11 +9,13 @@ import { promisify } from '../../utils';
 
 export class MovementSensorClient implements MovementSensor {
   private client: MovementSensorServiceClient;
+  private sensorclient: SensorClient;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: Client, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MovementSensorServiceClient);
+    this.sensorclient = new SensorClient(client, name, options);
     this.name = name;
     this.options = options;
   }
@@ -220,5 +223,9 @@ export class MovementSensorClient implements MovementSensor {
       y: acc.getY(),
       z: acc.getZ(),
     };
+  }
+
+  getReadings(extra = {}) {
+    return this.sensorclient.getReadings(extra);
   }
 }
