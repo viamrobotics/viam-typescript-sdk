@@ -1,9 +1,19 @@
-# Viam SDK Quickstart
+# Tele-operation Interface
 
-This example demonstrates how to connect to a robot and operate a motor on it.
+This example demonstrates how to build remote control UI on a robot with motor
+controls, accelerometer readings, and a wifi strength sensor.
+
+This example is implemented using Elm with ports.
 
 ## Usage
 
-Run `npm run watch` and visit `localhost:8000` in a browser. Press the button to execute the logic defined in `src/main.ts`.
+Run `npm run watch` and visit `localhost:8000` in a browser.
 
-Edit `src/main.ts` to change the robot logic being run. Edit `static/index.html` to change the layout of the app.
+You should see an interface that looks like this after a few seconds:
+
+<TODO add picture>
+
+You may need to enable "allow audio and video" in your browser to get a live
+video stream.
+
+<TODO add picture>
