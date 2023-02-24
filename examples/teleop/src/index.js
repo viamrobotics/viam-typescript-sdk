@@ -74,12 +74,15 @@ function onTrack(event) {
   if (!eventStream) {
     throw new Error('expected event stream to exist');
   }
+
   const kind = 'track';
   const streamName = eventStream.id;
   const streamContainers = document.querySelectorAll(
     `[data-stream="${streamName}"]`
   );
 
+  // Most of this logic is a hack that to inject a WebRTC stream into the DOM.
+  // Elm does not support media elements so we have to do it here.
   for (const streamContainer of streamContainers) {
     const mediaElement = document.createElement(kind);
     mediaElement.srcObject = eventStream;
