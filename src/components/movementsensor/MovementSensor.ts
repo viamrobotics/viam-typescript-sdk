@@ -6,6 +6,7 @@ export interface Position {
   altitudeMM: number;
 }
 
+/** The readings supported by this movement sensor */
 export interface Properties {
   linearVelocitySupported: boolean;
   angularVelocitySupported: boolean;
@@ -37,7 +38,7 @@ export interface MovementSensor {
   /** Get the current position latitude, longitude, and altitude (in mm) */
   getPosition(extra?: Extra): Promise<Position>;
 
-  /** Get the movement sensor readings supported by this movement sensor */
+  /** Get the properties of this movement sensor */
   getProperties(extra?: Extra): Promise<Properties>;
 
   /** Get the accuracy of various sensors in mm */
