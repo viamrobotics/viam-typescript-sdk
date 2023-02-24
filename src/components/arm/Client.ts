@@ -37,7 +37,6 @@ export class ArmClient implements Arm {
 
     const result = response.getPose();
     if (!result) {
-      // eslint-disable-next-line no-warning-comments
       throw new Error('no pose');
     }
     return result;
