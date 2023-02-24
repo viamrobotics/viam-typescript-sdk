@@ -17,7 +17,7 @@ export interface Properties {
   linearAccelerationSupported: boolean;
 }
 
-interface BareMovementSensor {
+export interface MovementSensor extends Sensor {
   /** Get linear velocity in mm/s across x/y/z axes */
   getLinearVelocity(extra?: Extra): Promise<Vector3D>;
 
@@ -48,5 +48,3 @@ interface BareMovementSensor {
   /** Get linear acceleration in mm/s/s across x/y/z axes */
   getLinearAcceleration(extra?: Extra): Promise<Vector3D>;
 }
-
-export type MovementSensor = BareMovementSensor & Sensor;
