@@ -8,7 +8,6 @@ export interface Arm {
   /**
    * Get the position of the end of the arm expressed as a pose
    *
-   * @returns Pose
    */
   GetEndPosition: (extra?: Extra) => Promise<Pose>;
 
@@ -17,7 +16,6 @@ export interface Arm {
    *
    * @param pose - The destination pose for the arm
    * @param world - The obstacles for the arm to avoid
-   * @returns
    */
   MoveToPosition: (
     pose: Pose,
@@ -26,11 +24,10 @@ export interface Arm {
   ) => Promise<void>;
 
   /**
-   * Move each joint of the arm based on the angles in the jointpoisitons
+   * Move each joint of the arm based on the angles on the joint poisitons
    * parameter
    *
    * @param jointPositions Destination joint positons
-   * @returns
    */
   MoveToJointPositions: (
     jointPositions: JointPositions,
@@ -40,21 +37,18 @@ export interface Arm {
   /**
    * Gets the current position of each joint
    *
-   * @returns JointPositions - the current JointPositions of the arm
    */
   GetJointPositions: (extra: Extra) => Promise<JointPositions>;
 
   /**
    * Stops the motion of the arm
    *
-   * @returns
    */
   Stop: (extra: Extra) => Promise<void>;
 
   /**
    * Get if the arm is currently moving
-   *
-   * @returns Boolean whether the arm is moving
+   * 
    */
   IsMoving: () => Promise<boolean>;
 }
