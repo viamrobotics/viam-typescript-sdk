@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Viam SDK tele-operation demo",
   "scripts": {
-    "start": "yarn run vite --port 8000",
+    "start": "vite --port 8000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Maxim Pertsov",
