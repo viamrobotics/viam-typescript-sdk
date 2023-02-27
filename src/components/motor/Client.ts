@@ -3,7 +3,7 @@ import type Client from '../../Client';
 import type { Motor } from './Motor';
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm';
 import type { Options } from '../../types';
-import { motorApi } from '../../main';
+import motorApi from '../../gen/component/motor/v1/motor_pb.esm';
 import { promisify } from '../../utils';
 
 export class MotorClient implements Motor {
