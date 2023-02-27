@@ -1,4 +1,4 @@
-type Callback = (args: any) => void
+type Callback = (args: any) => void;
 
 export class EventDispatcher {
   listeners: Record<string, Set<Callback>> = {};

@@ -1,23 +1,11 @@
-import type { Arm } from './arm';
-import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
-import type Client from '../../Client';
-import type { Options } from '../../types';
-import pb from '../../gen/component/arm/v1/arm_pb.esm';
+import type { Pose, WorldState } from '../../gen/common/v1/common_pb.esm';
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import type Client from '../../Client';
+import pb from '../../gen/component/arm/v1/arm_pb.esm';
+import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
+import type { Options } from '../../types';
 import { promisify } from '../../utils';
-
-import type {
-    Pose,
-    WorldState
-
-  } from '../../gen/common/v1/common_pb.esm';
-
-  import type {
-    JointPositions
-  } from '../../gen/component/arm/v1/arm_pb.esm';
-
-
-
+import type { Arm } from './Arm';
 
   export class ArmClient implements Arm {
     private client: ArmServiceClient;
@@ -34,22 +22,21 @@ import type {
       return this.client;
     }
 
-    async GetEndPosition(extra = {})  {
+  async GetEndPosition(extra = {}) {
         const armService = this.ArmService;
         const request = new pb.GetEndPositionRequest();
         request.setName(this.name);
-        request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+        request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra))
 
         this.options.requestLogger?.(request);
 
-        const response = await promisify<pb.GetEndPositionRequest, pb.GetEndPositionResponse>(
-            armService.getEndPosition.bind(armService),
-            request
-          );
+    const response = await promisify<
+      pb.GetEndPositionRequest,
+      pb.GetEndPositionResponse
+    >(armService.getEndPosition.bind(armService), request);
       
           const result = response.getPose();
           if (!result) {
-            // eslint-disable-next-line no-warning-comments
             throw new Error('no pose');
           }
           return result;
@@ -61,8 +48,6 @@ import type {
         request.setTo(pose);
         request.setWorldState(world);
         request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
-        // how to set the pose??
-
 
         this.options.requestLogger?.(request);
 
@@ -70,10 +55,9 @@ import type {
             armService.moveToPosition.bind(armService),
             request
           );
-
     }
 
-    async MoveToJointPositions(jointPositions: JointPositions, extra = {}) {
+  async MoveToJointPositions(jointPositions: pb.JointPositions, extra = {}) {
         const armService = this.ArmService;
         const request = new pb.MoveToJointPositionsRequest();
         request.setName(this.name);
@@ -82,10 +66,10 @@ import type {
 
         this.options.requestLogger?.(request);
 
-        await promisify<pb.MoveToJointPositionsRequest, pb.MoveToJointPositionsResponse>(
-            armService.moveToJointPositions.bind(armService),
-            request
-          );
+    await promisify<
+      pb.MoveToJointPositionsRequest,
+      pb.MoveToJointPositionsResponse
+    >(armService.moveToJointPositions.bind(armService), request);
         }
         
     async GetJointPositions(extra = {}) {
@@ -96,15 +80,14 @@ import type {
 
         this.options.requestLogger?.(request);
 
-        const response = await promisify<pb.GetJointPositionsRequest, pb.GetJointPositionsResponse>(
-            armService.getJointPositions.bind(armService),
-            request
-          );
+    const response = await promisify<
+      pb.GetJointPositionsRequest,
+      pb.GetJointPositionsResponse
+    >(armService.getJointPositions.bind(armService), request);
 
           const result = response.getPositions();
 
           if (!result) {
-            // eslint-disable-next-line no-warning-comments
             throw new Error('no pose');
           }
           return result;
@@ -128,20 +111,12 @@ import type {
         const armService = this.ArmService;
         const request = new pb.IsMovingRequest();
 
-
         this.options.requestLogger?.(request);
 
         const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>( 
             armService.isMoving.bind(armService),
             request
-        )
+    );
        return response.getIsMoving();
-
     }
-
-    
-    
 }
-
-
-
