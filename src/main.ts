@@ -1,5 +1,4 @@
 import Client from './Client';
-import { StreamClient } from './extra/stream/Client';
 
 import armApi from './gen/component/arm/v1/arm_pb.esm';
 import baseApi from './gen/component/base/v1/base_pb.esm';
@@ -33,6 +32,7 @@ export {
   MovementSensorClient,
 } from './components/movementsensor';
 export { type Sensor, SensorClient } from './components/sensor';
+export { type Stream, StreamClient } from './extra/stream';
 
 export {
   commonApi,
@@ -56,7 +56,6 @@ export {
   visionApi,
   streamApi,
   Client,
-  StreamClient,
 };
 
 // It doesn't matter which ServiceError we export really.
