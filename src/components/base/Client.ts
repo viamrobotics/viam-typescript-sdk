@@ -8,7 +8,7 @@ import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.e
 import type { Options } from '../../types';
 import { promisify } from '../../utils';
 
-/** A gRPC client for the Base component. */
+/** A gRPC-web client for the Base component. */
 export class BaseClient implements Base {
   private client: BaseServiceClient;
   private readonly name: string;

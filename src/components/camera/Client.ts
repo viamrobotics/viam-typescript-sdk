@@ -6,7 +6,7 @@ import type { Options } from '../../types';
 import pb from '../../gen/component/camera/v1/camera_pb.esm';
 import { promisify } from '../../utils';
 
-/** A gRPC client for the Camera component. */
+/** A gRPC-web client for the Camera component. */
 export class CameraClient implements Camera {
   private client: CameraServiceClient;
   private readonly name: string;
