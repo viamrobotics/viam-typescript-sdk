@@ -4,11 +4,9 @@ import type { JointPositions } from '../../gen/component/arm/v1/arm_pb.esm';
 
 import type { Extra } from '../../types';
 
+/** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm {
-  /**
-   * Get the position of the end of the arm expressed as a pose
-   *
-   */
+  /** Get the position of the end of the arm expressed as a pose */
   GetEndPosition: (extra?: Extra) => Promise<Pose>;
 
   /**
@@ -34,21 +32,12 @@ export interface Arm {
     extra?: Extra
   ) => Promise<void>;
 
-  /**
-   * Gets the current position of each joint
-   *
-   */
+  /** Gets the current position of each joint */
   GetJointPositions: (extra: Extra) => Promise<JointPositions>;
 
-  /**
-   * Stops the motion of the arm
-   *
-   */
+  /** Stops the motion of the arm */
   Stop: (extra: Extra) => Promise<void>;
 
-  /**
-   * Get if the arm is currently moving
-   * 
-   */
+  /** Get if the arm is currently moving */
   IsMoving: () => Promise<boolean>;
 }
