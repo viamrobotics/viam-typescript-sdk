@@ -83,7 +83,7 @@ export class MotorClient implements Motor {
     >(motorService.resetZeroPosition.bind(motorService), request);
   }
 
-  async motorStop(extra = {}) {
+  async stop(extra = {}) {
     const motorService = this.motorService;
     const request = new motorApi.StopRequest();
     request.setName(this.name);
@@ -95,6 +95,11 @@ export class MotorClient implements Motor {
       motorService.stop.bind(motorService),
       request
     );
+  }
+
+  /** @deprecated Use {@link MotorClient#stop} instead. */
+  motorStop(extra = {}) {
+    return this.stop(extra);
   }
 
   async getProperties(extra = {}) {

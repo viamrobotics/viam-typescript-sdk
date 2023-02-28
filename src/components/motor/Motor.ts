@@ -46,7 +46,7 @@ export interface Motor {
   resetZeroPosition(offset: number, extra?: Extra): Promise<void>;
 
   /** Turn the motor off. */
-  motorStop(extra?: Extra): Promise<void>;
+  stop(extra?: Extra): Promise<void>;
 
   /** Return the motor's properties. */
   getProperties(extra?: Extra): Promise<Properties>;
