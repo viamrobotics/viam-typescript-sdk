@@ -5,9 +5,10 @@ import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_servic
 import type Client from '../../Client';
 import type { Options } from '../../types';
 
-import { boardApi } from '../../main';
+import pb from '../../gen/component/board/v1/board_pb.esm';
 import { promisify } from '../../utils';
 
+/** A gRPC-web client for the Board component. */
 export class BoardClient implements Board {
   private client: BoardServiceClient;
   private readonly name: string;
@@ -24,21 +25,21 @@ export class BoardClient implements Board {
   }
   async status(extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.StatusRequest();
+    const request = new pb.StatusRequest();
     request.setName(this.name);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      boardApi.StatusRequest,
-      boardApi.StatusResponse
-    >(boardService.status.bind(boardService), request);
+    const response = await promisify<pb.StatusRequest, pb.StatusResponse>(
+      boardService.status.bind(boardService),
+      request
+    );
     return response;
   }
   async setGPIO(pin: string, high: boolean, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.SetGPIORequest();
+    const request = new pb.SetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
     request.setHigh(high);
@@ -46,36 +47,36 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request);
 
-    await promisify<boardApi.SetGPIORequest, boardApi.SetGPIOResponse>(
+    await promisify<pb.SetGPIORequest, pb.SetGPIOResponse>(
       boardService.setGPIO.bind(boardService),
       request
     );
   }
   async getGPIO(pin: string, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.GetGPIORequest();
+    const request = new pb.GetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      boardApi.GetGPIORequest,
-      boardApi.GetGPIOResponse
-    >(boardService.getGPIO.bind(boardService), request);
+    const response = await promisify<pb.GetGPIORequest, pb.GetGPIOResponse>(
+      boardService.getGPIO.bind(boardService),
+      request
+    );
     return response.getHigh();
   }
   async getPWM(pin: string, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.PWMRequest();
+    const request = new pb.PWMRequest();
     request.setName(this.name);
     request.setPin(pin);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<boardApi.PWMRequest, boardApi.PWMResponse>(
+    const response = await promisify<pb.PWMRequest, pb.PWMResponse>(
       boardService.pWM.bind(boardService),
       request
     );
@@ -83,7 +84,7 @@ export class BoardClient implements Board {
   }
   async setPWM(pin: string, dutyCyle: number, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.SetPWMRequest();
+    const request = new pb.SetPWMRequest();
     request.setName(this.name);
     request.setPin(pin);
     request.setDutyCyclePct(dutyCyle);
@@ -91,14 +92,14 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request);
 
-    await promisify<boardApi.SetPWMRequest, boardApi.SetPWMResponse>(
+    await promisify<pb.SetPWMRequest, pb.SetPWMResponse>(
       boardService.setPWM.bind(boardService),
       request
     );
   }
   async getPWMFrequency(pin: string, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.PWMFrequencyRequest();
+    const request = new pb.PWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
@@ -106,14 +107,14 @@ export class BoardClient implements Board {
     this.options.requestLogger?.(request);
 
     const response = await promisify<
-      boardApi.PWMFrequencyRequest,
-      boardApi.PWMFrequencyResponse
+      pb.PWMFrequencyRequest,
+      pb.PWMFrequencyResponse
     >(boardService.pWMFrequency.bind(boardService), request);
     return response.getFrequencyHz();
   }
   async setPWMFrequency(pin: string, frequencyHz: number, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.SetPWMFrequencyRequest();
+    const request = new pb.SetPWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
     request.setFrequencyHz(frequencyHz);
@@ -121,14 +122,14 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request);
 
-    await promisify<
-      boardApi.SetPWMFrequencyRequest,
-      boardApi.SetPWMFrequencyResponse
-    >(boardService.setPWMFrequency.bind(boardService), request);
+    await promisify<pb.SetPWMFrequencyRequest, pb.SetPWMFrequencyResponse>(
+      boardService.setPWMFrequency.bind(boardService),
+      request
+    );
   }
   async readAnalogReader(boardName: string, analogReader: string, extra = {}) {
     const boardService = this.boardService;
-    const request = new boardApi.ReadAnalogReaderRequest();
+    const request = new pb.ReadAnalogReaderRequest();
     request.setBoardName(boardName);
     request.setAnalogReaderName(analogReader);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
@@ -136,8 +137,8 @@ export class BoardClient implements Board {
     this.options.requestLogger?.(request);
 
     const response = await promisify<
-      boardApi.ReadAnalogReaderRequest,
-      boardApi.ReadAnalogReaderResponse
+      pb.ReadAnalogReaderRequest,
+      pb.ReadAnalogReaderResponse
     >(boardService.readAnalogReader.bind(boardService), request);
     return response.getValue();
   }
@@ -147,7 +148,7 @@ export class BoardClient implements Board {
     extra = {}
   ) {
     const boardService = this.boardService;
-    const request = new boardApi.GetDigitalInterruptValueRequest();
+    const request = new pb.GetDigitalInterruptValueRequest();
     request.setBoardName(boardName);
     request.setDigitalInterruptName(digitalInteruptName);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
@@ -155,8 +156,8 @@ export class BoardClient implements Board {
     this.options.requestLogger?.(request);
 
     const response = await promisify<
-      boardApi.GetDigitalInterruptValueRequest,
-      boardApi.GetDigitalInterruptValueResponse
+      pb.GetDigitalInterruptValueRequest,
+      pb.GetDigitalInterruptValueResponse
     >(boardService.getDigitalInterruptValue.bind(boardService), request);
     return response.getValue();
   }

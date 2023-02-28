@@ -3,9 +3,10 @@ import type Client from '../../Client';
 import type { Motor } from './Motor';
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm';
 import type { Options } from '../../types';
-import { motorApi } from '../../main';
+import motorApi from '../../gen/component/motor/v1/motor_pb.esm';
 import { promisify } from '../../utils';
 
+/** A gRPC-web client for the Motor component. */
 export class MotorClient implements Motor {
   private client: MotorServiceClient;
   private readonly name: string;
@@ -83,7 +84,7 @@ export class MotorClient implements Motor {
     >(motorService.resetZeroPosition.bind(motorService), request);
   }
 
-  async motorStop(extra = {}) {
+  async stop(extra = {}) {
     const motorService = this.motorService;
     const request = new motorApi.StopRequest();
     request.setName(this.name);
@@ -95,6 +96,11 @@ export class MotorClient implements Motor {
       motorService.stop.bind(motorService),
       request
     );
+  }
+
+  /** @deprecated Use {@link MotorClient#stop} instead. */
+  motorStop(extra = {}) {
+    return this.stop(extra);
   }
 
   async getProperties(extra = {}) {

@@ -7,6 +7,7 @@ import { promisify } from '../../utils';
 import type { Arm } from './Arm';
 import commonPB from '../../gen/common/v1/common_pb.esm';
 
+/** A gRPC-web client for the Arm component. */
 export class ArmClient implements Arm {
   private client: ArmServiceClient;
   private readonly name: string;

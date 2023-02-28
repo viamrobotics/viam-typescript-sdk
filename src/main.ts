@@ -1,14 +1,4 @@
-import * as Base from './components/base/Base';
-import * as Board from './components/board/Board';
-import * as Camera from './components/camera/Camera';
-import * as Motor from './components/motor/Motor';
-
-import { BaseClient } from './components/base/Client';
-import { BoardClient } from './components/board/Client';
-import { CameraClient } from './components/camera/Client';
 import Client from './Client';
-import { MotorClient } from './components/motor/Client';
-import { StreamClient } from './extra/stream/Client';
 
 import armApi from './gen/component/arm/v1/arm_pb.esm';
 import baseApi from './gen/component/base/v1/base_pb.esm';
@@ -33,11 +23,16 @@ import visionApi from './gen/service/vision/v1/vision_pb.esm';
 
 export { type Robot, RobotClient } from './components/robot';
 export { type Arm, ArmClient } from './components/arm';
+export { type Base, BaseClient } from './components/base';
+export { type Board, BoardClient } from './components/board';
+export { type Camera, CameraClient } from './components/camera';
+export { type Motor, MotorClient } from './components/motor';
 export {
   type MovementSensor,
   MovementSensorClient,
 } from './components/movementsensor';
 export { type Sensor, SensorClient } from './components/sensor';
+export { type Stream, StreamClient } from './extra/stream';
 
 export {
   commonApi,
@@ -60,16 +55,7 @@ export {
   slamApi,
   visionApi,
   streamApi,
-  Camera,
-  Motor,
-  Base,
-  Board,
-  BaseClient,
-  BoardClient,
-  CameraClient,
   Client,
-  MotorClient,
-  StreamClient,
 };
 
 // It doesn't matter which ServiceError we export really.
