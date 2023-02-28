@@ -1,11 +1,11 @@
-import type { Pose, WorldState } from '../../gen/common/v1/common_pb.esm';
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 import type Client from '../../Client';
 import pb from '../../gen/component/arm/v1/arm_pb.esm';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
-import type { Options } from '../../types';
+import type { Options, Pose } from '../../types';
 import { promisify } from '../../utils';
 import type { Arm } from './Arm';
+import commonPB from '../../gen/common/v1/common_pb.esm';
 
 /** A gRPC-web client for the Arm component. */
 export class ArmClient implements Arm {
@@ -23,7 +23,7 @@ export class ArmClient implements Arm {
     return this.client;
   }
 
-  async GetEndPosition(extra = {}) {
+  async getEndPosition(extra = {}) {
     const armService = this.ArmService;
     const request = new pb.GetEndPositionRequest();
     request.setName(this.name);
@@ -40,13 +40,32 @@ export class ArmClient implements Arm {
     if (!result) {
       throw new Error('no pose');
     }
-    return result;
+    return {
+      x: result.getX(),
+      y: result.getY(),
+      z: result.getZ(),
+      ox: result.getOX(),
+      oy: result.getOY(),
+      oz: result.getOZ(),
+      theta: result.getTheta(),
+    };
   }
 
-  async MoveToPosition(pose: Pose, world: WorldState, extra = {}) {
+  async moveToPosition(pose: Pose, world?: commonPB.WorldState, extra = {}) {
     const armService = this.ArmService;
+
+    const pbPose = new commonPB.Pose();
+    pbPose.setX(pose.x);
+    pbPose.setY(pose.y);
+    pbPose.setZ(pose.z);
+    pbPose.setOX(pose.ox);
+    pbPose.setOY(pose.oy);
+    pbPose.setOZ(pose.oz);
+    pbPose.setTheta(pose.theta);
+
     const request = new pb.MoveToPositionRequest();
-    request.setTo(pose);
+    request.setName(this.name);
+    request.setTo(pbPose);
     request.setWorldState(world);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
@@ -58,11 +77,15 @@ export class ArmClient implements Arm {
     );
   }
 
-  async MoveToJointPositions(jointPositions: pb.JointPositions, extra = {}) {
+  async moveToJointPositions(jointPositionsList: number[], extra = {}) {
     const armService = this.ArmService;
+
+    const newJointPositions = new pb.JointPositions();
+    newJointPositions.setValuesList(jointPositionsList);
+
     const request = new pb.MoveToJointPositionsRequest();
     request.setName(this.name);
-    request.setPositions(jointPositions);
+    request.setPositions(newJointPositions);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -73,7 +96,7 @@ export class ArmClient implements Arm {
     >(armService.moveToJointPositions.bind(armService), request);
   }
 
-  async GetJointPositions(extra = {}) {
+  async getJointPositions(extra = {}) {
     const armService = this.ArmService;
     const request = new pb.GetJointPositionsRequest();
     request.setName(this.name);
@@ -94,7 +117,7 @@ export class ArmClient implements Arm {
     return result;
   }
 
-  async Stop(extra = {}) {
+  async stop(extra = {}) {
     const armService = this.ArmService;
     const request = new pb.StopRequest();
     request.setName(this.name);
@@ -108,7 +131,7 @@ export class ArmClient implements Arm {
     );
   }
 
-  async IsMoving() {
+  async isMoving() {
     const armService = this.ArmService;
     const request = new pb.IsMovingRequest();
 
@@ -121,3 +144,5 @@ export class ArmClient implements Arm {
     return response.getIsMoving();
   }
 }
+
+
