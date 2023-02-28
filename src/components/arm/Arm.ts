@@ -1,14 +1,11 @@
-import type { Pose, WorldState } from '../../gen/common/v1/common_pb.esm';
+import type { WorldState } from '../../gen/common/v1/common_pb.esm';
 
 import type { JointPositions } from '../../gen/component/arm/v1/arm_pb.esm';
 
-import type { Extra } from '../../types';
+import type { Extra, Pose } from '../../types';
 
 export interface Arm {
-  /**
-   * Get the position of the end of the arm expressed as a pose
-   *
-   */
+  /** Get the position of the end of the arm expressed as a pose */
   GetEndPosition: (extra?: Extra) => Promise<Pose>;
 
   /**
@@ -27,28 +24,19 @@ export interface Arm {
    * Move each joint of the arm based on the angles on the joint poisitons
    * parameter
    *
-   * @param jointPositions - Destination joint positons
+   * @param jointPositionsList - List of angles (0-360) to move each joint to
    */
   MoveToJointPositions: (
-    jointPositions: JointPositions,
+    jointPositionsList: number[],
     extra?: Extra
   ) => Promise<void>;
 
-  /**
-   * Gets the current position of each joint
-   *
-   */
+  /** Gets the current position of each joint */
   GetJointPositions: (extra: Extra) => Promise<JointPositions>;
 
-  /**
-   * Stops the motion of the arm
-   *
-   */
+  /** Stops the motion of the arm */
   Stop: (extra: Extra) => Promise<void>;
 
-  /**
-   * Get if the arm is currently moving
-   * 
-   */
+  /** Get if the arm is currently moving */
   IsMoving: () => Promise<boolean>;
 }
