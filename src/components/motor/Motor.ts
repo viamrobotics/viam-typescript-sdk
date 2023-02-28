@@ -1,7 +1,7 @@
 import type { Extra } from '../../types';
 
-/** A record of booleans indicating which optional features a motor supports. */
 export interface Properties {
+  /** Whether a motor supports position reporting. */
   positionReporting: boolean;
 }
 

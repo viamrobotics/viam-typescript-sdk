@@ -1,10 +1,8 @@
 import * as Base from './components/base/Base';
 import * as Board from './components/board/Board';
-import * as Camera from './components/camera/Camera';
 
 import { BaseClient } from './components/base/Client';
 import { BoardClient } from './components/board/Client';
-import { CameraClient } from './components/camera/Client';
 import Client from './Client';
 import { StreamClient } from './extra/stream/Client';
 
@@ -31,6 +29,7 @@ import visionApi from './gen/service/vision/v1/vision_pb.esm';
 
 export { type Robot, RobotClient } from './components/robot';
 export { type Arm, ArmClient } from './components/arm';
+export { type Camera, CameraClient } from './components/camera';
 export { type Motor, MotorClient } from './components/motor';
 export {
   type MovementSensor,
@@ -59,12 +58,10 @@ export {
   slamApi,
   visionApi,
   streamApi,
-  Camera,
   Base,
   Board,
   BaseClient,
   BoardClient,
-  CameraClient,
   Client,
   StreamClient,
 };
