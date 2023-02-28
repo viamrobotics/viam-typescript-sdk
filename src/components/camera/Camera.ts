@@ -20,6 +20,7 @@ export enum MimeType {
   UNSUPPORTED = 'unsupported',
 }
 
+/** Represents any physical hardware that can capture frames. */
 export interface Camera {
   /**
    * Return a frame from a camera.

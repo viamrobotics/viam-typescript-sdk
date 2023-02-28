@@ -7,6 +7,7 @@ import type { Options } from '../../types';
 import { promisify } from '../../utils';
 import type { Arm } from './Arm';
 
+/** A gRPC client for the Arm component. */
 export class ArmClient implements Arm {
   private client: ArmServiceClient;
   private readonly name: string;

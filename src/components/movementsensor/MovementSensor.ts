@@ -17,6 +17,10 @@ export interface Properties {
   linearAccelerationSupported: boolean;
 }
 
+/**
+ * Represents any sensor that reports information about the robot's direction,
+ * position, and/or speed.
+ */
 export interface MovementSensor extends Sensor {
   /** Get linear velocity in mm/s across x/y/z axes */
   getLinearVelocity(extra?: Extra): Promise<Vector3D>;

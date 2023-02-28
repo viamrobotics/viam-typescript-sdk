@@ -5,6 +5,7 @@ export interface Properties {
   positionReporting: boolean;
 }
 
+/** Represents a physical motor. */
 export interface Motor {
   /**
    * Set the percentage of the motor's total power that should be employed.

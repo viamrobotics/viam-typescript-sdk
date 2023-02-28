@@ -7,6 +7,7 @@ import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb.esm';
 import { promisify } from '../../utils';
 
+/** A gRPC client for the MovementSensor component. */
 export class MovementSensorClient implements MovementSensor {
   private client: MovementSensorServiceClient;
   private sensorclient: SensorClient;

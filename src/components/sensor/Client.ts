@@ -8,6 +8,7 @@ import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_ser
 import { promisify } from '../../utils';
 import sensorApi from '../../gen/component/sensor/v1/sensor_pb.esm';
 
+/** A gRPC client for the Sensor component. */
 export class SensorClient implements Sensor {
   private client: SensorServiceClient;
   private readonly name: string;

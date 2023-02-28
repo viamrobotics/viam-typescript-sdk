@@ -11,6 +11,7 @@ import { RobotServiceClient } from '../../gen/robot/v1/robot_pb_service.esm';
 import { promisify } from '../../utils';
 import proto from '../../gen/robot/v1/robot_pb.esm';
 
+/** A gRPC client for the Robot component. */
 export class RobotClient implements Robot {
   private client: RobotServiceClient;
 

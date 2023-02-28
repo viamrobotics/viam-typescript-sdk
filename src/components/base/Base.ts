@@ -1,6 +1,7 @@
 import type { Extra } from '../../types';
 import type { commonApi } from '../../main';
 
+/** Represents a physical base of a robot. */
 export interface Base {
   /**
    * Move a base in a straight line by a given distance at a given speed. This

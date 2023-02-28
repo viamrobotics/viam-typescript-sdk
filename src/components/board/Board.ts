@@ -1,6 +1,10 @@
 import type { Extra } from '../../types';
 import type pb from '../../gen/component/board/v1/board_pb.esm';
 
+/**
+ * Represents a physical general purpose compute board that contains various
+ * components such as analog readers, and digital interrupts.
+ */
 export interface Board {
   /** Get the status of the board. */
   status(extra?: Extra): Promise<pb.StatusResponse>;
