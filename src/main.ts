@@ -32,10 +32,10 @@ import visionApi from './gen/service/vision/v1/vision_pb.esm';
 
 export { type Robot, RobotClient } from './components/robot';
 export { type Arm, ArmClient } from './components/arm';
-export { type BaseClient } from './components/base';
-export { type BoardClient } from './components/board';
-export { type CameraClient } from './components/camera';
-export { type MotorClient } from './components/motor';
+export { BaseClient } from './components/base';
+export { BoardClient } from './components/board';
+export { CameraClient } from './components/camera';
+export { MotorClient } from './components/motor';
 export {
   type MovementSensor,
   MovementSensorClient,
