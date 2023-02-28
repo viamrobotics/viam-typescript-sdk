@@ -22,7 +22,7 @@ export class ArmClient implements Arm {
     return this.client;
   }
 
-  async GetEndPosition(extra = {}) {
+  async getEndPosition(extra = {}) {
     const armService = this.ArmService;
     const request = new pb.GetEndPositionRequest();
     request.setName(this.name);
@@ -50,7 +50,7 @@ export class ArmClient implements Arm {
     };
   }
 
-  async MoveToPosition(pose: Pose, world: commonPB.WorldState, extra = {}) {
+  async moveToPosition(pose: Pose, world?: commonPB.WorldState, extra = {}) {
     const armService = this.ArmService;
 
     const pbPose = new commonPB.Pose();
@@ -76,7 +76,7 @@ export class ArmClient implements Arm {
     );
   }
 
-  async MoveToJointPositions(jointPositionsList: number[], extra = {}) {
+  async moveToJointPositions(jointPositionsList: number[], extra = {}) {
     const armService = this.ArmService;
 
     const newJointPositions = new pb.JointPositions();
@@ -95,7 +95,7 @@ export class ArmClient implements Arm {
     >(armService.moveToJointPositions.bind(armService), request);
   }
 
-  async GetJointPositions(extra = {}) {
+  async getJointPositions(extra = {}) {
     const armService = this.ArmService;
     const request = new pb.GetJointPositionsRequest();
     request.setName(this.name);
@@ -116,7 +116,7 @@ export class ArmClient implements Arm {
     return result;
   }
 
-  async Stop(extra = {}) {
+  async stop(extra = {}) {
     const armService = this.ArmService;
     const request = new pb.StopRequest();
     request.setName(this.name);
@@ -130,7 +130,7 @@ export class ArmClient implements Arm {
     );
   }
 
-  async IsMoving() {
+  async isMoving() {
     const armService = this.ArmService;
     const request = new pb.IsMovingRequest();
 
@@ -143,4 +143,5 @@ export class ArmClient implements Arm {
     return response.getIsMoving();
   }
 }
+
 
