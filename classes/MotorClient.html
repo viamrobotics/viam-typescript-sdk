@@ -15,6 +15,9 @@
 <li><a href="../modules.html">@viamrobotics/sdk</a></li>
 <li><a href="MotorClient.html">MotorClient</a></li></ul>
 <h1>Class MotorClient</h1></div>
+<section class="tsd-panel tsd-comment">
+<div class="tsd-comment tsd-typography"><p>A gRPC-web client for the Motor component.</p>
+</div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
@@ -22,9 +25,9 @@
 <section class="tsd-panel">
 <h4>Implements</h4>
 <ul class="tsd-hierarchy">
-<li><a href="../interfaces/Motor.Motor.html" class="tsd-signature-type" data-tsd-kind="Interface">Motor</a></li></ul></section><aside class="tsd-sources">
+<li><a href="../interfaces/Motor.html" class="tsd-signature-type" data-tsd-kind="Interface">Motor</a></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L9">src/components/motor/Client.ts:9</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L10">src/components/motor/Client.ts:10</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -54,6 +57,7 @@
 <a href="MotorClient.html#motorStop" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>motor<wbr/>Stop</span></a>
 <a href="MotorClient.html#resetZeroPosition" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>reset<wbr/>Zero<wbr/>Position</span></a>
 <a href="MotorClient.html#setPower" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>set<wbr/>Power</span></a>
+<a href="MotorClient.html#stop" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>stop</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
@@ -73,24 +77,24 @@
 <h5>options: <span class="tsd-signature-type">Options</span><span class="tsd-signature-symbol"> = {}</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="MotorClient.html" class="tsd-signature-type" data-tsd-kind="Class">MotorClient</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L14">src/components/motor/Client.ts:14</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L15">src/components/motor/Client.ts:15</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="client" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>client</span><a href="#client" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">client<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">MotorServiceClient</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L10">src/components/motor/Client.ts:10</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L11">src/components/motor/Client.ts:11</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="name" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>name</span><a href="#name" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L11">src/components/motor/Client.ts:11</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L12">src/components/motor/Client.ts:12</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="options" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <code class="tsd-tag ts-flagReadonly">Readonly</code> <span>options</span><a href="#options" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Options</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L12">src/components/motor/Client.ts:12</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L13">src/components/motor/Client.ts:13</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Accessors</h2>
 <section class="tsd-panel tsd-member tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><a id="motorService" class="tsd-anchor"></a>
@@ -100,7 +104,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">MotorServiceClient</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L20">src/components/motor/Client.ts:20</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L21">src/components/motor/Client.ts:21</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getPosition" class="tsd-anchor"></a>
@@ -108,6 +112,9 @@
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getPosition.getPosition-1">get<wbr/>Position<span class="tsd-signature-symbol">(</span>extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><a href="#getPosition.getPosition-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Return the position of the motor relative to its zero position. Raise an
+error if position reporting is not supported.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -115,14 +122,16 @@
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#getPosition">getPosition</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#getPosition">getPosition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L115">src/components/motor/Client.ts:115</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L121">src/components/motor/Client.ts:121</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="getProperties" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Properties</span><a href="#getProperties" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="getProperties.getProperties-1">get<wbr/>Properties<span class="tsd-signature-symbol">(</span>extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>positionReporting<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><a href="#getProperties.getProperties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Return the motor&#39;s properties.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -130,52 +139,73 @@
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span><br/><span>    </span>positionReporting<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#getProperties">getProperties</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#getProperties">getProperties</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L100">src/components/motor/Client.ts:100</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L106">src/components/motor/Client.ts:106</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="goFor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>go<wbr/>For</span><a href="#goFor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="goFor.goFor-1">go<wbr/>For<span class="tsd-signature-symbol">(</span>rpm<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, revolutions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#goFor.goFor-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Turn the motor at a specified speed for either a specified number of
+revolutions or indefinitely. Raise an error if position reporting is not
+supported.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>rpm: <span class="tsd-signature-type">number</span></h5></li>
+<h5>rpm: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Speed in revolutions per minute.</p>
+</div></li>
 <li>
-<h5>revolutions: <span class="tsd-signature-type">number</span></h5></li>
+<h5>revolutions: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Number of revolutions relative to the motor&#39;s starting
+  position. If this value is 0, this will run the motor at the given rpm
+  indefinitely. If this value is nonzero, this will block until the number
+  of revolutions has been completed or another operation comes in.</p>
+</div></li>
 <li>
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#goFor">goFor</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#goFor">goFor</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L39">src/components/motor/Client.ts:39</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L40">src/components/motor/Client.ts:40</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="goTo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>go<wbr/>To</span><a href="#goTo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="goTo.goTo-1">go<wbr/>To<span class="tsd-signature-symbol">(</span>rpm<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, positionRevolutions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#goTo.goTo-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Move the motor to a specific position relative to its home position at a
+specified speed. Raise an error if position reporting is not supported.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>rpm: <span class="tsd-signature-type">number</span></h5></li>
+<h5>rpm: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Speed in revolutions per minute.</p>
+</div></li>
 <li>
-<h5>positionRevolutions: <span class="tsd-signature-type">number</span></h5></li>
+<h5>positionRevolutions: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Number of revolutions relative to the motor&#39;s
+  home position.</p>
+</div></li>
 <li>
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#goTo">goTo</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#goTo">goTo</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L55">src/components/motor/Client.ts:55</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L56">src/components/motor/Client.ts:56</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="isPowered" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Powered</span><a href="#isPowered" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="isPowered.isPowered-1">is<wbr/>Powered<span class="tsd-signature-symbol">(</span>extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span><a href="#isPowered.isPowered-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Return true if the motor is on.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -183,14 +213,17 @@
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">readonly </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#isPowered">isPowered</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#isPowered">isPowered</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L130">src/components/motor/Client.ts:130</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L136">src/components/motor/Client.ts:136</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="motorStop" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>motor<wbr/>Stop</span><a href="#motorStop" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="motorStop.motorStop-1">motor<wbr/>Stop<span class="tsd-signature-symbol">(</span>extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#motorStop.motorStop-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography">
+<h3>Deprecated</h3><p>Use <a href="MotorClient.html#stop">stop</a> instead.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -198,43 +231,69 @@
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#motorStop">motorStop</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L86">src/components/motor/Client.ts:86</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L102">src/components/motor/Client.ts:102</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="resetZeroPosition" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>reset<wbr/>Zero<wbr/>Position</span><a href="#resetZeroPosition" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="resetZeroPosition.resetZeroPosition-1">reset<wbr/>Zero<wbr/>Position<span class="tsd-signature-symbol">(</span>offset<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#resetZeroPosition.resetZeroPosition-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set the current position of the motor as the new zero position, offset by a
+given position. Raise an error if position reporting is not supported.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>offset: <span class="tsd-signature-type">number</span></h5></li>
+<h5>offset: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>Position from which to offset the current position.</p>
+</div></li>
 <li>
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#resetZeroPosition">resetZeroPosition</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#resetZeroPosition">resetZeroPosition</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L71">src/components/motor/Client.ts:71</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L72">src/components/motor/Client.ts:72</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="setPower" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>set<wbr/>Power</span><a href="#setPower" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="setPower.setPower-1">set<wbr/>Power<span class="tsd-signature-symbol">(</span>power<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#setPower.setPower-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Set the percentage of the motor&#39;s total power that should be employed.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>power: <span class="tsd-signature-type">number</span></h5></li>
+<h5>power: <span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>A value between -1 and 1 where negative values indicate a
+  backwards direction and positive values a forward direction.</p>
+</div></li>
 <li>
 <h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
 <ul class="tsd-parameters"></ul></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<p>Implementation of <a href="../interfaces/Motor.Motor.html">Motor</a>.<a href="../interfaces/Motor.Motor.html#setPower">setPower</a></p>
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#setPower">setPower</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/90d3d31/src/components/motor/Client.ts#L24">src/components/motor/Client.ts:24</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L25">src/components/motor/Client.ts:25</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="stop" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>stop</span><a href="#stop" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="stop.stop-1">stop<span class="tsd-signature-symbol">(</span>extra<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#stop.stop-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Turn the motor off.</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>extra: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
+<ul class="tsd-parameters"></ul></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#stop">stop</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/viamrobotics/viam-typescript-sdk/blob/f3967b0/src/components/motor/Client.ts#L87">src/components/motor/Client.ts:87</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -256,10 +315,6 @@
 <ul>
 <li><a href="../modules.html">@viamrobotics/sdk</a>
 <ul>
-<li class="tsd-kind-namespace"><a href="../modules/Base.html">Base</a></li>
-<li class="tsd-kind-namespace"><a href="../modules/Board.html">Board</a></li>
-<li class="tsd-kind-namespace"><a href="../modules/Camera.html">Camera</a></li>
-<li class="tsd-kind-namespace"><a href="../modules/Motor.html">Motor</a></li>
 <li class="tsd-kind-namespace"><a href="../modules/armApi.html">arm<wbr/>Api</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/armApi.GetEndPositionRequest.html">Get<wbr/>End<wbr/>Position<wbr/>Request</a></li>
@@ -389,12 +444,18 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/inputControllerApi.TriggerEventResponse.html">Trigger<wbr/>Event<wbr/>Response</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/motionApi.html">motion<wbr/>Api</a>
 <ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.CollisionSpecification.html">Collision<wbr/>Specification</a>
+<ul>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.CollisionSpecification.AllowedFrameCollisions.html">Allowed<wbr/>Frame<wbr/>Collisions</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.Constraints.html">Constraints</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.GetPoseRequest.html">Get<wbr/>Pose<wbr/>Request</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.GetPoseResponse.html">Get<wbr/>Pose<wbr/>Response</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.LinearConstraint.html">Linear<wbr/>Constraint</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.MoveRequest.html">Move<wbr/>Request</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.MoveResponse.html">Move<wbr/>Response</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.MoveSingleComponentRequest.html">Move<wbr/>Single<wbr/>Component<wbr/>Request</a></li>
-<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.MoveSingleComponentResponse.html">Move<wbr/>Single<wbr/>Component<wbr/>Response</a></li></ul></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.MoveSingleComponentResponse.html">Move<wbr/>Single<wbr/>Component<wbr/>Response</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motionApi.OrientationConstraint.html">Orientation<wbr/>Constraint</a></li></ul></li>
 <li class="tsd-kind-namespace"><a href="../modules/motorApi.html">motor<wbr/>Api</a>
 <ul>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/motorApi.GetPositionRequest.html">Get<wbr/>Position<wbr/>Request</a></li>
@@ -586,7 +647,8 @@
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="MotorClient.html#isPowered" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>is<wbr/>Powered</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="MotorClient.html#motorStop" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>motor<wbr/>Stop</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="MotorClient.html#resetZeroPosition" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>reset<wbr/>Zero<wbr/>Position</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="MotorClient.html#setPower" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Power</a></li></ul></li></ul></nav></div></div>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="MotorClient.html#setPower" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>set<wbr/>Power</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="MotorClient.html#stop" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>stop</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>
