@@ -1,11 +1,11 @@
-import type { Pose, WorldState } from '../../gen/common/v1/common_pb.esm';
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 import type Client from '../../Client';
 import pb from '../../gen/component/arm/v1/arm_pb.esm';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
-import type { Options } from '../../types';
+import type { Options, Pose } from '../../types';
 import { promisify } from '../../utils';
 import type { Arm } from './Arm';
+import commonPB from '../../gen/common/v1/common_pb.esm';
 
 export class ArmClient implements Arm {
   private client: ArmServiceClient;
@@ -39,13 +39,32 @@ export class ArmClient implements Arm {
     if (!result) {
       throw new Error('no pose');
     }
-    return result;
+    return {
+      x: result.getX(),
+      y: result.getY(),
+      z: result.getZ(),
+      ox: result.getX(),
+      oy: result.getY(),
+      oz: result.getZ(),
+      theta: result.getTheta(),
+    };
   }
 
-  async MoveToPosition(pose: Pose, world: WorldState, extra = {}) {
+  async MoveToPosition(pose: Pose, world: commonPB.WorldState, extra = {}) {
     const armService = this.ArmService;
+
+    const pbPose = new commonPB.Pose();
+    pbPose.setX(pose.x);
+    pbPose.setY(pose.y);
+    pbPose.setZ(pose.z);
+    pbPose.setOX(pose.ox);
+    pbPose.setOY(pose.oy);
+    pbPose.setOZ(pose.oz);
+    pbPose.setTheta(pose.theta);
+
     const request = new pb.MoveToPositionRequest();
-    request.setTo(pose);
+    request.setName(this.name);
+    request.setTo(pbPose);
     request.setWorldState(world);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
@@ -57,11 +76,15 @@ export class ArmClient implements Arm {
     );
   }
 
-  async MoveToJointPositions(jointPositions: pb.JointPositions, extra = {}) {
+  async MoveToJointPositions(jointPositionsList: number[], extra = {}) {
     const armService = this.ArmService;
+
+    const newJointPositions = new pb.JointPositions();
+    newJointPositions.setValuesList(jointPositionsList);
+
     const request = new pb.MoveToJointPositionsRequest();
     request.setName(this.name);
-    request.setPositions(jointPositions);
+    request.setPositions(newJointPositions);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -120,3 +143,4 @@ export class ArmClient implements Arm {
     return response.getIsMoving();
   }
 }
+
