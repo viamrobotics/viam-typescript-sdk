@@ -44,9 +44,9 @@ export class ArmClient implements Arm {
       x: result.getX(),
       y: result.getY(),
       z: result.getZ(),
-      ox: result.getX(),
-      oy: result.getY(),
-      oz: result.getZ(),
+      ox: result.getOX(),
+      oy: result.getOY(),
+      oz: result.getOZ(),
       theta: result.getTheta(),
     };
   }
