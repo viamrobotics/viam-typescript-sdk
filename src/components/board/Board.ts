@@ -1,5 +1,9 @@
 import type { Extra } from '../../types';
-import type pb from '../../gen/component/board/v1/board_pb.esm';
+
+interface Status {
+  analogs: Record<string, number>;
+  digitalInterrupts: Record<string, number>;
+}
 
 /**
  * Represents a physical general purpose compute board that contains various
@@ -7,7 +11,7 @@ import type pb from '../../gen/component/board/v1/board_pb.esm';
  */
 export interface Board {
   /** Get the status of the board. */
-  status(extra?: Extra): Promise<pb.StatusResponse>;
+  getStatus(extra?: Extra): Promise<Status>;
   /**
    * Get the high/low state of the given pin of a board.
    *
