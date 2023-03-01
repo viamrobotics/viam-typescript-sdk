@@ -3,10 +3,9 @@ import Client from './Client';
 // eslint-disable-next-line no-warning-comments
 // TODO: remove this style of export
 import * as Board from './components/board/Board';
-import * as Camera from './components/camera/Camera';
 import * as Motor from './components/motor/Motor';
 
-export { Board, Camera, Motor };
+export { Board, Motor };
 
 import armApi from './gen/component/arm/v1/arm_pb.esm';
 import baseApi from './gen/component/base/v1/base_pb.esm';
@@ -33,7 +32,7 @@ export { type Robot, RobotClient } from './components/robot';
 export { type Arm, ArmClient } from './components/arm';
 export { type Base, BaseClient } from './components/base';
 export { BoardClient } from './components/board';
-export { CameraClient } from './components/camera';
+export { type Camera, CameraClient } from './components/camera';
 export { MotorClient } from './components/motor';
 export {
   type MovementSensor,

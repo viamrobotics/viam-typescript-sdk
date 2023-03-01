@@ -1,10 +1,12 @@
-import { type Camera, MimeType } from './Camera';
+import type { Camera, MimeType } from './Camera';
 import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm';
 import type Client from '../../Client';
 import type { HttpBody } from '../../gen/google/api/httpbody_pb';
 import type { Options } from '../../types';
 import pb from '../../gen/component/camera/v1/camera_pb.esm';
 import { promisify } from '../../utils';
+
+const PointCloudPCD: MimeType = 'pointcloud/pcd';
 
 /** A gRPC-web client for the Camera component. */
 export class CameraClient implements Camera {
@@ -58,7 +60,7 @@ export class CameraClient implements Camera {
     const cameraService = this.cameraService;
     const request = new pb.GetPointCloudRequest();
     request.setName(this.name);
-    request.setMimeType(MimeType.PCD);
+    request.setMimeType(PointCloudPCD);
 
     this.options.requestLogger?.(request);
 
