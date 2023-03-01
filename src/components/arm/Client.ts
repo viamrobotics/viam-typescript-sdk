@@ -144,5 +144,3 @@ export class ArmClient implements Arm {
     return response.getIsMoving();
   }
 }
-
-

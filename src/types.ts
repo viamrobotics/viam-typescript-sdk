@@ -18,7 +18,7 @@ export interface Options {
   requestLogger?: (req: unknown) => void;
 }
 
- export interface Pose {
+export interface Pose {
   x: number;
   y: number;
   z: number;
@@ -26,4 +26,4 @@ export interface Options {
   oy: number;
   oz: number;
   theta: number;
-} 
+}
