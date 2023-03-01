@@ -59,13 +59,7 @@ export interface Board {
    *
    * @param analogReader - The name of the analog reader.
    */
-  readAnalogReader(
-    // eslint-disable-next-line no-warning-comments
-    // TODO: remove this argument.
-    boardName: string,
-    analogReader: string,
-    extra?: Extra
-  ): Promise<number>;
+  readAnalogReader(analogReader: string, extra?: Extra): Promise<number>;
   /**
    * Return the current value of the interrupt which is based on the type of
    * interrupt.
@@ -73,9 +67,6 @@ export interface Board {
    * @param digitalInterruptName - The name of the digital interrupt.
    */
   getDigitalInterruptValue(
-    // eslint-disable-next-line no-warning-comments
-    // TODO: remove this argument.
-    boardName: string,
     digitalInterruptName: string,
     extra?: Extra
   ): Promise<number>;

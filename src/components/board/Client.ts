@@ -127,10 +127,10 @@ export class BoardClient implements Board {
       request
     );
   }
-  async readAnalogReader(boardName: string, analogReader: string, extra = {}) {
+  async readAnalogReader(analogReader: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.ReadAnalogReaderRequest();
-    request.setBoardName(boardName);
+    request.setBoardName(this.name);
     request.setAnalogReaderName(analogReader);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
@@ -142,14 +142,10 @@ export class BoardClient implements Board {
     >(boardService.readAnalogReader.bind(boardService), request);
     return response.getValue();
   }
-  async getDigitalInterruptValue(
-    boardName: string,
-    digitalInteruptName: string,
-    extra = {}
-  ) {
+  async getDigitalInterruptValue(digitalInteruptName: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.GetDigitalInterruptValueRequest();
-    request.setBoardName(boardName);
+    request.setBoardName(this.name);
     request.setDigitalInterruptName(digitalInteruptName);
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
