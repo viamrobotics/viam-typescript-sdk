@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useAsync } from 'react-async';
 import reactLogo from './assets/react.svg';
 import './App.css';
 
-import { Client } from '@viamrobotics/sdk';
+import { Client, BaseClient, MovementSensorClient, SensorClient } from '@viamrobotics/sdk';
 
 async function connectWebRTC() {
   const secret = import.meta.env.VITE_SECRET;
@@ -39,8 +38,34 @@ async function connectWebRTC() {
 }
 
 function App() {
-  const { data, error, isPending } = useAsync(connectWebRTC);
-  const [count, setCount] = useState(0);
+  const [ base, setBase ] = useState<BaseClient>();
+  const [ wifi, setWifi ] = useState<SensorClient>();
+  const [ accel, setAccel ] = useState<MovementSensorClient>();
+
+  const [ count, setCount ] = useState(0);
+
+  // connect to client
+  useEffect(() => { 
+    const connect = async () => {
+      const client: Client = await connectWebRTC();
+
+      setBase(new BaseClient(client, "viam_base"));
+      setWifi(new SensorClient(client, "wifi"));
+      setAccel(new MovementSensorClient(client, "accelerometer"));
+    }
+
+    connect().catch((err) => console.error(err.message));
+  }, [])
+
+  // connect to client
+  useEffect(() => {
+    if (!base) return;
+    if (!wifi) return;
+    if (!accel) return;
+
+    console.log("Components are ready!");
+
+  }, [base, wifi, accel])
 
   return (
     <div className="App">
