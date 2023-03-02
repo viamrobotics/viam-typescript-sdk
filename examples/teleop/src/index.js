@@ -105,7 +105,6 @@ function onTrack(event) {
 connectWebRTC()
   .then((client) => {
     const base = new BaseClient(client, 'viam_base');
-    const m1 = new MotorClient(client, 'left');
     const wifi = new SensorClient(client, 'wifi');
     const accel = new MovementSensorClient(client, 'accelerometer');
 
