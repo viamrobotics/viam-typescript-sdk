@@ -1,15 +1,10 @@
 version: v1
 plugins:
-  - name: js
-    out: src/gen
-    opt:
-      - import_style=commonjs
-  - name: grpc-web
-    out: src/gen
-    opt:
-      - import_style=commonjs
-      - mode=grpcwebtext
   - name: ts
-    out: src/gen
+    out: dist/js
     opt:
-      - service=grpc-web
+      - env=browser
+      - outputServices=nice-grpc
+      - outputServices=generic-definitions
+      - outputJsonMethods=false
+      - useExactTypes=false
