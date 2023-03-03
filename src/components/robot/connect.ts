@@ -1,5 +1,6 @@
 import Client from '../../Client';
-import { RobotClient } from './Client';
+// eslint-disable-next-line capitalized-comments
+// import { RobotClient } from './Client';
 
 interface ConnectDirectConf {
   authEntity?: string;
@@ -85,7 +86,10 @@ const isConnectWebRTCConf = (value: Conf): value is ConnectWebRTCConf => {
   return true;
 };
 
-export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
+// eslint-disable-next-line no-warning-comments
+// TODO: return RobotClient
+export const createRobotClient = async (conf: Conf): Promise<Client> => {
+  // Export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
   let client;
 
   // Try to connect via WebRTC first.
@@ -109,5 +113,6 @@ export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
     throw new Error('failed to connect to robot');
   }
 
-  return new RobotClient(client);
+  // return new RobotClient(client);
+  return client;
 };
