@@ -1,23 +1,29 @@
 import Client from '../../Client';
 import { RobotClient } from './Client';
 
-// Connect
-
 interface ConnectDirectConf {
   authEntity?: string;
   host: string;
-  secret: string;
+  secret?: string;
 }
 
 const connectDirect = async (conf: ConnectDirectConf): Promise<Client> => {
-  const creds = {
-    payload: conf.secret,
-    type: 'robot-location-secret',
-  };
+  // eslint-disable-next-line no-console
+  console.info('attempting to connect via gRPC...');
 
   const client = new Client(conf.host);
 
+  let creds;
+  if (conf.secret) {
+    creds = {
+      payload: conf.secret,
+      type: 'robot-location-secret',
+    };
+  }
   await client.connect(conf.authEntity, creds);
+
+  // eslint-disable-next-line no-console
+  console.info('connected via gRPC');
 
   return client;
 };
@@ -31,17 +37,15 @@ interface ICEServer {
 interface ConnectWebRTCConf {
   authEntity?: string;
   host: string;
-  secret: string;
+  secret?: string;
   // WebRTC
   signalingAddress: string;
   iceServers: ICEServer[];
 }
 
 const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<Client> => {
-  const creds = {
-    payload: conf.secret,
-    type: 'robot-location-secret',
-  };
+  // eslint-disable-next-line no-console
+  console.info('attempting to connect via WebRTC...');
 
   const impliedURL = conf.host;
   const signalingAddress = conf.signalingAddress;
@@ -56,6 +60,13 @@ const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<Client> => {
   };
   const client = new Client(impliedURL, clientConf);
 
+  let creds;
+  if (conf.secret) {
+    creds = {
+      payload: conf.secret,
+      type: 'robot-location-secret',
+    };
+  }
   await client.connect(impliedURL, creds);
 
   // eslint-disable-next-line no-console
@@ -64,16 +75,26 @@ const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<Client> => {
   return client;
 };
 
-type Conf = ConnectDirectConf & ConnectWebRTCConf;
+type Conf = ConnectDirectConf | ConnectWebRTCConf;
+
+const isConnectWebRTCConf = (value: Conf): value is ConnectWebRTCConf => {
+  const conf = value as ConnectWebRTCConf;
+
+  if (typeof conf.signalingAddress !== 'string') return false;
+  if (!(conf.iceServers instanceof Array)) return false;
+  return true;
+};
 
 export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
   let client;
 
   // Try to connect via WebRTC first.
-  try {
-    client = await connectWebRTC(conf);
-  } catch (err) {
-    // Try another way of connecting.
+  if (isConnectWebRTCConf(conf)) {
+    try {
+      client = await connectWebRTC(conf);
+    } catch (err) {
+      // Try another way of connecting.
+    }
   }
 
   if (!client) {
