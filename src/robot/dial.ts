@@ -6,9 +6,18 @@ interface DialDirectConf {
   locationSecret?: string;
 }
 
+/** Check if a url corresponds to a local connection via heuristic */
+const isLocalConnection = (url: string) => url.includes('.local');
+
 const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
   console.info('dialing via gRPC...');
+
+  if (!isLocalConnection(conf.host)) {
+    throw new Error(
+      `cannot dial "${conf.host}" directly, please use a local url instead.`
+    );
+  }
 
   const client = new RobotClient(conf.host);
 
@@ -93,7 +102,7 @@ export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
     try {
       client = await dialWebRTC(conf);
     } catch (err) {
-      // Try another way of dialing.
+      console.warn('failed to connect via WebRTC...');
     }
   }
 
@@ -101,7 +110,7 @@ export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
     try {
       client = await dialDirect(conf);
     } catch (err) {
-      // Try another way of dialing.
+      console.warn('failed to connect via gRPC...');
     }
   }
 
