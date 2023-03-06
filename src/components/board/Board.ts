@@ -1,5 +1,9 @@
 import type { Extra } from '../../types';
-import type pb from '../../gen/component/board/v1/board_pb.esm';
+
+interface Status {
+  analogs: Record<string, number>;
+  digitalInterrupts: Record<string, number>;
+}
 
 /**
  * Represents a physical general purpose compute board that contains various
@@ -7,7 +11,7 @@ import type pb from '../../gen/component/board/v1/board_pb.esm';
  */
 export interface Board {
   /** Get the status of the board. */
-  status(extra?: Extra): Promise<pb.StatusResponse>;
+  getStatus(extra?: Extra): Promise<Status>;
   /**
    * Get the high/low state of the given pin of a board.
    *
@@ -59,13 +63,7 @@ export interface Board {
    *
    * @param analogReader - The name of the analog reader.
    */
-  readAnalogReader(
-    // eslint-disable-next-line no-warning-comments
-    // TODO: remove this argument.
-    boardName: string,
-    analogReader: string,
-    extra?: Extra
-  ): Promise<number>;
+  readAnalogReader(analogReader: string, extra?: Extra): Promise<number>;
   /**
    * Return the current value of the interrupt which is based on the type of
    * interrupt.
@@ -73,9 +71,6 @@ export interface Board {
    * @param digitalInterruptName - The name of the digital interrupt.
    */
   getDigitalInterruptValue(
-    // eslint-disable-next-line no-warning-comments
-    // TODO: remove this argument.
-    boardName: string,
     digitalInterruptName: string,
     extra?: Extra
   ): Promise<number>;

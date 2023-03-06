@@ -13,10 +13,13 @@ test:
 	npm run test
 
 lint: install
-	npm run format
-	npm run lint
+	npm run lint:prettier
+	npm run lint:eslint
 	npm run typecheck
 	npm run check
+
+format: install
+	npm run format
 
 buf-clean:
 	rm -rf src/gen/

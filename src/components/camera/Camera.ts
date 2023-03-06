@@ -12,13 +12,12 @@ export interface Properties {
   distortionParameters?: DistortionParameters.AsObject;
 }
 
-export enum MimeType {
-  VIAM_RGBA = 'image/vnd.viam.rgba',
-  JPEG = 'image/jpeg',
-  PNG = 'image/png',
-  PCD = 'pointcloud/pcd',
-  UNSUPPORTED = 'unsupported',
-}
+export type MimeType =
+  | 'image/vnd.viam.rgba'
+  | 'image/jpeg'
+  | 'image/png'
+  | 'pointcloud/pcd'
+  | 'unsupported';
 
 /** Represents any physical hardware that can capture frames. */
 export interface Camera {

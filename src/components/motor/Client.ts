@@ -98,11 +98,6 @@ export class MotorClient implements Motor {
     );
   }
 
-  /** @deprecated Use {@link MotorClient#stop} instead. */
-  motorStop(extra = {}) {
-    return this.stop(extra);
-  }
-
   async getProperties(extra = {}) {
     const motorService = this.motorService;
     const request = new motorApi.GetPropertiesRequest();

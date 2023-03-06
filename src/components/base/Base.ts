@@ -1,5 +1,4 @@
-import type { Extra } from '../../types';
-import type { commonApi } from '../../main';
+import type { Extra, Vector3D } from '../../types';
 
 /** Represents a physical base of a robot. */
 export interface Base {
@@ -32,13 +31,7 @@ export interface Base {
    * @param linear - Desired linear power percentage from -1 to 1.
    * @param angular - Desired angular power percentage from -1 to 1.
    */
-  setPower(
-    // eslint-disable-next-line no-warning-comments
-    // TODO: change args from proto Vector3 to Vector3D
-    linear: commonApi.Vector3,
-    angular: commonApi.Vector3,
-    extra?: Extra
-  ): Promise<void>;
+  setPower(linear: Vector3D, angular: Vector3D, extra?: Extra): Promise<void>;
 
   /**
    * Set the linear and angular velocity of a base.
@@ -47,10 +40,8 @@ export interface Base {
    * @param angular - Desired angular velocity in degrees per second.
    */
   setVelocity(
-    // eslint-disable-next-line no-warning-comments
-    // TODO: change args from proto Vector3 to Vector3D
-    linear: commonApi.Vector3,
-    angular: commonApi.Vector3,
+    linear: Vector3D,
+    angular: Vector3D,
     extra?: Extra
   ): Promise<void>;
 

@@ -32,22 +32,12 @@ export interface Arm {
     extra?: Extra
   ) => Promise<void>;
 
-  /** 
-   *Gets the current position of each joint.
-   * 
-  */
+  /** Gets the current position of each joint. */
   getJointPositions: (extra: Extra) => Promise<JointPositions>;
 
-  /**
-   *  Stops the motion of the arm.
-   *  */
+  /** Stops the motion of the arm. */
   stop: (extra: Extra) => Promise<void>;
 
-  /** 
-   * 
-   * Get if the arm is currently moving.
-   */
+  /** Get if the arm is currently moving. */
   isMoving: () => Promise<boolean>;
 }
-
-

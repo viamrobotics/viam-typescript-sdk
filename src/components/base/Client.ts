@@ -2,11 +2,10 @@ import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_
 
 import type Client from '../../Client';
 import pb from '../../gen/component/base/v1/base_pb.esm';
-import type commonApi from '../../gen/common/v1/common_pb.esm';
 import type { Base } from './Base';
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.esm';
-import type { Options } from '../../types';
-import { promisify } from '../../utils';
+import type { Options, Vector3D } from '../../types';
+import { promisify, encodeVector3D } from '../../utils';
 
 /** A gRPC-web client for the Base component. */
 export class BaseClient implements Base {
@@ -55,16 +54,13 @@ export class BaseClient implements Base {
       request
     );
   }
-  async setPower(
-    linear: commonApi.Vector3,
-    angular: commonApi.Vector3,
-    extra = {}
-  ) {
+
+  async setPower(linear: Vector3D, angular: Vector3D, extra = {}) {
     const baseService = this.baseService;
     const request = new pb.SetPowerRequest();
     request.setName(this.name);
-    request.setLinear(linear);
-    request.setAngular(angular);
+    request.setLinear(encodeVector3D(linear));
+    request.setAngular(encodeVector3D(angular));
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -75,16 +71,12 @@ export class BaseClient implements Base {
     );
   }
 
-  async setVelocity(
-    linear: commonApi.Vector3,
-    angular: commonApi.Vector3,
-    extra = {}
-  ) {
+  async setVelocity(linear: Vector3D, angular: Vector3D, extra = {}) {
     const baseService = this.baseService;
     const request = new pb.SetVelocityRequest();
     request.setName(this.name);
-    request.setLinear(linear);
-    request.setAngular(angular);
+    request.setLinear(encodeVector3D(linear));
+    request.setAngular(encodeVector3D(angular));
     request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
