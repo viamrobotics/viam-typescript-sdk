@@ -1,14 +1,14 @@
 import { RobotClient } from './Client';
 
-interface ConnectDirectConf {
+interface DialDirectConf {
   authEntity?: string;
   host: string;
   locationSecret?: string;
 }
 
-const connectDirect = async (conf: ConnectDirectConf): Promise<RobotClient> => {
+const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
-  console.info('attempting to connect via gRPC...');
+  console.info('dialing via gRPC...');
 
   const client = new RobotClient(conf.host);
 
@@ -33,7 +33,7 @@ interface ICEServer {
   credential: string;
 }
 
-interface ConnectWebRTCConf {
+interface DialWebRTCConf {
   authEntity?: string;
   host: string;
   locationSecret?: string;
@@ -42,9 +42,9 @@ interface ConnectWebRTCConf {
   iceServers: ICEServer[];
 }
 
-const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<RobotClient> => {
+const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
-  console.info('attempting to connect via WebRTC...');
+  console.info('dialing via WebRTC...');
 
   const impliedURL = conf.host;
   const signalingAddress = conf.signalingAddress;
@@ -74,33 +74,34 @@ const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<RobotClient> => {
   return client;
 };
 
-type Conf = ConnectDirectConf | ConnectWebRTCConf;
+type Conf = DialDirectConf | DialWebRTCConf;
 
-const isConnectWebRTCConf = (value: Conf): value is ConnectWebRTCConf => {
-  const conf = value as ConnectWebRTCConf;
+const isDialWebRTCConf = (value: Conf): value is DialWebRTCConf => {
+  const conf = value as DialWebRTCConf;
 
   if (typeof conf.signalingAddress !== 'string') return false;
   if (!(conf.iceServers instanceof Array)) return false;
+
   return true;
 };
 
 export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
   let client;
 
-  // Try to connect via WebRTC first.
-  if (isConnectWebRTCConf(conf)) {
+  // Try to dial via WebRTC first.
+  if (isDialWebRTCConf(conf)) {
     try {
-      client = await connectWebRTC(conf);
+      client = await dialWebRTC(conf);
     } catch (err) {
-      // Try another way of connecting.
+      // Try another way of dialing.
     }
   }
 
   if (!client) {
     try {
-      client = await connectDirect(conf);
+      client = await dialDirect(conf);
     } catch (err) {
-      // Try another way of connecting.
+      // Try another way of dialing.
     }
   }
 
