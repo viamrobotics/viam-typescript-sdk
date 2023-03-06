@@ -1,5 +1,5 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import type { Motor } from './Motor';
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm';
 import type { Options } from '../../types';
@@ -12,7 +12,7 @@ export class MotorClient implements Motor {
   private readonly name: string;
   private readonly options: Options;
 
-  constructor(client: Client, name: string, options: Options = {}) {
+  constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MotorServiceClient);
     this.name = name;
     this.options = options;

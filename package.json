@@ -6,7 +6,7 @@
   "module": "./dist/main.es.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "dist/Client.*",
+    "dist/robot.*",
     "dist/events.*",
     "dist/components/**/*.d.ts",
     "dist/extra/**/*.d.ts",

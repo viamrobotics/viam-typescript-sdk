@@ -1,5 +1,5 @@
 import { EventDispatcher, events } from '../../events';
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import type { Stream } from './Stream';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service.esm';
@@ -10,7 +10,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;
 
-  constructor(client: Client, options: Options = {}) {
+  constructor(client: RobotClient, options: Options = {}) {
     super();
     this.client = client.createServiceClient(StreamServiceClient);
     this.options = options;

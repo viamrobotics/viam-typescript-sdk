@@ -1,6 +1,6 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import pb from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import { DataManagerServiceClient } from '../../gen/service/datamanager/v1/data_manager_pb_service.js';
 import type { Options } from '../../types';
@@ -12,7 +12,7 @@ export class DataManagerClient implements DataManager {
   private readonly name: string;
   private readonly options: Options;
 
-  constructor(client: Client, name: string, options: Options = {}) {
+  constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(DataManagerServiceClient);
     this.name = name;
     this.options = options;

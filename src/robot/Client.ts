@@ -1,24 +1,33 @@
 /* eslint-disable max-classes-per-file */
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
+import type { Robot } from './Robot';
+import proto from '../gen/robot/v1/robot_pb.esm';
+import type {
+  PoseInFrame,
+  ResourceName,
+  Transform,
+} from '../gen/common/v1/common_pb.esm';
+import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { promisify } from '../utils';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
-import { ArmServiceClient } from './gen/component/arm/v1/arm_pb_service.esm';
-import { BaseServiceClient } from './gen/component/base/v1/base_pb_service.esm';
-import { BoardServiceClient } from './gen/component/board/v1/board_pb_service.esm';
-import { GantryServiceClient } from './gen/component/gantry/v1/gantry_pb_service.esm';
-import { GenericServiceClient } from './gen/component/generic/v1/generic_pb_service.esm';
-import { GripperServiceClient } from './gen/component/gripper/v1/gripper_pb_service.esm';
-import { InputControllerServiceClient } from './gen/component/inputcontroller/v1/input_controller_pb_service.esm';
-import { MotionServiceClient } from './gen/service/motion/v1/motion_pb_service.esm';
-import { MotorServiceClient } from './gen/component/motor/v1/motor_pb_service.esm';
-import { MovementSensorServiceClient } from './gen/component/movementsensor/v1/movementsensor_pb_service.esm';
-import { NavigationServiceClient } from './gen/service/navigation/v1/navigation_pb_service.esm';
-import { RobotServiceClient } from './gen/robot/v1/robot_pb_service.esm';
-import { SLAMServiceClient } from './gen/service/slam/v1/slam_pb_service.esm';
-import { SensorsServiceClient } from './gen/service/sensors/v1/sensors_pb_service.esm';
-import { ServoServiceClient } from './gen/component/servo/v1/servo_pb_service.esm';
+import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service.esm';
+import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service.esm';
+import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service.esm';
+import { GantryServiceClient } from '../gen/component/gantry/v1/gantry_pb_service.esm';
+import { GenericServiceClient } from '../gen/component/generic/v1/generic_pb_service.esm';
+import { GripperServiceClient } from '../gen/component/gripper/v1/gripper_pb_service.esm';
+import { InputControllerServiceClient } from '../gen/component/inputcontroller/v1/input_controller_pb_service.esm';
+import { MotionServiceClient } from '../gen/service/motion/v1/motion_pb_service.esm';
+import { MotorServiceClient } from '../gen/component/motor/v1/motor_pb_service.esm';
+import { MovementSensorServiceClient } from '../gen/component/movementsensor/v1/movementsensor_pb_service.esm';
+import { NavigationServiceClient } from '../gen/service/navigation/v1/navigation_pb_service.esm';
+import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service.esm';
+import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service.esm';
+import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service.esm';
+import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service.esm';
 import SessionManager from './SessionManager';
-import { VisionServiceClient } from './gen/service/vision/v1/vision_pb_service.esm';
-import { events } from './events';
+import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service.esm';
+import { events } from '../events';
 import type { grpc } from '@improbable-eng/grpc-web';
 
 interface WebRTCOptions {
@@ -36,7 +45,8 @@ abstract class ServiceClient {
   constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
-export default class Client {
+/** A gRPC-web client for the Robot component. */
+export class RobotClient implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;
   private readonly sessionOptions: SessionOptions | undefined;
@@ -100,7 +110,7 @@ export default class Client {
       serviceHost,
       (opts: grpc.TransportOptions): grpc.Transport => {
         if (!this.transportFactory) {
-          throw new Error(Client.notConnectedYetStr);
+          throw new Error(RobotClient.notConnectedYetStr);
         }
         return this.transportFactory(opts);
       }
@@ -115,112 +125,112 @@ export default class Client {
 
   get robotService() {
     if (!this.robotServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.robotServiceClient;
   }
 
   get armService() {
     if (!this.armServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.armServiceClient;
   }
 
   get baseService() {
     if (!this.baseServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.baseServiceClient;
   }
 
   get boardService() {
     if (!this.boardServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.boardServiceClient;
   }
 
   get gantryService() {
     if (!this.gantryServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.gantryServiceClient;
   }
 
   get genericService() {
     if (!this.genericServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.genericServiceClient;
   }
 
   get gripperService() {
     if (!this.gripperServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.gripperServiceClient;
   }
 
   get movementSensorService() {
     if (!this.movementSensorServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.movementSensorServiceClient;
   }
 
   get inputControllerService() {
     if (!this.inputControllerServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.inputControllerServiceClient;
   }
 
   get motorService() {
     if (!this.motorServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.motorServiceClient;
   }
 
   get navigationService() {
     if (!this.navigationServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.navigationServiceClient;
   }
 
   get motionService() {
     if (!this.motionServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.motionServiceClient;
   }
 
   get visionService() {
     if (!this.visionServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.visionServiceClient;
   }
 
   get sensorsService() {
     if (!this.sensorsServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.sensorsServiceClient;
   }
 
   get servoService() {
     if (!this.servoServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.servoServiceClient;
   }
 
   get slamService() {
     if (!this.slamServiceClient) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.slamServiceClient;
   }
@@ -233,7 +243,7 @@ export default class Client {
       : this.sessionManager.transportFactory;
 
     if (!clientTransportFactory) {
-      throw new Error(Client.notConnectedYetStr);
+      throw new Error(RobotClient.notConnectedYetStr);
     }
     const grpcOptions = { transport: clientTransportFactory };
     return new SC(this.serviceHost, grpcOptions);
@@ -451,5 +461,159 @@ export default class Client {
        */
       this.connecting = undefined; // eslint-disable-line require-atomic-updates
     }
+  }
+
+  // OPERATIONS
+
+  async getOperations() {
+    const robotService = this.robotService;
+    const request = new proto.GetOperationsRequest();
+    const response = await promisify<
+      proto.GetOperationsRequest,
+      proto.GetOperationsResponse
+    >(robotService.getOperations.bind(robotService), request);
+    return response.getOperationsList();
+  }
+
+  async cancelOperation(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.CancelOperationRequest();
+    request.setId(id);
+    await promisify<
+      proto.CancelOperationRequest,
+      proto.CancelOperationResponse
+    >(robotService.cancelOperation.bind(robotService), request);
+  }
+
+  async blockForOperation(id: string) {
+    const robotService = this.robotService;
+    const request = new proto.BlockForOperationRequest();
+    request.setId(id);
+    await promisify<
+      proto.BlockForOperationRequest,
+      proto.BlockForOperationResponse
+    >(robotService.blockForOperation.bind(robotService), request);
+  }
+
+  async stopAll() {
+    const robotService = this.robotService;
+    const request = new proto.StopAllRequest();
+    await promisify<proto.StopAllRequest, proto.StopAllResponse>(
+      robotService.stopAll.bind(robotService),
+      request
+    );
+  }
+
+  // FRAME SYSTEM
+
+  async frameSystemConfig(transforms: Transform[]) {
+    const robotService = this.robotService;
+    const request = new proto.FrameSystemConfigRequest();
+    request.setSupplementalTransformsList(transforms);
+    const response = await promisify<
+      proto.FrameSystemConfigRequest,
+      proto.FrameSystemConfigResponse
+    >(robotService.frameSystemConfig.bind(robotService), request);
+    return response.getFrameSystemConfigsList();
+  }
+
+  async transformPose(
+    source: PoseInFrame,
+    destination: string,
+    supplementalTransforms: Transform[]
+  ) {
+    const robotService = this.robotService;
+    const request = new proto.TransformPoseRequest();
+    request.setSource(source);
+    request.setDestination(destination);
+    request.setSupplementalTransformsList(supplementalTransforms);
+    const response = await promisify<
+      proto.TransformPoseRequest,
+      proto.TransformPoseResponse
+    >(robotService.transformPose.bind(robotService), request);
+    const result = response.getPose();
+    if (!result) {
+      // eslint-disable-next-line no-warning-comments
+      // TODO: Can the response frame be undefined or null?
+      throw new Error('no pose');
+    }
+    return result;
+  }
+
+  async transformPCD(
+    pointCloudPCD: Uint8Array,
+    source: string,
+    destination: string
+  ) {
+    const robotService = this.robotService;
+    const request = new proto.TransformPCDRequest();
+    request.setPointCloudPcd(pointCloudPCD);
+    request.setSource(source);
+    request.setDestination(destination);
+    const response = await promisify<
+      proto.TransformPCDRequest,
+      proto.TransformPCDResponse
+    >(robotService.transformPCD.bind(robotService), request);
+    return response.getPointCloudPcd_asU8();
+  }
+
+  // DISCOVERY
+
+  async discoverComponents(queries: proto.DiscoveryQuery[]) {
+    const robotService = this.robotService;
+    const request = new proto.DiscoverComponentsRequest();
+    request.setQueriesList(queries);
+    const response = await promisify<
+      proto.DiscoverComponentsRequest,
+      proto.DiscoverComponentsResponse
+    >(robotService.discoverComponents.bind(robotService), request);
+    return response.getDiscoveryList();
+  }
+
+  // RESOURCES
+
+  async resourceNames() {
+    const robotService = this.robotService;
+    const request = new proto.ResourceNamesRequest();
+    const response = await promisify<
+      proto.ResourceNamesRequest,
+      proto.ResourceNamesResponse
+    >(robotService.resourceNames.bind(robotService), request);
+    return response.getResourcesList();
+  }
+
+  async resourceRPCSubtypes() {
+    const robotService = this.robotService;
+    const request = new proto.ResourceRPCSubtypesRequest();
+    const response = await promisify<
+      proto.ResourceRPCSubtypesRequest,
+      proto.ResourceRPCSubtypesResponse
+    >(robotService.resourceRPCSubtypes.bind(robotService), request);
+    return response.getResourceRpcSubtypesList();
+  }
+
+  // STATUS
+
+  async getStatus(resourceNames: ResourceName[]) {
+    const robotService = this.robotService;
+    const request = new proto.GetStatusRequest();
+    request.setResourceNamesList(resourceNames);
+    const response = await promisify<
+      proto.GetStatusRequest,
+      proto.GetStatusResponse
+    >(robotService.getStatus.bind(robotService), request);
+    return response.getStatusList();
+  }
+
+  async streamStatus(resourceNames: ResourceName[], duration: Duration) {
+    const robotService = this.robotService;
+    const request = new proto.StreamStatusRequest();
+    request.setResourceNamesList(resourceNames);
+    request.setEvery(duration);
+    const response = await promisify<
+      proto.StreamStatusRequest,
+      proto.StreamStatusResponse
+    >(robotService.streamStatus.bind(robotService), request);
+    return response.getStatusList();
   }
 }

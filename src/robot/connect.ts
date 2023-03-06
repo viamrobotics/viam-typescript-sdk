@@ -1,6 +1,4 @@
-import Client from '../../Client';
-// eslint-disable-next-line capitalized-comments
-// import { RobotClient } from './Client';
+import { RobotClient } from './Client';
 
 interface ConnectDirectConf {
   authEntity?: string;
@@ -8,11 +6,11 @@ interface ConnectDirectConf {
   secret?: string;
 }
 
-const connectDirect = async (conf: ConnectDirectConf): Promise<Client> => {
+const connectDirect = async (conf: ConnectDirectConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
   console.info('attempting to connect via gRPC...');
 
-  const client = new Client(conf.host);
+  const client = new RobotClient(conf.host);
 
   let creds;
   if (conf.secret) {
@@ -44,7 +42,7 @@ interface ConnectWebRTCConf {
   iceServers: ICEServer[];
 }
 
-const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<Client> => {
+const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
   console.info('attempting to connect via WebRTC...');
 
@@ -59,7 +57,7 @@ const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<Client> => {
     signalingAddress,
     rtcConfig,
   };
-  const client = new Client(impliedURL, clientConf);
+  const client = new RobotClient(impliedURL, clientConf);
 
   let creds;
   if (conf.secret) {
@@ -86,10 +84,7 @@ const isConnectWebRTCConf = (value: Conf): value is ConnectWebRTCConf => {
   return true;
 };
 
-// eslint-disable-next-line no-warning-comments
-// TODO: return RobotClient
-export const createRobotClient = async (conf: Conf): Promise<Client> => {
-  // Export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
+export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
   let client;
 
   // Try to connect via WebRTC first.
@@ -113,6 +108,5 @@ export const createRobotClient = async (conf: Conf): Promise<Client> => {
     throw new Error('failed to connect to robot');
   }
 
-  // return new RobotClient(client);
   return client;
 };
