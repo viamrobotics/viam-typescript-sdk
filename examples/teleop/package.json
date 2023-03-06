@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
-    "@viamrobotics/sdk": "^0.0.21"
+    "@viamrobotics/sdk": "file:../../../typescript-sdk/viamrobotics-sdk-0.0.26.tgz"
   },
   "devDependencies": {
     "elm": "^0.19.1-5",

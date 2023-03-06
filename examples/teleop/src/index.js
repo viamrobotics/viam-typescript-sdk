@@ -6,10 +6,7 @@ import {
   MovementSensorClient,
   SensorClient,
   StreamClient,
-  commonApi,
-  movementSensorApi,
 } from '@viamrobotics/sdk';
-import { grpc } from '@improbable-eng/grpc-web';
 
 async function connect() {
   // You can remove this block entirely if your robot is not authenticated.
@@ -105,7 +102,6 @@ function onTrack(event) {
 connectWebRTC()
   .then((client) => {
     const base = new BaseClient(client, 'viam_base');
-    const m1 = new MotorClient(client, 'left');
     const wifi = new SensorClient(client, 'wifi');
     const accel = new MovementSensorClient(client, 'accelerometer');
 
@@ -122,11 +118,9 @@ connectWebRTC()
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
       console.log('linear', linear);
       console.log('angular', angular);
-      // TODO: stop requiring users to import commonApi, if possible
-      const linearVec = new commonApi.Vector3();
-      const angularVec = new commonApi.Vector3();
-      linearVec.setY(linear);
-      angularVec.setZ(angular);
+
+      const linearVec = { x: 0, y: linear, z: 0 };
+      const angularVec = { x: 0, y: 0, z: angular };
 
       await base.setPower(linearVec, angularVec);
     });
