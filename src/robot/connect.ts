@@ -3,7 +3,7 @@ import { RobotClient } from './Client';
 interface ConnectDirectConf {
   authEntity?: string;
   host: string;
-  secret?: string;
+  locationSecret?: string;
 }
 
 const connectDirect = async (conf: ConnectDirectConf): Promise<RobotClient> => {
@@ -13,9 +13,9 @@ const connectDirect = async (conf: ConnectDirectConf): Promise<RobotClient> => {
   const client = new RobotClient(conf.host);
 
   let creds;
-  if (conf.secret) {
+  if (conf.locationSecret) {
     creds = {
-      payload: conf.secret,
+      payload: conf.locationSecret,
       type: 'robot-location-secret',
     };
   }
@@ -36,7 +36,7 @@ interface ICEServer {
 interface ConnectWebRTCConf {
   authEntity?: string;
   host: string;
-  secret?: string;
+  locationSecret?: string;
   // WebRTC
   signalingAddress: string;
   iceServers: ICEServer[];
@@ -60,9 +60,9 @@ const connectWebRTC = async (conf: ConnectWebRTCConf): Promise<RobotClient> => {
   const client = new RobotClient(impliedURL, clientConf);
 
   let creds;
-  if (conf.secret) {
+  if (conf.locationSecret) {
     creds = {
-      payload: conf.secret,
+      payload: conf.locationSecret,
       type: 'robot-location-secret',
     };
   }
