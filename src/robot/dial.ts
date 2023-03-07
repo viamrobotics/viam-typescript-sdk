@@ -28,10 +28,7 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
 
   let creds;
   if (conf.credential) {
-    creds = {
-      payload: conf.credential.payload,
-      type: conf.credential.type,
-    };
+    creds = conf.credential;
   }
   await client.connect(conf.authEntity, creds);
 
@@ -75,10 +72,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
 
   let creds;
   if (conf.credential) {
-    creds = {
-      payload: conf.credential.payload,
-      type: conf.credential.payload,
-    };
+    creds = conf.credential;
   }
   await client.connect(impliedURL, creds);
 
