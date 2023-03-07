@@ -17,7 +17,13 @@ async function connect() {
   // Replace with the host of your actual robot running Viam.
   const host = import.meta.env.VITE_HOST;
 
-  return createRobotClient({ host, locationSecret });
+  return createRobotClient({
+    host,
+    credential: {
+      type: 'robot-location-secret',
+      payload: locationSecret,
+    },
+  });
 }
 
 async function connectWebRTC() {
@@ -28,7 +34,10 @@ async function connectWebRTC() {
 
   return createRobotClient({
     host,
-    locationSecret,
+    credential: {
+      type: 'robot-location-secret',
+      payload: locationSecret,
+    },
     authEntity: host,
     signalingAddress,
     iceServers,
