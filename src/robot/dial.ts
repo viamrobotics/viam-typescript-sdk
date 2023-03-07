@@ -11,7 +11,7 @@ const isLocalConnection = (url: string) => url.includes('.local');
 
 const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
-  console.info('dialing via gRPC...');
+  console.debug('dialing via gRPC...');
 
   if (!isLocalConnection(conf.host)) {
     throw new Error(
@@ -31,7 +31,7 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   await client.connect(conf.authEntity, creds);
 
   // eslint-disable-next-line no-console
-  console.info('connected via gRPC');
+  console.debug('connected via gRPC');
 
   return client;
 };
@@ -53,7 +53,7 @@ interface DialWebRTCConf {
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
-  console.info('dialing via WebRTC...');
+  console.debug('dialing via WebRTC...');
 
   const impliedURL = conf.host;
   const signalingAddress = conf.signalingAddress;
@@ -78,7 +78,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   await client.connect(impliedURL, creds);
 
   // eslint-disable-next-line no-console
-  console.info('connected via WebRTC');
+  console.debug('connected via WebRTC');
 
   return client;
 };
@@ -102,7 +102,8 @@ export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
     try {
       client = await dialWebRTC(conf);
     } catch (err) {
-      console.warn('failed to connect via WebRTC...');
+      // eslint-disable-next-line no-console
+      console.debug('failed to connect via WebRTC...');
     }
   }
 
@@ -110,7 +111,8 @@ export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
     try {
       client = await dialDirect(conf);
     } catch (err) {
-      console.warn('failed to connect via gRPC...');
+      // eslint-disable-next-line no-console
+      console.debug('failed to connect via gRPC...');
     }
   }
 
