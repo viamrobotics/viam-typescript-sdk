@@ -88,9 +88,8 @@ const isDialWebRTCConf = (value: Conf): value is DialWebRTCConf => {
   const conf = value as DialWebRTCConf;
 
   if (typeof conf.signalingAddress !== 'string') return false;
-  if (!conf.iceServers || conf.iceServers instanceof Array) return false;
 
-  return true;
+  return !conf.iceServers || conf.iceServers instanceof Array;
 };
 
 export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
