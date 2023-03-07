@@ -1,3 +1,7 @@
 export type { Robot } from './robot/Robot';
 export { RobotClient } from './robot/Client';
-export { createRobotClient } from './robot/dial';
+export {
+  type DialDirectConf,
+  type DialWebRTCConf,
+  createRobotClient,
+} from './robot/dial';

@@ -5,7 +5,8 @@ interface Credential {
   payload: string;
 }
 
-interface DialDirectConf {
+/** Options required to dial a robot via gRPC. */
+export interface DialDirectConf {
   authEntity?: string;
   host: string;
   credential?: Credential;
@@ -44,7 +45,8 @@ interface ICEServer {
   credential: string;
 }
 
-interface DialWebRTCConf {
+/** Options required to dial a robot via WebRTC. */
+export interface DialWebRTCConf {
   authEntity?: string;
   host: string;
   credential?: Credential;
