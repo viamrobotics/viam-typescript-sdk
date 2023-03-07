@@ -59,7 +59,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
 
   const impliedURL = conf.host;
   const signalingAddress = conf.signalingAddress;
-  const iceServers = conf.iceServers ? [] : conf.iceServers;
+  const iceServers = conf.iceServers ?? [];
 
   const rtcConfig = { iceServers };
   const clientConf = {
