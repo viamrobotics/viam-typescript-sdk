@@ -1,5 +1,5 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import type { MovementSensor } from './MovementSensor';
 import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service.esm';
@@ -14,7 +14,7 @@ export class MovementSensorClient implements MovementSensor {
   private readonly name: string;
   private readonly options: Options;
 
-  constructor(client: Client, name: string, options: Options = {}) {
+  constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MovementSensorServiceClient);
     this.sensorclient = new SensorClient(client, name, options);
     this.name = name;

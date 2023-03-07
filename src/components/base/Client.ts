@@ -1,6 +1,6 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/base/v1/base_pb.esm';
 import type { Base } from './Base';
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.esm';
@@ -13,7 +13,7 @@ export class BaseClient implements Base {
   private readonly name: string;
   private readonly options: Options;
 
-  constructor(client: Client, name: string, options: Options = {}) {
+  constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(BaseServiceClient);
     this.name = name;
     this.options = options;

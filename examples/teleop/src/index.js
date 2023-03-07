@@ -6,67 +6,40 @@ import {
   MovementSensorClient,
   SensorClient,
   StreamClient,
-  commonApi,
-  movementSensorApi,
+  createRobotClient,
 } from '@viamrobotics/sdk';
-import { grpc } from '@improbable-eng/grpc-web';
 
 async function connect() {
   // You can remove this block entirely if your robot is not authenticated.
   // Otherwise, replace with an actual secret.
-  const secret = import.meta.env.VITE_SECRET;
-  const creds = {
-    payload: secret,
-    type: 'robot-location-secret',
-  };
+  const locationSecret = import.meta.env.VITE_SECRET;
 
   // Replace with the host of your actual robot running Viam.
   const host = import.meta.env.VITE_HOST;
-  const client = new Client(host);
 
-  // Omit `creds` if your robot is not authenticated.
-  try {
-    await client.connect(undefined, creds);
-  } catch (err) {
-    console.error('failed to connect');
-    console.error(err);
-    throw err;
-  }
-
-  return client;
+  return createRobotClient({
+    host,
+    credential: {
+      type: 'robot-location-secret',
+      payload: locationSecret,
+    },
+  });
 }
 
 async function connectWebRTC() {
-  const secret = import.meta.env.VITE_SECRET;
-  const creds = {
-    payload: secret,
-    type: 'robot-location-secret',
-  };
-
+  const locationSecret = import.meta.env.VITE_SECRET;
   const host = import.meta.env.VITE_WEBRTC_HOST;
-  const impliedURL = host;
   const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
-  const iceServers = JSON.parse(import.meta.env.VITE_WEBRTC_ICE_SERVERS);
 
-  const rtcConfig = { iceServers };
-  const conf = {
-    enabled: true,
+  return createRobotClient({
     host,
+    credential: {
+      type: 'robot-location-secret',
+      payload: locationSecret,
+    },
+    authEntity: host,
     signalingAddress,
-    rtcConfig,
-  };
-
-  const client = new Client(impliedURL, conf);
-
-  try {
-    await client.connect(impliedURL, creds);
-  } catch (err) {
-    console.error('failed to connect');
-    console.error(err);
-    throw err;
-  }
-
-  return client;
+  });
 }
 
 function onTrack(event) {
@@ -105,7 +78,6 @@ function onTrack(event) {
 connectWebRTC()
   .then((client) => {
     const base = new BaseClient(client, 'viam_base');
-    const m1 = new MotorClient(client, 'left');
     const wifi = new SensorClient(client, 'wifi');
     const accel = new MovementSensorClient(client, 'accelerometer');
 
@@ -122,11 +94,9 @@ connectWebRTC()
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
       console.log('linear', linear);
       console.log('angular', angular);
-      // TODO: stop requiring users to import commonApi, if possible
-      const linearVec = new commonApi.Vector3();
-      const angularVec = new commonApi.Vector3();
-      linearVec.setY(linear);
-      angularVec.setZ(angular);
+
+      const linearVec = { x: 0, y: linear, z: 0 };
+      const angularVec = { x: 0, y: 0, z: angular };
 
       await base.setPower(linearVec, angularVec);
     });

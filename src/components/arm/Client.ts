@@ -1,5 +1,5 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/arm/v1/arm_pb.esm';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
 import type { Options, Pose } from '../../types';
@@ -13,7 +13,7 @@ export class ArmClient implements Arm {
   private readonly name: string;
   private readonly options: Options;
 
-  constructor(client: Client, name: string, options: Options = {}) {
+  constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(ArmServiceClient);
     this.name = name;
     this.options = options;

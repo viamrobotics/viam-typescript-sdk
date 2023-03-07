@@ -1,4 +1,4 @@
-import Client from './Client';
+import { RobotClient as Client } from './robot';
 
 import armApi from './gen/component/arm/v1/arm_pb.esm';
 import baseApi from './gen/component/base/v1/base_pb.esm';
@@ -21,7 +21,13 @@ import slamApi from './gen/service/slam/v1/slam_pb.esm';
 import streamApi from './gen/proto/stream/v1/stream_pb.esm';
 import visionApi from './gen/service/vision/v1/vision_pb.esm';
 
-export { type Robot, RobotClient } from './components/robot';
+export {
+  type Robot,
+  type DialDirectConf,
+  type DialWebRTCConf,
+  RobotClient,
+  createRobotClient,
+} from './robot';
 export { type Arm, ArmClient } from './components/arm';
 export { type Base, BaseClient } from './components/base';
 export { type Board, BoardClient } from './components/board';

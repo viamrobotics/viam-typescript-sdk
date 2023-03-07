@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { ConnectionClosedError } from '@viamrobotics/rpc';
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
-import { RobotServiceClient } from './gen/robot/v1/robot_pb_service.esm';
+import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service.esm';
 import { grpc } from '@improbable-eng/grpc-web';
 
 import SessionManager from './SessionManager';

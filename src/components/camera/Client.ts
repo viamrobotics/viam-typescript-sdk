@@ -1,6 +1,6 @@
 import type { Camera, MimeType } from './Camera';
 import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service.esm';
-import type Client from '../../Client';
+import type { RobotClient } from '../../robot';
 import type { HttpBody } from '../../gen/google/api/httpbody_pb';
 import type { Options } from '../../types';
 import pb from '../../gen/component/camera/v1/camera_pb.esm';
@@ -14,7 +14,7 @@ export class CameraClient implements Camera {
   private readonly name: string;
   private readonly options: Options;
 
-  constructor(client: Client, name: string, options: Options = {}) {
+  constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(CameraServiceClient);
     this.name = name;
     this.options = options;
