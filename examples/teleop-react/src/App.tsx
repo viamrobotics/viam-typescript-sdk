@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
 
-import { Client, BaseClient, MovementSensorClient, SensorClient } from '@viamrobotics/sdk';
+import {
+  Client,
+  BaseClient,
+  MovementSensorClient,
+  SensorClient,
+  StreamClient
+} from '@viamrobotics/sdk';
 
 async function connectWebRTC() {
   const secret = import.meta.env.VITE_SECRET;
@@ -37,12 +43,26 @@ async function connectWebRTC() {
   return client;
 }
 
+const READINGS_INTERVAL = 1000;
+
 function App() {
   const [ base, setBase ] = useState<BaseClient>();
   const [ wifi, setWifi ] = useState<SensorClient>();
+  const [ wifiReadings, setWifiReadings ] = useState<Record<string, unknown>>();
   const [ accel, setAccel ] = useState<MovementSensorClient>();
+  const [ accelReadings, setAccelReadings ] = useState<{x: number, y: number, z: number}>();
+  const [ stream, setStream ] = useState<StreamClient>();
 
   const [ count, setCount ] = useState(0);
+
+  const ready = () => {
+    if (!base) return false;
+    if (!wifi) return false;
+    if (!accel) return false;
+    if (!stream) return false;
+
+    return true;
+  }
 
   // connect to client
   useEffect(() => { 
@@ -52,43 +72,62 @@ function App() {
       setBase(new BaseClient(client, "viam_base"));
       setWifi(new SensorClient(client, "wifi"));
       setAccel(new MovementSensorClient(client, "accelerometer"));
+      setStream(new StreamClient(client, "cam"));
     }
 
     connect().catch((err) => console.error(err.message));
   }, [])
 
-  // connect to client
+
   useEffect(() => {
-    if (!base) return;
     if (!wifi) return;
+
+    const interval = setInterval(() => {
+      wifi
+        .getReadings()
+        .then((readings) => setWifiReadings(readings))
+        .catch((err) => console.warn(`error getting wifi signal: ${err}`));
+    }, READINGS_INTERVAL);
+    return () => clearInterval(interval);
+  }, [wifi, setWifiReadings])
+
+  useEffect(() => {
     if (!accel) return;
 
-    console.log("Components are ready!");
+    const interval = setInterval(() => {
+      accel
+        .getLinearAcceleration()
+        .then((readings) => setAccelReadings(readings))
+        .catch((err) => console.warn(`error getting acceleration: ${err}`));
+    }, READINGS_INTERVAL);
+    return () => clearInterval(interval);
+  }, [accel, setAccelReadings])
 
-  }, [base, wifi, accel])
+  if (!ready()) {
+    return "Loading...";
+  }
 
   return (
     <div className="App">
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
         <a href="https://reactjs.org" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>Viam</h1>
       <div className="card">
+        <div>
+          <p>Wifi Signal</p>
+          {JSON.stringify(wifiReadings)}
+        </div>
+        <div>
+          <p>Acceleration</p>
+          {JSON.stringify(accelReadings)}
+        </div>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   );
 }
