@@ -1,9 +1,14 @@
 import { RobotClient } from './Client';
 
+interface Credential {
+  type: string;
+  payload: string;
+}
+
 interface DialDirectConf {
   authEntity?: string;
   host: string;
-  locationSecret?: string;
+  credential?: Credential;
 }
 
 /** Check if a url corresponds to a local connection via heuristic */
@@ -22,10 +27,10 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   const client = new RobotClient(conf.host);
 
   let creds;
-  if (conf.locationSecret) {
+  if (conf.credential) {
     creds = {
-      payload: conf.locationSecret,
-      type: 'robot-location-secret',
+      payload: conf.credential.payload,
+      type: conf.credential.type,
     };
   }
   await client.connect(conf.authEntity, creds);
@@ -45,7 +50,7 @@ interface ICEServer {
 interface DialWebRTCConf {
   authEntity?: string;
   host: string;
-  locationSecret?: string;
+  credential?: Credential;
   // WebRTC
   signalingAddress: string;
   iceServers: ICEServer[];
@@ -69,10 +74,10 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   const client = new RobotClient(impliedURL, clientConf);
 
   let creds;
-  if (conf.locationSecret) {
+  if (conf.credential) {
     creds = {
-      payload: conf.locationSecret,
-      type: 'robot-location-secret',
+      payload: conf.credential.payload,
+      type: conf.credential.payload,
     };
   }
   await client.connect(impliedURL, creds);
