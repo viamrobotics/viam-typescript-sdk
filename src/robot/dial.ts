@@ -50,7 +50,7 @@ interface DialWebRTCConf {
   credential?: Credential;
   // WebRTC
   signalingAddress: string;
-  iceServers: ICEServer[];
+  iceServers?: ICEServer[];
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
@@ -59,7 +59,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
 
   const impliedURL = conf.host;
   const signalingAddress = conf.signalingAddress;
-  const iceServers = conf.iceServers;
+  const iceServers = conf.iceServers ? [] : conf.iceServers;
 
   const rtcConfig = { iceServers };
   const clientConf = {
@@ -88,7 +88,7 @@ const isDialWebRTCConf = (value: Conf): value is DialWebRTCConf => {
   const conf = value as DialWebRTCConf;
 
   if (typeof conf.signalingAddress !== 'string') return false;
-  if (!(conf.iceServers instanceof Array)) return false;
+  if (!conf.iceServers || conf.iceServers instanceof Array) return false;
 
   return true;
 };
