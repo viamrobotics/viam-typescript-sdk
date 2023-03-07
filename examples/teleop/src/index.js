@@ -9,23 +9,6 @@ import {
   createRobotClient,
 } from '@viamrobotics/sdk';
 
-async function connect() {
-  // You can remove this block entirely if your robot is not authenticated.
-  // Otherwise, replace with an actual secret.
-  const locationSecret = import.meta.env.VITE_SECRET;
-
-  // Replace with the host of your actual robot running Viam.
-  const host = import.meta.env.VITE_HOST;
-
-  return createRobotClient({
-    host,
-    credential: {
-      type: 'robot-location-secret',
-      payload: locationSecret,
-    },
-  });
-}
-
 async function connectWebRTC() {
   const locationSecret = import.meta.env.VITE_SECRET;
   const host = import.meta.env.VITE_WEBRTC_HOST;
