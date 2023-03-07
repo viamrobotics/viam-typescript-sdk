@@ -30,7 +30,6 @@ async function connectWebRTC() {
   const locationSecret = import.meta.env.VITE_SECRET;
   const host = import.meta.env.VITE_WEBRTC_HOST;
   const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
-  const iceServers = JSON.parse(import.meta.env.VITE_WEBRTC_ICE_SERVERS);
 
   return createRobotClient({
     host,
@@ -40,7 +39,6 @@ async function connectWebRTC() {
     },
     authEntity: host,
     signalingAddress,
-    iceServers,
   });
 }
 
