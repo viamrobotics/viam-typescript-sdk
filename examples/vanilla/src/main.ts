@@ -16,11 +16,17 @@ async function connect() {
   // it is most likely https://app.viam.com:443.
   const signalingAddress = '<SIGNALING ADDRESS>';
 
+  // You can replace this with a different ICE server, append additional ICE
+  // servers, or omit entirely. This option is not strictly required but can
+  // make it easier to connect via WebRTC.
+  const iceServers = [{ urls: 'stun:global.stun.twilio.com:3478' }];
+
   return createRobotClient({
     host,
     credential,
     authEntity: host,
     signalingAddress,
+    iceServers,
   });
 }
 
