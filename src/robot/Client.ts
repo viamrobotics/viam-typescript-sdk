@@ -579,7 +579,7 @@ export class RobotClient implements Robot {
       proto.ResourceNamesRequest,
       proto.ResourceNamesResponse
     >(robotService.resourceNames.bind(robotService), request);
-    return response.getResourcesList();
+    return response.getResourcesList().map((r) => r.toObject());
   }
 
   async resourceRPCSubtypes() {

@@ -122,7 +122,7 @@ export interface Robot {
    * @group Resources
    * @alpha
    */
-  resourceNames(): Promise<ResourceName[]>;
+  resourceNames(): Promise<ResourceName.AsObject[]>;
 
   /**
    * Get a list of all resource types.
