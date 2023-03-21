@@ -1,7 +1,7 @@
 {
     "arm": {
-        "import": "ArmClient",
-        "function": "endPosition",
+        "client": "ArmClient",
+        "func": "endPosition",
         "args": []
     }
 }
