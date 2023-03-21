@@ -3,5 +3,17 @@
         "client": "ArmClient",
         "func": "endPosition",
         "args": []
+    },
+    "board": {
+        "client": "BoardClient",
+        "func": "getGPIO",
+        "args": [
+            "\"16\""
+        ]
+    },
+    "camera": {
+        "client": "CameraClient",
+        "func": "getImage",
+        "args": []
     }
 }
