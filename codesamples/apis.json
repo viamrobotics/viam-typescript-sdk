@@ -8,7 +8,7 @@
         "client": "BoardClient",
         "func": "getGPIO",
         "args": [
-            "\"16\""
+            "'16'"
         ]
     },
     "camera": {
