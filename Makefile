@@ -28,7 +28,7 @@ buf-clean:
 buf-install: buf-clean
 	./etc/install_buf.sh $(BUF_BIN)
 
-buf-update:
+buf-update: buf-install
 	PATH=$(PATH_WITH_TOOLS) buf mod update
 
 buf: install buf-install
