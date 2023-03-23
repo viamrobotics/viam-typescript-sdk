@@ -1,7 +1,7 @@
 {
     "arm": {
         "client": "ArmClient",
-        "func": "endPosition",
+        "func": "getEndPosition",
         "args": []
     },
     "board": {
