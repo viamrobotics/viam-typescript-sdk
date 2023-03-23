@@ -9,7 +9,8 @@
         "func": "getGPIO",
         "args": [
             "'16'"
-        ]
+        ],
+        "comment": "Note that the pin supplied is a placeholder. Please change this to a valid pin you are using."
     },
     "camera": {
         "client": "CameraClient",
