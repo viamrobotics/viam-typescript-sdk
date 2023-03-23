@@ -8,4 +8,4 @@ on:
 
 jobs:
   test:
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@main
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@RSDK-2091-auto-PR-api-changes
