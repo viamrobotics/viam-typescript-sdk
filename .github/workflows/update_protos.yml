@@ -1,9 +1,6 @@
 name: Update Protos + Open PR
 
 on:
-  push:
-    branches:
-      - "RSDK-2091-auto-PR-api-changes"
   workflow_dispatch:
   repository_dispatch:
     types:
