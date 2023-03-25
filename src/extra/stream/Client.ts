@@ -27,29 +27,42 @@ export class StreamClient extends EventDispatcher implements Stream {
     return this.client;
   }
 
+  // Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+  // where track names should not include colons.
+  private getValidSDPTrackName(name: string) {
+    return name.replaceAll(":", "+")
+  }
+
   async add(name: string) {
     const streamService = this.streamService;
     const request = new pb.AddStreamRequest();
-    request.setName(name);
-
+    request.setName(this.getValidSDPTrackName(name));
+    console.log(this.getValidSDPTrackName(name))
     this.options.requestLogger?.(request);
+    try {
+      await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
+        streamService.addStream.bind(streamService),
+        request
+      );
+    } catch (e) {
+      console.log(e)
+    }
 
-    await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
-      streamService.addStream.bind(streamService),
-      request
-    );
   }
 
   async remove(name: string) {
     const streamService = this.streamService;
     const request = new pb.RemoveStreamRequest();
-    request.setName(name);
-
+    request.setName(this.getValidSDPTrackName(name));
+    console.log(this.getValidSDPTrackName(name))
     this.options.requestLogger?.(request);
-
-    await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
-      streamService.removeStream.bind(streamService),
-      request
-    );
+    try {
+      await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
+        streamService.removeStream.bind(streamService),
+        request
+      );
+    } catch (e) {
+      console.log(e)
+    }
   }
 }
