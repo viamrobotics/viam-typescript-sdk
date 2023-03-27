@@ -333,10 +333,12 @@ export class RobotClient implements Robot {
             throw new Error('expected event stream to exist');
           }
 
-          // track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
-          // where names should not contain colons.
+          /*
+           * Track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+           * where names should not contain colons.
+           */
           const resName = eventStream.id.replaceAll('+', ':');
-          // overriding the stream id to match the resource name and then immediately setting it back to readonly
+          // Overriding the stream id to match the resource name and then immediately setting it back to readonly
           Object.defineProperty(eventStream, 'id', {
             value: resName,
             writable: true,

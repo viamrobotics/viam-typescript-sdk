@@ -6,6 +6,14 @@ import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service
 import pb from '../../gen/proto/stream/v1/stream_pb.esm';
 import { promisify } from '../../utils';
 
+/*
+ * Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+ * where track names should not include colons.
+ */
+const getValidSDPTrackName = function (name: string) {
+  return name.replaceAll(':', '+');
+};
+
 export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;
@@ -27,16 +35,10 @@ export class StreamClient extends EventDispatcher implements Stream {
     return this.client;
   }
 
-  // Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
-  // where track names should not include colons.
-  private getValidSDPTrackName(name: string) {
-    return name.replaceAll(':', '+');
-  }
-
   async add(name: string) {
     const streamService = this.streamService;
     const request = new pb.AddStreamRequest();
-    const valName = this.getValidSDPTrackName(name);
+    const valName = getValidSDPTrackName(name);
     request.setName(valName);
     this.options.requestLogger?.(request);
     try {
@@ -45,7 +47,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         request
       );
     } catch (error) {
-      // try again with just the resource name
+      // Try again with just the resource name
       request.setName(name);
       this.options.requestLogger?.(request);
       await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
@@ -58,7 +60,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   async remove(name: string) {
     const streamService = this.streamService;
     const request = new pb.RemoveStreamRequest();
-    const valName = this.getValidSDPTrackName(name);
+    const valName = getValidSDPTrackName(name);
     request.setName(valName);
     this.options.requestLogger?.(request);
     try {
@@ -67,7 +69,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         request
       );
     } catch (e) {
-      // try again with just the resource name
+      // Try again with just the resource name
       request.setName(name);
       this.options.requestLogger?.(request);
       await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
