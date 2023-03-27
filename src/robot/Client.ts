@@ -341,10 +341,6 @@ export class RobotClient implements Robot {
           // Overriding the stream id to match the resource name and then immediately setting it back to readonly
           Object.defineProperty(eventStream, 'id', {
             value: resName,
-            writable: true,
-          });
-          Object.defineProperty(eventStream, 'id', {
-            writable: false,
           });
           events.emit('track', event);
           const streamName = eventStream.id;
