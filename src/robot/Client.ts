@@ -338,7 +338,7 @@ export class RobotClient implements Robot {
            * where names should not contain colons.
            */
           const resName = eventStream.id.replaceAll('+', ':');
-          // Overriding the stream id to match the resource name and then immediately setting it back to readonly
+          // Overriding the stream id to match the resource name
           Object.defineProperty(eventStream, 'id', {
             value: resName,
           });
