@@ -30,13 +30,13 @@ export class StreamClient extends EventDispatcher implements Stream {
   // Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
   // where track names should not include colons.
   private getValidSDPTrackName(name: string) {
-    return name.replaceAll(":", "+")
+    return name.replaceAll(':', '+');
   }
 
   async add(name: string) {
     const streamService = this.streamService;
     const request = new pb.AddStreamRequest();
-    const valName = this.getValidSDPTrackName(name)
+    const valName = this.getValidSDPTrackName(name);
     request.setName(valName);
     this.options.requestLogger?.(request);
     try {
@@ -58,7 +58,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   async remove(name: string) {
     const streamService = this.streamService;
     const request = new pb.RemoveStreamRequest();
-    const valName = this.getValidSDPTrackName(name)
+    const valName = this.getValidSDPTrackName(name);
     request.setName(valName);
     this.options.requestLogger?.(request);
     try {

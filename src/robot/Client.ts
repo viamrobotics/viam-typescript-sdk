@@ -42,7 +42,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 /** A gRPC-web client for the Robot component. */
@@ -335,13 +335,13 @@ export class RobotClient implements Robot {
 
           // track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
           // where names should not contain colons.
-          const resName = eventStream.id.replaceAll("+", ":")
+          const resName = eventStream.id.replaceAll('+', ':');
           // overriding the stream id to match the resource name and then immediately setting it back to readonly
-          Object.defineProperty(eventStream, "id", {
+          Object.defineProperty(eventStream, 'id', {
             value: resName,
             writable: true,
           });
-          Object.defineProperty(eventStream, "id", {
+          Object.defineProperty(eventStream, 'id', {
             writable: false,
           });
           events.emit('track', event);
