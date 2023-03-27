@@ -36,25 +36,30 @@ export class StreamClient extends EventDispatcher implements Stream {
   async add(name: string) {
     const streamService = this.streamService;
     const request = new pb.AddStreamRequest();
-    request.setName(this.getValidSDPTrackName(name));
-    console.log(this.getValidSDPTrackName(name))
+    const valName = this.getValidSDPTrackName(name)
+    request.setName(valName);
     this.options.requestLogger?.(request);
     try {
       await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
         streamService.addStream.bind(streamService),
         request
       );
-    } catch (e) {
-      console.log(e)
+    } catch (error) {
+      // try again with just the resource name
+      request.setName(name);
+      this.options.requestLogger?.(request);
+      await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
+        streamService.addStream.bind(streamService),
+        request
+      );
     }
-
   }
 
   async remove(name: string) {
     const streamService = this.streamService;
     const request = new pb.RemoveStreamRequest();
-    request.setName(this.getValidSDPTrackName(name));
-    console.log(this.getValidSDPTrackName(name))
+    const valName = this.getValidSDPTrackName(name)
+    request.setName(valName);
     this.options.requestLogger?.(request);
     try {
       await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
@@ -62,7 +67,13 @@ export class StreamClient extends EventDispatcher implements Stream {
         request
       );
     } catch (e) {
-      console.log(e)
+      // try again with just the resource name
+      request.setName(name);
+      this.options.requestLogger?.(request);
+      await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
+        streamService.removeStream.bind(streamService),
+        request
+      );
     }
   }
 }
