@@ -14,6 +14,8 @@ jobs:
       image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.REPO_READ_TOKEN }}
 
       - name: Update api
         run: |
