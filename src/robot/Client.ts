@@ -42,7 +42,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
 }
 
 /** A gRPC-web client for the Robot component. */
@@ -325,14 +325,26 @@ export class RobotClient implements Robot {
         this.transportFactory = webRTCConn.transportFactory;
 
         webRTCConn.peerConnection.ontrack = (event) => {
-          events.emit('track', event);
-
           const { kind } = event.track;
 
           const eventStream = event.streams[0];
           if (!eventStream) {
+            events.emit('track', event);
             throw new Error('expected event stream to exist');
           }
+
+          // track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+          // where names should not contain colons.
+          const resName = eventStream.id.replaceAll("+", ":")
+          // overriding the stream id to match the resource name and then immediately setting it back to readonly
+          Object.defineProperty(eventStream, "id", {
+            value: resName,
+            writable: true,
+          });
+          Object.defineProperty(eventStream, "id", {
+            writable: false,
+          });
+          events.emit('track', event);
           const streamName = eventStream.id;
           const streamContainers = document.querySelectorAll(
             `[data-stream="${streamName}"]`
