@@ -6,6 +6,14 @@ import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service
 import pb from '../../gen/proto/stream/v1/stream_pb.esm';
 import { promisify } from '../../utils';
 
+/*
+ * Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+ * where track names should not include colons.
+ */
+const getValidSDPTrackName = function (name: string) {
+  return name.replaceAll(':', '+');
+};
+
 export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;
@@ -30,26 +38,44 @@ export class StreamClient extends EventDispatcher implements Stream {
   async add(name: string) {
     const streamService = this.streamService;
     const request = new pb.AddStreamRequest();
-    request.setName(name);
-
+    const valName = getValidSDPTrackName(name);
+    request.setName(valName);
     this.options.requestLogger?.(request);
-
-    await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
-      streamService.addStream.bind(streamService),
-      request
-    );
+    try {
+      await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
+        streamService.addStream.bind(streamService),
+        request
+      );
+    } catch (error) {
+      // Try again with just the resource name
+      request.setName(name);
+      this.options.requestLogger?.(request);
+      await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
+        streamService.addStream.bind(streamService),
+        request
+      );
+    }
   }
 
   async remove(name: string) {
     const streamService = this.streamService;
     const request = new pb.RemoveStreamRequest();
-    request.setName(name);
-
+    const valName = getValidSDPTrackName(name);
+    request.setName(valName);
     this.options.requestLogger?.(request);
-
-    await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
-      streamService.removeStream.bind(streamService),
-      request
-    );
+    try {
+      await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
+        streamService.removeStream.bind(streamService),
+        request
+      );
+    } catch (e) {
+      // Try again with just the resource name
+      request.setName(name);
+      this.options.requestLogger?.(request);
+      await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
+        streamService.removeStream.bind(streamService),
+        request
+      );
+    }
   }
 }

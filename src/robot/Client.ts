@@ -325,14 +325,24 @@ export class RobotClient implements Robot {
         this.transportFactory = webRTCConn.transportFactory;
 
         webRTCConn.peerConnection.ontrack = (event) => {
-          events.emit('track', event);
-
           const { kind } = event.track;
 
           const eventStream = event.streams[0];
           if (!eventStream) {
+            events.emit('track', event);
             throw new Error('expected event stream to exist');
           }
+
+          /*
+           * Track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+           * where names should not contain colons.
+           */
+          const resName = eventStream.id.replaceAll('+', ':');
+          // Overriding the stream id to match the resource name
+          Object.defineProperty(eventStream, 'id', {
+            value: resName,
+          });
+          events.emit('track', event);
           const streamName = eventStream.id;
           const streamContainers = document.querySelectorAll(
             `[data-stream="${streamName}"]`
