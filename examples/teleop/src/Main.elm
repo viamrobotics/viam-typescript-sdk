@@ -374,10 +374,19 @@ viewStreams =
         ]
         [ -- Camera stream inserted here
           H.div
-            [ At.attribute "data-stream" "cam"
+            [ At.attribute "data-stream" "cam1"
+            ]
+            [],
+            H.div
+            [ At.attribute "data-stream" "cam2"
+            ]
+            [],
+            H.div
+            [ At.attribute "data-stream" "cam3"
             ]
             []
         ]
+
 
 
 viewMovementControls : Model -> H.Html Msg

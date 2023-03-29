@@ -22,7 +22,7 @@ async function connectWebRTC() {
   const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
   const iceServers = JSON.parse(import.meta.env.VITE_WEBRTC_ICE_SERVERS);
 
-  const rtcConfig = { iceServers };
+  const rtcConfig = { "iceServers":[] };
   const conf = {
     enabled: true,
     host,
