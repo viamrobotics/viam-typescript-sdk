@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import path from 'node:path';
 import dts from 'vite-plugin-dts';
-import { include, includeRe } from './etc/rollup_files.js'
+import { include } from './etc/rollup_files.js'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,7 +14,7 @@ export default defineConfig({
   },
   build: {
     commonjsOptions: {
-      include: includeRe,
+      include: include.map((path: string) => new RegExp(path)),
     },
     minify: true,
     target: 'esnext',

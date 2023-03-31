@@ -1,4 +1,4 @@
-type Callback = (args: any) => void;
+type Callback = (args: unknown) => void;
 
 export class EventDispatcher {
   listeners: Record<string, Set<Callback>> = {};
@@ -25,7 +25,7 @@ export class EventDispatcher {
     this.listeners[type]?.delete(listener);
   }
 
-  emit(type: string, args: any) {
+  emit(type: string, args: unknown) {
     for (const callback of this.listeners[type] ?? []) {
       callback(args);
     }
