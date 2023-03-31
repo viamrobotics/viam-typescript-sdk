@@ -1,32 +1,32 @@
 /* eslint-disable max-classes-per-file */
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import type { Robot } from './Robot';
-import proto from '../gen/robot/v1/robot_pb.esm';
+import proto from '../gen/robot/v1/robot_pb';
 import type {
   PoseInFrame,
   ResourceName,
   Transform,
-} from '../gen/common/v1/common_pb.esm';
+} from '../gen/common/v1/common_pb';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { promisify } from '../utils';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
-import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service.esm';
-import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service.esm';
-import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service.esm';
-import { GantryServiceClient } from '../gen/component/gantry/v1/gantry_pb_service.esm';
-import { GenericServiceClient } from '../gen/component/generic/v1/generic_pb_service.esm';
-import { GripperServiceClient } from '../gen/component/gripper/v1/gripper_pb_service.esm';
-import { InputControllerServiceClient } from '../gen/component/inputcontroller/v1/input_controller_pb_service.esm';
-import { MotionServiceClient } from '../gen/service/motion/v1/motion_pb_service.esm';
-import { MotorServiceClient } from '../gen/component/motor/v1/motor_pb_service.esm';
-import { MovementSensorServiceClient } from '../gen/component/movementsensor/v1/movementsensor_pb_service.esm';
-import { NavigationServiceClient } from '../gen/service/navigation/v1/navigation_pb_service.esm';
-import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service.esm';
-import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service.esm';
-import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service.esm';
-import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service.esm';
+import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service';
+import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service';
+import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service';
+import { GantryServiceClient } from '../gen/component/gantry/v1/gantry_pb_service';
+import { GenericServiceClient } from '../gen/component/generic/v1/generic_pb_service';
+import { GripperServiceClient } from '../gen/component/gripper/v1/gripper_pb_service';
+import { InputControllerServiceClient } from '../gen/component/inputcontroller/v1/input_controller_pb_service';
+import { MotionServiceClient } from '../gen/service/motion/v1/motion_pb_service';
+import { MotorServiceClient } from '../gen/component/motor/v1/motor_pb_service';
+import { MovementSensorServiceClient } from '../gen/component/movementsensor/v1/movementsensor_pb_service';
+import { NavigationServiceClient } from '../gen/service/navigation/v1/navigation_pb_service';
+import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
+import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
+import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service';
+import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
 import SessionManager from './SessionManager';
-import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service.esm';
+import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { events } from '../events';
 import type { grpc } from '@improbable-eng/grpc-web';
 

@@ -1,9 +1,9 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
-import pb from '../../gen/component/base/v1/base_pb.esm';
+import pb from '../../gen/component/base/v1/base_pb';
 import type { Base } from './Base';
-import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service.esm';
+import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service';
 import type { Options, Vector3D } from '../../types';
 import { promisify, encodeVector3D } from '../../utils';
 

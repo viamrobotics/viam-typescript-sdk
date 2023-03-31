@@ -3,10 +3,10 @@ import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import type { Sensor } from './Sensor';
-import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service.esm';
+import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service';
 
 import { promisify } from '../../utils';
-import sensorApi from '../../gen/component/sensor/v1/sensor_pb.esm';
+import sensorApi from '../../gen/component/sensor/v1/sensor_pb';
 
 /** A gRPC-web client for the Sensor component. */
 export class SensorClient implements Sensor {

@@ -1,6 +1,6 @@
-import type { WorldState } from '../../gen/common/v1/common_pb.esm';
+import type { WorldState } from '../../gen/common/v1/common_pb';
 
-import type { JointPositions } from '../../gen/component/arm/v1/arm_pb.esm';
+import type { JointPositions } from '../../gen/component/arm/v1/arm_pb';
 
 import type { Extra, Pose } from '../../types';
 

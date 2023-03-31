@@ -1,9 +1,9 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import type { Motor } from './Motor';
-import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm';
+import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service';
 import type { Options } from '../../types';
-import motorApi from '../../gen/component/motor/v1/motor_pb.esm';
+import motorApi from '../../gen/component/motor/v1/motor_pb';
 import { promisify } from '../../utils';
 
 /** A gRPC-web client for the Motor component. */

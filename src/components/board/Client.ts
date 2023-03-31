@@ -1,11 +1,11 @@
 import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { Board } from './Board';
-import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service.esm';
+import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import pb from '../../gen/component/board/v1/board_pb.esm';
+import pb from '../../gen/component/board/v1/board_pb';
 import { promisify } from '../../utils';
 
 /** A gRPC-web client for the Board component. */
