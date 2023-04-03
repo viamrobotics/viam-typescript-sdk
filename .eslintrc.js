@@ -8,15 +8,20 @@ module.exports = {
   extends: [
     'eslint:all',
     'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:@typescript-eslint/strict',
     'prettier',
   ],
   ignorePatterns: ['*.d.ts', 'src/examples', 'src/gen'],
-  overrides: [],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    project: ['./tsconfig.json'],
+    project: [
+      './tsconfig.json',
+      './tsconfig.node.json',
+      './examples/**/tsconfig.json',
+      './examples/**/tsconfig.node.json',
+    ],
     sourceType: 'module',
     tsconfigRootDir: __dirname,
   },
@@ -68,12 +73,19 @@ module.exports = {
     'padded-blocks': ['error', 'never'],
     'prefer-destructuring': 'off',
     'quote-props': ['error', 'consistent-as-needed'],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'always'],
     'sort-keys': 'off',
     'sort-imports': 'off',
+    "spaced-comment": ["error", "always", { "markers": ["/"] }],
     '@typescript-eslint/prefer-for-of': 'off',
     '@typescript-eslint/no-shadow': ['error'], // https://github.com/typescript-eslint/typescript-eslint/issues/2483#issuecomment-687095358
     '@typescript-eslint/type-annotation-spacing': 'warn',
   },
+  overrides: [
+    {
+      files: ["**/*.cjs"],
+      parserOptions: {
+        sourceType: 'script',
+      }
+    }
+  ],
 }

@@ -102,7 +102,7 @@ connectWebRTC()
     });
 
     // Add stream from camera
-    streams.add('cam');
+    streams.add('cam1');
   })
   .catch((err) => {
     console.error('something went wrong');
