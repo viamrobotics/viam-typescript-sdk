@@ -1,4 +1,4 @@
-import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/service/datamanager/v1/data_manager_pb.js';
@@ -26,7 +26,7 @@ export class DataManagerClient implements DataManager {
     const datamanagerService = this.datamanagerService;
     const request = new pb.SyncRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 

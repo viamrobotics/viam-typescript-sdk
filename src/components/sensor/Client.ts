@@ -1,4 +1,4 @@
-import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
@@ -27,7 +27,7 @@ export class SensorClient implements Sensor {
     const sensorService = this.sensorService;
     const request = new sensorApi.GetReadingsRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 

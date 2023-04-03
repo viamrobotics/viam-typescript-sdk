@@ -1,4 +1,4 @@
-import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/base/v1/base_pb';
@@ -29,7 +29,7 @@ export class BaseClient implements Base {
     request.setName(this.name);
     request.setMmPerSec(mmPerSec);
     request.setDistanceMm(distanceMm);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -45,7 +45,7 @@ export class BaseClient implements Base {
     request.setName(this.name);
     request.setAngleDeg(angleDeg);
     request.setDegsPerSec(degsPerSec);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -61,7 +61,7 @@ export class BaseClient implements Base {
     request.setName(this.name);
     request.setLinear(encodeVector3D(linear));
     request.setAngular(encodeVector3D(angular));
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -77,7 +77,7 @@ export class BaseClient implements Base {
     request.setName(this.name);
     request.setLinear(encodeVector3D(linear));
     request.setAngular(encodeVector3D(angular));
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -91,7 +91,7 @@ export class BaseClient implements Base {
     const baseService = this.baseService;
     const request = new pb.StopRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 

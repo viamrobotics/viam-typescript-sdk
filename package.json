@@ -1,6 +1,6 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
@@ -27,7 +27,6 @@
     "format": "prettier --write './src/**/*.{ts,js}'",
     "lint:prettier": "prettier --check './src/**/*.{ts,js}'",
     "lint:eslint": "eslint './src/**/*.{ts,js}' --fix",
-    "rollup": "rollup -c ./etc/rollup.config.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'node:path';
 import dts from 'vite-plugin-dts';
-import { include } from './etc/rollup_files.js'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,12 +8,14 @@ export default defineConfig({
     'process.env.NODE_ENV': '"production"',
   },
   plugins: [dts()],
-  optimizeDeps: {
-    include,
-  },
   build: {
     commonjsOptions: {
-      include: include.map((path: string) => new RegExp(path)),
+      transformMixedEsModules: true,
+      include: [
+        /google-protobuf/,
+        /@improbable-eng\/grpc-web/,
+        /gen\//,
+      ]
     },
     minify: true,
     target: 'esnext',

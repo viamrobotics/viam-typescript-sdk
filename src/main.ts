@@ -1,4 +1,5 @@
 import { RobotClient as Client } from './robot';
+import { version } from '../package.json';
 
 import armApi from './gen/component/arm/v1/arm_pb';
 import baseApi from './gen/component/base/v1/base_pb';
@@ -62,6 +63,7 @@ export {
   visionApi,
   streamApi,
   Client,
+  version,
 };
 
 // It doesn't matter which ServiceError we export really.
