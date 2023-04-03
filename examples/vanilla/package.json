@@ -12,6 +12,6 @@
     "esbuild": "0.16.12"
   },
   "dependencies": {
-    "@viamrobotics/sdk": "^0.0.27"
+    "@viamrobotics/sdk": "^0.0.34-alpha.2"
   }
 }

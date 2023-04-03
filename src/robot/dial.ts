@@ -41,8 +41,8 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
 
 interface ICEServer {
   urls: string;
-  username: string;
-  credential: string;
+  username?: string;
+  credential?: string;
 }
 
 /** Options required to dial a robot via WebRTC. */
