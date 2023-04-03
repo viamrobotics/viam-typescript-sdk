@@ -9,6 +9,14 @@ export default defineConfig({
   },
   plugins: [dts()],
   build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      include: [
+        /google-protobuf/,
+        /@improbable-eng\/grpc-web/,
+        /gen\//,
+      ]
+    },
     minify: true,
     target: 'esnext',
     lib: {

@@ -2,10 +2,10 @@ import type {
   PoseInFrame,
   ResourceName,
   Transform,
-} from '../gen/common/v1/common_pb.esm';
+} from '../gen/common/v1/common_pb';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import type { Extra } from '../types';
-import type proto from '../gen/robot/v1/robot_pb.esm';
+import type proto from '../gen/robot/v1/robot_pb';
 
 export interface Robot {
   /**

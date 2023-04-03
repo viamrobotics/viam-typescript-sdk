@@ -13,7 +13,7 @@ describe('StreamClient', () => {
       const streamClient = new StreamClient(client);
 
       streamClient.on('track', (data) => {
-        expect(data.mock).eq(true);
+        expect((data as { mock: true }).mock).eq(true);
         done(undefined);
       });
 

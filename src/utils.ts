@@ -1,6 +1,6 @@
-import type { ServiceError } from './gen/robot/v1/robot_pb_service.esm';
+import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
-import pb from './gen/common/v1/common_pb.esm';
+import pb from './gen/common/v1/common_pb';
 import type { Vector3D } from './types';
 
 type Callback<T> = (error: ServiceError | null, response: T | null) => void;

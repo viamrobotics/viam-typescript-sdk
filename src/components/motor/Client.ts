@@ -1,9 +1,9 @@
-import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import type { Motor } from './Motor';
-import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service.esm';
+import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service';
 import type { Options } from '../../types';
-import motorApi from '../../gen/component/motor/v1/motor_pb.esm';
+import motorApi from '../../gen/component/motor/v1/motor_pb';
 import { promisify } from '../../utils';
 
 /** A gRPC-web client for the Motor component. */
@@ -27,7 +27,7 @@ export class MotorClient implements Motor {
     const request = new motorApi.SetPowerRequest();
     request.setName(this.name);
     request.setPowerPct(power);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -43,7 +43,7 @@ export class MotorClient implements Motor {
     request.setName(this.name);
     request.setRpm(rpm);
     request.setRevolutions(revolutions);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -59,7 +59,7 @@ export class MotorClient implements Motor {
     request.setName(this.name);
     request.setRpm(rpm);
     request.setPositionRevolutions(positionRevolutions);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -74,7 +74,7 @@ export class MotorClient implements Motor {
     const request = new motorApi.ResetZeroPositionRequest();
     request.setName(this.name);
     request.setOffset(offset);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -88,7 +88,7 @@ export class MotorClient implements Motor {
     const motorService = this.motorService;
     const request = new motorApi.StopRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -102,7 +102,7 @@ export class MotorClient implements Motor {
     const motorService = this.motorService;
     const request = new motorApi.GetPropertiesRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -117,7 +117,7 @@ export class MotorClient implements Motor {
     const motorService = this.motorService;
     const request = new motorApi.GetPositionRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -132,7 +132,7 @@ export class MotorClient implements Motor {
     const motorService = this.motorService;
     const request = new motorApi.IsPoweredRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 

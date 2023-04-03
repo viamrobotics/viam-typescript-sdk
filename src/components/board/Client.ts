@@ -1,11 +1,11 @@
-import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { Board } from './Board';
-import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service.esm';
+import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import pb from '../../gen/component/board/v1/board_pb.esm';
+import pb from '../../gen/component/board/v1/board_pb';
 import { promisify } from '../../utils';
 
 /** A gRPC-web client for the Board component. */
@@ -28,7 +28,7 @@ export class BoardClient implements Board {
     const boardService = this.boardService;
     const request = new pb.StatusRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -77,7 +77,7 @@ export class BoardClient implements Board {
     request.setName(this.name);
     request.setPin(pin);
     request.setHigh(high);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -91,7 +91,7 @@ export class BoardClient implements Board {
     const request = new pb.GetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -106,7 +106,7 @@ export class BoardClient implements Board {
     const request = new pb.PWMRequest();
     request.setName(this.name);
     request.setPin(pin);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -122,7 +122,7 @@ export class BoardClient implements Board {
     request.setName(this.name);
     request.setPin(pin);
     request.setDutyCyclePct(dutyCyle);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -136,7 +136,7 @@ export class BoardClient implements Board {
     const request = new pb.PWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -152,7 +152,7 @@ export class BoardClient implements Board {
     request.setName(this.name);
     request.setPin(pin);
     request.setFrequencyHz(frequencyHz);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -166,7 +166,7 @@ export class BoardClient implements Board {
     const request = new pb.ReadAnalogReaderRequest();
     request.setBoardName(this.name);
     request.setAnalogReaderName(analogReader);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -181,7 +181,7 @@ export class BoardClient implements Board {
     const request = new pb.GetDigitalInterruptValueRequest();
     request.setBoardName(this.name);
     request.setDigitalInterruptName(digitalInteruptName);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 

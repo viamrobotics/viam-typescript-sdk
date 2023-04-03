@@ -1,11 +1,11 @@
-import * as googleProtobufStructPb from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import pb from '../../gen/component/arm/v1/arm_pb.esm';
-import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service.esm';
+import pb from '../../gen/component/arm/v1/arm_pb';
+import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
 import type { Options, Pose } from '../../types';
 import { promisify } from '../../utils';
 import type { Arm } from './Arm';
-import commonPB from '../../gen/common/v1/common_pb.esm';
+import commonPB from '../../gen/common/v1/common_pb';
 
 /** A gRPC-web client for the Arm component. */
 export class ArmClient implements Arm {
@@ -27,7 +27,7 @@ export class ArmClient implements Arm {
     const armService = this.ArmService;
     const request = new pb.GetEndPositionRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -67,7 +67,7 @@ export class ArmClient implements Arm {
     request.setName(this.name);
     request.setTo(pbPose);
     request.setWorldState(world);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -86,7 +86,7 @@ export class ArmClient implements Arm {
     const request = new pb.MoveToJointPositionsRequest();
     request.setName(this.name);
     request.setPositions(newJointPositions);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -100,7 +100,7 @@ export class ArmClient implements Arm {
     const armService = this.ArmService;
     const request = new pb.GetJointPositionsRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
@@ -121,7 +121,7 @@ export class ArmClient implements Arm {
     const armService = this.ArmService;
     const request = new pb.StopRequest();
     request.setName(this.name);
-    request.setExtra(googleProtobufStructPb.Struct.fromJavaScript(extra));
+    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 

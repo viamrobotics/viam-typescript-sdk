@@ -2,8 +2,8 @@ import { EventDispatcher, events } from '../../events';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import type { Stream } from './Stream';
-import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service.esm';
-import pb from '../../gen/proto/stream/v1/stream_pb.esm';
+import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
+import pb from '../../gen/proto/stream/v1/stream_pb';
 import { promisify } from '../../utils';
 
 /*

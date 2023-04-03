@@ -1,7 +1,7 @@
 import type {
   DistortionParameters,
   IntrinsicParameters,
-} from '../../gen/component/camera/v1/camera_pb.esm';
+} from '../../gen/component/camera/v1/camera_pb';
 
 export interface Properties {
   /** Whether the camera supports the return of point cloud data. */
