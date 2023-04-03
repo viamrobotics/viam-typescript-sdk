@@ -32,3 +32,5 @@ export const useConnect = (): ((credentials: RobotCredentials) => void) => {
 
   return setCredentials;
 };
+
+export const useStream = (cameraName: string): MediaStream | undefined => {};
