@@ -126,7 +126,7 @@ export class ArmClient implements Arm {
     this.options.requestLogger?.(request);
 
     await promisify<pb.StopRequest, pb.StopResponse>(
-      armService.getJointPositions.bind(armService),
+      armService.stop.bind(armService),
       request
     );
   }
