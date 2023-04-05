@@ -3,7 +3,7 @@ name: Update Protos + Open PR
 on:
   push:
     branches:
-      - "RSDK-2091-auto-PR-api-changes"
+      - 'RSDK-2091-auto-PR-api-changes'
   workflow_dispatch:
   repository_dispatch:
     types:
@@ -24,7 +24,7 @@ jobs:
       - name: Update api
         run: |
           sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make buf-update'
+          sudo -u testbot bash -lc 'make update-buf'
 
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v3

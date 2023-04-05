@@ -1,6 +1,7 @@
-export PATH := $(shell npm root)/.bin:$(PATH)
-
 buf := ./bin/buf
+node_modules := $(shell npm root)
+
+export PATH := $(node_modules)/.bin:$(PATH)
 
 # common targets
 
@@ -8,36 +9,38 @@ buf := ./bin/buf
 all: clean build lint test
 
 .PHONY: setup
-setup: setup-buf setup-dist
+setup: setup-buf setup-js
 
 .PHONY: teardown
-teardown: teardown-buf teardown-dist
+teardown: teardown-buf teardown-js
 
 .PHONY: build
-build: build-buf build-dist
+build: build-buf build-js
 
 .PHONY: clean
-clean: clean-buf clean-dist
+clean: clean-buf clean-js
 
 .PHONY: test
-test:
+test: $(node_modules)
 	npm run test
 
 .PHONY: lint
-lint:
+lint: $(node_modules)
 	npm run lint:prettier
 	npm run lint:eslint
 	npm run typecheck
 	npm run check
 
 .PHONY: format
-format:
+format: $(node_modules)
 	npm run format
 
 # protobuf targets
 
 .PHONY: setup-buf
 setup-buf: $(buf)
+
+$(buf):
 	./etc/install_buf.sh ./bin
 
 .PHONY: teardown-buf
@@ -49,39 +52,41 @@ clean-buf:
 	rm -rf src/gen
 
 .PHONY: update-buf
-update-buf:
+update-buf: $(buf)
 	$(buf) mod update
 
 .PHONY: build-buf
-build-buf: update-buf
+build-buf: $(buf) $(node_modules)
 	$(buf) generate buf.build/googleapis/googleapis
 	$(buf) generate buf.build/viamrobotics/api --path common,component,robot,service
 	$(buf) generate buf.build/erdaniels/gostream
 	$(buf) generate buf.build/viamrobotics/goutils
 
-# distributable build targets
+# js targets
 
-.PHONY: setup-dist
-setup-dist:
+.PHONY: setup-js
+setup-js: $(node_modules)
+
+$(node_modules): package-lock.json
 	npm ci --audit=false
 
-.PHONY: teardown-dist
-teardown-dist:
+.PHONY: teardown-js
+teardown-js:
 	rm -rf node_modules
 
-.PHONY: clean-dist
-clean-dist:
+.PHONY: clean-js
+clean-js:
 	rm -rf dist
 
 # TODO(RSDK-870): try removing the custom `--max-old-space-size` option
 # once we migrate to protobuf-es, since that generator should produce
 # much smaller javascript bundles.
-.PHONY: build-dist
-build-dist: build-buf
+.PHONY: build-js
+build-js: $(node_modules) build-buf
 	NODE_OPTIONS="--max-old-space-size=16384" npm run build
 
 # build and create a tarball from a package - useful for local testing,
 # inspecting what is included in the final distribution, and local publishing.
-.PHONY: pack-dist
-pack-dist: build-dist
+.PHONY: pack-js
+pack-js: build-js
 	npm pack
