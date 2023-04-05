@@ -56,7 +56,7 @@ update-buf: $(buf)
 	$(buf) mod update
 
 .PHONY: build-buf
-build-buf: $(buf) $(node_modules)
+build-buf: $(buf) $(node_modules) clean-buf
 	$(buf) generate buf.build/googleapis/googleapis
 	$(buf) generate buf.build/viamrobotics/api --path common,component,robot,service
 	$(buf) generate buf.build/erdaniels/gostream
@@ -82,7 +82,7 @@ clean-js:
 # once we migrate to protobuf-es, since that generator should produce
 # much smaller javascript bundles.
 .PHONY: build-js
-build-js: $(node_modules) build-buf
+build-js: $(node_modules) clean-js build-buf
 	NODE_OPTIONS="--max-old-space-size=16384" npm run build
 
 # build and create a tarball from a package - useful for local testing,
