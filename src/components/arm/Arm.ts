@@ -1,5 +1,3 @@
-import type { WorldState } from '../../gen/common/v1/common_pb';
-
 import type { JointPositions } from '../../gen/component/arm/v1/arm_pb';
 
 import type { Extra, Pose } from '../../types';
@@ -10,16 +8,11 @@ export interface Arm {
   getEndPosition: (extra?: Extra) => Promise<Pose>;
 
   /**
-   * Move the end of the arm to the pose, avoiding obstacles in the worldstate.
+   * Move the end of the arm to the pose.
    *
-   * @param pose - The destination pose for the arm
-   * @param world - The obstacles for the arm to avoid
+   * @param pose - The destination pose for the arm.
    */
-  moveToPosition: (
-    pose: Pose,
-    world?: WorldState,
-    extra?: Extra
-  ) => Promise<void>;
+  moveToPosition: (pose: Pose, extra?: Extra) => Promise<void>;
 
   /**
    * Move each joint of the arm based on the angles on the joint poisitons.

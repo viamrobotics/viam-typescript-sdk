@@ -51,7 +51,7 @@ export class ArmClient implements Arm {
     };
   }
 
-  async moveToPosition(pose: Pose, world?: commonPB.WorldState, extra = {}) {
+  async moveToPosition(pose: Pose, extra = {}) {
     const armService = this.ArmService;
 
     const pbPose = new commonPB.Pose();
@@ -66,7 +66,6 @@ export class ArmClient implements Arm {
     const request = new pb.MoveToPositionRequest();
     request.setName(this.name);
     request.setTo(pbPose);
-    request.setWorldState(world);
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
