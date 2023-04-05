@@ -25,6 +25,7 @@
     "build": "vite build",
     "check": "npm-check --production",
     "doc": "typedoc",
+    "doc:watch": "typedoc --watch",
     "format": "prettier --write './src/**/*.{ts,js}'",
     "lint:prettier": "prettier --check './src/**/*.{ts,js}'",
     "lint:eslint": "eslint './src/**/*.{ts,js}' --fix",
