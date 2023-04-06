@@ -1,13 +1,7 @@
 node_modules := $(shell npm root)
 buf := npm exec --offline -- buf
 
-RM := rm -rf
-
 # common targets
-
-.PHONY: test-rm
-test-rm:
-	echo $(SHELL)
 
 .PHONY: all
 all: clean build lint test
@@ -17,7 +11,7 @@ setup:  $(node_modules)
 
 .PHONY: teardown
 teardown:
-	$(RM) -rf node_modules
+	rm -rf node_modules
 
 .PHONY: build
 build: build-buf build-js
@@ -49,7 +43,7 @@ $(node_modules): package-lock.json
 
 .PHONY: clean-buf
 clean-buf:
-	$(RM) src/gen
+	rm -rf src/gen
 
 .PHONY: update-buf
 update-buf: $(node_modules)
@@ -66,7 +60,7 @@ build-buf: $(node_modules) clean-buf
 
 .PHONY: clean-js
 clean-js:
-	$(RM) -rf dist
+	rm -rf dist
 
 .PHONY: build-js
 build-js: $(node_modules) clean-js build-buf
