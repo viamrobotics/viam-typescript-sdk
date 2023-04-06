@@ -46,7 +46,7 @@ abstract class ServiceClient {
 }
 
 /**
- * A gRPC-web client for the Robot component.
+ * A gRPC-web client for a Robot.
  *
  * @group Clients
  */
