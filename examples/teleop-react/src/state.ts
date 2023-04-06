@@ -1,36 +1,109 @@
-import { useState, useEffect } from 'react';
-import { Robot } from '../../../dist/robot.js';
-import { getRobotClient, type RobotCredentials } from './client.js';
+import { useEffect, useRef, useState } from 'react';
+import type { RobotClient, StreamClient } from '@viamrobotics/sdk';
+import {
+  getRobotClient,
+  getStreamClient,
+  getStream,
+  type RobotCredentials,
+} from './client.js';
 
-export interface ClientStateDisconnected {
-  status: 'disconnected' | 'error';
-  error?: string;
+export const DISCONNECTED = 'disconnected';
+export const CONNECTING = 'connecting';
+export const DISCONNECTING = 'disconnecting';
+export const CONNECTED = 'connected';
+
+interface ClientStateDisconnected {
+  status: typeof DISCONNECTED;
+  error?: unknown;
 }
 
-export interface ClientStateTransitioning {
-  status: 'connecting' | 'disconnecting';
+interface ClientStateTransitioning {
+  status: typeof CONNECTING | typeof DISCONNECTING;
 }
 
-export interface ClientStateConnected {
-  status: 'connected';
+interface ClientStateConnected {
+  status: typeof CONNECTED;
   client: RobotClient;
+  streamClient: StreamClient;
 }
 
-export type ClientState =
+type ClientState =
   | ClientStateDisconnected
   | ClientStateTransitioning
   | ClientStateConnected;
 
-const useCredentials = () => {
-  return useState<RobotCredentials | undefined>(undefined);
+export type ClientStatus = ClientState['status'];
+
+export interface Store {
+  status: ClientStatus;
+  client?: RobotClient;
+  streamClient?: StreamClient;
+  connectOrDisconnect: (credentials: RobotCredentials) => unknown;
+}
+
+export const useStore = (): Store => {
+  const [state, setState] = useState<ClientState>({ status: DISCONNECTED });
+
+  if (state.status === DISCONNECTED && state.error) {
+    console.warn('Connection error', state.error);
+  }
+
+  const connectOrDisconnect = (credentials: RobotCredentials): void => {
+    if (state.status === DISCONNECTED) {
+      setState({ status: CONNECTING });
+
+      getRobotClient(credentials)
+        .then((client) => {
+          const streamClient = getStreamClient(client);
+          setState({ status: CONNECTED, client, streamClient });
+        })
+        .catch((error: unknown) => setState({ status: DISCONNECTED, error }));
+    } else if (state.status === CONNECTED) {
+      setState({ status: DISCONNECTING });
+
+      state.client
+        .disconnect()
+        .then(() => setState({ status: DISCONNECTED }))
+        .catch((error: unknown) => setState({ status: DISCONNECTED, error }));
+    }
+  };
+
+  return {
+    connectOrDisconnect,
+    status: state.status,
+    client: state.status === CONNECTED ? state.client : undefined,
+    streamClient: state.status === CONNECTED ? state.streamClient : undefined,
+  };
 };
 
-const useClient = () => {};
+export const useStream = (
+  streamClient: StreamClient | undefined,
+  cameraName: string
+): MediaStream | undefined => {
+  const okToConnectRef = useRef(true);
+  const [stream, setStream] = useState<MediaStream | undefined>();
 
-export const useConnect = (): ((credentials: RobotCredentials) => void) => {
-  const [, setCredentials] = useCredentials();
+  useEffect(() => {
+    if (streamClient && okToConnectRef.current) {
+      okToConnectRef.current = false;
 
-  return setCredentials;
+      getStream(streamClient, cameraName)
+        .then((mediaStream) => setStream(mediaStream))
+        .catch((error: unknown) => {
+          console.warn(`Unable to connect to camera ${cameraName}`, error);
+        });
+
+      return () => {
+        okToConnectRef.current = true;
+
+        streamClient.remove(cameraName).catch((error: unknown) => {
+          console.warn(`Unable to disconnect to camera ${cameraName}`, error);
+        });
+      };
+    }
+
+    return undefined;
+  }, [streamClient, cameraName]);
+
+  return stream;
 };
-
-export const useStream = (cameraName: string): MediaStream | undefined => {};

@@ -14,5 +14,5 @@ export const VideoStream = (props: VideoStreamProps): JSX.Element => {
     }
   }, [stream]);
 
-  return <video ref={videoRef} autoPlay muted />;
+  return <video ref={videoRef} autoPlay muted className="p-4" />;
 };
