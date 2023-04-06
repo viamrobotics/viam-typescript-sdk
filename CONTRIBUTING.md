@@ -4,7 +4,7 @@ Welcome to the Viam TypeScript SDK. Please read this guide prior to opening a pu
 
 ## Development setup
 
-Developing on the TypeScript SDK requires macOS, Linux, or WSL / Bash for Windows. To get started, clone this repository:
+Developing on the TypeScript SDK requires macOS or Linux. To get started, clone this repository:
 
 ```shell
 git clone https://github.com/viamrobotics/viam-typescript-sdk.git
