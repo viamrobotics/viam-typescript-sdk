@@ -1,24 +1,29 @@
-buf := ./bin/buf
 node_modules := $(shell npm root)
+buf := npm exec --offline -- buf
 
-export PATH := $(node_modules)/.bin:$(PATH)
+RM := rm -rf
 
 # common targets
+
+.PHONY: test-rm
+test-rm:
+	echo $(SHELL)
 
 .PHONY: all
 all: clean build lint test
 
 .PHONY: setup
-setup: setup-buf setup-js
+setup:  $(node_modules)
 
 .PHONY: teardown
-teardown: teardown-buf teardown-js
+teardown:
+	$(RM) -rf node_modules
 
 .PHONY: build
 build: build-buf build-js
 
 .PHONY: clean
-clean: clean-buf clean-js
+clean: clean-js clean-buf
 
 .PHONY: test
 test: $(node_modules)
@@ -35,28 +40,23 @@ lint: $(node_modules)
 format: $(node_modules)
 	npm run format
 
+# development dependencies
+
+$(node_modules): package-lock.json
+	npm ci --audit=false
+
 # protobuf targets
-
-.PHONY: setup-buf
-setup-buf: $(buf)
-
-$(buf):
-	./etc/install_buf.sh ./bin
-
-.PHONY: teardown-buf
-teardown-buf:
-	rm -rf $(buf)
 
 .PHONY: clean-buf
 clean-buf:
-	rm -rf src/gen
+	$(RM) src/gen
 
 .PHONY: update-buf
-update-buf: $(buf)
+update-buf: $(node_modules)
 	$(buf) mod update
 
 .PHONY: build-buf
-build-buf: $(buf) $(node_modules) clean-buf
+build-buf: $(node_modules) clean-buf
 	$(buf) generate buf.build/googleapis/googleapis
 	$(buf) generate buf.build/viamrobotics/api --path common,component,robot,service
 	$(buf) generate buf.build/erdaniels/gostream
@@ -64,19 +64,9 @@ build-buf: $(buf) $(node_modules) clean-buf
 
 # js targets
 
-.PHONY: setup-js
-setup-js: $(node_modules)
-
-$(node_modules): package-lock.json
-	npm ci --audit=false
-
-.PHONY: teardown-js
-teardown-js:
-	rm -rf node_modules
-
 .PHONY: clean-js
 clean-js:
-	rm -rf dist
+	$(RM) -rf dist
 
 .PHONY: build-js
 build-js: $(node_modules) clean-js build-buf
