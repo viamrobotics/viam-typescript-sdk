@@ -17,7 +17,10 @@ export {
   RobotClient,
   createRobotClient,
 } from './robot';
-/** @deprecated Use {@link RobotClient} instead. */
+/**
+ * @deprecated Use {@link RobotClient} instead.
+ * @group Clients
+ */
 export { RobotClient as Client } from './robot';
 
 /**

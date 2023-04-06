@@ -7,7 +7,11 @@ import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service';
 import type { Options, Vector3D } from '../../types';
 import { promisify, encodeVector3D } from '../../utils';
 
-/** A gRPC-web client for the Base component. */
+/**
+ * A gRPC-web client for the Base component.
+ *
+ * @group Clients
+ */
 export class BaseClient implements Base {
   private client: BaseServiceClient;
   private readonly name: string;
