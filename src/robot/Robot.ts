@@ -12,8 +12,8 @@ export interface Robot {
    * Get the list of operations currently running on the robot.
    *
    * @privateRemarks
-   *   TODO: this function should return an more idiomatic type instead of just
-   *   passing along a proto type.
+   * TODO: this function should return an more idiomatic type instead of just
+   * passing along a proto type.
    * @group Operations
    * @alpha
    */
@@ -53,8 +53,8 @@ export interface Robot {
    * Get the configuration of the frame system of a given robot.
    *
    * @privateRemarks
-   *   TODO: this function should return an more idiomatic type instead of just
-   *   passing along a proto type.
+   * TODO: this function should return an more idiomatic type instead of just
+   * passing along a proto type.
    * @group Frame System
    * @alpha
    */
@@ -65,8 +65,8 @@ export interface Robot {
    * destination which is a reference frame.
    *
    * @privateRemarks
-   *   TODO: this function should return an more idiomatic type instead of just
-   *   passing along a proto type.
+   * TODO: this function should return an more idiomatic type instead of just
+   * passing along a proto type.
    * @param query - The pose that should be transformed
    * @param destination - The name of the reference frame to transform the given
    * @param supplementalTransforms - Pose information on any additional
@@ -106,8 +106,8 @@ export interface Robot {
    * Get the list of discovered component configurations.
    *
    * @privateRemarks
-   *   TODO: this function should return an more idiomatic type instead of just
-   *   passing along a proto type.
+   * TODO: this function should return an more idiomatic type instead of just
+   * passing along a proto type.
    * @param queries - The list of component models to discovery.
    * @group Discovery
    * @alpha
