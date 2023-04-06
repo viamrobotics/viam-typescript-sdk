@@ -78,12 +78,9 @@ teardown-js:
 clean-js:
 	rm -rf dist
 
-# TODO(RSDK-870): try removing the custom `--max-old-space-size` option
-# once we migrate to protobuf-es, since that generator should produce
-# much smaller javascript bundles.
 .PHONY: build-js
 build-js: $(node_modules) clean-js build-buf
-	NODE_OPTIONS="--max-old-space-size=16384" npm run build
+	npm run build
 
 # build and create a tarball from a package - useful for local testing,
 # inspecting what is included in the final distribution, and local publishing.
