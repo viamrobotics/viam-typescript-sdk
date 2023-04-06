@@ -1,5 +1,4 @@
 import { RobotClient as Client } from './robot';
-import { version } from '../package.json';
 
 import armApi from './gen/component/arm/v1/arm_pb';
 import baseApi from './gen/component/base/v1/base_pb';
@@ -40,6 +39,8 @@ export {
 } from './components/movementsensor';
 export { type Sensor, SensorClient } from './components/sensor';
 export { type Stream, StreamClient } from './extra/stream';
+
+const version = __VERSION__;
 
 export {
   commonApi,

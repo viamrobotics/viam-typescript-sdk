@@ -1,51 +1,14 @@
 {
+  "extends": "@viamrobotics/typescript-config/base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "useDefineForClassFields": true,
-    "strict": true,
-    "noEmit": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "types": [
-      "vite/client"
-    ],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "forceConsistentCasingInFileNames": true,
-    "sourceMap": true,
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.iterable",
-      "scripthost"
-    ]
+    "types": ["vite/client"],
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "dist",
+
+    // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
+    "exactOptionalPropertyTypes": false
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.vue"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"]
 }

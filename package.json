@@ -22,15 +22,22 @@
     }
   },
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:bundle && npm run build:types",
+    "build:bundle": "vite build",
+    "build:types": "tsc",
     "check": "npm-check --production",
     "doc": "typedoc",
-    "format": "prettier --write './src/**/*.{ts,js}'",
-    "lint:prettier": "prettier --check './src/**/*.{ts,js}'",
-    "lint:eslint": "eslint './src/**/*.{ts,js}' --fix",
+    "format": "npm run _eslint -- --fix && npm run _prettier -- --write",
+    "lint": "concurrently -g npm:lint:*",
+    "lint:prettier": "npm run _prettier -- --check",
+    "lint:eslint": "npm run _eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "concurrently -g npm:typecheck:*",
+    "typecheck:src": "tsc  --noEmit",
+    "typecheck:node": "tsc --project tsconfig.node.json",
+    "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}' --quiet",
+    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
   },
   "repository": {
     "type": "git",
@@ -49,9 +56,13 @@
     "@improbable-eng/grpc-web": "^0.15.0",
     "@improbable-eng/grpc-web-fake-transport": "^0.15.0",
     "@types/google-protobuf": "^3.15.6",
-    "@typescript-eslint/eslint-plugin": "^5.43.0",
-    "@typescript-eslint/parser": "^5.43.0",
-    "eslint": "^8.27.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "@viamrobotics/eslint-config": "^0.0.2",
+    "@viamrobotics/prettier-config": "^0.0.1",
+    "@viamrobotics/typescript-config": "^0.0.2",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.5.0",
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.2",
@@ -64,7 +75,6 @@
     "typedoc": "^0.23.28",
     "typescript": "^5.0.3",
     "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.1.0",
     "vitest": "^0.28.4"
   }
 }
