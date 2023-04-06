@@ -92,7 +92,7 @@ export { type Motor, MotorClient } from './components/motor';
  * @alpha
  * @group Raw Protobufs
  */
-export { default as movementsensorApi } from './gen/component/movementsensor/v1/movementsensor_pb';
+export { default as movementSensorApi } from './gen/component/movementsensor/v1/movementsensor_pb';
 export {
   type MovementSensor,
   MovementSensorClient,
