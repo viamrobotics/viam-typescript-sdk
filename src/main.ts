@@ -214,29 +214,13 @@ export { default as genericApi } from './gen/component/generic/v1/generic_pb';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
  *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new gripperApi.IsMovingRequest();
- * request.setName('mygripper');
- *
- * client.gripperService.isMoving(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link GripperClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as gripperApi } from './gen/component/gripper/v1/gripper_pb';
+export { type Gripper, GripperClient } from './components/gripper';
 
 /**
  * Raw Protobuf interfaces for an InputController component.
