@@ -122,7 +122,7 @@ export { type Sensor, SensorClient } from './components/sensor';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new sensorsApi.GetSensorsRequest();
- * request.setName('my sensors');
+ * request.setName('mysensors');
  *
  * client.sensorsService.getSensors(
  *   request,
@@ -162,7 +162,7 @@ export { type Stream, StreamClient } from './extra/stream';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new gantryApi.GetLengthsRequest();
- * request.setName('my gantry');
+ * request.setName('mygantry');
  *
  * client.gantryService.getLengths(
  *   request,
@@ -201,7 +201,7 @@ export { default as genericApi } from './gen/component/generic/v1/generic_pb';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new gripperApi.IsMovingRequest();
- * request.setName('my gripper');
+ * request.setName('mygripper');
  *
  * client.gripperService.isMoving(
  *   request,
@@ -230,7 +230,7 @@ export { default as gripperApi } from './gen/component/gripper/v1/gripper_pb';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new inputControllerApi.GetControlsRequest();
- * request.setName('my input controller');
+ * request.setName('myinput controller');
  *
  * client.inputControllerService.getControls(
  *   request,
@@ -259,7 +259,7 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
  * const client = {}; // replace with a connected robot client
  *
  * const request = new motionApi.GetPoseRequest();
- * request.setName('my motion');
+ * request.setName('mymotion');
  *
  * client.motionService.getPose(
  *   request,
@@ -288,7 +288,7 @@ export { default as motionApi } from './gen/service/motion/v1/motion_pb';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new navigationApi.GetWaypointsRequest();
- * request.setName('my navigation');
+ * request.setName('mynavigation');
  *
  * client.navigationService.getWaypoints(
  *   request,
@@ -317,7 +317,7 @@ export { default as navigationApi } from './gen/service/navigation/v1/navigation
  * const client = {}; // replace with a connected robot client
  *
  * const request = new servoApi.GetPositionRequest();
- * request.setName('my servo');
+ * request.setName('myservo');
  *
  * client.servoService.getPosition(
  *   request,
@@ -346,7 +346,7 @@ export { default as servoApi } from './gen/component/servo/v1/servo_pb';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new slamApi.GetPositionRequest();
- * request.setName('my slam');
+ * request.setName('myslam');
  *
  * client.slamService.getPosition(
  *   request,
@@ -375,7 +375,7 @@ export { default as slamApi } from './gen/service/slam/v1/slam_pb';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new visionApi.GetDetectorNamesRequest();
- * request.setName('my vision');
+ * request.setName('myvision');
  *
  * client.visionService.getDetectorNames(
  *   request,
