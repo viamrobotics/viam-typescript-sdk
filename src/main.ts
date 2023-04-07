@@ -214,7 +214,6 @@ export { default as genericApi } from './gen/component/generic/v1/generic_pb';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- *
  * @deprecated Use {@link GripperClient} instead.
  * @alpha
  * @group Raw Protobufs
