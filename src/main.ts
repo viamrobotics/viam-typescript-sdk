@@ -272,29 +272,12 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new motionApi.GetPoseRequest();
- * request.setName('mymotion');
- *
- * client.motionService.getPose(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link MotionClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
+export { type Motion, MotionClient } from './services/motion';
 
 /**
  * Raw Protobuf interfaces for a Navigation service.

@@ -10,6 +10,7 @@
     "dist/robot/**/*.d.ts",
     "dist/events.*",
     "dist/components/**/*.d.ts",
+    "dist/services/**/*.d.ts",
     "dist/extra/**/*.d.ts",
     "dist/main.*",
     "dist/gen/**/*.esm.d.ts",
