@@ -41,21 +41,6 @@ export class GripperClient implements Gripper {
     );
   }
 
-  async grap(extra = {}) {
-    const service = this.GripperService;
-
-    const request = new pb.GrabRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
-
-    this.options.requestLogger?.(request);
-
-    await promisify<pb.GrabRequest, pb.GrabResponse>(
-      service.grab.bind(service),
-      request
-    );
-  }
-
   async grab(extra = {}) {
     const service = this.GripperService;
 
