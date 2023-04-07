@@ -179,9 +179,30 @@ export { type Stream, StreamClient } from './extra/stream';
 export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
 
 /**
- * Raw Protobuf interfaces for a Generic component.
+ * Raw Protobuf interfaces for a Generic service.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @example
+ *
+ * ```ts
+ * import { grpc } from '@improbable-eng/grpc-web';
+ * import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+ *
+ * const client = {}; // replace with a connected robot client
+ *
+ * const request = new genericApi.DoCommandRequest();
+ * request.setName('mygeneric');
+ * request.setCommand(Struct.fromJavaScript({ foo: 'bar' }));
+ *
+ * client.genericService.doCommand(
+ *   request,
+ *   new grpc.Metadata(),
+ *   (error, response) => {
+ *     // do something with error or response
+ *   }
+ * );
+ * ```
  *
  * @alpha
  * @group Raw Protobufs
