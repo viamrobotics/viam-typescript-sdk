@@ -179,7 +179,7 @@ export { type Stream, StreamClient } from './extra/stream';
 export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
 
 /**
- * Raw Protobuf interfaces for a Generic service.
+ * Raw Protobuf interfaces for a Generic component.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
