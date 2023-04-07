@@ -45,7 +45,11 @@ abstract class ServiceClient {
   constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
-/** A gRPC-web client for the Robot component. */
+/**
+ * A gRPC-web client for a Robot.
+ *
+ * @group Clients
+ */
 export class RobotClient implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;

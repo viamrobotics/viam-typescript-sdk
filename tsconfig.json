@@ -41,7 +41,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "src/**/*.vue"
+    "*.cjs"
   ],
   "references": [
     {

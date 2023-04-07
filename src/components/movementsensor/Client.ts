@@ -7,7 +7,11 @@ import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify, decodeVector3D } from '../../utils';
 
-/** A gRPC-web client for the MovementSensor component. */
+/**
+ * A gRPC-web client for the MovementSensor component.
+ *
+ * @group Clients
+ */
 export class MovementSensorClient implements MovementSensor {
   private client: MovementSensorServiceClient;
   private sensorclient: SensorClient;

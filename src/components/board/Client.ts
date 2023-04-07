@@ -8,7 +8,11 @@ import type { Options } from '../../types';
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify } from '../../utils';
 
-/** A gRPC-web client for the Board component. */
+/**
+ * A gRPC-web client for the Board component.
+ *
+ * @group Clients
+ */
 export class BoardClient implements Board {
   private client: BoardServiceClient;
   private readonly name: string;
