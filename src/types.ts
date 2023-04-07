@@ -17,13 +17,3 @@ export interface Orientation {
 export interface Options {
   requestLogger?: (req: unknown) => void;
 }
-
-export interface Pose {
-  x: number;
-  y: number;
-  z: number;
-  ox: number;
-  oy: number;
-  oz: number;
-  theta: number;
-}
