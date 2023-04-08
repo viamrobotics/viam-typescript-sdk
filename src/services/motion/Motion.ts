@@ -22,10 +22,10 @@ export interface Motion {
    * @param constraints - Constrain the way the robot will move.
    */
   move: (
-    destination: common.PoseInFrame,
-    componentName: common.ResourceName,
-    worldState?: common.WorldState,
-    constraints?: pb.Constraints,
+    destination: common.PoseInFrame.AsObject,
+    componentName: common.ResourceName.AsObject,
+    worldState?: common.WorldState.AsObject,
+    constraints?: pb.Constraints.AsObject,
     extra?: Extra
   ) => Promise<boolean>;
 
@@ -38,9 +38,9 @@ export interface Motion {
    *   is requested
    */
   moveOnMap: (
-    destination: common.Pose,
-    componentName: common.ResourceName,
-    slamServiceName: common.ResourceName,
+    destination: common.Pose.AsObject,
+    componentName: common.ResourceName.AsObject,
+    slamServiceName: common.ResourceName.AsObject,
     extra?: Extra
   ) => Promise<boolean>;
 
@@ -54,9 +54,9 @@ export interface Motion {
    *   additional transforms to add to it for the duration of the Move.
    */
   moveSingleComponent: (
-    destination: common.PoseInFrame,
-    componentName: common.ResourceName,
-    worldState?: common.WorldState,
+    destination: common.PoseInFrame.AsObject,
+    componentName: common.ResourceName.AsObject,
+    worldState?: common.WorldState.AsObject,
     extra?: Extra
   ) => Promise<boolean>;
 
@@ -69,9 +69,9 @@ export interface Motion {
    *   reference frames that are needed to compute the component's pose.
    */
   getPose: (
-    componentName: common.ResourceName,
+    componentName: common.ResourceName.AsObject,
     destinationFrame: string,
-    supplementalTransforms: common.Transform[],
+    supplementalTransforms: common.Transform.AsObject[],
     extra?: Extra
-  ) => Promise<common.PoseInFrame>;
+  ) => Promise<common.PoseInFrame.AsObject>;
 }

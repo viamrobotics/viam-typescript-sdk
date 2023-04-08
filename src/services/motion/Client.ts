@@ -1,12 +1,70 @@
 import type { RobotClient } from '../../robot';
 import { MotionServiceClient } from '../../gen/service/motion/v1/motion_pb_service';
 import type { Options } from '../../types';
-import { promisify } from '../../utils';
+import {
+  promisify,
+  encodeResourceName,
+  encodePose,
+  encodePoseInFrame,
+  encodeWorldState,
+  encodeTransform,
+} from '../../utils';
 import type { Motion } from './Motion';
 
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import common from '../../gen/common/v1/common_pb';
 import pb from '../../gen/service/motion/v1/motion_pb';
+
+const encodeLinearConstraint = (
+  obj: pb.LinearConstraint.AsObject
+): pb.LinearConstraint => {
+  const result = new pb.LinearConstraint();
+  result.setLineToleranceMm(obj.lineToleranceMm);
+  result.setOrientationToleranceDegs(obj.orientationToleranceDegs);
+  return result;
+};
+
+const encodeOrientationConstraint = (
+  obj: pb.OrientationConstraint.AsObject
+): pb.OrientationConstraint => {
+  const result = new pb.OrientationConstraint();
+  result.setOrientationToleranceDegs(obj.orientationToleranceDegs);
+  return result;
+};
+
+const encodeAllowedFrameCollisions = (
+  obj: pb.CollisionSpecification.AllowedFrameCollisions.AsObject
+): pb.CollisionSpecification.AllowedFrameCollisions => {
+  const result = new pb.CollisionSpecification.AllowedFrameCollisions();
+  result.setFrame1(obj.frame1);
+  result.setFrame2(obj.frame2);
+  return result;
+};
+
+const encodeCollisionSpecification = (
+  obj: pb.CollisionSpecification.AsObject
+): pb.CollisionSpecification => {
+  const result = new pb.CollisionSpecification();
+  result.setAllowsList(obj.allowsList.map(encodeAllowedFrameCollisions));
+  return result;
+};
+
+/** Convert a Constraints object to a Protobuf Datatype. */
+const encodeConstraints = (obj: pb.Constraints.AsObject): pb.Constraints => {
+  const result = new pb.Constraints();
+
+  result.setLinearConstraintList(
+    obj.linearConstraintList.map(encodeLinearConstraint)
+  );
+  result.setOrientationConstraintList(
+    obj.orientationConstraintList.map(encodeOrientationConstraint)
+  );
+  result.setCollisionSpecificationList(
+    obj.collisionSpecificationList.map(encodeCollisionSpecification)
+  );
+
+  return result;
+};
 
 export class MotionClient implements Motion {
   private client: MotionServiceClient;
@@ -24,23 +82,23 @@ export class MotionClient implements Motion {
   }
 
   async move(
-    destination: common.PoseInFrame,
-    componentName: common.ResourceName,
-    worldState?: common.WorldState,
-    constraints?: pb.Constraints,
+    destination: common.PoseInFrame.AsObject,
+    componentName: common.ResourceName.AsObject,
+    worldState?: common.WorldState.AsObject,
+    constraints?: pb.Constraints.AsObject,
     extra = {}
   ) {
     const service = this.service;
 
     const request = new pb.MoveRequest();
     request.setName(this.name);
-    request.setDestination(destination);
-    request.setComponentName(componentName);
+    request.setDestination(encodePoseInFrame(destination));
+    request.setComponentName(encodeResourceName(componentName));
     if (worldState !== undefined) {
-      request.setWorldState(worldState);
+      request.setWorldState(encodeWorldState(worldState));
     }
     if (constraints !== undefined) {
-      request.setConstraints(constraints);
+      request.setConstraints(encodeConstraints(constraints));
     }
     request.setExtra(Struct.fromJavaScript(extra));
 
@@ -55,18 +113,18 @@ export class MotionClient implements Motion {
   }
 
   async moveOnMap(
-    destination: common.Pose,
-    componentName: common.ResourceName,
-    slamServiceName: common.ResourceName,
+    destination: common.Pose.AsObject,
+    componentName: common.ResourceName.AsObject,
+    slamServiceName: common.ResourceName.AsObject,
     extra = {}
   ) {
     const service = this.service;
 
     const request = new pb.MoveOnMapRequest();
     request.setName(this.name);
-    request.setDestination(destination);
-    request.setComponentName(componentName);
-    request.setSlamServiceName(slamServiceName);
+    request.setDestination(encodePose(destination));
+    request.setComponentName(encodeResourceName(componentName));
+    request.setSlamServiceName(encodeResourceName(slamServiceName));
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -80,19 +138,19 @@ export class MotionClient implements Motion {
   }
 
   async moveSingleComponent(
-    destination: common.PoseInFrame,
-    componentName: common.ResourceName,
-    worldState?: common.WorldState,
+    destination: common.PoseInFrame.AsObject,
+    componentName: common.ResourceName.AsObject,
+    worldState?: common.WorldState.AsObject,
     extra = {}
   ) {
     const service = this.service;
 
     const request = new pb.MoveSingleComponentRequest();
     request.setName(this.name);
-    request.setDestination(destination);
-    request.setComponentName(componentName);
+    request.setDestination(encodePoseInFrame(destination));
+    request.setComponentName(encodeResourceName(componentName));
     if (worldState !== undefined) {
-      request.setWorldState(worldState);
+      request.setWorldState(encodeWorldState(worldState));
     }
     request.setExtra(Struct.fromJavaScript(extra));
 
@@ -107,18 +165,20 @@ export class MotionClient implements Motion {
   }
 
   async getPose(
-    componentName: common.ResourceName,
+    componentName: common.ResourceName.AsObject,
     destinationFrame: string,
-    supplementalTransforms: common.Transform[],
+    supplementalTransforms: common.Transform.AsObject[],
     extra = {}
   ) {
     const service = this.service;
 
     const request = new pb.GetPoseRequest();
     request.setName(this.name);
-    request.setComponentName(componentName);
+    request.setComponentName(encodeResourceName(componentName));
     request.setDestinationFrame(destinationFrame);
-    request.setSupplementalTransformsList(supplementalTransforms);
+    request.setSupplementalTransformsList(
+      supplementalTransforms.map(encodeTransform)
+    );
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -134,6 +194,6 @@ export class MotionClient implements Motion {
       throw new Error('no pose');
     }
 
-    return result;
+    return result.toObject();
   }
 }

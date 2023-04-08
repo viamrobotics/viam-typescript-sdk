@@ -3,7 +3,7 @@ import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/arm/v1/arm_pb';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
 import type { Options } from '../../types';
-import { promisify } from '../../utils';
+import { promisify, encodePose } from '../../utils';
 import type { Arm } from './Arm';
 import { Pose } from '../../gen/common/v1/common_pb';
 
@@ -50,18 +50,9 @@ export class ArmClient implements Arm {
   async moveToPosition(pose: Pose.AsObject, extra = {}) {
     const armService = this.ArmService;
 
-    const pbPose = new Pose();
-    pbPose.setX(pose.x);
-    pbPose.setY(pose.y);
-    pbPose.setZ(pose.z);
-    pbPose.setOX(pose.oX);
-    pbPose.setOY(pose.oY);
-    pbPose.setOZ(pose.oZ);
-    pbPose.setTheta(pose.theta);
-
     const request = new pb.MoveToPositionRequest();
     request.setName(this.name);
-    request.setTo(pbPose);
+    request.setTo(encodePose(pose));
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
