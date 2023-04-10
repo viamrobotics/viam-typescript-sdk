@@ -14,6 +14,11 @@ const getValidSDPTrackName = function (name: string) {
   return name.replaceAll(':', '+');
 };
 
+/**
+ * A gRPC-web client for a Stream.
+ *
+ * @group Clients
+ */
 export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;

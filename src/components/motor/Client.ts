@@ -6,7 +6,11 @@ import type { Options } from '../../types';
 import motorApi from '../../gen/component/motor/v1/motor_pb';
 import { promisify } from '../../utils';
 
-/** A gRPC-web client for the Motor component. */
+/**
+ * A gRPC-web client for the Motor component.
+ *
+ * @group Clients
+ */
 export class MotorClient implements Motor {
   private client: MotorServiceClient;
   private readonly name: string;
