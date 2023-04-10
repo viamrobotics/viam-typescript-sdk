@@ -1,6 +1,6 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.40-alpha.3",
+  "version": "0.0.40-alpha.2",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
