@@ -21,6 +21,10 @@ module.exports = {
     ],
   },
   rules: {
+    // TODO(mc, 2023-04-10): remove overrides when https://github.com/viamrobotics/js-config/pull/7 merged
+    'no-underscore-dangle': ['error', { allow: ['__VERSION__'] }],
+    'sonarjs/cognitive-complexity': ['error', 20],
+
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
     curly: 'warn',
     'func-names': 'warn',
@@ -68,4 +72,13 @@ module.exports = {
     'unicorn/prefer-export-from': 'warn',
     'unicorn/prefer-optional-catch-binding': 'warn',
   },
+  overrides: [
+    // TODO(mc, 2023-04-10): remove overrides when https://github.com/viamrobotics/js-config/pull/7 merged
+    {
+      files: ['**/vite.config.ts', '**/vitest.config.ts'],
+      rules: {
+        'unicorn/prefer-module': 'off',
+      },
+    },
+  ],
 };

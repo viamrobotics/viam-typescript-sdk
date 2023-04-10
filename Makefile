@@ -20,11 +20,11 @@ build: build-buf build-js
 clean: clean-js clean-buf
 
 .PHONY: test
-test: $(node_modules) build
+test: $(node_modules) build-buf
 	npm run test
 
 .PHONY: lint
-lint: $(node_modules) build
+lint: $(node_modules) build-buf
 	npm run lint
 	npm run typecheck
 	npm run check

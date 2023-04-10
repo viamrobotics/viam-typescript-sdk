@@ -35,7 +35,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "concurrently -g npm:typecheck:*",
-    "typecheck:src": "tsc  --noEmit",
+    "typecheck:src": "tsc  --noEmit --emitDeclarationOnly false",
     "typecheck:node": "tsc --project tsconfig.node.json",
     "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}' --quiet",
     "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
