@@ -15,7 +15,6 @@ teardown:
 
 .PHONY: build
 build: build-buf build-js
-	npm run copy-dts
 
 .PHONY: clean
 clean: clean-js clean-buf
