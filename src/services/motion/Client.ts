@@ -138,7 +138,7 @@ export class MotionClient implements Motion {
     request.setComponentName(encodeResourceName(componentName));
     request.setDestinationFrame(destinationFrame);
     request.setSupplementalTransformsList(
-      supplementalTransforms.map(encodeTransform)
+      supplementalTransforms.map((x) => encodeTransform(x))
     );
     request.setExtra(Struct.fromJavaScript(extra));
 
