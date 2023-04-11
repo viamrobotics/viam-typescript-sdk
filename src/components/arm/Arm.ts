@@ -1,19 +1,18 @@
 import type { JointPositions } from '../../gen/component/arm/v1/arm_pb';
 
-import type { Extra } from '../../types';
-import { Pose } from '../../gen/common/v1/common_pb';
+import type { Extra, Pose } from '../../types';
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm {
   /** Get the position of the end of the arm expressed as a pose */
-  getEndPosition: (extra?: Extra) => Promise<Pose.AsObject>;
+  getEndPosition: (extra?: Extra) => Promise<Pose>;
 
   /**
    * Move the end of the arm to the pose.
    *
    * @param pose - The destination pose for the arm.
    */
-  moveToPosition: (pose: Pose.AsObject, extra?: Extra) => Promise<void>;
+  moveToPosition: (pose: Pose, extra?: Extra) => Promise<void>;
 
   /**
    * Move each joint of the arm based on the angles on the joint poisitons.
