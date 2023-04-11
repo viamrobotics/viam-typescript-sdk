@@ -1,7 +1,15 @@
-import common from '../../gen/common/v1/common_pb';
 import pb from '../../gen/service/motion/v1/motion_pb';
 
-import type { Extra } from '../../types';
+import type {
+  Extra,
+  Pose,
+  PoseInFrame,
+  ResourceName,
+  Transform,
+  WorldState,
+} from '../../types';
+
+export type Constraints = pb.Constraints.AsObject;
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -22,10 +30,10 @@ export interface Motion {
    * @param constraints - Constrain the way the robot will move.
    */
   move: (
-    destination: common.PoseInFrame.AsObject,
-    componentName: common.ResourceName.AsObject,
-    worldState?: common.WorldState.AsObject,
-    constraints?: pb.Constraints.AsObject,
+    destination: PoseInFrame,
+    componentName: ResourceName,
+    worldState?: WorldState,
+    constraints?: Constraints,
     extra?: Extra
   ) => Promise<boolean>;
 
@@ -38,9 +46,9 @@ export interface Motion {
    *   is requested
    */
   moveOnMap: (
-    destination: common.Pose.AsObject,
-    componentName: common.ResourceName.AsObject,
-    slamServiceName: common.ResourceName.AsObject,
+    destination: Pose,
+    componentName: ResourceName,
+    slamServiceName: ResourceName,
     extra?: Extra
   ) => Promise<boolean>;
 
@@ -54,9 +62,9 @@ export interface Motion {
    *   additional transforms to add to it for the duration of the Move.
    */
   moveSingleComponent: (
-    destination: common.PoseInFrame.AsObject,
-    componentName: common.ResourceName.AsObject,
-    worldState?: common.WorldState.AsObject,
+    destination: PoseInFrame,
+    componentName: ResourceName,
+    worldState?: WorldState,
     extra?: Extra
   ) => Promise<boolean>;
 
@@ -69,9 +77,9 @@ export interface Motion {
    *   reference frames that are needed to compute the component's pose.
    */
   getPose: (
-    componentName: common.ResourceName.AsObject,
+    componentName: ResourceName,
     destinationFrame: string,
-    supplementalTransforms: common.Transform.AsObject[],
+    supplementalTransforms: Transform[],
     extra?: Extra
-  ) => Promise<common.PoseInFrame.AsObject>;
+  ) => Promise<PoseInFrame>;
 }

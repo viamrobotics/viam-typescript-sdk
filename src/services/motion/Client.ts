@@ -15,6 +15,14 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import common from '../../gen/common/v1/common_pb';
 import pb from '../../gen/service/motion/v1/motion_pb';
 
+import type {
+  Pose,
+  PoseInFrame,
+  ResourceName,
+  Transform,
+  WorldState,
+} from '../../types';
+
 const encodeLinearConstraint = (
   obj: pb.LinearConstraint.AsObject
 ): pb.LinearConstraint => {
