@@ -1,6 +1,6 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
@@ -22,8 +22,9 @@
     }
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && npm run copy-dts",
     "check": "npm-check --production",
+    "copy-dts": "copyfiles -u 1 \"src/**/*.d.ts\" dist",
     "doc": "typedoc",
     "doc:watch": "typedoc --watch",
     "format": "prettier --write './src/**/*.{ts,js}'",
@@ -52,6 +53,7 @@
     "@types/google-protobuf": "^3.15.6",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-tsdoc": "^0.2.17",

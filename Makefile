@@ -68,6 +68,6 @@ build-js: $(node_modules) clean-js build-buf
 
 # build and create a tarball from a package - useful for local testing,
 # inspecting what is included in the final distribution, and local publishing.
-.PHONY: pack-js
-pack-js: build-js
+.PHONY: pack
+pack: build
 	npm pack
