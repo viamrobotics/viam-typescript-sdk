@@ -8,7 +8,11 @@ import { promisify } from '../../utils';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
 
-/** A gRPC-web client for the Camera component. */
+/**
+ * A gRPC-web client for the Camera component.
+ *
+ * @group Clients
+ */
 export class CameraClient implements Camera {
   private client: CameraServiceClient;
   private readonly name: string;

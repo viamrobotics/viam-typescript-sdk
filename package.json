@@ -1,6 +1,6 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.35",
+  "version": "0.0.41",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
@@ -22,9 +22,11 @@
     }
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && npm run copy-dts",
     "check": "npm-check --production",
+    "copy-dts": "copyfiles -u 1 \"src/**/*.d.ts\" dist",
     "doc": "typedoc",
+    "doc:watch": "typedoc --watch",
     "format": "prettier --write './src/**/*.{ts,js}'",
     "lint:prettier": "prettier --check './src/**/*.{ts,js}'",
     "lint:eslint": "eslint './src/**/*.{ts,js}' --fix",
@@ -45,13 +47,16 @@
     "@viamrobotics/rpc": "^0.1.34"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.15.0-1",
     "@improbable-eng/grpc-web": "^0.15.0",
     "@improbable-eng/grpc-web-fake-transport": "^0.15.0",
     "@types/google-protobuf": "^3.15.6",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-tsdoc": "^0.2.17",
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.2",
     "happy-dom": "^8.2.6",

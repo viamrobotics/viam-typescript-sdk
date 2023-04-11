@@ -7,7 +7,11 @@ import { promisify } from '../../utils';
 import type { Arm } from './Arm';
 import commonPB from '../../gen/common/v1/common_pb';
 
-/** A gRPC-web client for the Arm component. */
+/**
+ * A gRPC-web client for the Arm component.
+ *
+ * @group Clients
+ */
 export class ArmClient implements Arm {
   private client: ArmServiceClient;
   private readonly name: string;
@@ -51,7 +55,7 @@ export class ArmClient implements Arm {
     };
   }
 
-  async moveToPosition(pose: Pose, world?: commonPB.WorldState, extra = {}) {
+  async moveToPosition(pose: Pose, extra = {}) {
     const armService = this.ArmService;
 
     const pbPose = new commonPB.Pose();
@@ -66,7 +70,6 @@ export class ArmClient implements Arm {
     const request = new pb.MoveToPositionRequest();
     request.setName(this.name);
     request.setTo(pbPose);
-    request.setWorldState(world);
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -126,7 +129,7 @@ export class ArmClient implements Arm {
     this.options.requestLogger?.(request);
 
     await promisify<pb.StopRequest, pb.StopResponse>(
-      armService.getJointPositions.bind(armService),
+      armService.stop.bind(armService),
       request
     );
   }

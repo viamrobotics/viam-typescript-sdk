@@ -1,51 +1,73 @@
-BUF_BIN="`pwd`/bin"
-BUF_TARGET?=buf.build/viamrobotics/api --path common,component,robot,service
-NPM_BIN="`pwd`/node_modules/.bin"
-PATH_WITH_TOOLS="${BUF_BIN}:${NPM_BIN}:${PATH}"
+node_modules := $(shell npm root)
+buf := npm exec --offline -- buf
 
-clean-dist:
-	rm -rf dist
+# common targets
 
-install:
-	npm ci --audit=false
+.PHONY: all
+all: clean build lint test
 
-test:
+.PHONY: setup
+setup:  $(node_modules)
+
+.PHONY: teardown
+teardown:
+	rm -rf node_modules
+
+.PHONY: build
+build: build-buf build-js
+
+.PHONY: clean
+clean: clean-js clean-buf
+
+.PHONY: test
+test: $(node_modules)
 	npm run test
 
-lint: install
+.PHONY: lint
+lint: $(node_modules)
 	npm run lint:prettier
 	npm run lint:eslint
 	npm run typecheck
 	npm run check
 
-format: install
+.PHONY: format
+format: $(node_modules)
 	npm run format
 
-buf-clean:
-	rm -rf src/gen/
+# development dependencies
 
+$(node_modules): package-lock.json
+	npm ci --audit=false
 
-buf-install: buf-clean
-	./etc/install_buf.sh $(BUF_BIN)
+# protobuf targets
 
-buf-update: buf-install
-	PATH=$(PATH_WITH_TOOLS) buf mod update
+.PHONY: clean-buf
+clean-buf:
+	rm -rf src/gen
 
-buf: install buf-install
-	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/googleapis/googleapis
-	PATH=$(PATH_WITH_TOOLS) buf generate ${BUF_TARGET}
-	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/erdaniels/gostream
-	PATH=$(PATH_WITH_TOOLS) buf generate buf.build/viamrobotics/goutils
+.PHONY: update-buf
+update-buf: $(node_modules)
+	$(buf) mod update
 
-build: clean-dist buf
-	# TODO(RSDK-870): try removing the custom `--max-old-space-size` option
-	# once we migrate to protobuf-es, since that generator should produce
-	# much smaller javascript bundles.
-	NODE_OPTIONS="--max-old-space-size=16384" npm run build
+.PHONY: build-buf
+build-buf: $(node_modules) clean-buf
+	$(buf) generate buf.build/googleapis/googleapis
+	$(buf) generate buf.build/viamrobotics/api --path common,component,robot,service
+	$(buf) generate buf.build/erdaniels/gostream
+	$(buf) generate buf.build/viamrobotics/goutils
 
-# LOCAL DEVELOPMENT HELPERS
+# js targets
+
+.PHONY: clean-js
+clean-js:
+	rm -rf dist
+
+.PHONY: build-js
+build-js: $(node_modules) clean-js build-buf
+	npm run build
 
 # build and create a tarball from a package - useful for local testing,
 # inspecting what is included in the final distribution, and local publishing.
+.PHONY: pack
 pack: build
 	npm pack

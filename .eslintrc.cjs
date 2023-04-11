@@ -27,6 +27,7 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    "eslint-plugin-tsdoc",
   ],
   root: true,
   rules: {

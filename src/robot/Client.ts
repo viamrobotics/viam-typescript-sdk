@@ -45,7 +45,11 @@ abstract class ServiceClient {
   constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
-/** A gRPC-web client for the Robot component. */
+/**
+ * A gRPC-web client for a Robot.
+ *
+ * @group Clients
+ */
 export class RobotClient implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;
@@ -325,8 +329,6 @@ export class RobotClient implements Robot {
         this.transportFactory = webRTCConn.transportFactory;
 
         webRTCConn.peerConnection.ontrack = (event) => {
-          const { kind } = event.track;
-
           const eventStream = event.streams[0];
           if (!eventStream) {
             events.emit('track', event);
@@ -343,48 +345,6 @@ export class RobotClient implements Robot {
             value: resName,
           });
           events.emit('track', event);
-          const streamName = eventStream.id;
-          const streamContainers = document.querySelectorAll(
-            `[data-stream="${streamName}"]`
-          );
-
-          for (const streamContainer of streamContainers) {
-            const mediaElement = document.createElement(kind) as
-              | HTMLAudioElement
-              | HTMLVideoElement;
-            mediaElement.srcObject = eventStream;
-            mediaElement.autoplay = true;
-            if (mediaElement instanceof HTMLVideoElement) {
-              mediaElement.playsInline = true;
-              mediaElement.controls = false;
-            } else {
-              mediaElement.controls = true;
-            }
-
-            const child = streamContainer.querySelector(kind);
-            child?.remove();
-            streamContainer.append(mediaElement);
-          }
-
-          const streamPreviewContainers = document.querySelectorAll(
-            `[data-stream-preview="${streamName}"]`
-          );
-          for (const streamContainer of streamPreviewContainers) {
-            const mediaElementPreview = document.createElement(kind) as
-              | HTMLAudioElement
-              | HTMLVideoElement;
-            mediaElementPreview.srcObject = eventStream;
-            mediaElementPreview.autoplay = true;
-            if (mediaElementPreview instanceof HTMLVideoElement) {
-              mediaElementPreview.playsInline = true;
-              mediaElementPreview.controls = false;
-            } else {
-              mediaElementPreview.controls = true;
-            }
-            const child = streamContainer.querySelector(kind);
-            child?.remove();
-            streamContainer.append(mediaElementPreview);
-          }
         };
       } else {
         this.transportFactory = await dialDirect(this.serviceHost, opts);
