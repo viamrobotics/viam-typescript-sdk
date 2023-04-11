@@ -4,7 +4,7 @@
   "description": "An example tele-operation application using @viamrobotics/sdk",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "start": "vite dev",
     "build": "vite build",
     "test": "vitest",
     "test-once": "vitest --run",
