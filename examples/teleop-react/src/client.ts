@@ -58,15 +58,15 @@ export const getStream = async (
       const stream = event.streams[0];
 
       if (!stream) {
-        streamClient.off('track', handleTrack);
+        streamClient.off('track', handleTrack as (args: unknown) => void);
         reject(new Error('Recieved track event with no streams'));
       } else if (stream.id === name) {
-        streamClient.off('track', handleTrack);
+        streamClient.off('track', handleTrack as (args: unknown) => void);
         resolve(stream);
       }
     };
 
-    streamClient.on('track', handleTrack);
+    streamClient.on('track', handleTrack as (args: unknown) => void);
   });
 
   await streamClient.add(name);
