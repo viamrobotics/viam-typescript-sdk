@@ -2,10 +2,9 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/arm/v1/arm_pb';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
-import type { Options } from '../../types';
+import type { Options, Pose } from '../../types';
 import { promisify, encodePose } from '../../utils';
 import type { Arm } from './Arm';
-import { Pose } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -47,7 +46,7 @@ export class ArmClient implements Arm {
     return result.toObject();
   }
 
-  async moveToPosition(pose: Pose.AsObject, extra = {}) {
+  async moveToPosition(pose: Pose, extra = {}) {
     const armService = this.ArmService;
 
     const request = new pb.MoveToPositionRequest();
