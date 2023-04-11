@@ -1,5 +1,5 @@
-import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import { grpc } from '@improbable-eng/grpc-web';
+import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import common from './gen/common/v1/common_pb';
 import type { Vector3D } from './types';
 
@@ -129,7 +129,7 @@ const encodeGeometriesInFrame = (
 ): common.GeometriesInFrame => {
   const result = new common.GeometriesInFrame();
   result.setReferenceFrame(obj.referenceFrame);
-  result.setGeometriesList(obj.geometriesList.map(encodeGeometry));
+  result.setGeometriesList(obj.geometriesList.map((x) => encodeGeometry(x)));
   return result;
 };
 
@@ -154,8 +154,10 @@ export const encodeWorldState = (
 ): common.WorldState => {
   const result = new common.WorldState();
 
-  result.setObstaclesList(obj.obstaclesList.map(encodeGeometriesInFrame));
-  result.setTransformsList(obj.transformsList.map(encodeTransform));
+  result.setObstaclesList(
+    obj.obstaclesList.map((x) => encodeGeometriesInFrame(x))
+  );
+  result.setTransformsList(obj.transformsList.map((x) => encodeTransform(x)));
 
   return result;
 };

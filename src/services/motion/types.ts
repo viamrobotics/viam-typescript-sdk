@@ -32,7 +32,9 @@ const encodeCollisionSpecification = (
   obj: pb.CollisionSpecification.AsObject
 ): pb.CollisionSpecification => {
   const result = new pb.CollisionSpecification();
-  result.setAllowsList(obj.allowsList.map(encodeAllowedFrameCollisions));
+  result.setAllowsList(
+    obj.allowsList.map((x) => encodeAllowedFrameCollisions(x))
+  );
   return result;
 };
 
@@ -41,13 +43,13 @@ export const encodeConstraints = (obj: MotionConstraints): pb.Constraints => {
   const result = new pb.Constraints();
 
   result.setLinearConstraintList(
-    obj.linearConstraintList.map(encodeLinearConstraint)
+    obj.linearConstraintList.map((x) => encodeLinearConstraint(x))
   );
   result.setOrientationConstraintList(
-    obj.orientationConstraintList.map(encodeOrientationConstraint)
+    obj.orientationConstraintList.map((x) => encodeOrientationConstraint(x))
   );
   result.setCollisionSpecificationList(
-    obj.collisionSpecificationList.map(encodeCollisionSpecification)
+    obj.collisionSpecificationList.map((x) => encodeCollisionSpecification(x))
   );
 
   return result;
