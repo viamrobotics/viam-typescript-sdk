@@ -9,7 +9,7 @@ module.exports = {
     'docs',
     /*
      * TODO(mc, 2023-04-06): something about nested node_modules in examples
-     * is causing eslint to choke. See if this behaves better with pnpm
+     * is causing eslint to choke. Investigate workspaces as a solution
      */
     'examples',
   ],

@@ -11,7 +11,7 @@ setup:  $(node_modules)
 
 .PHONY: teardown
 teardown:
-	rm -rf node_modules
+	rm -rf node_modules examples/*/node_modules examples/*/elm-stuff
 
 .PHONY: build
 build: build-buf build-js
