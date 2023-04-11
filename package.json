@@ -13,6 +13,7 @@
     "dist/services/**/*.d.ts",
     "dist/extra/**/*.d.ts",
     "dist/main.*",
+    "dist/types.d.ts",
     "dist/gen/**/*.esm.d.ts",
     "dist/gen/**/*.d.ts"
   ],

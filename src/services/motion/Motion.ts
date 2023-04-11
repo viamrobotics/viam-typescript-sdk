@@ -1,5 +1,3 @@
-import pb from '../../gen/service/motion/v1/motion_pb';
-
 import type {
   Extra,
   Pose,
@@ -8,8 +6,7 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-
-export type Constraints = pb.Constraints.AsObject;
+import type { MotionConstraints } from './types';
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -33,7 +30,7 @@ export interface Motion {
     destination: PoseInFrame,
     componentName: ResourceName,
     worldState?: WorldState,
-    constraints?: Constraints,
+    constraints?: MotionConstraints,
     extra?: Extra
   ) => Promise<boolean>;
 

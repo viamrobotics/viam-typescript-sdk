@@ -1,6 +1,14 @@
 import type { RobotClient } from '../../robot';
 import { MotionServiceClient } from '../../gen/service/motion/v1/motion_pb_service';
-import type { Options } from '../../types';
+import type {
+  Options,
+  Pose,
+  PoseInFrame,
+  ResourceName,
+  Transform,
+  WorldState,
+} from '../../types';
+import { type MotionConstraints, encodeConstraints } from './types';
 import {
   promisify,
   encodeResourceName,
@@ -12,67 +20,7 @@ import {
 import type { Motion } from './Motion';
 
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
-import common from '../../gen/common/v1/common_pb';
 import pb from '../../gen/service/motion/v1/motion_pb';
-
-import type {
-  Pose,
-  PoseInFrame,
-  ResourceName,
-  Transform,
-  WorldState,
-} from '../../types';
-
-const encodeLinearConstraint = (
-  obj: pb.LinearConstraint.AsObject
-): pb.LinearConstraint => {
-  const result = new pb.LinearConstraint();
-  result.setLineToleranceMm(obj.lineToleranceMm);
-  result.setOrientationToleranceDegs(obj.orientationToleranceDegs);
-  return result;
-};
-
-const encodeOrientationConstraint = (
-  obj: pb.OrientationConstraint.AsObject
-): pb.OrientationConstraint => {
-  const result = new pb.OrientationConstraint();
-  result.setOrientationToleranceDegs(obj.orientationToleranceDegs);
-  return result;
-};
-
-const encodeAllowedFrameCollisions = (
-  obj: pb.CollisionSpecification.AllowedFrameCollisions.AsObject
-): pb.CollisionSpecification.AllowedFrameCollisions => {
-  const result = new pb.CollisionSpecification.AllowedFrameCollisions();
-  result.setFrame1(obj.frame1);
-  result.setFrame2(obj.frame2);
-  return result;
-};
-
-const encodeCollisionSpecification = (
-  obj: pb.CollisionSpecification.AsObject
-): pb.CollisionSpecification => {
-  const result = new pb.CollisionSpecification();
-  result.setAllowsList(obj.allowsList.map(encodeAllowedFrameCollisions));
-  return result;
-};
-
-/** Convert a Constraints object to a Protobuf Datatype. */
-const encodeConstraints = (obj: pb.Constraints.AsObject): pb.Constraints => {
-  const result = new pb.Constraints();
-
-  result.setLinearConstraintList(
-    obj.linearConstraintList.map(encodeLinearConstraint)
-  );
-  result.setOrientationConstraintList(
-    obj.orientationConstraintList.map(encodeOrientationConstraint)
-  );
-  result.setCollisionSpecificationList(
-    obj.collisionSpecificationList.map(encodeCollisionSpecification)
-  );
-
-  return result;
-};
 
 export class MotionClient implements Motion {
   private client: MotionServiceClient;
@@ -90,10 +38,10 @@ export class MotionClient implements Motion {
   }
 
   async move(
-    destination: common.PoseInFrame.AsObject,
-    componentName: common.ResourceName.AsObject,
-    worldState?: common.WorldState.AsObject,
-    constraints?: pb.Constraints.AsObject,
+    destination: PoseInFrame,
+    componentName: ResourceName,
+    worldState?: WorldState,
+    constraints?: MotionConstraints,
     extra = {}
   ) {
     const service = this.service;
@@ -121,9 +69,9 @@ export class MotionClient implements Motion {
   }
 
   async moveOnMap(
-    destination: common.Pose.AsObject,
-    componentName: common.ResourceName.AsObject,
-    slamServiceName: common.ResourceName.AsObject,
+    destination: Pose,
+    componentName: ResourceName,
+    slamServiceName: ResourceName,
     extra = {}
   ) {
     const service = this.service;
@@ -146,9 +94,9 @@ export class MotionClient implements Motion {
   }
 
   async moveSingleComponent(
-    destination: common.PoseInFrame.AsObject,
-    componentName: common.ResourceName.AsObject,
-    worldState?: common.WorldState.AsObject,
+    destination: PoseInFrame,
+    componentName: ResourceName,
+    worldState?: WorldState,
     extra = {}
   ) {
     const service = this.service;
@@ -173,9 +121,9 @@ export class MotionClient implements Motion {
   }
 
   async getPose(
-    componentName: common.ResourceName.AsObject,
+    componentName: ResourceName,
     destinationFrame: string,
-    supplementalTransforms: common.Transform.AsObject[],
+    supplementalTransforms: Transform[],
     extra = {}
   ) {
     const service = this.service;

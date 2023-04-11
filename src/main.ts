@@ -277,7 +277,11 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
  * @group Raw Protobufs
  */
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
-export { type Motion, MotionClient } from './services/motion';
+export {
+  type Motion,
+  type MotionConstraints,
+  MotionClient,
+} from './services/motion';
 
 /**
  * Raw Protobuf interfaces for a Navigation service.
