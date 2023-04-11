@@ -6,4 +6,5 @@ module.exports = {
   out: 'docs',
   name: 'Viam Typescript SDK',
   readme: 'none',
+  customCss: './docs.css',
 };
