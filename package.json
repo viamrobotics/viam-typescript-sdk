@@ -17,7 +17,7 @@
   "scripts": {
     "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
     "build:bundle": "vite build",
-    "build:types": "tsc",
+    "build:types": "tsc --project tsconfig.build.json",
     "build:copy-dts": "copyfiles -u 1 \"src/gen/**/*.d.ts\" dist",
     "check": "npm-check --production",
     "doc": "typedoc",
@@ -29,7 +29,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "concurrently -g npm:typecheck:*",
-    "typecheck:src": "tsc  --noEmit --emitDeclarationOnly false",
+    "typecheck:src": "tsc",
     "typecheck:node": "tsc --project tsconfig.node.json",
     "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}' --quiet",
     "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
