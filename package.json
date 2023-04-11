@@ -26,8 +26,8 @@
     "lint": "concurrently -g npm:lint:*",
     "lint:prettier": "npm run _prettier -- --check",
     "lint:eslint": "npm run _eslint",
-    "test": "vitest run src",
-    "test:watch": "vitest src",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "concurrently -g npm:typecheck:*",
     "typecheck:src": "tsc",
     "typecheck:node": "tsc --project tsconfig.node.json",
@@ -71,6 +71,6 @@
     "typedoc": "^0.23.28",
     "typescript": "^5.0.3",
     "vite": "^4.2.1",
-    "vitest": "^0.29.8"
+    "vitest": "^0.28.4"
   }
 }
