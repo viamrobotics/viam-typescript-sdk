@@ -22,6 +22,11 @@ import type { Motion } from './Motion';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import pb from '../../gen/service/motion/v1/motion_pb';
 
+/**
+ * A gRPC-web client for a Motion service.
+ *
+ * @group Clients
+ */
 export class MotionClient implements Motion {
   private client: MotionServiceClient;
   private readonly name: string;
