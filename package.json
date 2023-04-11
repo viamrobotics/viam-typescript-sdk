@@ -1,19 +1,12 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.39",
+  "version": "0.0.41",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "dist/robot.*",
-    "dist/robot/**/*.d.ts",
-    "dist/events.*",
-    "dist/components/**/*.d.ts",
-    "dist/extra/**/*.d.ts",
-    "dist/main.*",
-    "dist/gen/**/*.esm.d.ts",
-    "dist/gen/**/*.d.ts"
+    "dist"
   ],
   "exports": {
     ".": {
@@ -22,9 +15,10 @@
     }
   },
   "scripts": {
-    "build": "npm run build:bundle && npm run build:types",
+    "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
     "build:bundle": "vite build",
     "build:types": "tsc",
+    "build:copy-dts": "copyfiles -u 1 \"src/gen/**/*.d.ts\" dist",
     "check": "npm-check --production",
     "doc": "typedoc",
     "doc:watch": "typedoc --watch",
@@ -63,6 +57,7 @@
     "@viamrobotics/prettier-config": "^0.0.1",
     "@viamrobotics/typescript-config": "^0.0.3",
     "concurrently": "^8.0.1",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-tsdoc": "^0.2.17",
