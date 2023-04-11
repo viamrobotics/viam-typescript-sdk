@@ -23,7 +23,7 @@
     }
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && npm run copy-dts",
     "check": "npm-check --production",
     "copy-dts": "copyfiles -u 1 \"src/**/*.d.ts\" dist",
     "doc": "typedoc",
