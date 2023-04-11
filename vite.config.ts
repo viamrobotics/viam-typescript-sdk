@@ -1,21 +1,18 @@
-import { defineConfig } from 'vite';
 import path from 'node:path';
-import dts from 'vite-plugin-dts';
+import { defineConfig } from 'vite';
+
+import pkg from './package.json';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   define: {
     'process.env.NODE_ENV': '"production"',
+    __VERSION__: JSON.stringify(pkg.version),
   },
-  plugins: [dts()],
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
-      include: [
-        /google-protobuf/,
-        /@improbable-eng\/grpc-web/,
-        /gen\//,
-      ]
+      include: [/google-protobuf/u, /@improbable-eng\/grpc-web/u, /gen\//u],
     },
     minify: true,
     target: 'esnext',
