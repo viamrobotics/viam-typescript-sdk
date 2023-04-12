@@ -84,6 +84,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   return client;
 };
 
+/** Options required to dial a robot. */
 export type DialConf = DialDirectConf | DialWebRTCConf;
 
 const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
@@ -94,7 +95,23 @@ const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
   return !conf.iceServers || conf.iceServers instanceof Array;
 };
 
-export const createRobotClient = async (conf: DialConf): Promise<RobotClient> => {
+/**
+ * Connect to a robot via WebRTC or gRPC and return a RobotClient after
+ * connecting successfully.
+ *
+ * The initial connection method is determined by whether a
+ * {@link DialWebRTCConf} or {@link DialDirectConf} is passed in as the first
+ * argument.
+ *
+ * If connecting via WebRTC fails, then this function will automatically
+ * re-attempt to connect via gRPC directly.
+ *
+ * @privateRemarks
+ * We should add an example that is not viam-specific.
+ */
+export const createRobotClient = async (
+  conf: DialConf
+): Promise<RobotClient> => {
   let client;
 
   // Try to dial via WebRTC first.
