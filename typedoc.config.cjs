@@ -35,4 +35,7 @@ module.exports = {
     'Reference',
     'Namespace',
   ],
+  navigationLinks: {
+    GitHub: 'https://github.com/viamrobotics/viam-typescript-sdk',
+  },
 };
