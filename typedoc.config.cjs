@@ -5,7 +5,6 @@ module.exports = {
   entryPoints: ['./src/main.ts'],
   out: 'docs',
   name: 'Viam Typescript SDK',
-  readme: 'none',
   customCss: './docs.css',
   cname: 'ts.viam.dev',
 };
