@@ -84,9 +84,9 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   return client;
 };
 
-type Conf = DialDirectConf | DialWebRTCConf;
+export type DialConf = DialDirectConf | DialWebRTCConf;
 
-const isDialWebRTCConf = (value: Conf): value is DialWebRTCConf => {
+const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
   const conf = value as DialWebRTCConf;
 
   if (typeof conf.signalingAddress !== 'string') return false;
@@ -94,7 +94,7 @@ const isDialWebRTCConf = (value: Conf): value is DialWebRTCConf => {
   return !conf.iceServers || conf.iceServers instanceof Array;
 };
 
-export const createRobotClient = async (conf: Conf): Promise<RobotClient> => {
+export const createRobotClient = async (conf: DialConf): Promise<RobotClient> => {
   let client;
 
   // Try to dial via WebRTC first.
