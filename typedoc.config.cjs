@@ -3,8 +3,8 @@
 /** @type {import('typedoc').TypeDocOptions} */
 module.exports = {
   entryPoints: ['./src/main.ts'],
-  out: 'docs',
+  out: 'docs/dist',
   name: 'Viam SDK',
-  customCss: './docs.css',
+  customCss: './docs/docs.css',
   cname: 'ts.viam.dev',
 };
