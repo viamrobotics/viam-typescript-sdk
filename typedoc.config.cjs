@@ -7,6 +7,7 @@ module.exports = {
   name: 'Viam SDK',
   customCss: './docs/docs.css',
   cname: 'ts.viam.dev',
+  disableSources: true,
   // see: https://typedoc.org/options/organization/#kindsortorder
   kindSortOrder: [
     'Function',
