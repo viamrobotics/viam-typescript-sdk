@@ -1,7 +1,8 @@
 # Viam TypeScript SDK
 
-[![documentation](https://img.shields.io/static/v1?label=docs&message=ts.viam.dev&color=lightgray)](https://ts.viam.dev)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue)](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@viamrobotics/sdk?color=33cd56&logo=npm)](https://www.npmjs.com/package/@viamrobotics/sdk)
+[![documentation](https://img.shields.io/static/v1?label=docs&message=ts.viam.dev&color=lightgray)](https://ts.viam.dev)
 
 ## (In)stability Notice
 
