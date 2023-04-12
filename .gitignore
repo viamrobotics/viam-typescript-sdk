@@ -110,4 +110,4 @@ src/gen/
 bin/
 
 # typedoc documentation
-docs
+docs/dist

@@ -12,6 +12,7 @@ export const version = __VERSION__;
 export { default as robotApi } from './gen/robot/v1/robot_pb';
 export {
   type Robot,
+  type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
   RobotClient,

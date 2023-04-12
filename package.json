@@ -68,7 +68,7 @@
     "prettier": "^2.8.1",
     "prettier-plugin-jsdoc": "^0.4.2",
     "ts-protoc-gen": "^0.15.0",
-    "typedoc": "^0.23.28",
+    "typedoc": "^0.24.1",
     "typescript": "^5.0.3",
     "vite": "^4.2.1",
     "vitest": "^0.28.4"
