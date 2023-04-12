@@ -22,6 +22,6 @@ npm install --save @viamrobotics/sdk
 [The examples directory](https://github.com/viamrobotics/viam-typescript-sdk/tree/main/examples) contains small apps that demonstrate how to use this SDK to operate a robot running Viam.
 
 ## License 
-Copyright 2022 Viam Inc.
+Copyright 2022-2023 Viam Inc.
 
 Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE) file
