@@ -55,7 +55,10 @@ export class EncoderClient implements Encoder {
     return response.toObject();
   }
 
-  async getPosition(positionType: PositionType = PositionType.POSITION_TYPE_UNSPECIFIED, extra = {}) {
+  async getPosition(
+    positionType: PositionType = PositionType.POSITION_TYPE_UNSPECIFIED,
+    extra = {}
+  ) {
     const encoderService = this.encoderService;
     const request = new encoderApi.GetPositionRequest();
     request.setName(this.name);

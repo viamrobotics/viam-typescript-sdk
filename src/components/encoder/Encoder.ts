@@ -1,7 +1,7 @@
 import type { Extra, PositionType } from '../../types';
 import pb from '../../gen/component/encoder/v1/encoder_pb';
 
-export type EncoderProperties = pb.Properties.AsObject;
+export type EncoderProperties = pb.GetPropertiesResponse.AsObject;
 
 /** Represents a physical encoder. */
 export interface Encoder {
@@ -14,8 +14,9 @@ export interface Encoder {
   /**
    * Return the current position either in relative units (ticks away from a
    * zero position) or absolute units (degrees along a circle).
-   * 
-   * @param positionType - The type of position the encoder returns (ticks or degrees)
+   *
+   * @param positionType - The type of position the encoder returns (ticks or
+   *   degrees)
    */
   getPosition(
     positionType?: PositionType,
