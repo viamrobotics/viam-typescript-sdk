@@ -72,6 +72,18 @@ export { default as cameraApi } from './gen/component/camera/v1/camera_pb';
 export { type Camera, CameraClient } from './components/camera';
 
 /**
+ * Raw Protobuf interfaces for an Encoder component.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link EncoderClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as encoderApi } from './gen/component/encoder/v1/encoder_pb';
+export { type Encoder, EncoderClient } from './components/encoder';
+
+/**
  * Raw Protobuf interfaces for a Motor component.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
