@@ -1,10 +1,7 @@
 import type { Extra, PositionType } from '../../types';
+import pb from '../../gen/component/encoder/v1/encoder_pb';
 
-export interface Properties {
-  /** Whether a encoder supports ticks and/or degrees. */
-  ticksCountSupported: boolean;
-  angleDegreesSupported: boolean;
-}
+export type EncoderProperties = pb.Properties.AsObject;
 
 /** Represents a physical encoder. */
 export interface Encoder {
@@ -12,11 +9,13 @@ export interface Encoder {
   resetPosition(extra?: Extra): Promise<void>;
 
   /** Return the encoder's properties. */
-  getProperties(extra?: Extra): Promise<Properties>;
+  getProperties(extra?: Extra): Promise<EncoderProperties>;
 
   /**
    * Return the current position either in relative units (ticks away from a
    * zero position) or absolute units (degrees along a circle).
+   * 
+   * @param positionType - The type of position the encoder returns (ticks or degrees)
    */
   getPosition(
     positionType?: PositionType,

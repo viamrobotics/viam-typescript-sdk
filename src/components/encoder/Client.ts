@@ -52,21 +52,14 @@ export class EncoderClient implements Encoder {
       encoderApi.GetPropertiesRequest,
       encoderApi.GetPropertiesResponse
     >(encoderService.getProperties.bind(encoderService), request);
-    return {
-      ticksCountSupported: response.getTicksCountSupported(),
-      angleDegreesSupported: response.getAngleDegreesSupported(),
-    };
+    return response.toObject();
   }
 
-  async getPosition(positionType?: PositionType, extra = {}) {
+  async getPosition(positionType: PositionType = PositionType.POSITION_TYPE_UNSPECIFIED, extra = {}) {
     const encoderService = this.encoderService;
     const request = new encoderApi.GetPositionRequest();
     request.setName(this.name);
-    if (positionType === undefined) {
-      request.setPositionType(PositionType.POSITION_TYPE_UNSPECIFIED);
-    } else {
-      request.setPositionType(positionType);
-    }
+    request.setPositionType(positionType);
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);

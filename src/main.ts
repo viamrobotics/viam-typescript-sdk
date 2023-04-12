@@ -81,7 +81,7 @@ export { type Camera, CameraClient } from './components/camera';
  * @group Raw Protobufs
  */
 export { default as encoderApi } from './gen/component/encoder/v1/encoder_pb';
-export { type Encoder, EncoderClient } from './components/encoder';
+export { type Encoder, type EncoderProperties, EncoderClient } from './components/encoder';
 
 /**
  * Raw Protobuf interfaces for a Motor component.
