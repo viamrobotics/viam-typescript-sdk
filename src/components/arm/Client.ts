@@ -3,9 +3,8 @@ import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/arm/v1/arm_pb';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
 import type { Options, Pose } from '../../types';
-import { promisify } from '../../utils';
+import { promisify, encodePose } from '../../utils';
 import type { Arm } from './Arm';
-import commonPB from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -44,32 +43,15 @@ export class ArmClient implements Arm {
     if (!result) {
       throw new Error('no pose');
     }
-    return {
-      x: result.getX(),
-      y: result.getY(),
-      z: result.getZ(),
-      ox: result.getOX(),
-      oy: result.getOY(),
-      oz: result.getOZ(),
-      theta: result.getTheta(),
-    };
+    return result.toObject();
   }
 
   async moveToPosition(pose: Pose, extra = {}) {
     const armService = this.ArmService;
 
-    const pbPose = new commonPB.Pose();
-    pbPose.setX(pose.x);
-    pbPose.setY(pose.y);
-    pbPose.setZ(pose.z);
-    pbPose.setOX(pose.ox);
-    pbPose.setOY(pose.oy);
-    pbPose.setOZ(pose.oz);
-    pbPose.setTheta(pose.theta);
-
     const request = new pb.MoveToPositionRequest();
     request.setName(this.name);
-    request.setTo(pbPose);
+    request.setTo(encodePose(pose));
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
