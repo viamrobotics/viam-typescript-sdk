@@ -58,14 +58,15 @@ export default class SessionTransport implements grpc.Transport {
     this.sessionManager
       .getSessionMetadata()
       .then((md) => {
+        // eslint-disable-next-line unicorn/no-array-for-each
         md.forEach((key: string, values: string | string[]) => {
           metadata.set(key, values);
         });
         this.transport.start(metadata);
         this.mdPromResolve?.();
       })
-      .catch((err) => {
-        this.opts.onEnd(err);
+      .catch((error) => {
+        this.opts.onEnd(error);
       });
   }
 

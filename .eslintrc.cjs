@@ -18,37 +18,13 @@ module.exports = {
   },
   rules: {
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
-    'id-length': [
-      'warn',
-      {
-        exceptions: [
-          '_',
-          'x',
-          'y',
-          'z',
-          'w',
-          'r',
-          'i',
-          'j',
-          'k',
-          'l',
-          'h',
-          'a',
-          'b',
-        ],
-      },
-    ],
-    'prefer-destructuring': 'warn',
+
+    // 'prefer-destructuring': 'warn',
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/no-misused-promises': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
-    'unicorn/no-array-for-each': 'warn',
-    'unicorn/catch-error-name': 'warn',
     'unicorn/filename-case': 'warn',
-    'unicorn/no-instanceof-array': 'warn',
-    'unicorn/no-lonely-if': 'warn',
     'unicorn/prefer-add-event-listener': 'warn',
-    'unicorn/prefer-export-from': 'warn',
   },
 };

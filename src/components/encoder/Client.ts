@@ -27,7 +27,7 @@ export class EncoderClient implements Encoder {
   }
 
   async resetPosition(extra = {}) {
-    const encoderService = this.encoderService;
+    const {encoderService} = this;
     const request = new encoderApi.ResetPositionRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -41,7 +41,7 @@ export class EncoderClient implements Encoder {
   }
 
   async getProperties(extra = {}) {
-    const encoderService = this.encoderService;
+    const {encoderService} = this;
     const request = new encoderApi.GetPropertiesRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -59,7 +59,7 @@ export class EncoderClient implements Encoder {
     positionType: PositionType = PositionType.POSITION_TYPE_UNSPECIFIED,
     extra = {}
   ) {
-    const encoderService = this.encoderService;
+    const {encoderService} = this;
     const request = new encoderApi.GetPositionRequest();
     request.setName(this.name);
     request.setPositionType(positionType);

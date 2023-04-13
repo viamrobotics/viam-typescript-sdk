@@ -60,7 +60,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   console.debug('dialing via WebRTC...');
 
   const impliedURL = conf.host;
-  const signalingAddress = conf.signalingAddress;
+  const {signalingAddress} = conf;
   const iceServers = conf.iceServers ?? [];
 
   const rtcConfig = { iceServers };
@@ -94,7 +94,7 @@ const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
     return false;
   }
 
-  return !conf.iceServers || conf.iceServers instanceof Array;
+  return !conf.iceServers || Array.isArray(conf.iceServers);
 };
 
 /**

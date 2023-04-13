@@ -41,7 +41,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   async add(name: string) {
-    const streamService = this.streamService;
+    const {streamService} = this;
     const request = new pb.AddStreamRequest();
     const valName = getValidSDPTrackName(name);
     request.setName(valName);
@@ -63,7 +63,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   async remove(name: string) {
-    const streamService = this.streamService;
+    const {streamService} = this;
     const request = new pb.RemoveStreamRequest();
     const valName = getValidSDPTrackName(name);
     request.setName(valName);

@@ -29,7 +29,7 @@ export class SensorClient implements Sensor {
   }
 
   async getReadings(extra = {}) {
-    const sensorService = this.sensorService;
+    const {sensorService} = this;
     const request = new sensorApi.GetReadingsRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));

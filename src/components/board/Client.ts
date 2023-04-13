@@ -29,7 +29,7 @@ export class BoardClient implements Board {
   }
 
   private async getRawStatusResponse(extra = {}): Promise<pb.StatusResponse> {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.StatusRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -75,7 +75,7 @@ export class BoardClient implements Board {
   }
 
   async setGPIO(pin: string, high: boolean, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.SetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -91,7 +91,7 @@ export class BoardClient implements Board {
   }
 
   async getGPIO(pin: string, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.GetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -107,7 +107,7 @@ export class BoardClient implements Board {
   }
 
   async getPWM(pin: string, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.PWMRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -123,7 +123,7 @@ export class BoardClient implements Board {
   }
 
   async setPWM(pin: string, dutyCyle: number, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.SetPWMRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -139,7 +139,7 @@ export class BoardClient implements Board {
   }
 
   async getPWMFrequency(pin: string, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.PWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -155,7 +155,7 @@ export class BoardClient implements Board {
   }
 
   async setPWMFrequency(pin: string, frequencyHz: number, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.SetPWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -171,7 +171,7 @@ export class BoardClient implements Board {
   }
 
   async readAnalogReader(analogReader: string, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.ReadAnalogReaderRequest();
     request.setBoardName(this.name);
     request.setAnalogReaderName(analogReader);
@@ -187,7 +187,7 @@ export class BoardClient implements Board {
   }
 
   async getDigitalInterruptValue(digitalInteruptName: string, extra = {}) {
-    const boardService = this.boardService;
+    const {boardService} = this;
     const request = new pb.GetDigitalInterruptValueRequest();
     request.setBoardName(this.name);
     request.setDigitalInterruptName(digitalInteruptName);
