@@ -18,8 +18,6 @@ module.exports = {
   },
   rules: {
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
-
-    // 'prefer-destructuring': 'warn',
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/no-misused-promises': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
