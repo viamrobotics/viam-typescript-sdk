@@ -1,11 +1,11 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import type { MovementSensor } from './MovementSensor';
 import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify, decodeVector3D } from '../../utils';
+import type { MovementSensor } from './MovementSensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.

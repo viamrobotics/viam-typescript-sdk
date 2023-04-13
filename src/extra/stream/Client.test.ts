@@ -2,8 +2,8 @@
 
 import { describe, expect, test } from 'vitest';
 import { RobotClient } from '../../robot';
-import { StreamClient } from './Client';
 import { events } from '../../events';
+import { StreamClient } from './Client';
 
 describe('StreamClient', () => {
   test('webrtc track will cause the client to emit an event', () =>

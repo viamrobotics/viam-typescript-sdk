@@ -1,11 +1,11 @@
+import { ConnectionClosedError } from '@viamrobotics/rpc';
+import { grpc } from '@improbable-eng/grpc-web';
 import {
   RobotServiceClient,
   type ServiceError,
 } from '../gen/robot/v1/robot_pb_service';
-import { ConnectionClosedError } from '@viamrobotics/rpc';
-import SessionTransport from './SessionTransport';
-import { grpc } from '@improbable-eng/grpc-web';
 import robotApi from '../gen/robot/v1/robot_pb';
+import SessionTransport from './SessionTransport';
 
 const timeoutBlob = new Blob(
   [

@@ -1,3 +1,4 @@
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import { MotionServiceClient } from '../../gen/service/motion/v1/motion_pb_service';
 import type {
@@ -8,7 +9,6 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import { type MotionConstraints, encodeConstraints } from './types';
 import {
   promisify,
   encodeResourceName,
@@ -17,10 +17,10 @@ import {
   encodeWorldState,
   encodeTransform,
 } from '../../utils';
+import pb from '../../gen/service/motion/v1/motion_pb';
+import { type MotionConstraints, encodeConstraints } from './types';
 import type { Motion } from './Motion';
 
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
-import pb from '../../gen/service/motion/v1/motion_pb';
 
 /**
  * A gRPC-web client for a Motion service.

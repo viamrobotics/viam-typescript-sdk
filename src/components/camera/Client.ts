@@ -1,10 +1,10 @@
-import type { Camera, MimeType } from './Camera';
 import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service';
 import type { RobotClient } from '../../robot';
 import type { HttpBody } from '../../gen/google/api/httpbody_pb';
 import type { Options } from '../../types';
 import pb from '../../gen/component/camera/v1/camera_pb';
 import { promisify } from '../../utils';
+import type { Camera, MimeType } from './Camera';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
 

@@ -1,10 +1,10 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import type { Encoder } from './Encoder';
 import { EncoderServiceClient } from '../../gen/component/encoder/v1/encoder_pb_service';
 import { type Options, PositionType } from '../../types';
 import encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 import { promisify } from '../../utils';
+import type { Encoder } from './Encoder';
 
 /**
  * A gRPC-web client for the Encoder component.
