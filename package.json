@@ -1,19 +1,12 @@
 {
   "name": "@viamrobotics/sdk",
-  "version": "0.0.40-alpha.1",
+  "version": "0.0.43",
   "description": "",
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "dist/robot.*",
-    "dist/robot/**/*.d.ts",
-    "dist/events.*",
-    "dist/components/**/*.d.ts",
-    "dist/extra/**/*.d.ts",
-    "dist/main.*",
-    "dist/gen/**/*.esm.d.ts",
-    "dist/gen/**/*.d.ts"
+    "dist"
   ],
   "exports": {
     ".": {
@@ -22,16 +15,24 @@
     }
   },
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
+    "build:bundle": "vite build",
+    "build:types": "tsc --project tsconfig.build.json",
+    "build:copy-dts": "copyfiles -u 1 \"src/gen/**/*.d.ts\" dist",
     "check": "npm-check --production",
     "doc": "typedoc",
     "doc:watch": "typedoc --watch",
-    "format": "prettier --write './src/**/*.{ts,js}'",
-    "lint:prettier": "prettier --check './src/**/*.{ts,js}'",
-    "lint:eslint": "eslint './src/**/*.{ts,js}' --fix",
+    "format": "npm run _eslint -- --fix && npm run _prettier -- --write",
+    "lint": "concurrently -g npm:lint:*",
+    "lint:prettier": "npm run _prettier -- --check",
+    "lint:eslint": "npm run _eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "concurrently -g npm:typecheck:*",
+    "typecheck:src": "tsc",
+    "typecheck:node": "tsc --project tsconfig.node.json",
+    "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}' --quiet",
+    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
   },
   "repository": {
     "type": "git",
@@ -50,9 +51,14 @@
     "@improbable-eng/grpc-web": "^0.15.0",
     "@improbable-eng/grpc-web-fake-transport": "^0.15.0",
     "@types/google-protobuf": "^3.15.6",
-    "@typescript-eslint/eslint-plugin": "^5.43.0",
-    "@typescript-eslint/parser": "^5.43.0",
-    "eslint": "^8.27.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "@viamrobotics/eslint-config": "^0.0.3",
+    "@viamrobotics/prettier-config": "^0.0.1",
+    "@viamrobotics/typescript-config": "^0.0.3",
+    "concurrently": "^8.0.1",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-tsdoc": "^0.2.17",
     "google-protobuf": "^3.21.2",
@@ -62,11 +68,9 @@
     "prettier": "^2.8.1",
     "prettier-plugin-jsdoc": "^0.4.2",
     "ts-protoc-gen": "^0.15.0",
-    "tslib": "^2.4.1",
-    "typedoc": "^0.23.28",
+    "typedoc": "^0.24.1",
     "typescript": "^5.0.3",
     "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.1.0",
     "vitest": "^0.28.4"
   }
 }

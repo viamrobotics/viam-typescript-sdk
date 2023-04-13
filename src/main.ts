@@ -1,4 +1,4 @@
-export { version } from '../package.json';
+export const version = __VERSION__;
 
 /**
  * Raw Protobuf interfaces for a Robot component.
@@ -12,6 +12,7 @@ export { version } from '../package.json';
 export { default as robotApi } from './gen/robot/v1/robot_pb';
 export {
   type Robot,
+  type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
   RobotClient,
@@ -70,6 +71,22 @@ export { type Board, BoardClient } from './components/board';
  */
 export { default as cameraApi } from './gen/component/camera/v1/camera_pb';
 export { type Camera, CameraClient } from './components/camera';
+
+/**
+ * Raw Protobuf interfaces for an Encoder component.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link EncoderClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as encoderApi } from './gen/component/encoder/v1/encoder_pb';
+export {
+  type Encoder,
+  type EncoderProperties,
+  EncoderClient,
+} from './components/encoder';
 
 /**
  * Raw Protobuf interfaces for a Motor component.
@@ -255,29 +272,16 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new motionApi.GetPoseRequest();
- * request.setName('mymotion');
- *
- * client.motionService.getPose(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link MotionClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
+export {
+  type Motion,
+  type MotionConstraints,
+  MotionClient,
+} from './services/motion';
 
 /**
  * Raw Protobuf interfaces for a Navigation service.
@@ -420,3 +424,5 @@ export type {
   ResponseStream,
   ServiceError,
 } from './gen/robot/v1/robot_pb_service';
+
+export * from './types';

@@ -20,13 +20,12 @@ build: build-buf build-js
 clean: clean-js clean-buf
 
 .PHONY: test
-test: $(node_modules)
+test: $(node_modules) build-buf
 	npm run test
 
 .PHONY: lint
-lint: $(node_modules)
-	npm run lint:prettier
-	npm run lint:eslint
+lint: $(node_modules) build-buf
+	npm run lint
 	npm run typecheck
 	npm run check
 
@@ -68,6 +67,6 @@ build-js: $(node_modules) clean-js build-buf
 
 # build and create a tarball from a package - useful for local testing,
 # inspecting what is included in the final distribution, and local publishing.
-.PHONY: pack-js
-pack-js: build-js
+.PHONY: pack
+pack: build
 	npm pack
