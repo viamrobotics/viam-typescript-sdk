@@ -23,10 +23,14 @@ You'll need to make sure the following tools are installed on your machine and a
 
 ### Makefile targets
 
-To get started, run `make all` to install development dependencies, run checks, and build the distributable artifacts:
+To get started, run `make all` to install development dependencies, run checks, build the distributable artifacts, and build docs:
 
 ```shell
+# run sequentially
 make all
+
+# run in parallel
+make all -j
 ```
 
 You can also use individual targets:

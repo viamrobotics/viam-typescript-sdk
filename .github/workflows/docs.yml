@@ -23,9 +23,6 @@ jobs:
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build'
 
-      - name: Generate docs
-        run: npm run doc
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
