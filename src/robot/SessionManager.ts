@@ -112,7 +112,7 @@ export default class SessionManager {
       const url = window.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
-      worker.onmessage = function () {
+      worker.onmessage = () => {
         doHeartbeat();
       };
     }
@@ -143,7 +143,7 @@ export default class SessionManager {
         new grpc.Metadata(),
         (err, resp) => {
           if (err) {
-            if ((err as ServiceError).code === grpc.Code.Unimplemented) {
+            if (err.code === grpc.Code.Unimplemented) {
               console.error('sessions unsupported; will not try again');
               this.sessionsSupported = false;
               this.startResolve?.();

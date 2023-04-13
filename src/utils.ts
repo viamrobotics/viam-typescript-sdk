@@ -11,10 +11,10 @@ type ServiceFunc<Req, Resp> = (
   callback: Callback<Resp>
 ) => void;
 
-export const promisify = function <Req, Resp>(
+export const promisify = <Req, Resp>(
   func: ServiceFunc<Req, Resp>,
   request: Req
-): Promise<Resp> {
+): Promise<Resp> => {
   return new Promise((resolve, reject) => {
     func(request, new grpc.Metadata(), (error, response) => {
       if (error) {
@@ -29,7 +29,7 @@ export const promisify = function <Req, Resp>(
 };
 
 /** Convert a 3D Vector POJO to a Protobuf Datatype */
-export const encodeVector3D = function (value: Vector3D): common.Vector3 {
+export const encodeVector3D = (value: Vector3D): common.Vector3 => {
   const proto = new common.Vector3();
 
   proto.setX(value.x);
@@ -40,7 +40,7 @@ export const encodeVector3D = function (value: Vector3D): common.Vector3 {
 };
 
 /** Convert a 3D Vector Protobuf Datatype to a POJO */
-export const decodeVector3D = function (proto: common.Vector3): Vector3D {
+export const decodeVector3D = (proto: common.Vector3): Vector3D => {
   return {
     x: proto.getX(),
     y: proto.getY(),

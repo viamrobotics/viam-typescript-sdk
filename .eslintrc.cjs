@@ -18,8 +18,6 @@ module.exports = {
   },
   rules: {
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
-    curly: 'warn',
-    'func-names': 'warn',
     'id-length': [
       'warn',
       {
@@ -40,15 +38,9 @@ module.exports = {
         ],
       },
     ],
-    'lines-between-class-members': [
-      'warn',
-      'always',
-      { exceptAfterSingleLine: true },
-    ],
     'prefer-destructuring': 'warn',
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/no-misused-promises': 'warn',
-    '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
     'import/order': 'warn',
@@ -59,9 +51,7 @@ module.exports = {
     'unicorn/filename-case': 'warn',
     'unicorn/no-instanceof-array': 'warn',
     'unicorn/no-lonely-if': 'warn',
-    'unicorn/no-useless-undefined': 'warn',
     'unicorn/prefer-add-event-listener': 'warn',
     'unicorn/prefer-export-from': 'warn',
-    'unicorn/prefer-optional-catch-binding': 'warn',
   },
 };

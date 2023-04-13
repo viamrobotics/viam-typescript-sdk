@@ -27,6 +27,7 @@ export class SensorClient implements Sensor {
   private get sensorService() {
     return this.client;
   }
+
   async getReadings(extra = {}) {
     const sensorService = this.sensorService;
     const request = new sensorApi.GetReadingsRequest();

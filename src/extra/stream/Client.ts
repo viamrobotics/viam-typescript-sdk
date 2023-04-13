@@ -10,7 +10,7 @@ import { promisify } from '../../utils';
  * Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
  * where track names should not include colons.
  */
-const getValidSDPTrackName = function (name: string) {
+const getValidSDPTrackName = (name: string) => {
   return name.replaceAll(':', '+');
 };
 
@@ -51,7 +51,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.addStream.bind(streamService),
         request
       );
-    } catch (error) {
+    } catch {
       // Try again with just the resource name
       request.setName(name);
       this.options.requestLogger?.(request);
@@ -73,7 +73,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.removeStream.bind(streamService),
         request
       );
-    } catch (e) {
+    } catch {
       // Try again with just the resource name
       request.setName(name);
       this.options.requestLogger?.(request);

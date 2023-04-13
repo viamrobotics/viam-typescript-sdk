@@ -90,6 +90,7 @@ export class BoardClient implements Board {
       request
     );
   }
+
   async getGPIO(pin: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.GetGPIORequest();
@@ -105,6 +106,7 @@ export class BoardClient implements Board {
     );
     return response.getHigh();
   }
+
   async getPWM(pin: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.PWMRequest();
@@ -120,6 +122,7 @@ export class BoardClient implements Board {
     );
     return response.getDutyCyclePct();
   }
+
   async setPWM(pin: string, dutyCyle: number, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.SetPWMRequest();
@@ -135,6 +138,7 @@ export class BoardClient implements Board {
       request
     );
   }
+
   async getPWMFrequency(pin: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.PWMFrequencyRequest();
@@ -150,6 +154,7 @@ export class BoardClient implements Board {
     >(boardService.pWMFrequency.bind(boardService), request);
     return response.getFrequencyHz();
   }
+
   async setPWMFrequency(pin: string, frequencyHz: number, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.SetPWMFrequencyRequest();
@@ -165,6 +170,7 @@ export class BoardClient implements Board {
       request
     );
   }
+
   async readAnalogReader(analogReader: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.ReadAnalogReaderRequest();
@@ -180,6 +186,7 @@ export class BoardClient implements Board {
     >(boardService.readAnalogReader.bind(boardService), request);
     return response.getValue();
   }
+
   async getDigitalInterruptValue(digitalInteruptName: string, extra = {}) {
     const boardService = this.boardService;
     const request = new pb.GetDigitalInterruptValueRequest();

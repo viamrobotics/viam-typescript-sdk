@@ -90,7 +90,9 @@ export type DialConf = DialDirectConf | DialWebRTCConf;
 const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
   const conf = value as DialWebRTCConf;
 
-  if (typeof conf.signalingAddress !== 'string') return false;
+  if (typeof conf.signalingAddress !== 'string') {
+    return false;
+  }
 
   return !conf.iceServers || conf.iceServers instanceof Array;
 };
@@ -118,7 +120,7 @@ export const createRobotClient = async (
   if (isDialWebRTCConf(conf)) {
     try {
       client = await dialWebRTC(conf);
-    } catch (err) {
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via WebRTC...');
     }
@@ -127,7 +129,7 @@ export const createRobotClient = async (
   if (!client) {
     try {
       client = await dialDirect(conf);
-    } catch (err) {
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via gRPC...');
     }
