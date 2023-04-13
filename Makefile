@@ -14,10 +14,10 @@ teardown:
 	rm -rf node_modules
 
 .PHONY: build
-build: build-buf build-js
+build: build-buf build-js build-docs
 
 .PHONY: clean
-clean: clean-js clean-buf
+clean: clean-js clean-buf clean-docs
 
 .PHONY: test
 test: $(node_modules) build-buf
@@ -70,3 +70,13 @@ build-js: $(node_modules) clean-js build-buf
 .PHONY: pack
 pack: build
 	npm pack
+
+# docs targes
+
+.PHONY: clean-docs
+clean-docs:
+	rm -rf docs/dist
+
+.PHONY: build-docs
+build-docs: build-buf
+	npm run doc
