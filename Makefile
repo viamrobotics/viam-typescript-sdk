@@ -78,5 +78,5 @@ clean-docs:
 	rm -rf docs/dist
 
 .PHONY: build-docs
-build-docs: build-buf
+build-docs: clean-docs build-buf
 	npm run doc
