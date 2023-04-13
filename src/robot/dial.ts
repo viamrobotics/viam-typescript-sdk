@@ -60,7 +60,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   console.debug('dialing via WebRTC...');
 
   const impliedURL = conf.host;
-  const {signalingAddress} = conf;
+  const { signalingAddress } = conf;
   const iceServers = conf.iceServers ?? [];
 
   const rtcConfig = { iceServers };

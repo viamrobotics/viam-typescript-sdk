@@ -28,7 +28,7 @@ export class BaseClient implements Base {
   }
 
   async moveStraight(distanceMm: number, mmPerSec: number, extra = {}) {
-    const {baseService} = this;
+    const { baseService } = this;
     const request = new pb.MoveStraightRequest();
     request.setName(this.name);
     request.setMmPerSec(mmPerSec);
@@ -44,7 +44,7 @@ export class BaseClient implements Base {
   }
 
   async spin(angleDeg: number, degsPerSec: number, extra = {}) {
-    const {baseService} = this;
+    const { baseService } = this;
     const request = new pb.SpinRequest();
     request.setName(this.name);
     request.setAngleDeg(angleDeg);
@@ -60,7 +60,7 @@ export class BaseClient implements Base {
   }
 
   async setPower(linear: Vector3D, angular: Vector3D, extra = {}) {
-    const {baseService} = this;
+    const { baseService } = this;
     const request = new pb.SetPowerRequest();
     request.setName(this.name);
     request.setLinear(encodeVector3D(linear));
@@ -76,7 +76,7 @@ export class BaseClient implements Base {
   }
 
   async setVelocity(linear: Vector3D, angular: Vector3D, extra = {}) {
-    const {baseService} = this;
+    const { baseService } = this;
     const request = new pb.SetVelocityRequest();
     request.setName(this.name);
     request.setLinear(encodeVector3D(linear));
@@ -92,7 +92,7 @@ export class BaseClient implements Base {
   }
 
   async stop(extra = {}) {
-    const {baseService} = this;
+    const { baseService } = this;
     const request = new pb.StopRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
