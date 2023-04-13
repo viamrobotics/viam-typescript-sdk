@@ -36,11 +36,10 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.StatusRequest, pb.StatusResponse>(
+    return promisify<pb.StatusRequest, pb.StatusResponse>(
       boardService.status.bind(boardService),
       request
     );
-    return response;
   }
 
   /**

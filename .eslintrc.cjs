@@ -43,8 +43,6 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
-    'sonarjs/no-collapsible-if': 'warn',
-    'sonarjs/prefer-immediate-return': 'warn',
     'unicorn/no-array-for-each': 'warn',
     'unicorn/catch-error-name': 'warn',
     'unicorn/filename-case': 'warn',

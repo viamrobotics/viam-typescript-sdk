@@ -17,13 +17,13 @@ export default class SessionTransport implements grpc.Transport {
   ) {
     const actualOnEnd = opts.onEnd;
     opts.onEnd = (err?: Error) => {
-      if (err && err instanceof GRPCError) {
-        if (
-          err.code === grpc.Code.InvalidArgument &&
-          err.grpcMessage === 'SESSION_EXPIRED'
-        ) {
-          this.sessionManager.reset();
-        }
+      if (
+        err &&
+        err instanceof GRPCError &&
+        err.code === grpc.Code.InvalidArgument &&
+        err.grpcMessage === 'SESSION_EXPIRED'
+      ) {
+        this.sessionManager.reset();
       }
       actualOnEnd(err);
     };

@@ -83,17 +83,15 @@ export default class SessionManager {
         sendHeartbeatReq,
         new grpc.Metadata(),
         (err) => {
-          if (err) {
-            if (ConnectionClosedError.isError(err)) {
-              /*
-               * We assume the connection closing will cause getSessionMetadata to be
-               * called again by way of a reset.
-               */
-              this.reset();
-              return;
-            }
-            // Otherwise we want to continue in case it was just a blip
+          if (err && ConnectionClosedError.isError(err)) {
+            /*
+             * We assume the connection closing will cause getSessionMetadata to be
+             * called again by way of a reset.
+             */
+            this.reset();
+            return;
           }
+          // Otherwise we want to continue in case it was just a blip
           if (worker) {
             worker.postMessage(this.heartbeatIntervalMs);
           } else {
