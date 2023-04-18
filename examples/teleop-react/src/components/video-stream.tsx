@@ -1,11 +1,12 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, type ReactNode } from 'react';
 
 export interface VideoStreamProps {
   stream?: MediaStream;
+  children?: ReactNode;
 }
 
 export const VideoStream = (props: VideoStreamProps): JSX.Element => {
-  const { stream } = props;
+  const { stream, children } = props;
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -14,5 +15,10 @@ export const VideoStream = (props: VideoStreamProps): JSX.Element => {
     }
   }, [stream]);
 
-  return <video ref={videoRef} autoPlay muted className="p-4" />;
+  return (
+    <div className='relative inline-flex p-4'>
+      <video ref={videoRef} autoPlay muted />
+      {children}
+    </div>
+  );
 };
