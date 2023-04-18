@@ -13,6 +13,7 @@ import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service';
 import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service';
 import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service';
+import { EncoderServiceClient } from '../gen/component/encoder/v1/encoder_pb_service';
 import { GantryServiceClient } from '../gen/component/gantry/v1/gantry_pb_service';
 import { GenericServiceClient } from '../gen/component/generic/v1/generic_pb_service';
 import { GripperServiceClient } from '../gen/component/gripper/v1/gripper_pb_service';
@@ -75,6 +76,8 @@ export class RobotClient implements Robot {
   private baseServiceClient: BaseServiceClient | undefined;
 
   private boardServiceClient: BoardServiceClient | undefined;
+
+  private encoderServiceClient: EncoderServiceClient | undefined;
 
   private gantryServiceClient: GantryServiceClient | undefined;
 
@@ -153,6 +156,13 @@ export class RobotClient implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.boardServiceClient;
+  }
+
+  get encoderService() {
+    if (!this.encoderServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.encoderServiceClient;
   }
 
   get gantryService() {
@@ -370,6 +380,10 @@ export class RobotClient implements Robot {
         grpcOptions
       );
       this.boardServiceClient = new BoardServiceClient(
+        this.serviceHost,
+        grpcOptions
+      );
+      this.encoderServiceClient = new EncoderServiceClient(
         this.serviceHost,
         grpcOptions
       );

@@ -23,20 +23,17 @@ jobs:
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build'
 
-      - name: Generate docs
-        run: npm run doc
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: html-docs
-          path: docs
+          path: docs/dist
 
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs
+          publish_dir: docs/dist
           publish_branch: docs-gh_pages
           cname: ts.viam.dev

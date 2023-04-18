@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Viam SDK Quickstart",
   "scripts": {
-    "watch": "esbuild ./src/main.ts --bundle --outfile=static/main.js --servedir=static",
+    "start": "esbuild ./src/main.ts --bundle --outfile=static/main.js --servedir=static",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,6 +12,6 @@
     "esbuild": "0.16.12"
   },
   "dependencies": {
-    "@viamrobotics/sdk": "^0.0.34"
+    "@viamrobotics/sdk": "file:../.."
   }
 }
