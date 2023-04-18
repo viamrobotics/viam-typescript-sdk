@@ -29,7 +29,7 @@ export const getRobotClient = async (
       payload: secret,
     },
     signalingAddress: 'https://app.viam.com:443',
-    iceServers: [],
+    iceServers: [{ urls: "stun:global.stun.twilio.com:3478" }],
   });
 };
 
