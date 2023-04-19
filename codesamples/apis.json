@@ -36,5 +36,10 @@
         "client": "MotionClient",
         "func": "getPose",
         "args": []
+    },
+    "data_manager": {
+        "client": "DataManagerClient",
+        "func": "sync",
+        "args": []
     }
 }
