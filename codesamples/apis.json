@@ -4,6 +4,11 @@
         "func": "getEndPosition",
         "args": []
     },
+    "motor": {
+        "client": "MotorClient",
+        "func": "isMoving",
+        "args": []
+    },
     "board": {
         "client": "BoardClient",
         "func": "getGPIO",
@@ -15,6 +20,21 @@
     "camera": {
         "client": "CameraClient",
         "func": "getImage",
+        "args": []
+    },
+    "sensor": {
+        "client": "SensorClient",
+        "func": "getReadings",
+        "args": []
+    },
+    "movement_sensor": {
+        "client": "MovementSensorClient",
+        "func": "getLinearAcceleration",
+        "args": []
+    },
+    "motion": {
+        "client": "MotionClient",
+        "func": "getPose",
         "args": []
     }
 }
