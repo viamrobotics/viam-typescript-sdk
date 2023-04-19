@@ -104,4 +104,18 @@ export class BaseClient implements Base {
       request
     );
   }
+
+  async isMoving() {
+    const baseService = this.baseService;
+    const request = new pb.IsMovingRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>(
+      baseService.isMoving.bind(baseService),
+      request
+    );
+    return response.getIsMoving();
+  }
 }
