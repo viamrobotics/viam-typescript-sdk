@@ -5,7 +5,7 @@ import pb from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import { DataManagerServiceClient } from '../../gen/service/datamanager/v1/data_manager_pb_service.js';
 import type { Options } from '../../types';
 import { promisify } from '../../utils';
-import type { DataManager } from './datamanager';
+import type { DataManager } from './data-manager';
 
 export class DataManagerClient implements DataManager {
   private client: DataManagerServiceClient;
