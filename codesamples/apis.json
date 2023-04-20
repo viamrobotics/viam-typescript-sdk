@@ -35,7 +35,8 @@
     "motion": {
         "client": "MotionClient",
         "func": "getPose",
-        "args": []
+        "args": [],
+        "comment": "Note this function requires additional arguments. Please provide valid arguments for function to work properly."
     },
     "data_manager": {
         "client": "DataManagerClient",
