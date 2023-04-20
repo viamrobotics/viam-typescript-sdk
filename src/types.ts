@@ -24,12 +24,6 @@ export interface Options {
   requestLogger?: (req: unknown) => void;
 }
 
-export enum PositionType {
-  POSITION_TYPE_UNSPECIFIED = 0,
-  POSITION_TYPE_TICKS_COUNT = 1,
-  POSITION_TYPE_ANGLE_DEGREES = 2,
-}
-
 // Common Protobuf Types
 
 export type ResourceName = common.ResourceName.AsObject;
