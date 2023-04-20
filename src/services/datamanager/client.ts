@@ -22,7 +22,7 @@ export class DataManagerClient implements DataManager {
     return this.client;
   }
 
-  async Sync(extra = {}) {
+  async sync(extra = {}) {
     const datamanagerService = this.datamanagerService;
     const request = new pb.SyncRequest();
     request.setName(this.name);
