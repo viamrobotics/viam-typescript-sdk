@@ -71,7 +71,7 @@ build-js: $(node_modules) clean-js build-buf
 pack: build
 	npm pack
 
-# docs targes
+# docs targets
 
 .PHONY: clean-docs
 clean-docs:
