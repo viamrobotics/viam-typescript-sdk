@@ -300,6 +300,8 @@ export {
   MotionClient,
 } from './services/motion';
 
+export { type DataManager, DataManagerClient } from './services/data-manager';
+
 /**
  * Raw Protobuf interfaces for a Navigation service.
  *
