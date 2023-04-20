@@ -1,7 +1,0 @@
-"servo": "get_position", -- raw only
-"gantry": "get_lengths", -- raw only
-"gripper": "is_moving", -- raw only
-"input_controller": "get_controls", -- raw only
-"audio": "get_properties", -- raw only?
-"pose_tracker": "get_poses", -- raw only
-"vision": "get_detector_names" -- raw only
