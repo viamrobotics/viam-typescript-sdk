@@ -11,6 +11,6 @@ export interface Gripper {
   /** Stop a robot's gripper. */
   stop: (extra?: Extra) => Promise<void>;
 
-  /** Report if a component is in motion. */
+  /** Report if the gripper is in motion. */
   isMoving: () => Promise<boolean>;
 }

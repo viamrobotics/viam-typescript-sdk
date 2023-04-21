@@ -1,2 +1,2 @@
-export type { Gripper } from './gripper/Gripper';
-export { GripperClient } from './gripper/Client';
+export type { Gripper } from './gripper/gripper';
+export { GripperClient } from './gripper/client';

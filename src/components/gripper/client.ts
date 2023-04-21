@@ -4,7 +4,7 @@ import pb from '../../gen/component/gripper/v1/gripper_pb';
 import { GripperServiceClient } from '../../gen/component/gripper/v1/gripper_pb_service';
 import type { Options } from '../../types';
 import { promisify } from '../../utils';
-import type { Gripper } from './Gripper';
+import type { Gripper } from './gripper';
 
 /**
  * A gRPC-web client for the Gripper component.
@@ -22,12 +22,12 @@ export class GripperClient implements Gripper {
     this.options = options;
   }
 
-  private get GripperService() {
+  private get gripperService() {
     return this.client;
   }
 
   async open(extra = {}) {
-    const service = this.GripperService;
+    const service = this.gripperService;
 
     const request = new pb.OpenRequest();
     request.setName(this.name);
@@ -42,7 +42,7 @@ export class GripperClient implements Gripper {
   }
 
   async grab(extra = {}) {
-    const service = this.GripperService;
+    const service = this.gripperService;
 
     const request = new pb.GrabRequest();
     request.setName(this.name);
@@ -57,7 +57,7 @@ export class GripperClient implements Gripper {
   }
 
   async stop(extra = {}) {
-    const service = this.GripperService;
+    const service = this.gripperService;
 
     const request = new pb.StopRequest();
     request.setName(this.name);
@@ -72,7 +72,7 @@ export class GripperClient implements Gripper {
   }
 
   async isMoving() {
-    const service = this.GripperService;
+    const service = this.gripperService;
 
     const request = new pb.IsMovingRequest();
     request.setName(this.name);
