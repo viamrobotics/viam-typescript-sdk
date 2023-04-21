@@ -47,4 +47,7 @@ export interface Base {
 
   /** Stop a base */
   stop(extra?: Extra): Promise<void>;
+
+  /** Return true if the base is in motion. */
+  isMoving(extra?: Extra): Promise<boolean>;
 }

@@ -60,4 +60,7 @@ export interface Motor {
 
   /** Return true if the motor is on. */
   isPowered(extra?: Extra): Promise<readonly [boolean, number]>;
+
+  /** Return true if the motor is in motion. */
+  isMoving(): Promise<boolean>;
 }
