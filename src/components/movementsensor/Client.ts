@@ -1,11 +1,11 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import type { MovementSensor } from './MovementSensor';
 import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
-import { promisify, decodeVector3 } from '../../utils';
+import { promisify } from '../../utils';
+import type { MovementSensor } from './MovementSensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -50,7 +50,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no linear velocity');
     }
 
-    return decodeVector3(vel);
+    return vel.toObject();
   }
 
   async getAngularVelocity(extra = {}) {
@@ -117,12 +117,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no orientation');
     }
 
-    return {
-      ox: ori.getOX(),
-      oy: ori.getOY(),
-      oz: ori.getOZ(),
-      theta: ori.getTheta(),
-    };
+    return ori.toObject();
   }
 
   async getPosition(extra = {}) {
@@ -215,7 +210,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no linear acceleration');
     }
 
-    return decodeVector3(acc);
+    return acc.toObject();
   }
 
   getReadings(extra = {}) {

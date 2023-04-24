@@ -39,15 +39,6 @@ export const encodeVector3 = function (value: Vector3): common.Vector3 {
   return proto;
 };
 
-/** Convert a 3D Vector Protobuf Datatype to a POJO */
-export const decodeVector3 = function (proto: common.Vector3): Vector3 {
-  return {
-    x: proto.getX(),
-    y: proto.getY(),
-    z: proto.getZ(),
-  };
-};
-
 /** Convert a Pose object to a Protobuf Datatype. */
 export const encodePose = (obj: common.Pose.AsObject): common.Pose => {
   const result = new common.Pose();
