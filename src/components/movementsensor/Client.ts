@@ -5,7 +5,7 @@ import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
-import { promisify, decodeVector3D } from '../../utils';
+import { promisify, decodeVector3 } from '../../utils';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -50,7 +50,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no linear velocity');
     }
 
-    return decodeVector3D(vel);
+    return decodeVector3(vel);
   }
 
   async getAngularVelocity(extra = {}) {
@@ -74,7 +74,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no angular velocity');
     }
 
-    return decodeVector3D(ang);
+    return decodeVector3(ang);
   }
 
   async getCompassHeading(extra = {}) {
@@ -215,7 +215,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no linear acceleration');
     }
 
-    return decodeVector3D(acc);
+    return decodeVector3(acc);
   }
 
   getReadings(extra = {}) {

@@ -1,4 +1,4 @@
-import type { Extra, Vector3D } from '../../types';
+import type { Extra, Vector3 } from '../../types';
 
 /** Represents a physical base of a robot. */
 export interface Base {
@@ -31,7 +31,7 @@ export interface Base {
    * @param linear - Desired linear power percentage from -1 to 1.
    * @param angular - Desired angular power percentage from -1 to 1.
    */
-  setPower(linear: Vector3D, angular: Vector3D, extra?: Extra): Promise<void>;
+  setPower(linear: Vector3, angular: Vector3, extra?: Extra): Promise<void>;
 
   /**
    * Set the linear and angular velocity of a base.
@@ -40,8 +40,8 @@ export interface Base {
    * @param angular - Desired angular velocity in degrees per second.
    */
   setVelocity(
-    linear: Vector3D,
-    angular: Vector3D,
+    linear: Vector3,
+    angular: Vector3,
     extra?: Extra
   ): Promise<void>;
 

@@ -1,4 +1,4 @@
-import type { Extra, Orientation, Vector3D } from '../../types';
+import type { Extra, Orientation, Vector3 } from '../../types';
 import type { Sensor } from '../sensor';
 
 export interface Position {
@@ -23,10 +23,10 @@ export interface Properties {
  */
 export interface MovementSensor extends Sensor {
   /** Get linear velocity in mm/s across x/y/z axes */
-  getLinearVelocity(extra?: Extra): Promise<Vector3D>;
+  getLinearVelocity(extra?: Extra): Promise<Vector3>;
 
   /** Get the angular velocity in degrees/s across x/y/z axes */
-  getAngularVelocity(extra?: Extra): Promise<Vector3D>;
+  getAngularVelocity(extra?: Extra): Promise<Vector3>;
 
   /**
    * Get the compass heading, which is a number from 0-359 where 0 is North, 90
@@ -50,5 +50,5 @@ export interface MovementSensor extends Sensor {
   getAccuracy(extra?: Extra): Promise<Record<string, number>>;
 
   /** Get linear acceleration in mm/s/s across x/y/z axes */
-  getLinearAcceleration(extra?: Extra): Promise<Vector3D>;
+  getLinearAcceleration(extra?: Extra): Promise<Vector3>;
 }
