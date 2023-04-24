@@ -1,21 +1,9 @@
 import type { Extra, Orientation, Vector3 } from '../../types';
 import type { Sensor } from '../sensor';
+import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 
-export interface Position {
-  latitude: number;
-  longitude: number;
-  altitudeMM: number;
-}
-
-/** The readings supported by this movement sensor */
-export interface Properties {
-  linearVelocitySupported: boolean;
-  angularVelocitySupported: boolean;
-  orientationSupported: boolean;
-  positionSupported: boolean;
-  compassHeadingSupported: boolean;
-  linearAccelerationSupported: boolean;
-}
+export type Position = pb.GetPositionResponse.AsObject;
+export type MovementSensorProperties = pb.GetPropertiesResponse.AsObject;
 
 /**
  * Represents any sensor that reports information about the robot's direction,
@@ -44,7 +32,7 @@ export interface MovementSensor extends Sensor {
   getPosition(extra?: Extra): Promise<Position>;
 
   /** Get the properties of this movement sensor */
-  getProperties(extra?: Extra): Promise<Properties>;
+  getProperties(extra?: Extra): Promise<MovementSensorProperties>;
 
   /** Get the accuracy of various sensors in mm */
   getAccuracy(extra?: Extra): Promise<Record<string, number>>;

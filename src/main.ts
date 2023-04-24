@@ -112,6 +112,8 @@ export { type Motor, MotorClient } from './components/motor';
 export { default as movementSensorApi } from './gen/component/movementsensor/v1/movementsensor_pb';
 export {
   type MovementSensor,
+  type MovementSensorProperties,
+  type Position,
   MovementSensorClient,
 } from './components/movementsensor';
 
