@@ -39,11 +39,7 @@ export interface Base {
    * @param linear - Desired linear velocity in millimeters per second.
    * @param angular - Desired angular velocity in degrees per second.
    */
-  setVelocity(
-    linear: Vector3,
-    angular: Vector3,
-    extra?: Extra
-  ): Promise<void>;
+  setVelocity(linear: Vector3, angular: Vector3, extra?: Extra): Promise<void>;
 
   /** Stop a base */
   stop(extra?: Extra): Promise<void>;
