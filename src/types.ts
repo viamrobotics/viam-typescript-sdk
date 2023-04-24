@@ -16,6 +16,7 @@ export enum PositionType {
 // Common Protobuf Types
 
 export type ResourceName = common.ResourceName.AsObject;
+export type GeoPoint = common.GeoPoint.AsObject;
 
 // Spatial Math
 export type Vector3 = common.Vector3.AsObject;
