@@ -42,7 +42,7 @@ const encodeCollisionSpecification = (
 };
 
 /** Convert a Constraints object to a Protobuf Datatype. */
-export const encodeConstraints = (obj: MotionConstraints): pb.Constraints => {
+export const encodeConstraints = (obj: Constraints): pb.Constraints => {
   const result = new pb.Constraints();
 
   result.setLinearConstraintList(
