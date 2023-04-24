@@ -2,7 +2,7 @@ import type { Extra, Orientation, Vector3 } from '../../types';
 import type { Sensor } from '../sensor';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 
-export type Position = pb.GetPositionResponse.AsObject;
+export type MovementSensorPosition = pb.GetPositionResponse.AsObject;
 export type MovementSensorProperties = pb.GetPropertiesResponse.AsObject;
 
 /**
@@ -29,7 +29,7 @@ export interface MovementSensor extends Sensor {
   getOrientation(extra?: Extra): Promise<Orientation>;
 
   /** Get the current position latitude, longitude, and altitude (in mm) */
-  getPosition(extra?: Extra): Promise<Position>;
+  getPosition(extra?: Extra): Promise<MovementSensorPosition>;
 
   /** Get the properties of this movement sensor */
   getProperties(extra?: Extra): Promise<MovementSensorProperties>;

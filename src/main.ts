@@ -113,7 +113,7 @@ export { default as movementSensorApi } from './gen/component/movementsensor/v1/
 export {
   type MovementSensor,
   type MovementSensorProperties,
-  type Position,
+  type MovementSensorPosition,
   MovementSensorClient,
 } from './components/movementsensor';
 

@@ -1,5 +1,5 @@
 export type {
-  Position,
+  MovementSensorPosition,
   MovementSensorProperties,
   MovementSensor,
 } from './movementsensor/MovementSensor';
