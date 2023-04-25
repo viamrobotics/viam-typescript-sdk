@@ -10,10 +10,10 @@ export type MovementSensorProperties = pb.GetPropertiesResponse.AsObject;
  * position, and/or speed.
  */
 export interface MovementSensor extends Sensor {
-  /** Get linear velocity in mm/s across x/y/z axes */
+  /** Get linear velocity across x/y/z axes */
   getLinearVelocity(extra?: Extra): Promise<Vector3>;
 
-  /** Get the angular velocity in degrees/s across x/y/z axes */
+  /** Get the angular velocity across x/y/z axes */
   getAngularVelocity(extra?: Extra): Promise<Vector3>;
 
   /**
@@ -28,15 +28,15 @@ export interface MovementSensor extends Sensor {
    */
   getOrientation(extra?: Extra): Promise<Orientation>;
 
-  /** Get the current position latitude, longitude, and altitude (in mm) */
+  /** Get the current position latitude, longitude, and altitude */
   getPosition(extra?: Extra): Promise<MovementSensorPosition>;
 
   /** Get the properties of this movement sensor */
   getProperties(extra?: Extra): Promise<MovementSensorProperties>;
 
-  /** Get the accuracy of various sensors in mm */
+  /** Get the accuracy of various sensors */
   getAccuracy(extra?: Extra): Promise<Record<string, number>>;
 
-  /** Get linear acceleration in mm/s/s across x/y/z axes */
+  /** Get linear acceleration across x/y/z axes */
   getLinearAcceleration(extra?: Extra): Promise<Vector3>;
 }
