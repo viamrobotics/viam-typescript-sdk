@@ -1,20 +1,12 @@
 import { Elm } from './Main.elm';
-import {
-  Client,
-  BaseClient,
-  MotorClient,
-  MovementSensorClient,
-  SensorClient,
-  StreamClient,
-  createRobotClient,
-} from '@viamrobotics/sdk';
+import * as VIAM from '@viamrobotics/sdk';
 
 async function connectWebRTC() {
   const locationSecret = import.meta.env.VITE_SECRET;
   const host = import.meta.env.VITE_WEBRTC_HOST;
   const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
 
-  return createRobotClient({
+  return VIAM.createRobotClient({
     host,
     credential: {
       type: 'robot-location-secret',
@@ -60,9 +52,9 @@ function onTrack(event) {
 
 connectWebRTC()
   .then((client) => {
-    const base = new BaseClient(client, 'viam_base');
-    const wifi = new SensorClient(client, 'wifi');
-    const accel = new MovementSensorClient(client, 'accelerometer');
+    const base = new VIAM.BaseClient(client, 'viam_base');
+    const wifi = new VIAM.SensorClient(client, 'wifi');
+    const accel = new VIAM.MovementSensorClient(client, 'accelerometer');
 
     const app = Elm.Main.init({
       node: document.getElementById('main'),
@@ -71,7 +63,7 @@ connectWebRTC()
 
     // streams
 
-    const streams = new StreamClient(client);
+    const streams = new VIAM.StreamClient(client);
     streams.on('track', onTrack);
 
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
