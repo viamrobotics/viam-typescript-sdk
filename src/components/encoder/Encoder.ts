@@ -1,7 +1,11 @@
-import type { Extra, PositionType } from '../../types';
+import type { Extra } from '../../types';
 import pb from '../../gen/component/encoder/v1/encoder_pb';
 
 export type EncoderProperties = pb.GetPropertiesResponse.AsObject;
+
+type ValueOf<T> = T[keyof T];
+export const EncoderPositionType = pb.PositionType;
+export type EncoderPositionType = ValueOf<typeof pb.PositionType>;
 
 /** Represents a physical encoder. */
 export interface Encoder {
@@ -19,7 +23,7 @@ export interface Encoder {
    *   degrees)
    */
   getPosition(
-    positionType?: PositionType,
+    positionType?: EncoderPositionType,
     extra?: Extra
-  ): Promise<readonly [number, PositionType]>;
+  ): Promise<readonly [number, EncoderPositionType]>;
 }

@@ -85,6 +85,7 @@ export { default as encoderApi } from './gen/component/encoder/v1/encoder_pb';
 export {
   type Encoder,
   type EncoderProperties,
+  EncoderPositionType,
   EncoderClient,
 } from './components/encoder';
 
