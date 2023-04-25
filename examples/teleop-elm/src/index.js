@@ -37,6 +37,7 @@ function onTrack(event) {
     if (mediaElement instanceof HTMLVideoElement) {
       mediaElement.playsInline = true;
       mediaElement.controls = false;
+      mediaElement.muted = true;
     } else {
       mediaElement.controls = true;
     }
