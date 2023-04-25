@@ -6,7 +6,7 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import type { MotionConstraints } from './types';
+import type { Constraints } from './types';
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -30,7 +30,7 @@ export interface Motion {
     destination: PoseInFrame,
     componentName: ResourceName,
     worldState?: WorldState,
-    constraints?: MotionConstraints,
+    constraints?: Constraints,
     extra?: Extra
   ) => Promise<boolean>;
 

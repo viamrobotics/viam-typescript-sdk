@@ -113,6 +113,8 @@ export { type Motor, MotorClient } from './components/motor';
 export { default as movementSensorApi } from './gen/component/movementsensor/v1/movementsensor_pb';
 export {
   type MovementSensor,
+  type MovementSensorProperties,
+  type MovementSensorPosition,
   MovementSensorClient,
 } from './components/movementsensor';
 
@@ -232,29 +234,12 @@ export { default as genericApi } from './gen/component/generic/v1/generic_pb';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new gripperApi.IsMovingRequest();
- * request.setName('mygripper');
- *
- * client.gripperService.isMoving(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link GripperClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as gripperApi } from './gen/component/gripper/v1/gripper_pb';
+export { type Gripper, GripperClient } from './components/gripper';
 
 /**
  * Raw Protobuf interfaces for an InputController component.
@@ -297,7 +282,10 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
 export {
   type Motion,
-  type MotionConstraints,
+  type Constraints,
+  type LinearConstraint,
+  type OrientationConstraint,
+  type CollisionSpecification,
   MotionClient,
 } from './services/motion';
 

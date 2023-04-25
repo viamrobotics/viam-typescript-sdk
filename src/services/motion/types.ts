@@ -1,6 +1,9 @@
 import pb from '../../gen/service/motion/v1/motion_pb';
 
-export type MotionConstraints = pb.Constraints.AsObject;
+export type Constraints = pb.Constraints.AsObject;
+export type LinearConstraint = pb.LinearConstraint.AsObject;
+export type OrientationConstraint = pb.OrientationConstraint.AsObject;
+export type CollisionSpecification = pb.CollisionSpecification.AsObject;
 
 const encodeLinearConstraint = (
   obj: pb.LinearConstraint.AsObject
@@ -39,7 +42,7 @@ const encodeCollisionSpecification = (
 };
 
 /** Convert a Constraints object to a Protobuf Datatype. */
-export const encodeConstraints = (obj: MotionConstraints): pb.Constraints => {
+export const encodeConstraints = (obj: Constraints): pb.Constraints => {
   const result = new pb.Constraints();
 
   result.setLinearConstraintList(
