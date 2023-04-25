@@ -23,7 +23,6 @@ function onTrack(event) {
     throw new Error('expected event stream to exist');
   }
 
-  const kind = 'track';
   const streamName = eventStream.id;
   const streamContainers = document.querySelectorAll(
     `[data-stream="${streamName}"]`
@@ -32,7 +31,7 @@ function onTrack(event) {
   // Most of this logic is a hack that to inject a WebRTC stream into the DOM.
   // Elm does not support media elements so we have to do it here.
   for (const streamContainer of streamContainers) {
-    const mediaElement = document.createElement(kind);
+    const mediaElement = document.createElement('video');
     mediaElement.srcObject = eventStream;
     mediaElement.autoplay = true;
     if (mediaElement instanceof HTMLVideoElement) {
@@ -41,9 +40,6 @@ function onTrack(event) {
     } else {
       mediaElement.controls = true;
     }
-
-    const child = streamContainer.querySelector(kind);
-    child?.remove();
     streamContainer.append(mediaElement);
   }
 }
@@ -67,8 +63,8 @@ connectWebRTC()
     streams.on('track', onTrack);
 
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
-      console.log('linear', linear);
-      console.log('angular', angular);
+      console.debug('linear', linear);
+      console.debug('angular', angular);
 
       const linearVec = { x: 0, y: linear, z: 0 };
       const angularVec = { x: 0, y: 0, z: angular };
@@ -77,7 +73,7 @@ connectWebRTC()
     });
 
     app.ports.sendBaseStop.subscribe(async () => {
-      console.log('stopping');
+      console.debug('stopping');
       await base.stop();
     });
 
