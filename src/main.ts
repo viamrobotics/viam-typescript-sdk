@@ -112,6 +112,8 @@ export { type Motor, MotorClient } from './components/motor';
 export { default as movementSensorApi } from './gen/component/movementsensor/v1/movementsensor_pb';
 export {
   type MovementSensor,
+  type MovementSensorProperties,
+  type MovementSensorPosition,
   MovementSensorClient,
 } from './components/movementsensor';
 
@@ -279,7 +281,10 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
 export {
   type Motion,
-  type MotionConstraints,
+  type Constraints,
+  type LinearConstraint,
+  type OrientationConstraint,
+  type CollisionSpecification,
   MotionClient,
 } from './services/motion';
 
