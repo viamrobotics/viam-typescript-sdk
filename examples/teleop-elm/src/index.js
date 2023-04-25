@@ -64,8 +64,8 @@ connectWebRTC()
     streams.on('track', onTrack);
 
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
-      console.debug('linear', linear);
-      console.debug('angular', angular);
+      console.log('linear', linear);
+      console.log('angular', angular);
 
       const linearVec = { x: 0, y: linear, z: 0 };
       const angularVec = { x: 0, y: 0, z: angular };
@@ -74,19 +74,19 @@ connectWebRTC()
     });
 
     app.ports.sendBaseStop.subscribe(async () => {
-      console.debug('stopping');
+      console.log('stopping');
       await base.stop();
     });
 
     app.ports.getWifiReading.subscribe(async () => {
       const readings = await wifi.getReadings();
-      console.debug(readings);
+      console.log(readings);
       app.ports.recvWifiReading.send(readings);
     });
 
     app.ports.getAccelReading.subscribe(async () => {
       const readings = await accel.getLinearAcceleration();
-      console.debug(readings);
+      console.log(readings);
       app.ports.recvAccelReading.send(readings);
     });
 
