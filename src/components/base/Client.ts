@@ -3,9 +3,8 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/base/v1/base_pb';
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service';
-import type { Options, Vector3D } from '../../types';
-import { promisify, encodeVector3D } from '../../utils';
-import type { Base } from './Base';
+import type { Options, Vector3 } from '../../types';
+import { promisify, encodeVector3 } from '../../utils';
 
 /**
  * A gRPC-web client for the Base component.
@@ -59,12 +58,12 @@ export class BaseClient implements Base {
     );
   }
 
-  async setPower(linear: Vector3D, angular: Vector3D, extra = {}) {
-    const { baseService } = this;
+  async setPower(linear: Vector3, angular: Vector3, extra = {}) {
+    const baseService = this.baseService;
     const request = new pb.SetPowerRequest();
     request.setName(this.name);
-    request.setLinear(encodeVector3D(linear));
-    request.setAngular(encodeVector3D(angular));
+    request.setLinear(encodeVector3(linear));
+    request.setAngular(encodeVector3(angular));
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -75,12 +74,12 @@ export class BaseClient implements Base {
     );
   }
 
-  async setVelocity(linear: Vector3D, angular: Vector3D, extra = {}) {
-    const { baseService } = this;
+  async setVelocity(linear: Vector3, angular: Vector3, extra = {}) {
+    const baseService = this.baseService;
     const request = new pb.SetVelocityRequest();
     request.setName(this.name);
-    request.setLinear(encodeVector3D(linear));
-    request.setAngular(encodeVector3D(angular));
+    request.setLinear(encodeVector3(linear));
+    request.setAngular(encodeVector3(angular));
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
@@ -103,5 +102,19 @@ export class BaseClient implements Base {
       baseService.stop.bind(baseService),
       request
     );
+  }
+
+  async isMoving() {
+    const baseService = this.baseService;
+    const request = new pb.IsMovingRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>(
+      baseService.isMoving.bind(baseService),
+      request
+    );
+    return response.getIsMoving();
   }
 }

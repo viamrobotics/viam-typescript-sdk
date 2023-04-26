@@ -1,14 +1,7 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import pb from '../../gen/service/motion/v1/motion_pb';
 import type { RobotClient } from '../../robot';
 import { MotionServiceClient } from '../../gen/service/motion/v1/motion_pb_service';
-import type {
-  Options,
-  Pose,
-  PoseInFrame,
-  ResourceName,
-  Transform,
-  WorldState,
-} from '../../types';
 import {
   promisify,
   encodeResourceName,
@@ -17,8 +10,15 @@ import {
   encodeWorldState,
   encodeTransform,
 } from '../../utils';
-import pb from '../../gen/service/motion/v1/motion_pb';
-import { type MotionConstraints, encodeConstraints } from './types';
+import type {
+  Options,
+  Pose,
+  PoseInFrame,
+  ResourceName,
+  Transform,
+  WorldState,
+} from '../../types';
+import { type Constraints, encodeConstraints } from './types';
 import type { Motion } from './Motion';
 
 /**
@@ -45,7 +45,7 @@ export class MotionClient implements Motion {
     destination: PoseInFrame,
     componentName: ResourceName,
     worldState?: WorldState,
-    constraints?: MotionConstraints,
+    constraints?: Constraints,
     extra = {}
   ) {
     const { service } = this;

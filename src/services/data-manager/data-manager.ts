@@ -1,5 +1,5 @@
 import type { Extra } from '../../types';
 
 export interface DataManager {
-  Sync: (extra?: Extra) => Promise<void>;
+  sync: (extra?: Extra) => Promise<void>;
 }

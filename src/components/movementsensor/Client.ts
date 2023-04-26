@@ -4,7 +4,7 @@ import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
-import { promisify, decodeVector3D } from '../../utils';
+import { promisify } from '../../utils';
 import type { MovementSensor } from './MovementSensor';
 
 /**
@@ -50,7 +50,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no linear velocity');
     }
 
-    return decodeVector3D(vel);
+    return vel.toObject();
   }
 
   async getAngularVelocity(extra = {}) {
@@ -74,7 +74,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no angular velocity');
     }
 
-    return decodeVector3D(ang);
+    return ang.toObject();
   }
 
   async getCompassHeading(extra = {}) {
@@ -117,12 +117,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no orientation');
     }
 
-    return {
-      ox: ori.getOX(),
-      oy: ori.getOY(),
-      oz: ori.getOZ(),
-      theta: ori.getTheta(),
-    };
+    return ori.toObject();
   }
 
   async getPosition(extra = {}) {
@@ -138,16 +133,7 @@ export class MovementSensorClient implements MovementSensor {
       pb.GetPositionResponse
     >(movementsensorService.getPosition.bind(movementsensorService), request);
 
-    const coordinate = response.getCoordinate();
-    if (!coordinate) {
-      throw new Error('no coordinate');
-    }
-
-    return {
-      latitude: coordinate.getLatitude(),
-      longitude: coordinate.getLongitude(),
-      altitudeMM: response.getAltitudeMm(),
-    };
+    return response.toObject();
   }
 
   async getProperties(extra = {}) {
@@ -163,14 +149,7 @@ export class MovementSensorClient implements MovementSensor {
       pb.GetPropertiesResponse
     >(movementsensorService.getProperties.bind(movementsensorService), request);
 
-    return {
-      linearVelocitySupported: response.getLinearVelocitySupported(),
-      angularVelocitySupported: response.getAngularVelocitySupported(),
-      orientationSupported: response.getOrientationSupported(),
-      positionSupported: response.getPositionSupported(),
-      compassHeadingSupported: response.getCompassHeadingSupported(),
-      linearAccelerationSupported: response.getLinearAccelerationSupported(),
-    };
+    return response.toObject();
   }
 
   async getAccuracy(extra = {}) {
@@ -186,7 +165,7 @@ export class MovementSensorClient implements MovementSensor {
       pb.GetAccuracyResponse
     >(movementsensorService.getAccuracy.bind(movementsensorService), request);
 
-    const acc = response.getAccuracyMmMap();
+    const acc = response.getAccuracyMap();
     const result: Record<string, number> = {};
     for (const [key, value] of acc.entries()) {
       result[key] = value;
@@ -215,7 +194,7 @@ export class MovementSensorClient implements MovementSensor {
       throw new Error('no linear acceleration');
     }
 
-    return decodeVector3D(acc);
+    return acc.toObject();
   }
 
   getReadings(extra = {}) {

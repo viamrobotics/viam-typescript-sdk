@@ -1,10 +1,10 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import { EncoderServiceClient } from '../../gen/component/encoder/v1/encoder_pb_service';
-import { type Options, PositionType } from '../../types';
 import encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 import { promisify } from '../../utils';
-import type { Encoder } from './Encoder';
+import { type Options } from '../../types';
+import { EncoderServiceClient } from '../../gen/component/encoder/v1/encoder_pb_service';
+import { type Encoder, EncoderPositionType } from './Encoder';
 
 /**
  * A gRPC-web client for the Encoder component.
@@ -56,7 +56,7 @@ export class EncoderClient implements Encoder {
   }
 
   async getPosition(
-    positionType: PositionType = PositionType.POSITION_TYPE_UNSPECIFIED,
+    positionType: EncoderPositionType = EncoderPositionType.POSITION_TYPE_UNSPECIFIED,
     extra = {}
   ) {
     const { encoderService } = this;

@@ -1,7 +1,7 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import common from './gen/common/v1/common_pb';
-import type { Vector3D } from './types';
+import type { Vector3 } from './types';
 
 type Callback<T> = (error: ServiceError | null, response: T | null) => void;
 
@@ -29,7 +29,7 @@ export const promisify = <Req, Resp>(
 };
 
 /** Convert a 3D Vector POJO to a Protobuf Datatype */
-export const encodeVector3D = (value: Vector3D): common.Vector3 => {
+export const encodeVector3 = function (value: Vector3): common.Vector3 {
   const proto = new common.Vector3();
 
   proto.setX(value.x);
@@ -37,15 +37,6 @@ export const encodeVector3D = (value: Vector3D): common.Vector3 => {
   proto.setZ(value.z);
 
   return proto;
-};
-
-/** Convert a 3D Vector Protobuf Datatype to a POJO */
-export const decodeVector3D = (proto: common.Vector3): Vector3D => {
-  return {
-    x: proto.getX(),
-    y: proto.getY(),
-    z: proto.getZ(),
-  };
 };
 
 /** Convert a Pose object to a Protobuf Datatype. */
@@ -109,7 +100,7 @@ const encodeGeometry = (obj: common.Geometry.AsObject): common.Geometry => {
   if (obj.box !== undefined) {
     const rectPrism = new common.RectangularPrism();
     if (obj.box.dimsMm !== undefined) {
-      rectPrism.setDimsMm(encodeVector3D(obj.box.dimsMm));
+      rectPrism.setDimsMm(encodeVector3(obj.box.dimsMm));
     }
     result.setBox(rectPrism);
   }

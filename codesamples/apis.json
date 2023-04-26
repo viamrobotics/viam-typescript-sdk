@@ -1,0 +1,50 @@
+{
+    "arm": {
+        "client": "ArmClient",
+        "func": "getEndPosition",
+        "args": []
+    },
+    "base": {
+        "client": "BaseClient",
+        "func": "isMoving"
+    },
+    "motor": {
+        "client": "MotorClient",
+        "func": "isMoving",
+        "args": []
+    },
+    "board": {
+        "client": "BoardClient",
+        "func": "getGPIO",
+        "args": [
+            "'16'"
+        ],
+        "comment": "Note that the pin supplied is a placeholder. Please change this to a valid pin you are using."
+    },
+    "camera": {
+        "client": "CameraClient",
+        "func": "getImage",
+        "args": []
+    },
+    "sensor": {
+        "client": "SensorClient",
+        "func": "getReadings",
+        "args": []
+    },
+    "movement_sensor": {
+        "client": "MovementSensorClient",
+        "func": "getLinearAcceleration",
+        "args": []
+    },
+    "motion": {
+        "client": "MotionClient",
+        "func": "getPose",
+        "args": [],
+        "comment": "Note this function requires additional arguments. Please provide valid arguments for function to work properly."
+    },
+    "data_manager": {
+        "client": "DataManagerClient",
+        "func": "sync",
+        "args": []
+    }
+}

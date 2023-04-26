@@ -146,4 +146,18 @@ export class MotorClient implements Motor {
     >(motorService.isPowered.bind(motorService), request);
     return [response.getIsOn(), response.getPowerPct()] as const;
   }
+
+  async isMoving() {
+    const motorService = this.motorService;
+    const request = new motorApi.IsMovingRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      motorApi.IsMovingRequest,
+      motorApi.IsMovingResponse
+    >(motorService.isMoving.bind(motorService), request);
+    return response.getIsMoving();
+  }
 }

@@ -1,20 +1,12 @@
 import { Elm } from './Main.elm';
-import {
-  Client,
-  BaseClient,
-  MotorClient,
-  MovementSensorClient,
-  SensorClient,
-  StreamClient,
-  createRobotClient,
-} from '@viamrobotics/sdk';
+import * as VIAM from '@viamrobotics/sdk';
 
 async function connectWebRTC() {
   const locationSecret = import.meta.env.VITE_SECRET;
   const host = import.meta.env.VITE_WEBRTC_HOST;
   const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
 
-  return createRobotClient({
+  return VIAM.createRobotClient({
     host,
     credential: {
       type: 'robot-location-secret',
@@ -31,7 +23,6 @@ function onTrack(event) {
     throw new Error('expected event stream to exist');
   }
 
-  const kind = 'track';
   const streamName = eventStream.id;
   const streamContainers = document.querySelectorAll(
     `[data-stream="${streamName}"]`
@@ -40,18 +31,16 @@ function onTrack(event) {
   // Most of this logic is a hack that to inject a WebRTC stream into the DOM.
   // Elm does not support media elements so we have to do it here.
   for (const streamContainer of streamContainers) {
-    const mediaElement = document.createElement(kind);
+    const mediaElement = document.createElement('video');
     mediaElement.srcObject = eventStream;
     mediaElement.autoplay = true;
     if (mediaElement instanceof HTMLVideoElement) {
       mediaElement.playsInline = true;
       mediaElement.controls = false;
+      mediaElement.muted = true;
     } else {
       mediaElement.controls = true;
     }
-
-    const child = streamContainer.querySelector(kind);
-    child?.remove();
     streamContainer.append(mediaElement);
   }
 }
@@ -60,9 +49,9 @@ function onTrack(event) {
 
 connectWebRTC()
   .then((client) => {
-    const base = new BaseClient(client, 'viam_base');
-    const wifi = new SensorClient(client, 'wifi');
-    const accel = new MovementSensorClient(client, 'accelerometer');
+    const base = new VIAM.BaseClient(client, 'viam_base');
+    const wifi = new VIAM.SensorClient(client, 'wifi');
+    const accel = new VIAM.MovementSensorClient(client, 'accelerometer');
 
     const app = Elm.Main.init({
       node: document.getElementById('main'),
@@ -71,13 +60,10 @@ connectWebRTC()
 
     // streams
 
-    const streams = new StreamClient(client);
+    const streams = new VIAM.StreamClient(client);
     streams.on('track', onTrack);
 
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
-      console.log('linear', linear);
-      console.log('angular', angular);
-
       const linearVec = { x: 0, y: linear, z: 0 };
       const angularVec = { x: 0, y: 0, z: angular };
 
@@ -85,19 +71,16 @@ connectWebRTC()
     });
 
     app.ports.sendBaseStop.subscribe(async () => {
-      console.log('stopping');
       await base.stop();
     });
 
     app.ports.getWifiReading.subscribe(async () => {
       const readings = await wifi.getReadings();
-      console.debug(readings);
       app.ports.recvWifiReading.send(readings);
     });
 
     app.ports.getAccelReading.subscribe(async () => {
       const readings = await accel.getLinearAcceleration();
-      console.debug(readings);
       app.ports.recvAccelReading.send(readings);
     });
 
