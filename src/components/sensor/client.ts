@@ -6,7 +6,7 @@ import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_ser
 
 import { promisify } from '../../utils';
 import sensorApi from '../../gen/component/sensor/v1/sensor_pb';
-import type { Sensor } from './Sensor';
+import type { Sensor } from './sensor';
 
 /**
  * A gRPC-web client for the Sensor component.

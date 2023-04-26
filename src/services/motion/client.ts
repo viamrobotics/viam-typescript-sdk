@@ -19,7 +19,7 @@ import type {
   WorldState,
 } from '../../types';
 import { type Constraints, encodeConstraints } from './types';
-import type { Motion } from './Motion';
+import type { Motion } from './motion';
 
 /**
  * A gRPC-web client for a Motion service.

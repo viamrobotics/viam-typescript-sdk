@@ -4,7 +4,7 @@ import type { HttpBody } from '../../gen/google/api/httpbody_pb';
 import type { Options } from '../../types';
 import pb from '../../gen/component/camera/v1/camera_pb';
 import { promisify } from '../../utils';
-import type { Camera, MimeType } from './Camera';
+import type { Camera, MimeType } from './camera';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
 

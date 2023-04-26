@@ -4,7 +4,7 @@ import encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 import { promisify } from '../../utils';
 import { type Options } from '../../types';
 import { EncoderServiceClient } from '../../gen/component/encoder/v1/encoder_pb_service';
-import { type Encoder, EncoderPositionType } from './Encoder';
+import { type Encoder, EncoderPositionType } from './encoder';
 
 /**
  * A gRPC-web client for the Encoder component.

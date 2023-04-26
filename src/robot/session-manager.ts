@@ -5,7 +5,7 @@ import {
   type ServiceError,
 } from '../gen/robot/v1/robot_pb_service';
 import robotApi from '../gen/robot/v1/robot_pb';
-import SessionTransport from './SessionTransport';
+import SessionTransport from './session-transport';
 
 const timeoutBlob = new Blob(
   [

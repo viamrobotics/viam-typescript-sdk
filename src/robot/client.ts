@@ -28,8 +28,8 @@ import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_servi
 import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { events } from '../events';
-import SessionManager from './SessionManager';
-import type { Robot } from './Robot';
+import SessionManager from './session-manager';
+import type { Robot } from './robot';
 
 interface WebRTCOptions {
   enabled: boolean;

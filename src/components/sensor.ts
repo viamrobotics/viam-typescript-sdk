@@ -1,2 +1,2 @@
-export type { Sensor } from './sensor/Sensor';
-export { SensorClient } from './sensor/Client';
+export type { Sensor } from './sensor/sensor';
+export { SensorClient } from './sensor/client';

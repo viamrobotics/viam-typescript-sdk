@@ -5,7 +5,7 @@ import { MovementSensorServiceClient } from '../../gen/component/movementsensor/
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify } from '../../utils';
-import type { MovementSensor } from './MovementSensor';
+import type { MovementSensor } from './movement-sensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.

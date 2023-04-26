@@ -5,7 +5,7 @@ import pb from '../../gen/component/base/v1/base_pb';
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service';
 import type { Options, Vector3 } from '../../types';
 import { promisify, encodeVector3 } from '../../utils';
-import type { Base } from './Base';
+import type { Base } from './base';
 
 /**
  * A gRPC-web client for the Base component.

@@ -4,7 +4,7 @@ import type { Options } from '../../types';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
 import pb from '../../gen/proto/stream/v1/stream_pb';
 import { promisify } from '../../utils';
-import type { Stream } from './Stream';
+import type { Stream } from './stream';
 
 /*
  * Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)

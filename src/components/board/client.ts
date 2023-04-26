@@ -6,7 +6,7 @@ import type { Options } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify } from '../../utils';
-import type { Board } from './Board';
+import type { Board } from './board';
 
 /**
  * A gRPC-web client for the Board component.

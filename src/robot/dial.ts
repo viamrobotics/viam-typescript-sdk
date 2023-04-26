@@ -1,4 +1,4 @@
-import { RobotClient } from './Client';
+import { RobotClient } from './client';
 
 interface Credential {
   type: string;

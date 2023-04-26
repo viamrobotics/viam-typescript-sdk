@@ -1,2 +1,2 @@
-export type { Base } from './base/Base';
-export { BaseClient } from './base/Client';
+export type { Base } from './base/base';
+export { BaseClient } from './base/client';
