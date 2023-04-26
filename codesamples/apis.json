@@ -4,6 +4,10 @@
         "func": "getEndPosition",
         "args": []
     },
+    "base": {
+        "client": "BaseClient",
+        "func": "isMoving"
+    },
     "motor": {
         "client": "MotorClient",
         "func": "isMoving",

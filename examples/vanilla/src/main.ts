@@ -1,6 +1,6 @@
-import { Client, MotorClient, createRobotClient } from '@viamrobotics/sdk';
+import * as VIAM from '@viamrobotics/sdk';
 
-async function connect() {
+async function connect(): Promise<VIAM.RobotClient> {
   // You can remove this block entirely if your robot is not authenticated.
   // Otherwise, replace with an actual secret.
   const secret = '<SECRET>';
@@ -21,7 +21,7 @@ async function connect() {
   // make it easier to connect via WebRTC.
   const iceServers = [{ urls: 'stun:global.stun.twilio.com:3478' }];
 
-  return createRobotClient({
+  return VIAM.createRobotClient({
     host,
     credential,
     authEntity: host,
@@ -36,10 +36,10 @@ function button() {
 
 // This function runs a motor component with a given named on your robot.
 // Feel free to replace it whatever logic you want to test out!
-async function run(client: Client) {
+async function run(client: VIAM.RobotClient) {
   // Replace with the name of a motor on your robot.
   const name = '<MOTOR NAME>';
-  const mc = new MotorClient(client, name);
+  const mc = new VIAM.MotorClient(client, name);
 
   try {
     button().disabled = true;
@@ -54,7 +54,7 @@ async function run(client: Client) {
 
 async function main() {
   // Connect to client
-  let client: Client;
+  let client: VIAM.RobotClient;
   try {
     client = await connect();
     console.log('connected!');
