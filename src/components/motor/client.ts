@@ -148,7 +148,7 @@ export class MotorClient implements Motor {
   }
 
   async isMoving() {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.IsMovingRequest();
     request.setName(this.name);
 

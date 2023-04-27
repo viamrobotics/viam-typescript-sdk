@@ -29,7 +29,7 @@ export const promisify = <Req, Resp>(
 };
 
 /** Convert a 3D Vector POJO to a Protobuf Datatype */
-export const encodeVector3 = function (value: Vector3): common.Vector3 {
+export const encodeVector3 = (value: Vector3): common.Vector3 => {
   const proto = new common.Vector3();
 
   proto.setX(value.x);

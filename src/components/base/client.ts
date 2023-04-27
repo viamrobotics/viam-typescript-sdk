@@ -60,7 +60,7 @@ export class BaseClient implements Base {
   }
 
   async setPower(linear: Vector3, angular: Vector3, extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.SetPowerRequest();
     request.setName(this.name);
     request.setLinear(encodeVector3(linear));
@@ -76,7 +76,7 @@ export class BaseClient implements Base {
   }
 
   async setVelocity(linear: Vector3, angular: Vector3, extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.SetVelocityRequest();
     request.setName(this.name);
     request.setLinear(encodeVector3(linear));
@@ -106,7 +106,7 @@ export class BaseClient implements Base {
   }
 
   async isMoving() {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.IsMovingRequest();
     request.setName(this.name);
 
