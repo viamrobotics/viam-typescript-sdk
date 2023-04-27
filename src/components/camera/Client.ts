@@ -46,7 +46,7 @@ export class CameraClient implements Camera {
 
   async renderFrame(mimeType: MimeType = '') {
     const cameraService = this.cameraService;
-    const request = new pb.GetPointCloudRequest();
+    const request = new pb.RenderFrameRequest();
     request.setName(this.name);
     request.setMimeType(mimeType);
 
