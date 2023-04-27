@@ -1,15 +1,15 @@
 /* eslint-disable max-classes-per-file */
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
-import type { Robot } from './Robot';
+import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
+import type { grpc } from '@improbable-eng/grpc-web';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
   PoseInFrame,
   ResourceName,
   Transform,
 } from '../gen/common/v1/common_pb';
-import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { promisify } from '../utils';
-import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service';
 import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service';
 import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service';
@@ -26,10 +26,10 @@ import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service';
 import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
-import SessionManager from './SessionManager';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { events } from '../events';
-import type { grpc } from '@improbable-eng/grpc-web';
+import SessionManager from './session-manager';
+import type { Robot } from './robot';
 
 interface WebRTCOptions {
   enabled: boolean;
@@ -339,7 +339,7 @@ export class RobotClient implements Robot {
         this.transportFactory = webRTCConn.transportFactory;
 
         webRTCConn.peerConnection.ontrack = (event) => {
-          const eventStream = event.streams[0];
+          const [eventStream] = event.streams;
           if (!eventStream) {
             events.emit('track', event);
             throw new Error('expected event stream to exist');
@@ -450,7 +450,7 @@ export class RobotClient implements Robot {
   // OPERATIONS
 
   async getOperations() {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.GetOperationsRequest();
     const response = await promisify<
       proto.GetOperationsRequest,
@@ -460,7 +460,7 @@ export class RobotClient implements Robot {
   }
 
   async cancelOperation(id: string) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.CancelOperationRequest();
     request.setId(id);
     await promisify<
@@ -470,7 +470,7 @@ export class RobotClient implements Robot {
   }
 
   async blockForOperation(id: string) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.BlockForOperationRequest();
     request.setId(id);
     await promisify<
@@ -480,7 +480,7 @@ export class RobotClient implements Robot {
   }
 
   async stopAll() {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.StopAllRequest();
     await promisify<proto.StopAllRequest, proto.StopAllResponse>(
       robotService.stopAll.bind(robotService),
@@ -491,7 +491,7 @@ export class RobotClient implements Robot {
   // FRAME SYSTEM
 
   async frameSystemConfig(transforms: Transform[]) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.FrameSystemConfigRequest();
     request.setSupplementalTransformsList(transforms);
     const response = await promisify<
@@ -506,7 +506,7 @@ export class RobotClient implements Robot {
     destination: string,
     supplementalTransforms: Transform[]
   ) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.TransformPoseRequest();
     request.setSource(source);
     request.setDestination(destination);
@@ -529,7 +529,7 @@ export class RobotClient implements Robot {
     source: string,
     destination: string
   ) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.TransformPCDRequest();
     request.setPointCloudPcd(pointCloudPCD);
     request.setSource(source);
@@ -544,7 +544,7 @@ export class RobotClient implements Robot {
   // DISCOVERY
 
   async discoverComponents(queries: proto.DiscoveryQuery[]) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.DiscoverComponentsRequest();
     request.setQueriesList(queries);
     const response = await promisify<
@@ -557,7 +557,7 @@ export class RobotClient implements Robot {
   // RESOURCES
 
   async resourceNames() {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.ResourceNamesRequest();
     const response = await promisify<
       proto.ResourceNamesRequest,
@@ -567,7 +567,7 @@ export class RobotClient implements Robot {
   }
 
   async resourceRPCSubtypes() {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.ResourceRPCSubtypesRequest();
     const response = await promisify<
       proto.ResourceRPCSubtypesRequest,
@@ -579,7 +579,7 @@ export class RobotClient implements Robot {
   // STATUS
 
   async getStatus(resourceNames: ResourceName[]) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.GetStatusRequest();
     request.setResourceNamesList(resourceNames);
     const response = await promisify<
@@ -590,7 +590,7 @@ export class RobotClient implements Robot {
   }
 
   async streamStatus(resourceNames: ResourceName[], duration: Duration) {
-    const robotService = this.robotService;
+    const { robotService } = this;
     const request = new proto.StreamStatusRequest();
     request.setResourceNamesList(resourceNames);
     request.setEvery(duration);

@@ -1,2 +1,2 @@
-export type { Motor } from './motor/Motor';
-export { MotorClient } from './motor/Client';
+export type { Motor } from './motor/motor';
+export { MotorClient } from './motor/client';

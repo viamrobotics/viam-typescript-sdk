@@ -4,7 +4,7 @@ import pb from '../../gen/component/arm/v1/arm_pb';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
 import type { Options, Pose } from '../../types';
 import { promisify, encodePose } from '../../utils';
-import type { Arm } from './Arm';
+import type { Arm } from './arm';
 
 /**
  * A gRPC-web client for the Arm component.

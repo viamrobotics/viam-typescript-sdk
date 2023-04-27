@@ -2,11 +2,11 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import type { Sensor } from './Sensor';
 import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service';
 
 import { promisify } from '../../utils';
 import sensorApi from '../../gen/component/sensor/v1/sensor_pb';
+import type { Sensor } from './sensor';
 
 /**
  * A gRPC-web client for the Sensor component.
@@ -27,8 +27,9 @@ export class SensorClient implements Sensor {
   private get sensorService() {
     return this.client;
   }
+
   async getReadings(extra = {}) {
-    const sensorService = this.sensorService;
+    const { sensorService } = this;
     const request = new sensorApi.GetReadingsRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));

@@ -5,7 +5,7 @@ import { MovementSensorServiceClient } from '../../gen/component/movementsensor/
 import type { Options } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify } from '../../utils';
-import type { MovementSensor } from './MovementSensor';
+import type { MovementSensor } from './movement-sensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -30,7 +30,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getLinearVelocity(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetLinearVelocityRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -54,7 +54,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getAngularVelocity(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetAngularVelocityRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -78,7 +78,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getCompassHeading(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetCompassHeadingRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -97,7 +97,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getOrientation(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetOrientationRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -121,7 +121,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getPosition(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetPositionRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -137,7 +137,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getProperties(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetPropertiesRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -153,7 +153,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getAccuracy(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetAccuracyRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -174,7 +174,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getLinearAcceleration(extra = {}) {
-    const movementsensorService = this.movementsensorService;
+    const { movementsensorService } = this;
     const request = new pb.GetLinearAccelerationRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));

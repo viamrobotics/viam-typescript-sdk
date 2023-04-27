@@ -1,4 +1,4 @@
-import { RobotClient } from './Client';
+import { RobotClient } from './client';
 
 interface Credential {
   type: string;
@@ -60,7 +60,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   console.debug('dialing via WebRTC...');
 
   const impliedURL = conf.host;
-  const signalingAddress = conf.signalingAddress;
+  const { signalingAddress } = conf;
   const iceServers = conf.iceServers ?? [];
 
   const rtcConfig = { iceServers };
@@ -90,9 +90,11 @@ export type DialConf = DialDirectConf | DialWebRTCConf;
 const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
   const conf = value as DialWebRTCConf;
 
-  if (typeof conf.signalingAddress !== 'string') return false;
+  if (typeof conf.signalingAddress !== 'string') {
+    return false;
+  }
 
-  return !conf.iceServers || conf.iceServers instanceof Array;
+  return !conf.iceServers || Array.isArray(conf.iceServers);
 };
 
 /**
@@ -118,7 +120,7 @@ export const createRobotClient = async (
   if (isDialWebRTCConf(conf)) {
     try {
       client = await dialWebRTC(conf);
-    } catch (err) {
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via WebRTC...');
     }
@@ -127,7 +129,7 @@ export const createRobotClient = async (
   if (!client) {
     try {
       client = await dialDirect(conf);
-    } catch (err) {
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via gRPC...');
     }

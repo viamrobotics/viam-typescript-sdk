@@ -1,2 +1,2 @@
-export type { Stream } from './stream/Stream';
-export { StreamClient } from './stream/Client';
+export type { Stream } from './stream/stream';
+export { StreamClient } from './stream/client';

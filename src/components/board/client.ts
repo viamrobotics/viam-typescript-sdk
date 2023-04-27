@@ -1,12 +1,12 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
-import type { Board } from './Board';
 import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify } from '../../utils';
+import type { Board } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -29,18 +29,17 @@ export class BoardClient implements Board {
   }
 
   private async getRawStatusResponse(extra = {}): Promise<pb.StatusResponse> {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.StatusRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.StatusRequest, pb.StatusResponse>(
+    return promisify<pb.StatusRequest, pb.StatusResponse>(
       boardService.status.bind(boardService),
       request
     );
-    return response;
   }
 
   /**
@@ -76,7 +75,7 @@ export class BoardClient implements Board {
   }
 
   async setGPIO(pin: string, high: boolean, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.SetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -90,8 +89,9 @@ export class BoardClient implements Board {
       request
     );
   }
+
   async getGPIO(pin: string, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.GetGPIORequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -105,8 +105,9 @@ export class BoardClient implements Board {
     );
     return response.getHigh();
   }
+
   async getPWM(pin: string, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.PWMRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -120,8 +121,9 @@ export class BoardClient implements Board {
     );
     return response.getDutyCyclePct();
   }
+
   async setPWM(pin: string, dutyCyle: number, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.SetPWMRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -135,8 +137,9 @@ export class BoardClient implements Board {
       request
     );
   }
+
   async getPWMFrequency(pin: string, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.PWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -150,8 +153,9 @@ export class BoardClient implements Board {
     >(boardService.pWMFrequency.bind(boardService), request);
     return response.getFrequencyHz();
   }
+
   async setPWMFrequency(pin: string, frequencyHz: number, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.SetPWMFrequencyRequest();
     request.setName(this.name);
     request.setPin(pin);
@@ -165,8 +169,9 @@ export class BoardClient implements Board {
       request
     );
   }
+
   async readAnalogReader(analogReader: string, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.ReadAnalogReaderRequest();
     request.setBoardName(this.name);
     request.setAnalogReaderName(analogReader);
@@ -180,8 +185,9 @@ export class BoardClient implements Board {
     >(boardService.readAnalogReader.bind(boardService), request);
     return response.getValue();
   }
+
   async getDigitalInterruptValue(digitalInteruptName: string, extra = {}) {
-    const boardService = this.boardService;
+    const { boardService } = this;
     const request = new pb.GetDigitalInterruptValueRequest();
     request.setBoardName(this.name);
     request.setDigitalInterruptName(digitalInteruptName);

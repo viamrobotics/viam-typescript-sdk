@@ -1,5 +1,5 @@
-export type { Robot } from './robot/Robot';
-export { RobotClient } from './robot/Client';
+export type { Robot } from './robot/robot';
+export { RobotClient } from './robot/client';
 export {
   type DialConf,
   type DialDirectConf,

@@ -2,10 +2,10 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/base/v1/base_pb';
-import type { Base } from './Base';
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service';
 import type { Options, Vector3 } from '../../types';
 import { promisify, encodeVector3 } from '../../utils';
+import type { Base } from './base';
 
 /**
  * A gRPC-web client for the Base component.
@@ -28,7 +28,7 @@ export class BaseClient implements Base {
   }
 
   async moveStraight(distanceMm: number, mmPerSec: number, extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.MoveStraightRequest();
     request.setName(this.name);
     request.setMmPerSec(mmPerSec);
@@ -44,7 +44,7 @@ export class BaseClient implements Base {
   }
 
   async spin(angleDeg: number, degsPerSec: number, extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.SpinRequest();
     request.setName(this.name);
     request.setAngleDeg(angleDeg);
@@ -60,7 +60,7 @@ export class BaseClient implements Base {
   }
 
   async setPower(linear: Vector3, angular: Vector3, extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.SetPowerRequest();
     request.setName(this.name);
     request.setLinear(encodeVector3(linear));
@@ -76,7 +76,7 @@ export class BaseClient implements Base {
   }
 
   async setVelocity(linear: Vector3, angular: Vector3, extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.SetVelocityRequest();
     request.setName(this.name);
     request.setLinear(encodeVector3(linear));
@@ -92,7 +92,7 @@ export class BaseClient implements Base {
   }
 
   async stop(extra = {}) {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.StopRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -106,7 +106,7 @@ export class BaseClient implements Base {
   }
 
   async isMoving() {
-    const baseService = this.baseService;
+    const { baseService } = this;
     const request = new pb.IsMovingRequest();
     request.setName(this.name);
 

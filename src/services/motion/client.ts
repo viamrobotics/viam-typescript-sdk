@@ -19,7 +19,7 @@ import type {
   WorldState,
 } from '../../types';
 import { type Constraints, encodeConstraints } from './types';
-import type { Motion } from './Motion';
+import type { Motion } from './motion';
 
 /**
  * A gRPC-web client for a Motion service.
@@ -48,7 +48,7 @@ export class MotionClient implements Motion {
     constraints?: Constraints,
     extra = {}
   ) {
-    const service = this.service;
+    const { service } = this;
 
     const request = new pb.MoveRequest();
     request.setName(this.name);
@@ -78,7 +78,7 @@ export class MotionClient implements Motion {
     slamServiceName: ResourceName,
     extra = {}
   ) {
-    const service = this.service;
+    const { service } = this;
 
     const request = new pb.MoveOnMapRequest();
     request.setName(this.name);
@@ -103,7 +103,7 @@ export class MotionClient implements Motion {
     worldState?: WorldState,
     extra = {}
   ) {
-    const service = this.service;
+    const { service } = this;
 
     const request = new pb.MoveSingleComponentRequest();
     request.setName(this.name);
@@ -130,7 +130,7 @@ export class MotionClient implements Motion {
     supplementalTransforms: Transform[],
     extra = {}
   ) {
-    const service = this.service;
+    const { service } = this;
 
     const request = new pb.GetPoseRequest();
     request.setName(this.name);

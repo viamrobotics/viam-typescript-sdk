@@ -1,16 +1,16 @@
 import { EventDispatcher, events } from '../../events';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import type { Stream } from './Stream';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
 import pb from '../../gen/proto/stream/v1/stream_pb';
 import { promisify } from '../../utils';
+import type { Stream } from './stream';
 
 /*
  * Returns a valid SDP video/audio track name as defined in RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
  * where track names should not include colons.
  */
-const getValidSDPTrackName = function (name: string) {
+const getValidSDPTrackName = (name: string) => {
   return name.replaceAll(':', '+');
 };
 
@@ -41,7 +41,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   async add(name: string) {
-    const streamService = this.streamService;
+    const { streamService } = this;
     const request = new pb.AddStreamRequest();
     const valName = getValidSDPTrackName(name);
     request.setName(valName);
@@ -51,7 +51,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.addStream.bind(streamService),
         request
       );
-    } catch (error) {
+    } catch {
       // Try again with just the resource name
       request.setName(name);
       this.options.requestLogger?.(request);
@@ -63,7 +63,7 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   async remove(name: string) {
-    const streamService = this.streamService;
+    const { streamService } = this;
     const request = new pb.RemoveStreamRequest();
     const valName = getValidSDPTrackName(name);
     request.setName(valName);
@@ -73,7 +73,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.removeStream.bind(streamService),
         request
       );
-    } catch (e) {
+    } catch {
       // Try again with just the resource name
       request.setName(name);
       this.options.requestLogger?.(request);

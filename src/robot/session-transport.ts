@@ -1,6 +1,6 @@
 import { GRPCError } from '@viamrobotics/rpc';
-import type SessionManager from './SessionManager';
 import { grpc } from '@improbable-eng/grpc-web';
+import type SessionManager from './session-manager';
 
 export default class SessionTransport implements grpc.Transport {
   private readonly opts: grpc.TransportOptions;
@@ -17,13 +17,13 @@ export default class SessionTransport implements grpc.Transport {
   ) {
     const actualOnEnd = opts.onEnd;
     opts.onEnd = (err?: Error) => {
-      if (err && err instanceof GRPCError) {
-        if (
-          err.code === grpc.Code.InvalidArgument &&
-          err.grpcMessage === 'SESSION_EXPIRED'
-        ) {
-          this.sessionManager.reset();
-        }
+      if (
+        err &&
+        err instanceof GRPCError &&
+        err.code === grpc.Code.InvalidArgument &&
+        err.grpcMessage === 'SESSION_EXPIRED'
+      ) {
+        this.sessionManager.reset();
       }
       actualOnEnd(err);
     };
@@ -58,14 +58,15 @@ export default class SessionTransport implements grpc.Transport {
     this.sessionManager
       .getSessionMetadata()
       .then((md) => {
+        // eslint-disable-next-line unicorn/no-array-for-each
         md.forEach((key: string, values: string | string[]) => {
           metadata.set(key, values);
         });
         this.transport.start(metadata);
         this.mdPromResolve?.();
       })
-      .catch((err) => {
-        this.opts.onEnd(err);
+      .catch((error) => {
+        this.opts.onEnd(error);
       });
   }
 

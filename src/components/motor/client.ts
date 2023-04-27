@@ -1,10 +1,10 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import type { Motor } from './Motor';
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service';
 import type { Options } from '../../types';
 import motorApi from '../../gen/component/motor/v1/motor_pb';
 import { promisify } from '../../utils';
+import type { Motor } from './motor';
 
 /**
  * A gRPC-web client for the Motor component.
@@ -27,7 +27,7 @@ export class MotorClient implements Motor {
   }
 
   async setPower(power: number, extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.SetPowerRequest();
     request.setName(this.name);
     request.setPowerPct(power);
@@ -42,7 +42,7 @@ export class MotorClient implements Motor {
   }
 
   async goFor(rpm: number, revolutions: number, extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.GoForRequest();
     request.setName(this.name);
     request.setRpm(rpm);
@@ -58,7 +58,7 @@ export class MotorClient implements Motor {
   }
 
   async goTo(rpm: number, positionRevolutions: number, extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.GoToRequest();
     request.setName(this.name);
     request.setRpm(rpm);
@@ -74,7 +74,7 @@ export class MotorClient implements Motor {
   }
 
   async resetZeroPosition(offset: number, extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.ResetZeroPositionRequest();
     request.setName(this.name);
     request.setOffset(offset);
@@ -89,7 +89,7 @@ export class MotorClient implements Motor {
   }
 
   async stop(extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.StopRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -103,7 +103,7 @@ export class MotorClient implements Motor {
   }
 
   async getProperties(extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.GetPropertiesRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -118,7 +118,7 @@ export class MotorClient implements Motor {
   }
 
   async getPosition(extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.GetPositionRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -133,7 +133,7 @@ export class MotorClient implements Motor {
   }
 
   async isPowered(extra = {}) {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.IsPoweredRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -148,7 +148,7 @@ export class MotorClient implements Motor {
   }
 
   async isMoving() {
-    const motorService = this.motorService;
+    const { motorService } = this;
     const request = new motorApi.IsMovingRequest();
     request.setName(this.name);
 

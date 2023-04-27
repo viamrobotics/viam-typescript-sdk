@@ -4,7 +4,7 @@ import encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 import { promisify } from '../../utils';
 import { type Options } from '../../types';
 import { EncoderServiceClient } from '../../gen/component/encoder/v1/encoder_pb_service';
-import { type Encoder, EncoderPositionType } from './Encoder';
+import { type Encoder, EncoderPositionType } from './encoder';
 
 /**
  * A gRPC-web client for the Encoder component.
@@ -27,7 +27,7 @@ export class EncoderClient implements Encoder {
   }
 
   async resetPosition(extra = {}) {
-    const encoderService = this.encoderService;
+    const { encoderService } = this;
     const request = new encoderApi.ResetPositionRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -41,7 +41,7 @@ export class EncoderClient implements Encoder {
   }
 
   async getProperties(extra = {}) {
-    const encoderService = this.encoderService;
+    const { encoderService } = this;
     const request = new encoderApi.GetPropertiesRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
@@ -59,7 +59,7 @@ export class EncoderClient implements Encoder {
     positionType: EncoderPositionType = EncoderPositionType.POSITION_TYPE_UNSPECIFIED,
     extra = {}
   ) {
-    const encoderService = this.encoderService;
+    const { encoderService } = this;
     const request = new encoderApi.GetPositionRequest();
     request.setName(this.name);
     request.setPositionType(positionType);

@@ -1,11 +1,11 @@
+import { ConnectionClosedError } from '@viamrobotics/rpc';
+import { grpc } from '@improbable-eng/grpc-web';
 import {
   RobotServiceClient,
   type ServiceError,
 } from '../gen/robot/v1/robot_pb_service';
-import { ConnectionClosedError } from '@viamrobotics/rpc';
-import SessionTransport from './SessionTransport';
-import { grpc } from '@improbable-eng/grpc-web';
 import robotApi from '../gen/robot/v1/robot_pb';
+import SessionTransport from './session-transport';
 
 const timeoutBlob = new Blob(
   [
@@ -83,17 +83,15 @@ export default class SessionManager {
         sendHeartbeatReq,
         new grpc.Metadata(),
         (err) => {
-          if (err) {
-            if (ConnectionClosedError.isError(err)) {
-              /*
-               * We assume the connection closing will cause getSessionMetadata to be
-               * called again by way of a reset.
-               */
-              this.reset();
-              return;
-            }
-            // Otherwise we want to continue in case it was just a blip
+          if (err && ConnectionClosedError.isError(err)) {
+            /*
+             * We assume the connection closing will cause getSessionMetadata to be
+             * called again by way of a reset.
+             */
+            this.reset();
+            return;
           }
+          // Otherwise we want to continue in case it was just a blip
           if (worker) {
             worker.postMessage(this.heartbeatIntervalMs);
           } else {
@@ -112,7 +110,7 @@ export default class SessionManager {
       const url = window.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
-      worker.onmessage = function () {
+      worker.onmessage = () => {
         doHeartbeat();
       };
     }
@@ -143,7 +141,7 @@ export default class SessionManager {
         new grpc.Metadata(),
         (err, resp) => {
           if (err) {
-            if ((err as ServiceError).code === grpc.Code.Unimplemented) {
+            if (err.code === grpc.Code.Unimplemented) {
               console.error('sessions unsupported; will not try again');
               this.sessionsSupported = false;
               this.startResolve?.();
