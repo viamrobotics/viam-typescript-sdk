@@ -28,7 +28,7 @@ export class CameraClient implements Camera {
     return this.client;
   }
 
-  async getImage(mimeType: MimeType) {
+  async getImage(mimeType: MimeType = '') {
     const cameraService = this.cameraService;
     const request = new pb.GetImageRequest();
     request.setName(this.name);
@@ -44,7 +44,7 @@ export class CameraClient implements Camera {
     return response.getImage_asU8();
   }
 
-  async renderFrame(mimeType: MimeType) {
+  async renderFrame(mimeType: MimeType = '') {
     const cameraService = this.cameraService;
     const request = new pb.GetPointCloudRequest();
     request.setName(this.name);

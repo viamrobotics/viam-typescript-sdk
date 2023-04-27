@@ -70,7 +70,7 @@ export { type Board, BoardClient } from './components/board';
  * @group Raw Protobufs
  */
 export { default as cameraApi } from './gen/component/camera/v1/camera_pb';
-export { type Camera, CameraClient } from './components/camera';
+export { type Camera, type MimeType, CameraClient } from './components/camera';
 
 /**
  * Raw Protobuf interfaces for an Encoder component.
