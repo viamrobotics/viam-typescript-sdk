@@ -22,7 +22,6 @@ module.exports = {
     '@typescript-eslint/no-misused-promises': 'warn',
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
-    'unicorn/filename-case': 'warn',
     'unicorn/prefer-add-event-listener': 'warn',
   },
 };
