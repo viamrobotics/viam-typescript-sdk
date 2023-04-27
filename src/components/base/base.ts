@@ -1,4 +1,4 @@
-import type { Extra, Vector3 } from '../../types';
+import type { StructType, Vector3 } from '../../types';
 
 /** Represents a physical base of a robot. */
 export interface Base {
@@ -12,7 +12,7 @@ export interface Base {
   moveStraight(
     distanceMm: number,
     mmPerSec: number,
-    extra?: Extra
+    extra?: StructType
   ): Promise<void>;
 
   /**
@@ -22,7 +22,7 @@ export interface Base {
    * @param angleDeg - Degrees to spin.
    * @param degsPerSec - Angular speed, in degrees per second.
    */
-  spin(angleDeg: number, degsPerSec: number, extra?: Extra): Promise<void>;
+  spin(angleDeg: number, degsPerSec: number, extra?: StructType): Promise<void>;
 
   /**
    * Set the linear and angular power of a base from -1 to 1 in terms of power
@@ -31,7 +31,11 @@ export interface Base {
    * @param linear - Desired linear power percentage from -1 to 1.
    * @param angular - Desired angular power percentage from -1 to 1.
    */
-  setPower(linear: Vector3, angular: Vector3, extra?: Extra): Promise<void>;
+  setPower(
+    linear: Vector3,
+    angular: Vector3,
+    extra?: StructType
+  ): Promise<void>;
 
   /**
    * Set the linear and angular velocity of a base.
@@ -39,11 +43,15 @@ export interface Base {
    * @param linear - Desired linear velocity in millimeters per second.
    * @param angular - Desired angular velocity in degrees per second.
    */
-  setVelocity(linear: Vector3, angular: Vector3, extra?: Extra): Promise<void>;
+  setVelocity(
+    linear: Vector3,
+    angular: Vector3,
+    extra?: StructType
+  ): Promise<void>;
 
   /** Stop a base */
-  stop(extra?: Extra): Promise<void>;
+  stop(extra?: StructType): Promise<void>;
 
   /** Return true if the base is in motion. */
-  isMoving(extra?: Extra): Promise<boolean>;
+  isMoving(extra?: StructType): Promise<boolean>;
 }

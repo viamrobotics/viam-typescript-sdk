@@ -1,7 +1,8 @@
+import type { JavaScriptValue } from 'google-protobuf/google/protobuf/struct_pb';
+
 import common from './gen/common/v1/common_pb';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Extra = Map<string, any>;
+export type StructType = Record<string, JavaScriptValue>;
 
 export interface Options {
   requestLogger?: (req: unknown) => void;

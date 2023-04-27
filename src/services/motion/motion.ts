@@ -1,8 +1,8 @@
 import type {
-  Extra,
   Pose,
   PoseInFrame,
   ResourceName,
+  StructType,
   Transform,
   WorldState,
 } from '../../types';
@@ -31,7 +31,7 @@ export interface Motion {
     componentName: ResourceName,
     worldState?: WorldState,
     constraints?: Constraints,
-    extra?: Extra
+    extra?: StructType
   ) => Promise<boolean>;
 
   /**
@@ -46,7 +46,7 @@ export interface Motion {
     destination: Pose,
     componentName: ResourceName,
     slamServiceName: ResourceName,
-    extra?: Extra
+    extra?: StructType
   ) => Promise<boolean>;
 
   /**
@@ -62,7 +62,7 @@ export interface Motion {
     destination: PoseInFrame,
     componentName: ResourceName,
     worldState?: WorldState,
-    extra?: Extra
+    extra?: StructType
   ) => Promise<boolean>;
 
   /**
@@ -77,6 +77,6 @@ export interface Motion {
     componentName: ResourceName,
     destinationFrame: string,
     supplementalTransforms: Transform[],
-    extra?: Extra
+    extra?: StructType
   ) => Promise<PoseInFrame>;
 }

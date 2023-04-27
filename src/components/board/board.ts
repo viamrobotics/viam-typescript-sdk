@@ -1,4 +1,4 @@
-import type { Extra } from '../../types';
+import type { StructType } from '../../types';
 
 interface Status {
   analogs: Record<string, number>;
@@ -11,13 +11,13 @@ interface Status {
  */
 export interface Board {
   /** Get the status of the board. */
-  getStatus(extra?: Extra): Promise<Status>;
+  getStatus(extra?: StructType): Promise<Status>;
   /**
    * Get the high/low state of the given pin of a board.
    *
    * @param pin - The pin.
    */
-  getGPIO(pin: string, extra?: Extra): Promise<boolean>;
+  getGPIO(pin: string, extra?: StructType): Promise<boolean>;
   /**
    * Set the high/low state of the given pin of a board.
    *
@@ -25,27 +25,27 @@ export interface Board {
    * @param high - When true, set the given pin to high. When false, set the
    *   given pin to low.
    */
-  setGPIO(pin: string, high: boolean, extra?: Extra): Promise<void>;
+  setGPIO(pin: string, high: boolean, extra?: StructType): Promise<void>;
   /**
    * Get the duty cycle of the given pin of a board.
    *
    * @param pin - The pin.
    * @returns The duty cycle, which is a value from 0 to 1.
    */
-  getPWM(pin: string, extra?: Extra): Promise<number>;
+  getPWM(pin: string, extra?: StructType): Promise<number>;
   /**
    * Set the duty cycle of the given pin of a board.
    *
    * @param pin - The pin.
    * @param dutyCyclePct - A value from 0 to 1.
    */
-  setPWM(pin: string, dutyCyclePct: number, extra?: Extra): Promise<void>;
+  setPWM(pin: string, dutyCyclePct: number, extra?: StructType): Promise<void>;
   /**
    * Get the PWM frequency of the given pin of a board.
    *
    * @param pin - The pin.
    */
-  getPWMFrequency(pin: string, extra?: Extra): Promise<number>;
+  getPWMFrequency(pin: string, extra?: StructType): Promise<number>;
   /**
    * Set the PWM frequency of the given pin of a board.
    *
@@ -56,14 +56,14 @@ export interface Board {
   setPWMFrequency(
     pin: string,
     frequencyHz: number,
-    extra?: Extra
+    extra?: StructType
   ): Promise<void>;
   /**
    * Read the current value of an analog reader of a board.
    *
    * @param analogReader - The name of the analog reader.
    */
-  readAnalogReader(analogReader: string, extra?: Extra): Promise<number>;
+  readAnalogReader(analogReader: string, extra?: StructType): Promise<number>;
   /**
    * Return the current value of the interrupt which is based on the type of
    * interrupt.
@@ -72,6 +72,6 @@ export interface Board {
    */
   getDigitalInterruptValue(
     digitalInterruptName: string,
-    extra?: Extra
+    extra?: StructType
   ): Promise<number>;
 }

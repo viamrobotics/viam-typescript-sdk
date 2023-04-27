@@ -1,7 +1,7 @@
-import type { Extra } from '../../types';
+import type { StructType } from '../../types';
 
 /** Represents a physical sensing device that can provide measurement readings. */
 export interface Sensor {
   /** Return the readings of a sensor. */
-  getReadings(extra?: Extra): Promise<Record<string, unknown>>;
+  getReadings(extra?: StructType): Promise<Record<string, unknown>>;
 }

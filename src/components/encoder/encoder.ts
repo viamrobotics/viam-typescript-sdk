@@ -1,4 +1,4 @@
-import type { Extra } from '../../types';
+import type { StructType } from '../../types';
 import pb from '../../gen/component/encoder/v1/encoder_pb';
 
 export type EncoderProperties = pb.GetPropertiesResponse.AsObject;
@@ -10,10 +10,10 @@ export type EncoderPositionType = ValueOf<typeof pb.PositionType>;
 /** Represents a physical encoder. */
 export interface Encoder {
   /** Set the current position of the encoder as the new zero position. */
-  resetPosition(extra?: Extra): Promise<void>;
+  resetPosition(extra?: StructType): Promise<void>;
 
   /** Return the encoder's properties. */
-  getProperties(extra?: Extra): Promise<EncoderProperties>;
+  getProperties(extra?: StructType): Promise<EncoderProperties>;
 
   /**
    * Return the current position either in relative units (ticks away from a
@@ -24,6 +24,6 @@ export interface Encoder {
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: Extra
+    extra?: StructType
   ): Promise<readonly [number, EncoderPositionType]>;
 }
