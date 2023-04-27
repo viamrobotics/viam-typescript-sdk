@@ -1,4 +1,4 @@
-import type { StructType } from '../../types';
+import type { Resource, StructType } from '../../types';
 
 interface Status {
   analogs: Record<string, number>;
@@ -9,7 +9,7 @@ interface Status {
  * Represents a physical general purpose compute board that contains various
  * components such as analog readers, and digital interrupts.
  */
-export interface Board {
+export interface Board extends Resource {
   /** Get the status of the board. */
   getStatus(extra?: StructType): Promise<Status>;
   /**

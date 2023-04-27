@@ -1,7 +1,7 @@
-import type { StructType, Vector3 } from '../../types';
+import type { Resource, StructType, Vector3 } from '../../types';
 
 /** Represents a physical base of a robot. */
-export interface Base {
+export interface Base extends Resource {
   /**
    * Move a base in a straight line by a given distance at a given speed. This
    * method blocks until completed or cancelled.

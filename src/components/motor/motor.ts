@@ -1,4 +1,4 @@
-import type { StructType } from '../../types';
+import type { Resource, StructType } from '../../types';
 
 export interface Properties {
   /** Whether a motor supports position reporting. */
@@ -6,7 +6,7 @@ export interface Properties {
 }
 
 /** Represents a physical motor. */
-export interface Motor {
+export interface Motor extends Resource {
   /**
    * Set the percentage of the motor's total power that should be employed.
    *

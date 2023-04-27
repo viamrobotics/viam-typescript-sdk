@@ -1,7 +1,7 @@
-import type { StructType } from '../../types';
+import type { Resource, StructType } from '../../types';
 
 /** Represents a physical robotic gripper. */
-export interface Gripper {
+export interface Gripper extends Resource {
   /** Open a gripper of the underlying robot. */
   open: (extra?: StructType) => Promise<void>;
 

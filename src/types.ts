@@ -8,6 +8,15 @@ export interface Options {
   requestLogger?: (req: unknown) => void;
 }
 
+export interface Resource {
+  /**
+   * Send/Receive arbitrary commands to the resource.
+   *
+   * @param command - The command to execute.
+   */
+  doCommand: (command: StructType) => Promise<StructType>;
+}
+
 // Common Protobuf Types
 
 export type ResourceName = common.ResourceName.AsObject;

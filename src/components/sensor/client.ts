@@ -1,10 +1,10 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructType } from '../../types';
 import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service';
 
-import { promisify } from '../../utils';
+import { promisify, doCommandFromClient } from '../../utils';
 import sensorApi from '../../gen/component/sensor/v1/sensor_pb';
 import type { Sensor } from './sensor';
 
@@ -46,5 +46,10 @@ export class SensorClient implements Sensor {
       result[key] = value.toJavaScript();
     }
     return result;
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { sensorService } = this;
+    return doCommandFromClient(sensorService, this.name, command, this.options);
   }
 }

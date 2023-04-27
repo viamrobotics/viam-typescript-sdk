@@ -3,8 +3,8 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/base/v1/base_pb';
 import { BaseServiceClient } from '../../gen/component/base/v1/base_pb_service';
-import type { Options, Vector3 } from '../../types';
-import { promisify, encodeVector3 } from '../../utils';
+import type { Options, StructType, Vector3 } from '../../types';
+import { promisify, doCommandFromClient, encodeVector3 } from '../../utils';
 import type { Base } from './base';
 
 /**
@@ -117,5 +117,10 @@ export class BaseClient implements Base {
       request
     );
     return response.getIsMoving();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { baseService } = this;
+    return doCommandFromClient(baseService, this.name, command, this.options);
   }
 }

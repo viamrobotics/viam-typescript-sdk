@@ -1,9 +1,9 @@
 import type { JointPositions } from '../../gen/component/arm/v1/arm_pb';
 
-import type { StructType, Pose } from '../../types';
+import type { Pose, Resource, StructType } from '../../types';
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
-export interface Arm {
+export interface Arm extends Resource {
   /** Get the position of the end of the arm expressed as a pose */
   getEndPosition: (extra?: StructType) => Promise<Pose>;
 
@@ -33,11 +33,4 @@ export interface Arm {
 
   /** Get if the arm is currently moving. */
   isMoving: () => Promise<boolean>;
-
-  /**
-   * Send arbitrary commands to the resource.
-   *
-   * @param command - The command to execute.
-   */
-  doCommand: (command: StructType) => Promise<StructType>;
 }

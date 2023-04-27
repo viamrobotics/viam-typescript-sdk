@@ -1,6 +1,7 @@
 import type {
   Pose,
   PoseInFrame,
+  Resource,
   ResourceName,
   StructType,
   Transform,
@@ -12,7 +13,7 @@ import type { Constraints } from './types';
  * A service that coordinates motion planning across all of the components in a
  * given robot.
  */
-export interface Motion {
+export interface Motion extends Resource {
   /**
    * Move any component on the robot to a specified destination which can be
    * from the reference frame of any other component on the robot.
