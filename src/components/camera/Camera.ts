@@ -13,6 +13,7 @@ export interface Properties {
 }
 
 export type MimeType =
+  | ''
   | 'image/vnd.viam.rgba'
   | 'image/jpeg'
   | 'image/png'
@@ -27,7 +28,7 @@ export interface Camera {
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
    */
-  getImage: (mimeType: MimeType) => Promise<Uint8Array>;
+  getImage: (mimeType?: MimeType) => Promise<Uint8Array>;
 
   /**
    * Render a frame from a camera to an HTTP response.
@@ -35,7 +36,7 @@ export interface Camera {
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
    */
-  renderFrame: (mimeType: MimeType) => Promise<Blob>;
+  renderFrame: (mimeType?: MimeType) => Promise<Blob>;
 
   /** Return a point cloud from a camera. */
   getPointCloud: () => Promise<Uint8Array>;

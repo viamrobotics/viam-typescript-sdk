@@ -1,2 +1,2 @@
-export type { Camera } from './camera/Camera';
+export type { Camera, MimeType } from './camera/Camera';
 export { CameraClient } from './camera/Client';
