@@ -1,15 +1,15 @@
-import type { Extra } from '../../types';
+import type { Resource, StructType } from '../../types';
 
 /** Represents a physical robotic gripper. */
-export interface Gripper {
+export interface Gripper extends Resource {
   /** Open a gripper of the underlying robot. */
-  open: (extra?: Extra) => Promise<void>;
+  open: (extra?: StructType) => Promise<void>;
 
   /** Request a gripper of the underlying robot to grab. */
-  grab: (extra?: Extra) => Promise<void>;
+  grab: (extra?: StructType) => Promise<void>;
 
   /** Stop a robot's gripper. */
-  stop: (extra?: Extra) => Promise<void>;
+  stop: (extra?: StructType) => Promise<void>;
 
   /** Report if the gripper is in motion. */
   isMoving: () => Promise<boolean>;

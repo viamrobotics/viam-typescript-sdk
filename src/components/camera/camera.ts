@@ -2,6 +2,7 @@ import type {
   DistortionParameters,
   IntrinsicParameters,
 } from '../../gen/component/camera/v1/camera_pb';
+import type { Resource } from '../../types';
 
 export interface Properties {
   /** Whether the camera supports the return of point cloud data. */
@@ -21,7 +22,7 @@ export type MimeType =
   | 'unsupported';
 
 /** Represents any physical hardware that can capture frames. */
-export interface Camera {
+export interface Camera extends Resource {
   /**
    * Return a frame from a camera.
    *

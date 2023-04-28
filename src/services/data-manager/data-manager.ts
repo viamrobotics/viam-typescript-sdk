@@ -1,5 +1,5 @@
-import type { Extra } from '../../types';
+import type { Resource, StructType } from '../../types';
 
-export interface DataManager {
-  sync: (extra?: Extra) => Promise<void>;
+export interface DataManager extends Resource {
+  sync: (extra?: StructType) => Promise<void>;
 }

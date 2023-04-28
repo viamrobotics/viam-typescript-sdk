@@ -4,6 +4,7 @@ import type { RobotClient } from '../../robot';
 import { MotionServiceClient } from '../../gen/service/motion/v1/motion_pb_service';
 import {
   promisify,
+  doCommandFromClient,
   encodeResourceName,
   encodePose,
   encodePoseInFrame,
@@ -15,6 +16,7 @@ import type {
   Pose,
   PoseInFrame,
   ResourceName,
+  StructType,
   Transform,
   WorldState,
 } from '../../types';
@@ -155,5 +157,10 @@ export class MotionClient implements Motion {
     }
 
     return result.toObject();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { service } = this;
+    return doCommandFromClient(service, this.name, command, this.options);
   }
 }
