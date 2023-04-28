@@ -2,10 +2,10 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructType } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
-import { promisify } from '../../utils';
+import { promisify, doCommandFromClient } from '../../utils';
 import type { Board } from './board';
 
 /**
@@ -200,5 +200,10 @@ export class BoardClient implements Board {
       pb.GetDigitalInterruptValueResponse
     >(boardService.getDigitalInterruptValue.bind(boardService), request);
     return response.getValue();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { boardService } = this;
+    return doCommandFromClient(boardService, this.name, command, this.options);
   }
 }

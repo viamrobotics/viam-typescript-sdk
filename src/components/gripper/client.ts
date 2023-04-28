@@ -2,8 +2,8 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/gripper/v1/gripper_pb';
 import { GripperServiceClient } from '../../gen/component/gripper/v1/gripper_pb_service';
-import type { Options } from '../../types';
-import { promisify } from '../../utils';
+import type { Options, StructType } from '../../types';
+import { promisify, doCommandFromClient } from '../../utils';
 import type { Gripper } from './gripper';
 
 /**
@@ -85,5 +85,10 @@ export class GripperClient implements Gripper {
     );
 
     return response.getIsMoving();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const service = this.gripperService;
+    return doCommandFromClient(service, this.name, command, this.options);
   }
 }

@@ -211,7 +211,7 @@ export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
  *
  * const client = {}; // replace with a connected robot client
  *
- * const request = new genericApi.DoCommandRequest();
+ * const request = new commonApi.DoCommandRequest();
  * request.setName('mygeneric');
  * request.setCommand(Struct.fromJavaScript({ foo: 'bar' }));
  *

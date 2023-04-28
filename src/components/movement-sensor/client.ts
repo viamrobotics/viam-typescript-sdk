@@ -2,9 +2,9 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
-import type { Options } from '../../types';
+import type { Options, StructType } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
-import { promisify } from '../../utils';
+import { promisify, doCommandFromClient } from '../../utils';
 import type { MovementSensor } from './movement-sensor';
 
 /**
@@ -199,5 +199,15 @@ export class MovementSensorClient implements MovementSensor {
 
   getReadings(extra = {}) {
     return this.sensorclient.getReadings(extra);
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { movementsensorService } = this;
+    return doCommandFromClient(
+      movementsensorService,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

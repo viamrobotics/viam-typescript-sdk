@@ -3,8 +3,8 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import { DataManagerServiceClient } from '../../gen/service/datamanager/v1/data_manager_pb_service.js';
-import type { Options } from '../../types';
-import { promisify } from '../../utils';
+import type { Options, StructType } from '../../types';
+import { promisify, doCommandFromClient } from '../../utils';
 import type { DataManager } from './data-manager';
 
 export class DataManagerClient implements DataManager {
@@ -33,6 +33,16 @@ export class DataManagerClient implements DataManager {
     await promisify<pb.SyncRequest, pb.SyncResponse>(
       datamanagerService.sync.bind(datamanagerService),
       request
+    );
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { datamanagerService } = this;
+    return doCommandFromClient(
+      datamanagerService,
+      this.name,
+      command,
+      this.options
     );
   }
 }
