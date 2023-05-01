@@ -1,8 +1,8 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import encoderApi from '../../gen/component/encoder/v1/encoder_pb';
-import { promisify } from '../../utils';
-import { type Options } from '../../types';
+import { promisify, doCommandFromClient } from '../../utils';
+import type { Options, StructType } from '../../types';
 import { EncoderServiceClient } from '../../gen/component/encoder/v1/encoder_pb_service';
 import { type Encoder, EncoderPositionType } from './encoder';
 
@@ -72,5 +72,15 @@ export class EncoderClient implements Encoder {
       encoderApi.GetPositionResponse
     >(encoderService.getPosition.bind(encoderService), request);
     return [response.getValue(), response.getPositionType()] as const;
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { encoderService } = this;
+    return doCommandFromClient(
+      encoderService,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

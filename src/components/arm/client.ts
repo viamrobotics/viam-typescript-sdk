@@ -2,8 +2,8 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import pb from '../../gen/component/arm/v1/arm_pb';
 import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
-import type { Options, Pose } from '../../types';
-import { promisify, encodePose } from '../../utils';
+import type { Options, Pose, StructType } from '../../types';
+import { doCommandFromClient, encodePose, promisify } from '../../utils';
 import type { Arm } from './arm';
 
 /**
@@ -128,5 +128,10 @@ export class ArmClient implements Arm {
       request
     );
     return response.getIsMoving();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const armService = this.ArmService;
+    return doCommandFromClient(armService, this.name, command, this.options);
   }
 }

@@ -1,9 +1,9 @@
 import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service';
 import type { RobotClient } from '../../robot';
 import type { HttpBody } from '../../gen/google/api/httpbody_pb';
-import type { Options } from '../../types';
+import type { Options, StructType } from '../../types';
 import pb from '../../gen/component/camera/v1/camera_pb';
-import { promisify } from '../../utils';
+import { promisify, doCommandFromClient } from '../../utils';
 import type { Camera, MimeType } from './camera';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
@@ -89,5 +89,10 @@ export class CameraClient implements Camera {
     >(cameraService.getProperties.bind(cameraService), request);
 
     return response.toObject();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { cameraService } = this;
+    return doCommandFromClient(cameraService, this.name, command, this.options);
   }
 }

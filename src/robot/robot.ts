@@ -4,7 +4,7 @@ import type {
   ResourceName,
   Transform,
 } from '../gen/common/v1/common_pb';
-import type { Extra } from '../types';
+import type { StructType } from '../types';
 import type proto from '../gen/robot/v1/robot_pb';
 
 export interface Robot {
@@ -44,7 +44,7 @@ export interface Robot {
    * @group Operations
    * @alpha
    */
-  stopAll(extra?: Map<string, Extra>): Promise<void>;
+  stopAll(extra?: Map<string, StructType>): Promise<void>;
 
   /**
    * Get the configuration of the frame system of a given robot.
