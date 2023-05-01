@@ -1,9 +1,9 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import { MotorServiceClient } from '../../gen/component/motor/v1/motor_pb_service';
-import type { Options } from '../../types';
+import type { Options, StructType } from '../../types';
 import motorApi from '../../gen/component/motor/v1/motor_pb';
-import { promisify } from '../../utils';
+import { promisify, doCommandFromClient } from '../../utils';
 import type { Motor } from './motor';
 
 /**
@@ -159,5 +159,10 @@ export class MotorClient implements Motor {
       motorApi.IsMovingResponse
     >(motorService.isMoving.bind(motorService), request);
     return response.getIsMoving();
+  }
+
+  async doCommand(command: StructType): Promise<StructType> {
+    const { motorService } = this;
+    return doCommandFromClient(motorService, this.name, command, this.options);
   }
 }

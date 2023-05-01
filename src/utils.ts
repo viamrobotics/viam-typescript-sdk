@@ -1,7 +1,8 @@
 import { grpc } from '@improbable-eng/grpc-web';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import common from './gen/common/v1/common_pb';
-import type { Vector3 } from './types';
+import type { Options, StructType, Vector3 } from './types';
 
 type Callback<T> = (error: ServiceError | null, response: T | null) => void;
 
@@ -26,6 +27,34 @@ export const promisify = <Req, Resp>(
       return resolve(response);
     });
   });
+};
+
+interface DoCommandClient {
+  doCommand: ServiceFunc<common.DoCommandRequest, common.DoCommandResponse>;
+}
+
+/** Send/Receive an arbitrary command using a resource client */
+export const doCommandFromClient = async function doCommandFromClient(
+  client: DoCommandClient,
+  name: string,
+  command: StructType,
+  options: Options = {}
+): Promise<StructType> {
+  const request = new common.DoCommandRequest();
+  request.setName(name);
+  request.setCommand(Struct.fromJavaScript(command));
+
+  options.requestLogger?.(request);
+
+  const response = await promisify<
+    common.DoCommandRequest,
+    common.DoCommandResponse
+  >(client.doCommand.bind(client), request);
+  const result = response.getResult()?.toJavaScript();
+  if (!result) {
+    return {};
+  }
+  return result;
 };
 
 /** Convert a 3D Vector POJO to a Protobuf Datatype */
