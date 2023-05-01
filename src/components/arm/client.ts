@@ -119,6 +119,7 @@ export class ArmClient implements Arm {
   async isMoving() {
     const armService = this.ArmService;
     const request = new pb.IsMovingRequest();
+    request.setName(this.name);
 
     this.options.requestLogger?.(request);
 
