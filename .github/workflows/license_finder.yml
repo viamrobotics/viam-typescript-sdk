@@ -1,0 +1,23 @@
+name: License Finder
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  license_finder:
+    # if: github.repository_owner == 'viamrobotics'
+    name: Audit 3rd-Party Licenses
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run license finder
+        run: license_finder
