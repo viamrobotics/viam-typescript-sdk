@@ -9,3 +9,6 @@ on:
 jobs:
   test:
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@main
+
+  license_check:
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/license_finder.yml@license-check
