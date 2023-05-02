@@ -7,7 +7,7 @@
 ## (In)stability Notice
 
 > **Warning**
-> This is an alpha release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
+> This is a beta release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
 
 ## Usage
 
@@ -20,6 +20,10 @@ npm install --save @viamrobotics/sdk
 ### Examples
 
 [The examples directory](https://github.com/viamrobotics/viam-typescript-sdk/tree/main/examples) contains small apps that demonstrate how to use this SDK to operate a robot running Viam.
+
+### Documentation
+
+[https://ts.viam.dev](https://ts.viam.dev/)
 
 ## License 
 Copyright 2022-2023 Viam Inc.
