@@ -1,8 +1,8 @@
 {
-  "name": "@viamrobotics/sdk-teleop-demo",
-  "version": "0.0.1",
-  "description": "Viam SDK tele-operation demo in Elm",
+  "name": "@viamrobotics/elm-teleop-sdk-example",
+  "description": "An example tele-operation application using @viamrobotics/sdk",
   "scripts": {
+    "preinstall": "make -C ../.. build",
     "start": "vite --port 8000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

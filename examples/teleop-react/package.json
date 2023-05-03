@@ -1,9 +1,9 @@
 {
-  "name": "@viamrobotics/sdk-teleop-example",
-  "version": "0.0.0",
+  "name": "@viamrobotics/react-teleop-sdk-example",
   "description": "An example tele-operation application using @viamrobotics/sdk",
   "type": "module",
   "scripts": {
+    "preinstall": "make -C ../.. build",
     "start": "vite dev",
     "build": "vite build",
     "types": "npm run types:src && npm run types:node",
