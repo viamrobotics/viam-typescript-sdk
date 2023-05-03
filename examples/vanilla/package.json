@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "@viamrobotics/vanilla-sdk-example",
   "description": "A framework-free example application that demonstrates how to connect to a robot using @viamrobotics/sdk",
   "scripts": {
     "preinstall": "make -C ../.. build",

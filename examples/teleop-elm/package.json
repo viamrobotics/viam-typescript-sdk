@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "@viamrobotics/elm-teleop-sdk-example",
   "description": "An example tele-operation application using @viamrobotics/sdk",
   "scripts": {
     "preinstall": "make -C ../.. build",
