@@ -2,7 +2,7 @@
   "name": "example",
   "description": "An example tele-operation application using @viamrobotics/sdk",
   "scripts": {
-    "preinstall": "cd ../.. && make build",
+    "preinstall": "make -C ../.. build",
     "start": "vite --port 8000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

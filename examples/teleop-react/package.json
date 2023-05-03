@@ -3,7 +3,7 @@
   "description": "An example tele-operation application using @viamrobotics/sdk",
   "type": "module",
   "scripts": {
-    "preinstall": "cd ../.. && make build",
+    "preinstall": "make -C ../.. build",
     "start": "vite dev",
     "build": "vite build",
     "types": "npm run types:src && npm run types:node",
