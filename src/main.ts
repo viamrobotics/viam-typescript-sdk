@@ -325,29 +325,12 @@ export { default as navigationApi } from './gen/service/navigation/v1/navigation
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new servoApi.GetPositionRequest();
- * request.setName('myservo');
- *
- * client.servoService.getPosition(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link ServoClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as servoApi } from './gen/component/servo/v1/servo_pb';
+export { type Servo, ServoClient } from './components/servo';
 
 /**
  * Raw Protobuf interfaces for a Slam service.
