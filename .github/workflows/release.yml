@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The type of version bump. Select "nobump" for no version change. See https://github.com/npm/node-semver#functions'
+        type: choice
+        required: true
+        default: nobump
+        options:
+          - major
+          - minor
+          - patch
+          - premajor
+          - preminor
+          - prepatch
+          - prerelease
+          - nobump # this is a not an npm option
+
+jobs:
+  prepare:
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+    outputs:
+      sha: ${{ steps.commit.outputs.commit_long_sha }}
+      version: ${{ steps.bump_version.outputs.version }}
+    steps:
+      - name: Check if organization member
+        id: is_organization_member
+        uses: jamessingleton/is-organization-member@1.0.1
+        with:
+          organization: viamrobotics
+          username: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: cancelling
+        uses: andymckay/cancel-action@0.2
+        if: |
+          steps.is_organization_member.outputs.result == 'false'
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build, lint, and test
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build lint test'
+
+      - name: Bump Version
+        id: bump_version
+        run: npm version ${{ inputs.version }} --preid=rc
+        if: inputs.version != 'nobump'
+
+      - name: Which Version
+        id: which_version
+        run: echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" | tee -a $GITHUB_ENV
+
+      - name: Commit + Push
+        id: commit
+        uses: EndBug/add-and-commit@v9.0.0
+        with:
+          default_author: github_actions
+          message: Bumping version to v${{ env.SDK_VERSION }} [skip ci]
+          # TODO: do we need a new branch? rc prefix?
+          new_branch: ${{ env.SDK_VERSION }}
+
+  build:
+    needs: prepare
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+
+      - name: Build + Pack
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build pack'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packed
+          path: viamrobotics-sdk-*.tgz
+
+  release:
+    needs: [prepare, build]
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+
+    steps:
+      - uses: actions/download-artifact@v3
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          files: viamrobotics-sdk-*.tgz
+          draft: true
+          prerelease: ${{ contains(inputs.version, 'pre') }}
+          fail_on_unmatched_files: true
