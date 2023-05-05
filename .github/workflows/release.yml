@@ -60,7 +60,6 @@ jobs:
       - name: Which Version
         id: which_version
         run: echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" | tee -a $GITHUB_ENV
-
       - name: Commit + Push
         id: commit
         uses: EndBug/add-and-commit@v9.0.0
@@ -68,7 +67,7 @@ jobs:
           default_author: github_actions
           message: Bumping version to v${{ env.SDK_VERSION }} [skip ci]
           # TODO: do we need a new branch? rc prefix?
-          new_branch: ${{ env.SDK_VERSION }}
+          new_branch: release/${{ env.SDK_VERSION }}
 
   build:
     needs: prepare
@@ -107,7 +106,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
-          files: viamrobotics-sdk-*.tgz
+          files: packed/*
           draft: true
           prerelease: ${{ contains(inputs.version, 'pre') }}
           fail_on_unmatched_files: true
