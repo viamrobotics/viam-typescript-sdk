@@ -23,11 +23,13 @@ import { MotorServiceClient } from '../gen/component/motor/v1/motor_pb_service';
 import { MovementSensorServiceClient } from '../gen/component/movementsensor/v1/movementsensor_pb_service';
 import { NavigationServiceClient } from '../gen/service/navigation/v1/navigation_pb_service';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
+import type { ResponseStream, Status } from '../gen/robot/v1/robot_pb_service';
 import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service';
 import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { events } from '../events';
+import { IResponseStream } from '../responses';
 import SessionManager from './session-manager';
 import type { Robot } from './robot';
 
@@ -589,15 +591,29 @@ export class RobotClient implements Robot {
     return response.getStatusList();
   }
 
-  async streamStatus(resourceNames: ResourceName[], duration: Duration) {
+  streamStatus(
+    resourceNames: ResourceName[],
+    duration: Duration
+  ): ResponseStream<proto.Status[]> {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
     request.setResourceNamesList(resourceNames);
     request.setEvery(duration);
-    const response = await promisify<
-      proto.StreamStatusRequest,
-      proto.StreamStatusResponse
-    >(robotService.streamStatus.bind(robotService), request);
-    return response.getStatusList();
+
+    const statusStream = robotService.streamStatus(request);
+    if (statusStream === null) {
+      throw new Error('no stream');
+    }
+    const stream = new IResponseStream<proto.Status[]>(statusStream);
+    statusStream.on('data', (response: proto.StreamStatusResponse) => {
+      stream.emit('data', response.getStatusList());
+    });
+    statusStream.on('status', (status: Status) => {
+      stream.emit('status', status);
+    });
+    statusStream.on('end', (status?: Status) => {
+      stream.emit('end', status);
+    });
+    return stream;
   }
 }
