@@ -16,7 +16,7 @@ on:
           - preminor
           - prepatch
           - prerelease
-          - nobump # this is a not an npm option
+          - nobump # this action is custom for this action and does not exist in npm
 
 jobs:
   prepare:
@@ -35,28 +35,25 @@ jobs:
           username: ${{ github.actor }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: cancelling
+      - name: Cancelling - not an organization member
         uses: andymckay/cancel-action@0.2
-        if: |
-          steps.is_organization_member.outputs.result == 'false'
+        if: steps.is_organization_member.outputs.result == 'false'
 
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Build, lint, and test
+      - name: Build + Lint + Test
         run: |
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build lint test'
 
       - name: Bump Version
-        run: npm version ${{ inputs.version }} --preid=rc --no-git-tag-version
+        run: npm version ${{ inputs.version }} --preid=pre --no-git-tag-version
         if: inputs.version != 'nobump'
 
       - name: Which Version
         id: which_version
-        run: |
-          echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" | tee -a $GITHUB_ENV
-          echo "version=$(npm pkg get version | sed 's/\"//g')" | tee -a $GITHUB_OUTPUT
+        run: echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" | tee -a $GITHUB_ENV | tee -a $GITHUB_OUTPUT
 
       - name: Check if release exists
         uses: cardinalby/git-get-release-action@1.2.4
@@ -69,8 +66,7 @@ jobs:
 
       - name: Cancelling - release already exists
         uses: andymckay/cancel-action@0.2
-        if: |
-          steps.release_exists.outputs.id != ''
+        if: steps.release_exists.outputs.id != ''
 
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v5
