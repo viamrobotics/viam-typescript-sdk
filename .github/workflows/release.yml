@@ -25,8 +25,7 @@ jobs:
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     outputs:
-      sha: ${{ steps.commit.outputs.commit_long_sha }}
-      version: ${{ steps.bump_version.outputs.version }}
+      version: ${{ steps.which_version.outputs.version }}
     steps:
       - name: Check if organization member
         id: is_organization_member
@@ -50,10 +49,7 @@ jobs:
           sudo -u testbot bash -lc 'make build lint test'
 
       - name: Bump Version
-        id: bump_version
-        run: |
-          npm version ${{ inputs.version }} --preid=rc --no-git-tag-version
-          git status
+        run: npm version ${{ inputs.version }} --preid=rc --no-git-tag-version
         if: inputs.version != 'nobump'
 
       - name: Which Version
