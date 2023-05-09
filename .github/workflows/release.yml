@@ -55,7 +55,7 @@ jobs:
         id: which_version
         run: |
           echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
-          echo "version=${{ env.SDK_VERSION }}" >> $GITHUB_OUTPUT
+          echo "version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
 
       - name: Check if release exists
         uses: cardinalby/git-get-release-action@1.2.4
