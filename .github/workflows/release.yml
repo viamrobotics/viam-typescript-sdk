@@ -10,7 +10,7 @@ on:
         description: 'The type of version bump. Select "nobump" for no version change. See https://github.com/npm/node-semver#functions'
         type: choice
         required: true
-        default: nobump
+        default: prepatch # TODO: default should be nobump
         options:
           - major
           - minor
