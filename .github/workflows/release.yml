@@ -60,14 +60,30 @@ jobs:
       - name: Which Version
         id: which_version
         run: echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" | tee -a $GITHUB_ENV
-      - name: Commit + Push
-        id: commit
-        uses: EndBug/add-and-commit@v9.0.0
+
+      - name: Check if release exists
+        uses: cardinalby/git-get-release-action@1.2.4
+        id: release_exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          default_author: github_actions
-          message: Bumping version to v${{ env.SDK_VERSION }} [skip ci]
-          # TODO: do we need a new branch? rc prefix?
-          new_branch: release/${{ env.SDK_VERSION }}
+          releaseName: v${{ env.SDK_VERSION }}
+          doNotFailIfNotFound: 'true'
+
+      - name: Cancelling - release already exists
+        uses: andymckay/cancel-action@0.2
+        if: |
+          steps.release_exists.outputs.id != ''
+
+      - name: Add + Commit + Open PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: Bump version to ${{ env.SDK_VERSION }}
+          branch: release/${{ env.SDK_VERSION }}
+          delete-branch: true
+          base: main
+          title: ${{ env.SDK_VERSION }}
+          body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
     needs: prepare
@@ -79,7 +95,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          ref: ${{ needs.prepare.outputs.sha }}
+          ref: ${{ needs.prepare.outputs.version }}
 
       - name: Build + Pack
         run: |
