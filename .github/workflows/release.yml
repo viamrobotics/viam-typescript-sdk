@@ -1,12 +1,6 @@
 name: Release
 
 on:
-  # push:
-  #   branches:
-  #     - release-process
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       version:
@@ -26,7 +20,7 @@ on:
 
 jobs:
   prepare:
-    # if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -92,7 +86,7 @@ jobs:
 
   build:
     needs: prepare
-    # if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -115,7 +109,7 @@ jobs:
 
   release:
     needs: [prepare, build]
-    # if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
