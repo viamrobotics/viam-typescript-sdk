@@ -10,7 +10,7 @@ on:
         description: 'The type of version bump. Select "nobump" for no version change. See https://github.com/npm/node-semver#functions'
         type: choice
         required: true
-        default: prepatch # TODO: default should be nobump
+        default: prepatch # TODO: default should be `nobump`
         options:
           - major
           - minor
@@ -81,7 +81,7 @@ jobs:
           commit-message: Bump version to ${{ env.SDK_VERSION }}
           branch: release/${{ env.SDK_VERSION }}
           delete-branch: true
-          base: main
+          base: release-process # TODO: this should be `main`
           title: ${{ env.SDK_VERSION }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
