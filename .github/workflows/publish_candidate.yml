@@ -37,13 +37,14 @@ jobs:
           github.event_name == 'workflow_dispatch' && steps.is_organization_member.outputs.result == 'false'
 
       - name: Download Release
+        id: download_release
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           file: "viamrobotics\\-sdk\\-.*\\.tgz"
           regex: true
 
-      - name: Check files
-        run: ls -1
+      - name: Check Download
+        run: echo ${{ steps.download_release.outputs.version }}
 
       - name: Publish
         uses: JS-DevTools/npm-publish@v2
