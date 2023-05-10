@@ -121,3 +121,4 @@ jobs:
           draft: true
           prerelease: ${{ contains(inputs.version, 'pre') }}
           fail_on_unmatched_files: true
+          target_commitish: release/${{ needs.prepare.outputs.version }}
