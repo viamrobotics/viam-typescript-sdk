@@ -1,12 +1,6 @@
 name: Publish Release Candidate to NPM
 
 on:
-  pull_request:
-    secrets:
-      NPM_TOKEN:
-        required: true
-    branches:
-      - main
   release:
     types: [published]
     secrets:
