@@ -2,8 +2,8 @@ name: Publish Release Candidate to NPM
 
 on:
   release:
-    # types: [published]
-    types: [prereleased] # TODO: this should be `[published]`
+    types: [published]
+    # types: [prereleased] # TODO: this should be `[published]`
     secrets:
       NPM_TOKEN:
         required: true
