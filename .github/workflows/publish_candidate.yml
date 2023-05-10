@@ -43,8 +43,14 @@ jobs:
           file: "viamrobotics\\-sdk\\-.*\\.tgz"
           regex: true
 
-      - name: Check Download
-        run: echo ${{ steps.download_release.outputs.version }}
+      - name: Check Files
+        id: check_files
+        run: ls -1 >> $GITHUB_OUTPUT
+
+      - name: Check
+        run: |
+          echo ${{ steps.download_release.outputs.version }}
+          echo ${{ steps.check_files.outputs.version }}
 
       - name: Publish
         uses: JS-DevTools/npm-publish@v2
