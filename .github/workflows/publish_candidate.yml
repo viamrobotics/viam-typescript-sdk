@@ -3,7 +3,6 @@ name: Publish Release Candidate to NPM
 on:
   release:
     types: [published]
-    # types: [prereleased] # TODO: this should be `[published]`
     secrets:
       NPM_TOKEN:
         required: true
@@ -37,7 +36,6 @@ jobs:
           github.event_name == 'workflow_dispatch' && steps.is_organization_member.outputs.result == 'false'
 
       - name: Download Release
-        id: download_release
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           file: "viamrobotics\\-sdk\\-.*\\.tgz"
@@ -45,17 +43,12 @@ jobs:
           target: './'
 
       - name: Check Files
-        id: check_files
-        run: echo "path=$(ls -1)" >> $GITHUB_OUTPUT
-
-      - name: Check
-        run: |
-          echo ${{ steps.download_release.outputs.version }}
-          echo ${{ steps.check_files.outputs.path }}
+        id: release_file
+        run: echo "path=$(ls -1 | head -1)" >> $GITHUB_OUTPUT
 
       - name: Publish
         uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_TOKEN }}
-          package: ${{ steps.check_files.outputs.path }}
-          dry-run: true
+          package: ${{ steps.release_file.outputs.path }}
+          dry-run: true # TODO: remove dry run
