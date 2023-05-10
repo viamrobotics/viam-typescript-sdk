@@ -75,7 +75,7 @@ jobs:
           commit-message: Bump version to ${{ steps.which_version.outputs.version }}
           branch: release/${{ steps.which_version.outputs.version }}
           delete-branch: true
-          base: release-process # TODO: this should be `main`
+          base: main
           title: ${{ steps.which_version.outputs.version }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
