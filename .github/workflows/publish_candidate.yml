@@ -42,6 +42,9 @@ jobs:
           file: "viamrobotics\\-sdk\\-.*\\.tgz"
           regex: true
 
+      - name: Check files
+        run: ls -1
+
       - name: Publish
         uses: JS-DevTools/npm-publish@v2
         with:
