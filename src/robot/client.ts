@@ -601,7 +601,7 @@ export class RobotClient implements Robot {
     request.setEvery(duration);
 
     const statusStream = robotService.streamStatus(request);
-    if (statusStream === null) {
+    if (!statusStream) {
       throw new Error('no stream');
     }
     const stream = new IResponseStream<proto.Status[]>(statusStream);
