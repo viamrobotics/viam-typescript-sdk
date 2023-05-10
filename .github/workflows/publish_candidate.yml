@@ -57,4 +57,5 @@ jobs:
         uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_TOKEN }}
+          package: ${{ steps.check_files.outputs.path }}
           dry-run: true
