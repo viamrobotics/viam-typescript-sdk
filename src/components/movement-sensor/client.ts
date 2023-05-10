@@ -1,6 +1,5 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
-import { SensorClient } from '../sensor';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
 import type { Options, StructType } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
@@ -14,13 +13,11 @@ import type { MovementSensor } from './movement-sensor';
  */
 export class MovementSensorClient implements MovementSensor {
   private client: MovementSensorServiceClient;
-  private sensorclient: SensorClient;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MovementSensorServiceClient);
-    this.sensorclient = new SensorClient(client, name, options);
     this.name = name;
     this.options = options;
   }
@@ -197,8 +194,17 @@ export class MovementSensorClient implements MovementSensor {
     return acc.toObject();
   }
 
-  getReadings(extra = {}) {
-    return this.sensorclient.getReadings(extra);
+  async getReadings(extra = {}) {
+    var readings = {
+      "position": await this.getPosition(extra),
+      "linear_velocity": await this.getLinearVelocity(extra),
+      "angular_velocity": await this.getAngularVelocity(extra),
+      "linear_acceleration": await this.getLinearAcceleration(extra),
+      "compass_heading": await this.getCompassHeading(extra),
+      "orientation": await this.getOrientation(extra)
+    };
+    
+    return readings;
   }
 
   async doCommand(command: StructType): Promise<StructType> {
