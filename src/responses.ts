@@ -1,10 +1,10 @@
 import { EventDispatcher } from './events';
-import type { ResponseStream } from './gen/robot/v1/robot_pb_service';
+import type { ResponseStream as ProtoResponseStream } from './gen/robot/v1/robot_pb_service';
 
-export class IResponseStream<T> extends EventDispatcher {
-  private stream: ResponseStream<any>;
+export class ResponseStream<T> extends EventDispatcher {
+  private stream: ProtoResponseStream<any>;
 
-  constructor(stream: ResponseStream<any>) {
+  constructor(stream: ProtoResponseStream<any>) {
     super();
     this.stream = stream;
   }
@@ -12,7 +12,7 @@ export class IResponseStream<T> extends EventDispatcher {
   override on(
     type: string,
     handler: (message: any) => void
-  ): IResponseStream<T> {
+  ): ResponseStream<T> {
     super.on(type, handler);
     return this;
   }
