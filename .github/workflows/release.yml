@@ -54,7 +54,6 @@ jobs:
       - name: Which Version
         id: which_version
         run: |
-          echo "SDK_VERSION=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
           echo "version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
 
       - name: Check if release exists
@@ -63,7 +62,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          releaseName: v${{ env.SDK_VERSION }}
+          releaseName: v${{ steps.which_version.outputs.version }}
           doNotFailIfNotFound: 'true'
 
       - name: Cancelling - release already exists
@@ -73,11 +72,11 @@ jobs:
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Bump version to ${{ env.SDK_VERSION }}
-          branch: release/${{ env.SDK_VERSION }}
+          commit-message: Bump version to ${{ steps.which_version.outputs.version }}
+          branch: release/${{ steps.which_version.outputs.version }}
           delete-branch: true
           base: release-process # TODO: this should be `main`
-          title: ${{ env.SDK_VERSION }}
+          title: ${{ steps.which_version.outputs.version }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
