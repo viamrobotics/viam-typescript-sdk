@@ -204,22 +204,21 @@ export class MovementSensorClient implements MovementSensor {
       orientation?: Orientation;
     } = {};
     const readingFunctions: Record<keyof typeof readings, CallableFunction> = {
-      "position": this.getPosition.bind(this),
-      "linear_velocity": this.getLinearVelocity.bind(this),
-      "angular_velocity": this.getAngularVelocity.bind(this),
-      "linear_acceleration": this.getLinearAcceleration.bind(this),
-      "compass_heading": this.getCompassHeading.bind(this),
-      "orientation": this.getOrientation.bind(this)
-    }
+      position: this.getPosition.bind(this),
+      linear_velocity: this.getLinearVelocity.bind(this),
+      angular_velocity: this.getAngularVelocity.bind(this),
+      linear_acceleration: this.getLinearAcceleration.bind(this),
+      compass_heading: this.getCompassHeading.bind(this),
+      orientation: this.getOrientation.bind(this),
+    };
     /* eslint-disable no-await-in-loop */
     for (const [field, func] of Object.entries(readingFunctions)) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        readings[field as keyof typeof readings] = await func(extra)
-      }
-      catch (error) {
-        if (!(error as Error).message.includes("Unimplemented")) {
-          throw error
+        readings[field as keyof typeof readings] = await func(extra);
+      } catch (error) {
+        if (!(error as Error).message.includes('Unimplemented')) {
+          throw error;
         }
       }
     }
