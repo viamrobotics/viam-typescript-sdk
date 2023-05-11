@@ -203,7 +203,7 @@ export class MovementSensorClient implements MovementSensor {
       compass_heading?: number;
       orientation?: Orientation;
     } = {};
-    const mapping: Record<keyof typeof readings, CallableFunction> = {
+    const readingFunctions: Record<keyof typeof readings, CallableFunction> = {
       "position": this.getPosition.bind(this),
       "linear_velocity": this.getLinearVelocity.bind(this),
       "angular_velocity": this.getAngularVelocity.bind(this),
@@ -211,8 +211,10 @@ export class MovementSensorClient implements MovementSensor {
       "compass_heading": this.getCompassHeading.bind(this),
       "orientation": this.getOrientation.bind(this)
     }
-    for (const [field, func] of Object.entries(mapping)) {
+    /* eslint-disable no-await-in-loop */
+    for (const [field, func] of Object.entries(readingFunctions)) {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         readings[field as keyof typeof readings] = await func(extra)
       }
       catch (error) {
@@ -221,6 +223,7 @@ export class MovementSensorClient implements MovementSensor {
         }
       }
     }
+    /* eslint-enable no-await-in-loop */
 
     return readings;
   }
