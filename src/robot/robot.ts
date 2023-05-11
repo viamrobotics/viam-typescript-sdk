@@ -8,6 +8,8 @@ import type { StructType } from '../types';
 import type proto from '../gen/robot/v1/robot_pb';
 import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
+export type RobotStatusStream = ResponseStream<proto.Status[]>;
+
 export interface Robot {
   /**
    * Get the list of operations currently running on the robot.
@@ -143,5 +145,5 @@ export interface Robot {
   streamStatus(
     resourceNames: ResourceName[],
     duration: Duration
-  ): ResponseStream<proto.Status[]>;
+  ): RobotStatusStream;
 }

@@ -1,10 +1,10 @@
 import { EventDispatcher } from './events';
-import type { ResponseStream as ProtoResponseStream } from './gen/robot/v1/robot_pb_service';
+import type { ResponseStream } from './gen/robot/v1/robot_pb_service';
 
-export class ResponseStream<T> extends EventDispatcher {
-  private stream: ProtoResponseStream<any>;
+export class ViamResponseStream<T> extends EventDispatcher {
+  private stream: ResponseStream<any>;
 
-  constructor(stream: ProtoResponseStream<any>) {
+  constructor(stream: ResponseStream<any>) {
     super();
     this.stream = stream;
   }
