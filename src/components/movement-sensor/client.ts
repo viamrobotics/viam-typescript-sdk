@@ -1,10 +1,10 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
-import type { Options, StructType } from '../../types';
+import type { Options, Orientation, StructType, Vector3 } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { MovementSensor } from './movement-sensor';
+import type { MovementSensor, MovementSensorPosition } from './movement-sensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -195,15 +195,33 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getReadings(extra = {}) {
-    var readings = {
-      "position": await this.getPosition(extra),
-      "linear_velocity": await this.getLinearVelocity(extra),
-      "angular_velocity": await this.getAngularVelocity(extra),
-      "linear_acceleration": await this.getLinearAcceleration(extra),
-      "compass_heading": await this.getCompassHeading(extra),
-      "orientation": await this.getOrientation(extra)
-    };
-    
+    const readings: {
+      position?: MovementSensorPosition;
+      linear_velocity?: Vector3;
+      angular_velocity?: Vector3;
+      linear_acceleration?: Vector3;
+      compass_heading?: number;
+      orientation?: Orientation;
+    } = {};
+    const mapping: Record<keyof typeof readings, CallableFunction> = {
+      "position": this.getPosition.bind(this),
+      "linear_velocity": this.getLinearVelocity.bind(this),
+      "angular_velocity": this.getAngularVelocity.bind(this),
+      "linear_acceleration": this.getLinearAcceleration.bind(this),
+      "compass_heading": this.getCompassHeading.bind(this),
+      "orientation": this.getOrientation.bind(this)
+    }
+    for (const [field, func] of Object.entries(mapping)) {
+      try {
+        readings[field as keyof typeof readings] = await func(extra)
+      }
+      catch (error) {
+        if (!(error as Error).message.includes("Unimplemented")) {
+          throw error
+        }
+      }
+    }
+
     return readings;
   }
 
