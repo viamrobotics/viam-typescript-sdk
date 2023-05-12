@@ -1,7 +1,7 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { RobotClient } from '../../robot';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
-import type { Options, Orientation, StructType, Vector3 } from '../../types';
+import type { Options, StructType } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify, doCommandFromClient } from '../../utils';
 import type { MovementSensor, MovementSensorReadings } from './movement-sensor';
