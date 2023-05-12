@@ -211,10 +211,9 @@ export class MovementSensorClient implements MovementSensor {
       compassHeading: this.getCompassHeading.bind(this),
       orientation: this.getOrientation.bind(this),
     };
-    /* eslint-disable no-await-in-loop */
     for (const [field, func] of Object.entries(readingFunctions)) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // eslint-disable-next-line no-await-in-loop,@typescript-eslint/no-unsafe-assignment
         readings[field as keyof typeof readings] = await func(extra);
       } catch (error) {
         if (!(error as Error).message.includes('Unimplemented')) {
@@ -222,7 +221,6 @@ export class MovementSensorClient implements MovementSensor {
         }
       }
     }
-    /* eslint-enable no-await-in-loop */
 
     return readings;
   }
