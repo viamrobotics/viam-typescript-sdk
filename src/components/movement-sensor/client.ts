@@ -205,10 +205,10 @@ export class MovementSensorClient implements MovementSensor {
     } = {};
     const readingFunctions: Record<keyof typeof readings, CallableFunction> = {
       position: this.getPosition.bind(this),
-      linear_velocity: this.getLinearVelocity.bind(this),
-      angular_velocity: this.getAngularVelocity.bind(this),
-      linear_acceleration: this.getLinearAcceleration.bind(this),
-      compass_heading: this.getCompassHeading.bind(this),
+      linearVelocity: this.getLinearVelocity.bind(this),
+      angularVelocity: this.getAngularVelocity.bind(this),
+      linearAcceleration: this.getLinearAcceleration.bind(this),
+      compassHeading: this.getCompassHeading.bind(this),
       orientation: this.getOrientation.bind(this),
     };
     /* eslint-disable no-await-in-loop */
