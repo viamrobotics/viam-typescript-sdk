@@ -197,10 +197,10 @@ export class MovementSensorClient implements MovementSensor {
   async getReadings(extra = {}) {
     const readings: {
       position?: MovementSensorPosition;
-      linear_velocity?: Vector3;
-      angular_velocity?: Vector3;
-      linear_acceleration?: Vector3;
-      compass_heading?: number;
+      linearVelocity?: Vector3;
+      angularVelocity?: Vector3;
+      linearAcceleration?: Vector3;
+      compassHeading?: number;
       orientation?: Orientation;
     } = {};
     const readingFunctions: Record<keyof typeof readings, CallableFunction> = {
