@@ -1,0 +1,123 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The type of version bump. Select "nobump" for no version change. See https://github.com/npm/node-semver#functions'
+        type: choice
+        required: true
+        default: nobump
+        options:
+          - major
+          - minor
+          - patch
+          - premajor
+          - preminor
+          - prepatch
+          - prerelease
+          - nobump # this action is custom for this action and does not exist in npm
+
+jobs:
+  prepare:
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+    outputs:
+      version: ${{ steps.which_version.outputs.version }}
+    steps:
+      - name: Check if organization member
+        id: is_organization_member
+        uses: jamessingleton/is-organization-member@1.0.1
+        with:
+          organization: viamrobotics
+          username: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cancelling - not an organization member
+        uses: andymckay/cancel-action@0.2
+        if: steps.is_organization_member.outputs.result == 'false'
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build + Lint + Test
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build lint test'
+
+      - name: Bump Version
+        run: npm version ${{ inputs.version }} --preid=pre --no-git-tag-version
+        if: inputs.version != 'nobump'
+
+      - name: Which Version
+        id: which_version
+        run: |
+          echo "version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
+
+      - name: Check if release exists
+        uses: cardinalby/git-get-release-action@1.2.4
+        id: release_exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseName: v${{ steps.which_version.outputs.version }}
+          doNotFailIfNotFound: 'true'
+
+      - name: Cancelling - release already exists
+        uses: andymckay/cancel-action@0.2
+        if: steps.release_exists.outputs.id != ''
+
+      - name: Add + Commit + Open PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: Bump version to ${{ steps.which_version.outputs.version }}
+          branch: release/${{ steps.which_version.outputs.version }}
+          delete-branch: true
+          base: main
+          title: ${{ steps.which_version.outputs.version }}
+          body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
+
+  build:
+    needs: prepare
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: release/${{ needs.prepare.outputs.version }}
+
+      - name: Build + Pack
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build pack'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packed
+          path: viamrobotics-sdk-*.tgz
+
+  release:
+    needs: [prepare, build]
+    if: github.repository_owner == 'viamrobotics' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, x64]
+    container:
+      image: ghcr.io/viamrobotics/canon:amd64
+
+    steps:
+      - uses: actions/download-artifact@v3
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          files: packed/*
+          draft: true
+          prerelease: ${{ contains(inputs.version, 'pre') }}
+          fail_on_unmatched_files: true
+          target_commitish: release/${{ needs.prepare.outputs.version }}
