@@ -4,7 +4,7 @@ import { MovementSensorServiceClient } from '../../gen/component/movementsensor/
 import type { Options, Orientation, StructType, Vector3 } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { MovementSensor, MovementSensorPosition } from './movement-sensor';
+import type { MovementSensor, MovementSensorReadings } from './movement-sensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -195,15 +195,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getReadings(extra = {}) {
-    const readings: {
-      position?: MovementSensorPosition;
-      linearVelocity?: Vector3;
-      angularVelocity?: Vector3;
-      linearAcceleration?: Vector3;
-      compassHeading?: number;
-      orientation?: Orientation;
-    } = {};
-    const readingFunctions: Record<keyof typeof readings, CallableFunction> = {
+    const readingFunctions = {
       position: this.getPosition.bind(this),
       linearVelocity: this.getLinearVelocity.bind(this),
       angularVelocity: this.getAngularVelocity.bind(this),
@@ -211,18 +203,22 @@ export class MovementSensorClient implements MovementSensor {
       compassHeading: this.getCompassHeading.bind(this),
       orientation: this.getOrientation.bind(this),
     };
-    for (const [field, func] of Object.entries(readingFunctions)) {
-      try {
-        // eslint-disable-next-line no-await-in-loop,@typescript-eslint/no-unsafe-assignment
-        readings[field as keyof typeof readings] = await func(extra);
-      } catch (error) {
-        if (!(error as Error).message.includes('Unimplemented')) {
-          throw error;
-        }
-      }
-    }
 
-    return readings;
+    const tasks = Object.entries(readingFunctions).flatMap(([field, func]) =>
+      (async () => {
+        try {
+          return [[field, await func(extra)]];
+        } catch (error) {
+          if (!(error as Error).message.includes('Unimplemented')) {
+            throw error;
+          }
+          return [];
+        }
+      })()
+    );
+    const entries = await Promise.all(tasks);
+
+    return Object.fromEntries(entries.flat()) as MovementSensorReadings;
   }
 
   async doCommand(command: StructType): Promise<StructType> {
