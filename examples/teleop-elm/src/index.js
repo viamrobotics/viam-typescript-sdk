@@ -41,6 +41,9 @@ function onTrack(event) {
     } else {
       mediaElement.controls = true;
     }
+
+    const child = streamContainer.querySelector('video');
+    child?.remove();
     streamContainer.append(mediaElement);
   }
 }
