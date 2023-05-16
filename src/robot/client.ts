@@ -352,14 +352,17 @@ export class RobotClient implements Robot {
            */
           if (this.peerConn?.iceConnectionState === 'closed') {
             let retries = 0;
+            // eslint-disable-next-line no-console
             console.debug('connection closed, will try to reconnect');
             void backOff(() =>
               this.connect().then(
                 () => {
+                  // eslint-disable-next-line no-console
                   console.debug('reconnected successfully!');
                   events.emit('reconnected', {});
                 },
                 (error) => {
+                  // eslint-disable-next-line no-console
                   console.debug(
                     `failed to reconnect - retries count: ${retries}`
                   );
