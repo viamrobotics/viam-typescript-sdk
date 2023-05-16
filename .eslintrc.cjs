@@ -17,6 +17,7 @@ module.exports = {
     project: ['./tsconfig.json', './tsconfig.node.json'],
   },
   rules: {
+    'no-void': ['error', { allowAsStatement: true }],
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
     '@typescript-eslint/no-floating-promises': 'warn',
     '@typescript-eslint/no-misused-promises': 'warn',

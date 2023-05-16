@@ -22,18 +22,31 @@ const getValidSDPTrackName = (name: string) => {
 export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;
+  private streams: Record<string, boolean>;
 
   constructor(client: RobotClient, options: Options = {}) {
     super();
     this.client = client.createServiceClient(StreamServiceClient);
     this.options = options;
+    this.streams = {};
 
     /**
      * Currently this is emitting events for every track that we recieve. In the
      * future we'll want to partition here and have individual events for each
      * stream.
      */
-    events.on('track', (args) => this.emit('track', args));
+    events.on('track', (args) => {
+      this.emit('track', args);
+    });
+
+    events.on('reconnected', () => {
+      // TODO: add option to opt-out of stream restart?
+      for (const [name, active] of Object.entries(this.streams)) {
+        if (active) {
+          void this.add(name);
+        }
+      }
+    });
   }
 
   private get streamService() {
@@ -51,6 +64,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.addStream.bind(streamService),
         request
       );
+      this.streams[name] = true;
     } catch {
       // Try again with just the resource name
       request.setName(name);
@@ -59,6 +73,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.addStream.bind(streamService),
         request
       );
+      this.streams[name] = true;
     }
   }
 
@@ -73,6 +88,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.removeStream.bind(streamService),
         request
       );
+      this.streams[name] = false;
     } catch {
       // Try again with just the resource name
       request.setName(name);
@@ -81,6 +97,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.removeStream.bind(streamService),
         request
       );
+      this.streams[name] = false;
     }
   }
 }
