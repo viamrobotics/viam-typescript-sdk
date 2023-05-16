@@ -53,6 +53,7 @@ export interface DialWebRTCConf {
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
+  noReconnect?: boolean;
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
@@ -69,6 +70,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     host: conf.host,
     signalingAddress,
     rtcConfig,
+    noReconnect: conf.noReconnect,
   };
   const client = new RobotClient(impliedURL, clientConf);
 

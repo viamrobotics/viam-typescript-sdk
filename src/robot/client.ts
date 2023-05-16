@@ -37,6 +37,7 @@ interface WebRTCOptions {
   host: string;
   signalingAddress: string;
   rtcConfig: RTCConfiguration | undefined;
+  noReconnect?: boolean;
 }
 
 interface SessionOptions {
@@ -351,6 +352,10 @@ export class RobotClient implements Robot {
            * recover.
            */
           if (this.peerConn?.iceConnectionState === 'closed') {
+            if (this.webrtcOptions?.noReconnect) {
+              return;
+            }
+
             let retries = 0;
             // eslint-disable-next-line no-console
             console.debug('connection closed, will try to reconnect');
