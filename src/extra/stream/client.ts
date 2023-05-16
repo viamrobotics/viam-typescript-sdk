@@ -22,13 +22,13 @@ const getValidSDPTrackName = (name: string) => {
 export class StreamClient extends EventDispatcher implements Stream {
   private client: StreamServiceClient;
   private readonly options: Options;
-  private streams: Record<string, boolean>;
+  private streams: Set<string>;
 
   constructor(client: RobotClient, options: Options = {}) {
     super();
     this.client = client.createServiceClient(StreamServiceClient);
     this.options = options;
-    this.streams = {};
+    this.streams = new Set();
 
     /**
      * Currently this is emitting events for every track that we recieve. In the
@@ -40,11 +40,8 @@ export class StreamClient extends EventDispatcher implements Stream {
     });
 
     events.on('reconnected', () => {
-      // TODO: add option to opt-out of stream restart?
-      for (const [name, active] of Object.entries(this.streams)) {
-        if (active) {
-          void this.add(name);
-        }
+      for (const name of this.streams.values()) {
+        void this.add(name);
       }
     });
   }
@@ -64,7 +61,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.addStream.bind(streamService),
         request
       );
-      this.streams[name] = true;
+      this.streams.add(name);
     } catch {
       // Try again with just the resource name
       request.setName(name);
@@ -73,7 +70,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.addStream.bind(streamService),
         request
       );
-      this.streams[name] = true;
+      this.streams.add(name);
     }
   }
 
@@ -88,7 +85,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.removeStream.bind(streamService),
         request
       );
-      this.streams[name] = false;
+      this.streams.delete(name);
     } catch {
       // Try again with just the resource name
       request.setName(name);
@@ -97,7 +94,7 @@ export class StreamClient extends EventDispatcher implements Stream {
         streamService.removeStream.bind(streamService),
         request
       );
-      this.streams[name] = false;
+      this.streams.delete(name);
     }
   }
 }

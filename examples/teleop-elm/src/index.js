@@ -14,6 +14,7 @@ async function connectWebRTC() {
     },
     authEntity: host,
     signalingAddress,
+    // noReconnect: true,
   });
 }
 
