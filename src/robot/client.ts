@@ -357,7 +357,6 @@ export class RobotClient implements Robot {
               this.connect().then(
                 () => {
                   console.debug('reconnected successfully!');
-                  // TODO: send receivers if any?
                   events.emit('reconnected', {});
                 },
                 (error) => {
