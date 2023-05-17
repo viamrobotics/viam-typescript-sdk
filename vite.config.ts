@@ -12,7 +12,12 @@ export default defineConfig({
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
-      include: [/google-protobuf/u, /@improbable-eng\/grpc-web/u, /gen\//u],
+      include: [
+        /exponential-backoff/u,
+        /google-protobuf/u,
+        /@improbable-eng\/grpc-web/u,
+        /gen\//u,
+      ],
     },
     minify: true,
     target: 'esnext',

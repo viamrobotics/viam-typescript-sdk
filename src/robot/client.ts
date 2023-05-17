@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { backOff } from 'exponential-backoff';
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
@@ -36,6 +37,7 @@ interface WebRTCOptions {
   host: string;
   signalingAddress: string;
   rtcConfig: RTCConfiguration | undefined;
+  noReconnect?: boolean;
 }
 
 interface SessionOptions {
@@ -263,6 +265,10 @@ export class RobotClient implements Robot {
     return new SC(this.serviceHost, grpcOptions);
   }
 
+  get peerConnection() {
+    return this.peerConn;
+  }
+
   public async disconnect() {
     while (this.connecting) {
       // eslint-disable-next-line no-await-in-loop
@@ -336,6 +342,43 @@ export class RobotClient implements Robot {
          * read and then write to 'peerConn', even after we have awaited/paused.
          */
         this.peerConn = webRTCConn.peerConnection; // eslint-disable-line require-atomic-updates
+        this.peerConn.addEventListener('iceconnectionstatechange', () => {
+          /*
+           * TODO: are there any disconnection scenarios where we can reuse the
+           * same connection and restart ice?
+           *
+           * All connection loss scenarios I tested seem to result in the peer
+           * connection getting closed, so restarting ice is not a valid way to
+           * recover.
+           */
+          if (this.peerConn?.iceConnectionState === 'closed') {
+            if (this.webrtcOptions?.noReconnect) {
+              return;
+            }
+
+            let retries = 0;
+            // eslint-disable-next-line no-console
+            console.debug('connection closed, will try to reconnect');
+            void backOff(() =>
+              this.connect().then(
+                () => {
+                  // eslint-disable-next-line no-console
+                  console.debug('reconnected successfully!');
+                  events.emit('reconnected', {});
+                },
+                (error) => {
+                  // eslint-disable-next-line no-console
+                  console.debug(
+                    `failed to reconnect - retries count: ${retries}`
+                  );
+                  retries += 1;
+                  throw error;
+                }
+              )
+            );
+          }
+        });
+
         this.transportFactory = webRTCConn.transportFactory;
 
         webRTCConn.peerConnection.ontrack = (event) => {
