@@ -6,6 +6,9 @@ import type {
 } from '../gen/common/v1/common_pb';
 import type { StructType } from '../types';
 import type proto from '../gen/robot/v1/robot_pb';
+import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
+
+export type RobotStatusStream = ResponseStream<proto.Status[]>;
 
 export interface Robot {
   /**
@@ -142,5 +145,5 @@ export interface Robot {
   streamStatus(
     resourceNames: ResourceName[],
     duration: Duration
-  ): Promise<proto.Status[]>;
+  ): RobotStatusStream;
 }

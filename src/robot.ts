@@ -1,4 +1,4 @@
-export type { Robot } from './robot/robot';
+export type { Robot, RobotStatusStream } from './robot/robot';
 export { RobotClient } from './robot/client';
 export {
   type DialConf,
