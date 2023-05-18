@@ -15,8 +15,8 @@ export {
   type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
+  type RobotStatusStream,
   RobotClient,
-  RobotStatusStream,
   createRobotClient,
 } from './robot';
 /**
