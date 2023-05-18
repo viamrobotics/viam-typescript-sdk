@@ -10,6 +10,7 @@ export interface DialDirectConf {
   authEntity?: string;
   host: string;
   credential?: Credential;
+  disableSessions?: boolean;
 }
 
 /** Check if a url corresponds to a local connection via heuristic */
@@ -25,7 +26,11 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
     );
   }
 
-  const client = new RobotClient(conf.host);
+  let sessOpts;
+  if (conf.disableSessions) {
+    sessOpts = { disabled: true };
+  }
+  const client = new RobotClient(conf.host, undefined, sessOpts);
 
   let creds;
   if (conf.credential) {
@@ -50,9 +55,11 @@ export interface DialWebRTCConf {
   authEntity?: string;
   host: string;
   credential?: Credential;
+  disableSessions?: boolean;
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
+  noReconnect?: boolean;
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
@@ -69,8 +76,13 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     host: conf.host,
     signalingAddress,
     rtcConfig,
+    noReconnect: conf.noReconnect,
   };
-  const client = new RobotClient(impliedURL, clientConf);
+  let sessOpts;
+  if (conf.disableSessions) {
+    sessOpts = { disabled: true };
+  }
+  const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
   let creds;
   if (conf.credential) {
