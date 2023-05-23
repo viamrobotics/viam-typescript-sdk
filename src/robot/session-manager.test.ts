@@ -1,36 +1,38 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { when } from 'vitest-when';
 import { ConnectionClosedError } from '@viamrobotics/rpc';
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { grpc } from '@improbable-eng/grpc-web';
-import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 
+import * as robotApi from '../gen/robot/v1/robot_pb';
+import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 import SessionManager from './session-manager';
+
+vi.mock('../gen/robot/v1/robot_pb_service');
 
 const host = 'fakeServiceHost';
 const transport = new FakeTransportBuilder().build();
-
-let sm: SessionManager;
 
 const mockGetHeartBeatWindow = () => ({
   getSeconds: () => 1,
   getNanos: () => 1,
 });
 
-// @ts-expect-error: 7006
 const mockHealthyHeartbeat = (_req, _md, cb) => {
   cb(null, 'ok');
 };
 
 describe('SessionManager', () => {
+  let sm: SessionManager;
+
   beforeEach(() => {
     sm = new SessionManager(host, transport);
-    vi.mock('./gen/robot/v1/robot_pb_service');
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   test('no session initially', () => {
@@ -38,11 +40,13 @@ describe('SessionManager', () => {
   });
 
   test('start session when sessions are not supported', async () => {
-    RobotServiceClient.prototype.startSession = vi
-      .fn()
-      .mockImplementation((_req, _md, cb) => {
-        cb({ code: grpc.Code.Unimplemented }, null);
-      });
+    when(RobotServiceClient.prototype.startSession)
+      .calledWith(
+        new robotApi.StartSessionRequest(),
+        new grpc.Metadata(),
+        expect.any(Function)
+      )
+      .thenDo((_req, _md, cb) => cb({ code: grpc.Code.Unimplemented }, null));
 
     const expected = new grpc.Metadata();
     await expect(sm.getSessionMetadata()).resolves.toStrictEqual(expected);
