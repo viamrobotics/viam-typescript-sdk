@@ -35,6 +35,7 @@ jobs:
           file: "viamrobotics\\-sdk\\-.*\\.tgz"
           regex: true
           target: './'
+          version: tags/${{ github.event.release.tag_name }}
 
       - name: Check Files
         id: release_file
@@ -43,7 +44,7 @@ jobs:
       - name: Which Tag
         id: which_tag
         run: |
-          if [[ ${{ steps.release_file.outputs.path }} == *"rc"* ]]; then
+          if [[ ${{ github.event.release.tag_name }} == *"rc"* ]]; then
             echo "tag=rc" >> $GITHUB_OUTPUT
           else
             echo "tag=latest" >> $GITHUB_OUTPUT

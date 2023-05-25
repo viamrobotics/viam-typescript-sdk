@@ -12,7 +12,6 @@ on:
           - premajor
           - preminor
           - prepatch
-          - prerelease
           - nobump # this action is custom for this action and does not exist in npm
     secrets:
       NPM_TOKEN:
@@ -127,7 +126,7 @@ jobs:
         with:
           tag_name: v${{ needs.prepare.outputs.rc_version }}
           files: dist/*
-          draft: false
+          draft: true
           prerelease: true
           fail_on_unmatched_files: true
           target_commitish: rc-${{ needs.prepare.outputs.version }}
