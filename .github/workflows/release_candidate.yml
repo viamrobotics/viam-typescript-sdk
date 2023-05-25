@@ -12,6 +12,7 @@ on:
           - premajor
           - preminor
           - prepatch
+          - prerelease
           - nobump # this action is custom for this action and does not exist in npm
     secrets:
       NPM_TOKEN:
