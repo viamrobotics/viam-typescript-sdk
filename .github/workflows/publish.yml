@@ -49,9 +49,6 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
 
-      - name: echo
-        run: echo ${{steps.which_tag.outputs.tag}}
-
       - name: Publish
         uses: JS-DevTools/npm-publish@v2
         with:
