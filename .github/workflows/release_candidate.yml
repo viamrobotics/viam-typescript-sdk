@@ -68,31 +68,30 @@ jobs:
       - name: echo
         shell: bash
         run: |
-          echo "{{ steps.which_version.outputs.rc_version }}"
-          echo "version=$(npm pkg get version | sed -e 's/\"//g' -e 's/-rc.*//g')"
+          echo "${{ steps.which_version.outputs.version }}"
 
-      - name: Check if release exists
-        uses: cardinalby/git-get-release-action@1.2.4
-        id: release_exists
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          releaseName: v${{ steps.which_version.outputs.rc_version }}
-          doNotFailIfNotFound: 'true'
+  #     - name: Check if release exists
+  #       uses: cardinalby/git-get-release-action@1.2.4
+  #       id: release_exists
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         releaseName: v${{ steps.which_version.outputs.rc_version }}
+  #         doNotFailIfNotFound: 'true'
 
-      - name: Cancelling - release already exists
-        uses: andymckay/cancel-action@0.2
-        if: steps.release_exists.outputs.id != ''
+  #     - name: Cancelling - release already exists
+  #       uses: andymckay/cancel-action@0.2
+  #       if: steps.release_exists.outputs.id != ''
 
-      - name: Add + Commit + Open PR
-        uses: peter-evans/create-pull-request@v5
-        with:
-          commit-message: Bump version to ${{ steps.which_version.outputs.rc_version }}
-          branch: rc-${{ needs.prepare.outputs.version }}
-          delete-branch: false
-          base: main
-          title: rc-${{ needs.prepare.outputs.version }}
-          body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
+  #     - name: Add + Commit + Open PR
+  #       uses: peter-evans/create-pull-request@v5
+  #       with:
+  #         commit-message: Bump version to ${{ steps.which_version.outputs.rc_version }}
+  #         branch: rc-${{ steps.which_version.outputs.version }}
+  #         delete-branch: false
+  #         base: main
+  #         title: rc-${{ steps.which_version.outputs.version }}
+  #         body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
     needs: prepare
@@ -101,6 +100,10 @@ jobs:
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     steps:
+      - name: echo
+        shell: bash
+        run: |
+          echo "${{ needs.prepare.outputs.version }}"
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
