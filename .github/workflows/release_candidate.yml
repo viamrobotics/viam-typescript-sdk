@@ -1,4 +1,4 @@
-name: Publish Release Candidate to NPM
+name: Release Candidate
 
 on:
   workflow_dispatch:
@@ -49,6 +49,7 @@ jobs:
 
       - name: Bump Version
         id: bump_version
+        shell: bash
         run: |
           if [[ $(npm pkg get version) == *"rc"* ]]; then
             npm version prerelease --preid=rc --no-git-tag-version
@@ -59,11 +60,10 @@ jobs:
 
       - name: Which Version
         id: which_version
+        shell: bash
         run: |
-          echo "SDK_RC_VERSION=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
-          echo "SDK_VERSION=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_ENV
-          echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT          
-          echo "version=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_OUTPUT
+          echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
+          echo "version=$(npm pkg get version | sed -e 's/\"//g' -e 's/-rc.*//g')" >> $GITHUB_OUTPUT
 
       - name: Check if release exists
         uses: cardinalby/git-get-release-action@1.2.4
@@ -81,11 +81,11 @@ jobs:
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Bump version to ${{ env.RC_SDK_VERSION }}
-          branch: rc-${{ env.SDK_VERSION }}
+          commit-message: Bump version to ${{ steps.which_version.outputs.rc_version }}
+          branch: rc-${{ steps.which_version.outputs.version }}
           delete-branch: false
           base: main
-          title: rc-${{ env.SDK_VERSION }}
+          title: rc-${{ steps.which_version.outputs.version }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
@@ -108,7 +108,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: packed
+          name: dist
           path: viamrobotics-sdk-*.tgz
 
   release:
