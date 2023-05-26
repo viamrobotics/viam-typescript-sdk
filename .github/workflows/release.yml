@@ -34,10 +34,11 @@ jobs:
 
       - name: Bump Version
         shell: bash
-        run: npm version ${$(npm pkg get version | sed 's/\"//g')%-rc*} --no-git-tag-version
+        run: npm version $(npm pkg get version | sed -e 's/\"//g' -e 's/-rc.*//g') --no-git-tag-version
 
       - name: Which Version
         id: which_version
+        shell: bash
         run: |
           echo "version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
 

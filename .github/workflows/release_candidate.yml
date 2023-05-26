@@ -62,8 +62,8 @@ jobs:
         id: which_version
         shell: bash
         run: |
-          echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT          
-          echo "version=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_OUTPUT
+          echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
+          echo "version=$(npm pkg get version | sed -e 's/\"//g' -e 's/-rc.*//g')" >> $GITHUB_OUTPUT
 
       - name: Check if release exists
         uses: cardinalby/git-get-release-action@1.2.4
