@@ -84,14 +84,18 @@ jobs:
         uses: andymckay/cancel-action@0.2
         if: steps.release_exists.outputs.id != ''
 
-      - name: Add + Commit + Open PR
-        uses: peter-evans/create-pull-request@v5
+      - name: Add + Commit
+        uses: EndBug/add-and-commit@v9
         with:
-          commit-message: Bump version to ${{ steps.which_version.outputs.rc_version }}
-          branch: rc-${{ steps.which_version.outputs.version }}
-          delete-branch: false
-          title: rc-${{ steps.which_version.outputs.version }}
-          body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
+          new_branch: rc-${{ steps.which_version.outputs.version }}
+          message: Bump version to ${{ steps.which_version.outputs.rc_version }}
+
+      - name: Open PR
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "main" 
+          pr_title: ${{ steps.which_version.outputs.version }}
+          pr_body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
     needs: prepare
