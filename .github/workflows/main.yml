@@ -8,9 +8,3 @@ on:
 jobs:
   test:
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@main
-
-  publish:
-    needs: test
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/publish.yml@main
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

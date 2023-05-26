@@ -1,15 +1,30 @@
-name: Release
+name: Publish Release Candidate to NPM
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'The type of version bump. Select "nobump" for no version change. `rc` version bumps will happen automatically, so select the type of version bump for the final release. See https://github.com/npm/node-semver#functions'
+        type: choice
+        required: true
+        default: nobump
+        options:
+          - premajor
+          - preminor
+          - prepatch
+          - nobump # this action is custom for this action and does not exist in npm
+    secrets:
+      NPM_TOKEN:
+        required: true
 
 jobs:
   prepare:
-    if: github.repository_owner == 'viamrobotics' && startsWith(github.ref, 'rc-')
+    if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     outputs:
+      rc_version: ${{ steps.which_version.outputs.rc_version }}
       version: ${{ steps.which_version.outputs.version }}
     steps:
       - name: Check if organization member
@@ -18,7 +33,7 @@ jobs:
         with:
           organization: viamrobotics
           username: ${{ github.actor }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token:  ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cancelling - not an organization member
         uses: andymckay/cancel-action@0.2
@@ -33,12 +48,22 @@ jobs:
           sudo -u testbot bash -lc 'make build lint test'
 
       - name: Bump Version
-        run: npm version ${$(npm pkg get version | sed 's/\"//g')%-rc*} --no-git-tag-version
+        id: bump_version
+        run: |
+          if [[ $(npm pkg get version) == *"rc"* ]]; then
+            npm version prerelease --preid=rc --no-git-tag-version
+          else
+            npm version ${{ inputs.version }} --preid=rc --no-git-tag-version
+          fi
+        if: inputs.version != 'nobump'
 
       - name: Which Version
         id: which_version
         run: |
-          echo "version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
+          echo "SDK_RC_VERSION=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
+          echo "SDK_VERSION=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_ENV
+          echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT          
+          echo "version=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_OUTPUT
 
       - name: Check if release exists
         uses: cardinalby/git-get-release-action@1.2.4
@@ -46,7 +71,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          releaseName: v${{ steps.which_version.outputs.version }}
+          releaseName: v${{ steps.which_version.outputs.rc_version }}
           doNotFailIfNotFound: 'true'
 
       - name: Cancelling - release already exists
@@ -56,16 +81,16 @@ jobs:
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Bump version to ${{ steps.which_version.outputs.version }}
-          branch: rc-${{ steps.which_version.outputs.version }}
-          delete-branch: true
+          commit-message: Bump version to ${{ env.RC_SDK_VERSION }}
+          branch: rc-${{ env.SDK_VERSION }}
+          delete-branch: false
           base: main
-          title: ${{ steps.which_version.outputs.version }}
+          title: rc-${{ env.SDK_VERSION }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
     needs: prepare
-    if: github.repository_owner == 'viamrobotics' && startsWith(github.ref, 'rc-')
+    if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -88,7 +113,7 @@ jobs:
 
   release:
     needs: [prepare, build]
-    if: github.repository_owner == 'viamrobotics' && startsWith(github.ref, 'rc-')
+    if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -99,9 +124,9 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ needs.prepare.outputs.version }}
-          files: packed/*
+          tag_name: v${{ needs.prepare.outputs.rc_version }}
+          files: dist/*
           draft: true
-          prerelease: false
+          prerelease: true
           fail_on_unmatched_files: true
           target_commitish: rc-${{ needs.prepare.outputs.version }}
