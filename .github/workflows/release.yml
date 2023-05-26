@@ -85,7 +85,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: packed
+          name: dist
           path: viamrobotics-sdk-*.tgz
 
   release:
@@ -102,7 +102,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
-          files: packed/*
+          files: dist/*
           draft: true
           prerelease: false
           fail_on_unmatched_files: true
