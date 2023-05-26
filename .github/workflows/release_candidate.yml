@@ -90,7 +90,6 @@ jobs:
           commit-message: Bump version to ${{ steps.which_version.outputs.rc_version }}
           branch: rc-${{ steps.which_version.outputs.version }}
           delete-branch: false
-          base: main
           title: rc-${{ steps.which_version.outputs.version }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
