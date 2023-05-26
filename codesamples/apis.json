@@ -26,6 +26,11 @@
         "func": "getImage",
         "args": []
     },
+    "encoder": {
+        "client": "EncoderClient",
+        "func": "getProperties",
+        "args": []
+    },
     "sensor": {
         "client": "SensorClient",
         "func": "getReadings",
