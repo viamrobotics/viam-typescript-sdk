@@ -51,7 +51,7 @@ jobs:
         id: bump_version
         shell: bash
         run: |
-          if [[ $(npm pkg get version) == *"rc"* ]]; then
+          if [ $(npm pkg get version) == *"rc"* ]; then
             npm version prerelease --preid=rc --no-git-tag-version
           else
             npm version ${{ inputs.version }} --preid=rc --no-git-tag-version
