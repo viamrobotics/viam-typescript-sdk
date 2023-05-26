@@ -33,10 +33,12 @@ jobs:
           sudo -u testbot bash -lc 'make build lint test'
 
       - name: Bump Version
-        run: npm version ${$(npm pkg get version | sed 's/\"//g')%-rc*} --no-git-tag-version
+        shell: bash
+        run: npm version $(npm pkg get version | sed -e 's/\"//g' -e 's/-rc.*//g') --no-git-tag-version
 
       - name: Which Version
         id: which_version
+        shell: bash
         run: |
           echo "version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT
 
@@ -83,7 +85,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: packed
+          name: dist
           path: viamrobotics-sdk-*.tgz
 
   release:
@@ -100,7 +102,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
-          files: packed/*
+          files: dist/*
           draft: true
           prerelease: false
           fail_on_unmatched_files: true

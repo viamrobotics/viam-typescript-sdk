@@ -34,7 +34,7 @@ jobs:
         with:
           file: "viamrobotics\\-sdk\\-.*\\.tgz"
           regex: true
-          target: './'
+          target: 'dist/'
           version: tags/${{ github.event.release.tag_name }}
 
       - name: Check Files
@@ -43,6 +43,7 @@ jobs:
 
       - name: Which Tag
         id: which_tag
+        shell: bash
         run: |
           if [[ ${{ github.event.release.tag_name }} == *"rc"* ]]; then
             echo "tag=rc" >> $GITHUB_OUTPUT
