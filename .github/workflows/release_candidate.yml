@@ -62,8 +62,6 @@ jobs:
         id: which_version
         shell: bash
         run: |
-          echo "SDK_RC_VERSION=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
-          echo "SDK_VERSION=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_ENV
           echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT          
           echo "version=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_OUTPUT
 
@@ -80,18 +78,14 @@ jobs:
         uses: andymckay/cancel-action@0.2
         if: steps.release_exists.outputs.id != ''
 
-      - name: echo
-        run: |
-          echo ${{ env.SDK_VERSION }}
-
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Bump version to ${{ env.RC_SDK_VERSION }}
-          branch: rc-${{ env.SDK_VERSION }}
+          commit-message: Bump version to ${{ steps.which_version.outputs.rc_version }}
+          branch: rc-${{ needs.prepare.outputs.version }}
           delete-branch: false
           base: main
-          title: rc-${{ env.SDK_VERSION }}
+          title: rc-${{ needs.prepare.outputs.version }}
           body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
