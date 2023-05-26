@@ -33,6 +33,7 @@ jobs:
           sudo -u testbot bash -lc 'make build lint test'
 
       - name: Bump Version
+        shell: bash
         run: npm version ${$(npm pkg get version | sed 's/\"//g')%-rc*} --no-git-tag-version
 
       - name: Which Version

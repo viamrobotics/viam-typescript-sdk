@@ -19,7 +19,7 @@ on:
 
 jobs:
   prepare:
-    if: github.repository_owner == 'viamrobotics'
+    # if: github.repository_owner == 'viamrobotics'
     runs-on: [self-hosted, x64]
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -49,6 +49,7 @@ jobs:
 
       - name: Bump Version
         id: bump_version
+        shell: bash
         run: |
           if [[ $(npm pkg get version) == *"rc"* ]]; then
             npm version prerelease --preid=rc --no-git-tag-version
@@ -59,11 +60,12 @@ jobs:
 
       - name: Which Version
         id: which_version
+        shell: bash
         run: |
           echo "SDK_RC_VERSION=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
-          echo "SDK_VERSION=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_ENV
+          echo "SDK_VERSION=$($(npm pkg get version | sed 's/\"//g')%-rc*)" >> $GITHUB_ENV
           echo "rc_version=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_OUTPUT          
-          echo "version=${$(npm pkg get version | sed 's/\"//g')%-rc*}" >> $GITHUB_OUTPUT
+          echo "version=$($(npm pkg get version | sed 's/\"//g')%-rc*)" >> $GITHUB_OUTPUT
 
       - name: Check if release exists
         uses: cardinalby/git-get-release-action@1.2.4
