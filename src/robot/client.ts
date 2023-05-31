@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { backOff } from 'exponential-backoff';
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
-import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import type { grpc } from '@improbable-eng/grpc-web';
 import proto from '../gen/robot/v1/robot_pb';
@@ -47,7 +47,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
 }
 
 /**
@@ -635,13 +635,13 @@ export class RobotClient implements Robot {
   }
 
   streamStatus(
-    resourceNames: ResourceName[],
-    duration: Duration
+    resourceNames?: ResourceName[],
+    duration?: Duration
   ): RobotStatusStream {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
-    request.setResourceNamesList(resourceNames);
-    request.setEvery(duration);
+    request.setResourceNamesList(resourceNames ?? []);
+    request.setEvery(duration ?? new Duration().setNanos(500_000_000));
 
     const statusStream = robotService.streamStatus(request);
     if (!statusStream) {
