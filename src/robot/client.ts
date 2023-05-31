@@ -635,11 +635,12 @@ export class RobotClient implements Robot {
   }
 
   streamStatus(
-    durationMs?: number = 500
+    resourceNames: ResourceName[] = [],
+    durationMs: number = 500
   ): RobotStatusStream {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
-    request.setResourceNamesList(resourceNames ?? []);
+    request.setResourceNamesList(resourceNames);
     request.setEvery(new Duration().setNanos(durationMs * 1e+6));
 
     const statusStream = robotService.streamStatus(request);
