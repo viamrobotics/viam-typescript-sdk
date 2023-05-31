@@ -640,7 +640,7 @@ export class RobotClient implements Robot {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
     request.setResourceNamesList(resourceNames ?? []);
-    request.setEvery(duration ?? new Duration().setNanos(500_000_000));
+    request.setEvery(new Duration().setNanos(durationMs * 1e+6));
 
     const statusStream = robotService.streamStatus(request);
     if (!statusStream) {
