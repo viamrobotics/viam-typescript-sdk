@@ -137,7 +137,8 @@ export interface Robot {
    * Periodically receive the status of all statuses requested. An empty request
    * signifies all resources.
    *
-   * @param resourceNames - The list of resources for which to receive statuses. Default is [].
+   * @param resourceNames - The list of resources for which to receive statuses.
+   *   Default is [].
    * @param duration - How often to send a new status. Default is 0.5 seconds.
    * @group Status
    * @alpha

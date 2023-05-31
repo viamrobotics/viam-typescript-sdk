@@ -47,7 +47,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 /**
