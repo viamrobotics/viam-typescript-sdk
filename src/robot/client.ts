@@ -635,8 +635,7 @@ export class RobotClient implements Robot {
   }
 
   streamStatus(
-    resourceNames?: ResourceName[],
-    duration?: Duration
+    durationMs?: number = 500
   ): RobotStatusStream {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
