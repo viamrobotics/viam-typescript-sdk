@@ -1,4 +1,3 @@
-import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import type {
   PoseInFrame,
   ResourceName,
@@ -131,7 +130,7 @@ export interface Robot {
    * @group Status
    * @alpha
    */
-  getStatus(resourceNames: ResourceName[]): Promise<proto.Status[]>;
+  getStatus(resourceNames?: ResourceName.AsObject[]): Promise<proto.Status[]>;
 
   /**
    * Periodically receive the status of all statuses requested. An empty request
@@ -144,7 +143,7 @@ export interface Robot {
    * @alpha
    */
   streamStatus(
-    resourceNames?: ResourceName[],
+    resourceNames?: ResourceName.AsObject[],
     durationMs?: number
   ): RobotStatusStream;
 }

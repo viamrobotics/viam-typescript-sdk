@@ -10,7 +10,7 @@ import type {
   ResourceName,
   Transform,
 } from '../gen/common/v1/common_pb';
-import { promisify } from '../utils';
+import { encodeResourceName, promisify } from '../utils';
 import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service';
 import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service';
 import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service';
@@ -623,10 +623,13 @@ export class RobotClient implements Robot {
 
   // STATUS
 
-  async getStatus(resourceNames: ResourceName[]) {
+  async getStatus(resourceNames: ResourceName.AsObject[] = []) {
     const { robotService } = this;
     const request = new proto.GetStatusRequest();
-    request.setResourceNamesList(resourceNames);
+    const encodedNames = resourceNames.map((rName) =>
+      encodeResourceName(rName)
+    );
+    request.setResourceNamesList(encodedNames);
     const response = await promisify<
       proto.GetStatusRequest,
       proto.GetStatusResponse
@@ -635,13 +638,16 @@ export class RobotClient implements Robot {
   }
 
   streamStatus(
-    resourceNames: ResourceName[] = [],
-    durationMs: number = 500
+    resourceNames: ResourceName.AsObject[] = [],
+    durationMs = 500
   ): RobotStatusStream {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
-    request.setResourceNamesList(resourceNames);
-    request.setEvery(new Duration().setNanos(durationMs * 1e+6));
+    const encodedNames = resourceNames.map((rName) =>
+      encodeResourceName(rName)
+    );
+    request.setResourceNamesList(encodedNames);
+    request.setEvery(new Duration().setNanos(durationMs * 1e6));
 
     const statusStream = robotService.streamStatus(request);
     if (!statusStream) {
