@@ -145,6 +145,6 @@ export interface Robot {
    */
   streamStatus(
     resourceNames?: ResourceName[],
-    duration?: Duration
+    durationMs?: number
   ): RobotStatusStream;
 }
