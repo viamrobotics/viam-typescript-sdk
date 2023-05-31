@@ -45,7 +45,7 @@ jobs:
         id: which_tag
         shell: bash
         run: |
-          if [ ${{ contains(github.event.release.tag_name, 'rc') }} ]; then
+          if ${{ contains(github.event.release.tag_name, 'rc') }} ; then
             echo "tag=rc" >> $GITHUB_OUTPUT
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
