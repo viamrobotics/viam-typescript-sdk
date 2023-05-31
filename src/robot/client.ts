@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { backOff } from 'exponential-backoff';
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
-import type { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import type { grpc } from '@improbable-eng/grpc-web';
 import proto from '../gen/robot/v1/robot_pb';
@@ -10,7 +10,7 @@ import type {
   ResourceName,
   Transform,
 } from '../gen/common/v1/common_pb';
-import { promisify } from '../utils';
+import { encodeResourceName, promisify } from '../utils';
 import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service';
 import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service';
 import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service';
@@ -623,10 +623,13 @@ export class RobotClient implements Robot {
 
   // STATUS
 
-  async getStatus(resourceNames: ResourceName[]) {
+  async getStatus(resourceNames: ResourceName.AsObject[] = []) {
     const { robotService } = this;
     const request = new proto.GetStatusRequest();
-    request.setResourceNamesList(resourceNames);
+    const encodedNames = resourceNames.map((rName) =>
+      encodeResourceName(rName)
+    );
+    request.setResourceNamesList(encodedNames);
     const response = await promisify<
       proto.GetStatusRequest,
       proto.GetStatusResponse
@@ -635,13 +638,16 @@ export class RobotClient implements Robot {
   }
 
   streamStatus(
-    resourceNames: ResourceName[],
-    duration: Duration
+    resourceNames: ResourceName.AsObject[] = [],
+    durationMs = 500
   ): RobotStatusStream {
     const { robotService } = this;
     const request = new proto.StreamStatusRequest();
-    request.setResourceNamesList(resourceNames);
-    request.setEvery(duration);
+    const encodedNames = resourceNames.map((rName) =>
+      encodeResourceName(rName)
+    );
+    request.setResourceNamesList(encodedNames);
+    request.setEvery(new Duration().setNanos(durationMs * 1e6));
 
     const statusStream = robotService.streamStatus(request);
     if (!statusStream) {
