@@ -129,10 +129,34 @@ export class RobotClient extends EventDispatcher implements Robot {
     );
 
     events.on('reconnected', () => {
-      this.reconnectHook();
+      this.emit('reconnected', {})
     })
     events.on('disconnected', () => {
-      this.disconnectHook();
+      this.emit('disconnected', {})
+      if (this.webrtcOptions?.noReconnect) {
+        return;
+      }
+
+      let retries = 0;
+      // eslint-disable-next-line no-console
+      console.debug('connection closed, will try to reconnect');
+      void backOff(() =>
+        this.connect().then(
+          () => {
+            // eslint-disable-next-line no-console
+            console.debug('reconnected successfully!');
+            events.emit('reconnected', {});
+          },
+          (error) => {
+            // eslint-disable-next-line no-console
+            console.debug(
+              `failed to reconnect - retries count: ${retries}`
+            );
+            retries += 1;
+            throw error;
+          }
+        )
+      );
     })
   }
 
@@ -298,37 +322,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     return connected
   }
 
-  public reconnectHook() {
-    // 
-  }
-
-  public disconnectHook() {
-    if (this.webrtcOptions?.noReconnect) {
-      return;
-    }
-
-    let retries = 0;
-    // eslint-disable-next-line no-console
-    console.debug('connection closed, will try to reconnect');
-    void backOff(() =>
-      this.connect().then(
-        () => {
-          // eslint-disable-next-line no-console
-          console.debug('reconnected successfully!');
-          events.emit('reconnected', {});
-        },
-        (error) => {
-          // eslint-disable-next-line no-console
-          console.debug(
-            `failed to reconnect - retries count: ${retries}`
-          );
-          retries += 1;
-          throw error;
-        }
-      )
-    );
-  }
-
   public async connect(
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds
@@ -398,11 +391,7 @@ export class RobotClient extends EventDispatcher implements Robot {
            * connection getting closed, so restarting ice is not a valid way to
            * recover.
            */
-          if (this.isConnected()) {
-            events.emit('reconnected', {});
-          } else {
-            events.emit('disconnected', {});
-          }
+          this.isConnected() ? events.emit('reconnected', {}) : events.emit('disconnected', {});
         });
 
         this.transportFactory = webRTCConn.transportFactory;

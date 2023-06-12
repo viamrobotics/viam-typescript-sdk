@@ -9,6 +9,8 @@ import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
 export type RobotStatusStream = ResponseStream<proto.Status[]>;
 
+type Callback = (args: unknown) => void
+
 export interface Robot {
   /**
    * Get the list of operations currently running on the robot.
@@ -146,4 +148,6 @@ export interface Robot {
     resourceNames?: ResourceName.AsObject[],
     durationMs?: number
   ): RobotStatusStream;
+
+  on: (type: 'reconnected' | 'disconnected', listener: Callback) => void;
 }
