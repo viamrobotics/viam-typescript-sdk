@@ -292,8 +292,10 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.sessionManager.reset();
   }
 
-  public isConnected() {
-    this.peerConn?.iceConnectionState === 'closed' ? true : false
+  public isConnected(): boolean {
+    let connected: boolean
+    this.peerConn?.iceConnectionState === 'closed' ? connected = false : connected = true;
+    return connected
   }
 
   public reconnectHook() {
@@ -301,7 +303,30 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public disconnectHook() {
-    // 
+    if (this.webrtcOptions?.noReconnect) {
+      return;
+    }
+
+    let retries = 0;
+    // eslint-disable-next-line no-console
+    console.debug('connection closed, will try to reconnect');
+    void backOff(() =>
+      this.connect().then(
+        () => {
+          // eslint-disable-next-line no-console
+          console.debug('reconnected successfully!');
+          events.emit('reconnected', {});
+        },
+        (error) => {
+          // eslint-disable-next-line no-console
+          console.debug(
+            `failed to reconnect - retries count: ${retries}`
+          );
+          retries += 1;
+          throw error;
+        }
+      )
+    );
   }
 
   public async connect(
@@ -377,30 +402,6 @@ export class RobotClient extends EventDispatcher implements Robot {
             events.emit('reconnected', {});
           } else {
             events.emit('disconnected', {});
-            if (this.webrtcOptions?.noReconnect) {
-              return;
-            }
-
-            let retries = 0;
-            // eslint-disable-next-line no-console
-            console.debug('connection closed, will try to reconnect');
-            void backOff(() =>
-              this.connect().then(
-                () => {
-                  // eslint-disable-next-line no-console
-                  console.debug('reconnected successfully!');
-                  events.emit('reconnected', {});
-                },
-                (error) => {
-                  // eslint-disable-next-line no-console
-                  console.debug(
-                    `failed to reconnect - retries count: ${retries}`
-                  );
-                  retries += 1;
-                  throw error;
-                }
-              )
-            );
           }
         });
 
