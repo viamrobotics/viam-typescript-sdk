@@ -4,6 +4,7 @@ import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import type { grpc } from '@improbable-eng/grpc-web';
+import { EventDispatcher, events } from '../events';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
   PoseInFrame,
@@ -29,7 +30,6 @@ import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service';
 import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
-import { events } from '../events';
 import { ViamResponseStream } from '../responses';
 import SessionManager from './session-manager';
 import type { Robot, RobotStatusStream } from './robot';
@@ -47,7 +47,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
 }
 
 /**
@@ -55,7 +55,7 @@ abstract class ServiceClient {
  *
  * @group Clients
  */
-export class RobotClient implements Robot {
+export class RobotClient extends EventDispatcher implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;
   private readonly sessionOptions: SessionOptions | undefined;
@@ -114,6 +114,7 @@ export class RobotClient implements Robot {
     webrtcOptions?: WebRTCOptions,
     sessionOptions?: SessionOptions
   ) {
+    super();
     this.serviceHost = serviceHost;
     this.webrtcOptions = webrtcOptions;
     this.sessionOptions = sessionOptions;
@@ -126,6 +127,13 @@ export class RobotClient implements Robot {
         return this.transportFactory(opts);
       }
     );
+
+    events.on('reconnected', () => {
+      this.reconnectHook();
+    })
+    events.on('disconnected', () => {
+      this.disconnectHook();
+    })
   }
 
   get sessionId() {
@@ -284,6 +292,18 @@ export class RobotClient implements Robot {
     this.sessionManager.reset();
   }
 
+  public isConnected() {
+    this.peerConn?.iceConnectionState === 'closed' ? true : false
+  }
+
+  public reconnectHook() {
+    // 
+  }
+
+  public disconnectHook() {
+    // 
+  }
+
   public async connect(
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds
@@ -353,7 +373,10 @@ export class RobotClient implements Robot {
            * connection getting closed, so restarting ice is not a valid way to
            * recover.
            */
-          if (this.peerConn?.iceConnectionState === 'closed') {
+          if (this.isConnected()) {
+            events.emit('reconnected', {});
+          } else {
+            events.emit('disconnected', {});
             if (this.webrtcOptions?.noReconnect) {
               return;
             }
