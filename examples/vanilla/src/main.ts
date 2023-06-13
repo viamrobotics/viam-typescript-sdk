@@ -52,12 +52,22 @@ async function run(client: VIAM.RobotClient) {
   }
 }
 
+function disconnected(event) {
+  console.log("CUSTOM ROBOTCLIENT HOOK: the robot has been disconnected")
+}
+
+function reconnected(event) {
+  console.log("CUSTOM ROBOTCLIENT HOOK: the robot has been reconnected")
+}
+
 async function main() {
   // Connect to client
   let client: VIAM.RobotClient;
   try {
     client = await connect();
     console.log('connected!');
+    client.on('disconnected', disconnected)
+    client.on('reconnected', reconnected)
   } catch (error) {
     console.log(error);
     return;
