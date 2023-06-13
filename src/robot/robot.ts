@@ -149,5 +149,14 @@ export interface Robot {
     durationMs?: number
   ): RobotStatusStream;
 
+  /**
+   * Call a function when an event of either 'reconnected' or 'disconnected' is 
+   * triggered.
+   * 
+   * @param event - The event that was triggered.
+   * @param listener - The function to call
+   * @group Connection
+   * @alpha
+   */
   on: (type: 'reconnected' | 'disconnected', listener: Callback) => void;
 }
