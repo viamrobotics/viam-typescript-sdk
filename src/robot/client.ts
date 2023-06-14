@@ -317,9 +317,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public isConnected(): boolean {
-    let connected: boolean
-    this.peerConn?.iceConnectionState === 'closed' ? connected = false : connected = true;
-    return connected
+    return this.peerConn?.iceConnectionState === 'closed';
   }
 
   public async connect(
