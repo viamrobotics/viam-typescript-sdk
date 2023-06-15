@@ -4,6 +4,7 @@ import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import type { grpc } from '@improbable-eng/grpc-web';
+import { DISCONNECTED, EventDispatcher, events, RECONNECTED } from '../events';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
   PoseInFrame,
@@ -29,7 +30,6 @@ import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service';
 import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
-import { events } from '../events';
 import { ViamResponseStream } from '../responses';
 import SessionManager from './session-manager';
 import type { Robot, RobotStatusStream } from './robot';
@@ -49,7 +49,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
 }
 
 /**
@@ -57,7 +57,7 @@ abstract class ServiceClient {
  *
  * @group Clients
  */
-export class RobotClient implements Robot {
+export class RobotClient extends EventDispatcher implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;
   private readonly sessionOptions: SessionOptions | undefined;
@@ -116,6 +116,7 @@ export class RobotClient implements Robot {
     webrtcOptions?: WebRTCOptions,
     sessionOptions?: SessionOptions
   ) {
+    super();
     this.serviceHost = serviceHost;
     this.webrtcOptions = webrtcOptions;
     this.sessionOptions = sessionOptions;
@@ -128,6 +129,41 @@ export class RobotClient implements Robot {
         return this.transportFactory(opts);
       }
     );
+
+    events.on(RECONNECTED, () => {
+      this.emit(RECONNECTED, {});
+    });
+    events.on(DISCONNECTED, () => {
+      this.emit(DISCONNECTED, {});
+      if (this.webrtcOptions?.noReconnect) {
+        return;
+      }
+
+      let retries = 0;
+      // eslint-disable-next-line no-console
+      console.debug('connection closed, will try to reconnect');
+      void backOff(() =>
+        this.connect().then(
+          () => {
+            // eslint-disable-next-line no-console
+            console.debug('reconnected successfully!');
+            events.emit(RECONNECTED, {});
+          },
+          (error) => {
+            // eslint-disable-next-line no-console
+            console.debug(`failed to reconnect - retries count: ${retries}`);
+            retries += 1;
+            if (retries == this.webrtcOptions?.reconnectMaxAttempts) {
+              console.log(
+                `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
+              );
+              return;
+            }
+            throw error;
+          }
+        )
+      );
+    });
   }
 
   get sessionId() {
@@ -286,6 +322,10 @@ export class RobotClient implements Robot {
     this.sessionManager.reset();
   }
 
+  public isConnected(): boolean {
+    return this.peerConn?.iceConnectionState === 'connected';
+  }
+
   public async connect(
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds
@@ -355,37 +395,10 @@ export class RobotClient implements Robot {
            * connection getting closed, so restarting ice is not a valid way to
            * recover.
            */
-          if (this.peerConn?.iceConnectionState === 'closed') {
-            if (this.webrtcOptions?.noReconnect) {
-              return;
-            }
-
-            let retries = 0;
-            // eslint-disable-next-line no-console
-            console.debug('connection closed, will try to reconnect');
-            void backOff(() =>
-              this.connect().then(
-                () => {
-                  // eslint-disable-next-line no-console
-                  console.debug('reconnected successfully!');
-                  events.emit('reconnected', {});
-                },
-                (error) => {
-                  // eslint-disable-next-line no-console
-                  console.debug(
-                    `failed to reconnect - retries count: ${retries}`
-                  );
-                  retries += 1;
-                  if (retries == this.webrtcOptions?.reconnectMaxAttempts) {
-                    console.log(
-                      `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
-                    );
-                    return;
-                  }
-                  throw error;
-                }
-              )
-            );
+          if (this.peerConn?.iceConnectionState === 'connected') {
+            events.emit(RECONNECTED, {});
+          } else if (this.peerConn?.iceConnectionState === 'closed') {
+            events.emit(DISCONNECTED, {});
           }
         });
 

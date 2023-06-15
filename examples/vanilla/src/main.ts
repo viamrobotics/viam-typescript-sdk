@@ -34,8 +34,8 @@ function button() {
   return <HTMLButtonElement>document.getElementById('main-button');
 }
 
-// This function runs a motor component with a given named on your robot.
-// Feel free to replace it whatever logic you want to test out!
+// This function runs a motor component with a given name on your robot.
+// Feel free to replace it with whatever logic you want to test out!
 async function run(client: VIAM.RobotClient) {
   // Replace with the name of a motor on your robot.
   const name = '<MOTOR NAME>';
@@ -52,12 +52,26 @@ async function run(client: VIAM.RobotClient) {
   }
 }
 
+// This function is called when the robot is disconnected.
+// Feel free to replace it with whatever logic you want to test out!
+async function disconnected(event) {
+  console.log('The robot has been disconnected. Trying reconnect...');
+}
+
+// This function is called when the robot is reconnected.
+// Feel free to replace it with whatever logic you want to test out!
+async function reconnected(event) {
+  console.log('The robot has been reconnected. Work can be continued.');
+}
+
 async function main() {
   // Connect to client
   let client: VIAM.RobotClient;
   try {
     client = await connect();
     console.log('connected!');
+    client.on('disconnected', disconnected);
+    client.on('reconnected', reconnected);
   } catch (error) {
     console.log(error);
     return;
