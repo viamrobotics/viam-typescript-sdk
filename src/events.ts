@@ -1,5 +1,8 @@
 type Callback = (args: unknown) => void;
 
+export const RECONNECTED = 'reconnected';
+export const DISCONNECTED = 'disconnected';
+
 export class EventDispatcher {
   listeners: Record<string, Set<Callback>> = {};
 

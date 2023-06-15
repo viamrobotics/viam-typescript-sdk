@@ -4,6 +4,7 @@ import type {
   Transform,
 } from '../gen/common/v1/common_pb';
 import type { StructType } from '../types';
+import { DISCONNECTED, RECONNECTED } from '../events';
 import type proto from '../gen/robot/v1/robot_pb';
 import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
@@ -152,11 +153,11 @@ export interface Robot {
   /**
    * Call a function when an event of either 'reconnected' or 'disconnected' is 
    * triggered.
+   * NOTE: Please note that these functions currently only apply to WebRTC connections.
    * 
-   * @param event - The event that was triggered.
+   * @param type - The event ('reconnected' or 'disconnected') that was triggered.
    * @param listener - The function to call
-   * @group Connection
    * @alpha
    */
-  on: (type: 'reconnected' | 'disconnected', listener: Callback) => void;
+  on: (type: typeof RECONNECTED | typeof DISCONNECTED, listener: Callback) => void;
 }

@@ -4,7 +4,7 @@ import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import type { grpc } from '@improbable-eng/grpc-web';
-import { EventDispatcher, events } from '../events';
+import { DISCONNECTED, EventDispatcher, events, RECONNECTED } from '../events';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
   PoseInFrame,
@@ -128,11 +128,11 @@ export class RobotClient extends EventDispatcher implements Robot {
       }
     );
 
-    events.on('reconnected', () => {
-      this.emit('reconnected', {})
+    events.on(RECONNECTED, () => {
+      this.emit(RECONNECTED, {})
     })
-    events.on('disconnected', () => {
-      this.emit('disconnected', {})
+    events.on(DISCONNECTED, () => {
+      this.emit(DISCONNECTED, {})
       if (this.webrtcOptions?.noReconnect) {
         return;
       }
@@ -145,7 +145,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           () => {
             // eslint-disable-next-line no-console
             console.debug('reconnected successfully!');
-            events.emit('reconnected', {});
+            events.emit(RECONNECTED, {});
           },
           (error) => {
             // eslint-disable-next-line no-console
@@ -317,11 +317,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public isConnected(): boolean {
-    if (this.peerConn?.iceConnectionState === 'connected') {
-      return true
-    } else if (this.peerConn?.iceConnectionState === 'closed') {
-      return false
-    };
+    return this.peerConn?.iceConnectionState === 'connected'
   }
 
   public async connect(
