@@ -10,7 +10,7 @@ import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
 export type RobotStatusStream = ResponseStream<proto.Status[]>;
 
-type Callback = (args: unknown) => void
+type Callback = (args: unknown) => void;
 
 export interface Robot {
   /**
@@ -151,13 +151,17 @@ export interface Robot {
   ): RobotStatusStream;
 
   /**
-   * Call a function when an event of either 'reconnected' or 'disconnected' is 
-   * triggered.
-   * NOTE: Please note that these functions currently only apply to WebRTC connections.
-   * 
-   * @param type - The event ('reconnected' or 'disconnected') that was triggered.
+   * Call a function when an event of either 'reconnected' or 'disconnected' is
+   * triggered. NOTE: Please note that these functions currently only apply to
+   * WebRTC connections.
+   *
+   * @param type - The event ('reconnected' or 'disconnected') that was
+   *   triggered.
    * @param listener - The function to call
    * @alpha
    */
-  on: (type: typeof RECONNECTED | typeof DISCONNECTED, listener: Callback) => void;
+  on: (
+    type: typeof RECONNECTED | typeof DISCONNECTED,
+    listener: Callback
+  ) => void;
 }

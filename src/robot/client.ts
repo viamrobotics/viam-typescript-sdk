@@ -47,7 +47,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 /**
@@ -129,10 +129,10 @@ export class RobotClient extends EventDispatcher implements Robot {
     );
 
     events.on(RECONNECTED, () => {
-      this.emit(RECONNECTED, {})
-    })
+      this.emit(RECONNECTED, {});
+    });
     events.on(DISCONNECTED, () => {
-      this.emit(DISCONNECTED, {})
+      this.emit(DISCONNECTED, {});
       if (this.webrtcOptions?.noReconnect) {
         return;
       }
@@ -149,15 +149,13 @@ export class RobotClient extends EventDispatcher implements Robot {
           },
           (error) => {
             // eslint-disable-next-line no-console
-            console.debug(
-              `failed to reconnect - retries count: ${retries}`
-            );
+            console.debug(`failed to reconnect - retries count: ${retries}`);
             retries += 1;
             throw error;
           }
         )
       );
-    })
+    });
   }
 
   get sessionId() {
@@ -317,7 +315,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public isConnected(): boolean {
-    return this.peerConn?.iceConnectionState === 'connected'
+    return this.peerConn?.iceConnectionState === 'connected';
   }
 
   public async connect(
@@ -391,9 +389,8 @@ export class RobotClient extends EventDispatcher implements Robot {
            */
           if (this.peerConn?.iceConnectionState === 'connected') {
             events.emit(RECONNECTED, {});
-          }
-          else if (this.peerConn?.iceConnectionState === 'closed') {
-            console.log("emit disconnected")
+          } else if (this.peerConn?.iceConnectionState === 'closed') {
+            console.log('emit disconnected');
             events.emit(DISCONNECTED, {});
           }
         });

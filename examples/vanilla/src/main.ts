@@ -55,7 +55,7 @@ async function run(client: VIAM.RobotClient) {
 // This function is called when the robot is disconnected.
 // Feel free to replace it with whatever logic you want to test out!
 async function disconnected(event) {
-  console.log("The robot has been disconnected. New images may not appear.")
+  console.log('The robot has been disconnected. New images may not appear.');
 }
 
 // This function gets an image from a LiDAR component with a given name on
@@ -74,8 +74,8 @@ async function main() {
   try {
     client = await connect();
     console.log('connected!');
-    client.on('disconnected', disconnected)
-    client.on('reconnected', reconnected)
+    client.on('disconnected', disconnected);
+    client.on('reconnected', reconnected);
   } catch (error) {
     console.log(error);
     return;
