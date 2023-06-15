@@ -152,8 +152,7 @@ export interface Robot {
 
   /**
    * Call a function when an event of either 'reconnected' or 'disconnected' is
-   * triggered. NOTE: Please note that these functions currently only apply to
-   * WebRTC connections.
+   * triggered. Note that these events will only be triggered on WebRTC connections.
    *
    * @param type - The event ('reconnected' or 'disconnected') that was
    *   triggered.
