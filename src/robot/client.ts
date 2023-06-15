@@ -49,7 +49,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 /**
@@ -153,7 +153,7 @@ export class RobotClient extends EventDispatcher implements Robot {
             // eslint-disable-next-line no-console
             console.debug(`failed to reconnect - retries count: ${retries}`);
             retries += 1;
-            if (retries == this.webrtcOptions?.reconnectMaxAttempts) {
+            if (retries === this.webrtcOptions?.reconnectMaxAttempts) {
               console.log(
                 `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
               );
