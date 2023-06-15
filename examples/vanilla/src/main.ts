@@ -34,7 +34,7 @@ function button() {
   return <HTMLButtonElement>document.getElementById('main-button');
 }
 
-// This function runs a motor component with a given named on your robot.
+// This function runs a motor component with a given name on your robot.
 // Feel free to replace it with whatever logic you want to test out!
 async function run(client: VIAM.RobotClient) {
   // Replace with the name of a motor on your robot.
@@ -62,7 +62,6 @@ async function disconnected(event) {
 // your robot when the robot is reconnected.
 // Feel free to replace it with whatever logic you want to test out!
 async function reconnected(event) {
-  console.log("CUSTOM ROBOTCLIENT HOOK: the robot has been reconnected")
   // rplidar
   const rplidarClient = new VIAM.CameraClient(this, '<LIDAR NAME>');
   const rplidarReturnValue = await rplidarClient.getImage();

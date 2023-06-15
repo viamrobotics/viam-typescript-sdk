@@ -317,7 +317,11 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public isConnected(): boolean {
-    return this.peerConn?.iceConnectionState === 'closed';
+    if (this.peerConn?.iceConnectionState === 'connected') {
+      return true
+    } else if (this.peerConn?.iceConnectionState === 'closed') {
+      return false
+    };
   }
 
   public async connect(
