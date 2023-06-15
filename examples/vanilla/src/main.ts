@@ -55,17 +55,13 @@ async function run(client: VIAM.RobotClient) {
 // This function is called when the robot is disconnected.
 // Feel free to replace it with whatever logic you want to test out!
 async function disconnected(event) {
-  console.log('The robot has been disconnected. New images may not appear.');
+  console.log('The robot has been disconnected. Trying reconnect...');
 }
 
-// This function gets an image from a LiDAR component with a given name on
-// your robot when the robot is reconnected.
+// This function is called when the robot is reconnected.
 // Feel free to replace it with whatever logic you want to test out!
 async function reconnected(event) {
-  // rplidar
-  const rplidarClient = new VIAM.CameraClient(this, '<LIDAR NAME>');
-  const rplidarReturnValue = await rplidarClient.getImage();
-  console.log('rplidar getImage return value:', rplidarReturnValue);
+  console.log('The robot has been reconnected. Work can be continued.');
 }
 
 async function main() {
