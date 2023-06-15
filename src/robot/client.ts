@@ -39,7 +39,9 @@ interface WebRTCOptions {
   host: string;
   signalingAddress: string;
   rtcConfig: RTCConfiguration | undefined;
+  // reconnection options
   noReconnect?: boolean;
+  reconnectMaxAttempts?: number;
 }
 
 interface SessionOptions {
@@ -374,6 +376,12 @@ export class RobotClient implements Robot {
                     `failed to reconnect - retries count: ${retries}`
                   );
                   retries += 1;
+                  if (retries == this.webrtcOptions?.reconnectMaxAttempts) {
+                    console.log(
+                      `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
+                    );
+                    return;
+                  }
                   throw error;
                 }
               )

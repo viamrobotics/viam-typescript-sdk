@@ -56,6 +56,8 @@ export interface DialWebRTCConf {
   host: string;
   credential?: Credential;
   disableSessions?: boolean;
+  reconnectMaxWait?: number;
+  reconnectMaxAttempts?: number;
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
@@ -77,6 +79,8 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     signalingAddress,
     rtcConfig,
     noReconnect: conf.noReconnect,
+    reconnectMaxWait: conf.reconnectMaxWait,
+    reconnectMaxAttempts: conf.reconnectMaxAttempts,
   };
   let sessOpts;
   if (conf.disableSessions) {
