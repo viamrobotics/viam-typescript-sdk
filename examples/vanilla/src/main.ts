@@ -3,7 +3,7 @@ import * as VIAM from '@viamrobotics/sdk';
 async function connect(): Promise<VIAM.RobotClient> {
   // You can remove this block entirely if your robot is not authenticated.
   // Otherwise, replace with an actual secret.
-  const secret = 'a91i8tli4smkyyrqkhn88u4h1ai2uvcgvtv9hgtyvzhd26l0';
+  const secret = '<SECRET>';
   const credential = {
     payload: secret,
     type: 'robot-location-secret',
