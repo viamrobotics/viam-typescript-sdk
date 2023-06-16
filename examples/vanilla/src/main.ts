@@ -27,7 +27,7 @@ async function connect(): Promise<VIAM.RobotClient> {
     authEntity: host,
     signalingAddress,
     iceServers,
-    // optional: specify max reconnection attempt tries on disconnect
+    // optional: configure reconnection options
     reconnectMaxAttempts: 7,
     reconnectMaxWait: 1000,
   });
