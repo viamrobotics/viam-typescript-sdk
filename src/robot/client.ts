@@ -50,7 +50,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
 
 /**
@@ -143,28 +143,31 @@ export class RobotClient extends EventDispatcher implements Robot {
       let retries = 0;
       // eslint-disable-next-line no-console
       console.debug('connection closed, will try to reconnect');
-      void backOff(() =>
-        this.connect().then(
-          () => {
-            // eslint-disable-next-line no-console
-            console.debug('reconnected successfully!');
-            events.emit(RECONNECTED, {});
-          },
-          (error) => {
-            // eslint-disable-next-line no-console
-            console.debug(`failed to reconnect - retries count: ${retries}`);
-            retries += 1;
-            if (retries === this.webrtcOptions?.reconnectMaxAttempts) {
-              console.log(
-                `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
-              );
+      void backOff(
+        () =>
+          this.connect().then(
+            () => {
+              // eslint-disable-next-line no-console
+              console.debug('reconnected successfully!');
+              events.emit(RECONNECTED, {});
+            },
+            (error) => {
+              // eslint-disable-next-line no-console
+              console.debug(`failed to reconnect - retries count: ${retries}`);
+              retries += 1;
+              if (retries === this.webrtcOptions?.reconnectMaxAttempts) {
+                console.log(
+                  `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
+                );
+              }
+              throw error;
             }
-            throw error;
-          }
-        ),
+          ),
         {
           // default values taken from `exponential-backoff` library
-          maxDelay: this.webrtcOptions?.reconnectMaxWait || Infinity,
+
+          maxDelay:
+            this.webrtcOptions?.reconnectMaxWait || Number.POSITIVE_INFINITY,
           numOfAttempts: this.webrtcOptions?.reconnectMaxAttempts || 10,
         }
       );
