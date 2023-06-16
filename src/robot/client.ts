@@ -165,7 +165,6 @@ export class RobotClient extends EventDispatcher implements Robot {
           ),
         {
           // default values taken from `exponential-backoff` library
-
           maxDelay:
             this.webrtcOptions?.reconnectMaxWait || Number.POSITIVE_INFINITY,
           numOfAttempts: this.webrtcOptions?.reconnectMaxAttempts || 10,
