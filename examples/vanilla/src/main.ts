@@ -3,7 +3,7 @@ import * as VIAM from '@viamrobotics/sdk';
 async function connect(): Promise<VIAM.RobotClient> {
   // You can remove this block entirely if your robot is not authenticated.
   // Otherwise, replace with an actual secret.
-  const secret = '<SECRET>';
+  const secret = 'a91i8tli4smkyyrqkhn88u4h1ai2uvcgvtv9hgtyvzhd26l0';
   const credential = {
     payload: secret,
     type: 'robot-location-secret',
@@ -28,7 +28,8 @@ async function connect(): Promise<VIAM.RobotClient> {
     signalingAddress,
     iceServers,
     // optional: specify max reconnection attempt tries on disconnect
-    reconnectMaxAttempts: 3,
+    reconnectMaxAttempts: 7,
+    reconnectMaxWait: 1000,
   });
 }
 

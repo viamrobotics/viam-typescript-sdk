@@ -42,6 +42,7 @@ interface WebRTCOptions {
   // reconnection options
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
 }
 
 interface SessionOptions {
@@ -49,7 +50,7 @@ interface SessionOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(public serviceHost: string, public options?: grpc.RpcOptions) { }
 }
 
 /**
@@ -157,11 +158,15 @@ export class RobotClient extends EventDispatcher implements Robot {
               console.log(
                 `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
               );
-              return;
             }
             throw error;
           }
-        )
+        ),
+        {
+          // default values taken from `exponential-backoff` library
+          maxDelay: this.webrtcOptions?.reconnectMaxWait || Infinity,
+          numOfAttempts: this.webrtcOptions?.reconnectMaxAttempts || 10,
+        }
       );
     });
   }
