@@ -17,6 +17,11 @@
 <h1>Interface DialWebRTCConf</h1></div>
 <section class="tsd-panel tsd-comment">
 <div class="tsd-comment tsd-typography"><p>Options required to dial a robot via WebRTC.</p>
+<ul>
+<li><code>reconnectMaxAttempts</code> value should be a positive int; default is 10.</li>
+<li><code>reconnectMaxWait</code> value should be a positive int; default is positive
+infinity.</li>
+</ul>
 </div></section>
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
@@ -35,6 +40,8 @@
 <a href="DialWebRTCConf.html#host" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>host</span></a>
 <a href="DialWebRTCConf.html#iceServers" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>ice<wbr/>Servers?</span></a>
 <a href="DialWebRTCConf.html#noReconnect" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>no<wbr/>Reconnect?</span></a>
+<a href="DialWebRTCConf.html#reconnectMaxAttempts" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>reconnect<wbr/>Max<wbr/>Attempts?</span></a>
+<a href="DialWebRTCConf.html#reconnectMaxWait" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>reconnect<wbr/>Max<wbr/>Wait?</span></a>
 <a href="DialWebRTCConf.html#signalingAddress" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>signaling<wbr/>Address</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -57,6 +64,12 @@
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="noReconnect" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>no<wbr/>Reconnect</span><a href="#noReconnect" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">no<wbr/>Reconnect<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="reconnectMaxAttempts" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reconnect<wbr/>Max<wbr/>Attempts</span><a href="#reconnectMaxAttempts" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">reconnect<wbr/>Max<wbr/>Attempts<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="reconnectMaxWait" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reconnect<wbr/>Max<wbr/>Wait</span><a href="#reconnectMaxWait" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">reconnect<wbr/>Max<wbr/>Wait<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="signalingAddress" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>signaling<wbr/>Address</span><a href="#signalingAddress" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">signaling<wbr/>Address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div></section></section></div>
@@ -85,6 +98,8 @@
 <li><a href="#host" class="tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>host</span></a></li>
 <li><a href="#iceServers" class="tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>ice<wbr/>Servers</span></a></li>
 <li><a href="#noReconnect" class="tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>no<wbr/>Reconnect</span></a></li>
+<li><a href="#reconnectMaxAttempts" class="tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>reconnect<wbr/>Max<wbr/>Attempts</span></a></li>
+<li><a href="#reconnectMaxWait" class="tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>reconnect<wbr/>Max<wbr/>Wait</span></a></li>
 <li><a href="#signalingAddress" class="tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>signaling<wbr/>Address</span></a></li></ul></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-4-path"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)" id="icon-4-text"></path></svg><span>Viam SDK</span></a>
@@ -739,6 +754,8 @@
 <li><a href="../classes/gantryApi.GetLengthsResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Lengths<wbr/>Response</span></a></li>
 <li><a href="../classes/gantryApi.GetPositionRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Position<wbr/>Request</span></a></li>
 <li><a href="../classes/gantryApi.GetPositionResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Position<wbr/>Response</span></a></li>
+<li><a href="../classes/gantryApi.HomeRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Home<wbr/>Request</span></a></li>
+<li><a href="../classes/gantryApi.HomeResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Home<wbr/>Response</span></a></li>
 <li><a href="../classes/gantryApi.IsMovingRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Is<wbr/>Moving<wbr/>Request</span></a></li>
 <li><a href="../classes/gantryApi.IsMovingResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Is<wbr/>Moving<wbr/>Response</span></a></li>
 <li><a href="../classes/gantryApi.MoveToPositionRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Move<wbr/>To<wbr/>Position<wbr/>Request</span></a></li>
@@ -766,6 +783,16 @@
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
 <li><a href="../types/gantryApi.GetPositionResponse-1.AsObject.html" class="tsd-kind-type-alias tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>As<wbr/>Object</span></a></li></ul></div></details></li>
+<li>
+<details class="tsd-index-accordion tsd-kind-namespace tsd-parent-kind-namespace" data-key="gantryApi.HomeRequest"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><a href="../modules/gantryApi.HomeRequest-1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4-path"></use><use href="#icon-4-text"></use></svg><span>Home<wbr/>Request</span></a></summary>
+<div class="tsd-accordion-details">
+<ul class="tsd-nested-navigation">
+<li><a href="../types/gantryApi.HomeRequest-1.AsObject.html" class="tsd-kind-type-alias tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>As<wbr/>Object</span></a></li></ul></div></details></li>
+<li>
+<details class="tsd-index-accordion tsd-kind-namespace tsd-parent-kind-namespace" data-key="gantryApi.HomeResponse"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><a href="../modules/gantryApi.HomeResponse-1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4-path"></use><use href="#icon-4-text"></use></svg><span>Home<wbr/>Response</span></a></summary>
+<div class="tsd-accordion-details">
+<ul class="tsd-nested-navigation">
+<li><a href="../types/gantryApi.HomeResponse-1.AsObject.html" class="tsd-kind-type-alias tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>As<wbr/>Object</span></a></li></ul></div></details></li>
 <li>
 <details class="tsd-index-accordion tsd-kind-namespace tsd-parent-kind-namespace" data-key="gantryApi.IsMovingRequest"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><a href="../modules/gantryApi.IsMovingRequest-1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4-path"></use><use href="#icon-4-text"></use></svg><span>Is<wbr/>Moving<wbr/>Request</span></a></summary>
 <div class="tsd-accordion-details">
@@ -1674,6 +1701,8 @@
 <ul class="tsd-nested-navigation">
 <li><a href="../classes/slamApi.GetInternalStateRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Internal<wbr/>State<wbr/>Request</span></a></li>
 <li><a href="../classes/slamApi.GetInternalStateResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Internal<wbr/>State<wbr/>Response</span></a></li>
+<li><a href="../classes/slamApi.GetLatestMapInfoRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Latest<wbr/>Map<wbr/>Info<wbr/>Request</span></a></li>
+<li><a href="../classes/slamApi.GetLatestMapInfoResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Latest<wbr/>Map<wbr/>Info<wbr/>Response</span></a></li>
 <li><a href="../classes/slamApi.GetPointCloudMapRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Point<wbr/>Cloud<wbr/>Map<wbr/>Request</span></a></li>
 <li><a href="../classes/slamApi.GetPointCloudMapResponse.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Point<wbr/>Cloud<wbr/>Map<wbr/>Response</span></a></li>
 <li><a href="../classes/slamApi.GetPositionRequest.html" class="tsd-kind-class tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-128-path"></use><use href="#icon-128-text"></use></svg><span>Get<wbr/>Position<wbr/>Request</span></a></li>
@@ -1688,6 +1717,16 @@
 <div class="tsd-accordion-details">
 <ul class="tsd-nested-navigation">
 <li><a href="../types/slamApi.GetInternalStateResponse-1.AsObject.html" class="tsd-kind-type-alias tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>As<wbr/>Object</span></a></li></ul></div></details></li>
+<li>
+<details class="tsd-index-accordion tsd-kind-namespace tsd-parent-kind-namespace" data-key="slamApi.GetLatestMapInfoRequest"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><a href="../modules/slamApi.GetLatestMapInfoRequest-1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4-path"></use><use href="#icon-4-text"></use></svg><span>Get<wbr/>Latest<wbr/>Map<wbr/>Info<wbr/>Request</span></a></summary>
+<div class="tsd-accordion-details">
+<ul class="tsd-nested-navigation">
+<li><a href="../types/slamApi.GetLatestMapInfoRequest-1.AsObject.html" class="tsd-kind-type-alias tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>As<wbr/>Object</span></a></li></ul></div></details></li>
+<li>
+<details class="tsd-index-accordion tsd-kind-namespace tsd-parent-kind-namespace" data-key="slamApi.GetLatestMapInfoResponse"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><a href="../modules/slamApi.GetLatestMapInfoResponse-1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4-path"></use><use href="#icon-4-text"></use></svg><span>Get<wbr/>Latest<wbr/>Map<wbr/>Info<wbr/>Response</span></a></summary>
+<div class="tsd-accordion-details">
+<ul class="tsd-nested-navigation">
+<li><a href="../types/slamApi.GetLatestMapInfoResponse-1.AsObject.html" class="tsd-kind-type-alias tsd-parent-kind-namespace"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4194304-path"></use><use href="#icon-4194304-text"></use></svg><span>As<wbr/>Object</span></a></li></ul></div></details></li>
 <li>
 <details class="tsd-index-accordion tsd-kind-namespace tsd-parent-kind-namespace" data-key="slamApi.GetPointCloudMapRequest"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg><a href="../modules/slamApi.GetPointCloudMapRequest-1.html"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-4-path"></use><use href="#icon-4-text"></use></svg><span>Get<wbr/>Point<wbr/>Cloud<wbr/>Map<wbr/>Request</span></a></summary>
 <div class="tsd-accordion-details">
