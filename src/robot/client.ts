@@ -39,11 +39,8 @@ interface WebRTCOptions {
   host: string;
   signalingAddress: string;
   rtcConfig: RTCConfiguration | undefined;
-  // RECONNECTION OPTIONS
   noReconnect?: boolean;
-  // value should be a positive int; default is 10
   reconnectMaxAttempts?: number;
-  // value should be a positive int; default is positive infinity
   reconnectMaxWait?: number;
 }
 
