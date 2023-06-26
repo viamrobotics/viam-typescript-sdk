@@ -13,6 +13,11 @@ export interface DialDirectConf {
   disableSessions?: boolean;
 }
 
+/** Check if a given number is a positive integer */
+const isPosInt = (x: number): boolean => {
+  return Boolean(x > 0 && Number.isInteger(x));
+};
+
 /** Check if a url corresponds to a local connection via heuristic */
 const isLocalConnection = (url: string) => url.includes('.local');
 
@@ -50,38 +55,29 @@ interface ICEServer {
   credential?: string;
 }
 
-/** Options required to dial a robot via WebRTC. */
+/**
+ * Options required to dial a robot via WebRTC.
+ *
+ * - `reconnectMaxAttempts` value should be a positive int; default is 10.
+ * - `reconnectMaxWait` value should be a positive int; default is positive
+ *   infinity.
+ */
 export interface DialWebRTCConf {
   authEntity?: string;
   host: string;
   credential?: Credential;
   disableSessions?: boolean;
-  reconnectMaxWait?: number;
   reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
   noReconnect?: boolean;
 }
 
-const isPosInt = (x: number): boolean => {
-  return Boolean(x > 0 && Number.isInteger(x));
-};
-
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
   console.debug('dialing via WebRTC...');
-
-  if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
-    throw new Error(
-      `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
-    );
-  }
-  if (conf.reconnectMaxWait && !isPosInt(conf.reconnectMaxWait)) {
-    throw new Error(
-      `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
-    );
-  }
 
   const impliedURL = conf.host;
   const { signalingAddress } = conf;
@@ -149,10 +145,20 @@ export const createRobotClient = async (
 
   // Try to dial via WebRTC first.
   if (isDialWebRTCConf(conf)) {
+    if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
+      throw new Error(
+        `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
+      );
+    }
+    if (conf.reconnectMaxWait && !isPosInt(conf.reconnectMaxWait)) {
+      throw new Error(
+        `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
+      );
+    }
+
     try {
       client = await dialWebRTC(conf);
-    } catch (error: any) {
-      console.log(error);
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via WebRTC...');
     }
@@ -161,8 +167,7 @@ export const createRobotClient = async (
   if (!client) {
     try {
       client = await dialDirect(conf);
-    } catch (error: any) {
-      console.log(error);
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via gRPC...');
     }
