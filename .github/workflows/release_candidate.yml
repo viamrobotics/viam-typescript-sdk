@@ -39,6 +39,15 @@ jobs:
         uses: andymckay/cancel-action@0.2
         if: steps.is_organization_member.outputs.result == 'false'
 
+      - name: Install GH CLI
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -91,11 +100,10 @@ jobs:
           message: Bump version to ${{ steps.which_version.outputs.rc_version }}
 
       - name: Open PR
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: "main" 
-          pr_title: ${{ steps.which_version.outputs.version }}
-          pr_body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
+        run: |
+          gh pr create -t "rc-${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the RC branch back into main upon successful release" -B "main" -H "rc-${{ steps.which_version.outputs.version }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     needs: prepare
