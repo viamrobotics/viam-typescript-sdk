@@ -40,6 +40,8 @@ interface WebRTCOptions {
   signalingAddress: string;
   rtcConfig: RTCConfiguration | undefined;
   noReconnect?: boolean;
+  reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
 }
 
 interface SessionOptions {
@@ -140,20 +142,32 @@ export class RobotClient extends EventDispatcher implements Robot {
       let retries = 0;
       // eslint-disable-next-line no-console
       console.debug('connection closed, will try to reconnect');
-      void backOff(() =>
-        this.connect().then(
-          () => {
-            // eslint-disable-next-line no-console
-            console.debug('reconnected successfully!');
-            events.emit(RECONNECTED, {});
-          },
-          (error) => {
-            // eslint-disable-next-line no-console
-            console.debug(`failed to reconnect - retries count: ${retries}`);
-            retries += 1;
-            throw error;
-          }
-        )
+      void backOff(
+        () =>
+          this.connect().then(
+            () => {
+              // eslint-disable-next-line no-console
+              console.debug('reconnected successfully!');
+              events.emit(RECONNECTED, {});
+            },
+            (error) => {
+              // eslint-disable-next-line no-console
+              console.debug(`failed to reconnect - retries count: ${retries}`);
+              retries += 1;
+              if (retries === this.webrtcOptions?.reconnectMaxAttempts) {
+                console.log(
+                  `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
+                );
+              }
+              throw error;
+            }
+          ),
+        {
+          // default values taken from `exponential-backoff` library
+          maxDelay:
+            this.webrtcOptions?.reconnectMaxWait || Number.POSITIVE_INFINITY,
+          numOfAttempts: this.webrtcOptions?.reconnectMaxAttempts || 10,
+        }
       );
     });
   }
@@ -390,7 +404,6 @@ export class RobotClient extends EventDispatcher implements Robot {
           if (this.peerConn?.iceConnectionState === 'connected') {
             events.emit(RECONNECTED, {});
           } else if (this.peerConn?.iceConnectionState === 'closed') {
-            console.log('emit disconnected');
             events.emit(DISCONNECTED, {});
           }
         });

@@ -13,6 +13,11 @@ export interface DialDirectConf {
   disableSessions?: boolean;
 }
 
+/** Check if a given number is a positive integer */
+const isPosInt = (x: number): boolean => {
+  return Boolean(x > 0 && Number.isInteger(x));
+};
+
 /** Check if a url corresponds to a local connection via heuristic */
 const isLocalConnection = (url: string) => url.includes('.local');
 
@@ -50,12 +55,20 @@ interface ICEServer {
   credential?: string;
 }
 
-/** Options required to dial a robot via WebRTC. */
+/**
+ * Options required to dial a robot via WebRTC.
+ *
+ * - `reconnectMaxAttempts` value should be a positive int; default is 10.
+ * - `reconnectMaxWait` value should be a positive int; default is positive
+ *   infinity.
+ */
 export interface DialWebRTCConf {
   authEntity?: string;
   host: string;
   credential?: Credential;
   disableSessions?: boolean;
+  reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
@@ -77,6 +90,8 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     signalingAddress,
     rtcConfig,
     noReconnect: conf.noReconnect,
+    reconnectMaxWait: conf.reconnectMaxWait,
+    reconnectMaxAttempts: conf.reconnectMaxAttempts,
   };
   let sessOpts;
   if (conf.disableSessions) {
@@ -130,6 +145,17 @@ export const createRobotClient = async (
 
   // Try to dial via WebRTC first.
   if (isDialWebRTCConf(conf)) {
+    if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
+      throw new Error(
+        `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
+      );
+    }
+    if (conf.reconnectMaxWait && !isPosInt(conf.reconnectMaxWait)) {
+      throw new Error(
+        `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
+      );
+    }
+
     try {
       client = await dialWebRTC(conf);
     } catch {
