@@ -10,11 +10,10 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/main.d.ts",
       "import": "./dist/main.es.js",
-      "require": "./dist/main.umd.js",
-      "types": "./dist/main.d.ts"
-    },
-    "./package.json": "./package.json"
+      "require": "./dist/main.umd.js"
+    }
   },
   "scripts": {
     "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
