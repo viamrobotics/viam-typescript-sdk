@@ -11,8 +11,10 @@
   "exports": {
     ".": {
       "import": "./dist/main.es.js",
-      "require": "./dist/main.umd.js"
-    }
+      "require": "./dist/main.umd.js",
+      "types": "./dist/main.d.ts"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
