@@ -37,6 +37,8 @@ jobs:
         run: |
           [[ "$(npm pkg get version)" =~ ^\"[0-9]+\.[0-9]+\.[0-9]\-next\.[0-9]+\"$ ]] || exit 1
 
+          # TODO: add custom error message pointing users to bump version with `make bump-next-version`
+
       - name: Publish
         if: ${{ steps.check_new_version.outputs.type }}
         uses: JS-DevTools/npm-publish@v2
