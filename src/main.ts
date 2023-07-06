@@ -91,6 +91,18 @@ export {
 } from './components/encoder';
 
 /**
+ * Raw Protobuf interfaces for a Gantry component.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link GantryClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
+export { type Gantry, GantryClient } from './components/gantry';
+
+/**
  * Raw Protobuf interfaces for a Motor component.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
@@ -198,7 +210,7 @@ export { type Stream, StreamClient } from './extra/stream';
  * @alpha
  * @group Raw Protobufs
  */
-export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
+// export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
 
 /**
  * Raw Protobuf interfaces for a Generic component.
