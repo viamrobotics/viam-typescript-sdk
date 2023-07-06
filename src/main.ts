@@ -91,6 +91,18 @@ export {
 } from './components/encoder';
 
 /**
+ * Raw Protobuf interfaces for a Gantry component.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link GantryClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
+export { type Gantry, GantryClient } from './components/gantry';
+
+/**
  * Raw Protobuf interfaces for a Motor component.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
@@ -170,35 +182,6 @@ export { default as sensorsApi } from './gen/service/sensors/v1/sensors_pb';
  */
 export { default as streamApi } from './gen/proto/stream/v1/stream_pb';
 export { type Stream, StreamClient } from './extra/stream';
-
-/**
- * Raw Protobuf interfaces for a Gantry component.
- *
- * Generated with https://github.com/improbable-eng/grpc-web
- *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new gantryApi.GetLengthsRequest();
- * request.setName('mygantry');
- *
- * client.gantryService.getLengths(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
- * @alpha
- * @group Raw Protobufs
- */
-export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
 
 /**
  * Raw Protobuf interfaces for a Generic component.

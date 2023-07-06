@@ -31,6 +31,11 @@
         "func": "getProperties",
         "args": []
     },
+    "gantry": {
+        "client": "GantryClient",
+        "func": "getLengths",
+        "args": []
+    },
     "sensor": {
         "client": "SensorClient",
         "func": "getReadings",
