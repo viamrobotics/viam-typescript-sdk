@@ -3,8 +3,8 @@ name: NPM Publish Next
 on:
   workflow_call:
     secrets:
-        NPM_TOKEN:
-          required: true
+      NPM_TOKEN:
+        required: true
 
 jobs:
   publish_next:
@@ -24,7 +24,21 @@ jobs:
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build'
 
+      - name: Publish (dry run)
+        id: check_new_version
+        uses: JS-DevTools/npm-publish@v2
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          tag: next
+          dry-run: true
+
+      - name: Validate version name
+        if: ${{ steps.check_new_version.outputs.type }}
+        run: |
+          [[ "$(npm pkg get version)" =~ ^\"[0-9]+\.[0-9]+\.[0-9]\-next\.[0-9]+\"$ ]] || exit 1
+
       - name: Publish
+        if: ${{ steps.check_new_version.outputs.type }}
         uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_TOKEN }}
