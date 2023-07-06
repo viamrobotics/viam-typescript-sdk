@@ -39,11 +39,7 @@ export class GantryClient implements Gantry {
       pb.GetPositionResponse
     >(gantryService.getPosition.bind(gantryService), request);
 
-    const result = response.getPositionsMmList();
-    if (!result) {
-      throw new Error('no positions');
-    }
-    return result;
+    return response.getPositionsMmList();
   }
 
   async moveToPosition(
@@ -80,12 +76,7 @@ export class GantryClient implements Gantry {
       request
     );
 
-    const result = response.getHomed();
-
-    if (!result) {
-      throw new Error('not homed');
-    }
-    return result;
+    return response.getHomed();
   }
 
   async getLengths(extra = {}) {
@@ -101,12 +92,7 @@ export class GantryClient implements Gantry {
       pb.GetLengthsResponse
     >(gantryService.getLengths.bind(gantryService), request);
 
-    const result = response.getLengthsMmList();
-
-    if (!result) {
-      throw new Error('no lengths');
-    }
-    return result;
+    return response.getLengthsMmList();
   }
 
   async stop(extra = {}) {
