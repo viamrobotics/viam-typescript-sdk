@@ -71,6 +71,12 @@ build-js: $(node_modules) clean-js build-buf
 pack: build
 	npm pack
 
+# bump to the next pre-release version on the `next` distribution tag -
+# run this command if you need to publish an off-cycle release of the sdk
+.PHONY: bump-next-version
+bump-next-version:
+	npm version --no-git-tag-version prerelease --preid=next
+
 # docs targets
 
 .PHONY: clean-docs
