@@ -44,9 +44,9 @@ jobs:
             exit 1
           fi
 
-      # - name: Publish
-      #   if: ${{ steps.check_new_version.outputs.type }}
-      #   uses: JS-DevTools/npm-publish@v2
-      #   with:
-      #     token: ${{ secrets.NPM_TOKEN }}
-      #     tag: next
+      - name: Publish
+        if: ${{ steps.check_new_version.outputs.type }}
+        uses: JS-DevTools/npm-publish@v2
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          tag: next
