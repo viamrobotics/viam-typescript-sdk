@@ -37,6 +37,7 @@ jobs:
 
       - name: Validate version name
         if: ${{ steps.check_new_version.outputs.type }}
+        shell: bash
         run: |
           if [[ ! "$(npm pkg get version)" =~ ^\"[0-9]+\.[0-9]+\.[0-9]\-next\.[0-9]+\"$ ]]; then
             # TODO: add custom error message pointing users to bump version with `make bump-next-version`
