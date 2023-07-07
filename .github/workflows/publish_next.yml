@@ -40,8 +40,7 @@ jobs:
         shell: bash
         run: |
           if [[ ! "$(npm pkg get version)" =~ ^\"[0-9]+\.[0-9]+\.[0-9]\-next\.[0-9]+\"$ ]]; then
-            echo "::error::cannot publish an off-cycle version named: '$(npm pkg get version)'\nPlease run `make bump-next-version` to generate a valid version name."
-            exit 1
+            echo "::error::Invalid version name.\nCannot publish an off-cycle version named: $(npm pkg get version).\nPlease run 'make bump-next-version' to generate a valid version name."
           fi
 
       # - name: Publish
