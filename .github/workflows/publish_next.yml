@@ -5,6 +5,9 @@ on:
     secrets:
       NPM_TOKEN:
         required: true
+  push:
+    branches:
+      - 'RSDK-3923-next-release'
 
 jobs:
   publish_next:
@@ -39,9 +42,9 @@ jobs:
 
           # TODO: add custom error message pointing users to bump version with `make bump-next-version`
 
-      - name: Publish
-        if: ${{ steps.check_new_version.outputs.type }}
-        uses: JS-DevTools/npm-publish@v2
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          tag: next
+      # - name: Publish
+      #   if: ${{ steps.check_new_version.outputs.type }}
+      #   uses: JS-DevTools/npm-publish@v2
+      #   with:
+      #     token: ${{ secrets.NPM_TOKEN }}
+      #     tag: next
