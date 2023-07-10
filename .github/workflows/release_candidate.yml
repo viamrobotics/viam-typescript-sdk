@@ -68,6 +68,8 @@ jobs:
         run: |
           if ${{ contains(steps.current_version.outputs.current_version, 'rc') }} ; then
             npm version prerelease --preid=rc --no-git-tag-version
+          elif ${{ contains(steps.current_version.outputs.current_version, 'next') && inputs.version == 'prepatch' }} ; then
+            npm version prerelease --preid=rc --no-git-tag-version
           else
             npm version ${{ inputs.version }} --preid=rc --no-git-tag-version
           fi
