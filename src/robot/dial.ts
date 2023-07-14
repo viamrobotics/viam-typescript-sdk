@@ -19,7 +19,7 @@ const isPosInt = (x: number): boolean => {
 };
 
 /** Check if a url corresponds to a local connection via heuristic */
-const isLocalConnection = (url: string) => url.includes('.local');
+const isLocalConnection = (url: string) => url.includes('local');
 
 const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
