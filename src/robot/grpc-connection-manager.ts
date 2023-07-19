@@ -39,7 +39,6 @@ export default class GRPCConnectionManager {
         (err, resp) => {
           if (err) {
             console.debug(err, resp);
-            // Do not emit first time
             events.emit(DISCONNECTED, {});
             return;
           }
@@ -66,11 +65,6 @@ export default class GRPCConnectionManager {
   }
 
   public async start() {
-    // call heartbeat once at start
-    console.debug('connecting get operation first time');
-
-    const getOperationsReq = new robotApi.GetOperationsRequest();
-
     // TODO: make sure we are not already connecting
 
     this.connecting = new Promise<void>((resolve, reject) => {
@@ -78,17 +72,18 @@ export default class GRPCConnectionManager {
       this.connectReject = reject;
     });
 
+    // call heartbeat once at start
+    const getOperationsReq = new robotApi.GetOperationsRequest();
     this.client.getOperations(
       getOperationsReq,
       new grpc.Metadata(),
       (err, _resp) => {
         if (err) {
           this.connectReject?.(err);
-          console.debug('failed to connect womp womp');
+          console.debug('failed to connect');
           return;
         }
         this.connectResolve?.();
-        console.debug('connected yay');
       }
     );
 
