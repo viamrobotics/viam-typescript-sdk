@@ -158,12 +158,12 @@ export class RobotClient extends EventDispatcher implements Robot {
           this.connect().then(
             () => {
               // eslint-disable-next-line no-console
-              console.debug('reconnected successfully!');
+              console.info('reconnected successfully!');
               events.emit(RECONNECTED, {});
             },
             (error) => {
               // eslint-disable-next-line no-console
-              console.debug(`failed to reconnect - retries count: ${retries}`);
+              console.info(`failed to reconnect - retries count: ${retries}`);
               retries += 1;
               if (retries === this.webrtcOptions?.reconnectMaxAttempts) {
                 console.log(
@@ -354,6 +354,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         // eslint-disable-next-line no-await-in-loop
         await this.connecting;
       }
+      console.debug('reconnect while connecting - exiting early');
       return;
     }
     this.connecting = new Promise<void>((resolve) => {
@@ -441,7 +442,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         };
       } else {
         this.transportFactory = await dialDirect(this.serviceHost, opts);
-        this.gRPCConnectionManager.start()
+        await this.gRPCConnectionManager.start();
       }
 
       const clientTransportFactory = this.sessionOptions?.disabled
