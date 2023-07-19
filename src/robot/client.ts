@@ -3,7 +3,7 @@ import { backOff } from 'exponential-backoff';
 import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
-import type { grpc } from '@improbable-eng/grpc-web';
+import { grpc } from '@improbable-eng/grpc-web';
 import { DISCONNECTED, EventDispatcher, events, RECONNECTED } from '../events';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
@@ -45,6 +45,12 @@ interface WebRTCOptions {
   reconnectMaxWait?: number;
 }
 
+interface DirectOptions {
+  noReconnect?: boolean;
+  reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
+}
+
 interface SessionOptions {
   disabled: boolean;
 }
@@ -61,9 +67,13 @@ abstract class ServiceClient {
 export class RobotClient extends EventDispatcher implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;
+  private readonly directOptions: DirectOptions | undefined;
   private readonly sessionOptions: SessionOptions | undefined;
   private gRPCConnectionManager: GRPCConnectionManager;
   private sessionManager: SessionManager;
+  private noReconnect: boolean | undefined;
+  private reconnectMaxAttempts: number | undefined;
+  private reconnectMaxWait: number | undefined;
 
   private peerConn: RTCPeerConnection | undefined;
 
@@ -116,11 +126,13 @@ export class RobotClient extends EventDispatcher implements Robot {
   constructor(
     serviceHost: string,
     webrtcOptions?: WebRTCOptions,
+    directOptions?: DirectOptions,
     sessionOptions?: SessionOptions
   ) {
     super();
     this.serviceHost = serviceHost;
     this.webrtcOptions = webrtcOptions;
+    this.directOptions = directOptions;
     this.sessionOptions = sessionOptions;
     this.gRPCConnectionManager = new GRPCConnectionManager(
       serviceHost,
@@ -140,13 +152,21 @@ export class RobotClient extends EventDispatcher implements Robot {
         return this.transportFactory(opts);
       }
     );
+    this.noReconnect =
+      this.webrtcOptions?.noReconnect || this.directOptions?.noReconnect;
+    this.reconnectMaxAttempts =
+      this.webrtcOptions?.reconnectMaxAttempts ||
+      this.directOptions?.reconnectMaxAttempts;
+    this.reconnectMaxWait =
+      this.webrtcOptions?.reconnectMaxWait ||
+      this.directOptions?.reconnectMaxWait;
 
     events.on(RECONNECTED, () => {
       this.emit(RECONNECTED, {});
     });
     events.on(DISCONNECTED, () => {
       this.emit(DISCONNECTED, {});
-      if (this.webrtcOptions?.noReconnect) {
+      if (this.noReconnect) {
         return;
       }
 
@@ -165,9 +185,9 @@ export class RobotClient extends EventDispatcher implements Robot {
               // eslint-disable-next-line no-console
               console.info(`failed to reconnect - retries count: ${retries}`);
               retries += 1;
-              if (retries === this.webrtcOptions?.reconnectMaxAttempts) {
+              if (retries === this.reconnectMaxAttempts) {
                 console.log(
-                  `reached max attempts: ${this.webrtcOptions.reconnectMaxAttempts}`
+                  `reached max attempts: ${this.reconnectMaxAttempts}`
                 );
               }
               throw error;
@@ -175,9 +195,8 @@ export class RobotClient extends EventDispatcher implements Robot {
           ),
         {
           // default values taken from `exponential-backoff` library
-          maxDelay:
-            this.webrtcOptions?.reconnectMaxWait || Number.POSITIVE_INFINITY,
-          numOfAttempts: this.webrtcOptions?.reconnectMaxAttempts || 10,
+          maxDelay: this.reconnectMaxWait || Number.POSITIVE_INFINITY,
+          numOfAttempts: this.reconnectMaxAttempts || 10,
         }
       );
     });
