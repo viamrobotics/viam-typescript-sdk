@@ -32,6 +32,7 @@ import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { ViamResponseStream } from '../responses';
 import SessionManager from './session-manager';
+import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot, RobotStatusStream } from './robot';
 
 interface WebRTCOptions {
@@ -61,6 +62,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   private readonly serviceHost: string;
   private readonly webrtcOptions: WebRTCOptions | undefined;
   private readonly sessionOptions: SessionOptions | undefined;
+  private gRPCConnectionManager: GRPCConnectionManager;
   private sessionManager: SessionManager;
 
   private peerConn: RTCPeerConnection | undefined;
@@ -120,6 +122,15 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.serviceHost = serviceHost;
     this.webrtcOptions = webrtcOptions;
     this.sessionOptions = sessionOptions;
+    this.gRPCConnectionManager = new GRPCConnectionManager(
+      serviceHost,
+      (opts: grpc.TransportOptions): grpc.Transport => {
+        if (!this.transportFactory) {
+          throw new Error(RobotClient.notConnectedYetStr);
+        }
+        return this.transportFactory(opts);
+      }
+    );
     this.sessionManager = new SessionManager(
       serviceHost,
       (opts: grpc.TransportOptions): grpc.Transport => {
@@ -430,6 +441,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         };
       } else {
         this.transportFactory = await dialDirect(this.serviceHost, opts);
+        this.gRPCConnectionManager.start()
       }
 
       const clientTransportFactory = this.sessionOptions?.disabled
