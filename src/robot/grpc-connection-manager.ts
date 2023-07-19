@@ -34,6 +34,7 @@ export default class GRPCConnectionManager {
                 (err, resp) => {
                     if (err) {
                         console.debug(err, resp);
+                        events.emit(DISCONNECTED, {});
                         return
                     }
                     if (worker) {
