@@ -24,7 +24,7 @@ export default class GRPCConnectionManager {
         });
     }
 
-    private async heartbeat() {
+    private heartbeat() {
         let worker: Worker | undefined;
         const doHeartbeat = () => {
             const getOperationsReq = new robotApi.GetOperationsRequest()
@@ -59,7 +59,7 @@ export default class GRPCConnectionManager {
         doHeartbeat();
     }
 
-    public async start() {
+    public start() {
         this.heartbeat()
     }
 
