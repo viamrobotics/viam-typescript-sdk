@@ -65,7 +65,9 @@ export default class GRPCConnectionManager {
   }
 
   public async start() {
-    // TODO: make sure we are not already connecting
+    if (this.connecting) {
+      await this.connecting;
+    }
 
     this.connecting = new Promise<void>((resolve, reject) => {
       this.connectResolve = resolve;
@@ -87,8 +89,11 @@ export default class GRPCConnectionManager {
       }
     );
 
-    await this.connecting;
-    this.connecting = undefined;
+    try {
+      await this.connecting;
+    } finally {
+      this.connecting = undefined;
+    }
 
     this.heartbeat();
   }
