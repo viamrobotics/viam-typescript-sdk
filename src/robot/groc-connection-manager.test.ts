@@ -24,7 +24,13 @@ describe('GPRCConnectionManager', () => {
   });
 
   test('call heartbeat successfully', async () => {
-    await cm.start();
+    await expect(cm.start()).resolves.toBe(undefined);
     expect(cm.connecting).toBe(undefined);
   });
+
+  test('call heartbeat when disconnected', async () => {
+    // TODO: emulate disconnected robot
+    // await expect(cm.start()).rejects.toBe(undefined);
+    // expect(cm.connecting).toBe(undefined);
+  })
 });
