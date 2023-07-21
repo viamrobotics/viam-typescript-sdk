@@ -18,7 +18,7 @@ export default class GRPCConnectionManager {
   private client: RobotServiceClient;
   private heartbeatIntervalMs: number | undefined;
 
-  private connecting: Promise<void> | undefined;
+  public connecting: Promise<void> | undefined;
   private connectResolve: (() => void) | undefined;
   private connectReject: ((reason: ServiceError) => void) | undefined;
 
