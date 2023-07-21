@@ -29,7 +29,7 @@ export default class GRPCConnectionManager {
     });
   }
 
-  private heartbeat() {
+  public heartbeat() {
     let worker: Worker | undefined;
     const doHeartbeat = () => {
       const getOperationsReq = new robotApi.GetOperationsRequest();
