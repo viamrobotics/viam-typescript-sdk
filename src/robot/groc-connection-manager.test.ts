@@ -37,7 +37,7 @@ describe('GPRCConnectionManager', () => {
     expect(heartbeat).toHaveBeenCalledOnce();
   });
 
-  test('call heartbeat when not connected', async () => {
+  test('check connection when not connected', async () => {
     const heartbeat = vi.spyOn(cm, 'heartbeat');
     RobotServiceClient.prototype.getOperations = vi
       .fn()
@@ -48,7 +48,7 @@ describe('GPRCConnectionManager', () => {
     expect(heartbeat).not.toHaveBeenCalled();
   });
 
-  test('call heartbeat and then disconnect', async () => {
+  test('successfully detect connection and then disconnect', async () => {
     const heartbeat = vi.spyOn(cm, 'heartbeat');
     const disconnected = vi.spyOn(events, 'emit');
     RobotServiceClient.prototype.getOperations = vi
