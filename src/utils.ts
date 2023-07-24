@@ -181,3 +181,15 @@ export const encodeWorldState = (
 
   return result;
 };
+
+/** Covert a GeoPoint object to a Protobuf Datatype */
+export const encodeGeoPoint = (
+  obj: common.GeoPoint.AsObject
+): common.GeoPoint => {
+  const result = new common.GeoPoint();
+
+  result.setLatitude(obj.latitude);
+  result.setLongitude(obj.longitude);
+
+  return result;
+};

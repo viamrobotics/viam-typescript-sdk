@@ -1,10 +1,11 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { NavigationServiceClient } from '../../gen/service/navigation/v1/navigation_pb_service';
-import pb, { ModeMap } from '../../gen/service/navigation/v1/navigation_pb';
+import type { ModeMap } from '../../gen/service/navigation/v1/navigation_pb';
+import pb from '../../gen/service/navigation/v1/navigation_pb';
 import { RobotClient } from '../../robot';
-import { GeoPoint, Options, StructType } from '../../types';
-import { doCommandFromClient, promisify } from '../../utils';
-import { Navigation } from './navigation';
+import type { GeoPoint, Options, StructType } from '../../types';
+import { doCommandFromClient, encodeGeoPoint, promisify } from '../../utils';
+import type { Navigation } from './navigation';
 
 /**
  * A gRPC-web client for a Navigation service.
@@ -53,7 +54,7 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    return promisify<pb.SetModeRequest, pb.SetModeResponse>(
+    await promisify<pb.SetModeRequest, pb.SetModeResponse>(
       service.setMode.bind(service),
       request
     );
@@ -71,9 +72,13 @@ export class NavigationClient implements Navigation {
     const response = await promisify<
       pb.GetLocationRequest,
       pb.GetLocationResponse
-    >(service.setMode.bind(service), request);
+    >(service.getLocation.bind(service), request);
 
-    return response.getLocation();
+    const result = response.getLocation();
+    if (!result) {
+      throw new Error('no location');
+    }
+    return result.toObject();
   }
 
   async getWayPoints(extra = {}) {
@@ -88,7 +93,7 @@ export class NavigationClient implements Navigation {
     const response = await promisify<
       pb.GetWaypointsRequest,
       pb.GetWaypointsResponse
-    >(service.setMode.bind(service), request);
+    >(service.getWaypoints.bind(service), request);
 
     return response.getWaypointsList();
   }
@@ -98,13 +103,13 @@ export class NavigationClient implements Navigation {
 
     const request = new pb.AddWaypointRequest();
     request.setName(this.name);
-    request.setLocation(location);
+    request.setLocation(encodeGeoPoint(location));
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    return promisify<pb.AddWaypointRequest, pb.AddWaypointResponse>(
-      service.setMode.bind(service),
+    await promisify<pb.AddWaypointRequest, pb.AddWaypointResponse>(
+      service.addWaypoint.bind(service),
       request
     );
   }
@@ -119,8 +124,8 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    return promisify<pb.RemoveWaypointRequest, pb.RemoveWaypointResponse>(
-      service.setMode.bind(service),
+    await promisify<pb.RemoveWaypointRequest, pb.RemoveWaypointResponse>(
+      service.removeWaypoint.bind(service),
       request
     );
   }
@@ -137,7 +142,7 @@ export class NavigationClient implements Navigation {
     const response = await promisify<
       pb.GetObstaclesRequest,
       pb.GetObstaclesResponse
-    >(service.setMode.bind(service), request);
+    >(service.getObstacles.bind(service), request);
 
     return response.getObstaclesList();
   }
