@@ -186,7 +186,7 @@ export class RobotClient extends EventDispatcher implements Robot {
               console.debug(`failed to reconnect - retries count: ${retries}`);
               retries += 1;
               if (retries === this.reconnectMaxAttempts) {
-                console.log(
+                console.debug(
                   `reached max attempts: ${this.reconnectMaxAttempts}`
                 );
               }
