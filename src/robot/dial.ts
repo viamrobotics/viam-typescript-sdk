@@ -11,6 +11,9 @@ export interface DialDirectConf {
   host: string;
   credential?: Credential;
   disableSessions?: boolean;
+  noReconnect?: boolean;
+  reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
 }
 
 /** Check if a given number is a positive integer */
@@ -31,11 +34,17 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
     );
   }
 
+  const clientConf = {
+    noReconnect: conf.noReconnect,
+    reconnectMaxWait: conf.reconnectMaxWait,
+    reconnectMaxAttempts: conf.reconnectMaxAttempts,
+  };
+
   let sessOpts;
   if (conf.disableSessions) {
     sessOpts = { disabled: true };
   }
-  const client = new RobotClient(conf.host, undefined, sessOpts);
+  const client = new RobotClient(conf.host, undefined, sessOpts, clientConf);
 
   let creds;
   if (conf.credential) {
@@ -67,12 +76,12 @@ export interface DialWebRTCConf {
   host: string;
   credential?: Credential;
   disableSessions?: boolean;
+  noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
-  noReconnect?: boolean;
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
@@ -143,19 +152,19 @@ export const createRobotClient = async (
 ): Promise<RobotClient> => {
   let client;
 
+  if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
+    throw new Error(
+      `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
+    );
+  }
+  if (conf.reconnectMaxWait && !isPosInt(conf.reconnectMaxWait)) {
+    throw new Error(
+      `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
+    );
+  }
+
   // Try to dial via WebRTC first.
   if (isDialWebRTCConf(conf)) {
-    if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
-      throw new Error(
-        `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
-      );
-    }
-    if (conf.reconnectMaxWait && !isPosInt(conf.reconnectMaxWait)) {
-      throw new Error(
-        `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
-      );
-    }
-
     try {
       client = await dialWebRTC(conf);
     } catch {
