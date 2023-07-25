@@ -36,6 +36,8 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
+   * Move a component to a Pose in respect to the origin of the SLAM map.
+   *
    * @param destination - Specify a destination to, which can be any pose with
    *   respect to the SLAM map's origin.
    * @param componentName - Component on the robot to move to the specified
@@ -67,6 +69,8 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
+   * Get the current location and orientation of a component.
+   *
    * @param componentName - The component whose pose is being requested.
    * @param destinationFrame - The reference frame in which the component's pose
    *   should be provided, if unset this defaults to the "world" reference
