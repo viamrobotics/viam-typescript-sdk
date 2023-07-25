@@ -44,7 +44,7 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   if (conf.disableSessions) {
     sessOpts = { disabled: true };
   }
-  const client = new RobotClient(conf.host, undefined, clientConf, sessOpts);
+  const client = new RobotClient(conf.host, undefined, sessOpts, clientConf);
 
   let creds;
   if (conf.credential) {
@@ -106,7 +106,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   if (conf.disableSessions) {
     sessOpts = { disabled: true };
   }
-  const client = new RobotClient(impliedURL, clientConf, undefined, sessOpts);
+  const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
   let creds;
   if (conf.credential) {

@@ -126,8 +126,8 @@ export class RobotClient extends EventDispatcher implements Robot {
   constructor(
     serviceHost: string,
     webrtcOptions?: WebRTCOptions,
-    directOptions?: DirectOptions,
-    sessionOptions?: SessionOptions
+    sessionOptions?: SessionOptions,
+    directOptions?: DirectOptions
   ) {
     super();
     this.serviceHost = serviceHost;
