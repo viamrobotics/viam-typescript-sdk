@@ -71,9 +71,6 @@ export class RobotClient extends EventDispatcher implements Robot {
   private readonly sessionOptions: SessionOptions | undefined;
   private gRPCConnectionManager: GRPCConnectionManager;
   private sessionManager: SessionManager;
-  private noReconnect: boolean | undefined;
-  private reconnectMaxAttempts: number | undefined;
-  private reconnectMaxWait: number | undefined;
 
   private peerConn: RTCPeerConnection | undefined;
 
@@ -152,14 +149,6 @@ export class RobotClient extends EventDispatcher implements Robot {
         return this.transportFactory(opts);
       }
     );
-    this.noReconnect =
-      this.webrtcOptions?.noReconnect || this.directOptions?.noReconnect;
-    this.reconnectMaxAttempts =
-      this.webrtcOptions?.reconnectMaxAttempts ||
-      this.directOptions?.reconnectMaxAttempts;
-    this.reconnectMaxWait =
-      this.webrtcOptions?.reconnectMaxWait ||
-      this.directOptions?.reconnectMaxWait;
 
     events.on(RECONNECTED, () => {
       this.emit(RECONNECTED, {});
@@ -200,6 +189,24 @@ export class RobotClient extends EventDispatcher implements Robot {
         }
       );
     });
+  }
+
+  private get noReconnect() {
+    return this.webrtcOptions?.noReconnect || this.directOptions?.noReconnect;
+  }
+
+  private get reconnectMaxAttempts() {
+    return (
+      this.webrtcOptions?.reconnectMaxAttempts ||
+      this.directOptions?.reconnectMaxAttempts
+    );
+  }
+
+  private get reconnectMaxWait() {
+    return (
+      this.webrtcOptions?.reconnectMaxWait ||
+      this.directOptions?.reconnectMaxWait
+    );
   }
 
   get sessionId() {
