@@ -1,4 +1,6 @@
+import { GeoObstacle } from '../../gen/common/v1/common_pb';
 import type {
+  GeoPoint,
   Pose,
   PoseInFrame,
   Resource,
@@ -53,6 +55,34 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
+   * Move a component to a specific latitude and longitude, using a movement
+   * sensor to determine the location.
+   *
+   * @param destination - Destination for the component to move to, represented
+   *   as a GeoPoint.
+   * @param componentName - The name of the component to move.
+   * @param movementSensorName - The name of the movement sensor used to check
+   *   the robot's location.
+   * @param obstaclesList - Obstacles to consider when planning the motion of
+   *   the component.
+   * @param heading - Compass heading, in degrees, to achieve at destination
+   * @param linearMetersPerSec - Linear velocity to target when moving.
+   * @param angularDegPerSec - Angular velocity to target when moving.
+   */
+  moveOnGlobe: (
+    destination: GeoPoint,
+    componentName: ResourceName,
+    movementSensorName: ResourceName,
+    heading?: number,
+    obstaclesList?: GeoObstacle[],
+    linearMetersPerSec?: number,
+    angularDegPerSec?: number,
+    extra?: StructType
+  ) => Promise<boolean>;
+
+  /**
+   * Move a single component.
+   *
    * @param destination - Destination to move to, which can a pose in the
    *   reference frame of any frame in the robot's frame system.
    * @param componentName - Component on the robot to move to the specified
