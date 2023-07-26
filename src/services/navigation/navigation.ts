@@ -10,7 +10,7 @@ import type { GeoPoint, Resource, StructType } from '../../types';
 export interface Navigation extends Resource {
   /** Get the mode the robot is operating in. */
   getMode: (extra?: StructType) => Promise<ModeMap[keyof ModeMap]>;
-  
+
   /**
    * Set the mode the robot is operating in.
    *
