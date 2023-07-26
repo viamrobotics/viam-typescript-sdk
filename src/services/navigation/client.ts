@@ -1,10 +1,10 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
-import { NavigationServiceClient } from '../../gen/service/navigation/v1/navigation_pb_service';
-import type { ModeMap } from '../../gen/service/navigation/v1/navigation_pb';
 import pb from '../../gen/service/navigation/v1/navigation_pb';
 import { RobotClient } from '../../robot';
-import type { GeoPoint, Options, StructType } from '../../types';
+import { NavigationServiceClient } from '../../gen/service/navigation/v1/navigation_pb_service';
 import { doCommandFromClient, encodeGeoPoint, promisify } from '../../utils';
+import type { GeoPoint, Options, StructType } from '../../types';
+import type { ModeMap } from './types';
 import type { Navigation } from './navigation';
 
 /**

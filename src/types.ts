@@ -20,6 +20,7 @@ export interface Resource {
 // Common Protobuf Types
 
 export type ResourceName = common.ResourceName.AsObject;
+export type GeoObstacle = common.GeoObstacle.AsObject;
 export type GeoPoint = common.GeoPoint.AsObject;
 
 // Spatial Math

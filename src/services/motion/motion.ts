@@ -1,5 +1,5 @@
-import { GeoObstacle } from '../../gen/common/v1/common_pb';
 import type {
+  GeoObstacle,
   GeoPoint,
   Pose,
   PoseInFrame,

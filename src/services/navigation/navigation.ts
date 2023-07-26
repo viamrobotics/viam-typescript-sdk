@@ -1,7 +1,6 @@
-import { GeoObstacle } from '../../gen/common/v1/common_pb';
-import type { ModeMap } from '../../gen/service/navigation/v1/navigation_pb';
-import { Waypoint } from '../../gen/service/navigation/v1/navigation_pb';
-import type { GeoPoint, Resource, StructType } from '../../types';
+import type { GeoObstacle, GeoPoint, Resource, StructType } from '../../types';
+import type { ModeMap } from './types';
+import { Waypoint } from './types';
 
 /**
  * A service that uses GPS to automatically navigate a robot to user defined
