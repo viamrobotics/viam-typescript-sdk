@@ -304,7 +304,11 @@ export { type DataManager, DataManagerClient } from './services/data-manager';
  * @group Raw Protobufs
  */
 export { default as navigationApi } from './gen/service/navigation/v1/navigation_pb';
-export { type ModeMap, NavigationClient } from './services/navigation';
+export {
+  type ModeMap,
+  type Waypoint,
+  NavigationClient,
+} from './services/navigation';
 
 /**
  * Raw Protobuf interfaces for a Servo component.
