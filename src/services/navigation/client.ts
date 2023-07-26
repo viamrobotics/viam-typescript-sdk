@@ -95,7 +95,7 @@ export class NavigationClient implements Navigation {
       pb.GetWaypointsResponse
     >(service.getWaypoints.bind(service), request);
 
-    return response.getWaypointsList();
+    return response.getWaypointsList().map((x) => x.toObject());
   }
 
   async addWayPoint(location: GeoPoint, extra = {}) {
@@ -144,7 +144,7 @@ export class NavigationClient implements Navigation {
       pb.GetObstaclesResponse
     >(service.getObstacles.bind(service), request);
 
-    return response.getObstaclesList();
+    return response.getObstaclesList().map((x) => x.toObject());
   }
 
   async doCommand(command: StructType): Promise<StructType> {

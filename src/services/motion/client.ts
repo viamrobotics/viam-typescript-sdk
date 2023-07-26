@@ -11,8 +11,10 @@ import {
   encodeWorldState,
   encodeTransform,
   encodeGeoPoint,
+  encodeGeoObstacle,
 } from '../../utils';
 import type {
+  GeoObstacle,
   GeoPoint,
   Options,
   Pose,
@@ -22,7 +24,6 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import { GeoObstacle } from '../../gen/common/v1/common_pb';
 import { type Constraints, encodeConstraints } from './types';
 import type { Motion } from './motion';
 
@@ -122,7 +123,7 @@ export class MotionClient implements Motion {
       request.setHeading(heading);
     }
     if (obstaclesList) {
-      request.setObstaclesList(obstaclesList);
+      request.setObstaclesList(obstaclesList.map((x) => encodeGeoObstacle(x)));
     }
     if (linearMetersPerSec) {
       request.setLinearMetersPerSec(linearMetersPerSec);

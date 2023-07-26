@@ -1,6 +1,5 @@
 import type { GeoObstacle, GeoPoint, Resource, StructType } from '../../types';
-import type { ModeMap } from './types';
-import { Waypoint } from './types';
+import type { ModeMap, Waypoint } from './types';
 
 /**
  * A service that uses GPS to automatically navigate a robot to user defined

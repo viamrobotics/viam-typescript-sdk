@@ -182,7 +182,7 @@ export const encodeWorldState = (
   return result;
 };
 
-/** Covert a GeoPoint object to a Protobuf Datatype */
+/** Convert a GeoPoint object to a Protobuf Datatype */
 export const encodeGeoPoint = (
   obj: common.GeoPoint.AsObject
 ): common.GeoPoint => {
@@ -190,6 +190,20 @@ export const encodeGeoPoint = (
 
   result.setLatitude(obj.latitude);
   result.setLongitude(obj.longitude);
+
+  return result;
+};
+
+/** Convert a GeoObstacle object to a Protobuf Datatype */
+export const encodeGeoObstacle = (
+  obj: common.GeoObstacle.AsObject
+): common.GeoObstacle => {
+  const result = new common.GeoObstacle();
+
+  if (obj.location) {
+    result.setLocation(encodeGeoPoint(obj.location));
+  }
+  result.setGeometriesList(obj.geometriesList.map((x) => encodeGeometry(x)));
 
   return result;
 };
