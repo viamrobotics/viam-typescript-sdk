@@ -97,4 +97,31 @@ export class StreamClient extends EventDispatcher implements Stream {
       this.streams.delete(name);
     }
   }
+
+  /**
+   * Get a stream by name from a StreamClient.
+   *
+   * @param name - The name of a camera component.
+   */
+  getStream = async (name: string): Promise<MediaStream> => {
+    const streamPromise = new Promise<MediaStream>((resolve, reject) => {
+      const handleTrack = (event: RTCTrackEvent) => {
+        const [stream] = event.streams;
+
+        if (!stream) {
+          this.off('track', handleTrack as (args: unknown) => void);
+          reject(new Error('Recieved track event with no streams'));
+        } else if (stream.id === name) {
+          this.off('track', handleTrack as (args: unknown) => void);
+          resolve(stream);
+        }
+      };
+
+      this.on('track', handleTrack as (args: unknown) => void);
+    });
+
+    await this.add(name);
+
+    return streamPromise;
+  };
 }
