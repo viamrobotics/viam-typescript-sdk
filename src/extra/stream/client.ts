@@ -98,8 +98,11 @@ export class StreamClient extends EventDispatcher implements Stream {
     }
   }
 
+  private getStreamTimeout = 30_000;
+
   /**
-   * Get a stream by name from a StreamClient.
+   * Get a stream by name from a StreamClient. Will time out if stream is not
+   * received within 30 seconds.
    *
    * @param name - The name of a camera component.
    */
@@ -118,6 +121,11 @@ export class StreamClient extends EventDispatcher implements Stream {
       };
 
       this.on('track', handleTrack as (args: unknown) => void);
+
+      setTimeout(() => {
+        this.off('track', handleTrack as (args: unknown) => void);
+        reject(new Error('timed out'));
+      }, this.getStreamTimeout);
     });
 
     await this.add(name);
