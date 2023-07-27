@@ -46,4 +46,16 @@ describe('StreamClient', () => {
       fakeStream
     );
   });
+  test('getStream fails when add stream fails', async () => {
+    const error = new Error('could not add stream');
+    StreamServiceClient.prototype.addStream = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(error);
+      });
+
+    await expect(streamClient.getStream('fakecam')).rejects.toStrictEqual(
+      error
+    );
+  });
 });
