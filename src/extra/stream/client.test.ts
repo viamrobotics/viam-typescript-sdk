@@ -73,4 +73,22 @@ describe('StreamClient', () => {
     vi.runAllTimers();
     await expect(promise).rejects.toThrowError('timed out');
   });
+
+  test('getStream can add the same stream twice', async () => {
+    const fakeCamName = 'fakecam';
+    const fakeStream = { id: fakeCamName };
+    StreamServiceClient.prototype.addStream = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {});
+        streamClient.emit('track', { streams: [fakeStream] });
+      });
+
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
+      fakeStream
+    );
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
+      fakeStream
+    );
+  });
 });
