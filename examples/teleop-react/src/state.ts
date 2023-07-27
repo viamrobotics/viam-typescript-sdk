@@ -92,7 +92,8 @@ export const useStream = (
     if (streamClient && okToConnectRef.current) {
       okToConnectRef.current = false;
 
-      getStream(streamClient, cameraName)
+      streamClient
+        .getStream(cameraName)
         .then((mediaStream) => setStream(mediaStream))
         .catch((error: unknown) => {
           console.warn(`Unable to connect to camera ${cameraName}`, error);

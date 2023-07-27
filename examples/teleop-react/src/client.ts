@@ -52,35 +52,3 @@ export const getStreamClient = (client: RobotClient): StreamClient => {
 export const getBaseClient = (client: RobotClient): BaseClient => {
   return new BaseClient(client, 'viam_base');
 };
-
-/**
- * Get a stream by name from a StreamClient.
- *
- * @param streamClient - The connected StreamClient.
- * @param name - The name of the camera.
- * @returns A MediaStream object that can be used in a <video>.
- */
-export const getStream = async (
-  streamClient: StreamClient,
-  name: string
-): Promise<MediaStream> => {
-  const streamPromise = new Promise<MediaStream>((resolve, reject) => {
-    const handleTrack = (event: RTCTrackEvent) => {
-      const stream = event.streams[0];
-
-      if (!stream) {
-        streamClient.off('track', handleTrack as (args: unknown) => void);
-        reject(new Error('Recieved track event with no streams'));
-      } else if (stream.id === name) {
-        streamClient.off('track', handleTrack as (args: unknown) => void);
-        resolve(stream);
-      }
-    };
-
-    streamClient.on('track', handleTrack as (args: unknown) => void);
-  });
-
-  await streamClient.add(name);
-
-  return streamPromise;
-};
