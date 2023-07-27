@@ -281,7 +281,6 @@ export { type DataManager, DataManagerClient } from './services/data-manager';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- *
  * @deprecated Use {@link NavigationClient} instead.
  * @alpha
  * @group Raw Protobufs
