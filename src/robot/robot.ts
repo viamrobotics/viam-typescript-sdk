@@ -34,7 +34,7 @@ export interface Robot {
    * Blocks on the specified operation on the robot. This function will only
    * return when the specific operation has finished or has been cancelled.
    *
-   * @param id (str) - ID of operation to block on.
+   * @param id - ID of operation to block on.
    * @group Operations
    * @alpha
    */
