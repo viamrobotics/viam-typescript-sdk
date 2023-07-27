@@ -281,29 +281,16 @@ export { type DataManager, DataManagerClient } from './services/data-manager';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new navigationApi.GetWaypointsRequest();
- * request.setName('mynavigation');
- *
- * client.navigationService.getWaypoints(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link NavigationClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as navigationApi } from './gen/service/navigation/v1/navigation_pb';
+export {
+  type ModeMap,
+  type Waypoint,
+  NavigationClient,
+} from './services/navigation';
 
 /**
  * Raw Protobuf interfaces for a Servo component.

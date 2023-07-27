@@ -181,3 +181,29 @@ export const encodeWorldState = (
 
   return result;
 };
+
+/** Convert a GeoPoint object to a Protobuf Datatype */
+export const encodeGeoPoint = (
+  obj: common.GeoPoint.AsObject
+): common.GeoPoint => {
+  const result = new common.GeoPoint();
+
+  result.setLatitude(obj.latitude);
+  result.setLongitude(obj.longitude);
+
+  return result;
+};
+
+/** Convert a GeoObstacle object to a Protobuf Datatype */
+export const encodeGeoObstacle = (
+  obj: common.GeoObstacle.AsObject
+): common.GeoObstacle => {
+  const result = new common.GeoObstacle();
+
+  if (obj.location) {
+    result.setLocation(encodeGeoPoint(obj.location));
+  }
+  result.setGeometriesList(obj.geometriesList.map((x) => encodeGeometry(x)));
+
+  return result;
+};

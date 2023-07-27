@@ -10,8 +10,12 @@ import {
   encodePoseInFrame,
   encodeWorldState,
   encodeTransform,
+  encodeGeoPoint,
+  encodeGeoObstacle,
 } from '../../utils';
 import type {
+  GeoObstacle,
+  GeoPoint,
   Options,
   Pose,
   PoseInFrame,
@@ -95,6 +99,46 @@ export class MotionClient implements Motion {
       service.moveOnMap.bind(service),
       request
     );
+
+    return response.getSuccess();
+  }
+
+  async moveOnGlobe(
+    destination: GeoPoint,
+    componentName: ResourceName,
+    movementSensorName: ResourceName,
+    heading?: number,
+    obstaclesList?: GeoObstacle[],
+    linearMetersPerSec?: number,
+    angularDegPerSec?: number,
+    extra = {}
+  ) {
+    const { service } = this;
+
+    const request = new pb.MoveOnGlobeRequest();
+    request.setDestination(encodeGeoPoint(destination));
+    request.setComponentName(encodeResourceName(componentName));
+    request.setMovementSensorName(encodeResourceName(movementSensorName));
+    if (heading) {
+      request.setHeading(heading);
+    }
+    if (obstaclesList) {
+      request.setObstaclesList(obstaclesList.map((x) => encodeGeoObstacle(x)));
+    }
+    if (linearMetersPerSec) {
+      request.setLinearMetersPerSec(linearMetersPerSec);
+    }
+    if (angularDegPerSec) {
+      request.setAngularDegPerSec(angularDegPerSec);
+    }
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.MoveOnGlobeRequest,
+      pb.MoveOnGlobeResponse
+    >(service.moveOnGlobe.bind(service), request);
 
     return response.getSuccess();
   }
