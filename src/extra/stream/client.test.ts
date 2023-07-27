@@ -11,6 +11,8 @@ let streamClient: StreamClient;
 
 describe('StreamClient', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
+
     vi.mock('./robot/client');
 
     robotClient = new RobotClient('fakehost');
@@ -21,6 +23,7 @@ describe('StreamClient', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.useRealTimers();
   });
 
   test('webrtc track will cause the client to emit an event', () =>
@@ -34,7 +37,8 @@ describe('StreamClient', () => {
     }));
 
   test('getStream creates and returns a new stream', async () => {
-    const fakeStream = { id: 'fakecam' };
+    const fakeCamName = 'fakecam';
+    const fakeStream = { id: fakeCamName };
     StreamServiceClient.prototype.addStream = vi
       .fn()
       .mockImplementation((_req, _md, cb) => {
@@ -42,10 +46,11 @@ describe('StreamClient', () => {
         streamClient.emit('track', { streams: [fakeStream] });
       });
 
-    await expect(streamClient.getStream('fakecam')).resolves.toStrictEqual(
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
     );
   });
+
   test('getStream fails when add stream fails', async () => {
     const error = new Error('could not add stream');
     StreamServiceClient.prototype.addStream = vi
@@ -54,8 +59,18 @@ describe('StreamClient', () => {
         cb(error);
       });
 
-    await expect(streamClient.getStream('fakecam')).rejects.toStrictEqual(
-      error
-    );
+    await expect(streamClient.getStream('fakecam')).rejects.toThrow(error);
+  });
+
+  test('getStream fails when timeout exceeded', async () => {
+    StreamServiceClient.prototype.addStream = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {});
+      });
+
+    const promise = streamClient.getStream('fakecam');
+    vi.runAllTimers();
+    await expect(promise).rejects.toThrowError('timed out');
   });
 });
