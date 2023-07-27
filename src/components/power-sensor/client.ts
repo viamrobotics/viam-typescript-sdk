@@ -71,13 +71,7 @@ export class PowerSensorClient implements PowerSensor {
       powersensorService.getPower.bind(powersensorService),
       request
     );
-
-    const pow = response.getWatts();
-    if (!pow) {
-      throw new Error('no power');
-    }
-
-    return pow;
+    return response.getWatts();
   }
 
   async getReadings(extra = {}) {

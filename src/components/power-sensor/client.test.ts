@@ -7,9 +7,9 @@ import { PowerSensorServiceClient } from '../../gen/component/powersensor/v1/pow
 import { PowerSensorClient } from './client';
 
 let sensor: PowerSensorClient;
-const testVoltage: (number | boolean)[] = [0.5, true];
-const testCurrent: (number | boolean)[] = [1, false];
-let testPower: 2;
+const testPower = { Watts: 0.5 };
+const testVoltage = [{ Volts: 1 }, { IsAc: true }];
+const testCurrent = [{ Amperes: 1 }, { IsAc: true }];
 
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
@@ -20,9 +20,14 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getVoltage: () => {
+        getVolts: () => {
           return {
-            testVoltage,
+            Volts: 1,
+          };
+        },
+        getIsAc: () => {
+          return {
+            IsAc: true,
           };
         },
       });
@@ -31,9 +36,14 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getCurrent: () => {
+        getAmperes: () => {
           return {
-            testCurrent,
+            Amperes: 1,
+          };
+        },
+        getIsAc: () => {
+          return {
+            IsAc: true,
           };
         },
       });
@@ -43,9 +53,9 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getPower: () => {
+        getWatts: () => {
           return {
-            testPower,
+            Watts: 0.5,
           };
         },
       });
