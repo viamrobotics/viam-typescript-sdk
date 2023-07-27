@@ -1,17 +1,30 @@
 // @vitest-environment happy-dom
 
-import { describe, expect, test } from 'vitest';
+import { vi, beforeEach, afterEach, describe, expect, test } from 'vitest';
 import { RobotClient } from '../../robot';
 import { events } from '../../events';
+import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
 import { StreamClient } from './client';
 
+let robotClient: RobotClient;
+let streamClient: StreamClient;
+
 describe('StreamClient', () => {
+  beforeEach(() => {
+    vi.mock('./robot/client');
+
+    robotClient = new RobotClient('fakehost');
+    vi.mock('./gen/proto/stream/v1/stream_pb_service');
+
+    streamClient = new StreamClient(robotClient);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   test('webrtc track will cause the client to emit an event', () =>
     new Promise<void>((done) => {
-      const host = 'fakeServiceHost';
-      const client = new RobotClient(host);
-      const streamClient = new StreamClient(client);
-
       streamClient.on('track', (data) => {
         expect((data as { mock: true }).mock).eq(true);
         done();
@@ -19,4 +32,18 @@ describe('StreamClient', () => {
 
       events.emit('track', { mock: true });
     }));
+
+  test('getStream creates and returns a new stream', async () => {
+    const fakeStream = { id: 'fakecam' };
+    StreamServiceClient.prototype.addStream = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {});
+        streamClient.emit('track', { streams: [fakeStream] });
+      });
+
+    await expect(streamClient.getStream('fakecam')).resolves.toStrictEqual(
+      fakeStream
+    );
+  });
 });
