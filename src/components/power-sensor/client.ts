@@ -102,7 +102,7 @@ export class PowerSensorClient implements PowerSensor {
         throw error;
       }
     }
-    return readings;
+    return readings as PowerSensorReadings;
   }
 
   async doCommand(command: StructType): Promise<StructType> {
