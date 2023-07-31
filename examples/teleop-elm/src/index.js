@@ -17,11 +17,8 @@ async function connectWebRTC() {
   });
 }
 
-function onTrack(event) {
-  const eventStream = event.streams[0];
-  if (!eventStream) {
-    throw new Error('expected event stream to exist');
-  }
+function injectMediaStream(eventStream) {
+  console.debug("got media stream");
 
   const streamName = eventStream.id;
   const streamContainers = document.querySelectorAll(
@@ -53,6 +50,7 @@ connectWebRTC()
   .then((client) => {
     const base = new VIAM.BaseClient(client, 'viam_base');
     const wifi = new VIAM.SensorClient(client, 'wifi');
+    const streams = new VIAM.StreamClient(client);
     const accel = new VIAM.MovementSensorClient(client, 'accelerometer');
 
     const app = Elm.Main.init({
@@ -60,10 +58,10 @@ connectWebRTC()
       flags: {},
     });
 
-    // streams
-
-    const streams = new VIAM.StreamClient(client);
-    streams.on('track', onTrack);
+    console.debug("requested media stream");
+    streams.getStream('cam').then((mediaStream) => {
+      injectMediaStream(mediaStream);
+    });
 
     app.ports.sendBaseSetPower.subscribe(async ({ linear, angular }) => {
       const linearVec = { x: 0, y: linear, z: 0 };
@@ -85,9 +83,6 @@ connectWebRTC()
       const readings = await accel.getLinearAcceleration();
       app.ports.recvAccelReading.send(readings);
     });
-
-    // Add stream from camera
-    streams.add('cam');
   })
   .catch((err) => {
     console.error('something went wrong');
