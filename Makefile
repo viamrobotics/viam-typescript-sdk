@@ -23,7 +23,7 @@ clean: clean-js clean-buf clean-docs
 test: $(node_modules) build-buf
 	npm run test
 
-.PHONY: test-watch-js
+.PHONY: test-watch
 test-watch: $(node_modules) build-buf
 	npm run test:watch
 
