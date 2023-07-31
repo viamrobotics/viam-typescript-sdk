@@ -2,8 +2,12 @@
 
 import { vi, beforeEach, afterEach, describe, expect, test } from 'vitest';
 import { RobotClient } from '../../robot';
+vi.mock('../../robot/client');
+
 import { events } from '../../events';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
+vi.mock('../../gen/proto/stream/v1/stream_pb_service');
+
 import { StreamClient } from './client';
 
 let robotClient: RobotClient;
@@ -13,16 +17,11 @@ describe('StreamClient', () => {
   beforeEach(() => {
     vi.useFakeTimers();
 
-    vi.mock('./robot/client');
-
     robotClient = new RobotClient('fakehost');
-    vi.mock('./gen/proto/stream/v1/stream_pb_service');
-
     streamClient = new StreamClient(robotClient);
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
     vi.useRealTimers();
   });
 
