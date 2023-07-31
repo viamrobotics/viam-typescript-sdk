@@ -33,10 +33,12 @@ export class SlamClient implements Slam {
 
     this.options.requestLogger?.(request);
 
-    return promisify<pb.GetPositionRequest, pb.GetPositionResponse>(
-      service.getPosition.bind(service),
-      request
-    );
+    const response = await promisify<
+      pb.GetPositionRequest,
+      pb.GetPositionResponse
+    >(service.getPosition.bind(service), request);
+
+    return response.toObject();
   }
 
   async getPointCloudMap() {
@@ -88,7 +90,7 @@ export class SlamClient implements Slam {
     if (!result) {
       throw new Error('no map update');
     }
-    return result;
+    return result.toObject();
   }
 
   async doCommand(command: StructType): Promise<StructType> {
