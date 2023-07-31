@@ -1,5 +1,6 @@
+/// <reference types="vitest" />
 import path from 'node:path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 
 import pkg from './package.json';
 
