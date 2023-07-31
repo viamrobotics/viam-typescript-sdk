@@ -24,7 +24,7 @@ test: $(node_modules) build-buf
 	npm run test
 
 .PHONY: test-watch-js
-test-watch-js: $(node_modules) build-buf
+test-watch: $(node_modules) build-buf
 	npm run test:watch
 
 .PHONY: lint
