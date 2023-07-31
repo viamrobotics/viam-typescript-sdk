@@ -47,7 +47,7 @@
         "args": []
     },
     "power_sensor": {
-        "client": "MovementSensorClient",
+        "client": "PowerSensorClient",
         "func": "getVoltage",
         "args": []
     },
