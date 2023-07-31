@@ -102,7 +102,7 @@ export class StreamClient extends EventDispatcher implements Stream {
 
   /**
    * Get a stream by name from a StreamClient. Will time out if stream is not
-   * received within 30 seconds.
+   * received within 5 seconds.
    *
    * @param name - The name of a camera component.
    */
