@@ -7,9 +7,9 @@ import { PowerSensorServiceClient } from '../../gen/component/powersensor/v1/pow
 import { PowerSensorClient } from './client';
 
 let sensor: PowerSensorClient;
-const testPower = { Watts: 0.5 };
-const testVoltage = [{ Volts: 1 }, { IsAc: true }];
-const testCurrent = [{ Amperes: 1 }, { IsAc: true }];
+const testPower = 0.5
+const testVoltage = [1.5, true];
+const testCurrent = [1, true];
 
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
@@ -20,32 +20,16 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getVolts: () => {
-          return {
-            Volts: 1,
-          };
-        },
-        getIsAc: () => {
-          return {
-            IsAc: true,
-          };
-        },
+        getVolts: () => 1.5,
+        getIsAc: () => true
       });
     });
   PowerSensorServiceClient.prototype.getCurrent = vi
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getAmperes: () => {
-          return {
-            Amperes: 1,
-          };
-        },
-        getIsAc: () => {
-          return {
-            IsAc: true,
-          };
-        },
+        getAmperes: () => 1,
+        getIsAc: () => true
       });
     });
 
@@ -53,11 +37,7 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getWatts: () => {
-          return {
-            Watts: 0.5,
-          };
-        },
+        getWatts: () => 0.5
       });
     });
 
@@ -75,9 +55,13 @@ test('individual readings', async () => {
 });
 
 test('get readings', async () => {
+  console.log("SENSOR GET")
+  console.log(await sensor.getReadings())
+  console.log("volts")
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    voltage: testVoltage,
-    current: testCurrent,
+    voltage: testVoltage[0],
+    current: testCurrent[0],
+    isAc: testVoltage[1],
     power: testPower,
   });
 });
@@ -93,7 +77,8 @@ test('get readings returns without unimplemented fields', async () => {
 
   await expect(sensor.getVoltage()).rejects.toStrictEqual(unimplementedError);
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    current: testCurrent,
+    current: testCurrent[0],
+    isAc: testVoltage[1],
     power: testPower,
   });
 });

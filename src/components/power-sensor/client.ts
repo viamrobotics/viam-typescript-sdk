@@ -40,6 +40,10 @@ export class PowerSensorClient implements PowerSensor {
       pb.GetVoltageResponse
     >(powersensorService.getVoltage.bind(powersensorService), request);
 
+
+    console.log("voltage get volts")
+    console.log(response.getVolts())
+
     return [response.getVolts(), response.getIsAc()] as const;
   }
 
@@ -71,32 +75,42 @@ export class PowerSensorClient implements PowerSensor {
       powersensorService.getPower.bind(powersensorService),
       request
     );
+    
     return response.getWatts();
   }
 
   async getReadings(extra = {}) {
-    const readingFunctions = {
-      voltage: this.getVoltage.bind(this),
-      current: this.getCurrent.bind(this),
-      power: this.getPower.bind(this),
-    };
-
-    const tasks = Object.entries(readingFunctions).flatMap(([field, func]) =>
-      (async () => {
-        try {
-          return [[field, await func(extra)]];
-        } catch (error) {
-          if (!(error as Error).message.includes('Unimplemented')) {
-            throw error;
-          }
-          return [];
+    let readings: Record<string, any> = {};
+    try {
+        const ret = await this.getVoltage(extra = {})
+        readings["voltage"] = ret[0]
+        readings["isAc"] = ret[1]
+      }
+      catch (error) {
+        if (!(error as Error).message.includes('Unimplemented')) {
+          throw error;
         }
-      })()
-    );
-    const entries = await Promise.all(tasks);
-
-    return Object.fromEntries(entries.flat()) as PowerSensorReadings;
-  }
+      }
+    try {
+        const ret = await this.getCurrent(extra = {})
+        readings["current"] = ret[0]
+        readings["isAc"] = ret[1]
+      }
+      catch (error) {
+        if (!(error as Error).message.includes('Unimplemented')) {
+          throw error;
+        }
+      }
+    try {
+        readings["power"] = await this.getPower(extra = {})
+    }
+    catch (error) {
+      if (!(error as Error).message.includes('Unimplemented')) {
+        throw error;
+      }
+    }
+    return readings
+ }
 
   async doCommand(command: StructType): Promise<StructType> {
     const { powersensorService } = this;
