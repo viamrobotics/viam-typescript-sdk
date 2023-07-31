@@ -8,8 +8,9 @@ import { PowerSensorClient } from './client';
 
 let sensor: PowerSensorClient;
 const testPower = 0.5;
-const testVoltage = [1.5, true];
-const testCurrent = [1, true];
+const testVoltage = 1.5;
+const testCurrent = 1;
+const testIsAc = true
 
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
@@ -20,16 +21,16 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getVolts: () => 1.5,
-        getIsAc: () => true,
+        getVolts: () => testVoltage,
+        getIsAc: () => testIsAc,
       });
     });
   PowerSensorServiceClient.prototype.getCurrent = vi
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getAmperes: () => 1,
-        getIsAc: () => true,
+        getAmperes: () => testCurrent,
+        getIsAc: () => testIsAc,
       });
     });
 
@@ -37,7 +38,7 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getWatts: () => 0.5,
+        getWatts: () => testPower,
       });
     });
 
@@ -49,16 +50,16 @@ afterEach(() => {
 });
 
 test('individual readings', async () => {
-  await expect(sensor.getVoltage()).resolves.toStrictEqual(testVoltage);
-  await expect(sensor.getCurrent()).resolves.toStrictEqual(testCurrent);
+  await expect(sensor.getVoltage()).resolves.toStrictEqual([testVoltage, testIsAc]);
+  await expect(sensor.getCurrent()).resolves.toStrictEqual([testCurrent, testIsAc]);
   await expect(sensor.getPower()).resolves.toStrictEqual(testPower);
 });
 
 test('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    voltage: testVoltage[0],
-    current: testCurrent[0],
-    isAc: testVoltage[1],
+    voltage: testVoltage,
+    current: testCurrent,
+    isAc: testIsAc,
     power: testPower,
   });
 });
@@ -74,8 +75,8 @@ test('get readings returns without unimplemented fields', async () => {
 
   await expect(sensor.getVoltage()).rejects.toStrictEqual(unimplementedError);
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    current: testCurrent[0],
-    isAc: testVoltage[1],
+    current: testCurrent,
+    isAc: testIsAc,
     power: testPower,
   });
 });

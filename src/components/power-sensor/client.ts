@@ -78,18 +78,14 @@ export class PowerSensorClient implements PowerSensor {
   async getReadings(extra = {}) {
     const readings: Record<string, any> = {};
     try {
-      const ret = await this.getVoltage(extra);
-      readings['voltage'] = ret[0];
-      readings['isAc'] = ret[1];
+      [readings['voltage'], readings['isAc']] = await this.getVoltage(extra);
     } catch (error) {
       if (!(error as Error).message.includes('Unimplemented')) {
         throw error;
       }
     }
     try {
-      const ret = await this.getCurrent(extra);
-      readings['current'] = ret[0];
-      readings['isAc'] = ret[1];
+      [readings['current'], readings['isAc']]  = await this.getCurrent(extra);
     } catch (error) {
       if (!(error as Error).message.includes('Unimplemented')) {
         throw error;
