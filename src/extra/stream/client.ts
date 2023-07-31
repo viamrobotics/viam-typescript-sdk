@@ -98,7 +98,7 @@ export class StreamClient extends EventDispatcher implements Stream {
     }
   }
 
-  private getStreamTimeout = 30_000;
+  private STREAM_TIMEOUT = 5000;
 
   /**
    * Get a stream by name from a StreamClient. Will time out if stream is not
@@ -124,8 +124,10 @@ export class StreamClient extends EventDispatcher implements Stream {
 
       setTimeout(() => {
         this.off('track', handleTrack as (args: unknown) => void);
-        reject(new Error('timed out'));
-      }, this.getStreamTimeout);
+        reject(
+          new Error(`Did not receive a stream after ${this.STREAM_TIMEOUT} ms`)
+        );
+      }, this.STREAM_TIMEOUT);
     });
 
     await this.add(name);

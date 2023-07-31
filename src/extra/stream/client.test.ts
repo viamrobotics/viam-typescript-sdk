@@ -71,7 +71,9 @@ describe('StreamClient', () => {
 
     const promise = streamClient.getStream('fakecam');
     vi.runAllTimers();
-    await expect(promise).rejects.toThrowError('timed out');
+    await expect(promise).rejects.toThrowError(
+      'Did not receive a stream after 5000 ms'
+    );
   });
 
   test('getStream can add the same stream twice', async () => {
