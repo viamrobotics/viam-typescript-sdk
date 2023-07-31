@@ -40,10 +40,6 @@ export class PowerSensorClient implements PowerSensor {
       pb.GetVoltageResponse
     >(powersensorService.getVoltage.bind(powersensorService), request);
 
-
-    console.log("voltage get volts")
-    console.log(response.getVolts())
-
     return [response.getVolts(), response.getIsAc()] as const;
   }
 

@@ -55,9 +55,6 @@ test('individual readings', async () => {
 });
 
 test('get readings', async () => {
-  console.log("SENSOR GET")
-  console.log(await sensor.getReadings())
-  console.log("volts")
   await expect(sensor.getReadings()).resolves.toStrictEqual({
     voltage: testVoltage[0],
     current: testCurrent[0],
