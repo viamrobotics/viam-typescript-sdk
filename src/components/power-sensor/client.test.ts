@@ -10,7 +10,7 @@ let sensor: PowerSensorClient;
 const testPower = 0.5;
 const testVoltage = 1.5;
 const testCurrent = 1;
-const testIsAc = true
+const testIsAc = true;
 
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
@@ -50,8 +50,14 @@ afterEach(() => {
 });
 
 test('individual readings', async () => {
-  await expect(sensor.getVoltage()).resolves.toStrictEqual([testVoltage, testIsAc]);
-  await expect(sensor.getCurrent()).resolves.toStrictEqual([testCurrent, testIsAc]);
+  await expect(sensor.getVoltage()).resolves.toStrictEqual([
+    testVoltage,
+    testIsAc,
+  ]);
+  await expect(sensor.getCurrent()).resolves.toStrictEqual([
+    testCurrent,
+    testIsAc,
+  ]);
   await expect(sensor.getPower()).resolves.toStrictEqual(testPower);
 });
 

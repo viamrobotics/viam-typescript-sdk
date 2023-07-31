@@ -85,7 +85,7 @@ export class PowerSensorClient implements PowerSensor {
       }
     }
     try {
-      [readings['current'], readings['isAc']]  = await this.getCurrent(extra);
+      [readings['current'], readings['isAc']] = await this.getCurrent(extra);
     } catch (error) {
       if (!(error as Error).message.includes('Unimplemented')) {
         throw error;
