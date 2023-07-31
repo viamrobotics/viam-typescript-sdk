@@ -18,7 +18,7 @@ async function connectWebRTC() {
 }
 
 function injectMediaStream(eventStream) {
-  console.debug("got media stream");
+  console.debug('got media stream');
 
   const streamName = eventStream.id;
   const streamContainers = document.querySelectorAll(
@@ -58,7 +58,7 @@ connectWebRTC()
       flags: {},
     });
 
-    console.debug("requested media stream");
+    console.debug('requested media stream');
     streams.getStream('cam').then((mediaStream) => {
       injectMediaStream(mediaStream);
     });
