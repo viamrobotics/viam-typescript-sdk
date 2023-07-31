@@ -7,7 +7,7 @@ import { PowerSensorServiceClient } from '../../gen/component/powersensor/v1/pow
 import { PowerSensorClient } from './client';
 
 let sensor: PowerSensorClient;
-const testPower = 0.5
+const testPower = 0.5;
 const testVoltage = [1.5, true];
 const testCurrent = [1, true];
 
@@ -21,7 +21,7 @@ beforeEach(() => {
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
         getVolts: () => 1.5,
-        getIsAc: () => true
+        getIsAc: () => true,
       });
     });
   PowerSensorServiceClient.prototype.getCurrent = vi
@@ -29,7 +29,7 @@ beforeEach(() => {
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
         getAmperes: () => 1,
-        getIsAc: () => true
+        getIsAc: () => true,
       });
     });
 
@@ -37,7 +37,7 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getWatts: () => 0.5
+        getWatts: () => 0.5,
       });
     });
 

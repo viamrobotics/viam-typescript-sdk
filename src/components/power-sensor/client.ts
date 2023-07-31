@@ -71,42 +71,39 @@ export class PowerSensorClient implements PowerSensor {
       powersensorService.getPower.bind(powersensorService),
       request
     );
-    
+
     return response.getWatts();
   }
 
   async getReadings(extra = {}) {
-    let readings: Record<string, any> = {};
+    const readings: Record<string, any> = {};
     try {
-        const ret = await this.getVoltage(extra = {})
-        readings["voltage"] = ret[0]
-        readings["isAc"] = ret[1]
-      }
-      catch (error) {
-        if (!(error as Error).message.includes('Unimplemented')) {
-          throw error;
-        }
-      }
-    try {
-        const ret = await this.getCurrent(extra = {})
-        readings["current"] = ret[0]
-        readings["isAc"] = ret[1]
-      }
-      catch (error) {
-        if (!(error as Error).message.includes('Unimplemented')) {
-          throw error;
-        }
-      }
-    try {
-        readings["power"] = await this.getPower(extra = {})
-    }
-    catch (error) {
+      const ret = await this.getVoltage(extra);
+      readings['voltage'] = ret[0];
+      readings['isAc'] = ret[1];
+    } catch (error) {
       if (!(error as Error).message.includes('Unimplemented')) {
         throw error;
       }
     }
-    return readings
- }
+    try {
+      const ret = await this.getCurrent(extra);
+      readings['current'] = ret[0];
+      readings['isAc'] = ret[1];
+    } catch (error) {
+      if (!(error as Error).message.includes('Unimplemented')) {
+        throw error;
+      }
+    }
+    try {
+      readings['power'] = await this.getPower(extra);
+    } catch (error) {
+      if (!(error as Error).message.includes('Unimplemented')) {
+        throw error;
+      }
+    }
+    return readings;
+  }
 
   async doCommand(command: StructType): Promise<StructType> {
     const { powersensorService } = this;

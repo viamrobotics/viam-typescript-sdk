@@ -4,7 +4,7 @@ import type { Sensor } from '../sensor';
 export type PowerSensorReadings = {
   voltage?: number;
   current?: number;
-  isAc?: boolean
+  isAc?: boolean;
   power?: number;
 };
 
