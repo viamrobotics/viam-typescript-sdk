@@ -46,12 +46,16 @@ describe('StreamClient', () => {
         streamClient.emit('track', { streams: [fakeStream] });
       });
 
+    const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
     );
+    expect(addStream).toHaveBeenCalledOnce();
+    expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
   test('getStream fails when add stream fails', async () => {
+    const fakeCamName = 'fakecam';
     const error = new Error('could not add stream');
     StreamServiceClient.prototype.addStream = vi
       .fn()
@@ -59,21 +63,28 @@ describe('StreamClient', () => {
         cb(error);
       });
 
-    await expect(streamClient.getStream('fakecam')).rejects.toThrow(error);
+    const addStream = vi.spyOn(streamClient, 'add');
+    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(error);
+    expect(addStream).toHaveBeenCalledOnce();
+    expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
   test('getStream fails when timeout exceeded', async () => {
+    const fakeCamName = 'fakecam';
     StreamServiceClient.prototype.addStream = vi
       .fn()
       .mockImplementation((_req, _md, cb) => {
         cb(null, {});
       });
 
-    const promise = streamClient.getStream('fakecam');
+    const addStream = vi.spyOn(streamClient, 'add');
+    const promise = streamClient.getStream(fakeCamName);
     vi.runAllTimers();
     await expect(promise).rejects.toThrowError(
       'Did not receive a stream after 5000 ms'
     );
+    expect(addStream).toHaveBeenCalledOnce();
+    expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
   test('getStream can add the same stream twice', async () => {
@@ -86,11 +97,14 @@ describe('StreamClient', () => {
         streamClient.emit('track', { streams: [fakeStream] });
       });
 
+    const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
     );
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
     );
+    expect(addStream).toHaveBeenCalledTimes(2);
+    expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 });
