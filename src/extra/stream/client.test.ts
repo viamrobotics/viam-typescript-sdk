@@ -10,14 +10,18 @@ vi.mock('../../gen/proto/stream/v1/stream_pb_service');
 
 import { StreamClient } from './client';
 
-let robotClient: RobotClient;
 let streamClient: StreamClient;
 
 describe('StreamClient', () => {
   beforeEach(() => {
     vi.useFakeTimers();
 
-    robotClient = new RobotClient('fakehost');
+    const fakehost = 'fakehost';
+    RobotClient.prototype.createServiceClient = vi
+      .fn()
+      .mockImplementation(() => new StreamServiceClient(fakehost));
+
+    const robotClient = new RobotClient(fakehost);
     streamClient = new StreamClient(robotClient);
   });
 
