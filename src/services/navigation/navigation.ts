@@ -12,7 +12,7 @@ export interface Navigation extends Resource {
   /**
    * Set the mode the robot is operating in.
    *
-   * @param mode -
+   * @param mode - The mode for the service to operate in.
    */
   setMode: (mode: ModeMap[keyof ModeMap], extra?: StructType) => Promise<void>;
 
