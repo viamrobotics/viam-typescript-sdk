@@ -46,6 +46,11 @@
         "func": "getLinearAcceleration",
         "args": []
     },
+    "power_sensor": {
+        "client": "PowerSensorClient",
+        "func": "getVoltage",
+        "args": []
+    },
     "servo": {
         "client": "ServoClient",
         "func": "getPosition"

@@ -133,6 +133,22 @@ export {
 } from './components/movementsensor';
 
 /**
+ * Raw Protobuf interfaces for a PowerSensor component.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link PowerSensorClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as powerSensorApi } from './gen/component/powersensor/v1/powersensor_pb';
+export {
+  type PowerSensor,
+  type PowerSensorReadings,
+  PowerSensorClient,
+} from './components/powersensor';
+
+/**
  * Raw Protobuf interfaces generated with
  * https://github.com/improbable-eng/grpc-web for a Sensor component.
  *
