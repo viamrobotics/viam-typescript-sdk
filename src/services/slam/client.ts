@@ -54,7 +54,7 @@ export class SlamClient implements Slam {
       pb.GetPointCloudMapResponse
     >(service.getPointCloudMap.bind(service), request);
 
-    return response.getPointCloudPcdChunk();
+    return response.getPointCloudPcdChunk_asU8();
   }
 
   async getInternalState() {
@@ -70,7 +70,7 @@ export class SlamClient implements Slam {
       pb.GetInternalStateResponse
     >(service.getInternalState.bind(service), request);
 
-    return response.getInternalStateChunk();
+    return response.getInternalStateChunk_asU8();
   }
 
   async getLatestMapInfo() {
