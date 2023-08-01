@@ -86,11 +86,11 @@ export class SlamClient implements Slam {
       pb.GetLatestMapInfoResponse
     >(service.getLatestMapInfo.bind(service), request);
 
-    const result = response.getLastMapUpdate();
-    if (!result) {
+    const timestamp = response.getLastMapUpdate();
+    if (!timestamp) {
       throw new Error('no map update');
     }
-    return result.toObject();
+    return new Date(timestamp.getSeconds() * 1e3 + timestamp.getNanos() / 1e6);
   }
 
   async doCommand(command: StructType): Promise<StructType> {
