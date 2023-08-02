@@ -255,7 +255,7 @@ export { type Gripper, GripperClient } from './components/gripper';
  * const client = {}; // replace with a connected robot client
  *
  * const request = new inputControllerApi.GetControlsRequest();
- * request.setName('myinputcontroller');
+ * request.setController('myinputcontroller');
  *
  * client.inputControllerService.getControls(
  *   request,
