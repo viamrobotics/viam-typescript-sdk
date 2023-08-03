@@ -41,6 +41,92 @@ export class SlamClient implements Slam {
     return response.toObject();
   }
 
+  async getPointCloudMap() {
+    const request = new pb.GetPointCloudMapRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const chunks: Uint8Array[] = [];
+    const stream = this.client.getPointCloudMap(request);
+
+    stream.on('data', (response) => {
+      const chunk = response.getPointCloudPcdChunk_asU8();
+      chunks.push(chunk);
+    });
+
+    return new Promise<Uint8Array[]>((resolve, reject) => {
+      stream.on('status', (status) => {
+        if (status.code !== 0) {
+          const error = {
+            message: status.details,
+            code: status.code,
+            metadata: status.metadata,
+          };
+          reject(error);
+        }
+      });
+
+      stream.on('end', (end) => {
+        if (end === undefined) {
+          const error = { message: 'Stream ended without status code' };
+          reject(error);
+        } else if (end.code !== 0) {
+          const error = {
+            message: end.details,
+            code: end.code,
+            metadata: end.metadata,
+          };
+          reject(error);
+        }
+        resolve(chunks);
+      });
+    });
+  }
+
+  async getInternalState() {
+    const request = new pb.GetInternalStateRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const chunks: Uint8Array[] = [];
+    const stream = this.client.getInternalState(request);
+
+    stream.on('data', (response) => {
+      const chunk = response.getInternalStateChunk_asU8();
+      chunks.push(chunk);
+    });
+
+    return new Promise<Uint8Array[]>((resolve, reject) => {
+      stream.on('status', (status) => {
+        if (status.code !== 0) {
+          const error = {
+            message: status.details,
+            code: status.code,
+            metadata: status.metadata,
+          };
+          reject(error);
+        }
+      });
+
+      stream.on('end', (end) => {
+        if (end === undefined) {
+          const error = { message: 'Stream ended without status code' };
+          reject(error);
+        } else if (end.code !== 0) {
+          const error = {
+            message: end.details,
+            code: end.code,
+            metadata: end.metadata,
+          };
+          reject(error);
+        }
+        resolve(chunks);
+      });
+    });
+  }
+
   async getLatestMapInfo() {
     const { service } = this;
 
