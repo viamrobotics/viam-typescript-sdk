@@ -89,7 +89,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist
-          path: viamrobotics-sdk-*.tgz
+          path: |
+            viamrobotics-sdk-*.tgz
+            docs/dist
 
   release:
     needs: [prepare, build]
@@ -105,8 +107,16 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
-          files: dist/*
+          files: dist/*.tgz
           draft: true
           prerelease: false
           fail_on_unmatched_files: true
           target_commitish: rc-${{ needs.prepare.outputs.version }}
+
+      - name: Publish Docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/docs/dist
+          publish_branch: docs-gh_pages
+          cname: ts.viam.dev
