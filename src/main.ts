@@ -322,7 +322,7 @@ export { type Servo, ServoClient } from './components/servo';
 
 /**
  * Raw Protobuf interfaces for a Slam service.
- *
+ * 
  * Generated with https://github.com/improbable-eng/grpc-web
  *
  * @example
