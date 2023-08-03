@@ -348,7 +348,7 @@ export { type Servo, ServoClient } from './components/servo';
  * @group Raw Protobufs
  */
 export { default as slamApi } from './gen/service/slam/v1/slam_pb';
-export { type GetPositionResponse, SlamClient } from './services/slam';
+export { type SlamPosition, SlamClient } from './services/slam';
 
 /**
  * Raw Protobuf interfaces for a Vision service.
