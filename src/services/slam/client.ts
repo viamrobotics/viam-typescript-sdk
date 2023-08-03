@@ -41,38 +41,6 @@ export class SlamClient implements Slam {
     return response.toObject();
   }
 
-  async getPointCloudMap() {
-    const { service } = this;
-
-    const request = new pb.GetPointCloudMapRequest();
-    request.setName(this.name);
-
-    this.options.requestLogger?.(request);
-
-    const response = await promisify<
-      pb.GetPointCloudMapRequest,
-      pb.GetPointCloudMapResponse
-    >(service.getPointCloudMap.bind(service), request);
-
-    return response.getPointCloudPcdChunk_asU8();
-  }
-
-  async getInternalState() {
-    const { service } = this;
-
-    const request = new pb.GetInternalStateRequest();
-    request.setName(this.name);
-
-    this.options.requestLogger?.(request);
-
-    const response = await promisify<
-      pb.GetInternalStateRequest,
-      pb.GetInternalStateResponse
-    >(service.getInternalState.bind(service), request);
-
-    return response.getInternalStateChunk_asU8();
-  }
-
   async getLatestMapInfo() {
     const { service } = this;
 
