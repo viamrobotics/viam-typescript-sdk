@@ -50,16 +50,19 @@ connectWebRTC()
   .then((client) => {
     const base = new VIAM.BaseClient(client, 'viam_base');
     const wifi = new VIAM.SensorClient(client, 'wifi');
+    const cameraName = 'cam';
     const streams = new VIAM.StreamClient(client);
     const accel = new VIAM.MovementSensorClient(client, 'accelerometer');
 
     const app = Elm.Main.init({
       node: document.getElementById('main'),
-      flags: {},
+      flags: {
+        streamNames: [cameraName],
+      },
     });
 
     console.debug('requested media stream');
-    streams.getStream('cam').then((mediaStream) => {
+    streams.getStream(cameraName).then((mediaStream) => {
       injectMediaStream(mediaStream);
     });
 

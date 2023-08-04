@@ -37,7 +37,7 @@ port recvAccelReading : (E.Value -> msg) -> Sub msg
 -- PROGRAM
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
@@ -47,9 +47,15 @@ main =
         }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+type alias Flags =
+    { streamNames : List String
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     ( { keys = []
+      , streamNames = flags.streamNames
       , signalLevels = Dict.empty
       , acceleration = { x = 0, y = 0, z = 0 }
       }
@@ -63,6 +69,7 @@ init _ =
 
 type alias Model =
     { keys : List Keyboard.Key
+    , streamNames : List String
     , signalLevels : Dict String Float
     , acceleration : Acceleration
     }
@@ -220,7 +227,7 @@ viewHUD model =
         ]
         -- TODO: automatically make these `position:absolute`
         [ viewWifiSignal model
-        , viewStreams
+        , viewStreams model
         , viewMovementControls model
         , viewAcceleration model
         ]
@@ -360,8 +367,8 @@ statsColor =
     "black"
 
 
-viewStreams : H.Html Msg
-viewStreams =
+viewStreams : Model -> H.Html Msg
+viewStreams { streamNames } =
     H.div
         [ --flex
           At.style "display" "flex"
@@ -372,12 +379,11 @@ viewStreams =
         , At.style "top" "0"
         , At.style "position" "absolute"
         ]
-        [ -- Camera stream inserted here
-          H.div
-            [ At.attribute "data-stream" "cam"
-            ]
-            []
-        ]
+    <|
+        List.map
+            -- Camera stream injected here
+            (\stream -> H.div [ At.attribute "data-stream" stream ] [])
+            streamNames
 
 
 viewMovementControls : Model -> H.Html Msg
