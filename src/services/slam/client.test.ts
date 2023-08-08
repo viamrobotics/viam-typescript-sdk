@@ -81,7 +81,8 @@ describe('getPointCloudMap tests', () => {
     testPcdStream?.emit('data', response2);
     testPcdStream?.emit('end', { code: 0 });
 
-    expect(promise).resolves.toStrictEqual([chunk1, chunk2]);
+    const array = new Uint8Array([4, 13, 16, 25])
+    expect(promise).resolves.toStrictEqual(array);
   });
 
   test('end getPcdMap stream with wrong code', () => {
@@ -127,7 +128,8 @@ describe('getInternalState tests', () => {
     testInternalStream?.emit('data', response2);
     testInternalStream?.emit('end', { code: 0 });
 
-    expect(promise).resolves.toStrictEqual([chunk1, chunk2]);
+    const array = new Uint8Array([4, 13, 16, 25])
+    expect(promise).resolves.toStrictEqual(array);
   });
 
   test('end getInternalState stream with wrong code', () => {
