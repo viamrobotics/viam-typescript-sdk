@@ -2,8 +2,10 @@
 
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { SLAMServiceClient } from '../../gen/service/slam/v1/slam_pb_service';
+vi.mock('../../gen/service/slam/v1/slam_pb_service');
 import { type ResponseStream } from '../../gen/robot/v1/robot_pb_service';
 import { RobotClient } from '../../robot';
+vi.mock('../../robot');
 import { EventDispatcher } from '../../events';
 import {
   GetInternalStateResponse,
@@ -60,7 +62,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  vi.clearAllMocks();
   testPcdStream = undefined;
   testInternalStream = undefined;
 });
