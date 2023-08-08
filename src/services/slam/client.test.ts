@@ -81,7 +81,7 @@ describe('getPointCloudMap tests', () => {
     testPcdStream?.emit('data', response2);
     testPcdStream?.emit('end', { code: 0 });
 
-    const array = new Uint8Array([4, 13, 16, 25])
+    const array = new Uint8Array([4, 13, 16, 25]);
     expect(promise).resolves.toStrictEqual(array);
   });
 
@@ -128,7 +128,7 @@ describe('getInternalState tests', () => {
     testInternalStream?.emit('data', response2);
     testInternalStream?.emit('end', { code: 0 });
 
-    const array = new Uint8Array([4, 13, 16, 25])
+    const array = new Uint8Array([4, 13, 16, 25]);
     expect(promise).resolves.toStrictEqual(array);
   });
 
