@@ -325,25 +325,7 @@ export { type Servo, ServoClient } from './components/servo';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new slamApi.GetPositionRequest();
- * request.setName('myslam');
- *
- * client.slamService.getPosition(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link SlamClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
