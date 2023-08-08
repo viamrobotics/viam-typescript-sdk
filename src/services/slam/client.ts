@@ -41,7 +41,7 @@ export class SlamClient implements Slam {
     return response.toObject();
   }
 
-  getPointCloudMap = (): Promise<Uint8Array[]> => {
+  getPointCloudMap = (): Promise<Uint8Array> => {
     const request = new pb.GetPointCloudMapRequest();
     request.setName(this.name);
     this.options.requestLogger?.(request);
@@ -54,7 +54,7 @@ export class SlamClient implements Slam {
       chunks.push(chunk);
     });
 
-    return new Promise<Uint8Array[]>((resolve, reject) => {
+    return new Promise<Uint8Array>((resolve, reject) => {
       stream.on('status', (status) => {
         if (status.code !== 0) {
           const error = {
@@ -78,12 +78,13 @@ export class SlamClient implements Slam {
           };
           reject(error);
         }
-        resolve(chunks);
+        const arr = concatArrayU8(chunks);
+        resolve(arr);
       });
     });
   };
 
-  getInternalState = (): Promise<Uint8Array[]> => {
+  getInternalState = (): Promise<Uint8Array> => {
     const request = new pb.GetInternalStateRequest();
     request.setName(this.name);
     this.options.requestLogger?.(request);
@@ -96,7 +97,7 @@ export class SlamClient implements Slam {
       chunks.push(chunk);
     });
 
-    return new Promise<Uint8Array[]>((resolve, reject) => {
+    return new Promise<Uint8Array>((resolve, reject) => {
       stream.on('status', (status) => {
         if (status.code !== 0) {
           const error = {
@@ -120,7 +121,8 @@ export class SlamClient implements Slam {
           };
           reject(error);
         }
-        resolve(chunks);
+        const arr = concatArrayU8(chunks);
+        resolve(arr);
       });
     });
   };
@@ -150,3 +152,14 @@ export class SlamClient implements Slam {
     return doCommandFromClient(service, this.name, command, this.options);
   }
 }
+
+const concatArrayU8 = (arrays: Uint8Array[]) => {
+  const totalLength = arrays.reduce((acc, value) => acc + value.length, 0);
+  const result = new Uint8Array(totalLength);
+  let length = 0;
+  for (const array of arrays) {
+    result.set(array, length);
+    length += array.length;
+  }
+  return result;
+};
