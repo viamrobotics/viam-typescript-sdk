@@ -377,8 +377,6 @@ export { default as commonApi } from './gen/common/v1/common_pb';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @privateRemarks
- * It doesn't matter which ServiceError we export.
  * @alpha
  * @group Raw Protobufs
  */
