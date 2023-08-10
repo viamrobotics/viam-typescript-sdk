@@ -143,9 +143,6 @@ const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
  *
  * If connecting via WebRTC fails, then this function will automatically
  * re-attempt to connect via gRPC directly.
- *
- * @privateRemarks
- * We should add an example that is not viam-specific.
  */
 export const createRobotClient = async (
   conf: DialConf
