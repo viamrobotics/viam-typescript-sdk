@@ -2,7 +2,7 @@
 
 import { vi, beforeEach, afterEach, describe, expect, test } from 'vitest';
 import { RobotClient } from '../../robot';
-vi.mock('../../robot/client');
+vi.mock('../../robot');
 
 import { events } from '../../events';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
