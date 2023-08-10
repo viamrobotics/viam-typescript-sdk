@@ -81,24 +81,6 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
-   * Move a single component.
-   *
-   * @param destination - Destination to move to, which can a pose in the
-   *   reference frame of any frame in the robot's frame system.
-   * @param componentName - Component on the robot to move to the specified
-   *   destination.
-   * @param worldState - Avoid obstacles by specifying their geometries in the
-   *   `WorldState`. Augment the frame system of the robot by specifying
-   *   additional transforms to add to it for the duration of the Move.
-   */
-  moveSingleComponent: (
-    destination: PoseInFrame,
-    componentName: ResourceName,
-    worldState?: WorldState,
-    extra?: StructType
-  ) => Promise<boolean>;
-
-  /**
    * Get the current location and orientation of a component.
    *
    * @param componentName - The component whose `Pose` is being requested.
