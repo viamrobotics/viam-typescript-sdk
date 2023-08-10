@@ -143,33 +143,6 @@ export class MotionClient implements Motion {
     return response.getSuccess();
   }
 
-  async moveSingleComponent(
-    destination: PoseInFrame,
-    componentName: ResourceName,
-    worldState?: WorldState,
-    extra = {}
-  ) {
-    const { service } = this;
-
-    const request = new pb.MoveSingleComponentRequest();
-    request.setName(this.name);
-    request.setDestination(encodePoseInFrame(destination));
-    request.setComponentName(encodeResourceName(componentName));
-    if (worldState !== undefined) {
-      request.setWorldState(encodeWorldState(worldState));
-    }
-    request.setExtra(Struct.fromJavaScript(extra));
-
-    this.options.requestLogger?.(request);
-
-    const response = await promisify<
-      pb.MoveSingleComponentRequest,
-      pb.MoveSingleComponentResponse
-    >(service.moveSingleComponent.bind(service), request);
-
-    return response.getSuccess();
-  }
-
   async getPose(
     componentName: ResourceName,
     destinationFrame: string,
