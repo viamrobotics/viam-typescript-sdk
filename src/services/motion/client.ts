@@ -24,7 +24,12 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import { type Constraints, encodeConstraints } from './types';
+import {
+  type Constraints,
+  encodeConstraints,
+  type MotionConfiguration,
+  encodeMotionConfiguration,
+} from './types';
 import type { Motion } from './motion';
 
 /**
@@ -109,13 +114,13 @@ export class MotionClient implements Motion {
     movementSensorName: ResourceName,
     heading?: number,
     obstaclesList?: GeoObstacle[],
-    linearMetersPerSec?: number,
-    angularDegPerSec?: number,
+    motionConfig?: MotionConfiguration,
     extra = {}
   ) {
     const { service } = this;
 
     const request = new pb.MoveOnGlobeRequest();
+    request.setName(this.name);
     request.setDestination(encodeGeoPoint(destination));
     request.setComponentName(encodeResourceName(componentName));
     request.setMovementSensorName(encodeResourceName(movementSensorName));
@@ -125,11 +130,8 @@ export class MotionClient implements Motion {
     if (obstaclesList) {
       request.setObstaclesList(obstaclesList.map((x) => encodeGeoObstacle(x)));
     }
-    if (linearMetersPerSec) {
-      request.setLinearMetersPerSec(linearMetersPerSec);
-    }
-    if (angularDegPerSec) {
-      request.setAngularDegPerSec(angularDegPerSec);
+    if (motionConfig) {
+      request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));
     }
     request.setExtra(Struct.fromJavaScript(extra));
 

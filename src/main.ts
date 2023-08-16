@@ -287,6 +287,7 @@ export {
   type LinearConstraint,
   type OrientationConstraint,
   type CollisionSpecification,
+  type MotionConfiguration,
   MotionClient,
 } from './services/motion';
 

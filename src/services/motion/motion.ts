@@ -9,7 +9,7 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import type { Constraints } from './types';
+import type { Constraints, MotionConfiguration } from './types';
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -75,8 +75,7 @@ export interface Motion extends Resource {
     movementSensorName: ResourceName,
     heading?: number,
     obstaclesList?: GeoObstacle[],
-    linearMetersPerSec?: number,
-    angularDegPerSec?: number,
+    motionConfiguration?: MotionConfiguration,
     extra?: StructType
   ) => Promise<boolean>;
 
