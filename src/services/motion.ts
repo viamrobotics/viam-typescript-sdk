@@ -4,5 +4,6 @@ export type {
   LinearConstraint,
   OrientationConstraint,
   CollisionSpecification,
+  MotionConfiguration,
 } from './motion/types';
 export { MotionClient } from './motion/client';

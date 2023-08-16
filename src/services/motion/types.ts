@@ -1,9 +1,11 @@
 import pb from '../../gen/service/motion/v1/motion_pb';
+import { encodeResourceName } from '../../utils';
 
 export type Constraints = pb.Constraints.AsObject;
 export type LinearConstraint = pb.LinearConstraint.AsObject;
 export type OrientationConstraint = pb.OrientationConstraint.AsObject;
 export type CollisionSpecification = pb.CollisionSpecification.AsObject;
+export type MotionConfiguration = pb.MotionConfiguration.AsObject;
 
 const encodeLinearConstraint = (
   obj: pb.LinearConstraint.AsObject
@@ -54,6 +56,23 @@ export const encodeConstraints = (obj: Constraints): pb.Constraints => {
   result.setCollisionSpecificationList(
     obj.collisionSpecificationList.map((x) => encodeCollisionSpecification(x))
   );
+
+  return result;
+};
+
+export const encodeMotionConfiguration = (
+  obj: MotionConfiguration
+): pb.MotionConfiguration => {
+  const result = new pb.MotionConfiguration();
+
+  result.setVisionServicesList(
+    obj.visionServicesList.map((x) => encodeResourceName(x))
+  );
+  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
+  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
+  result.setPlanDeviationM(obj.planDeviationM);
+  result.setLinearMPerSec(obj.linearMPerSec);
+  result.setAngularDegsPerSec(obj.angularDegsPerSec);
 
   return result;
 };

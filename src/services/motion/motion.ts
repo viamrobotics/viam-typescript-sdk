@@ -9,7 +9,7 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import type { Constraints } from './types';
+import type { Constraints, MotionConfiguration } from './types';
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -65,9 +65,8 @@ export interface Motion extends Resource {
    *   the robot's location.
    * @param obstaclesList - Obstacles to consider when planning the motion of
    *   the component.
-   * @param heading - Compass heading, in degrees, to achieve at destination
-   * @param linearMetersPerSec - Linear velocity to target when moving.
-   * @param angularDegPerSec - Angular velocity to target when moving.
+   * @param heading - Compass heading, in degrees, to achieve at destination.
+   * @param motionConfiguration - Optional motion configuration options.
    */
   moveOnGlobe: (
     destination: GeoPoint,
@@ -75,8 +74,7 @@ export interface Motion extends Resource {
     movementSensorName: ResourceName,
     heading?: number,
     obstaclesList?: GeoObstacle[],
-    linearMetersPerSec?: number,
-    angularDegPerSec?: number,
+    motionConfiguration?: MotionConfiguration,
     extra?: StructType
   ) => Promise<boolean>;
 
