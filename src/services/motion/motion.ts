@@ -65,9 +65,8 @@ export interface Motion extends Resource {
    *   the robot's location.
    * @param obstaclesList - Obstacles to consider when planning the motion of
    *   the component.
-   * @param heading - Compass heading, in degrees, to achieve at destination
-   * @param linearMetersPerSec - Linear velocity to target when moving.
-   * @param angularDegPerSec - Angular velocity to target when moving.
+   * @param heading - Compass heading, in degrees, to achieve at destination.
+   * @param motionConfiguration - Optional motion configuration options.
    */
   moveOnGlobe: (
     destination: GeoPoint,
