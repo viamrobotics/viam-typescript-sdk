@@ -1,4 +1,7 @@
 import type { Resource, StructType, Vector3 } from '../../types';
+import pb from '../../gen/component/base/v1/base_pb';
+
+export type BaseProperties = pb.GetPropertiesResponse.AsObject;
 
 /** Represents a physical base of a robot. */
 export interface Base extends Resource {
@@ -54,4 +57,7 @@ export interface Base extends Resource {
 
   /** Return true if the base is in motion. */
   isMoving(extra?: StructType): Promise<boolean>;
+
+  /** Return the base's properties. */
+  getProperties(extra?: StructType): Promise<BaseProperties>;
 }

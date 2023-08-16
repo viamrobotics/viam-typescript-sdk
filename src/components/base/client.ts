@@ -123,4 +123,19 @@ export class BaseClient implements Base {
     const { baseService } = this;
     return doCommandFromClient(baseService, this.name, command, this.options);
   }
+
+  async getProperties(extra = {}) {
+    const { baseService } = this;
+    const request = new pb.GetPropertiesRequest();
+    request.setName(this.name);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.GetPropertiesRequest,
+      pb.GetPropertiesResponse
+    >(baseService.getProperties.bind(baseService), request);
+    return response.toObject();
+  }
 }
