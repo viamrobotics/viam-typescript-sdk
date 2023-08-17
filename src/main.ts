@@ -47,7 +47,7 @@ export { type Arm, ArmClient } from './components/arm';
  * @group Raw Protobufs
  */
 export { default as baseApi } from './gen/component/base/v1/base_pb';
-export { type Base, BaseClient } from './components/base';
+export { type Base, type BaseProperties, BaseClient } from './components/base';
 
 /**
  * Raw Protobuf interfaces for a Board component.
