@@ -41,14 +41,16 @@ describe('getLocation', () => {
       longitude: longitude(),
     }));
 
-    NavigationServiceClient.prototype.getLocation = vi.fn().mockImplementation((_req, _md, cb) => {
-      cb(null, {
-        toObject: () => ({
-          compassHeading: compassHeading(),
-          location: location(),
-        }),
+    NavigationServiceClient.prototype.getLocation = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          toObject: () => ({
+            compassHeading: compassHeading(),
+            location: location(),
+          }),
+        });
       });
-    });
   });
 
   test('null location', async () => {
