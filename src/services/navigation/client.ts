@@ -4,6 +4,7 @@ import { RobotClient } from '../../robot';
 import { NavigationServiceClient } from '../../gen/service/navigation/v1/navigation_pb_service';
 import { doCommandFromClient, encodeGeoPoint, promisify } from '../../utils';
 import type { GeoPoint, Options, StructType } from '../../types';
+import { isValidGeoPoint } from '../../types';
 import type { ModeMap } from './types';
 import type { Navigation } from './navigation';
 
@@ -74,10 +75,14 @@ export class NavigationClient implements Navigation {
       pb.GetLocationResponse
     >(service.getLocation.bind(service), request);
 
-    if (!response.getLocation()) {
+    const result = response.toObject();
+    if (!result.location) {
       throw new Error('no location');
     }
-    return response.toObject();
+    if (!isValidGeoPoint(result.location)) {
+      throw new Error('invalid location');
+    }
+    return result;
   }
 
   async getWayPoints(extra = {}) {

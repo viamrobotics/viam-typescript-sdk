@@ -23,6 +23,16 @@ export type ResourceName = common.ResourceName.AsObject;
 export type GeoObstacle = common.GeoObstacle.AsObject;
 export type GeoPoint = common.GeoPoint.AsObject;
 
+export const isValidGeoPoint = (value: GeoPoint): value is GeoPoint => {
+  const { latitude, longitude } = value;
+
+  return !(
+    typeof latitude !== 'number' ||
+    typeof longitude !== 'number' ||
+    Number.isNaN(latitude) ||
+    Number.isNaN(longitude)
+  );
+};
 
 // Spatial Math
 export type Vector3 = common.Vector3.AsObject;
