@@ -74,11 +74,10 @@ export class NavigationClient implements Navigation {
       pb.GetLocationResponse
     >(service.getLocation.bind(service), request);
 
-    const result = response.getLocation();
-    if (!result) {
+    if (!response.getLocation()) {
       throw new Error('no location');
     }
-    return result.toObject();
+    return response.toObject();
   }
 
   async getWayPoints(extra = {}) {
