@@ -30,27 +30,25 @@ const testLongitude = 75;
 const testCompassHeading = 90;
 
 describe('getLocation', () => {
-  let latitude: Mock;
-  let longitude: Mock;
-  let compassHeading: Mock;
-  let location: Mock;
+  let latitude: Mock<[], number>;
+  let longitude: Mock<[], number>;
+  let compassHeading: Mock<[], number>;
+  let location: Mock<[], { latitude: number; longitude: number }>;
 
   beforeEach(() => {
-    location = vi.fn().mockImplementation(() => ({
+    location = vi.fn(() => ({
       latitude: latitude(),
       longitude: longitude(),
     }));
 
-    NavigationServiceClient.prototype.getLocation = vi
-      .fn()
-      .mockImplementation((_req, _md, cb) => {
-        cb(null, {
-          toObject: () => ({
-            compassHeading: compassHeading(),
-            location: location(),
-          }),
-        });
+    NavigationServiceClient.prototype.getLocation = vi.fn().mockImplementation((_req, _md, cb) => {
+      cb(null, {
+        toObject: () => ({
+          compassHeading: compassHeading(),
+          location: location(),
+        }),
       });
+    });
   });
 
   test('null location', async () => {
