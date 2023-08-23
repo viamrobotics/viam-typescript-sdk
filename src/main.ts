@@ -306,6 +306,7 @@ export { default as navigationApi } from './gen/service/navigation/v1/navigation
 export {
   type ModeMap,
   type Waypoint,
+  type NavigationPosition,
   NavigationClient,
 } from './services/navigation';
 

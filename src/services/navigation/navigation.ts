@@ -1,5 +1,5 @@
 import type { GeoObstacle, GeoPoint, Resource, StructType } from '../../types';
-import type { ModeMap, Waypoint } from './types';
+import type { ModeMap, Waypoint, NavigationPosition } from './types';
 
 /**
  * A service that uses GPS to automatically navigate a robot to user defined
@@ -17,10 +17,10 @@ export interface Navigation extends Resource {
   setMode: (mode: ModeMap[keyof ModeMap], extra?: StructType) => Promise<void>;
 
   /** Get the current location of the robot. */
-  getLocation: (extra?: StructType) => Promise<GeoPoint>;
+  getLocation: (extra?: StructType) => Promise<NavigationPosition>;
 
   /** Get an array of waypoints currently in the service's data storage. */
-  getWayPoints: (extra?: StructType) => Promise<Array<Waypoint>>;
+  getWayPoints: (extra?: StructType) => Promise<Waypoint[]>;
 
   /**
    * Add a waypoint to the service's data storage.
@@ -39,5 +39,5 @@ export interface Navigation extends Resource {
   removeWayPoint: (id: string, extra?: StructType) => Promise<void>;
 
   /** Get a list of obstacles. */
-  getObstacles: (extra?: StructType) => Promise<Array<GeoObstacle>>;
+  getObstacles: (extra?: StructType) => Promise<GeoObstacle[]>;
 }
