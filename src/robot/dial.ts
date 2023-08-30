@@ -1,6 +1,6 @@
 import {
   dialDirect as nodeDialDirect,
-  DialOptions,
+  type DialOptions,
 } from '@viamrobotics/rpc/src/dial';
 import { grpc } from '@improbable-eng/grpc-web';
 import { ViamTransport } from '../app/viam-transport';
