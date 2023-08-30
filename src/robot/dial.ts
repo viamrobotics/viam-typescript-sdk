@@ -1,3 +1,11 @@
+import {
+  dialDirect as nodeDialDirect,
+  DialOptions,
+} from '@viamrobotics/rpc/src/dial';
+import { grpc } from '@improbable-eng/grpc-web';
+import { ViamTransport } from '../app/viam-transport';
+import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
+import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
 import { RobotClient } from './client';
 
 interface Credential {
@@ -184,4 +192,46 @@ export const createRobotClient = async (
   }
 
   return client;
+};
+
+export const createViamTransportFactory = async (
+  dialOpts: DialOptions
+): Promise<grpc.TransportFactory> => {
+  const serviceHost = 'app.viam.com:443';
+
+  if (!dialOpts.credentials) {
+    throw new Error(`credential cannot be none`);
+  } else if (dialOpts.credentials.type === 'robot-secret') {
+    throw new Error(`credential type cannot be 'robot secret'`);
+  } else if (!dialOpts.authEntity) {
+    throw new Error(`auth entity cannot be None`);
+  }
+
+  const entity = dialOpts.authEntity;
+  const creds = new Credentials();
+  creds.setType(dialOpts.credentials.type);
+  creds.setPayload(dialOpts.credentials.payload);
+
+  const req = new AuthenticateRequest();
+  req.setEntity(entity);
+  req.setCredentials(creds);
+
+  const transportFactory = await nodeDialDirect(serviceHost, dialOpts);
+  const authClient = new AuthServiceClient(serviceHost, {
+    transport: transportFactory,
+  });
+
+  const accessToken = await new Promise<string>((resolve, reject) => {
+    authClient.authenticate(req, new grpc.Metadata(), (err, response) => {
+      if (err) {
+        return reject(err);
+      }
+      const token = response?.getAccessToken.toString() ?? '';
+      return resolve(token);
+    });
+  });
+
+  return (opts: grpc.TransportOptions) => {
+    return new ViamTransport(transportFactory, opts, accessToken);
+  };
 };
