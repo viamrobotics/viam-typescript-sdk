@@ -231,7 +231,7 @@ export const createViamTransportFactory = async (
     });
   });
 
-  return (opts: grpc.TransportOptions) => {
+  return (opts: grpc.TransportOptions): ViamTransport => {
     return new ViamTransport(transportFactory, opts, accessToken);
   };
 };
