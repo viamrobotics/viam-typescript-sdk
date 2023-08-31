@@ -34,7 +34,7 @@ async function connect(): Promise<VIAM.ViamClient> {
   });
 
   const dialOpts: DialOptions = { authEntity: host, credentials: credential };
-  return new VIAM.ViamClient(robotClient, dialOpts);
+  return new VIAM.ViamClient(host, dialOpts);
 }
 
 async function main() {
