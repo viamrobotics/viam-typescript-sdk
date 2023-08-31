@@ -195,10 +195,9 @@ export const createRobotClient = async (
 };
 
 export const createViamTransportFactory = async (
+  serviceHost: string,
   dialOpts: DialOptions
 ): Promise<grpc.TransportFactory> => {
-  const serviceHost = 'app.viam.com:443';
-
   if (!dialOpts.credentials) {
     throw new Error(`credential cannot be none`);
   } else if (dialOpts.credentials.type === 'robot-secret') {
