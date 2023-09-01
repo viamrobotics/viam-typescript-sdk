@@ -15,7 +15,7 @@ export class ViamClient {
   }
 
   public getTransportFactory = async () => {
-    return createViamTransportFactory(this.serviceHost, this.dialOpts);
+    return await createViamTransportFactory(this.serviceHost, this.dialOpts);
   };
 
   get dataService() {
