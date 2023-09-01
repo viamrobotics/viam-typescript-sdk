@@ -12,7 +12,10 @@ async function connect(): Promise<VIAM.ViamClient> {
 
   const serviceHost = `app.viam.com:443`;
 
-  const dialOpts: DialOptions = { authEntity: serviceHost, credentials: credential };
+  const dialOpts: DialOptions = {
+    authEntity: serviceHost,
+    credentials: credential,
+  };
   return new VIAM.ViamClient(serviceHost, dialOpts);
 }
 
