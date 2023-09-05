@@ -16,7 +16,7 @@ async function connect(): Promise<VIAM.ViamClient> {
   const serviceHost = 'https://app.viam.com:443';
 
   const dialOpts: DialOptions = {
-    authEntity: serviceHost,
+    authEntity: host,
     credentials: credential,
   };
   return new VIAM.ViamClient(serviceHost, dialOpts);
