@@ -25,6 +25,7 @@ async function connect(): Promise<VIAM.ViamClient> {
 async function main() {
   let client: VIAM.ViamClient;
   try {
+    console.log('app is connecting...');
     client = await connect();
     await client.connect();
     console.log('app is connected!');
