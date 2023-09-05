@@ -215,7 +215,7 @@ export const createViamTransportFactory = async (
   req.setEntity(entity);
   req.setCredentials(creds);
 
-  const transportFactory = await nodeDialDirect(serviceHost, dialOpts);
+  const transportFactory = await nodeDialDirect(serviceHost);
   const authClient = new AuthServiceClient(serviceHost, {
     transport: transportFactory,
   });
