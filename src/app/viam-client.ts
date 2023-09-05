@@ -6,8 +6,8 @@ import { createViamTransportFactory } from '../robot/dial';
 export class ViamClient {
   private serviceHost: string;
   private dialOpts: DialOptions;
-  private dataServiceClient: DataServiceClient | undefined;
   private transportFactory: grpc.TransportFactory | undefined;
+  public dataServiceClient: DataServiceClient | undefined;
 
   constructor(serviceHost: string, dialOpts: DialOptions) {
     this.serviceHost = serviceHost;
