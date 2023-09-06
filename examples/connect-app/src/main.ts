@@ -29,6 +29,11 @@ async function main() {
     client = await connect();
     await client.connect();
     console.log('app is connected!');
+
+    console.log('waiting for data...');
+    const filter = new VIAM.dataApi.Filter();
+    filter.setComponentType('camera');
+    const data = await client.dataClient.tabularDataByFilter(filter);
   } catch (error) {
     console.log(error);
     return;

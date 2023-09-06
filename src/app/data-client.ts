@@ -22,9 +22,7 @@ export class DataClient {
   }
 
   async tabularDataByFilter(
-    filter: Filter | undefined,
-    dest: string | undefined
-  ) {
+    filter: Filter | undefined  ) {
     const { service } = this;
 
     let last = '';
@@ -55,13 +53,6 @@ export class DataClient {
       }
       dataArray.push(... dataList.map(d => d.toObject()));
       last = response.getLast();
-    }
-
-    if (dest) {
-      /*
-       * console.log(dest);
-       * await fsPromise.writeFile(dest, `${dataArray.map((x) => { return [x.data, x.metadataIndex, x.timeRequested, x.timeReceived]} )}`)
-       */
     }
 
     return dataArray;
