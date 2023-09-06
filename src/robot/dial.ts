@@ -225,7 +225,7 @@ export const createViamTransportFactory = async (
       if (err) {
         return reject(err);
       }
-      const token = response?.getAccessToken.toString() ?? '';
+      const token = response?.getAccessToken().toString() ?? '';
       return resolve(token);
     });
   });

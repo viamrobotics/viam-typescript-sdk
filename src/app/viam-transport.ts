@@ -1,33 +1,32 @@
 import { grpc } from '@improbable-eng/grpc-web';
 
 export class ViamTransport implements grpc.Transport {
-  private transportFactory: grpc.TransportFactory;
-  private opts: grpc.TransportOptions;
-  private metadata = new grpc.Metadata();
+  private accessToken: string;
+  protected readonly transport: grpc.Transport;
 
   constructor(
     transportFactory: grpc.TransportFactory,
     opts: grpc.TransportOptions,
     accessToken: string
   ) {
-    this.transportFactory = transportFactory;
-    this.opts = opts;
-    this.metadata.set('authorization', `Bearer ${accessToken}`);
+    this.transport = transportFactory(opts);
+    this.accessToken = accessToken
   }
 
   public start(metadata: grpc.Metadata): void {
-    this.transportFactory(this.opts).start(metadata);
+    metadata.set('authorization', `Bearer ${this.accessToken}`);
+    this.transport.start(metadata);
   }
 
   public sendMessage(msgBytes: Uint8Array): void {
-    this.transportFactory(this.opts).sendMessage(msgBytes);
+    this.transport.sendMessage(msgBytes);
   }
 
   public finishSend(): void {
-    this.transportFactory(this.opts).finishSend();
+    this.transport.finishSend();
   }
 
   public cancel(): void {
-    this.transportFactory(this.opts).cancel();
+    this.transport.cancel();
   }
 }

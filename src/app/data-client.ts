@@ -1,4 +1,5 @@
 // import * as fsPromise from 'fs/promises';
+import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client';
 import {
   DataRequest,
   Filter,
@@ -7,14 +8,13 @@ import {
   TabularDataByFilterResponse,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
-import { RobotClient } from '../robot';
 import { promisify } from '../utils';
 
 export class DataClient {
   private client: DataServiceClient;
 
-  constructor(client: RobotClient) {
-    this.client = client.createServiceClient(DataServiceClient);
+  constructor(serviceHost: string, grpcOptions: RpcOptions) {
+    this.client = new DataServiceClient(serviceHost, grpcOptions);
   }
 
   private get service() {
@@ -29,7 +29,7 @@ export class DataClient {
 
     let last = '';
     const dataArray: TabularData.AsObject[] = [];
-    let retrieving = false;
+    let retrieving = true;
 
     while (retrieving) {
       const dataReq = new DataRequest();
@@ -63,7 +63,7 @@ export class DataClient {
     }
 
     if (dest) {
-      console.log(dest);
+      // console.log(dest);
       // await fsPromise.writeFile(dest, `${dataArray.map((x) => { return [x.data, x.metadataIndex, x.timeRequested, x.timeReceived]} )}`)
     }
 
