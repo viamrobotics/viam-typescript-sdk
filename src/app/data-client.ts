@@ -29,9 +29,8 @@ export class DataClient {
 
     let last = '';
     const dataArray: TabularData.AsObject[] = [];
-    let retrieving = true;
 
-    while (retrieving) {
+    while (true) {
       const dataReq = new DataRequest();
       if (filter) {
         dataReq.setFilter(filter);
@@ -52,14 +51,10 @@ export class DataClient {
       >(service.tabularDataByFilter.bind(service), req);
       const dataList = response.getDataList();
       if (!dataList || dataList.length === 0) {
-        retrieving = false;
+        break;
       }
-      if (dataList) {
-        for (const data of dataList) {
-          dataArray.push(data.toObject());
-        }
-        last = response.getLast();
-      }
+      dataArray.push(... dataList.map(d => d.toObject()));
+      last = response.getLast();
     }
 
     if (dest) {
