@@ -10,7 +10,7 @@ export class ViamTransport implements grpc.Transport {
     accessToken: string
   ) {
     this.transport = transportFactory(opts);
-    this.accessToken = accessToken
+    this.accessToken = accessToken;
   }
 
   public start(metadata: grpc.Metadata): void {

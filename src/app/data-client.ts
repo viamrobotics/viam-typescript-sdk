@@ -1,5 +1,5 @@
 // import * as fsPromise from 'fs/promises';
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client';
+import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
 import {
   DataRequest,
   Filter,
@@ -63,8 +63,10 @@ export class DataClient {
     }
 
     if (dest) {
-      // console.log(dest);
-      // await fsPromise.writeFile(dest, `${dataArray.map((x) => { return [x.data, x.metadataIndex, x.timeRequested, x.timeReceived]} )}`)
+      /*
+       * console.log(dest);
+       * await fsPromise.writeFile(dest, `${dataArray.map((x) => { return [x.data, x.metadataIndex, x.timeRequested, x.timeReceived]} )}`)
+       */
     }
 
     return dataArray;
