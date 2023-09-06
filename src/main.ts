@@ -26,7 +26,7 @@ export {
 export { RobotClient as Client } from './robot';
 
 /**
- * @deprecated Use {@link RobotClient} instead.
+ * @deprecated Use {@link ViamClient} instead.
  * @group Clients
  */
 export { ViamClient } from './app/viam-client';
@@ -95,7 +95,7 @@ export { type Camera, type MimeType, CameraClient } from './components/camera';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @deprecated Use {@link CameraClient} instead.
+ * @deprecated Use {@link DataClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
