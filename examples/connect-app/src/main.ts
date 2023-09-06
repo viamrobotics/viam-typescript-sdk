@@ -30,10 +30,14 @@ async function main() {
     await client.connect();
     console.log('app is connected!');
 
-    console.log('waiting for data...');
+    // A filter is an optional tool to filter out which data comes back.
     const filter = new VIAM.dataApi.Filter();
+    // Replace the method and parameter with the desired filter.
     filter.setComponentType('camera');
+
+    console.log('waiting for data...');
     const data = await client.dataClient.tabularDataByFilter(filter);
+    console.log(data);
   } catch (error) {
     console.log(error);
     return;
