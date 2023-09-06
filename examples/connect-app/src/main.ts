@@ -13,13 +13,11 @@ async function connect(): Promise<VIAM.ViamClient> {
   // Replace with the host of your actual robot running Viam.
   const host = '<HOST>';
 
-  const serviceHost = 'https://app.viam.com:443';
-
   const dialOpts: DialOptions = {
     authEntity: host,
     credentials: credential,
   };
-  return new VIAM.ViamClient(serviceHost, dialOpts);
+  return new VIAM.ViamClient(dialOpts);
 }
 
 async function main() {
