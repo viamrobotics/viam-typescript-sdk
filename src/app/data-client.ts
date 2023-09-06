@@ -1,4 +1,3 @@
-// import * as fsPromise from 'fs/promises';
 import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
 import {
   DataRequest,
@@ -21,14 +20,13 @@ export class DataClient {
     return this.client;
   }
 
-  async tabularDataByFilter(
-    filter: Filter | undefined  ) {
+  async tabularDataByFilter(filter: Filter | undefined) {
     const { service } = this;
 
     let last = '';
     const dataArray: TabularData.AsObject[] = [];
 
-    while (true) {
+    for (;;) {
       const dataReq = new DataRequest();
       if (filter) {
         dataReq.setFilter(filter);
@@ -51,7 +49,7 @@ export class DataClient {
       if (!dataList || dataList.length === 0) {
         break;
       }
-      dataArray.push(... dataList.map(d => d.toObject()));
+      dataArray.push(...dataList.map((data) => data.toObject()));
       last = response.getLast();
     }
 

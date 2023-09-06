@@ -42,7 +42,6 @@ export { ViamClient } from './app/viam-client';
  */
 export { default as dataApi } from './gen/app/data/v1/data_pb';
 
-
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
