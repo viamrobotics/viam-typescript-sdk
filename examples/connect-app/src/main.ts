@@ -23,6 +23,26 @@ async function connect(): Promise<VIAM.ViamClient> {
 
   return client;
 }
+
+function button() {
+  return <HTMLButtonElement>document.getElementById('main-button');
+}
+
+async function run(client: VIAM.ViamClient) {
+  // A filter is an optional tool to filter out which data comes back.
+  const filter = new VIAM.dataApi.Filter();
+  // Replace the method and parameter with the desired filter.
+  filter.setComponentType('camera');
+
+  try {
+    button().disabled = true;
+
+    console.log('waiting for data...');
+    const data = await client.dataClient.tabularDataByFilter(filter);
+    console.log(data);
+  } finally {
+    button().disabled = false;
+  }
 }
 
 async function main() {
@@ -31,19 +51,16 @@ async function main() {
     console.log('app is connecting...');
     client = await connect();
     console.log('app is connected!');
-
-    // A filter is an optional tool to filter out which data comes back.
-    const filter = new VIAM.dataApi.Filter();
-    // Replace the method and parameter with the desired filter.
-    filter.setComponentType('camera');
-
-    console.log('waiting for data...');
-    const data = await client.dataClient.tabularDataByFilter(filter);
-    console.log(data);
   } catch (error) {
     console.log(error);
     return;
   }
+
+  // Make the button in our app do something interesting
+  button().onclick = async () => {
+    await run(client);
+  };
+  button().disabled = false;
 }
 
 main();
