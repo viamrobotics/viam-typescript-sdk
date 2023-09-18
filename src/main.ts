@@ -19,16 +19,9 @@ export {
   RobotClient,
   createRobotClient,
 } from './robot';
-/**
- * @deprecated Use {@link RobotClient} instead.
- * @group Clients
- */
+
 export { RobotClient as Client } from './robot';
 
-/**
- * @deprecated Use {@link ViamClient} instead.
- * @group Clients
- */
 export { ViamClient } from './app/viam-client';
 
 /**
