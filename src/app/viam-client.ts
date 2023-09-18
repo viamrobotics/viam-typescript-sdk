@@ -5,13 +5,14 @@ import { createViamTransportFactory } from '../robot/dial';
 import { DataClient } from './data-client';
 
 export class ViamClient {
-  private serviceHost = 'https://app.viam.com:443';
+  private serviceHost: string;
   private dialOpts: DialOptions;
   private transportFactory: grpc.TransportFactory | undefined;
   public dataServiceClient: DataServiceClient | undefined;
   public dataClient: DataClient | undefined;
 
-  constructor(dialOpts: DialOptions) {
+  constructor(dialOpts: DialOptions, serviceHost: string | undefined) {
+    this.serviceHost = serviceHost ? serviceHost : 'https://app.viam.com:443';
     this.dialOpts = dialOpts;
   }
 
