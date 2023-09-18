@@ -17,7 +17,12 @@ async function connect(): Promise<VIAM.ViamClient> {
     authEntity: host,
     credentials: credential,
   };
-  return new VIAM.ViamClient(dialOpts);
+  
+  const client = new VIAM.ViamClient(dialOpts);
+  await client.connect();
+
+  return client;
+}
 }
 
 async function main() {
@@ -25,7 +30,6 @@ async function main() {
   try {
     console.log('app is connecting...');
     client = await connect();
-    await client.connect();
     console.log('app is connected!');
 
     // A filter is an optional tool to filter out which data comes back.
