@@ -10,14 +10,10 @@ import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { promisify } from '../utils';
 
 export class DataClient {
-  private client: DataServiceClient;
+  private service: DataServiceClient;
 
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
-    this.client = new DataServiceClient(serviceHost, grpcOptions);
-  }
-
-  private get service() {
-    return this.client;
+    this.service = new DataServiceClient(serviceHost, grpcOptions);
   }
 
   async tabularDataByFilter(filter: Filter | undefined) {
