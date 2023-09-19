@@ -34,6 +34,7 @@ export { ViamClient } from './app/viam-client';
  * @group Raw Protobufs
  */
 export { default as dataApi } from './gen/app/data/v1/data_pb';
+export { type DataClient, type FilterOptions } from './app/data-client';
 
 /**
  * Raw Protobuf interfaces for an Arm component.
@@ -82,17 +83,6 @@ export { type Board, BoardClient } from './components/board';
  */
 export { default as cameraApi } from './gen/component/camera/v1/camera_pb';
 export { type Camera, type MimeType, CameraClient } from './components/camera';
-
-/**
- * Raw Protobuf interfaces for a Camera component.
- *
- * Generated with https://github.com/improbable-eng/grpc-web
- *
- * @deprecated Use {@link DataClient} instead.
- * @alpha
- * @group Raw Protobufs
- */
-export { type DataClient } from './app/data-client';
 
 /**
  * Raw Protobuf interfaces for an Encoder component.
