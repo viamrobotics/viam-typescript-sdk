@@ -42,15 +42,16 @@ async function run(client: VIAM.ViamClient) {
     let dataString: string = '';
 
     for (const data in dataList) {
-      const fieldsMap = dataList[data].data.fieldsMap;
       dataString = dataString + data + '<br />';
       for (const property in dataList[data]) {
         if (property === 'data') {
           dataString = dataString + property + ': <br />';
+          const fieldsMap = dataList[data].data.fieldsMap;
           for (const entry in fieldsMap) {
             dataString = dataString + fieldsMap[entry][0] + ': [ ';
             for (const innerEntry in fieldsMap[entry][1]) {
-              const dataPoint = fieldsMap[1][innerEntry];
+              const dataPoint =
+                dataList[data][property].fieldsMap[entry][1][innerEntry];
               dataString = dataString + innerEntry + ': ' + dataPoint + ', ';
             }
             dataString = dataString + ']<br />';
