@@ -12,7 +12,7 @@ export class ViamClient {
   public dataClient: DataClient | undefined;
 
   constructor(dialOpts: DialOptions, serviceHost: string | undefined) {
-    this.serviceHost = serviceHost ? serviceHost : 'https://app.viam.com:443';
+    this.serviceHost = serviceHost || 'https://app.viam.com:443';
     this.dialOpts = dialOpts;
   }
 
