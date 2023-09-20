@@ -68,11 +68,12 @@ async function run(client: VIAM.ViamClient) {
 async function main() {
   let client: VIAM.ViamClient;
   try {
-    console.log('app is connecting...');
+    button().textContent = 'Connecting...';
     client = await connect();
-    console.log('app is connected!');
+    button().textContent = 'Click for data';
   } catch (error) {
-    console.log(error);
+    button().textContent = 'Unable to connect';
+    console.error(error);
     return;
   }
 
