@@ -5,22 +5,11 @@ import pb from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { promisify } from '../utils';
 
-export interface FilterOptions {
-  componentName?: string;
-  componentType?: string;
-  method?: string;
-  robotName?: string;
-  robotId?: string;
-  partName?: string;
-  partId?: string;
-  locationIdsList?: Array<string>;
-  organizationIdsList?: Array<string>;
-  mimeTypeList?: Array<string>;
-  startTime?: Date;
+export type FilterOptions = Partial<pb.Filter.AsObject> & {
   endTime?: Date;
-  tags?: Array<string>;
-  bboxLabelsList?: Array<string>;
-}
+  startTime?: Date;
+  tags?: string[];
+};
 
 type TabularData = {
   data?: googleStructPb.Struct.AsObject;
@@ -78,8 +67,7 @@ export class DataClient {
     return dataArray;
   }
 
-  createFilter = (options: FilterOptions): pb.Filter => {
-    this.createFilter = this.createFilter.bind(this);
+  createFilter(options: FilterOptions): pb.Filter {
 
     const filter = new pb.Filter();
     if (options.componentName) {
