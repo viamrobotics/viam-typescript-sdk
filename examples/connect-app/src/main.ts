@@ -20,9 +20,6 @@ async function connect(): Promise<VIAM.ViamClient> {
   return client;
 }
 
-function button() {
-  return <HTMLButtonElement>document.getElementById('main-button');
-}
 const button  = <HTMLButtonElement>document.getElementById('main-button');
 
 async function run(client: VIAM.ViamClient) {
@@ -31,7 +28,7 @@ async function run(client: VIAM.ViamClient) {
   const filter = client.dataClient.createFilter(opts);
 
   try {
-    button().disabled = true;
+    button.disabled = true;
     const textElement = <HTMLParagraphElement>document.getElementById('text');
     textElement.innerHTML = 'waiting for data...';
 
@@ -61,27 +58,27 @@ async function run(client: VIAM.ViamClient) {
     }
     textElement.innerHTML = dataString;
   } finally {
-    button().disabled = false;
+    button.disabled = false;
   }
 }
 
 async function main() {
   let client: VIAM.ViamClient;
   try {
-    button().textContent = 'Connecting...';
+    button.textContent = 'Connecting...';
     client = await connect();
-    button().textContent = 'Click for data';
+    button.textContent = 'Click for data';
   } catch (error) {
-    button().textContent = 'Unable to connect';
+    button.textContent = 'Unable to connect';
     console.error(error);
     return;
   }
 
   // Make the button in our app do something interesting
- button().addEventListener('click', async () => {
+ button.addEventListener('click', async () => {
    await run(client);
  });
-  button().disabled = false;
+  button.disabled = false;
 }
 
 main();
