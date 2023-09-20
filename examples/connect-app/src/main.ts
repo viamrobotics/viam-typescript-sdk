@@ -23,6 +23,7 @@ async function connect(): Promise<VIAM.ViamClient> {
 function button() {
   return <HTMLButtonElement>document.getElementById('main-button');
 }
+const button  = <HTMLButtonElement>document.getElementById('main-button');
 
 async function run(client: VIAM.ViamClient) {
   // A filter is an optional tool to filter out which data comes back.
