@@ -55,7 +55,7 @@ update-buf: $(node_modules)
 .PHONY: build-buf
 build-buf: $(node_modules) clean-buf
 	$(buf) generate buf.build/googleapis/googleapis
-	$(buf) generate buf.build/viamrobotics/api --path common,component,robot,service
+	$(buf) generate buf.build/viamrobotics/api --path common,component,robot,service,app
 	$(buf) generate buf.build/erdaniels/gostream
 	$(buf) generate buf.build/viamrobotics/goutils
 
