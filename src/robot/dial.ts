@@ -195,11 +195,10 @@ export const createRobotClient = async (
 };
 
 /**
- * Get a Viam Transport Factory by getting the accessToken.
+ * Get a Viam Transport Factory after getting the accessToken.
  *
  * In dialOpts.credentials, the credential type cannot be a robot secret. The
- * credential type can be a robot location secret or, preferably, the org API
- * key.
+ * credential type can be a robot location secret.
  */
 export const createViamTransportFactory = async (
   serviceHost: string,

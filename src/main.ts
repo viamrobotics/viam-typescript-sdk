@@ -20,6 +20,10 @@ export {
   createRobotClient,
 } from './robot';
 
+/**
+  * @deprecated Use {@link RobotClient} instead.
+  * @group Clients
+ */
 export { RobotClient as Client } from './robot';
 
 export { ViamClient } from './app/viam-client';
