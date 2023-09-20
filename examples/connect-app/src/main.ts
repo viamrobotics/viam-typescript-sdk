@@ -32,7 +32,7 @@ async function run(client: VIAM.ViamClient) {
 
   try {
     button().disabled = true;
-    const textElement = <HTMLButtonElement>document.getElementById('text');
+    const textElement = <HTMLParagraphElement>document.getElementById('text');
     textElement.innerHTML = 'waiting for data...';
 
     const dataList = await client.dataClient.tabularDataByFilter(filter);
