@@ -209,7 +209,7 @@ export const createViamTransportFactory = async (
   } else if (dialOpts.credentials.type === 'robot-secret') {
     throw new Error(`credential type cannot be 'robot secret'`);
   } else if (!dialOpts.authEntity) {
-    throw new Error(`auth entity cannot be None`);
+    throw new Error(`auth entity cannot be null, undefined, or an empty value.`);
   }
 
   const entity = dialOpts.authEntity;
