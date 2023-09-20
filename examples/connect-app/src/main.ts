@@ -78,9 +78,9 @@ async function main() {
   }
 
   // Make the button in our app do something interesting
-  button().onclick = async () => {
-    await run(client);
-  };
+ button().addEventListener('click', async () => {
+   await run(client);
+ });
   button().disabled = false;
 }
 
