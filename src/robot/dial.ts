@@ -112,7 +112,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   if (conf.credential) {
     creds = conf.credential;
   }
-  await client.connect(impliedURL, creds);
+  await client.connect(conf.authEntity || impliedURL, creds);
 
   // eslint-disable-next-line no-console
   console.debug('connected via WebRTC');
