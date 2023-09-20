@@ -67,8 +67,8 @@ export class DataClient {
     return dataArray;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   createFilter(options: FilterOptions): pb.Filter {
-
     const filter = new pb.Filter();
     if (options.componentName) {
       filter.setComponentName(options.componentName);
@@ -122,5 +122,5 @@ export class DataClient {
     filter.setTagsFilter(tagsFilter);
 
     return filter;
-  };
+  }
 }

@@ -18,7 +18,7 @@ async function connect(): Promise<VIAM.ViamClient> {
   return client;
 }
 
-const button  = <HTMLButtonElement>document.getElementById('main-button');
+const button = <HTMLButtonElement>document.getElementById('main-button');
 
 async function run(client: VIAM.ViamClient) {
   // A filter is an optional tool to filter out which data comes back.
@@ -50,9 +50,9 @@ async function main() {
   }
 
   // Make the button in our app do something interesting
- button.addEventListener('click', async () => {
-   await run(client);
- });
+  button.addEventListener('click', async () => {
+    await run(client);
+  });
   button.disabled = false;
 }
 
