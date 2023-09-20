@@ -2,8 +2,6 @@ import { type DialOptions } from '@viamrobotics/rpc/src/dial';
 import * as VIAM from '@viamrobotics/sdk';
 
 async function connect(): Promise<VIAM.ViamClient> {
-  // You can remove this block entirely if your robot is not authenticated.
-  // Otherwise, replace with an actual secret.
   const credential = {
     payload: '<API-KEY>',
     type: 'api-key',
@@ -33,30 +31,7 @@ async function run(client: VIAM.ViamClient) {
     textElement.innerHTML = 'waiting for data...';
 
     const dataList = await client.dataClient.tabularDataByFilter(filter);
-    let dataString: string = '';
-
-    for (const data in dataList) {
-      dataString = dataString + data + '<br />';
-      for (const property in dataList[data]) {
-        if (property === 'data') {
-          dataString = dataString + property + ': <br />';
-          const fieldsMap = dataList[data].data.fieldsMap;
-          for (const entry in fieldsMap) {
-            dataString = dataString + fieldsMap[entry][0] + ': [ ';
-            for (const innerEntry in fieldsMap[entry][1]) {
-              const dataPoint =
-                dataList[data][property].fieldsMap[entry][1][innerEntry];
-              dataString = dataString + innerEntry + ': ' + dataPoint + ', ';
-            }
-            dataString = dataString + ']<br />';
-          }
-        } else {
-          dataString =
-            dataString + property + ': ' + dataList[data][property] + '<br />';
-        }
-      }
-    }
-    textElement.innerHTML = dataString;
+    textElement.innerHTML = JSON.stringify(dataList, null, 2);
   } finally {
     button.disabled = false;
   }
