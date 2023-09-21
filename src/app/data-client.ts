@@ -67,6 +67,56 @@ export class DataClient {
     return dataArray;
   }
 
+  async binaryDataByFilter(filter: pb.Filter | undefined) {
+    const { service } = this;
+
+    let last = '';
+    const dataArray: pb.BinaryData.AsObject[] = [];
+
+    for (;;) {
+      const dataReq = new pb.DataRequest();
+      if (filter) {
+        dataReq.setFilter(filter);
+      } else {
+        dataReq.setFilter(new pb.Filter());
+      }
+      dataReq.setLimit(100);
+      dataReq.setLast(last);
+
+      const req = new pb.BinaryDataByFilterRequest();
+      req.setDataRequest(dataReq);
+      req.setCountOnly(false);
+
+      // eslint-disable-next-line no-await-in-loop
+      const response = await promisify<
+        pb.BinaryDataByFilterRequest,
+        pb.BinaryDataByFilterResponse
+      >(service.binaryDataByFilter.bind(service), req);
+      const dataList = response.getDataList();
+      if (!dataList || dataList.length === 0) {
+        break;
+      }
+      dataArray.push(...dataList.map((data) => data.toObject()));
+      last = response.getLast();
+    }
+
+    return dataArray;
+  }
+
+  async binaryDataByIds(ids: pb.BinaryID[]) {
+    const { service } = this;
+
+    const req = new pb.BinaryDataByIDsRequest();
+    req.setBinaryIdsList(ids);
+    req.setIncludeBinary(true);
+
+    const response = await promisify<
+      pb.BinaryDataByIDsRequest,
+      pb.BinaryDataByIDsResponse
+    >(service.binaryDataByIDs.bind(service), req);
+    return response.toObject().dataList;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   createFilter(options: FilterOptions): pb.Filter {
     const filter = new pb.Filter();
