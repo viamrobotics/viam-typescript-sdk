@@ -38,7 +38,11 @@ export { ViamClient } from './app/viam-client';
  * @group Raw Protobufs
  */
 export { default as dataApi } from './gen/app/data/v1/data_pb';
-export { type DataClient, type FilterOptions } from './app/data-client';
+export {
+  type BinaryID,
+  type DataClient,
+  type FilterOptions,
+} from './app/data-client';
 
 /**
  * Raw Protobuf interfaces for an Arm component.

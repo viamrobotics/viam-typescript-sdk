@@ -5,6 +5,8 @@ import pb from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { promisify } from '../utils';
 
+export type BinaryID = pb.BinaryID.AsObject;
+
 export type FilterOptions = Partial<pb.Filter.AsObject> & {
   endTime?: Date;
   startTime?: Date;
@@ -103,11 +105,20 @@ export class DataClient {
     return dataArray;
   }
 
-  async binaryDataByIds(ids: pb.BinaryID[]) {
+  async binaryDataByIds(ids: BinaryID[]) {
     const { service } = this;
 
+    const binaryIds: pb.BinaryID[] = [];
+    for (const id of ids) {
+      const binaryId = new pb.BinaryID();
+      binaryId.setFileId(id.fileId);
+      binaryId.setOrganizationId(id.organizationId);
+      binaryId.setLocationId(id.locationId);
+      binaryIds.push(binaryId);
+    }
+
     const req = new pb.BinaryDataByIDsRequest();
-    req.setBinaryIdsList(ids);
+    req.setBinaryIdsList(binaryIds);
     req.setIncludeBinary(true);
 
     const response = await promisify<
