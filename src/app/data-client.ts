@@ -179,8 +179,8 @@ export class DataClient {
     const tagsFilter = new pb.TagsFilter();
     if (options.tags) {
       tagsFilter.setTagsList(options.tags);
+      filter.setTagsFilter(tagsFilter);
     }
-    filter.setTagsFilter(tagsFilter);
 
     return filter;
   }
