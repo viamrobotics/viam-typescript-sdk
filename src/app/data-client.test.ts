@@ -15,18 +15,15 @@ import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
 import { DataClient, type FilterOptions } from './data-client';
 
-
 const serviceHost = 'fakeServiceHost';
 const transport = new FakeTransportBuilder().build();
 let dataClient: DataClient;
 
+const struct1 = Struct.fromJavaScript({ key: 'value1' });
+const struct2 = Struct.fromJavaScript({ key: 'value2' });
 const tabularData1 = new TabularData();
-const data1 = { key: 'value1' };
-const struct1 = Struct.fromJavaScript(data1);
 tabularData1.setData(struct1);
 const tabularData2 = new TabularData();
-const data2 = { key: 'value2' };
-const struct2 = Struct.fromJavaScript(data2);
 tabularData2.setData(struct2);
 const tabularDataResponse = new TabularDataByFilterResponse();
 tabularDataResponse.setDataList([tabularData1, tabularData2]);
@@ -70,19 +67,18 @@ beforeEach(() => {
   dataClient = new DataClient(serviceHost, { transport });
 });
 
-describe('tabularDataByFilter tests',  () => {
+describe('tabularDataByFilter tests', () => {
   const filter: Filter = new Filter();
-  const dataList = tabularDataResponse.getDataList();
-  const dataArray: TabularData.AsObject[] = [];
-  dataArray.push(...dataList.map((data) => data.toObject()));
 
-  test('tabulardatabyfilter', async () => {
+  test('get tabular data', async () => {
     const promise = await dataClient.tabularDataByFilter(filter);
     expect(promise.length).toEqual(2);
-    expect(promise[0].data.fieldsMap[0][0]).toEqual('key')
-    expect(promise[0].data.fieldsMap[0][1].stringValue).toEqual('value1')
-    expect(promise[1].data.fieldsMap[0][0]).toEqual('key')
-    expect(promise[1].data.fieldsMap[0][1].stringValue).toEqual('value2')
+    expect(promise[0].data.fieldsMap[0][0]).toEqual('key');
+    expect(promise[0].data.fieldsMap[0][1].stringValue).toEqual('value1');
+    expect(promise[1].data.fieldsMap[0][0]).toEqual('key');
+    expect(promise[1].data.fieldsMap[0][1].stringValue).toEqual('value2');
+  });
+});
 
 describe('binaryDataByFilter tests', () => {
   const filter: Filter = new Filter();
@@ -127,24 +123,24 @@ describe('createFilter tests', () => {
     const interval = new CaptureInterval();
     interval.setStart(Timestamp.fromDate(startTime));
     interval.setEnd(Timestamp.fromDate(endTime));
-    const tagsList = ['testTag1', 'testTag2']
+    const tagsList = ['testTag1', 'testTag2'];
     const tagsFilter = new TagsFilter();
     tagsFilter.setTagsList(tagsList);
 
     opts = {
-      componentName: componentName,
-      componentType: componentType,
-      method: method,
-      robotName: robotName,
-      robotId: robotId,
-      partName: partName,
-      partId: partId,
+      componentName,
+      componentType,
+      method,
+      robotName,
+      robotId,
+      partName,
+      partId,
       locationIdsList: locationsIdsList,
-      organizationIdsList: organizationIdsList,
-      mimeTypeList: mimeTypeList,
-      bboxLabelsList: bboxLabelsList,
-      startTime: startTime,
-      endTime: endTime,
+      organizationIdsList,
+      mimeTypeList,
+      bboxLabelsList,
+      startTime,
+      endTime,
       tags: tagsList,
     };
     testFilter = dataClient.createFilter(opts);
