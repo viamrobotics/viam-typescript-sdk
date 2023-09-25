@@ -62,7 +62,7 @@ describe('tabularDataByFilter tests',  () => {
   });
 });
 
-describe('createFilter', () => {
+describe('createFilter tests', () => {
   let opts: FilterOptions;
   let testFilter: Filter;
   let actualFilter: Filter;
@@ -89,11 +89,14 @@ describe('createFilter', () => {
     const organizationIdsList = ['testOrgId1', 'testOrgId2'];
     const mimeTypeList = ['testMimeType1', 'testMimeType2'];
     const bboxLabelsList = ['testBboxLabel1', 'testBboxLabel2'];
+    const startTime = new Date(1, 1, 1, 1, 1, 1);
+    const endTime = new Date(2, 2, 2, 2, 2, 2);
     const interval = new CaptureInterval();
-    interval.setStart(Timestamp.fromDate(new Date(1, 1, 1, 1, 1, 1)));
-    interval.setEnd(Timestamp.fromDate(new Date(2, 2, 2, 2, 2, 2)));
+    interval.setStart(Timestamp.fromDate(startTime));
+    interval.setEnd(Timestamp.fromDate(endTime));
+    const tagsList = ['testTag1', 'testTag2']
     const tagsFilter = new TagsFilter();
-    tagsFilter.setTagsList(['testTag1', 'testTag2']);
+    tagsFilter.setTagsList(tagsList);
 
     opts = {
       componentName: componentName,
@@ -107,9 +110,9 @@ describe('createFilter', () => {
       organizationIdsList: organizationIdsList,
       mimeTypeList: mimeTypeList,
       bboxLabelsList: bboxLabelsList,
-      startTime: new Date(1, 1, 1, 1, 1, 1),
-      endTime: new Date(2, 2, 2, 2, 2, 2),
-      tags: ['testTag1', 'testTag2'],
+      startTime: startTime,
+      endTime: endTime,
+      tags: tagsList,
     };
     testFilter = dataClient.createFilter(opts);
     expect(testFilter.getComponentType()).toEqual('testComponentType');
