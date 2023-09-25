@@ -3,6 +3,8 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
+  BinaryData,
+  BinaryDataByFilterResponse,
   CaptureInterval,
   Filter,
   TabularData,
@@ -29,6 +31,15 @@ tabularData2.setData(struct2);
 const tabularDataResponse = new TabularDataByFilterResponse();
 tabularDataResponse.setDataList([tabularData1, tabularData2]);
 
+const binary1 = 'binary1';
+const binary2 = 'binary2';
+const binaryData1 = new BinaryData();
+binaryData1.setBinary(binary1);
+const binaryData2 = new BinaryData();
+binaryData2.setBinary(binary2);
+const binaryDataResponse = new BinaryDataByFilterResponse();
+binaryDataResponse.setDataList([binaryData1, binaryData2]);
+
 beforeEach(() => {
   DataServiceClient.prototype.tabularDataByFilter = vi
     .fn()
@@ -39,9 +50,22 @@ beforeEach(() => {
       });
     })
     .mockImplementation((_req, _md, cb) => {
-        cb(null, {
-            getDataList: () => []
-        })
+      cb(null, {
+        getDataList: () => [],
+      });
+    });
+  DataServiceClient.prototype.binaryDataByFilter = vi
+    .fn()
+    .mockImplementationOnce((_req, _md, cb) => {
+      cb(null, {
+        getDataList: () => binaryDataResponse.getDataList(),
+        getLast: () => binaryDataResponse.getLast(),
+      });
+    })
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, {
+        getDataList: () => [],
+      });
     });
   dataClient = new DataClient(serviceHost, { transport });
 });
@@ -59,6 +83,15 @@ describe('tabularDataByFilter tests',  () => {
     expect(promise[0].data.fieldsMap[0][1].stringValue).toEqual('value1')
     expect(promise[1].data.fieldsMap[0][0]).toEqual('key')
     expect(promise[1].data.fieldsMap[0][1].stringValue).toEqual('value2')
+
+describe('binaryDataByFilter tests', () => {
+  const filter: Filter = new Filter();
+
+  test('get binary data', async () => {
+    const promise = await dataClient.binaryDataByFilter(filter);
+    expect(promise.length).toEqual(2);
+    expect(promise[0].binary).toEqual(binary1);
+    expect(promise[1].binary).toEqual(binary2);
   });
 });
 
