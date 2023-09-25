@@ -112,6 +112,7 @@ describe('createFilter', () => {
       tags: ['testTag1', 'testTag2'],
     };
     testFilter = dataClient.createFilter(opts);
+    expect(testFilter.getComponentType()).toEqual('testComponentType');
 
     actualFilter = new Filter();
     actualFilter.setComponentName(componentName);
