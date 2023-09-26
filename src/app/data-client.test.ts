@@ -67,7 +67,9 @@ describe('DataClient tests', () => {
     test('get filtered tabular data', async () => {
       const filter = new Filter();
       const testComponentName = 'testComponentName';
+      const testComponentType = 'testComponentType';
       filter.setComponentName(testComponentName);
+      filter.setComponentType(testComponentType);
 
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
@@ -123,6 +125,7 @@ describe('DataClient tests', () => {
       const testComponentName = 'testComponentName';
       const testComponentType = 'testComponentType';
       filter.setComponentName(testComponentName);
+      filter.setComponentType(testComponentType);
 
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
