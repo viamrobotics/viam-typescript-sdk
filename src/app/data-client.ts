@@ -27,7 +27,7 @@ export class DataClient {
     this.service = new DataServiceClient(serviceHost, grpcOptions);
   }
 
-  async tabularDataByFilter(filter: pb.Filter | undefined) {
+  async tabularDataByFilter(filter?: pb.Filter) {
     const { service } = this;
 
     let last = '';
@@ -69,7 +69,7 @@ export class DataClient {
     return dataArray;
   }
 
-  async binaryDataByFilter(filter: pb.Filter | undefined) {
+  async binaryDataByFilter(filter?: pb.Filter) {
     const { service } = this;
 
     let last = '';
