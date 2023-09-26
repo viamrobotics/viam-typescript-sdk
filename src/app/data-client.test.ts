@@ -65,11 +65,10 @@ describe('DataClient tests', () => {
     });
 
     test('get filtered tabular data', async () => {
-      const filter = new Filter();
-      const testComponentName = 'testComponentName';
-      const testComponentType = 'testComponentType';
-      filter.setComponentName(testComponentName);
-      filter.setComponentType(testComponentType);
+      const filter = subject().createFilter({
+        componentName: 'testComponentName',
+        componentType: 'testComponentType',
+      });
 
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
@@ -121,11 +120,10 @@ describe('DataClient tests', () => {
     });
 
     test('get filtered binary data', async () => {
-      const filter = new Filter();
-      const testComponentName = 'testComponentName';
-      const testComponentType = 'testComponentType';
-      filter.setComponentName(testComponentName);
-      filter.setComponentType(testComponentType);
+      const filter = subject().createFilter({
+        componentName: 'testComponentName',
+        componentType: 'testComponentType',
+      });
 
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
