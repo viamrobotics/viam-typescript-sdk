@@ -6,8 +6,11 @@ import {
   BinaryData,
   BinaryDataByFilterResponse,
   CaptureInterval,
+  CaptureMetadata,
+  DataRequest,
   Filter,
   TabularData,
+  TabularDataByFilterRequest,
   TabularDataByFilterResponse,
   TagsFilter,
 } from '../gen/app/data/v1/data_pb';
@@ -19,14 +22,33 @@ const serviceHost = 'fakeServiceHost';
 const transport = new FakeTransportBuilder().build();
 let dataClient: DataClient;
 
+const dataReq = new DataRequest();
+const filter = new Filter();
+dataReq.setFilter(filter);
+dataReq.setLimit(100);
+dataReq.setLast('');
+const tabDataReq = new TabularDataByFilterRequest();
+tabDataReq.setDataRequest(dataReq);
+tabDataReq.setCountOnly(false);
+
 const struct1 = Struct.fromJavaScript({ key: 'value1' });
 const struct2 = Struct.fromJavaScript({ key: 'value2' });
-const tabularData1 = new TabularData();
-tabularData1.setData(struct1);
-const tabularData2 = new TabularData();
-tabularData2.setData(struct2);
-const tabularDataResponse = new TabularDataByFilterResponse();
-tabularDataResponse.setDataList([tabularData1, tabularData2]);
+const metadata1 = new CaptureMetadata();
+const testComponentName = 'testComponentName';
+metadata1.setComponentName(testComponentName);
+const metadata2 = new CaptureMetadata();
+const tabData1 = new TabularData();
+tabData1.setData(struct1);
+tabData1.setMetadataIndex(0);
+const tabData2 = new TabularData();
+tabData2.setData(struct2);
+tabData2.setMetadataIndex(1);
+const tabDataResponse = new TabularDataByFilterResponse();
+tabDataResponse.setDataList([tabData1, tabData2]);
+tabDataResponse.setMetadataList([metadata1, metadata2])
+
+const filteredTabDataResponse = new TabularDataByFilterResponse();
+filteredTabDataResponse.setDataList([tabData1]);
 
 const binary1 = 'binary1';
 const binary2 = 'binary2';
@@ -41,10 +63,17 @@ beforeEach(() => {
   DataServiceClient.prototype.tabularDataByFilter = vi
     .fn()
     .mockImplementationOnce((_req, _md, cb) => {
-      cb(null, {
-        getDataList: () => tabularDataResponse.getDataList(),
-        getLast: () => tabularDataResponse.getLast(),
-      });
+        if (JSON.stringify(_req) === JSON.stringify(tabDataReq)) {
+            cb(null, {
+                getDataList: () => tabDataResponse.getDataList(),
+                getLast: () => tabDataResponse.getLast()
+              });
+        } else{
+            cb(null, {
+                getDataList: () => filteredTabDataResponse.getDataList(),
+                getLast: () => filteredTabDataResponse.getLast()
+              });
+        }
     })
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
@@ -80,20 +109,24 @@ beforeEach(() => {
 });
 
 describe('tabularDataByFilter tests', () => {
-  const filter: Filter = new Filter();
-
   test('get tabular data', async () => {
     const promise = await dataClient.tabularDataByFilter(filter);
     expect(promise.length).toEqual(2);
     const [data1, data2] = promise;
-    expect(data1).toMatchObject(tabularData1.toObject());
-    expect(data2).toMatchObject(tabularData2.toObject());
+    expect(data1).toMatchObject(tabData1.toObject());
+    expect(data2).toMatchObject(tabData2.toObject());
   });
+
+  test('get filtered tabular data', async () => {
+    const filter2: Filter = new Filter();
+    filter2.setComponentName(testComponentName);
+    const promise = await dataClient.tabularDataByFilter(filter2);
+    expect(promise.length).toEqual(1);
+    expect(promise[0]).toMatchObject(tabData1.toObject());
+  })
 });
 
 describe('binaryDataByFilter tests', () => {
-  const filter: Filter = new Filter();
-
   test('get binary data', async () => {
     const promise = await dataClient.binaryDataByFilter(filter);
     expect(promise.length).toEqual(2);
