@@ -121,6 +121,7 @@ describe('DataClient tests', () => {
     test('get filtered binary data', async () => {
       const filter = new Filter();
       const testComponentName = 'testComponentName';
+      const testComponentType = 'testComponentType';
       filter.setComponentName(testComponentName);
 
       const dataReq = new DataRequest();
