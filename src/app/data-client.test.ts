@@ -13,7 +13,7 @@ import {
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
-import { DataClient, type FilterOptions } from './data-client';
+import { type BinaryID, DataClient, type FilterOptions } from './data-client';
 
 const serviceHost = 'fakeServiceHost';
 const transport = new FakeTransportBuilder().build();
@@ -64,6 +64,18 @@ beforeEach(() => {
         getDataList: () => [],
       });
     });
+  DataServiceClient.prototype.binaryDataByIDs = vi
+    .fn()
+    .mockImplementationOnce((_req, _md, cb) => {
+      cb(null, {
+        toObject: () => binaryDataResponse.toObject(),
+      });
+    })
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, {
+        getDataList: () => [],
+      });
+    });
   dataClient = new DataClient(serviceHost, { transport });
 });
 
@@ -73,10 +85,9 @@ describe('tabularDataByFilter tests', () => {
   test('get tabular data', async () => {
     const promise = await dataClient.tabularDataByFilter(filter);
     expect(promise.length).toEqual(2);
-    expect(promise[0].data.fieldsMap[0][0]).toEqual('key');
-    expect(promise[0].data.fieldsMap[0][1].stringValue).toEqual('value1');
-    expect(promise[1].data.fieldsMap[0][0]).toEqual('key');
-    expect(promise[1].data.fieldsMap[0][1].stringValue).toEqual('value2');
+    const [data1, data2] = promise;
+    expect(data1).toMatchObject(tabularData1.toObject());
+    expect(data2).toMatchObject(tabularData2.toObject());
   });
 });
 
@@ -86,8 +97,21 @@ describe('binaryDataByFilter tests', () => {
   test('get binary data', async () => {
     const promise = await dataClient.binaryDataByFilter(filter);
     expect(promise.length).toEqual(2);
-    expect(promise[0].binary).toEqual(binary1);
-    expect(promise[1].binary).toEqual(binary2);
+    expect(promise[0]?.binary).toEqual(binary1);
+    expect(promise[1]?.binary).toEqual(binary2);
+  });
+});
+
+describe('binaryDataById tests', () => {
+  const binaryID: BinaryID = {
+    fileId: 'testFileId',
+    organizationId: 'testOrgId',
+    locationId: 'testLocationId',
+  };
+
+  test('get binary data by id', async () => {
+    const promise = await dataClient.binaryDataByIds([binaryID]);
+    console.log(promise);
   });
 });
 
