@@ -6,8 +6,6 @@ import {
   BinaryData,
   BinaryDataByFilterResponse,
   CaptureInterval,
-  CaptureMetadata,
-  DataRequest,
   Filter,
   TabularData,
   TabularDataByFilterRequest,
@@ -22,30 +20,19 @@ const serviceHost = 'fakeServiceHost';
 const transport = new FakeTransportBuilder().build();
 let dataClient: DataClient;
 
-const dataReq = new DataRequest();
-const filter = new Filter();
-dataReq.setFilter(filter);
-dataReq.setLimit(100);
-dataReq.setLast('');
-const tabDataReq = new TabularDataByFilterRequest();
-tabDataReq.setDataRequest(dataReq);
-tabDataReq.setCountOnly(false);
+const filter1 = new Filter();
+const filter2 = new Filter();
+const testComponentName = 'testComponentName';
+filter2.setComponentName(testComponentName);
 
 const struct1 = Struct.fromJavaScript({ key: 'value1' });
 const struct2 = Struct.fromJavaScript({ key: 'value2' });
-const metadata1 = new CaptureMetadata();
-const testComponentName = 'testComponentName';
-metadata1.setComponentName(testComponentName);
-const metadata2 = new CaptureMetadata();
 const tabData1 = new TabularData();
 tabData1.setData(struct1);
-tabData1.setMetadataIndex(0);
 const tabData2 = new TabularData();
 tabData2.setData(struct2);
-tabData2.setMetadataIndex(1);
 const tabDataResponse = new TabularDataByFilterResponse();
 tabDataResponse.setDataList([tabData1, tabData2]);
-tabDataResponse.setMetadataList([metadata1, metadata2])
 
 const filteredTabDataResponse = new TabularDataByFilterResponse();
 filteredTabDataResponse.setDataList([tabData1]);
@@ -62,18 +49,18 @@ binaryDataResponse.setDataList([binaryData1, binaryData2]);
 beforeEach(() => {
   DataServiceClient.prototype.tabularDataByFilter = vi
     .fn()
-    .mockImplementationOnce((_req, _md, cb) => {
-        if (JSON.stringify(_req) === JSON.stringify(tabDataReq)) {
-            cb(null, {
-                getDataList: () => tabDataResponse.getDataList(),
-                getLast: () => tabDataResponse.getLast()
-              });
-        } else{
-            cb(null, {
-                getDataList: () => filteredTabDataResponse.getDataList(),
-                getLast: () => filteredTabDataResponse.getLast()
-              });
-        }
+    .mockImplementationOnce((_req: TabularDataByFilterRequest, _md, cb) => {
+      if (_req?.getDataRequest?.()?.getFilter?.() === filter1) {
+        cb(null, {
+          getDataList: () => tabDataResponse.getDataList(),
+          getLast: () => tabDataResponse.getLast(),
+        });
+      } else if (_req?.getDataRequest?.()?.getFilter?.() === filter2) {
+        cb(null, {
+          getDataList: () => filteredTabDataResponse.getDataList(),
+          getLast: () => filteredTabDataResponse.getLast(),
+        });
+      }
     })
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
@@ -110,7 +97,7 @@ beforeEach(() => {
 
 describe('tabularDataByFilter tests', () => {
   test('get tabular data', async () => {
-    const promise = await dataClient.tabularDataByFilter(filter);
+    const promise = await dataClient.tabularDataByFilter(filter1);
     expect(promise.length).toEqual(2);
     const [data1, data2] = promise;
     expect(data1).toMatchObject(tabData1.toObject());
@@ -118,17 +105,15 @@ describe('tabularDataByFilter tests', () => {
   });
 
   test('get filtered tabular data', async () => {
-    const filter2: Filter = new Filter();
-    filter2.setComponentName(testComponentName);
     const promise = await dataClient.tabularDataByFilter(filter2);
     expect(promise.length).toEqual(1);
     expect(promise[0]).toMatchObject(tabData1.toObject());
-  })
+  });
 });
 
 describe('binaryDataByFilter tests', () => {
   test('get binary data', async () => {
-    const promise = await dataClient.binaryDataByFilter(filter);
+    const promise = await dataClient.binaryDataByFilter(filter1);
     expect(promise.length).toEqual(2);
     expect(promise[0]?.binary).toEqual(binary1);
     expect(promise[1]?.binary).toEqual(binary2);
@@ -152,6 +137,12 @@ describe('createFilter tests', () => {
   let opts: FilterOptions;
   let testFilter: Filter;
   let actualFilter: Filter;
+
+  test('create empty filter', () => {
+    opts = {};
+    dataClient.createFilter(opts);
+    expect(testFilter).toBeUndefined();
+  });
 
   test('create filter', () => {
     opts = { componentName: 'camera' };
