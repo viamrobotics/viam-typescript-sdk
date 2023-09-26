@@ -4,6 +4,7 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   BinaryData,
+  BinaryDataByFilterRequest,
   BinaryDataByFilterResponse,
   CaptureInterval,
   Filter,
@@ -34,32 +35,28 @@ tabData2.setData(struct2);
 const tabDataResponse = new TabularDataByFilterResponse();
 tabDataResponse.setDataList([tabData1, tabData2]);
 
+const bin1 = 'binary1';
+const bin2 = 'binary2';
+const binData1 = new BinaryData();
+binData1.setBinary(bin1);
+const binData2 = new BinaryData();
+binData2.setBinary(bin2);
+const binDataResponse = new BinaryDataByFilterResponse();
+binDataResponse.setDataList([binData1, binData2]);
+
 const filteredTabDataResponse = new TabularDataByFilterResponse();
 filteredTabDataResponse.setDataList([tabData1]);
-
-const binary1 = 'binary1';
-const binary2 = 'binary2';
-const binaryData1 = new BinaryData();
-binaryData1.setBinary(binary1);
-const binaryData2 = new BinaryData();
-binaryData2.setBinary(binary2);
-const binaryDataResponse = new BinaryDataByFilterResponse();
-binaryDataResponse.setDataList([binaryData1, binaryData2]);
+const filteredBinDataResponse = new BinaryDataByFilterResponse();
+filteredBinDataResponse.setDataList([binData1]);
 
 beforeEach(() => {
   DataServiceClient.prototype.tabularDataByFilter = vi
     .fn()
     .mockImplementationOnce((_req: TabularDataByFilterRequest, _md, cb) => {
       if (_req?.getDataRequest?.()?.getFilter?.() === filter1) {
-        cb(null, {
-          getDataList: () => tabDataResponse.getDataList(),
-          getLast: () => tabDataResponse.getLast(),
-        });
+        cb(null, tabDataResponse);
       } else if (_req?.getDataRequest?.()?.getFilter?.() === filter2) {
-        cb(null, {
-          getDataList: () => filteredTabDataResponse.getDataList(),
-          getLast: () => filteredTabDataResponse.getLast(),
-        });
+        cb(null, filteredTabDataResponse);
       }
     })
     .mockImplementation((_req, _md, cb) => {
@@ -69,11 +66,12 @@ beforeEach(() => {
     });
   DataServiceClient.prototype.binaryDataByFilter = vi
     .fn()
-    .mockImplementationOnce((_req, _md, cb) => {
-      cb(null, {
-        getDataList: () => binaryDataResponse.getDataList(),
-        getLast: () => binaryDataResponse.getLast(),
-      });
+    .mockImplementationOnce((_req: BinaryDataByFilterRequest, _md, cb) => {
+      if (_req?.getDataRequest?.()?.getFilter?.() === filter1) {
+        cb(null, binDataResponse);
+      } else if (_req?.getDataRequest?.()?.getFilter?.() === filter2) {
+        cb(null, filteredBinDataResponse);
+      }
     })
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
@@ -82,16 +80,9 @@ beforeEach(() => {
     });
   DataServiceClient.prototype.binaryDataByIDs = vi
     .fn()
-    .mockImplementationOnce((_req, _md, cb) => {
-      cb(null, {
-        toObject: () => binaryDataResponse.toObject(),
-      });
-    })
     .mockImplementation((_req, _md, cb) => {
-      cb(null, {
-        getDataList: () => [],
-      });
-    });
+      cb(null, binDataResponse);
+    })
   dataClient = new DataClient(serviceHost, { transport });
 });
 
@@ -115,9 +106,15 @@ describe('binaryDataByFilter tests', () => {
   test('get binary data', async () => {
     const promise = await dataClient.binaryDataByFilter(filter1);
     expect(promise.length).toEqual(2);
-    expect(promise[0]?.binary).toEqual(binary1);
-    expect(promise[1]?.binary).toEqual(binary2);
+    expect(promise[0]?.binary).toEqual(bin1);
+    expect(promise[1]?.binary).toEqual(bin2);
   });
+
+  test('get filtered binary data', async () => {
+    const promise = await dataClient.binaryDataByFilter(filter2);
+    expect(promise.length).toEqual(1);
+    expect(promise[0]?.binary).toEqual(bin1);
+  })
 });
 
 describe('binaryDataById tests', () => {
