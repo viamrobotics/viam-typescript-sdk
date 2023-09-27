@@ -196,10 +196,10 @@ describe('DataClient tests', () => {
       const opts = { componentName: 'camera' };
       const testFilter = subject().createFilter(opts);
 
-      const actualFilter = new Filter();
-      actualFilter.setComponentName('camera');
+      const expectedFilter = new Filter();
+      expectedFilter.setComponentName('camera');
 
-      expect(testFilter).toEqual(actualFilter);
+      expect(testFilter).toEqual(expectedFilter);
     });
 
     test('create filter with all options', () => {
@@ -242,22 +242,22 @@ describe('DataClient tests', () => {
       const testFilter = subject().createFilter(opts);
       expect(testFilter.getComponentType()).toEqual('testComponentType');
 
-      const actualFilter = new Filter();
-      actualFilter.setComponentName(componentName);
-      actualFilter.setComponentType(componentType);
-      actualFilter.setMethod(method);
-      actualFilter.setRobotName(robotName);
-      actualFilter.setRobotId(robotId);
-      actualFilter.setPartName(partName);
-      actualFilter.setPartId(partId);
-      actualFilter.setLocationIdsList(locationsIdsList);
-      actualFilter.setOrganizationIdsList(organizationIdsList);
-      actualFilter.setMimeTypeList(mimeTypeList);
-      actualFilter.setBboxLabelsList(bboxLabelsList);
-      actualFilter.setInterval(interval);
-      actualFilter.setTagsFilter(tagsFilter);
+      const expectedFilter = new Filter();
+      expectedFilter.setComponentName(componentName);
+      expectedFilter.setComponentType(componentType);
+      expectedFilter.setMethod(method);
+      expectedFilter.setRobotName(robotName);
+      expectedFilter.setRobotId(robotId);
+      expectedFilter.setPartName(partName);
+      expectedFilter.setPartId(partId);
+      expectedFilter.setLocationIdsList(locationsIdsList);
+      expectedFilter.setOrganizationIdsList(organizationIdsList);
+      expectedFilter.setMimeTypeList(mimeTypeList);
+      expectedFilter.setBboxLabelsList(bboxLabelsList);
+      expectedFilter.setInterval(interval);
+      expectedFilter.setTagsFilter(tagsFilter);
 
-      expect(testFilter).toEqual(actualFilter);
+      expect(testFilter).toEqual(expectedFilter);
     });
   });
 });
