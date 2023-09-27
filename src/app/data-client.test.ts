@@ -74,13 +74,13 @@ describe('DataClient tests', () => {
       dataReq.setFilter(filter);
       dataReq.setLimit(100);
       dataReq.setLast('');
-      const req = new TabularDataByFilterRequest();
-      req.setDataRequest(dataReq);
-      req.setCountOnly(false);
+      const expectedRequest = new TabularDataByFilterRequest();
+      expectedRequest.setDataRequest(dataReq);
+      expectedRequest.setCountOnly(false);
 
       await subject().tabularDataByFilter(filter);
       expect(methodSpy).toHaveBeenCalledWith(
-        req,
+        expectedRequest,
         expect.anything(),
         expect.anything()
       );
@@ -129,13 +129,13 @@ describe('DataClient tests', () => {
       dataReq.setFilter(filter);
       dataReq.setLimit(100);
       dataReq.setLast('');
-      const req = new BinaryDataByFilterRequest();
-      req.setDataRequest(dataReq);
-      req.setCountOnly(false);
+      const expectedRequest = new BinaryDataByFilterRequest();
+      expectedRequest.setDataRequest(dataReq);
+      expectedRequest.setCountOnly(false);
 
       await subject().binaryDataByFilter(filter);
       expect(methodSpy).toHaveBeenCalledWith(
-        req,
+        expectedRequest,
         expect.anything(),
         expect.anything()
       );
@@ -173,13 +173,13 @@ describe('DataClient tests', () => {
     });
 
     test('get binary data by id', async () => {
-      const req = new BinaryDataByIDsRequest();
-      req.setBinaryIdsList([binaryId1]);
-      req.setIncludeBinary(true);
+      const expectedRequest = new BinaryDataByIDsRequest();
+      expectedRequest.setBinaryIdsList([binaryId1]);
+      expectedRequest.setIncludeBinary(true);
 
       await subject().binaryDataByIds([binaryId1.toObject()]);
       expect(methodSpy).toHaveBeenCalledWith(
-        req,
+        expectedRequest,
         expect.anything(),
         expect.anything()
       );
