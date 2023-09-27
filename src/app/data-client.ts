@@ -108,14 +108,13 @@ export class DataClient {
   async binaryDataByIds(ids: BinaryID[]) {
     const { service } = this;
 
-    const binaryIds: pb.BinaryID[] = [];
-    for (const id of ids) {
+    const binaryIds: pb.BinaryID[] = ids.map(({ fileId, organizationId, locationId }) => {
       const binaryId = new pb.BinaryID();
-      binaryId.setFileId(id.fileId);
-      binaryId.setOrganizationId(id.organizationId);
-      binaryId.setLocationId(id.locationId);
-      binaryIds.push(binaryId);
-    }
+      binaryId.setFileId(fileId);
+      binaryId.setOrganizationId(organizationId);
+      binaryId.setLocationId(locationId);
+      return binaryId;
+    });
 
     const req = new pb.BinaryDataByIDsRequest();
     req.setBinaryIdsList(binaryIds);
