@@ -32,15 +32,11 @@ export class DataClient {
 
     let last = '';
     const dataArray: TabularData[] = [];
+    const dataReq = new pb.DataRequest();
+    dataReq.setFilter(filter ?? new pb.Filter());
+    dataReq.setLimit(100);
 
     for (;;) {
-      const dataReq = new pb.DataRequest();
-      if (filter) {
-        dataReq.setFilter(filter);
-      } else {
-        dataReq.setFilter(new pb.Filter());
-      }
-      dataReq.setLimit(100);
       dataReq.setLast(last);
 
       const req = new pb.TabularDataByFilterRequest();
@@ -74,15 +70,11 @@ export class DataClient {
 
     let last = '';
     const dataArray: pb.BinaryData.AsObject[] = [];
+    const dataReq = new pb.DataRequest();
+    dataReq.setFilter(filter ?? new pb.Filter());
+    dataReq.setLimit(100);
 
     for (;;) {
-      const dataReq = new pb.DataRequest();
-      if (filter) {
-        dataReq.setFilter(filter);
-      } else {
-        dataReq.setFilter(new pb.Filter());
-      }
-      dataReq.setLimit(100);
       dataReq.setLast(last);
 
       const req = new pb.BinaryDataByFilterRequest();
