@@ -5,6 +5,8 @@ import pb from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { promisify } from '../utils';
 
+export type BinaryID = pb.BinaryID.AsObject;
+
 export type FilterOptions = Partial<pb.Filter.AsObject> & {
   endTime?: Date;
   startTime?: Date;
@@ -25,20 +27,16 @@ export class DataClient {
     this.service = new DataServiceClient(serviceHost, grpcOptions);
   }
 
-  async tabularDataByFilter(filter: pb.Filter | undefined) {
+  async tabularDataByFilter(filter?: pb.Filter) {
     const { service } = this;
 
     let last = '';
     const dataArray: TabularData[] = [];
+    const dataReq = new pb.DataRequest();
+    dataReq.setFilter(filter ?? new pb.Filter());
+    dataReq.setLimit(100);
 
     for (;;) {
-      const dataReq = new pb.DataRequest();
-      if (filter) {
-        dataReq.setFilter(filter);
-      } else {
-        dataReq.setFilter(new pb.Filter());
-      }
-      dataReq.setLimit(100);
       dataReq.setLast(last);
 
       const req = new pb.TabularDataByFilterRequest();
@@ -65,6 +63,62 @@ export class DataClient {
     }
 
     return dataArray;
+  }
+
+  async binaryDataByFilter(filter?: pb.Filter) {
+    const { service } = this;
+
+    let last = '';
+    const dataArray: pb.BinaryData.AsObject[] = [];
+    const dataReq = new pb.DataRequest();
+    dataReq.setFilter(filter ?? new pb.Filter());
+    dataReq.setLimit(100);
+
+    for (;;) {
+      dataReq.setLast(last);
+
+      const req = new pb.BinaryDataByFilterRequest();
+      req.setDataRequest(dataReq);
+      req.setCountOnly(false);
+
+      // eslint-disable-next-line no-await-in-loop
+      const response = await promisify<
+        pb.BinaryDataByFilterRequest,
+        pb.BinaryDataByFilterResponse
+      >(service.binaryDataByFilter.bind(service), req);
+      const dataList = response.getDataList();
+      if (!dataList || dataList.length === 0) {
+        break;
+      }
+      dataArray.push(...dataList.map((data) => data.toObject()));
+      last = response.getLast();
+    }
+
+    return dataArray;
+  }
+
+  async binaryDataByIds(ids: BinaryID[]) {
+    const { service } = this;
+
+    const binaryIds: pb.BinaryID[] = ids.map(
+      ({ fileId, organizationId, locationId }) => {
+        const binaryId = new pb.BinaryID();
+        binaryId.setFileId(fileId);
+        binaryId.setOrganizationId(organizationId);
+        binaryId.setLocationId(locationId);
+        return binaryId;
+      }
+    );
+
+    const req = new pb.BinaryDataByIDsRequest();
+    req.setBinaryIdsList(binaryIds);
+    req.setIncludeBinary(true);
+
+    const response = await promisify<
+      pb.BinaryDataByIDsRequest,
+      pb.BinaryDataByIDsResponse
+    >(service.binaryDataByIDs.bind(service), req);
+    return response.toObject().dataList;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -118,8 +172,8 @@ export class DataClient {
     const tagsFilter = new pb.TagsFilter();
     if (options.tags) {
       tagsFilter.setTagsList(options.tags);
+      filter.setTagsFilter(tagsFilter);
     }
-    filter.setTagsFilter(tagsFilter);
 
     return filter;
   }
