@@ -156,6 +156,9 @@ export const createRobotClient = async (
   conf: DialConf
 ): Promise<RobotClient> => {
   let client;
+  if (conf.authEntity) {
+    conf.authEntity = new URL(conf.authEntity).host;
+  }
 
   if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
     throw new Error(
