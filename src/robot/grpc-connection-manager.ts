@@ -36,9 +36,8 @@ export default class GRPCConnectionManager {
       this.client.getOperations(
         getOperationsReq,
         new grpc.Metadata(),
-        (err, resp) => {
+        (err) => {
           if (err) {
-            console.debug(err, resp);
             events.emit(DISCONNECTED, {});
             return;
           }

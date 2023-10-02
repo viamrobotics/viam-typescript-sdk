@@ -4,6 +4,7 @@ import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { events } from '../events';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
+vi.mock('../gen/robot/v1/robot_pb_service');
 import GRPCConnectionManager from './grpc-connection-manager';
 
 const host = 'fakeServiceHsot';
