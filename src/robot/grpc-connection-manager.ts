@@ -81,6 +81,7 @@ export default class GRPCConnectionManager {
       (err, _resp) => {
         if (err) {
           this.connectReject?.(err);
+          console.debug('failed to connect');
           return;
         }
         this.connectResolve?.();
