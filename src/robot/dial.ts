@@ -157,7 +157,13 @@ export const createRobotClient = async (
 ): Promise<RobotClient> => {
   let client;
   if (conf.authEntity) {
-    conf.authEntity = new URL(conf.authEntity).host;
+    try {
+      conf.authEntity = new URL(conf.authEntity).host;
+    } catch (error) {
+      if (!(error instanceof TypeError)) {
+        throw error;
+      }
+    }
   }
 
   if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {

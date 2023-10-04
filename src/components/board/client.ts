@@ -1,12 +1,13 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
+import { Duration as PBDuration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
 import type { Options, StructType } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { Board } from './board';
+import type { Board, Duration, PowerMode } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -200,6 +201,32 @@ export class BoardClient implements Board {
       pb.GetDigitalInterruptValueResponse
     >(boardService.getDigitalInterruptValue.bind(boardService), request);
     return response.getValue();
+  }
+
+  async setPowerMode(
+    name: string,
+    powerMode: PowerMode,
+    duration?: Duration,
+    extra = {}
+  ) {
+    const { boardService } = this;
+    const request = new pb.SetPowerModeRequest();
+    request.setName(name);
+    request.setPowerMode(powerMode);
+    if (duration) {
+      const pbDuration = new PBDuration();
+      pbDuration.setNanos(duration.nanos);
+      pbDuration.setSeconds(duration.seconds);
+      request.setDuration(pbDuration);
+    }
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    await promisify<pb.SetPowerModeRequest, pb.SetPowerModeResponse>(
+      boardService.setPowerMode.bind(boardService),
+      request
+    );
   }
 
   async doCommand(command: StructType): Promise<StructType> {
