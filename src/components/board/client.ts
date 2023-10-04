@@ -1,13 +1,13 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
-import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { Duration as PBDuration } from 'google-protobuf/google/protobuf/duration_pb';
 import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
 import type { Options, StructType } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { Board, DurationOptions, PowerMode } from './board';
+import type { Board, Duration, PowerMode } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -206,18 +206,18 @@ export class BoardClient implements Board {
   async setPowerMode(
     name: string,
     powerMode: PowerMode,
-    durationObj?: DurationOptions,
+    duration?: Duration,
     extra = {}
   ) {
     const { boardService } = this;
     const request = new pb.SetPowerModeRequest();
     request.setName(name);
     request.setPowerMode(powerMode);
-    if (durationObj) {
-      const duration = new Duration();
-      duration.setNanos(durationObj.nanos);
-      duration.setSeconds(durationObj.seconds);
-      request.setDuration(duration);
+    if (duration) {
+      const pbDuration = new PBDuration();
+      duration.setNanos(duration.nanos);
+      duration.setSeconds(duration.seconds);
+      request.setDuration(pbDuration);
     }
     request.setExtra(Struct.fromJavaScript(extra));
 

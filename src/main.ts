@@ -81,7 +81,7 @@ export { default as boardApi } from './gen/component/board/v1/board_pb';
 export {
   type Board,
   BoardClient,
-  type DurationOptions,
+  type Duration,
   PowerMode,
 } from './components/board';
 

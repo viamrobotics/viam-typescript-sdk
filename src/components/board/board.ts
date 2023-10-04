@@ -1,4 +1,4 @@
-import { type Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { type Duration as PBDuration } from 'google-protobuf/google/protobuf/duration_pb';
 import pb from '../../gen/component/board/v1/board_pb';
 import type { Resource, StructType } from '../../types';
 
@@ -11,7 +11,7 @@ type ValueOf<T> = T[keyof T];
 export const { PowerMode } = pb;
 export type PowerMode = ValueOf<typeof pb.PowerMode>;
 
-export type DurationOptions = Duration.AsObject;
+export type Duration = PBDuration.AsObject;
 
 /**
  * Represents a physical general purpose compute board that contains various
@@ -92,7 +92,7 @@ export interface Board extends Resource {
   setPowerMode(
     name: string,
     powerMode: PowerMode,
-    duration: DurationOptions,
+    duration: Duration,
     extra?: StructType
   ): Promise<void>;
 }
