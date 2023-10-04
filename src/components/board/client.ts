@@ -215,8 +215,8 @@ export class BoardClient implements Board {
     request.setPowerMode(powerMode);
     if (duration) {
       const pbDuration = new PBDuration();
-      duration.setNanos(duration.nanos);
-      duration.setSeconds(duration.seconds);
+      pbDuration.setNanos(duration.nanos);
+      pbDuration.setSeconds(duration.seconds);
       request.setDuration(pbDuration);
     }
     request.setExtra(Struct.fromJavaScript(extra));
