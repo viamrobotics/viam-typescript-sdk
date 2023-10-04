@@ -11,6 +11,8 @@ type ValueOf<T> = T[keyof T];
 export const { PowerMode } = pb;
 export type PowerMode = ValueOf<typeof pb.PowerMode>;
 
+export type DurationOptions = Duration.AsObject;
+
 /**
  * Represents a physical general purpose compute board that contains various
  * components such as analog readers, and digital interrupts.
@@ -90,7 +92,7 @@ export interface Board extends Resource {
   setPowerMode(
     name: string,
     powerMode: PowerMode,
-    duration: Duration,
+    duration: DurationOptions,
     extra?: StructType
   ): Promise<void>;
 }

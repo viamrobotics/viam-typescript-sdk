@@ -78,7 +78,12 @@ export { type Base, type BaseProperties, BaseClient } from './components/base';
  * @group Raw Protobufs
  */
 export { default as boardApi } from './gen/component/board/v1/board_pb';
-export { type Board, BoardClient, PowerMode } from './components/board';
+export {
+  type Board,
+  BoardClient,
+  type DurationOptions,
+  PowerMode,
+} from './components/board';
 
 /**
  * Raw Protobuf interfaces for a Camera component.
