@@ -7,7 +7,7 @@ import type { Options, StructType } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { Board } from './board';
+import type { Board, PowerMode } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -205,7 +205,7 @@ export class BoardClient implements Board {
 
   async setPowerMode(
     name: string,
-    powerMode: pb.PowerModeMap[keyof pb.PowerModeMap],
+    powerMode: PowerMode,
     duration?: Duration,
     extra = {}
   ) {

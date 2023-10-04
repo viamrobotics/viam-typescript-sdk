@@ -1,9 +1,15 @@
+import { type Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import pb from '../../gen/component/board/v1/board_pb';
 import type { Resource, StructType } from '../../types';
 
 interface Status {
   analogs: Record<string, number>;
   digitalInterrupts: Record<string, number>;
 }
+
+type ValueOf<T> = T[keyof T];
+export const { PowerMode } = pb;
+export type PowerMode = ValueOf<typeof pb.PowerMode>;
 
 /**
  * Represents a physical general purpose compute board that contains various
@@ -74,4 +80,17 @@ export interface Board extends Resource {
     digitalInterruptName: string,
     extra?: StructType
   ): Promise<number>;
+  /**
+   * Set power mode of the board.
+   *
+   * @param name - The name of the board.
+   * @param powerMode - The requested power mode.
+   * @param duration - The requested duration to stay in power mode.
+   */
+  setPowerMode(
+    name: string,
+    powerMode: PowerMode,
+    duration: Duration,
+    extra?: StructType
+  ): Promise<void>;
 }
