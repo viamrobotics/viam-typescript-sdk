@@ -58,7 +58,7 @@ export interface Board extends Resource {
    * Set the PWM frequency of the given pin of a board.
    *
    * @param pin - The pin.
-   * @param frequencyHz - The PWN frequency, in hertz. 0 will use the board's
+   * @param frequencyHz - The PWM frequency, in hertz. 0 will use the board's
    *   default PWM frequency.
    */
   setPWMFrequency(
@@ -72,6 +72,13 @@ export interface Board extends Resource {
    * @param analogReader - The name of the analog reader.
    */
   readAnalogReader(analogReader: string, extra?: StructType): Promise<number>;
+  /**
+   * Write an analog value to a pin on the board.
+   *
+   * @param pin - The pin name.
+   * @param value - An integer value to write.
+   */
+  writeAnalog(pin: string, value: number, extra?: StructType): Promise<void>;
   /**
    * Return the current value of the interrupt which is based on the type of
    * interrupt.
