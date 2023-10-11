@@ -187,6 +187,22 @@ export class BoardClient implements Board {
     return response.getValue();
   }
 
+  async writeAnalog(pin: string, value: number, extra = {}) {
+    const { boardService } = this;
+    const request = new pb.WriteAnalogRequest();
+    request.setName(this.name);
+    request.setPin(pin);
+    request.setValue(value);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    await promisify<pb.WriteAnalogRequest, pb.WriteAnalogResponse>(
+      boardService.writeAnalog.bind(boardService),
+      request
+    );
+  }
+
   async getDigitalInterruptValue(digitalInteruptName: string, extra = {}) {
     const { boardService } = this;
     const request = new pb.GetDigitalInterruptValueRequest();
