@@ -1,10 +1,11 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ConnectionClosedError } from '@viamrobotics/rpc';
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { grpc } from '@improbable-eng/grpc-web';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
+vi.mock('../gen/robot/v1/robot_pb_service');
 
 import SessionManager from './session-manager';
 
@@ -26,11 +27,6 @@ const mockHealthyHeartbeat = (_req, _md, cb) => {
 describe('SessionManager', () => {
   beforeEach(() => {
     sm = new SessionManager(host, transport);
-    vi.doMock('./gen/robot/v1/robot_pb_service');
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
   });
 
   test('no session initially', () => {
