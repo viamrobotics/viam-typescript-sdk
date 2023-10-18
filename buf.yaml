@@ -7,6 +7,6 @@ lint:
     - DEFAULT
 deps:
   - buf.build/googleapis/googleapis
-  - buf.build/viamrobotics/api:2109757288234ffc8248121f60437cdd
+  - buf.build/viamrobotics/api
   - buf.build/erdaniels/gostream
   - buf.build/viamrobotics/goutils
