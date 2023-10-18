@@ -4,5 +4,5 @@
     "noEmit": true
   },
   "include": ["./vite.config.ts", "./*.cjs", "./.*.cjs"],
-  "exclude": ["**/src/**", "**/examples/**"]
+  "exclude": ["**/src/**", "**/examples/**", "**/scripts/**"]
 }
