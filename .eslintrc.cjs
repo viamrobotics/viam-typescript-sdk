@@ -12,6 +12,8 @@ module.exports = {
      * is causing eslint to choke. Investigate workspaces as a solution
      */
     'examples',
+    // TODO(RSDK-5406): setup custom linting rules for standalone JS scripts.
+    'scripts',
   ],
   parserOptions: {
     project: ['./tsconfig.json', './tsconfig.node.json'],

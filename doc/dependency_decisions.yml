@@ -74,7 +74,7 @@
     :versions: []
     :when: 2023-05-01 18:19:05.224492180 Z
 - - :license
-  - '@viamrobotics/typescript-config'
+  - "@viamrobotics/typescript-config"
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -89,3 +89,9 @@
     :license_links: https://github.com/yinzara/protoc-gen-js/blob/master/LICENSE
     :versions: []
     :when: 2023-05-12 14:28:29.173104997 Z
+- - :permit
+  - ISC
+  - :who:
+    :why:
+    :versions: []
+    :when: 2023-10-18 20:31:08.255446206 Z

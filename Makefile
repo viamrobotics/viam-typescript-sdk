@@ -54,12 +54,10 @@ update-buf: $(node_modules)
 
 .PHONY: build-buf
 build-buf: $(node_modules) clean-buf
-	$(buf) generate buf.build/googleapis/googleapis
-	# TODO(RSDK-5362): remove hardcoded pin and create a sane way to pin protos
-	# See this thread for more details: https://viaminc.slack.com/archives/C039G724TKP/p1697119526822429
-	$(buf) generate buf.build/viamrobotics/api:2109757288234ffc8248121f60437cdd --path common,component,robot,service,app
-	$(buf) generate buf.build/erdaniels/gostream
-	$(buf) generate buf.build/viamrobotics/goutils
+	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/googleapis/googleapis)
+	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/viamrobotics/api) --path common,component,robot,service,app
+	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/erdaniels/gostream)
+	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/viamrobotics/goutils)
 
 # js targets
 

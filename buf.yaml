@@ -6,5 +6,7 @@ lint:
   use:
     - DEFAULT
 deps:
-  - buf.build/viamrobotics/goutils
+  - buf.build/googleapis/googleapis
   - buf.build/viamrobotics/api
+  - buf.build/erdaniels/gostream
+  - buf.build/viamrobotics/goutils
