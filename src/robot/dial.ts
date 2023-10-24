@@ -58,7 +58,7 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   if (conf.credential) {
     creds = conf.credential;
   }
-  await client.connect(conf.authEntity, creds);
+  await client.connect(undefined, conf.authEntity, creds);
 
   // eslint-disable-next-line no-console
   console.debug('connected via gRPC');
@@ -121,7 +121,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   if (conf.credential) {
     creds = conf.credential;
   }
-  await client.connect(conf.authEntity || impliedURL, creds, conf.priority);
+  await client.connect(conf.priority, conf.authEntity || impliedURL, creds);
 
   // eslint-disable-next-line no-console
   console.debug('connected via WebRTC');
