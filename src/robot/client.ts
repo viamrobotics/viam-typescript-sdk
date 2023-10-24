@@ -371,7 +371,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   public async connect(
     authEntity = this.savedAuthEntity,
-    creds = this.savedCreds
+    creds = this.savedCreds,
+    priority = 0
   ) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
@@ -404,6 +405,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
+          priority: priority,
         },
       };
 
