@@ -372,7 +372,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   public async connect(
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
-    priority = 0
+    priority?: number
   ) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
