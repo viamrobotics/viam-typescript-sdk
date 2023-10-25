@@ -55,6 +55,12 @@ interface SessionOptions {
   disabled: boolean;
 }
 
+export interface ConnectOptions {
+  priority?: number;
+  authEntity?: string;
+  creds?: Credentials;
+}
+
 abstract class ServiceClient {
   constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
@@ -164,7 +170,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       console.debug('connection closed, will try to reconnect');
       void backOff(
         () =>
-          this.connect().then(
+          this.connect({}).then(
             () => {
               // eslint-disable-next-line no-console
               console.debug('reconnected successfully!');
@@ -369,11 +375,11 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.peerConn?.iceConnectionState === 'connected';
   }
 
-  public async connect(
-    priority?: number,
+  public async connect({
+    priority,
     authEntity = this.savedAuthEntity,
-    creds = this.savedCreds
-  ) {
+    creds = this.savedCreds,
+  }: ConnectOptions) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
