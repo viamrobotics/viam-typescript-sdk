@@ -90,7 +90,7 @@ export interface DialWebRTCConf {
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
-  additionalSdpFields?: object;
+  additionalSdpFields?: Record<string, string | number>;
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {

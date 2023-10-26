@@ -56,7 +56,7 @@ interface SessionOptions {
 }
 
 export interface ConnectOptions {
-  additionalSdpFields?: object;
+  additionalSdpFields?: Record<string, string | number>;
   authEntity?: string;
   creds?: Credentials;
 }
