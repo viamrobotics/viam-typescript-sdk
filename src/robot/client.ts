@@ -56,9 +56,9 @@ interface SessionOptions {
 }
 
 export interface ConnectOptions {
-  additionalSdpFields?: Record<string, string | number>;
   authEntity?: string;
   creds?: Credentials;
+  priority?: number;
 }
 
 abstract class ServiceClient {
@@ -376,9 +376,9 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async connect({
-    additionalSdpFields,
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
+    priority,
   }: ConnectOptions = {}) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
@@ -411,9 +411,12 @@ export class RobotClient extends EventDispatcher implements Robot {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
-          additionalSdpFields,
         },
       };
+
+      if (priority && opts.webrtcOptions) {
+        opts.webrtcOptions.additionalSdpFields = { 'x-priority': priority };
+      }
 
       // Save authEntity, creds
       this.savedAuthEntity = authEntity;
