@@ -170,7 +170,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       console.debug('connection closed, will try to reconnect');
       void backOff(
         () =>
-          this.connect({}).then(
+          this.connect().then(
             () => {
               // eslint-disable-next-line no-console
               console.debug('reconnected successfully!');
@@ -379,7 +379,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     additionalSdpFields,
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
-  }: ConnectOptions) {
+  }: ConnectOptions = {}) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
