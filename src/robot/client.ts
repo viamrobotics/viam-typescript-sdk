@@ -56,7 +56,7 @@ interface SessionOptions {
 }
 
 export interface ConnectOptions {
-  priority?: number;
+  additionalSdpFields?: object;
   authEntity?: string;
   creds?: Credentials;
 }
@@ -376,7 +376,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async connect({
-    priority,
+    additionalSdpFields,
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
   }: ConnectOptions) {
@@ -411,7 +411,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
-          priority,
+          additionalSdpFields,
         },
       };
 

@@ -90,7 +90,7 @@ export interface DialWebRTCConf {
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
-  priority?: number;
+  additionalSdpFields?: object;
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
@@ -122,7 +122,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     creds = conf.credential;
   }
   await client.connect({
-    priority: conf.priority,
+    additionalSdpFields: conf.additionalSdpFields,
     authEntity: conf.authEntity || impliedURL,
     creds: creds,
   });
