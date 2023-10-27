@@ -15,7 +15,7 @@ export type FilterOptions = Partial<pb.Filter.AsObject> & {
 
 type TabularData = {
   data?: googleStructPb.Struct.AsObject;
-  metadataIndex: number;
+  metadata?: pb.CaptureMetadata.AsObject;
   timeRequested?: Date;
   timeReceived?: Date;
 };
@@ -54,7 +54,10 @@ export class DataClient {
       }
       dataArray.push(
         ...dataList.map((data) => ({
-          ...data.toObject(),
+          ...data.toObject().data,
+          metadata: response
+            .getMetadataList()
+            [data.getMetadataIndex()]?.toObject(),
           timeRequested: data.getTimeRequested()?.toDate(),
           timeReceived: data.getTimeReceived()?.toDate(),
         }))
