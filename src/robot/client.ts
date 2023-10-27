@@ -55,6 +55,12 @@ interface SessionOptions {
   disabled: boolean;
 }
 
+export interface ConnectOptions {
+  authEntity?: string;
+  creds?: Credentials;
+  priority?: number;
+}
+
 abstract class ServiceClient {
   constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
 }
@@ -369,10 +375,11 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.peerConn?.iceConnectionState === 'connected';
   }
 
-  public async connect(
+  public async connect({
     authEntity = this.savedAuthEntity,
-    creds = this.savedCreds
-  ) {
+    creds = this.savedCreds,
+    priority,
+  }: ConnectOptions = {}) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -406,6 +413,11 @@ export class RobotClient extends EventDispatcher implements Robot {
           rtcConfig: this.webrtcOptions?.rtcConfig,
         },
       };
+
+      // Webrtcoptions will always be defined, but TS doesn't know this
+      if (priority !== undefined && opts.webrtcOptions) {
+        opts.webrtcOptions.additionalSdpFields = { 'x-priority': priority };
+      }
 
       // Save authEntity, creds
       this.savedAuthEntity = authEntity;
