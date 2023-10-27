@@ -65,8 +65,13 @@ export const encodeMotionConfiguration = (
 ): pb.MotionConfiguration => {
   const result = new pb.MotionConfiguration();
 
-  result.setVisionServicesList(
-    obj.visionServicesList.map((x) => encodeResourceName(x))
+  result.setObstacleDetectorsList(
+    obj.obstacleDetectorsList.map((x) => {
+      const obstacleDetector = new pb.ObstacleDetector();
+      obstacleDetector.setVisionService(encodeResourceName(x.visionService));
+      obstacleDetector.setCamera(encodeResourceName(x.camera));
+      return obstacleDetector;
+    })
   );
   result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
   result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
