@@ -54,7 +54,7 @@ export class DataClient {
       }
       dataArray.push(
         ...dataList.map((data) => ({
-          ...data.toObject().data,
+          ...data.getData().toJavaScript(),
           metadata: response
             .getMetadataList()
             [data.getMetadataIndex()]?.toObject(),
