@@ -53,14 +53,20 @@ export class DataClient {
         break;
       }
       dataArray.push(
-        ...dataList.map((data) => ({
-          ...data.getData().toJavaScript(),
-          metadata: response
-            .getMetadataList()
-            [data.getMetadataIndex()]?.toObject(),
-          timeRequested: data.getTimeRequested()?.toDate(),
-          timeReceived: data.getTimeReceived()?.toDate(),
-        }))
+        ...dataList.map((data) => {
+          const index = data.getMetadataIndex();
+          if (index > response.getMetadataList().length) {
+            throw Error(
+              `metadata index ${index} is out of response's metadata list`
+            );
+          }
+          return {
+            ...data.getData()?.toJavaScript(),
+            metadata: response.getMetadataList()[index]?.toObject(),
+            timeRequested: data.getTimeRequested()?.toDate(),
+            timeReceived: data.getTimeReceived()?.toDate(),
+          };
+        })
       );
       last = response.getLast();
     }
