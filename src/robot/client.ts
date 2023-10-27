@@ -415,7 +415,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       };
 
       // Webrtcoptions will always be defined, but TS doesn't know this
-      if ((priority === 0 || priority) && opts.webrtcOptions) {
+      if (priority !== undefined && opts.webrtcOptions) {
         opts.webrtcOptions.additionalSdpFields = { 'x-priority': priority };
       }
 
