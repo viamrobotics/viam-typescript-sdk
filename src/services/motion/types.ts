@@ -2,6 +2,7 @@ import pb from '../../gen/service/motion/v1/motion_pb';
 import { encodeResourceName } from '../../utils';
 
 export type Constraints = pb.Constraints.AsObject;
+export type ObstacleDetector = pb.ObstacleDetector.AsObject;
 export type LinearConstraint = pb.LinearConstraint.AsObject;
 export type OrientationConstraint = pb.OrientationConstraint.AsObject;
 export type CollisionSpecification = pb.CollisionSpecification.AsObject;

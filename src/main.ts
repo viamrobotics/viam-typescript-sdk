@@ -309,6 +309,7 @@ export {
   type Motion,
   type Constraints,
   type LinearConstraint,
+  type ObstacleDetector,
   type OrientationConstraint,
   type CollisionSpecification,
   type MotionConfiguration,
