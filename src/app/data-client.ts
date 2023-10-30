@@ -14,7 +14,7 @@ export type FilterOptions = Partial<pb.Filter.AsObject> & {
 };
 
 type TabularData = {
-  data?: googleStructPb.JavaScriptValue;
+  data?: { [key: string]: googleStructPb.JavaScriptValue };
   metadata?: pb.CaptureMetadata.AsObject;
   timeRequested?: Date;
   timeReceived?: Date;
@@ -28,6 +28,10 @@ export class DataClient {
   }
 
   async tabularDataByFilter(filter?: pb.Filter) {
+    /*
+     * The returned metadata might be empty if the metadata index of
+     * the data is out of the bounds of the returned metadata list
+     */
     const { service } = this;
 
     let last = '';
@@ -57,10 +61,6 @@ export class DataClient {
       dataArray.push(
         ...dataList.map((data) => {
           const mdIndex = data.getMetadataIndex();
-          /*
-           * The returned metadata might be empty if the metadata index of
-           * the data is out of the bounds of the returned metadata list
-           */
           const metadata =
             mdListLength !== 0 && mdIndex >= mdListLength
               ? new pb.CaptureMetadata().toObject()
