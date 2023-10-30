@@ -26,12 +26,12 @@ export class DataClient {
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
     this.service = new DataServiceClient(serviceHost, grpcOptions);
   }
-
+    /**
+     * Filter and download tabular data. The returned metadata might be empty if the
+     * metadata index of the data is out of the bounds of the returned metadata list
+     * @param filter - Optional `pb.Filter` specifying tabular data to retrieve. No `filter` implies all tabular data.
+     **/
   async tabularDataByFilter(filter?: pb.Filter) {
-    /*
-     * The returned metadata might be empty if the metadata index of
-     * the data is out of the bounds of the returned metadata list
-     */
     const { service } = this;
 
     let last = '';
