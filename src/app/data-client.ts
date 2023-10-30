@@ -30,7 +30,7 @@ export class DataClient {
   /**
    * Filter and download tabular data. The returned metadata might be empty if
    * the metadata index of the data is out of the bounds of the returned
-   * metadata list
+   * metadata list.
    *
    * @param filter - Optional `pb.Filter` specifying tabular data to retrieve.
    *   No `filter` implies all tabular data.
