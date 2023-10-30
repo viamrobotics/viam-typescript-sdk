@@ -54,16 +54,16 @@ export class DataClient {
       }
       dataArray.push(
         ...dataList.map((data) => {
-          const index = data.getMetadataIndex();
+          const mdIndex = data.getMetadataIndex();
           const mdListLength = response.getMetadataList().length;
-          if (mdListLength != 0 && index >= mdListLength) {
+          if (mdListLength != 0 && mdIndex >= mdListLength) {
             throw Error(
-              `metadata index ${index} is out of response's metadata list`
+              `metadata index ${mdIndex} is out of response's metadata list`
             );
           }
           return {
             ...data.getData()?.toJavaScript(),
-            metadata: response.getMetadataList()[index]?.toObject(),
+            metadata: response.getMetadataList()[mdIndex]?.toObject(),
             timeRequested: data.getTimeRequested()?.toDate(),
             timeReceived: data.getTimeReceived()?.toDate(),
           };
