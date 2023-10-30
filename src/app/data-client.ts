@@ -55,7 +55,8 @@ export class DataClient {
       dataArray.push(
         ...dataList.map((data) => {
           const index = data.getMetadataIndex();
-          if (index > response.getMetadataList().length) {
+          const mdListLength = response.getMetadataList().length;
+          if (mdListLength != 0 && index >= mdListLength) {
             throw Error(
               `metadata index ${index} is out of response's metadata list`
             );
