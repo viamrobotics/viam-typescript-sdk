@@ -14,7 +14,7 @@ export type FilterOptions = Partial<pb.Filter.AsObject> & {
 };
 
 type TabularData = {
-  data?: googleStructPb.Struct.AsObject;
+  data?: googleStructPb.JavaScriptValue;
   metadata?: pb.CaptureMetadata.AsObject;
   timeRequested?: Date;
   timeReceived?: Date;
@@ -52,18 +52,22 @@ export class DataClient {
       if (!dataList || dataList.length === 0) {
         break;
       }
+      const mdListLength = response.getMetadataList().length;
+
       dataArray.push(
         ...dataList.map((data) => {
           const mdIndex = data.getMetadataIndex();
-          const mdListLength = response.getMetadataList().length;
-          if (mdListLength !== 0 && mdIndex >= mdListLength) {
-            throw new Error(
-              `metadata index ${mdIndex} is out of response's metadata list`
-            );
-          }
+          /*
+           * The returned metadata might be empty if the metadata index of
+           * the data is out of the bounds of the returned metadata list
+           */
+          const metadata =
+            mdListLength !== 0 && mdIndex >= mdListLength
+              ? new pb.CaptureMetadata().toObject()
+              : response.getMetadataList()[mdIndex]?.toObject();
           return {
-            ...data.getData()?.toJavaScript(),
-            metadata: response.getMetadataList()[mdIndex]?.toObject(),
+            data: data.getData()?.toJavaScript(),
+            metadata,
             timeRequested: data.getTimeRequested()?.toDate(),
             timeReceived: data.getTimeReceived()?.toDate(),
           };
