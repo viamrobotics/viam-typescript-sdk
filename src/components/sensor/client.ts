@@ -5,7 +5,10 @@ import type { Options, StructType } from '../../types';
 import { SensorServiceClient } from '../../gen/component/sensor/v1/sensor_pb_service';
 
 import { promisify, doCommandFromClient } from '../../utils';
-import sensorApi from '../../gen/component/sensor/v1/sensor_pb';
+import {
+  GetReadingsRequest,
+  GetReadingsResponse,
+} from '../../gen/common/v1/common_pb';
 import type { Sensor } from './sensor';
 
 /**
@@ -30,16 +33,16 @@ export class SensorClient implements Sensor {
 
   async getReadings(extra = {}) {
     const { sensorService } = this;
-    const request = new sensorApi.GetReadingsRequest();
+    const request = new GetReadingsRequest();
     request.setName(this.name);
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      sensorApi.GetReadingsRequest,
-      sensorApi.GetReadingsResponse
-    >(sensorService.getReadings.bind(sensorService), request);
+    const response = await promisify<GetReadingsRequest, GetReadingsResponse>(
+      sensorService.getReadings.bind(sensorService),
+      request
+    );
 
     const result: Record<string, unknown> = {};
     for (const [key, value] of response.getReadingsMap().entries()) {
