@@ -37,7 +37,7 @@ describe('DataClient tests', () => {
     const tabData1 = new TabularData();
     const tabData2 = new TabularData();
     tabData1.setData(Struct.fromJavaScript({ key: 'value1' }));
-    tabData2.setData(Struct.fromJavaScript({ key: 'value2' }));
+    tabData2.setData(Struct.fromJavaScript({ key: 'xxxx' }));
     const tabDataResponse = new TabularDataByFilterResponse();
     tabDataResponse.setDataList([tabData1, tabData2]);
 
