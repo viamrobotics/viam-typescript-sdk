@@ -14,8 +14,8 @@ export type FilterOptions = Partial<pb.Filter.AsObject> & {
 };
 
 type TabularData = {
-  data?: googleStructPb.Struct.AsObject;
-  metadataIndex: number;
+  data?: { [key: string]: googleStructPb.JavaScriptValue };
+  metadata?: pb.CaptureMetadata.AsObject;
   timeRequested?: Date;
   timeReceived?: Date;
 };
@@ -27,6 +27,14 @@ export class DataClient {
     this.service = new DataServiceClient(serviceHost, grpcOptions);
   }
 
+  /**
+   * Filter and download tabular data. The returned metadata might be empty if
+   * the metadata index of the data is out of the bounds of the returned
+   * metadata list.
+   *
+   * @param filter - Optional `pb.Filter` specifying tabular data to retrieve.
+   *   No `filter` implies all tabular data.
+   */
   async tabularDataByFilter(filter?: pb.Filter) {
     const { service } = this;
 
@@ -52,12 +60,22 @@ export class DataClient {
       if (!dataList || dataList.length === 0) {
         break;
       }
+      const mdListLength = response.getMetadataList().length;
+
       dataArray.push(
-        ...dataList.map((data) => ({
-          ...data.toObject(),
-          timeRequested: data.getTimeRequested()?.toDate(),
-          timeReceived: data.getTimeReceived()?.toDate(),
-        }))
+        ...dataList.map((data) => {
+          const mdIndex = data.getMetadataIndex();
+          const metadata =
+            mdListLength !== 0 && mdIndex >= mdListLength
+              ? new pb.CaptureMetadata().toObject()
+              : response.getMetadataList()[mdIndex]?.toObject();
+          return {
+            data: data.getData()?.toJavaScript(),
+            metadata,
+            timeRequested: data.getTimeRequested()?.toDate(),
+            timeReceived: data.getTimeReceived()?.toDate(),
+          };
+        })
       );
       last = response.getLast();
     }
