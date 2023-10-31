@@ -99,11 +99,18 @@
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
 <li class="tsd-signature tsd-anchor-link" id="tabularDataByFilter.tabularDataByFilter-1">tabular<wbr/>Data<wbr/>By<wbr/>Filter<span class="tsd-signature-symbol">(</span>filter<span class="tsd-signature-symbol">?: </span><a href="dataApi.Filter.html" class="tsd-signature-type" data-tsd-kind="Class">Filter</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TabularData</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#tabularDataByFilter.tabularDataByFilter-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Filter and download tabular data. The returned metadata might be empty if
+the metadata index of the data is out of the bounds of the returned
+metadata list.</p>
+</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> filter: <a href="dataApi.Filter.html" class="tsd-signature-type" data-tsd-kind="Class">Filter</a></h5></li></ul></div>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> filter: <a href="dataApi.Filter.html" class="tsd-signature-type" data-tsd-kind="Class">Filter</a></h5>
+<div class="tsd-comment tsd-typography"><p>Optional <code>pb.Filter</code> specifying tabular data to retrieve.
+  No <code>filter</code> implies all tabular data.</p>
+</div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TabularData</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
