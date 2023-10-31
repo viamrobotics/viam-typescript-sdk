@@ -60,8 +60,8 @@ describe('DataClient tests', () => {
       const promise = await subject().tabularDataByFilter();
       expect(promise.length).toEqual(2);
       const [data1, data2] = promise;
-      expect(data1).toMatchObject({ key: 'value1' });
-      expect(data2).toMatchObject({ key: 'value2' });
+      expect(data1?.data).toMatchObject({ key: 'value1' });
+      expect(data2?.data).toMatchObject({ key: 'value2' });
     });
 
     test('get filtered tabular data', async () => {
