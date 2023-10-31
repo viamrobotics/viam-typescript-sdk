@@ -52,8 +52,20 @@ jobs:
           fi
 
       - name: Publish
+        id: publish
         uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_TOKEN }}
           tag: ${{ steps.which_tag.outputs.tag }}
           package: ${{ steps.release_file.outputs.path }}
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        if: ${{ steps.publish.outputs.tag == 'latest' }}
+        with:
+          payload: |
+            {
+              "text": "${{ steps.publish.outputs.version }} was released.\n${{ steps.publish.outputs.registry }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
