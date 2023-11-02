@@ -2,6 +2,7 @@ import pb from '../../gen/service/motion/v1/motion_pb';
 import { encodeResourceName } from '../../utils';
 
 export type Constraints = pb.Constraints.AsObject;
+export type ObstacleDetector = pb.ObstacleDetector.AsObject;
 export type LinearConstraint = pb.LinearConstraint.AsObject;
 export type OrientationConstraint = pb.OrientationConstraint.AsObject;
 export type CollisionSpecification = pb.CollisionSpecification.AsObject;
@@ -65,8 +66,17 @@ export const encodeMotionConfiguration = (
 ): pb.MotionConfiguration => {
   const result = new pb.MotionConfiguration();
 
-  result.setVisionServicesList(
-    obj.visionServicesList.map((x) => encodeResourceName(x))
+  result.setObstacleDetectorsList(
+    obj.obstacleDetectorsList.map((x: ObstacleDetector) => {
+      const obstacleDetector = new pb.ObstacleDetector();
+      if (x.visionService) {
+        obstacleDetector.setVisionService(encodeResourceName(x.visionService));
+      }
+      if (x.camera) {
+        obstacleDetector.setCamera(encodeResourceName(x.camera));
+      }
+      return obstacleDetector;
+    })
   );
   result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
   result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
