@@ -1,7 +1,6 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { Value } from 'google-protobuf/google/protobuf/struct_pb'
 
 import { RobotClient } from '../../robot';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
