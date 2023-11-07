@@ -152,7 +152,6 @@ export {
   type MovementSensor,
   type MovementSensorProperties,
   type MovementSensorPosition,
-  type MovementSensorReadings,
   MovementSensorClient,
 } from './components/movementsensor';
 

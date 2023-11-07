@@ -8,11 +8,7 @@ import { MovementSensorClient } from './client';
 
 let sensor: MovementSensorClient;
 
-interface Val {
-  toJavaScript(): string;
-}
-
-const mapVals: Val = {
+const mapVals = {
   toJavaScript: () => {
     return 'readings';
   },

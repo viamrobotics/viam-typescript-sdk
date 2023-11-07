@@ -12,11 +12,7 @@ const testVoltage = 1.5;
 const testCurrent = 1;
 const testIsAc = true;
 
-interface Val {
-  toJavaScript(): string;
-}
-
-const mapVals: Val = {
+const mapVals = {
   toJavaScript: () => {
     return 'readings';
   },
