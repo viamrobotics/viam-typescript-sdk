@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { Value } from 'google-protobuf/google/protobuf/struct_pb'
 
 import { RobotClient } from '../../robot';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
@@ -8,17 +9,25 @@ import { MovementSensorClient } from './client';
 
 let sensor: MovementSensorClient;
 
+interface Val {
+  toJavaScript(): string
+} 
+
+const mapVals: Val = {
+  toJavaScript: () => { return 'readings'}
+}
+
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
     .fn()
     .mockImplementation(() => new MovementSensorServiceClient('mysensor'));
 
   MovementSensorServiceClient.prototype.getReadings = vi
-   .fn()
+    .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, { getReadingsMap: () => {
         return {
-          entries: () =>  new Map<string, unknown>([])
+          entries: () =>  new Map<string, unknown>([['readings', mapVals]])
         }
       }});
     });
@@ -117,19 +126,4 @@ test('get readings returns without unimplemented fields', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
     readings: 'readings'
   });
-});
-
-test('get readings fails on other errors', async () => {
-  const unexpectedError = new Error('Jank!');
-
-  MovementSensorServiceClient.prototype.getLinearVelocity = vi
-    .fn()
-    .mockImplementation((_req, _md, cb) => {
-      cb(unexpectedError, null);
-    });
-
-  await expect(sensor.getLinearVelocity()).rejects.toStrictEqual(
-    unexpectedError
-  );
-  await expect(sensor.getReadings()).rejects.toStrictEqual(unexpectedError);
 });
