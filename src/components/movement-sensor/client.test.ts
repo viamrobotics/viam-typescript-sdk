@@ -9,12 +9,14 @@ import { MovementSensorClient } from './client';
 let sensor: MovementSensorClient;
 
 interface Val {
-  toJavaScript(): string
-} 
+  toJavaScript(): string;
+}
 
 const mapVals: Val = {
-  toJavaScript: () => { return 'readings'}
-}
+  toJavaScript: () => {
+    return 'readings';
+  },
+};
 
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
@@ -24,11 +26,13 @@ beforeEach(() => {
   MovementSensorServiceClient.prototype.getReadings = vi
     .fn()
     .mockImplementation((_req, _md, cb) => {
-      cb(null, { getReadingsMap: () => {
-        return {
-          entries: () =>  new Map<string, unknown>([['readings', mapVals]])
-        }
-      }});
+      cb(null, {
+        getReadingsMap: () => {
+          return {
+            entries: () => new Map<string, unknown>([['readings', mapVals]]),
+          };
+        },
+      });
     });
 
   MovementSensorServiceClient.prototype.getPosition = vi
@@ -123,6 +127,6 @@ test('get readings returns without unimplemented fields', async () => {
     unimplementedError
   );
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    readings: 'readings'
+    readings: 'readings',
   });
 });

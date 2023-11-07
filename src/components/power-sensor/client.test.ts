@@ -13,12 +13,14 @@ const testCurrent = 1;
 const testIsAc = true;
 
 interface Val {
-  toJavaScript(): string
-} 
+  toJavaScript(): string;
+}
 
 const mapVals: Val = {
-  toJavaScript: () => { return 'readings'}
-}
+  toJavaScript: () => {
+    return 'readings';
+  },
+};
 
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
@@ -49,15 +51,17 @@ beforeEach(() => {
         getWatts: () => testPower,
       });
     });
-  
+
   PowerSensorServiceClient.prototype.getReadings = vi
     .fn()
     .mockImplementation((_req, _md, cb) => {
-      cb(null, { getReadingsMap: () => {
-        return {
-          entries: () =>  new Map<string, unknown>([['readings', mapVals]])
-        }
-      }});
+      cb(null, {
+        getReadingsMap: () => {
+          return {
+            entries: () => new Map<string, unknown>([['readings', mapVals]]),
+          };
+        },
+      });
     });
 
   sensor = new PowerSensorClient(new RobotClient('host'), 'test-sensor');

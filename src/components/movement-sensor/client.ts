@@ -206,10 +206,10 @@ export class MovementSensorClient implements MovementSensor {
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      GetReadingsRequest,
-      GetReadingsResponse
-    >(movementsensorService.getReadings.bind(movementsensorService), request);
+    const response = await promisify<GetReadingsRequest, GetReadingsResponse>(
+      movementsensorService.getReadings.bind(movementsensorService),
+      request
+    );
 
     const result: Record<string, unknown> = {};
     for (const [key, value] of response.getReadingsMap().entries()) {
