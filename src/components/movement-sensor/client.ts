@@ -4,7 +4,11 @@ import { MovementSensorServiceClient } from '../../gen/component/movementsensor/
 import type { Options, StructType } from '../../types';
 import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { MovementSensor, MovementSensorReadings } from './movement-sensor';
+import {
+  GetReadingsRequest,
+  GetReadingsResponse,
+} from '../../gen/common/v1/common_pb';
+import type { MovementSensor } from './movement-sensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -195,30 +199,23 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getReadings(extra = {}) {
-    const readingFunctions = {
-      position: this.getPosition.bind(this),
-      linearVelocity: this.getLinearVelocity.bind(this),
-      angularVelocity: this.getAngularVelocity.bind(this),
-      linearAcceleration: this.getLinearAcceleration.bind(this),
-      compassHeading: this.getCompassHeading.bind(this),
-      orientation: this.getOrientation.bind(this),
-    };
+    const { movementsensorService } = this;
+    const request = new GetReadingsRequest();
+    request.setName(this.name);
+    request.setExtra(Struct.fromJavaScript(extra));
 
-    const tasks = Object.entries(readingFunctions).flatMap(([field, func]) =>
-      (async () => {
-        try {
-          return [[field, await func(extra)]];
-        } catch (error) {
-          if (!(error as Error).message.includes('Unimplemented')) {
-            throw error;
-          }
-          return [];
-        }
-      })()
-    );
-    const entries = await Promise.all(tasks);
+    this.options.requestLogger?.(request);
 
-    return Object.fromEntries(entries.flat()) as MovementSensorReadings;
+    const response = await promisify<
+      GetReadingsRequest,
+      GetReadingsResponse
+    >(movementsensorService.getReadings.bind(movementsensorService), request);
+
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of response.getReadingsMap().entries()) {
+      result[key] = value.toJavaScript();
+    }
+    return result;
   }
 
   async doCommand(command: StructType): Promise<StructType> {

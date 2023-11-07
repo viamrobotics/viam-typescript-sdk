@@ -41,6 +41,12 @@ beforeEach(() => {
         getWatts: () => testPower,
       });
     });
+  
+  PowerSensorServiceClient.prototype.getReadings = vi
+    .fn()
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, { toObject: () => 'readings' });
+    });
 
   sensor = new PowerSensorClient(new RobotClient('host'), 'test-sensor');
 });
@@ -63,10 +69,7 @@ test('individual readings', async () => {
 
 test('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    voltage: testVoltage,
-    current: testCurrent,
-    isAc: testIsAc,
-    power: testPower,
+    readings: 'readings',
   });
 });
 
@@ -81,9 +84,7 @@ test('get readings returns without unimplemented fields', async () => {
 
   await expect(sensor.getVoltage()).rejects.toStrictEqual(unimplementedError);
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    current: testCurrent,
-    isAc: testIsAc,
-    power: testPower,
+    readings: 'readings',
   });
 });
 

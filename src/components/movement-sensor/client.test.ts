@@ -13,6 +13,16 @@ beforeEach(() => {
     .fn()
     .mockImplementation(() => new MovementSensorServiceClient('mysensor'));
 
+  MovementSensorServiceClient.prototype.getReadings = vi
+   .fn()
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, { getReadingsMap: () => {
+        return {
+          entries: () =>  new Map<string, unknown>([])
+        }
+      }});
+    });
+
   MovementSensorServiceClient.prototype.getPosition = vi
     .fn()
     .mockImplementation((_req, _md, cb) => {
@@ -88,12 +98,7 @@ test('individual readings', async () => {
 
 test('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    position: 'pos',
-    linearVelocity: 'vel',
-    linearAcceleration: 'acc',
-    angularVelocity: 'ang',
-    compassHeading: 'comp',
-    orientation: 'ori',
+    readings: 'readings',
   });
 });
 
@@ -110,11 +115,7 @@ test('get readings returns without unimplemented fields', async () => {
     unimplementedError
   );
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    position: 'pos',
-    linearAcceleration: 'acc',
-    angularVelocity: 'ang',
-    compassHeading: 'comp',
-    orientation: 'ori',
+    readings: 'readings'
   });
 });
 

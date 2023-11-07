@@ -67,7 +67,7 @@
     "grpc-web": "^1.4.2",
     "happy-dom": "^8.2.6",
     "npm-check": "^6.0.1",
-    "prettier": "^2.8.1",
+    "prettier": "^2.8.8",
     "prettier-plugin-jsdoc": "^0.4.2",
     "protoc-gen-js": "^3.21.2",
     "ts-protoc-gen": "^0.15.0",
