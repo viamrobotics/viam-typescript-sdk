@@ -4,10 +4,14 @@ import { PowerSensorServiceClient } from '../../gen/component/powersensor/v1/pow
 import type { Options, StructType } from '../../types';
 import pb from '../../gen/component/powersensor/v1/powersensor_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { PowerSensor, PowerSensorReadings } from './power-sensor';
+import {
+  GetReadingsRequest,
+  GetReadingsResponse,
+} from '../../gen/common/v1/common_pb';
+import type { PowerSensor } from './power-sensor';
 
 /**
- * A gRPC-web client for the MovementSensor component.
+ * A gRPC-web client for the PowerSensor component.
  *
  * @group Clients
  */
@@ -76,29 +80,23 @@ export class PowerSensorClient implements PowerSensor {
   }
 
   async getReadings(extra = {}) {
-    const readings: Record<string, any> = {};
-    try {
-      [readings['voltage'], readings['isAc']] = await this.getVoltage(extra);
-    } catch (error) {
-      if (!(error as Error).message.includes('Unimplemented')) {
-        throw error;
-      }
+    const { powersensorService } = this;
+    const request = new GetReadingsRequest();
+    request.setName(this.name);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<GetReadingsRequest, GetReadingsResponse>(
+      powersensorService.getReadings.bind(powersensorService),
+      request
+    );
+
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of response.getReadingsMap().entries()) {
+      result[key] = value.toJavaScript();
     }
-    try {
-      [readings['current'], readings['isAc']] = await this.getCurrent(extra);
-    } catch (error) {
-      if (!(error as Error).message.includes('Unimplemented')) {
-        throw error;
-      }
-    }
-    try {
-      readings['power'] = await this.getPower(extra);
-    } catch (error) {
-      if (!(error as Error).message.includes('Unimplemented')) {
-        throw error;
-      }
-    }
-    return readings as PowerSensorReadings;
+    return result;
   }
 
   async doCommand(command: StructType): Promise<StructType> {

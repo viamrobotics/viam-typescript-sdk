@@ -8,10 +8,28 @@ import { MovementSensorClient } from './client';
 
 let sensor: MovementSensorClient;
 
+const mapVals = {
+  toJavaScript: () => {
+    return 'readings';
+  },
+};
+
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
     .fn()
     .mockImplementation(() => new MovementSensorServiceClient('mysensor'));
+
+  MovementSensorServiceClient.prototype.getReadings = vi
+    .fn()
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, {
+        getReadingsMap: () => {
+          return {
+            entries: () => new Map<string, unknown>([['readings', mapVals]]),
+          };
+        },
+      });
+    });
 
   MovementSensorServiceClient.prototype.getPosition = vi
     .fn()
@@ -88,12 +106,7 @@ test('individual readings', async () => {
 
 test('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    position: 'pos',
-    linearVelocity: 'vel',
-    linearAcceleration: 'acc',
-    angularVelocity: 'ang',
-    compassHeading: 'comp',
-    orientation: 'ori',
+    readings: 'readings',
   });
 });
 
@@ -110,25 +123,6 @@ test('get readings returns without unimplemented fields', async () => {
     unimplementedError
   );
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    position: 'pos',
-    linearAcceleration: 'acc',
-    angularVelocity: 'ang',
-    compassHeading: 'comp',
-    orientation: 'ori',
+    readings: 'readings',
   });
-});
-
-test('get readings fails on other errors', async () => {
-  const unexpectedError = new Error('Jank!');
-
-  MovementSensorServiceClient.prototype.getLinearVelocity = vi
-    .fn()
-    .mockImplementation((_req, _md, cb) => {
-      cb(unexpectedError, null);
-    });
-
-  await expect(sensor.getLinearVelocity()).rejects.toStrictEqual(
-    unexpectedError
-  );
-  await expect(sensor.getReadings()).rejects.toStrictEqual(unexpectedError);
 });

@@ -12,6 +12,12 @@ const testVoltage = 1.5;
 const testCurrent = 1;
 const testIsAc = true;
 
+const mapVals = {
+  toJavaScript: () => {
+    return 'readings';
+  },
+};
+
 beforeEach(() => {
   RobotClient.prototype.createServiceClient = vi
     .fn()
@@ -42,6 +48,18 @@ beforeEach(() => {
       });
     });
 
+  PowerSensorServiceClient.prototype.getReadings = vi
+    .fn()
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, {
+        getReadingsMap: () => {
+          return {
+            entries: () => new Map<string, unknown>([['readings', mapVals]]),
+          };
+        },
+      });
+    });
+
   sensor = new PowerSensorClient(new RobotClient('host'), 'test-sensor');
 });
 
@@ -63,10 +81,7 @@ test('individual readings', async () => {
 
 test('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    voltage: testVoltage,
-    current: testCurrent,
-    isAc: testIsAc,
-    power: testPower,
+    readings: 'readings',
   });
 });
 
@@ -81,21 +96,6 @@ test('get readings returns without unimplemented fields', async () => {
 
   await expect(sensor.getVoltage()).rejects.toStrictEqual(unimplementedError);
   await expect(sensor.getReadings()).resolves.toStrictEqual({
-    current: testCurrent,
-    isAc: testIsAc,
-    power: testPower,
+    readings: 'readings',
   });
-});
-
-test('get readings fails on other errors', async () => {
-  const unexpectedError = new Error('Jank!');
-
-  PowerSensorServiceClient.prototype.getPower = vi
-    .fn()
-    .mockImplementation((_req, _md, cb) => {
-      cb(unexpectedError, null);
-    });
-
-  await expect(sensor.getPower()).rejects.toStrictEqual(unexpectedError);
-  await expect(sensor.getReadings()).rejects.toStrictEqual(unexpectedError);
 });

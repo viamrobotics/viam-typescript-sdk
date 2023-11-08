@@ -152,7 +152,6 @@ export {
   type MovementSensor,
   type MovementSensorProperties,
   type MovementSensorPosition,
-  type MovementSensorReadings,
   MovementSensorClient,
 } from './components/movementsensor';
 
@@ -166,11 +165,7 @@ export {
  * @group Raw Protobufs
  */
 export { default as powerSensorApi } from './gen/component/powersensor/v1/powersensor_pb';
-export {
-  type PowerSensor,
-  type PowerSensorReadings,
-  PowerSensorClient,
-} from './components/powersensor';
+export { type PowerSensor, PowerSensorClient } from './components/powersensor';
 
 /**
  * Raw Protobuf interfaces generated with
