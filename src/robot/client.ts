@@ -24,6 +24,7 @@ import { MotionServiceClient } from '../gen/service/motion/v1/motion_pb_service'
 import { MotorServiceClient } from '../gen/component/motor/v1/motor_pb_service';
 import { MovementSensorServiceClient } from '../gen/component/movementsensor/v1/movementsensor_pb_service';
 import { NavigationServiceClient } from '../gen/service/navigation/v1/navigation_pb_service';
+import { PowerSensorServiceClient } from '../gen/component/powersensor/v1/powersensor_pb_service';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 import type { Status } from '../gen/robot/v1/robot_pb_service';
 import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
@@ -107,6 +108,8 @@ export class RobotClient extends EventDispatcher implements Robot {
   private gripperServiceClient: GripperServiceClient | undefined;
 
   private movementSensorServiceClient: MovementSensorServiceClient | undefined;
+
+  private powerSensorServiceClient: PowerSensorServiceClient | undefined;
 
   private inputControllerServiceClient:
     | InputControllerServiceClient
@@ -282,6 +285,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.movementSensorServiceClient;
+  }
+
+  get powerSensorService() {
+    if (!this.powerSensorServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.powerSensorServiceClient;
   }
 
   get inputControllerService() {
@@ -522,6 +532,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         grpcOptions
       );
       this.movementSensorServiceClient = new MovementSensorServiceClient(
+        this.serviceHost,
+        grpcOptions
+      );
+      this.powerSensorServiceClient = new PowerSensorServiceClient(
         this.serviceHost,
         grpcOptions
       );
