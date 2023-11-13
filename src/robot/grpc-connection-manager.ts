@@ -22,7 +22,11 @@ export default class GRPCConnectionManager {
   private connectResolve: (() => void) | undefined;
   private connectReject: ((reason: ServiceError) => void) | undefined;
 
-  constructor(serviceHost: string, transportFactory: grpc.TransportFactory, heartbeatIntervalMs = 10_000) {
+  constructor(
+    serviceHost: string,
+    transportFactory: grpc.TransportFactory,
+    heartbeatIntervalMs = 10_000
+  ) {
     this.innerTransportFactory = transportFactory;
     this.client = new RobotServiceClient(serviceHost, {
       transport: this.innerTransportFactory,
