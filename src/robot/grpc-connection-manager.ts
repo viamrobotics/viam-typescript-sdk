@@ -16,17 +16,18 @@ const timeoutBlob = new Blob(
 export default class GRPCConnectionManager {
   private innerTransportFactory: grpc.TransportFactory;
   private client: RobotServiceClient;
-  private heartbeatIntervalMs: number | undefined;
+  private heartbeatIntervalMs: number;
 
   public connecting: Promise<void> | undefined;
   private connectResolve: (() => void) | undefined;
   private connectReject: ((reason: ServiceError) => void) | undefined;
 
-  constructor(serviceHost: string, transportFactory: grpc.TransportFactory) {
+  constructor(serviceHost: string, transportFactory: grpc.TransportFactory, heartbeatIntervalMs = 10_000) {
     this.innerTransportFactory = transportFactory;
     this.client = new RobotServiceClient(serviceHost, {
       transport: this.innerTransportFactory,
     });
+    this.heartbeatIntervalMs = heartbeatIntervalMs;
   }
 
   public heartbeat() {
