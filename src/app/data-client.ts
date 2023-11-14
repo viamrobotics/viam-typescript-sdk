@@ -13,18 +13,62 @@ export type FilterOptions = Partial<pb.Filter.AsObject> & {
   tags?: string[];
 };
 
-type TabularData = {
-  data?: { [key: string]: googleStructPb.JavaScriptValue };
+interface TabularData {
+  data?: Record<string, googleStructPb.JavaScriptValue>;
   metadata?: pb.CaptureMetadata.AsObject;
   timeRequested?: Date;
   timeReceived?: Date;
-};
+}
 
 export class DataClient {
   private service: DataServiceClient;
 
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
     this.service = new DataServiceClient(serviceHost, grpcOptions);
+  }
+
+  /**
+   * Obtain unified tabular data and metadata, queried with SQL.
+   *
+   * @param organizationId The ID of the organization that owns the data
+   * @param query The SQL query to run
+   * @returns An array of data objects
+   */
+  async tabularDataBySQL(organizationId: string, query: string) {
+    const { service } = this;
+
+    const req = new pb.TabularDataBySQLRequest();
+    req.setOrganizationId(organizationId);
+    req.setSqlQuery(query);
+
+    const response = await promisify<
+      pb.TabularDataBySQLRequest,
+      pb.TabularDataBySQLResponse
+    >(service.tabularDataBySQL.bind(service), req);
+    const dataList = response.getDataList();
+    return dataList.map((struct) => struct.toJavaScript());
+  }
+
+  /**
+   * Obtain unified tabular data and metadata, queried with MQL.
+   *
+   * @param organizationId The ID of the organization that owns the data
+   * @param query The MQL query to run
+   * @returns An array of data objects
+   */
+  async tabularDataByMQL(organizationId: string, query: string) {
+    const { service } = this;
+
+    const req = new pb.TabularDataByMQLRequest();
+    req.setOrganizationId(organizationId);
+    req.setMqlQuery(query);
+
+    const response = await promisify<
+      pb.TabularDataByMQLRequest,
+      pb.TabularDataByMQLResponse
+    >(service.tabularDataByMQL.bind(service), req);
+    const dataList = response.getDataList();
+    return dataList.map((struct) => struct.toJavaScript());
   }
 
   /**
@@ -57,7 +101,7 @@ export class DataClient {
         pb.TabularDataByFilterResponse
       >(service.tabularDataByFilter.bind(service), req);
       const dataList = response.getDataList();
-      if (!dataList || dataList.length === 0) {
+      if (dataList.length === 0) {
         break;
       }
       const mdListLength = response.getMetadataList().length;
@@ -105,7 +149,7 @@ export class DataClient {
         pb.BinaryDataByFilterResponse
       >(service.binaryDataByFilter.bind(service), req);
       const dataList = response.getDataList();
-      if (!dataList || dataList.length === 0) {
+      if (dataList.length === 0) {
         break;
       }
       dataArray.push(...dataList.map((data) => data.toObject()));
