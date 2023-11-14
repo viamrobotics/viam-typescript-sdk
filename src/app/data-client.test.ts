@@ -1,6 +1,9 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import {
+  Struct,
+  type JavaScriptValue,
+} from 'google-protobuf/google/protobuf/struct_pb';
 import {
   beforeEach,
   describe,
@@ -21,6 +24,10 @@ import {
   TabularData,
   TabularDataByFilterRequest,
   TabularDataByFilterResponse,
+  TabularDataBySQLRequest,
+  TabularDataBySQLResponse,
+  TabularDataByMQLRequest,
+  TabularDataByMQLResponse,
   TagsFilter,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
@@ -31,7 +38,56 @@ const subject = () =>
   new DataClient('fakeServiceHost', {
     transport: new FakeTransportBuilder().build(),
   });
+
 describe('DataClient tests', () => {
+  describe('tabularDataBySQL tests', () => {
+    const data: Record<string, JavaScriptValue>[] = [
+      { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
+    ];
+
+    beforeEach(() => {
+      vi.spyOn(DataServiceClient.prototype, 'tabularDataBySQL')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementationOnce((_req: TabularDataBySQLRequest, _md, cb) => {
+          const response = new TabularDataBySQLResponse();
+          response.setDataList(data.map((x) => Struct.fromJavaScript(x)));
+          cb(null, response);
+        });
+    });
+
+    test('get tabular data from SQL', async () => {
+      const response = await subject().tabularDataBySQL(
+        'some_org_id',
+        'some_sql_query'
+      );
+      expect(response).toEqual(data);
+    });
+  });
+
+  describe('tabularDataByMQL tests', () => {
+    const data: Record<string, JavaScriptValue>[] = [
+      { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
+    ];
+
+    beforeEach(() => {
+      vi.spyOn(DataServiceClient.prototype, 'tabularDataByMQL')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementationOnce((_req: TabularDataByMQLRequest, _md, cb) => {
+          const response = new TabularDataByMQLResponse();
+          response.setDataList(data.map((x) => Struct.fromJavaScript(x)));
+          cb(null, response);
+        });
+    });
+
+    test('get tabular data from MQL', async () => {
+      const response = await subject().tabularDataByMQL(
+        'some_org_id',
+        'some_sql_query'
+      );
+      expect(response).toEqual(data);
+    });
+  });
+
   describe('tabularDataByFilter tests', () => {
     let methodSpy: SpyInstance;
     const tabData1 = new TabularData();
