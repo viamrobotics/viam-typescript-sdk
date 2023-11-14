@@ -65,7 +65,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "${{ steps.publish.outputs.version }} was released.\n${{ steps.publish.outputs.registry }}"
+              "text": "${{ github.event.release.tag_name }} was released.\n${{ github.event.release.html_url }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
