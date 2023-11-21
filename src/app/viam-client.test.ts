@@ -1,17 +1,16 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { type DialOptions } from '@viamrobotics/rpc/src/dial';
 import { describe, expect, test, vi } from 'vitest';
-import { createViamTransportFactory } from '../robot/dial';
-import { DataClient } from './data-client';
-import { ViamClient } from './viam-client';
-
-vi.mock('../robot/dial', () => {
+import { createViamTransportFactory } from './viam-transport';
+vi.mock('./viam-transport', () => {
   return {
     createViamTransportFactory: vi
       .fn()
       .mockReturnValue(() => new FakeTransportBuilder().build()),
   };
 });
+import { DataClient } from './data-client';
+import { ViamClient } from './viam-client';
 
 describe('ViamClient', () => {
   let dialOpts: DialOptions = {};

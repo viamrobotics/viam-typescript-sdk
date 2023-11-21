@@ -1,6 +1,6 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import { type DialOptions } from '@viamrobotics/rpc/src/dial';
-import { createViamTransportFactory } from '../robot/dial';
+import { createViamTransportFactory } from './viam-transport';
 import { DataClient } from './data-client';
 
 export class ViamClient {
