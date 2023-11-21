@@ -218,6 +218,27 @@ export const createViamTransportFactory = async (
   serviceHost: string,
   dialOpts: DialOptions
 ): Promise<grpc.TransportFactory> => {
+  const transportFactory = await nodeDialDirect(serviceHost);
+
+  // if a token is provided, create a transport factory that uses it
+  let accessToken: string;
+  if (dialOpts.credentials && dialOpts.credentials.type === 'access-token') {
+    accessToken = dialOpts.credentials.payload;
+    console.debug('Using provided token', accessToken);
+    return (opts: grpc.TransportOptions): ViamTransport => {
+      return new ViamTransport(transportFactory, opts, accessToken);
+    };
+  }
+
+  console.debug('need to fetch access token');
+
+  /**
+   * If a token is not provided, we need to obtain one with either a
+   * 'robot-location-secret' or an 'api-key'
+   */
+  const authClient = new AuthServiceClient(serviceHost, {
+    transport: transportFactory,
+  });
   if (!dialOpts.credentials) {
     throw new Error(`credential cannot be none`);
   } else if (dialOpts.credentials.type === 'robot-secret') {
@@ -239,21 +260,16 @@ export const createViamTransportFactory = async (
   req.setEntity(entity);
   req.setCredentials(creds);
 
-  const transportFactory = await nodeDialDirect(serviceHost);
-  const authClient = new AuthServiceClient(serviceHost, {
-    transport: transportFactory,
-  });
-
-  const accessToken = await new Promise<string>((resolve, reject) => {
+  accessToken = await new Promise<string>((resolve, reject) => {
     authClient.authenticate(req, new grpc.Metadata(), (err, response) => {
       if (err) {
         return reject(err);
       }
-      const token = response?.getAccessToken().toString() ?? '';
-      return resolve(token);
+      return resolve(response?.getAccessToken().toString() ?? '');
     });
   });
 
+  console.debug('Using fetched token', accessToken);
   return (opts: grpc.TransportOptions): ViamTransport => {
     return new ViamTransport(transportFactory, opts, accessToken);
   };
