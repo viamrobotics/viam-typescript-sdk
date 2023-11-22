@@ -1,64 +1,69 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
-import { type DialOptions } from '@viamrobotics/rpc/src/dial';
-import { describe, expect, test, vi } from 'vitest';
-import { createViamTransportFactory } from '../robot/dial';
-import { DataClient } from './data-client';
-import { ViamClient } from './viam-client';
-
-vi.mock('../robot/dial', () => {
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import {
+  createViamTransportFactory,
+  type Credential,
+  type AccessToken,
+} from './viam-transport';
+vi.mock('./viam-transport', () => {
   return {
     createViamTransportFactory: vi
       .fn()
       .mockReturnValue(() => new FakeTransportBuilder().build()),
   };
 });
+import { DataClient } from './data-client';
+import { createViamClient, type ViamClientOptions } from './viam-client';
 
 describe('ViamClient', () => {
-  let dialOpts: DialOptions = {};
-  let serviceHost: string | undefined;
-  const defaultServiceHost = 'https://app.viam.com:443';
-  const subject = () => new ViamClient(dialOpts, serviceHost);
+  let options: ViamClientOptions | undefined;
 
-  test('create client with defaults', async () => {
-    const client = subject();
-    expect(client.dataClient).toBeUndefined();
+  const defaultServiceHost = 'https://app.viam.com';
+  const testCredential: Credential = {
+    authEntity: 'test-auth-entity',
+    type: 'api-key',
+    payload: 'testApiKey',
+  };
+  const testAccessToken: AccessToken = {
+    type: 'access-token',
+    payload: 'testAccessToken',
+  };
 
-    await client.connect();
+  const subject = () => createViamClient(options!);
+
+  beforeEach(() => {
+    options = undefined;
+  });
+
+  test('create client with an api key credential', async () => {
+    options = { credential: testCredential };
+    const client = await subject();
     expect(createViamTransportFactory).toHaveBeenCalledWith(
       defaultServiceHost,
-      dialOpts
+      testCredential
     );
     expect(client.dataClient).toBeInstanceOf(DataClient);
   });
 
-  test('create client with custom service host', async () => {
-    serviceHost = 'https://test.service.host';
-    const client = subject();
-    await client.connect();
+  test('create client with an api key credential and a custom service host', async () => {
+    const serviceHost = 'https://test.service.host';
+    options = { serviceHost, credential: testCredential };
+    const client = await subject();
 
     expect(createViamTransportFactory).toHaveBeenCalledWith(
       serviceHost,
-      dialOpts
+      testCredential
     );
     expect(client.dataClient).toBeInstanceOf(DataClient);
-
-    serviceHost = undefined;
   });
 
-  test('create client with custom dial options', async () => {
-    dialOpts = {
-      authEntity: 'test-auth-entity',
-      credentials: {
-        type: 'api-key',
-        payload: 'testApiKey',
-      },
-    };
-    const client = subject();
-    await client.connect();
+  test('create client with an access token', async () => {
+    options = { credential: testAccessToken };
+    const client = await subject();
 
     expect(createViamTransportFactory).toHaveBeenCalledWith(
       defaultServiceHost,
-      dialOpts
+      testAccessToken
     );
     expect(client.dataClient).toBeInstanceOf(DataClient);
   });
