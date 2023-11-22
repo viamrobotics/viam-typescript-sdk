@@ -1,55 +1,43 @@
 import { grpc } from '@improbable-eng/grpc-web';
-import { type DialOptions } from '@viamrobotics/rpc/src/dial';
-import { createViamTransportFactory } from './viam-transport';
+import {
+  createViamTransportFactory,
+  type Credential,
+  type AccessToken,
+} from './viam-transport';
 import { DataClient } from './data-client';
 
 export interface ViamClientOptions {
-  serviceHost: string;
-  authEntity?: string;
-  credential?: Credential;
+  serviceHost?: string;
+  credential: Credential | AccessToken;
 }
-
-export interface Credential {
-  type: CredentialType;
-  payload: string;
-}
-
-export type CredentialType =
-  | 'robot-location-secret'
-  | 'robot-secret'
-  | 'api-key'
-  | 'access-token';
 
 /** Instantiate a connected Viam client */
 export const createViamClient = async (
   options: ViamClientOptions
 ): Promise<ViamClient> => {
-  const client = new ViamClient(
-    { authEntity: options.authEntity, credentials: options.credential },
-    options.serviceHost
+  const serviceHost = options.serviceHost ?? 'https://app.viam.com';
+
+  const transportFactory = await createViamTransportFactory(
+    serviceHost,
+    options.credential
   );
-  await client.connect();
+  const client = new ViamClient(transportFactory, serviceHost);
+  client.connect();
   return client;
 };
 
-// TODO: deprecate and expose constructor
 export class ViamClient {
+  private transportFactory: grpc.TransportFactory;
   private serviceHost: string;
-  private dialOpts: DialOptions;
-  private transportFactory: grpc.TransportFactory | undefined;
+
   public dataClient: DataClient | undefined;
 
-  constructor(dialOpts: DialOptions, serviceHost?: string) {
-    this.serviceHost = serviceHost ?? 'https://app.viam.com:443';
-    this.dialOpts = dialOpts;
+  constructor(transportFactory: grpc.TransportFactory, serviceHost: string) {
+    this.transportFactory = transportFactory;
+    this.serviceHost = serviceHost;
   }
 
-  private getTransportFactory = async () => {
-    return createViamTransportFactory(this.serviceHost, this.dialOpts);
-  };
-
-  public async connect() {
-    this.transportFactory = await this.getTransportFactory();
+  public connect() {
     const grpcOptions = { transport: this.transportFactory };
     this.dataClient = new DataClient(this.serviceHost, grpcOptions);
   }

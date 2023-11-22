@@ -1,8 +1,24 @@
 import { grpc } from '@improbable-eng/grpc-web';
-import { dialDirect, type DialOptions } from '@viamrobotics/rpc/src/dial';
+import { dialDirect } from '@viamrobotics/rpc/src/dial';
 
 import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
 import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
+
+export interface Credential {
+  authEntity: string;
+  type: CredentialType;
+  payload: string;
+}
+
+export type CredentialType =
+  | 'robot-location-secret'
+  | 'api-key'
+  | 'robot-secret';
+
+export interface AccessToken {
+  type: 'access-token';
+  payload: string;
+}
 
 /**
  * Get a Viam Transport Factory after getting the accessToken.
@@ -12,21 +28,29 @@ import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
  */
 export const createViamTransportFactory = async (
   serviceHost: string,
-  dialOpts: DialOptions
+  credential: Credential | AccessToken
+): Promise<grpc.TransportFactory> => {
+  if (credential.type === 'access-token') {
+    return createWithAccessToken(serviceHost, credential);
+  }
+  return createWithCredential(serviceHost, credential);
+};
+
+const createWithAccessToken = async (
+  serviceHost: string,
+  accessToken: AccessToken
 ): Promise<grpc.TransportFactory> => {
   const transportFactory = await dialDirect(serviceHost);
 
-  // if a token is provided, create a transport factory that uses it
-  let accessToken: string;
-  if (dialOpts.credentials && dialOpts.credentials.type === 'access-token') {
-    accessToken = dialOpts.credentials.payload;
-    console.debug('Using provided token', accessToken);
-    return (opts: grpc.TransportOptions): ViamTransport => {
-      return new ViamTransport(transportFactory, opts, accessToken);
-    };
-  }
+  return (opts: grpc.TransportOptions): ViamTransport =>
+    new ViamTransport(transportFactory, opts, accessToken.payload);
+};
 
-  console.debug('need to fetch access token');
+const createWithCredential = async (
+  serviceHost: string,
+  credential: Credential
+): Promise<grpc.TransportFactory> => {
+  const transportFactory = await dialDirect(serviceHost);
 
   /**
    * If a token is not provided, we need to obtain one with either a
@@ -35,28 +59,26 @@ export const createViamTransportFactory = async (
   const authClient = new AuthServiceClient(serviceHost, {
     transport: transportFactory,
   });
-  if (!dialOpts.credentials) {
-    throw new Error(`credential cannot be none`);
-  } else if (dialOpts.credentials.type === 'robot-secret') {
+  if (credential.type === 'robot-secret') {
     throw new Error(
       `credential type cannot be 'robot-secret'. Must be either 'robot-location-secret' or 'api-key'.`
     );
-  } else if (!dialOpts.authEntity) {
+  } else if (!credential.authEntity) {
     throw new Error(
       `auth entity cannot be null, undefined, or an empty value.`
     );
   }
 
-  const entity = dialOpts.authEntity;
+  const entity = credential.authEntity;
   const creds = new Credentials();
-  creds.setType(dialOpts.credentials.type);
-  creds.setPayload(dialOpts.credentials.payload);
+  creds.setType(credential.type);
+  creds.setPayload(credential.payload);
 
   const req = new AuthenticateRequest();
   req.setEntity(entity);
   req.setCredentials(creds);
 
-  accessToken = await new Promise<string>((resolve, reject) => {
+  const accessToken = await new Promise<string>((resolve, reject) => {
     authClient.authenticate(req, new grpc.Metadata(), (err, response) => {
       if (err) {
         return reject(err);
@@ -65,10 +87,8 @@ export const createViamTransportFactory = async (
     });
   });
 
-  console.debug('Using fetched token', accessToken);
-  return (opts: grpc.TransportOptions): ViamTransport => {
-    return new ViamTransport(transportFactory, opts, accessToken);
-  };
+  return (opts: grpc.TransportOptions): ViamTransport =>
+    new ViamTransport(transportFactory, opts, accessToken);
 };
 
 export class ViamTransport implements grpc.Transport {
