@@ -7,11 +7,16 @@ import {
 import { DataClient } from './data-client';
 
 export interface ViamClientOptions {
+  /** URI of the Viam app. Defaults to 'https://app.viam.com' */
   serviceHost?: string;
+  /**
+   * Either an access token that can access protected resources directly or a
+   * credential that can be exchanged for an access token.
+   */
   credential: Credential | AccessToken;
 }
 
-/** Instantiate a connected Viam client */
+/** Instantiate a connected gRPC client that interfaces with Viam app. */
 export const createViamClient = async (
   options: ViamClientOptions
 ): Promise<ViamClient> => {
@@ -26,6 +31,7 @@ export const createViamClient = async (
   return client;
 };
 
+/** A gRPC client for method calls to Viam app. */
 export class ViamClient {
   private transportFactory: grpc.TransportFactory;
   private serviceHost: string;

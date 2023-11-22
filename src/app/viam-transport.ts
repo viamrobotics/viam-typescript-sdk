@@ -4,6 +4,7 @@ import { dialDirect } from '@viamrobotics/rpc/src/dial';
 import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
 import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
 
+/** A credential that can be exchanged to obtain an access token */
 export interface Credential {
   authEntity: string;
   type: CredentialType;
@@ -15,16 +16,15 @@ export type CredentialType =
   | 'api-key'
   | 'robot-secret';
 
+/** An access token used to access protected resources. */
 export interface AccessToken {
   type: 'access-token';
   payload: string;
 }
 
 /**
- * Get a Viam Transport Factory after getting the accessToken.
- *
- * In dialOpts.credentials, the credential type cannot be a robot secret. The
- * credential type to use would preferably be the organization api key.
+ * Initialize an authenticated transport factory that can access protected
+ * resources.
  */
 export const createViamTransportFactory = async (
   serviceHost: string,
@@ -52,10 +52,6 @@ const createWithCredential = async (
 ): Promise<grpc.TransportFactory> => {
   const transportFactory = await dialDirect(serviceHost);
 
-  /**
-   * If a token is not provided, we need to obtain one with either a
-   * 'robot-location-secret' or an 'api-key'
-   */
   const authClient = new AuthServiceClient(serviceHost, {
     transport: transportFactory,
   });
