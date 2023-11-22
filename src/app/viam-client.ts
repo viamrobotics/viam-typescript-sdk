@@ -7,24 +7,18 @@ import {
 import { DataClient } from './data-client';
 
 export interface ViamClientOptions {
-  /** URI of the Viam app. Defaults to 'https://app.viam.com' */
   serviceHost?: string;
-  /**
-   * Either an access token that can access protected resources directly or a
-   * credential that can be exchanged for an access token.
-   */
   credential: Credential | AccessToken;
 }
 
 /** Instantiate a connected gRPC client that interfaces with Viam app. */
-export const createViamClient = async (
-  options: ViamClientOptions
-): Promise<ViamClient> => {
-  const serviceHost = options.serviceHost ?? 'https://app.viam.com';
-
+export const createViamClient = async ({
+  serviceHost = 'https://app.viam.com',
+  credential,
+}: ViamClientOptions): Promise<ViamClient> => {
   const transportFactory = await createViamTransportFactory(
     serviceHost,
-    options.credential
+    credential
   );
   const client = new ViamClient(transportFactory, serviceHost);
   client.connect();
