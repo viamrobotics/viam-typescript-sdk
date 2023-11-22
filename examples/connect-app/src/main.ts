@@ -21,7 +21,6 @@ const button = <HTMLButtonElement>document.getElementById('main-button');
 
 async function run(client: VIAM.ViamClient) {
   // A filter is an optional tool to filter out which data comes back.
-  // const opts: VIAM.FilterOptions = { componentType: 'camera' };
   const opts: VIAM.FilterOptions = { componentType: 'camera' };
   const filter = client.dataClient.createFilter(opts);
 
