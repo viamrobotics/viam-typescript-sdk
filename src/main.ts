@@ -26,7 +26,13 @@ export {
  */
 export { RobotClient as Client } from './robot';
 
-export { ViamClient } from './app/viam-client';
+export {
+  ViamClient,
+  createViamClient,
+  type ViamClientOptions,
+  type Credential,
+  type CredentialType,
+} from './app/viam-client';
 
 /**
  * Raw Protobuf interfaces for a Data service.
