@@ -35,7 +35,7 @@ describe('ViamClient', () => {
     options = undefined;
   });
 
-  test('create client with api key and default service host', async () => {
+  test('create client with an api key credential', async () => {
     options = { credential: testCredential };
     const client = await subject();
     expect(createViamTransportFactory).toHaveBeenCalledWith(
@@ -45,7 +45,7 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
   });
 
-  test('create client with api key custom service host', async () => {
+  test('create client with an api key credential and a custom service host', async () => {
     const serviceHost = 'https://test.service.host';
     options = { serviceHost, credential: testCredential };
     const client = await subject();
@@ -57,7 +57,7 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
   });
 
-  test('create client with access token', async () => {
+  test('create client with an access token', async () => {
     options = { credential: testAccessToken };
     const client = await subject();
 
