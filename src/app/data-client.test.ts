@@ -80,10 +80,9 @@ describe('DataClient tests', () => {
     });
 
     test('get tabular data from MQL', async () => {
-      const response = await subject().tabularDataByMQL(
-        'some_org_id',
-        'some_sql_query'
-      );
+      const response = await subject().tabularDataByMQL('some_org_id', [
+        new TextEncoder().encode('some_mql_query'),
+      ]);
       expect(response).toEqual(data);
     });
   });
