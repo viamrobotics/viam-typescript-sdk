@@ -53,15 +53,15 @@ export class DataClient {
    * Obtain unified tabular data and metadata, queried with MQL.
    *
    * @param organizationId The ID of the organization that owns the data
-   * @param query The MQL query to run
+   * @param query The MQL query to run as a list of BSON documents
    * @returns An array of data objects
    */
-  async tabularDataByMQL(organizationId: string, query: string) {
+  async tabularDataByMQL(organizationId: string, query: Uint8Array[]) {
     const { service } = this;
 
     const req = new pb.TabularDataByMQLRequest();
     req.setOrganizationId(organizationId);
-    req.setMqlQuery(query);
+    req.setMqlBinaryList(query);
 
     const response = await promisify<
       pb.TabularDataByMQLRequest,
