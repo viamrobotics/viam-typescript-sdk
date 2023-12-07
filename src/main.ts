@@ -337,6 +337,7 @@ export {
   type ModeMap,
   type Waypoint,
   type NavigationPosition,
+  type Path,
   NavigationClient,
 } from './services/navigation';
 
