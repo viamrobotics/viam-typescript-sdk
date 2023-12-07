@@ -160,10 +160,10 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPathsRequest,
-      pb.GetPathsResponse
-    >(service.getPaths.bind(service), request);
+    const response = await promisify<pb.GetPathsRequest, pb.GetPathsResponse>(
+      service.getPaths.bind(service),
+      request
+    );
 
     return response.getPathsList().map((x) => x.toObject());
   }
