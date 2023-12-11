@@ -145,6 +145,43 @@ export class MotionClient implements Motion {
     return response.getSuccess();
   }
 
+  async moveOnGlobeNew(
+    destination: GeoPoint,
+    componentName: ResourceName,
+    movementSensorName: ResourceName,
+    heading?: number,
+    obstaclesList?: GeoObstacle[],
+    motionConfig?: MotionConfiguration,
+    extra = {}
+  ) {
+    const { service } = this;
+
+    const request = new pb.MoveOnGlobeNewRequest();
+    request.setName(this.name);
+    request.setDestination(encodeGeoPoint(destination));
+    request.setComponentName(encodeResourceName(componentName));
+    request.setMovementSensorName(encodeResourceName(movementSensorName));
+    if (heading) {
+      request.setHeading(heading);
+    }
+    if (obstaclesList) {
+      request.setObstaclesList(obstaclesList.map((x) => encodeGeoObstacle(x)));
+    }
+    if (motionConfig) {
+      request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));
+    }
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.MoveOnGlobeNewRequest,
+      pb.MoveOnGlobeNewResponse
+    >(service.moveOnGlobeNew.bind(service), request);
+
+    return response.getExecutionId();
+  }
+
   async getPose(
     componentName: ResourceName,
     destinationFrame: string,
