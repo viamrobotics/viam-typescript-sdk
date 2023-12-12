@@ -320,7 +320,7 @@ export {
   type MotionConfiguration,
   type ObstacleDetector,
   type OrientationConstraint,
-  type PlanStateMap,
+  PlanState,
   MotionClient,
 } from './services/motion';
 
