@@ -419,3 +419,5 @@ export type {
 } from './gen/robot/v1/robot_pb_service';
 
 export * from './types';
+
+export { doCommandFromClient } from './utils';
