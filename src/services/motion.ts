@@ -8,6 +8,6 @@ export type {
   MotionConfiguration,
   GetPlanResponse,
   ListPlanStatusesResponse,
-  PlanStateMap,
+  PlanState,
 } from './motion/types';
 export { MotionClient } from './motion/client';
