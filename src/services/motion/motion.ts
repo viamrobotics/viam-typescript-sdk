@@ -63,11 +63,10 @@ export interface Motion extends Resource {
    * Move a component to a specific latitude and longitude, using a
    * `MovementSensor` to check the location. `moveOnGlobe()` is non blocking,
    * meaning the motion service will move the component to the destination GPS
-   * point after `moveOnGlobe()` returns. Each successful `moveOnGlobe()`
-   * call retuns a unique ExectionID which you can use to identify all plans
-   * generated durring the `moveOnGlobe()` call. You can monitor the progress
-   * of the `moveOnGlobe()` call by querying `getPlan()` and
-   * `listPlanStatuses()`.
+   * point after `moveOnGlobe()` returns. Each successful `moveOnGlobe()` call
+   * retuns a unique ExectionID which you can use to identify all plans
+   * generated durring the `moveOnGlobe()` call. You can monitor the progress of
+   * the `moveOnGlobe()` call by querying `getPlan()` and `listPlanStatuses()`.
    *
    * @param destination - Destination for the component to move to, represented
    *   as a `GeoPoint`.
