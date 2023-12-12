@@ -311,13 +311,16 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
  */
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
 export {
-  type Motion,
+  type CollisionSpecification,
   type Constraints,
+  type GetPlanResponse,
   type LinearConstraint,
+  type ListPlanStatusesResponse,
+  type Motion,
+  type MotionConfiguration,
   type ObstacleDetector,
   type OrientationConstraint,
-  type CollisionSpecification,
-  type MotionConfiguration,
+  type PlanState,
   MotionClient,
 } from './services/motion';
 

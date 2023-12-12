@@ -6,5 +6,8 @@ export type {
   OrientationConstraint,
   CollisionSpecification,
   MotionConfiguration,
+  GetPlanResponse,
+  ListPlanStatusesResponse,
+  PlanState,
 } from './motion/types';
 export { MotionClient } from './motion/client';
