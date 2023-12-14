@@ -60,8 +60,13 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
-   * Move a component to a specific latitude and longitude, using a `Movement
-   * Sensor` to determine the location.
+   * Move a component to a specific latitude and longitude, using a
+   * `MovementSensor` to check the location. `moveOnGlobe()` is non blocking,
+   * meaning the motion service will move the component to the destination GPS
+   * point after `moveOnGlobe()` returns. Each successful `moveOnGlobe()` call
+   * retuns a unique ExectionID which you can use to identify all plans
+   * generated durring the `moveOnGlobe()` call. You can monitor the progress of
+   * the `moveOnGlobe()` call by querying `getPlan()` and `listPlanStatuses()`.
    *
    * @param destination - Destination for the component to move to, represented
    *   as a `GeoPoint`.
@@ -81,40 +86,10 @@ export interface Motion extends Resource {
     obstaclesList?: GeoObstacle[],
     motionConfiguration?: MotionConfiguration,
     extra?: StructType
-  ) => Promise<boolean>;
-
-  /**
-   * Move a component to a specific latitude and longitude, using a
-   * `MovementSensor` to check the location. `moveOnGlobeNew()` is non blocking,
-   * meaning the motion service will move the component to the destination GPS
-   * point after `moveOnGlobeNew()` returns. Each successful `moveOnGlobeNew()`
-   * call retuns a unique ExectionID which you can use to identify all plans
-   * generated durring the `moveOnGlobeNew()` call. You can monitor the progress
-   * of the `moveOnGlobeNew()` call by querying `getPlan()` and
-   * `listPlanStatuses()`.
-   *
-   * @param destination - Destination for the component to move to, represented
-   *   as a `GeoPoint`.
-   * @param componentName - The name of the component to move.
-   * @param movementSensorName - The name of the `Movement Sensor` used to check
-   *   the robot's location.
-   * @param obstaclesList - Obstacles to consider when planning the motion of
-   *   the component.
-   * @param heading - Compass heading, in degrees, to achieve at destination.
-   * @param motionConfiguration - Optional motion configuration options.
-   */
-  moveOnGlobeNew: (
-    destination: GeoPoint,
-    componentName: ResourceName,
-    movementSensorName: ResourceName,
-    heading?: number,
-    obstaclesList?: GeoObstacle[],
-    motionConfiguration?: MotionConfiguration,
-    extra?: StructType
   ) => Promise<string>;
 
   /**
-   * Stop a component being moved by an in progress `moveOnGlobeNew()` call.
+   * Stop a component being moved by an in progress `moveOnGlobe()` call.
    *
    * @param componentName - The component to stop
    */

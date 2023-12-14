@@ -28,7 +28,7 @@ beforeEach(() => {
 
 const testExecutionId = 'some execution id';
 
-describe('moveOnGlobeNew', () => {
+describe('moveOnGlobe', () => {
   let executionId: Mock<[], string>;
 
   test('return executionID', async () => {
@@ -54,7 +54,7 @@ describe('moveOnGlobeNew', () => {
     const expectedExtra = {};
     const mock = vi
       .fn()
-      .mockImplementation((req: pb.MoveOnGlobeNewRequest, _md, cb) => {
+      .mockImplementation((req: pb.MoveOnGlobeRequest, _md, cb) => {
         expect(req.getName()).toStrictEqual(expectedMotionName);
         expect(req.getDestination()?.toObject()).toStrictEqual(
           expectedDestination
@@ -79,10 +79,10 @@ describe('moveOnGlobeNew', () => {
           }),
         });
       });
-    MotionServiceClient.prototype.moveOnGlobeNew = mock;
+    MotionServiceClient.prototype.moveOnGlobe = mock;
 
     await expect(
-      motion.moveOnGlobeNew(
+      motion.moveOnGlobe(
         { latitude: 1, longitude: 2 },
         {
           namespace: 'viam',
@@ -166,7 +166,7 @@ describe('moveOnGlobeNew', () => {
     const expectedExtra = { some: 'extra' };
     const mock = vi
       .fn()
-      .mockImplementation((req: pb.MoveOnGlobeNewRequest, _md, cb) => {
+      .mockImplementation((req: pb.MoveOnGlobeRequest, _md, cb) => {
         expect(req.getName()).toStrictEqual(expectedMotionName);
         expect(req.getDestination()?.toObject()).toStrictEqual(
           expectedDestination
@@ -194,9 +194,9 @@ describe('moveOnGlobeNew', () => {
         });
       });
 
-    MotionServiceClient.prototype.moveOnGlobeNew = mock;
+    MotionServiceClient.prototype.moveOnGlobe = mock;
     await expect(
-      motion.moveOnGlobeNew(
+      motion.moveOnGlobe(
         expectedDestination,
         expectedComponentName,
         expectedMovementSensorName,
