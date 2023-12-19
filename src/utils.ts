@@ -116,6 +116,10 @@ export const encodeResourceName = (
 const encodeGeometry = (obj: common.Geometry.AsObject): common.Geometry => {
   const result = new common.Geometry();
 
+  if (obj.label) {
+    result.setLabel(obj.label);
+  }
+
   if (obj.center !== undefined) {
     result.setCenter(encodePose(obj.center));
   }

@@ -142,7 +142,74 @@ export class MotionClient implements Motion {
       pb.MoveOnGlobeResponse
     >(service.moveOnGlobe.bind(service), request);
 
-    return response.getSuccess();
+    return response.toObject().executionId;
+  }
+
+  async stopPlan(componentName: ResourceName, extra = {}) {
+    const { service } = this;
+
+    const request = new pb.StopPlanRequest();
+    request.setName(this.name);
+    request.setComponentName(encodeResourceName(componentName));
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    await promisify<pb.StopPlanRequest, pb.StopPlanResponse>(
+      service.stopPlan.bind(service),
+      request
+    );
+
+    return null;
+  }
+
+  async getPlan(
+    componentName: ResourceName,
+    lastPlanOnly?: boolean,
+    executionId?: string,
+    extra = {}
+  ) {
+    const { service } = this;
+
+    const request = new pb.GetPlanRequest();
+    request.setName(this.name);
+    request.setComponentName(encodeResourceName(componentName));
+    if (lastPlanOnly) {
+      request.setLastPlanOnly(lastPlanOnly);
+    }
+    if (executionId) {
+      request.setExecutionId(executionId);
+    }
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<pb.GetPlanRequest, pb.GetPlanResponse>(
+      service.getPlan.bind(service),
+      request
+    );
+
+    return response.toObject();
+  }
+
+  async listPlanStatuses(onlyActivePlans?: boolean, extra = {}) {
+    const { service } = this;
+
+    const request = new pb.ListPlanStatusesRequest();
+    request.setName(this.name);
+    if (onlyActivePlans) {
+      request.setOnlyActivePlans(onlyActivePlans);
+    }
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.ListPlanStatusesRequest,
+      pb.ListPlanStatusesResponse
+    >(service.listPlanStatuses.bind(service), request);
+
+    return response.toObject();
   }
 
   async getPose(

@@ -9,7 +9,12 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import type { Constraints, MotionConfiguration } from './types';
+import type {
+  Constraints,
+  MotionConfiguration,
+  GetPlanResponse,
+  ListPlanStatusesResponse,
+} from './types';
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -55,8 +60,13 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
-   * Move a component to a specific latitude and longitude, using a `Movement
-   * Sensor` to determine the location.
+   * Move a component to a specific latitude and longitude, using a
+   * `MovementSensor` to check the location. `moveOnGlobe()` is non blocking,
+   * meaning the motion service will move the component to the destination GPS
+   * point after `moveOnGlobe()` returns. Each successful `moveOnGlobe()` call
+   * retuns a unique ExectionID which you can use to identify all plans
+   * generated durring the `moveOnGlobe()` call. You can monitor the progress of
+   * the `moveOnGlobe()` call by querying `getPlan()` and `listPlanStatuses()`.
    *
    * @param destination - Destination for the component to move to, represented
    *   as a `GeoPoint`.
@@ -76,7 +86,56 @@ export interface Motion extends Resource {
     obstaclesList?: GeoObstacle[],
     motionConfiguration?: MotionConfiguration,
     extra?: StructType
-  ) => Promise<boolean>;
+  ) => Promise<string>;
+
+  /**
+   * Stop a component being moved by an in progress `moveOnGlobe()` call.
+   *
+   * @param componentName - The component to stop
+   */
+  stopPlan: (componentName: ResourceName, extra?: StructType) => Promise<null>;
+
+  /**
+   * By default: returns the plan history of the most recent
+   * `move_on_globe_new()` call to move a component. The plan history for
+   * executions before the most recent can be requested by providing an
+   * ExecutionID in the request. Returns a result if both of the following
+   * conditions are met:
+   *
+   * - The execution (call to `move_on_globe_new()`) is still executing **or**
+   *   changed state within the last 24 hours
+   * - The robot has not reinitialized Plans never change. Replans always create
+   *   new plans. Replans share the ExecutionID of the previously executing
+   *   plan. All repeated fields are in time ascending order.
+   *
+   * @param componentName - The component to query
+   * @param destinationFrame - The reference frame in which the component's
+   *   `Pose` should be provided, if unset this defaults to the "world"
+   *   reference frame.
+   * @param supplementalTransforms - `Pose` information on any additional
+   *   reference frames that are needed to compute the component's `Pose`.
+   */
+  getPlan: (
+    componentName: ResourceName,
+    lastPlanOnly?: boolean,
+    executionId?: string,
+    extra?: StructType
+  ) => Promise<GetPlanResponse>;
+
+  /**
+   * Get the current location and orientation of a component.
+   *
+   * @param componentName - The component whose `Pose` is being requested.
+   * @param destinationFrame - The reference frame in which the component's
+   *   `Pose` should be provided, if unset this defaults to the "world"
+   *   reference frame.
+   * @param supplementalTransforms - `Pose` information on any additional
+   *   reference frames that are needed to compute the component's `Pose`.
+   */
+  listPlanStatuses: (
+    onlyActivePlans?: boolean,
+    extra?: StructType
+  ) => Promise<ListPlanStatusesResponse>;
 
   /**
    * Get the current location and orientation of a component.

@@ -1,7 +1,6 @@
 import type { JavaScriptValue } from 'google-protobuf/google/protobuf/struct_pb';
 
 import common from './gen/common/v1/common_pb';
-
 export type StructType = Record<string, JavaScriptValue>;
 
 export interface Options {
