@@ -7,6 +7,11 @@ export type LinearConstraint = pb.LinearConstraint.AsObject;
 export type OrientationConstraint = pb.OrientationConstraint.AsObject;
 export type CollisionSpecification = pb.CollisionSpecification.AsObject;
 export type MotionConfiguration = pb.MotionConfiguration.AsObject;
+export type GetPlanResponse = pb.GetPlanResponse.AsObject;
+export type ListPlanStatusesResponse = pb.ListPlanStatusesResponse.AsObject;
+type ValueOf<T> = T[keyof T];
+export const { PlanState } = pb;
+export type PlanState = ValueOf<typeof pb.PlanState>;
 
 const encodeLinearConstraint = (
   obj: pb.LinearConstraint.AsObject

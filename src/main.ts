@@ -311,13 +311,16 @@ export { default as inputControllerApi } from './gen/component/inputcontroller/v
  */
 export { default as motionApi } from './gen/service/motion/v1/motion_pb';
 export {
-  type Motion,
+  type CollisionSpecification,
   type Constraints,
+  type GetPlanResponse,
   type LinearConstraint,
+  type ListPlanStatusesResponse,
+  type Motion,
+  type MotionConfiguration,
   type ObstacleDetector,
   type OrientationConstraint,
-  type CollisionSpecification,
-  type MotionConfiguration,
+  type PlanState,
   MotionClient,
 } from './services/motion';
 
@@ -337,6 +340,7 @@ export {
   type ModeMap,
   type Waypoint,
   type NavigationPosition,
+  type Path,
   NavigationClient,
 } from './services/navigation';
 
@@ -418,3 +422,5 @@ export type {
 } from './gen/robot/v1/robot_pb_service';
 
 export * from './types';
+
+export { doCommandFromClient } from './utils';
