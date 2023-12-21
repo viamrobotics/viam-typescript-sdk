@@ -8,6 +8,7 @@ export class EventDispatcher {
 
   on(type: string, listener: Callback) {
     const { listeners } = this;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     listeners[type] ??= new Set();
     listeners[type]?.add(listener);
   }

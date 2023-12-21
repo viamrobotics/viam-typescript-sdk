@@ -41,7 +41,7 @@ export class SlamClient implements Slam {
     return response.toObject();
   }
 
-  getPointCloudMap = (): Promise<Uint8Array> => {
+  getPointCloudMap = async (): Promise<Uint8Array> => {
     const request = new pb.GetPointCloudMapRequest();
     request.setName(this.name);
     this.options.requestLogger?.(request);
@@ -84,7 +84,7 @@ export class SlamClient implements Slam {
     });
   };
 
-  getInternalState = (): Promise<Uint8Array> => {
+  getInternalState = async (): Promise<Uint8Array> => {
     const request = new pb.GetInternalStateRequest();
     request.setName(this.name);
     this.options.requestLogger?.(request);

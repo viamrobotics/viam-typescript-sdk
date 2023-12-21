@@ -16,8 +16,9 @@ import { SlamClient } from './client';
 let slam: SlamClient;
 
 export class TestResponseStream<T> extends EventDispatcher {
-  private stream: ResponseStream<any>;
+  private stream: ResponseStream<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(stream: ResponseStream<any>) {
     super();
     this.stream = stream;
@@ -25,7 +26,7 @@ export class TestResponseStream<T> extends EventDispatcher {
 
   override on(
     type: string,
-    handler: (message: any) => void
+    handler: (message: any) => void // eslint-disable-line @typescript-eslint/no-explicit-any
   ): ResponseStream<T> {
     super.on(type, handler);
     return this;
