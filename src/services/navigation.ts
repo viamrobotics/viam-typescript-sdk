@@ -4,5 +4,6 @@ export type {
   Waypoint,
   NavigationPosition,
   Path,
+  NavigationProperties,
 } from './navigation/types';
 export { NavigationClient } from './navigation/client';

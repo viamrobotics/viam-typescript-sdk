@@ -168,6 +168,23 @@ export class NavigationClient implements Navigation {
     return response.getPathsList().map((x) => x.toObject());
   }
 
+  async getProperties(extra = {}) {
+    const { service } = this;
+
+    const request = new pb.GetPropertiesRequest();
+    request.setName(this.name);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<pb.GetPropertiesRequest, pb.GetPropertiesResponse>(
+      service.getMode.bind(service),
+      request
+    );
+
+    return response.getProperties();
+  }
+
   async doCommand(command: StructType): Promise<StructType> {
     const { service } = this;
     return doCommandFromClient(service, this.name, command, this.options);

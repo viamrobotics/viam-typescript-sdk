@@ -1,5 +1,5 @@
 import type { Resource } from '../../types';
-import type { SlamPosition } from './types';
+import type { SlamPosition, SlamProperties } from './types';
 
 /**
  * A service that allows your robot to create a map of its surroundings and find
@@ -12,7 +12,9 @@ export interface Slam extends Resource {
    */
   getPosition: () => Promise<SlamPosition>;
 
-  /** Get the point cloud SLAM map. */
+  /** 
+   * Get the point cloud SLAM map. 
+   */
   getPointCloudMap: () => Promise<Uint8Array>;
 
   /**
@@ -21,6 +23,13 @@ export interface Slam extends Resource {
    */
   getInternalState: () => Promise<Uint8Array>;
 
-  /** Get the timestamp of the last update to the point cloud SLAM map. */
+  /** 
+   * Get the timestamp of the last update to the point cloud SLAM map. 
+   */
   getLatestMapInfo: () => Promise<Date>;
+
+  /** 
+   * Gets information on the properties of the current SLAM service. 
+   */
+  getProperties: () => Promise<SlamProperties>;
 }
