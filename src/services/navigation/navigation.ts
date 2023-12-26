@@ -57,5 +57,5 @@ export interface Navigation extends Resource {
   /** 
    * Gets information on the properties of the current navigation service. 
    */
-  getProperties: (id: string) => Promise<NavigationProperties>;
+  getProperties: () => Promise<NavigationProperties>;
 }

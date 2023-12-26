@@ -168,12 +168,11 @@ export class NavigationClient implements Navigation {
     return response.getPathsList().map((x) => x.toObject());
   }
 
-  async getProperties(extra = {}) {
+  async getProperties() {
     const { service } = this;
 
     const request = new pb.GetPropertiesRequest();
     request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
