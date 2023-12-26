@@ -176,12 +176,12 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetPropertiesRequest, pb.GetPropertiesResponse>(
-      service.getMode.bind(service),
-      request
-    );
+    const response = await promisify<
+      pb.GetPropertiesRequest,
+      pb.GetPropertiesResponse
+    >(service.getProperties.bind(service), request);
 
-    return response.getProperties();
+    return response.toObject();
   }
 
   async doCommand(command: StructType): Promise<StructType> {

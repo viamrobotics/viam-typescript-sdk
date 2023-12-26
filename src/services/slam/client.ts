@@ -158,7 +158,7 @@ export class SlamClient implements Slam {
     const response = await promisify<
       pb.GetPropertiesRequest,
       pb.GetPropertiesResponse
-    >(service.getPosition.bind(service), request);
+    >(service.getProperties.bind(service), request);
 
     return response.toObject();
   }
