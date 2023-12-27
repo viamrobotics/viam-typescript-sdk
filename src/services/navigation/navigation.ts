@@ -1,14 +1,18 @@
 import type { GeoObstacle, GeoPoint, Resource, StructType } from '../../types';
-import type { ModeMap, Waypoint, NavigationPosition, NavigationProperties, Path } from './types';
+import type {
+  ModeMap,
+  Waypoint,
+  NavigationPosition,
+  NavigationProperties,
+  Path,
+} from './types';
 
 /**
  * A service that uses GPS to automatically navigate a robot to user defined
  * endpoints.
  */
 export interface Navigation extends Resource {
-  /** 
-   * Get the mode the robot is operating in. 
-   */
+  /** Get the mode the robot is operating in. */
   getMode: (extra?: StructType) => Promise<ModeMap[keyof ModeMap]>;
 
   /**
@@ -18,14 +22,10 @@ export interface Navigation extends Resource {
    */
   setMode: (mode: ModeMap[keyof ModeMap], extra?: StructType) => Promise<void>;
 
-  /** 
-   * Get the current location of the robot. 
-   */
+  /** Get the current location of the robot. */
   getLocation: (extra?: StructType) => Promise<NavigationPosition>;
 
-  /** 
-   * Get an array of waypoints currently in the service's data storage. 
-   */
+  /** Get an array of waypoints currently in the service's data storage. */
   getWayPoints: (extra?: StructType) => Promise<Waypoint[]>;
 
   /**
@@ -44,18 +44,12 @@ export interface Navigation extends Resource {
    */
   removeWayPoint: (id: string, extra?: StructType) => Promise<void>;
 
-  /** 
-   * Get a list of obstacles. 
-   */
+  /** Get a list of obstacles. */
   getObstacles: (extra?: StructType) => Promise<GeoObstacle[]>;
 
-  /** 
-   * Gets the list of paths known to the navigation service. 
-   */
+  /** Gets the list of paths known to the navigation service. */
   getPaths: (extra?: StructType) => Promise<Path[]>;
 
-  /** 
-   * Gets information on the properties of the current navigation service. 
-   */
+  /** Gets information on the properties of the current navigation service. */
   getProperties: () => Promise<NavigationProperties>;
 }

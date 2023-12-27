@@ -12,9 +12,7 @@ export interface Slam extends Resource {
    */
   getPosition: () => Promise<SlamPosition>;
 
-  /** 
-   * Get the point cloud SLAM map. 
-   */
+  /** Get the point cloud SLAM map. */
   getPointCloudMap: () => Promise<Uint8Array>;
 
   /**
@@ -23,13 +21,9 @@ export interface Slam extends Resource {
    */
   getInternalState: () => Promise<Uint8Array>;
 
-  /** 
-   * Get the timestamp of the last update to the point cloud SLAM map. 
-   */
+  /** Get the timestamp of the last update to the point cloud SLAM map. */
   getLatestMapInfo: () => Promise<Date>;
 
-  /** 
-   * Gets information on the properties of the current SLAM service. 
-   */
+  /** Gets information on the properties of the current SLAM service. */
   getProperties: () => Promise<SlamProperties>;
 }
