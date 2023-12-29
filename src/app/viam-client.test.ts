@@ -29,7 +29,7 @@ describe('ViamClient', () => {
     payload: 'testAccessToken',
   };
 
-  const subject = async () => createViamClient(options!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  const subject = async () => createViamClient(options!);
 
   beforeEach(() => {
     options = undefined;
