@@ -20,7 +20,7 @@ export default class SessionTransport implements grpc.Transport {
       if (
         err &&
         err instanceof GRPCError &&
-        err.code === grpc.Code.InvalidArgument && // eslint-disable-line @typescript-eslint/no-unsafe-enum-comparison
+        err.code === grpc.Code.InvalidArgument.valueOf() &&
         err.grpcMessage === 'SESSION_EXPIRED'
       ) {
         this.sessionManager.reset();

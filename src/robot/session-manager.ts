@@ -141,8 +141,7 @@ export default class SessionManager {
         new grpc.Metadata(),
         (err, resp) => {
           if (err) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-            if (err.code === grpc.Code.Unimplemented) {
+            if (err.code === grpc.Code.Unimplemented.valueOf()) {
               console.error('sessions unsupported; will not try again');
               this.sessionsSupported = false;
               this.startResolve?.();

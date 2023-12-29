@@ -744,10 +744,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     request.setEvery(new Duration().setNanos(durationMs * 1e6));
 
     const statusStream = robotService.streamStatus(request);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!statusStream) {
-      throw new Error('no stream');
-    }
     const stream = new ViamResponseStream<proto.Status[]>(statusStream);
     statusStream.on('data', (response: proto.StreamStatusResponse) => {
       stream.emit('data', response.getStatusList());
