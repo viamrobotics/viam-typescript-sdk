@@ -147,6 +147,22 @@ export class SlamClient implements Slam {
     return new Date(timestamp.getSeconds() * 1e3 + timestamp.getNanos() / 1e6);
   }
 
+  async getProperties() {
+    const { service } = this;
+
+    const request = new pb.GetPropertiesRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.GetPropertiesRequest,
+      pb.GetPropertiesResponse
+    >(service.getProperties.bind(service), request);
+
+    return response.toObject();
+  }
+
   async doCommand(command: StructType): Promise<StructType> {
     const { service } = this;
     return doCommandFromClient(service, this.name, command, this.options);
