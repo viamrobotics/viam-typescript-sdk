@@ -48,7 +48,7 @@ export class BoardClient implements Board {
    *
    * @deprecated Use {@link BoardClient#getStatus} instead.
    */
-  public status(extra = {}): Promise<pb.StatusResponse> {
+  public async status(extra = {}): Promise<pb.StatusResponse> {
     return this.getRawStatusResponse(extra);
   }
 

@@ -63,7 +63,10 @@ export interface ConnectOptions {
 }
 
 abstract class ServiceClient {
-  constructor(public serviceHost: string, public options?: grpc.RpcOptions) {}
+  constructor(
+    public serviceHost: string,
+    public options?: grpc.RpcOptions
+  ) {}
 }
 
 /**
@@ -172,7 +175,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       // eslint-disable-next-line no-console
       console.debug('connection closed, will try to reconnect');
       void backOff(
-        () =>
+        async () =>
           this.connect().then(
             () => {
               // eslint-disable-next-line no-console
@@ -193,27 +196,27 @@ export class RobotClient extends EventDispatcher implements Robot {
           ),
         {
           // default values taken from `exponential-backoff` library
-          maxDelay: this.reconnectMaxWait || Number.POSITIVE_INFINITY,
-          numOfAttempts: this.reconnectMaxAttempts || 10,
+          maxDelay: this.reconnectMaxWait ?? Number.POSITIVE_INFINITY,
+          numOfAttempts: this.reconnectMaxAttempts ?? 10,
         }
       );
     });
   }
 
   private get noReconnect() {
-    return this.webrtcOptions?.noReconnect || this.directOptions?.noReconnect;
+    return this.webrtcOptions?.noReconnect ?? this.directOptions?.noReconnect;
   }
 
   private get reconnectMaxAttempts() {
     return (
-      this.webrtcOptions?.reconnectMaxAttempts ||
+      this.webrtcOptions?.reconnectMaxAttempts ??
       this.directOptions?.reconnectMaxAttempts
     );
   }
 
   private get reconnectMaxWait() {
     return (
-      this.webrtcOptions?.reconnectMaxWait ||
+      this.webrtcOptions?.reconnectMaxWait ??
       this.directOptions?.reconnectMaxWait
     );
   }
@@ -741,9 +744,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     request.setEvery(new Duration().setNanos(durationMs * 1e6));
 
     const statusStream = robotService.streamStatus(request);
-    if (!statusStream) {
-      throw new Error('no stream');
-    }
     const stream = new ViamResponseStream<proto.Status[]>(statusStream);
     statusStream.on('data', (response: proto.StreamStatusResponse) => {
       stream.emit('data', response.getStatusList());
