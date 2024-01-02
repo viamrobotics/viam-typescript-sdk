@@ -3,6 +3,7 @@
 module.exports = {
   root: true,
   extends: ['@viamrobotics/eslint-config'],
+  plugins: ['eslint-plugin-tsdoc'],
   ignorePatterns: [
     'src/gen',
     'dist',
