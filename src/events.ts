@@ -4,7 +4,7 @@ export const RECONNECTED = 'reconnected';
 export const DISCONNECTED = 'disconnected';
 
 export class EventDispatcher {
-  listeners: Record<string, Set<Callback>> = {};
+  listeners: Partial<Record<string, Set<Callback>>> = {};
 
   on(type: string, listener: Callback) {
     const { listeners } = this;

@@ -23,7 +23,6 @@ module.exports = {
     'Variable',
     'Accessor',
     'Method',
-    'ObjectLiteral',
     'Parameter',
     'TypeParameter',
     'TypeLiteral',

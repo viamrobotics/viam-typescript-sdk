@@ -56,6 +56,7 @@ export default class GRPCConnectionManager {
       );
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (window.Worker) {
       const url = window.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);

@@ -1,5 +1,11 @@
 import type { GeoObstacle, GeoPoint, Resource, StructType } from '../../types';
-import type { ModeMap, Waypoint, NavigationPosition, Path } from './types';
+import type {
+  ModeMap,
+  Waypoint,
+  NavigationPosition,
+  NavigationProperties,
+  Path,
+} from './types';
 
 /**
  * A service that uses GPS to automatically navigate a robot to user defined
@@ -43,4 +49,7 @@ export interface Navigation extends Resource {
 
   /** Gets the list of paths known to the navigation service. */
   getPaths: (extra?: StructType) => Promise<Path[]>;
+
+  /** Gets information on the properties of the current navigation service. */
+  getProperties: () => Promise<NavigationProperties>;
 }

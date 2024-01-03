@@ -29,7 +29,7 @@ describe('ViamClient', () => {
     payload: 'testAccessToken',
   };
 
-  const subject = () => createViamClient(options!);
+  const subject = async () => createViamClient(options!);
 
   beforeEach(() => {
     options = undefined;

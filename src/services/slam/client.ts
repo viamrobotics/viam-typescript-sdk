@@ -41,7 +41,7 @@ export class SlamClient implements Slam {
     return response.toObject();
   }
 
-  getPointCloudMap = (): Promise<Uint8Array> => {
+  getPointCloudMap = async (): Promise<Uint8Array> => {
     const request = new pb.GetPointCloudMapRequest();
     request.setName(this.name);
     this.options.requestLogger?.(request);
@@ -84,7 +84,7 @@ export class SlamClient implements Slam {
     });
   };
 
-  getInternalState = (): Promise<Uint8Array> => {
+  getInternalState = async (): Promise<Uint8Array> => {
     const request = new pb.GetInternalStateRequest();
     request.setName(this.name);
     this.options.requestLogger?.(request);
@@ -145,6 +145,22 @@ export class SlamClient implements Slam {
       throw new Error('no map update');
     }
     return new Date(timestamp.getSeconds() * 1e3 + timestamp.getNanos() / 1e6);
+  }
+
+  async getProperties() {
+    const { service } = this;
+
+    const request = new pb.GetPropertiesRequest();
+    request.setName(this.name);
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.GetPropertiesRequest,
+      pb.GetPropertiesResponse
+    >(service.getProperties.bind(service), request);
+
+    return response.toObject();
   }
 
   async doCommand(command: StructType): Promise<StructType> {

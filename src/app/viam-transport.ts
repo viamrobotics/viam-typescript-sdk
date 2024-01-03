@@ -77,9 +77,10 @@ const createWithCredential = async (
   const accessToken = await new Promise<string>((resolve, reject) => {
     authClient.authenticate(req, new grpc.Metadata(), (err, response) => {
       if (err) {
-        return reject(err);
+        reject(err);
+        return;
       }
-      return resolve(response?.getAccessToken().toString() ?? '');
+      resolve(response?.getAccessToken().toString() ?? '');
     });
   });
 
