@@ -31,8 +31,7 @@ test-watch: $(node_modules) build-buf
 lint: $(node_modules) build-buf
 	npm run lint
 	npm run typecheck
-	# TODO(RSDK-5407): We can stop ignoring `@viamrobotics/rpc` once build issues are resolved in the latest version.
-	npm run check -- -i @viamrobotics/rpc
+	npm run check
 
 .PHONY: format
 format: $(node_modules)

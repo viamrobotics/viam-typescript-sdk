@@ -1,5 +1,5 @@
 import { grpc } from '@improbable-eng/grpc-web';
-import { dialDirect } from '@viamrobotics/rpc/src/dial';
+import { dialDirect } from '@viamrobotics/rpc';
 
 import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
 import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
