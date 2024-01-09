@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { backOff } from 'exponential-backoff';
-import type { Credentials, DialOptions } from '@viamrobotics/rpc';
+import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
 import { grpc } from '@improbable-eng/grpc-web';
