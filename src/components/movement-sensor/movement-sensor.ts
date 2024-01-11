@@ -3,6 +3,7 @@ import pb from '../../gen/component/movementsensor/v1/movementsensor_pb';
 
 export type MovementSensorPosition = pb.GetPositionResponse.AsObject;
 export type MovementSensorProperties = pb.GetPropertiesResponse.AsObject;
+export type MovementSensorAccuracy = pb.GetAccuracyResponse.AsObject;
 
 /**
  * Represents any sensor that reports information about the robot's direction,
@@ -34,7 +35,7 @@ export interface MovementSensor extends Resource {
   getProperties(extra?: StructType): Promise<MovementSensorProperties>;
 
   /** Get the accuracy of various sensors */
-  getAccuracy(extra?: StructType): Promise<Record<string, number>>;
+  getAccuracy(extra?: StructType): Promise<MovementSensorAccuracy>;
 
   /** Get linear acceleration across x/y/z axes */
   getLinearAcceleration(extra?: StructType): Promise<Vector3>;
