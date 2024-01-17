@@ -165,7 +165,7 @@ export class MovementSensorClient implements MovementSensor {
       pb.GetAccuracyRequest,
       pb.GetAccuracyResponse
     >(movementsensorService.getAccuracy.bind(movementsensorService), request);
-    
+
     return response.toObject();
   }
 
