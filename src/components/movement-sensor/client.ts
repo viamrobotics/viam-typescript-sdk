@@ -166,12 +166,7 @@ export class MovementSensorClient implements MovementSensor {
       pb.GetAccuracyResponse
     >(movementsensorService.getAccuracy.bind(movementsensorService), request);
 
-    const acc = response.getAccuracyMap();
-    const result: Record<string, number> = {};
-    for (const [key, value] of acc.entries()) {
-      result[key] = value;
-    }
-    return result;
+    return response.toObject();
   }
 
   async getLinearAcceleration(extra = {}) {
