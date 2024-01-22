@@ -1,5 +1,5 @@
 import { grpc } from '@improbable-eng/grpc-web';
-import { dialDirect } from '@viamrobotics/rpc/src/dial';
+import { dialDirect } from '@viamrobotics/rpc';
 
 import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
 import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
@@ -77,9 +77,10 @@ const createWithCredential = async (
   const accessToken = await new Promise<string>((resolve, reject) => {
     authClient.authenticate(req, new grpc.Metadata(), (err, response) => {
       if (err) {
-        return reject(err);
+        reject(err);
+        return;
       }
-      return resolve(response?.getAccessToken().toString() ?? '');
+      resolve(response?.getAccessToken().toString() ?? '');
     });
   });
 

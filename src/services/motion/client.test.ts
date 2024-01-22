@@ -36,7 +36,7 @@ describe('moveOnGlobe', () => {
 
     const expectedMotionName = motionClientName;
     const expectedDestination = { latitude: 1, longitude: 2 };
-    const expectedObstaclesList: Array<pb.ObstacleDetector> = [];
+    const expectedObstaclesList: pb.ObstacleDetector[] = [];
     const expectedHeading = 0;
     const expectedComponentName = {
       namespace: 'viam',
@@ -71,7 +71,7 @@ describe('moveOnGlobe', () => {
           expectedMotionConfiguration
         );
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, {
           toObject: () => ({
@@ -185,7 +185,7 @@ describe('moveOnGlobe', () => {
           expectedMotionConfiguration
         );
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, {
           toObject: () => ({
@@ -228,7 +228,7 @@ describe('stopPlan', () => {
           expectedComponentName
         );
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, {});
       });
@@ -253,7 +253,7 @@ describe('stopPlan', () => {
           expectedComponentName
         );
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, {});
       });
@@ -323,7 +323,7 @@ describe('getPlan', () => {
         expect(req.getLastPlanOnly()).toStrictEqual(expectedLastPlanOnly);
         expect(req.getExecutionId()).toStrictEqual(expectedExecutionID);
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, expectedResponse);
       });
@@ -353,7 +353,7 @@ describe('getPlan', () => {
         expect(req.getLastPlanOnly()).toStrictEqual(expectedLastPlanOnly);
         expect(req.getExecutionId()).toStrictEqual(expectedExecutionID);
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, expectedResponse);
       });
@@ -397,7 +397,7 @@ describe('listPlanStatuses', () => {
       .mockImplementation((req: pb.ListPlanStatusesRequest, _md, cb) => {
         expect(req.getOnlyActivePlans()).toStrictEqual(expectedOnlyActivePlans);
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, expectedResponse);
       });
@@ -416,7 +416,7 @@ describe('listPlanStatuses', () => {
       .mockImplementation((req: pb.ListPlanStatusesRequest, _md, cb) => {
         expect(req.getOnlyActivePlans()).toStrictEqual(expectedOnlyActivePlans);
         expect(req.getExtra()?.toObject()).toStrictEqual(
-          Struct.fromJavaScript(expectedExtra)?.toObject()
+          Struct.fromJavaScript(expectedExtra).toObject()
         );
         cb(null, expectedResponse);
       });

@@ -20,7 +20,7 @@
     :versions: []
     :when: 2023-05-01 18:06:59.633947982 Z
 - - :license
-  - "@bufbuild/buf"
+  - '@bufbuild/buf'
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -28,7 +28,7 @@
     :versions: []
     :when: 2023-05-01 18:09:18.081521457 Z
 - - :license
-  - "@improbable-eng/grpc-web"
+  - '@improbable-eng/grpc-web'
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -36,7 +36,7 @@
     :versions: []
     :when: 2023-05-01 18:11:37.804857463 Z
 - - :license
-  - "@improbable-eng/grpc-web-fake-transport"
+  - '@improbable-eng/grpc-web-fake-transport'
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -44,7 +44,7 @@
     :versions: []
     :when: 2023-05-01 18:11:37.804857463 Z
 - - :license
-  - "@typescript-eslint/parser"
+  - '@typescript-eslint/parser'
   - BSD-2-Clause
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -58,7 +58,7 @@
     :versions: []
     :when: 2023-05-01 18:16:13.435000538 Z
 - - :license
-  - "@viamrobotics/eslint-config"
+  - '@viamrobotics/eslint-config'
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -66,7 +66,7 @@
     :versions: []
     :when: 2023-05-01 18:17:50.394914571 Z
 - - :license
-  - "@viamrobotics/rpc"
+  - '@viamrobotics/rpc'
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
@@ -74,13 +74,21 @@
     :versions: []
     :when: 2023-05-01 18:19:05.224492180 Z
 - - :license
-  - "@viamrobotics/typescript-config"
+  - '@viamrobotics/typescript-config'
   - Apache 2.0
   - :who:
     :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
     :license_links: https://github.com/viamrobotics/js-config/blob/main/LICENSE
     :versions: []
     :when: 2023-05-01 18:19:54.768257194 Z
+- - :license
+  - '@viamrobotics/prettier-config'
+  - Apache 2.0
+  - :who:
+    :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
+    :license_links: https://github.com/viamrobotics/js-config/blob/main/LICENSE
+    :versions: []
+    :when: 2023-12-28 23:30:28.297289000 Z
 - - :license
   - protoc-gen-js
   - MIT

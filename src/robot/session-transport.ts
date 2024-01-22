@@ -20,7 +20,7 @@ export default class SessionTransport implements grpc.Transport {
       if (
         err &&
         err instanceof GRPCError &&
-        err.code === grpc.Code.InvalidArgument &&
+        err.code === grpc.Code.InvalidArgument.valueOf() &&
         err.grpcMessage === 'SESSION_EXPIRED'
       ) {
         this.sessionManager.reset();

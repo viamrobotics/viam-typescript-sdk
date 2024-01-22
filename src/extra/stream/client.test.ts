@@ -29,7 +29,7 @@ describe('StreamClient', () => {
     vi.useRealTimers();
   });
 
-  test('webrtc track will cause the client to emit an event', () =>
+  test('webrtc track will cause the client to emit an event', async () =>
     new Promise<void>((done) => {
       streamClient.on('track', (data) => {
         expect((data as { mock: true }).mock).eq(true);

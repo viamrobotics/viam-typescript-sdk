@@ -114,7 +114,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     creds = conf.credential;
   }
   await client.connect({
-    authEntity: conf.authEntity || impliedURL,
+    authEntity: conf.authEntity ?? impliedURL,
     creds,
     priority: conf.priority,
   });

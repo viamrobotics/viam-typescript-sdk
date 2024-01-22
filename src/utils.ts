@@ -12,19 +12,21 @@ type ServiceFunc<Req, Resp> = (
   callback: Callback<Resp>
 ) => void;
 
-export const promisify = <Req, Resp>(
+export const promisify = async <Req, Resp>(
   func: ServiceFunc<Req, Resp>,
   request: Req
 ): Promise<Resp> => {
   return new Promise((resolve, reject) => {
     func(request, new grpc.Metadata(), (error, response) => {
       if (error) {
-        return reject(error);
+        reject(error);
+        return;
       }
       if (!response) {
-        return reject(new Error('no response'));
+        reject(new Error('no response'));
+        return;
       }
-      return resolve(response);
+      resolve(response);
     });
   });
 };

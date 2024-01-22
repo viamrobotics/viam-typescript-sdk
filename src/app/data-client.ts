@@ -220,7 +220,7 @@ export class DataClient {
       filter.setBboxLabelsList(options.bboxLabelsList);
     }
 
-    if (options.startTime || options.endTime) {
+    if (options.startTime ?? options.endTime) {
       const interval = new pb.CaptureInterval();
       if (options.startTime) {
         interval.setStart(Timestamp.fromDate(options.startTime));
