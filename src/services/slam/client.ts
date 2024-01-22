@@ -127,26 +127,6 @@ export class SlamClient implements Slam {
     });
   };
 
-  async getLatestMapInfo() {
-    const { service } = this;
-
-    const request = new pb.GetLatestMapInfoRequest();
-    request.setName(this.name);
-
-    this.options.requestLogger?.(request);
-
-    const response = await promisify<
-      pb.GetLatestMapInfoRequest,
-      pb.GetLatestMapInfoResponse
-    >(service.getLatestMapInfo.bind(service), request);
-
-    const timestamp = response.getLastMapUpdate();
-    if (!timestamp) {
-      throw new Error('no map update');
-    }
-    return new Date(timestamp.getSeconds() * 1e3 + timestamp.getNanos() / 1e6);
-  }
-
   async getProperties() {
     const { service } = this;
 
