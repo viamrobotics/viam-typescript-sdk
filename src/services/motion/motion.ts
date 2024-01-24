@@ -43,7 +43,13 @@ export interface Motion extends Resource {
   ) => Promise<boolean>;
 
   /**
-   * Move a component to a `Pose` in respect to the origin of the SLAM map.
+   * Move a component to a `Pose` in respect to the origin of the SLAM map,
+   * using a `SLAM` service to check the location. moveOnMap()` is non blocking,
+   * meaning the motion service will move the component to the destination Pose
+   * after `moveOnMap()` returns. Each successful `moveOnMap()` call
+   * retuns a unique ExectionID which you can use to identify all plans
+   * generated durring the `moveOnMap()` call. You can monitor the progress of
+   * the `moveOnMap()` call by querying `getPlan()` and `listPlanStatuses()`.
    *
    * @param destination - Specify a destination to, which can be any `Pose` with
    *   respect to the SLAM map's origin.
@@ -51,13 +57,15 @@ export interface Motion extends Resource {
    *   destination.
    * @param slamServiceName - Name of the `SLAM` service from which the SLAM map
    *   is requested
+   * @param motionConfiguration - Optional motion configuration options.
    */
   moveOnMap: (
     destination: Pose,
     componentName: ResourceName,
     slamServiceName: ResourceName,
+    motionConfiguration?: MotionConfiguration,
     extra?: StructType
-  ) => Promise<boolean>;
+  ) => Promise<string>;
 
   /**
    * Move a component to a specific latitude and longitude, using a
@@ -89,7 +97,7 @@ export interface Motion extends Resource {
   ) => Promise<string>;
 
   /**
-   * Stop a component being moved by an in progress `moveOnGlobe()` call.
+   * Stop a component being moved by an in progress `moveOnGlobe()` or `moveOnMap()` call.
    *
    * @param componentName - The component to stop
    */
@@ -97,16 +105,19 @@ export interface Motion extends Resource {
 
   /**
    * By default: returns the plan history of the most recent
-   * `move_on_globe_new()` call to move a component. The plan history for
+   * `moveOnGlobe()` or `moveOnMap()` call to move a component. The plan history for
    * executions before the most recent can be requested by providing an
    * ExecutionID in the request. Returns a result if both of the following
    * conditions are met:
    *
-   * - The execution (call to `move_on_globe_new()`) is still executing **or**
+   * - The execution (call to `moveOnGlobe()` or `moveOnMap()`) is still executing **or**
    *   changed state within the last 24 hours
-   * - The robot has not reinitialized Plans never change. Replans always create
-   *   new plans. Replans share the ExecutionID of the previously executing
-   *   plan. All repeated fields are in time ascending order.
+   * - The robot has not reinitialized 
+   *
+   * Plans never change. 
+   * Replans always create new plans.
+   * Replans share the ExecutionID of the previously executing plan. 
+   * All repeated fields are in chronological order.
    *
    * @param componentName - The component to query
    * @param destinationFrame - The reference frame in which the component's
@@ -123,14 +134,13 @@ export interface Motion extends Resource {
   ) => Promise<GetPlanResponse>;
 
   /**
-   * Get the current location and orientation of a component.
+   * Returns the statuses of plans created by MoveOnGlobe calls that meet at least one of the following conditions since the motion service initialized: 
+   * - the plan’s status is in progress
+   * - the plan’s status changed state within the last 24 hours
    *
-   * @param componentName - The component whose `Pose` is being requested.
-   * @param destinationFrame - The reference frame in which the component's
-   *   `Pose` should be provided, if unset this defaults to the "world"
-   *   reference frame.
-   * @param supplementalTransforms - `Pose` information on any additional
-   *   reference frames that are needed to compute the component's `Pose`.
+   * All repeated fields are in chronological order.
+   *
+   * @param onlyActivePlans - If true, the response will only return plans which are executing.
    */
   listPlanStatuses: (
     onlyActivePlans?: boolean,

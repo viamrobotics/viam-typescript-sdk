@@ -87,6 +87,7 @@ export class MotionClient implements Motion {
     destination: Pose,
     componentName: ResourceName,
     slamServiceName: ResourceName,
+    motionConfig?: MotionConfiguration,
     extra = {}
   ) {
     const { service } = this;
@@ -96,16 +97,19 @@ export class MotionClient implements Motion {
     request.setDestination(encodePose(destination));
     request.setComponentName(encodeResourceName(componentName));
     request.setSlamServiceName(encodeResourceName(slamServiceName));
+    if (motionConfig) {
+      request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));
+    }
     request.setExtra(Struct.fromJavaScript(extra));
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.MoveOnMapRequest, pb.MoveOnMapResponse>(
-      service.moveOnMap.bind(service),
-      request
-    );
+    const response = await promisify<
+      pb.MoveOnMapRequest,
+      pb.MoveOnMapResponse
+    >(service.moveOnMap.bind(service),request);
 
-    return response.getSuccess();
+    return response.toObject().executionId;
   }
 
   async moveOnGlobe(
