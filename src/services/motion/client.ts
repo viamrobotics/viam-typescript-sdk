@@ -104,10 +104,10 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.MoveOnMapRequest,
-      pb.MoveOnMapResponse
-    >(service.moveOnMap.bind(service),request);
+    const response = await promisify<pb.MoveOnMapRequest, pb.MoveOnMapResponse>(
+      service.moveOnMap.bind(service),
+      request
+    );
 
     return response.toObject().executionId;
   }
