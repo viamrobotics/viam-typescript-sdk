@@ -72,13 +72,13 @@ export const encodeMotionConfiguration = (
   const result = new pb.MotionConfiguration();
 
   result.setObstacleDetectorsList(
-    obj.obstacleDetectorsList.map((x: ObstacleDetector) => {
+    obj.obstacleDetectorsList?.map((od: ObstacleDetector) => {
       const obstacleDetector = new pb.ObstacleDetector();
-      if (x.visionService) {
-        obstacleDetector.setVisionService(encodeResourceName(x.visionService));
+      if (od.visionService) {
+        obstacleDetector.setVisionService(encodeResourceName(od.visionService));
       }
-      if (x.camera) {
-        obstacleDetector.setCamera(encodeResourceName(x.camera));
+      if (od.camera) {
+        obstacleDetector.setCamera(encodeResourceName(od.camera));
       }
       return obstacleDetector;
     })
