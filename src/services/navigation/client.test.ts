@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { type Mock, beforeEach, describe, expect, test, vi } from 'vitest';
+import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NavigationServiceClient } from '../../gen/service/navigation/v1/navigation_pb_service';
 vi.mock('../../gen/service/navigation/v1/navigation_pb_service');
 import { RobotClient } from '../../robot';
@@ -53,7 +53,7 @@ describe('getLocation', () => {
       });
   });
 
-  test('null location', async () => {
+  it('null location', async () => {
     location = vi.fn();
     compassHeading = vi.fn();
 
@@ -65,7 +65,7 @@ describe('getLocation', () => {
     expect(compassHeading).toHaveBeenCalledOnce();
   });
 
-  test('valid geopoint', async () => {
+  it('valid geopoint', async () => {
     latitude = vi.fn(() => testLatitude);
     longitude = vi.fn(() => testLongitude);
     compassHeading = vi.fn(() => testCompassHeading);
@@ -81,7 +81,7 @@ describe('getLocation', () => {
     expect(compassHeading).toHaveBeenCalledOnce();
   });
 
-  test('invalid geopoint', async () => {
+  it('invalid geopoint', async () => {
     latitude = vi.fn(() => Number.NaN);
     longitude = vi.fn(() => Number.NaN);
 

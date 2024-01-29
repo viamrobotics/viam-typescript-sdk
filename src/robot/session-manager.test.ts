@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionClosedError } from '@viamrobotics/rpc';
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { grpc } from '@improbable-eng/grpc-web';
@@ -29,11 +29,11 @@ describe('SessionManager', () => {
     sm = new SessionManager(host, transport);
   });
 
-  test('no session initially', () => {
+  it('no session initially', () => {
     expect(sm.sessionID).eq('');
   });
 
-  test('start session when sessions are not supported', async () => {
+  it('start session when sessions are not supported', async () => {
     RobotServiceClient.prototype.startSession = vi
       .fn()
       .mockImplementation((_req, _md, cb) => {
@@ -45,7 +45,7 @@ describe('SessionManager', () => {
     expect(sm.sessionID).eq('');
   });
 
-  test('start session without a response', async () => {
+  it('start session without a response', async () => {
     RobotServiceClient.prototype.startSession = vi
       .fn()
       .mockImplementation((_req, _md, cb) => {
@@ -61,7 +61,7 @@ describe('SessionManager', () => {
     expect(sm.sessionID).eq('');
   });
 
-  test('start session without receiving a heartbeat window', async () => {
+  it('start session without receiving a heartbeat window', async () => {
     RobotServiceClient.prototype.startSession = vi
       .fn()
       .mockImplementation((_req, _md, cb) => {
@@ -80,7 +80,7 @@ describe('SessionManager', () => {
     expect(sm.sessionID).eq('');
   });
 
-  test('start session successfully', async () => {
+  it('start session successfully', async () => {
     const expectedSID = 'expected-sid';
 
     RobotServiceClient.prototype.startSession = vi
@@ -110,7 +110,7 @@ describe('SessionManager', () => {
     expect(sm.sessionID).eq(expectedSID);
   });
 
-  test('start session and reset', async () => {
+  it('start session and reset', async () => {
     const initialSID = 'sid1';
     const afterResetSID = 'sid2';
 
@@ -143,7 +143,7 @@ describe('SessionManager', () => {
     expect(sm.sessionID).eq(afterResetSID);
   });
 
-  test('start session but heartbeat detects closed connection', async () => {
+  it('start session but heartbeat detects closed connection', async () => {
     const initialSID = 'sid1';
     const afterResetSID = 'sid2';
 

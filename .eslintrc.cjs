@@ -36,6 +36,10 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
+        'vitest/no-restricted-vi-methods': 'warn',
+        'vitest/valid-expect': 'warn',
+        'vitest/require-top-level-describe': 'warn',
+        'vitest/consistent-test-filename': 'warn',
       },
     },
   ],

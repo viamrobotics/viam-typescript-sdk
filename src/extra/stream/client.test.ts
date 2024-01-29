@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { vi, beforeEach, afterEach, describe, expect, test } from 'vitest';
+import { vi, beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { RobotClient } from '../../robot';
 vi.mock('../../robot');
 
@@ -29,7 +29,7 @@ describe('StreamClient', () => {
     vi.useRealTimers();
   });
 
-  test('webrtc track will cause the client to emit an event', async () =>
+  it('webrtc track will cause the client to emit an event', async () =>
     new Promise<void>((done) => {
       streamClient.on('track', (data) => {
         expect((data as { mock: true }).mock).eq(true);
@@ -39,7 +39,7 @@ describe('StreamClient', () => {
       events.emit('track', { mock: true });
     }));
 
-  test('getStream creates and returns a new stream', async () => {
+  it('getStream creates and returns a new stream', async () => {
     const fakeCamName = 'fakecam';
     const fakeStream = { id: fakeCamName };
     StreamServiceClient.prototype.addStream = vi
@@ -57,7 +57,7 @@ describe('StreamClient', () => {
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
-  test('getStream fails when add stream fails', async () => {
+  it('getStream fails when add stream fails', async () => {
     const fakeCamName = 'fakecam';
     const error = new Error('could not add stream');
     StreamServiceClient.prototype.addStream = vi
@@ -72,7 +72,7 @@ describe('StreamClient', () => {
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
-  test('getStream fails when timeout exceeded', async () => {
+  it('getStream fails when timeout exceeded', async () => {
     const fakeCamName = 'fakecam';
     StreamServiceClient.prototype.addStream = vi
       .fn()
@@ -90,7 +90,7 @@ describe('StreamClient', () => {
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
-  test('getStream can add the same stream twice', async () => {
+  it('getStream can add the same stream twice', async () => {
     const fakeCamName = 'fakecam';
     const fakeStream = { id: fakeCamName };
     StreamServiceClient.prototype.addStream = vi
