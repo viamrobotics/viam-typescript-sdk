@@ -53,6 +53,7 @@
     "@improbable-eng/grpc-web": "^0.15.0",
     "@improbable-eng/grpc-web-fake-transport": "^0.15.0",
     "@types/google-protobuf": "^3.15.6",
+    "@types/node": "^20.11.10",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
     "@viamrobotics/eslint-config": "^0.3.0",
