@@ -1,13 +1,13 @@
 {
   "extends": "@viamrobotics/typescript-config/base.json",
   "compilerOptions": {
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "noEmit": true,
     "rootDir": "src",
     "outDir": "dist",
 
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
-    "exactOptionalPropertyTypes": false
+    "exactOptionalPropertyTypes": false,
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
 }

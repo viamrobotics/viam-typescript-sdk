@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SLAMServiceClient } from '../../gen/service/slam/v1/slam_pb_service';
 vi.mock('../../gen/service/slam/v1/slam_pb_service');
 import { type ResponseStream } from '../../gen/robot/v1/robot_pb_service';
@@ -67,7 +67,7 @@ afterEach(() => {
 });
 
 describe('getPointCloudMap tests', () => {
-  test('get point cloud map', () => {
+  it('get point cloud map', () => {
     const promise = slam.getPointCloudMap();
 
     const response1 = new GetPointCloudMapResponse();
@@ -85,7 +85,7 @@ describe('getPointCloudMap tests', () => {
     expect(promise).resolves.toStrictEqual(array);
   });
 
-  test('end getPcdMap stream with wrong code', () => {
+  it('end getPcdMap stream with wrong code', () => {
     const error = { code: 1, details: 'fake', metadata: undefined };
 
     const promise1 = slam.getPointCloudMap();
@@ -114,7 +114,7 @@ describe('getPointCloudMap tests', () => {
 });
 
 describe('getInternalState tests', () => {
-  test('get internal state', () => {
+  it('get internal state', () => {
     const promise = slam.getInternalState();
 
     const response1 = new GetInternalStateResponse();
@@ -132,7 +132,7 @@ describe('getInternalState tests', () => {
     expect(promise).resolves.toStrictEqual(array);
   });
 
-  test('end getInternalState stream with wrong code', () => {
+  it('end getInternalState stream with wrong code', () => {
     const error = { code: 1, details: 'fake', metadata: undefined };
 
     const promise1 = slam.getInternalState();

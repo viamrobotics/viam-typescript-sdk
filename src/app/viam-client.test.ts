@@ -1,5 +1,5 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createViamTransportFactory,
   type Credential,
@@ -35,7 +35,7 @@ describe('ViamClient', () => {
     options = undefined;
   });
 
-  test('create client with an api key credential', async () => {
+  it('create client with an api key credential', async () => {
     options = { credential: testCredential };
     const client = await subject();
     expect(createViamTransportFactory).toHaveBeenCalledWith(
@@ -45,7 +45,7 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
   });
 
-  test('create client with an api key credential and a custom service host', async () => {
+  it('create client with an api key credential and a custom service host', async () => {
     const serviceHost = 'https://test.service.host';
     options = { serviceHost, credential: testCredential };
     const client = await subject();
@@ -57,7 +57,7 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
   });
 
-  test('create client with an access token', async () => {
+  it('create client with an access token', async () => {
     options = { credential: testAccessToken };
     const client = await subject();
 
