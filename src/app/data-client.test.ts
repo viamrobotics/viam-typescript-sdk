@@ -4,14 +4,7 @@ import {
   Struct,
   type JavaScriptValue,
 } from 'google-protobuf/google/protobuf/struct_pb';
-import {
-  beforeEach,
-  describe,
-  expect,
-  type SpyInstance,
-  test,
-  vi,
-} from 'vitest';
+import { beforeEach, describe, expect, type SpyInstance, it, vi } from 'vitest';
 import {
   BinaryData,
   BinaryDataByFilterRequest,
@@ -55,7 +48,7 @@ describe('DataClient tests', () => {
         });
     });
 
-    test('get tabular data from SQL', async () => {
+    it('get tabular data from SQL', async () => {
       const response = await subject().tabularDataBySQL(
         'some_org_id',
         'some_sql_query'
@@ -79,7 +72,7 @@ describe('DataClient tests', () => {
         });
     });
 
-    test('get tabular data from MQL', async () => {
+    it('get tabular data from MQL', async () => {
       const response = await subject().tabularDataByMQL('some_org_id', [
         new TextEncoder().encode('some_mql_query'),
       ]);
@@ -111,7 +104,7 @@ describe('DataClient tests', () => {
         });
     });
 
-    test('get tabular data', async () => {
+    it('get tabular data', async () => {
       const promise = await subject().tabularDataByFilter();
       expect(promise.length).toEqual(2);
       const [data1, data2] = promise;
@@ -119,7 +112,7 @@ describe('DataClient tests', () => {
       expect(data2?.data).toMatchObject({ key: 'value2' });
     });
 
-    test('get filtered tabular data', async () => {
+    it('get filtered tabular data', async () => {
       const filter = subject().createFilter({
         componentName: 'testComponentName',
         componentType: 'testComponentType',
@@ -167,14 +160,14 @@ describe('DataClient tests', () => {
           });
         });
     });
-    test('get binary data', async () => {
+    it('get binary data', async () => {
       const promise = await subject().binaryDataByFilter();
       expect(promise.length).toEqual(2);
       expect(promise[0]?.binary).toEqual(bin1);
       expect(promise[1]?.binary).toEqual(bin2);
     });
 
-    test('get filtered binary data', async () => {
+    it('get filtered binary data', async () => {
       const filter = subject().createFilter({
         componentName: 'testComponentName',
         componentType: 'testComponentType',
@@ -217,7 +210,7 @@ describe('DataClient tests', () => {
     binaryId2.setOrganizationId('testOrgId');
     binaryId2.setLocationId('testLocationId');
 
-    test('get binary data by ids', async () => {
+    it('get binary data by ids', async () => {
       const promise = await subject().binaryDataByIds([
         binaryId1.toObject(),
         binaryId2.toObject(),
@@ -227,7 +220,7 @@ describe('DataClient tests', () => {
       expect(promise[1]?.binary).toEqual(bin2);
     });
 
-    test('get binary data by id', async () => {
+    it('get binary data by id', async () => {
       const expectedRequest = new BinaryDataByIDsRequest();
       expectedRequest.setBinaryIdsList([binaryId1]);
       expectedRequest.setIncludeBinary(true);
@@ -242,12 +235,12 @@ describe('DataClient tests', () => {
   });
 
   describe('createFilter tests', () => {
-    test('create empty filter', () => {
+    it('create empty filter', () => {
       const testFilter = subject().createFilter({});
       expect(testFilter).toEqual(new Filter());
     });
 
-    test('create filter', () => {
+    it('create filter', () => {
       const opts = { componentName: 'camera' };
       const testFilter = subject().createFilter(opts);
 
@@ -257,7 +250,7 @@ describe('DataClient tests', () => {
       expect(testFilter).toEqual(expectedFilter);
     });
 
-    test('create filter with all options', () => {
+    it('create filter with all options', () => {
       const componentName = 'testComponentName';
       const componentType = 'testComponentType';
       const method = 'testMethod';

@@ -2,7 +2,7 @@
  *  @vitest-environment happy-dom
  */
 
-import { type Mock, beforeEach, describe, expect, test, vi } from 'vitest';
+import { type Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { MotionServiceClient } from '../../gen/service/motion/v1/motion_pb_service';
@@ -31,7 +31,7 @@ const testExecutionId = 'some execution id';
 describe('moveOnGlobe', () => {
   let executionId: Mock<[], string>;
 
-  test('return executionID', async () => {
+  it('return executionID', async () => {
     executionId = vi.fn(() => testExecutionId);
 
     const expectedMotionName = motionClientName;
@@ -103,7 +103,7 @@ describe('moveOnGlobe', () => {
     expect(executionId).toHaveBeenCalledOnce();
   });
 
-  test('allows optionally specifying heading, obstacles, motionConfig & extra', async () => {
+  it('allows optionally specifying heading, obstacles, motionConfig & extra', async () => {
     executionId = vi.fn(() => testExecutionId);
     const expectedMotionName = motionClientName;
     const expectedDestination = { latitude: 1, longitude: 2 };
@@ -213,7 +213,7 @@ describe('moveOnGlobe', () => {
 });
 
 describe('stopPlan', () => {
-  test('return null', async () => {
+  it('return null', async () => {
     const expectedComponentName = {
       namespace: 'viam',
       type: 'component',
@@ -238,7 +238,7 @@ describe('stopPlan', () => {
     );
   });
 
-  test('allows optionally specifying extra', async () => {
+  it('allows optionally specifying extra', async () => {
     const expectedComponentName = {
       namespace: 'viam',
       type: 'component',
@@ -304,7 +304,7 @@ describe('getPlan', () => {
     }),
   };
 
-  test('return GetPlanResponse', async () => {
+  it('return GetPlanResponse', async () => {
     const expectedComponentName = {
       namespace: 'viam',
       type: 'component',
@@ -334,7 +334,7 @@ describe('getPlan', () => {
     expect(mock).toHaveBeenCalledOnce();
   });
 
-  test('allows optionally specifying lastPlanOnly, executionID, and extra', async () => {
+  it('allows optionally specifying lastPlanOnly, executionID, and extra', async () => {
     const expectedComponentName = {
       namespace: 'viam',
       type: 'component',
@@ -389,7 +389,7 @@ describe('listPlanStatuses', () => {
     }),
   };
 
-  test('return listPlanStatusesResponse', async () => {
+  it('return listPlanStatusesResponse', async () => {
     const expectedOnlyActivePlans = false;
     const expectedExtra = {};
     const mock = vi
@@ -408,7 +408,7 @@ describe('listPlanStatuses', () => {
     expect(mock).toHaveBeenCalledOnce();
   });
 
-  test('allows optionally specifying onlyActivePlans and extra', async () => {
+  it('allows optionally specifying onlyActivePlans and extra', async () => {
     const expectedOnlyActivePlans = true;
     const expectedExtra = { some: 'extra' };
     const mock = vi

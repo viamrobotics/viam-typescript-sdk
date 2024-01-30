@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 import { RobotClient } from '../../robot';
 import { PowerSensorServiceClient } from '../../gen/component/powersensor/v1/powersensor_pb_service';
@@ -67,7 +67,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-test('individual readings', async () => {
+it('individual readings', async () => {
   await expect(sensor.getVoltage()).resolves.toStrictEqual([
     testVoltage,
     testIsAc,
@@ -79,13 +79,13 @@ test('individual readings', async () => {
   await expect(sensor.getPower()).resolves.toStrictEqual(testPower);
 });
 
-test('get readings', async () => {
+it('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
     readings: 'readings',
   });
 });
 
-test('get readings returns without unimplemented fields', async () => {
+it('get readings returns without unimplemented fields', async () => {
   const unimplementedError = new Error('Unimplemented');
 
   PowerSensorServiceClient.prototype.getVoltage = vi

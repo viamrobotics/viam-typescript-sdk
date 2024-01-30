@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { events } from '../events';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 vi.mock('../gen/robot/v1/robot_pb_service');
@@ -22,11 +22,11 @@ describe('GPRCConnectionManager', () => {
     vi.clearAllMocks();
   });
 
-  test('no connecting attempt initially', () => {
+  it('no connecting attempt initially', () => {
     expect(cm.connecting).toBe(undefined);
   });
 
-  test('connect successfully', async () => {
+  it('connect successfully', async () => {
     const heartbeat = vi.spyOn(cm, 'heartbeat');
     RobotServiceClient.prototype.getOperations = vi
       .fn()
@@ -38,7 +38,7 @@ describe('GPRCConnectionManager', () => {
     expect(heartbeat).toHaveBeenCalledOnce();
   });
 
-  test('check connection when not connected', async () => {
+  it('check connection when not connected', async () => {
     const heartbeat = vi.spyOn(cm, 'heartbeat');
     RobotServiceClient.prototype.getOperations = vi
       .fn()
@@ -49,7 +49,7 @@ describe('GPRCConnectionManager', () => {
     expect(heartbeat).not.toHaveBeenCalled();
   });
 
-  test('successfully detect connection and then disconnect', async () => {
+  it('successfully detect connection and then disconnect', async () => {
     const heartbeat = vi.spyOn(cm, 'heartbeat');
     const disconnected = vi.spyOn(events, 'emit');
     RobotServiceClient.prototype.getOperations = vi

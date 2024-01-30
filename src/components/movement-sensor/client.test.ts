@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
 import { RobotClient } from '../../robot';
 import { MovementSensorServiceClient } from '../../gen/component/movementsensor/v1/movementsensor_pb_service';
@@ -95,7 +95,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-test('individual readings', async () => {
+it('individual readings', async () => {
   await expect(sensor.getPosition()).resolves.toStrictEqual('pos');
   await expect(sensor.getLinearVelocity()).resolves.toStrictEqual('vel');
   await expect(sensor.getLinearAcceleration()).resolves.toStrictEqual('acc');
@@ -104,13 +104,13 @@ test('individual readings', async () => {
   await expect(sensor.getOrientation()).resolves.toStrictEqual('ori');
 });
 
-test('get readings', async () => {
+it('get readings', async () => {
   await expect(sensor.getReadings()).resolves.toStrictEqual({
     readings: 'readings',
   });
 });
 
-test('get readings returns without unimplemented fields', async () => {
+it('get readings returns without unimplemented fields', async () => {
   const unimplementedError = new Error('Unimplemented');
 
   MovementSensorServiceClient.prototype.getLinearVelocity = vi
