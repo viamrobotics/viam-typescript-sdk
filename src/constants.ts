@@ -1,1 +1,1 @@
-export const DIAL_TIMEOUT: number = 5000;
+export const DIAL_TIMEOUT = 5000;
