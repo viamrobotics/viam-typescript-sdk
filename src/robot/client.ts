@@ -64,6 +64,8 @@ export interface ConnectOptions {
   authEntity?: string;
   creds?: Credentials;
   priority?: number;
+
+  // set timeout in milliseconds for dialing. Default is 5000ms.
   dialTimeout?: number;
 }
 
@@ -431,7 +433,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
         },
-        dialTimeout
+        dialTimeout: dialTimeout ?? 5000,
       };
 
       // Webrtcoptions will always be defined, but TS doesn't know this
