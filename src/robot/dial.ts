@@ -1,3 +1,4 @@
+import { DIAL_TIMEOUT } from '../constants';
 import { RobotClient } from './client';
 
 interface Credential {
@@ -14,7 +15,8 @@ export interface DialDirectConf {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
-  // set timeout in milliseconds for dialing. Default is 5000ms, a value of 0 would disable the timeout.
+  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
+  // and a value of 0 would disable the timeout.
   dialTimeout?: number;
 }
 
@@ -55,7 +57,7 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   await client.connect({
     authEntity: conf.authEntity,
     creds,
-    dialTimeout: conf.dialTimeout ?? 5000,
+    dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
   });
 
   // eslint-disable-next-line no-console
@@ -90,7 +92,8 @@ export interface DialWebRTCConf {
   iceServers?: ICEServer[];
   priority?: number;
 
-  // set timeout in milliseconds for dialing. Default is 5000ms, a value of 0 would disable the timeout.
+  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
+  // and a value of 0 would disable the timeout.
   dialTimeout?: number;
 }
 
@@ -126,7 +129,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
     authEntity: conf.authEntity ?? impliedURL,
     creds,
     priority: conf.priority,
-    dialTimeout: conf.dialTimeout ?? 5000,
+    dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
   });
 
   // eslint-disable-next-line no-console

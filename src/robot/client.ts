@@ -8,6 +8,7 @@ import {
   type DialOptions,
 } from '@viamrobotics/rpc';
 import { grpc } from '@improbable-eng/grpc-web';
+import { DIAL_TIMEOUT } from '../constants';
 import { DISCONNECTED, EventDispatcher, events, RECONNECTED } from '../events';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
@@ -65,7 +66,8 @@ export interface ConnectOptions {
   creds?: Credentials;
   priority?: number;
 
-  // set timeout in milliseconds for dialing. Default is 5000ms, a value of 0 would disable the timeout.
+  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
+  // and a value of 0 would disable the timeout.
   dialTimeout?: number;
 }
 
@@ -433,7 +435,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
         },
-        dialTimeout: dialTimeout ?? 5000,
+        dialTimeout: dialTimeout ?? DIAL_TIMEOUT,
       };
 
       // Webrtcoptions will always be defined, but TS doesn't know this
