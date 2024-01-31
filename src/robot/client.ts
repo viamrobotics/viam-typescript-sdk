@@ -64,6 +64,7 @@ export interface ConnectOptions {
   authEntity?: string;
   creds?: Credentials;
   priority?: number;
+  dialTimeout?: number;
 }
 
 abstract class ServiceClient {
@@ -396,6 +397,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
     priority,
+    dialTimeout,
   }: ConnectOptions = {}) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
@@ -429,6 +431,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
         },
+        dialTimeout
       };
 
       // Webrtcoptions will always be defined, but TS doesn't know this
