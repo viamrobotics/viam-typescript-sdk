@@ -14,7 +14,7 @@ export interface DialDirectConf {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
-  // set timeout in milliseconds for dialing. Default is 5000ms.
+  // set timeout in milliseconds for dialing. Default is 5000ms, a value of 0 would disable the timeout.
   dialTimeout?: number;
 }
 
@@ -90,7 +90,7 @@ export interface DialWebRTCConf {
   iceServers?: ICEServer[];
   priority?: number;
 
-  // set timeout in milliseconds for dialing. Default is 5000ms.
+  // set timeout in milliseconds for dialing. Default is 5000ms, a value of 0 would disable the timeout.
   dialTimeout?: number;
 }
 
