@@ -379,29 +379,17 @@ export {
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new visionApi.GetDetectorNamesRequest();
- * request.setName('myvision');
- *
- * client.visionService.getDetectorNames(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link VisionClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
 export { default as visionApi } from './gen/service/vision/v1/vision_pb';
+export {
+  type Detection,
+  type Classification,
+  type PointCloudObject,
+  VisionClient,
+} from './services/vision';
 
 /**
  * Raw Protobuf interfaces that are shared across multiple components and
