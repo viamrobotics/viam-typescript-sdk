@@ -1,9 +1,14 @@
 /* eslint-disable max-classes-per-file */
 import { backOff } from 'exponential-backoff';
-import type { Credentials, DialOptions } from '@viamrobotics/rpc/src/dial';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { dialDirect, dialWebRTC } from '@viamrobotics/rpc';
+import {
+  dialDirect,
+  dialWebRTC,
+  type Credentials,
+  type DialOptions,
+} from '@viamrobotics/rpc';
 import { grpc } from '@improbable-eng/grpc-web';
+import { DIAL_TIMEOUT } from '../constants';
 import { DISCONNECTED, EventDispatcher, events, RECONNECTED } from '../events';
 import proto from '../gen/robot/v1/robot_pb';
 import type {
@@ -60,6 +65,10 @@ export interface ConnectOptions {
   authEntity?: string;
   creds?: Credentials;
   priority?: number;
+
+  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
+  // and a value of 0 would disable the timeout.
+  dialTimeout?: number;
 }
 
 abstract class ServiceClient {
@@ -392,6 +401,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
     priority,
+    dialTimeout,
   }: ConnectOptions = {}) {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
@@ -425,6 +435,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
         },
+        dialTimeout: dialTimeout ?? DIAL_TIMEOUT,
       };
 
       // Webrtcoptions will always be defined, but TS doesn't know this

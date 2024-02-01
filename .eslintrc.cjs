@@ -27,6 +27,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-argument': 'warn',
     '@typescript-eslint/no-unsafe-call': 'warn',
     '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/prefer-promise-reject-errors': 'warn',
     'unicorn/prefer-add-event-listener': 'warn',
   },
   overrides: [
@@ -35,6 +36,10 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
+        'vitest/no-restricted-vi-methods': 'warn',
+        'vitest/valid-expect': 'warn',
+        'vitest/require-top-level-describe': 'warn',
+        'vitest/consistent-test-filename': 'warn',
       },
     },
   ],
