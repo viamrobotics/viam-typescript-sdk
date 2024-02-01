@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
   "dependencies": {
-    "@viamrobotics/rpc": "^0.2.3",
+    "@viamrobotics/rpc": "^0.2.2",
     "exponential-backoff": "^3.1.1"
   },
   "devDependencies": {
