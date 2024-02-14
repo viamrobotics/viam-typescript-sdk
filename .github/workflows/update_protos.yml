@@ -24,7 +24,7 @@ jobs:
           sudo -u testbot bash -lc 'make update-buf'
 
       - name: Add + Commit + Open PR
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           commit-message: '[WORKFLOW] Updating protos from ${{ github.event.client_payload.repo_name }}, commit: ${{ github.event.client_payload.sha }}'
           branch: 'workflow/update-protos'
@@ -32,5 +32,4 @@ jobs:
           base: main
           title: Automated Protos Update
           body: This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes
-          assignees: maximpertsov
-          reviewers: maximpertsov
+          team-reviewers: sdk-netcode
