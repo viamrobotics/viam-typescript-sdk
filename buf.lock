@@ -9,13 +9,13 @@ deps:
   - remote: buf.build
     owner: googleapis
     repository: googleapis
-    commit: a86849a25cc04f4dbe9b15ddddfbc488
-    digest: shake256:e19143328f8cbfe13fc226aeee5e63773ca494693a72740a7560664270039a380d94a1344234b88c7691311460df9a9b1c2982190d0a2612eae80368718e1943
+    commit: 7e6f6e774e29406da95bd61cdcdbc8bc
+    digest: shake256:fe43dd2265ea0c07d76bd925eeba612667cf4c948d2ce53d6e367e1b4b3cb5fa69a51e6acb1a6a50d32f894f054a35e6c0406f6808a483f2752e10c866ffbf73
   - remote: buf.build
     owner: viamrobotics
     repository: api
-    commit: e3c1978fe2bd4736a0d5ba469c54ed95
-    digest: shake256:8fa480699f4cd4cb68870a98b4af6b0dd543c0184ed90ce56cf47d9dc8c2c0b46b1a257fa95b3199006245bb0ff654031c0c5406047cf6627c04919f8a7e0aa3
+    commit: 7bd93df6125445e893eeb9df714ab588
+    digest: shake256:a3c97a33e02e7deea3617442010f5aaecf4d8c8964393c04a99a01938b5e1073dc348ca329c7537001b1471d60df6c681002962454058621a7c3273e540e1fe1
   - remote: buf.build
     owner: viamrobotics
     repository: goutils
