@@ -12,10 +12,12 @@ import {
   encodeTransform,
   encodeGeoPoint,
   encodeGeoObstacle,
+  encodeGeometry,
 } from '../../utils';
 import type {
   GeoObstacle,
   GeoPoint,
+  Geometry,
   Options,
   Pose,
   PoseInFrame,
@@ -88,6 +90,7 @@ export class MotionClient implements Motion {
     componentName: ResourceName,
     slamServiceName: ResourceName,
     motionConfig?: MotionConfiguration,
+    obstacles?: Geometry[],
     extra = {}
   ) {
     const { service } = this;
@@ -99,6 +102,9 @@ export class MotionClient implements Motion {
     request.setSlamServiceName(encodeResourceName(slamServiceName));
     if (motionConfig) {
       request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));
+    }
+    if (obstacles) {
+      request.setObstaclesList(obstacles.map((x) => encodeGeometry(x)));
     }
     request.setExtra(Struct.fromJavaScript(extra));
 
