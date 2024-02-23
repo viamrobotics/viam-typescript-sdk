@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { backOff } from 'exponential-backoff';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { RTCPeerConnection } from 'react-native-webrtc';
 import {
   dialDirect,
   dialWebRTC,
@@ -483,7 +484,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.transportFactory = webRTCConn.transportFactory;
 
-        webRTCConn.peerConnection.ontrack = (event) => {
+        webRTCConn.peerConnection.addEventListener('track', (event) => {
           const [eventStream] = event.streams;
           if (!eventStream) {
             events.emit('track', event);
@@ -500,7 +501,25 @@ export class RobotClient extends EventDispatcher implements Robot {
             value: resName,
           });
           events.emit('track', event);
-        };
+        });
+        // webRTCConn.peerConnection.ontrack = (event) => {
+        //   const [eventStream] = event.streams;
+        //   if (!eventStream) {
+        //     events.emit('track', event);
+        //     throw new Error('expected event stream to exist');
+        //   }
+
+        //   /*
+        //    * Track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
+        //    * where names should not contain colons.
+        //    */
+        //   const resName = eventStream.id.replaceAll('+', ':');
+        //   // Overriding the stream id to match the resource name
+        //   Object.defineProperty(eventStream, 'id', {
+        //     value: resName,
+        //   });
+        //   events.emit('track', event);
+        // };
       } else {
         this.transportFactory = await dialDirect(this.serviceHost, opts);
         await this.gRPCConnectionManager.start();
