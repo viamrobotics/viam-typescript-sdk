@@ -6,7 +6,7 @@ export type ObstacleDetector = pb.ObstacleDetector.AsObject;
 export type LinearConstraint = pb.LinearConstraint.AsObject;
 export type OrientationConstraint = pb.OrientationConstraint.AsObject;
 export type CollisionSpecification = pb.CollisionSpecification.AsObject;
-export type MotionConfiguration = pb.MotionConfiguration.AsObject;
+export type MotionConfiguration = Partial<pb.MotionConfiguration.AsObject>;
 export type GetPlanResponse = pb.GetPlanResponse.AsObject;
 export type ListPlanStatusesResponse = pb.ListPlanStatusesResponse.AsObject;
 type ValueOf<T> = T[keyof T];
@@ -72,7 +72,7 @@ export const encodeMotionConfiguration = (
   const result = new pb.MotionConfiguration();
 
   result.setObstacleDetectorsList(
-    obj.obstacleDetectorsList.map((od: ObstacleDetector) => {
+    obj.obstacleDetectorsList?.map((od: ObstacleDetector) => {
       const obstacleDetector = new pb.ObstacleDetector();
       if (od.visionService) {
         obstacleDetector.setVisionService(encodeResourceName(od.visionService));
@@ -81,13 +81,13 @@ export const encodeMotionConfiguration = (
         obstacleDetector.setCamera(encodeResourceName(od.camera));
       }
       return obstacleDetector;
-    })
+    }) ?? new Array<pb.ObstacleDetector>
   );
-  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
-  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
-  result.setPlanDeviationM(obj.planDeviationM);
-  result.setLinearMPerSec(obj.linearMPerSec);
-  result.setAngularDegsPerSec(obj.angularDegsPerSec);
+  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz?? 1);
+  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz?? 1);
+  result.setPlanDeviationM(obj.planDeviationM?? 2.6);
+  result.setLinearMPerSec(obj.linearMPerSec?? 0.3);
+  result.setAngularDegsPerSec(obj.angularDegsPerSec?? 20);
 
   return result;
 };
