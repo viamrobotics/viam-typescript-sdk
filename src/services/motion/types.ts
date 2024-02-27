@@ -71,8 +71,9 @@ export const encodeMotionConfiguration = (
 ): pb.MotionConfiguration => {
   const result = new pb.MotionConfiguration();
 
+  const { obstacleDetectorsList = [] } = obj;
   result.setObstacleDetectorsList(
-    obj.obstacleDetectorsList?.map((od: ObstacleDetector) => {
+    obstacleDetectorsList.map((od: ObstacleDetector) => {
       const obstacleDetector = new pb.ObstacleDetector();
       if (od.visionService) {
         obstacleDetector.setVisionService(encodeResourceName(od.visionService));
@@ -81,13 +82,23 @@ export const encodeMotionConfiguration = (
         obstacleDetector.setCamera(encodeResourceName(od.camera));
       }
       return obstacleDetector;
-    }) ?? new Array<pb.ObstacleDetector>()
+    })
   );
-  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz ?? 1);
-  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz ?? 1);
-  result.setPlanDeviationM(obj.planDeviationM ?? 2.6);
-  result.setLinearMPerSec(obj.linearMPerSec ?? 0.3);
-  result.setAngularDegsPerSec(obj.angularDegsPerSec ?? 20);
+  if (obj.positionPollingFrequencyHz) {
+    result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
+  }
+  if (obj.obstaclePollingFrequencyHz) {
+    result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
+  }
+  if (obj.planDeviationM) {
+    result.setPlanDeviationM(obj.planDeviationM);
+  }
+  if (obj.linearMPerSec) {
+    result.setLinearMPerSec(obj.linearMPerSec);
+  }
+  if (obj.angularDegsPerSec) {
+    result.setAngularDegsPerSec(obj.angularDegsPerSec);
+  }
 
   return result;
 };
