@@ -81,13 +81,13 @@ export const encodeMotionConfiguration = (
         obstacleDetector.setCamera(encodeResourceName(od.camera));
       }
       return obstacleDetector;
-    }) ?? new Array<pb.ObstacleDetector>
+    }) ?? new Array<pb.ObstacleDetector>()
   );
-  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz?? 1);
-  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz?? 1);
-  result.setPlanDeviationM(obj.planDeviationM?? 2.6);
-  result.setLinearMPerSec(obj.linearMPerSec?? 0.3);
-  result.setAngularDegsPerSec(obj.angularDegsPerSec?? 20);
+  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz ?? 1);
+  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz ?? 1);
+  result.setPlanDeviationM(obj.planDeviationM ?? 2.6);
+  result.setLinearMPerSec(obj.linearMPerSec ?? 0.3);
+  result.setAngularDegsPerSec(obj.angularDegsPerSec ?? 20);
 
   return result;
 };
