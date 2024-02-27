@@ -84,19 +84,19 @@ export const encodeMotionConfiguration = (
       return obstacleDetector;
     })
   );
-  if (obj.positionPollingFrequencyHz) {
+  if ('positionPollingFrequencyHz' in obj) {
     result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
   }
-  if (obj.obstaclePollingFrequencyHz) {
+  if ('obstaclePollingFrequencyHz' in obj) {
     result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
   }
-  if (obj.planDeviationM) {
+  if ('planDeviationM' in obj) {
     result.setPlanDeviationM(obj.planDeviationM);
   }
-  if (obj.linearMPerSec) {
+  if ('linearMPerSec' in obj) {
     result.setLinearMPerSec(obj.linearMPerSec);
   }
-  if (obj.angularDegsPerSec) {
+  if ('angularDegsPerSec' in obj) {
     result.setAngularDegsPerSec(obj.angularDegsPerSec);
   }
 
