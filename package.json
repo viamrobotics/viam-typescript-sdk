@@ -33,8 +33,7 @@
     "typecheck:src": "tsc",
     "typecheck:node": "tsc --project tsconfig.node.json",
     "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}' --quiet",
-    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'",
-    "postinstall": "install-local /Users/njooma/Developer/goutils/rpc/js"
+    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
   },
   "repository": {
     "type": "git",
@@ -46,12 +45,9 @@
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
   "dependencies": {
-    "@viamrobotics/rpc": "*",
-    "exponential-backoff": "^3.1.1"
-  },
-  "peerDependencies": {
-    "react-native": "*",
-    "react-native-webrtc": "*"
+    "@viamrobotics/rpc": "file:../goutils/rpc/js",
+    "exponential-backoff": "^3.1.1",
+    "react-native-webrtc": "^118.0.1"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.15.0-1",
@@ -83,8 +79,6 @@
     "typescript": "^5.3.3",
     "vite": "^5.0.10",
     "vitest": "^1.1.0",
-    "yaml": "^2.3.3",
-    "react-native": "*",
-    "react-native-webrtc": "*"
+    "yaml": "^2.3.3"
   }
 }
