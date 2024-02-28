@@ -67,7 +67,7 @@ export const encodeConstraints = (obj: Constraints): pb.Constraints => {
 };
 
 export const encodeMotionConfiguration = (
-  obj: MotionConfiguration
+  obj: MotionConfiguration = {}
 ): pb.MotionConfiguration => {
   const result = new pb.MotionConfiguration();
 
