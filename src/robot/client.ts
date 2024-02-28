@@ -704,6 +704,18 @@ export class RobotClient extends EventDispatcher implements Robot {
     return response.getDiscoveryList();
   }
 
+  // GET CLOUD METADATA
+
+  async getCloudMetadata() {
+    const { robotService } = this;
+    const request = new proto.GetCloudMetadataRequest();
+    const response = await promisify<
+      proto.GetCloudMetadataRequest,
+      proto.GetCloudMetadataResponse
+    >(robotService.getCloudMetadata.bind(robotService), request);
+    return response.toObject();
+  }
+
   // RESOURCES
 
   async resourceNames() {

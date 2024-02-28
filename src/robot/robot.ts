@@ -9,6 +9,7 @@ import type proto from '../gen/robot/v1/robot_pb';
 import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
 export type RobotStatusStream = ResponseStream<proto.Status[]>;
+export type CloudMetadata = proto.GetCloudMetadataResponse.AsObject;
 
 type Callback = (args: unknown) => void;
 
@@ -164,4 +165,12 @@ export interface Robot {
     type: typeof RECONNECTED | typeof DISCONNECTED,
     listener: Callback
   ) => void;
+
+  /**
+   * Get app-related information about the robot.
+   *
+   * @group App/Cloud
+   * @alpha
+   */
+  getCloudMetadata(): Promise<CloudMetadata>;
 }
