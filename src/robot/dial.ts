@@ -191,8 +191,7 @@ export const createRobotClient = async (
   if (isDialWebRTCConf(conf)) {
     try {
       client = await dialWebRTC(conf);
-    } catch (error) {
-      console.error(error);
+    } catch {
       // eslint-disable-next-line no-console
       console.debug('failed to connect via WebRTC...');
     }

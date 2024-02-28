@@ -197,6 +197,7 @@ export class RobotClient extends EventDispatcher implements Robot {
               console.debug(`failed to reconnect - retries count: ${retries}`);
               retries += 1;
               if (retries === this.reconnectMaxAttempts) {
+                // eslint-disable-next-line no-console
                 console.debug(
                   `reached max attempts: ${this.reconnectMaxAttempts}`
                 );
@@ -502,24 +503,6 @@ export class RobotClient extends EventDispatcher implements Robot {
           });
           events.emit('track', event);
         });
-        // webRTCConn.peerConnection.ontrack = (event) => {
-        //   const [eventStream] = event.streams;
-        //   if (!eventStream) {
-        //     events.emit('track', event);
-        //     throw new Error('expected event stream to exist');
-        //   }
-
-        //   /*
-        //    * Track id has +s to conform to RFC 4566 (https://www.rfc-editor.org/rfc/rfc4566)
-        //    * where names should not contain colons.
-        //    */
-        //   const resName = eventStream.id.replaceAll('+', ':');
-        //   // Overriding the stream id to match the resource name
-        //   Object.defineProperty(eventStream, 'id', {
-        //     value: resName,
-        //   });
-        //   events.emit('track', event);
-        // };
       } else {
         this.transportFactory = await dialDirect(this.serviceHost, opts);
         await this.gRPCConnectionManager.start();

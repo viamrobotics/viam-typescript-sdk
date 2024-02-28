@@ -71,7 +71,6 @@
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.2",
     "happy-dom": "^8.2.6",
-    "install-local": "^3.0.1",
     "npm-check": "^6.0.1",
     "prettier": "^3.1.1",
     "prettier-plugin-jsdoc": "^1.1.1",
