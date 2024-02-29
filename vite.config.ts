@@ -34,7 +34,6 @@ export default defineConfig({
         }
         warn(warning);
       },
-      external: [/react-native-webrtc/u],
     },
   },
   test: {

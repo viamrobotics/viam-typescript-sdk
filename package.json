@@ -45,11 +45,8 @@
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
   "dependencies": {
-    "@viamrobotics/rpc": "https://github.com/viamrobotics/goutils/releases/download/vRN/viamrobotics-rpc-rn.tgz",
+    "@viamrobotics/rpc": "/Users/njooma/Developer/goutils/rpc/js/viamrobotics-rpc-0.2.3.tgz",
     "exponential-backoff": "^3.1.1"
-  },
-  "peerDependencies": {
-    "react-native-webrtc": "*"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.15.0-1",

@@ -8,7 +8,6 @@ import {
 } from '@viamrobotics/rpc';
 import { backOff } from 'exponential-backoff';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { RTCPeerConnection } from 'react-native-webrtc';
 import { DIAL_TIMEOUT } from '../constants';
 import { DISCONNECTED, EventDispatcher, RECONNECTED, events } from '../events';
 import type {
