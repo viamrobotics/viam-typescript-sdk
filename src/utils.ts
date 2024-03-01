@@ -115,7 +115,9 @@ export const encodeResourceName = (
   return result;
 };
 
-const encodeGeometry = (obj: common.Geometry.AsObject): common.Geometry => {
+export const encodeGeometry = (
+  obj: common.Geometry.AsObject
+): common.Geometry => {
   const result = new common.Geometry();
 
   if (obj.label) {

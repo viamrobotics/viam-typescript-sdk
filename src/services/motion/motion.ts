@@ -1,5 +1,6 @@
 import type {
   GeoObstacle,
+  Geometry,
   GeoPoint,
   Pose,
   PoseInFrame,
@@ -58,12 +59,14 @@ export interface Motion extends Resource {
    * @param slamServiceName - Name of the `SLAM` service from which the SLAM map
    *   is requested
    * @param motionConfiguration - Optional motion configuration options.
+   * @param obstacles - Optional obstacles to be considered for motion planning.
    */
   moveOnMap: (
     destination: Pose,
     componentName: ResourceName,
     slamServiceName: ResourceName,
     motionConfiguration?: MotionConfiguration,
+    obstacles?: Geometry[],
     extra?: StructType
   ) => Promise<string>;
 
