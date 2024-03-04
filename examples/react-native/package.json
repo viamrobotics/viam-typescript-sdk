@@ -1,0 +1,40 @@
+{
+  "name": "ViamRNExampleApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "preinstall": "make -C ../.. build && cd ../.. && npm pack --pack-destination examples/react-native && cd examples/react-native && mv viamrobotics-sdk-*.tgz viamrobotics-sdk.tgz",
+    "postinstall": "npm install --no-save ./viamrobotics-sdk.tgz",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "lint": "eslint .",
+    "start": "react-native start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@improbable-eng/grpc-web-react-native-transport": "^0.15.0",
+    "@viamrobotics/sdk": "*",
+    "react": "18.2.0",
+    "react-native": "0.73.5",
+    "react-native-url-polyfill": "^2.0.0",
+    "react-native-webrtc": "^118.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/babel-preset": "0.73.21",
+    "@react-native/eslint-config": "0.73.2",
+    "@react-native/metro-config": "0.73.5",
+    "@react-native/typescript-config": "0.73.1",
+    "@types/react": "^18.2.6",
+    "@types/react-test-renderer": "^18.0.0",
+    "eslint": "^8.19.0",
+    "prettier": "2.8.8",
+    "react-test-renderer": "18.2.0",
+    "typescript": "5.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
