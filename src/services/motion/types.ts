@@ -6,7 +6,7 @@ export type ObstacleDetector = pb.ObstacleDetector.AsObject;
 export type LinearConstraint = pb.LinearConstraint.AsObject;
 export type OrientationConstraint = pb.OrientationConstraint.AsObject;
 export type CollisionSpecification = pb.CollisionSpecification.AsObject;
-export type MotionConfiguration = pb.MotionConfiguration.AsObject;
+export type MotionConfiguration = Partial<pb.MotionConfiguration.AsObject>;
 export type GetPlanResponse = pb.GetPlanResponse.AsObject;
 export type ListPlanStatusesResponse = pb.ListPlanStatusesResponse.AsObject;
 type ValueOf<T> = T[keyof T];
@@ -67,12 +67,13 @@ export const encodeConstraints = (obj: Constraints): pb.Constraints => {
 };
 
 export const encodeMotionConfiguration = (
-  obj: MotionConfiguration
+  obj: MotionConfiguration = {}
 ): pb.MotionConfiguration => {
   const result = new pb.MotionConfiguration();
 
+  const { obstacleDetectorsList = [] } = obj;
   result.setObstacleDetectorsList(
-    obj.obstacleDetectorsList.map((od: ObstacleDetector) => {
+    obstacleDetectorsList.map((od: ObstacleDetector) => {
       const obstacleDetector = new pb.ObstacleDetector();
       if (od.visionService) {
         obstacleDetector.setVisionService(encodeResourceName(od.visionService));
@@ -83,11 +84,21 @@ export const encodeMotionConfiguration = (
       return obstacleDetector;
     })
   );
-  result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
-  result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
-  result.setPlanDeviationM(obj.planDeviationM);
-  result.setLinearMPerSec(obj.linearMPerSec);
-  result.setAngularDegsPerSec(obj.angularDegsPerSec);
+  if (obj.positionPollingFrequencyHz !== undefined) {
+    result.setPositionPollingFrequencyHz(obj.positionPollingFrequencyHz);
+  }
+  if (obj.obstaclePollingFrequencyHz !== undefined) {
+    result.setObstaclePollingFrequencyHz(obj.obstaclePollingFrequencyHz);
+  }
+  if (obj.planDeviationM !== undefined) {
+    result.setPlanDeviationM(obj.planDeviationM);
+  }
+  if (obj.linearMPerSec !== undefined) {
+    result.setLinearMPerSec(obj.linearMPerSec);
+  }
+  if (obj.angularDegsPerSec !== undefined) {
+    result.setAngularDegsPerSec(obj.angularDegsPerSec);
+  }
 
   return result;
 };
