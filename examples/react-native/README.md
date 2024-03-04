@@ -11,8 +11,14 @@ This example demonstrates how to connect to a robot using a React Native app. Fo
 
 - Run `npm install`
 - Open `App.tsx` and update the `host` and API `credentials`.
-- [Optional] If running on an iOS device, run `cd ios && pod install && popd`
 - Run `npm run {ios|android}`
+  - If running on iOS, you may have to install dependencies: `cd ios && pod install && popd`
+  - If running on Android, you may have to export Android tool locations:
+    ```sh
+    export ANDROID_HOME=$HOME/Library/Android/sdk
+    export PATH=$PATH:$ANDROID_HOME/emulator
+    export PATH=$PATH:$ANDROID_HOME/platform-tools
+    ```
 
 ## Configuration
 
