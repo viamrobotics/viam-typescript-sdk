@@ -418,4 +418,4 @@ export type {
 
 export * from './types';
 
-export { doCommandFromClient } from './utils';
+export { doCommandFromClient, promisify } from './utils';
