@@ -398,6 +398,18 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.peerConn?.iceConnectionState === 'connected';
   }
 
+  // getStats should be used by app through `robot-client.svelte` in the RDK
+  // to gather stats for a single connection; parse out the relevant ones and
+  // send them to some telemetry monitoring process.
+  public async getStats(): Promise<RTCStatsReport | undefined> {
+    // Return no stats if the robot client is not yet connected.
+    if (!this.isConnected()) {
+      return;
+    }
+
+    return this.peerConn?.getStats();
+  }
+
   public async connect({
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
