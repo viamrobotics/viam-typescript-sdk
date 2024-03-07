@@ -26,6 +26,11 @@ export class GenericClient implements Generic {
 
   async doCommand(command: StructType): Promise<StructType> {
     const { genericService } = this;
-    return doCommandFromClient(genericService, this.name, command, this.options);
+    return doCommandFromClient(
+      genericService,
+      this.name,
+      command,
+      this.options
+    );
   }
 }
