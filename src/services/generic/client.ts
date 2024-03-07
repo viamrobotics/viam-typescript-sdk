@@ -1,6 +1,6 @@
 import { RobotClient } from '../../robot';
 import { GenericServiceClient } from '../../gen/service/generic/v1/generic_pb_service';
-import { doCommandFromClient, encodeGeoPoint, promisify } from '../../utils';
+import { doCommandFromClient } from '../../utils';
 import type { Options, StructType } from '../../types';
 import type { Generic } from './generic';
 
