@@ -235,31 +235,17 @@ export { type Stream, StreamClient } from './extra/stream';
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- * import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new commonApi.DoCommandRequest();
- * request.setName('mygeneric');
- * request.setCommand(Struct.fromJavaScript({ foo: 'bar' }));
- *
- * client.genericService.doCommand(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
+ * @deprecated Use {@link GenericComponentClient} instead.
+ * @deprecated Renamed to genericComponentApi
  * @alpha
  * @group Raw Protobufs
  */
 export { default as genericApi } from './gen/component/generic/v1/generic_pb';
+export { default as genericComponentApi } from './gen/component/generic/v1/generic_pb';
+export {
+  type Generic as GenericComponent,
+  GenericClient as GenericComponentClient,
+} from './components/generic';
 
 /**
  * Raw Protobuf interfaces for a Gripper component.
@@ -391,6 +377,21 @@ export {
   type PointCloudObject,
   VisionClient,
 } from './services/vision';
+
+/**
+ * Raw Protobuf interfaces for a Generic service.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link GenericServiceClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as genericServiceApi } from './gen/service/generic/v1/generic_pb';
+export {
+  type Generic as GenericService,
+  GenericClient as GenericServiceClient,
+} from './services/generic';
 
 /**
  * Raw Protobuf interfaces that are shared across multiple components and
