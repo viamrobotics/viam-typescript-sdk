@@ -41,9 +41,12 @@ export class SlamClient implements Slam {
     return response.toObject();
   }
 
-  getPointCloudMap = async (): Promise<Uint8Array> => {
+  getPointCloudMap = async (returnEditedMap?: boolean): Promise<Uint8Array> => {
     const request = new pb.GetPointCloudMapRequest();
     request.setName(this.name);
+    if (returnEditedMap) {
+      request.setReturnEditedMap(returnEditedMap);
+    }
     this.options.requestLogger?.(request);
 
     const chunks: Uint8Array[] = [];
