@@ -40,18 +40,22 @@ export class TestResponseStream<T> extends EventDispatcher {
 
 let pcdStream: ResponseStream<GetPointCloudMapResponse>;
 let testPcdStream: TestResponseStream<GetPointCloudMapResponse> | undefined;
-let testPcdStreamEdited: TestResponseStream<GetPointCloudMapResponse> | undefined;
+let testPcdStreamEdited:
+  | TestResponseStream<GetPointCloudMapResponse>
+  | undefined;
 let internalStream: ResponseStream<GetInternalStateResponse>;
 let testInternalStream:
   | TestResponseStream<GetInternalStateResponse>
   | undefined;
 
-const pointCloudMapMockfn = (requestMessage: GetPointCloudMapRequest): TestResponseStream<GetPointCloudMapResponse>|undefined =>{
+const pointCloudMapMockfn = (
+  requestMessage: GetPointCloudMapRequest
+): TestResponseStream<GetPointCloudMapResponse> | undefined => {
   if (requestMessage.getReturnEditedMap()) {
-    return testPcdStreamEdited
+    return testPcdStreamEdited;
   }
- return testPcdStream;
-}
+  return testPcdStream;
+};
 
 beforeEach(() => {
   testPcdStream = new TestResponseStream(pcdStream);
@@ -63,8 +67,7 @@ beforeEach(() => {
 
   SLAMServiceClient.prototype.getPointCloudMap = vi
     .fn()
-    .mockImplementation( 
-    pointCloudMapMockfn);
+    .mockImplementation(pointCloudMapMockfn);
   SLAMServiceClient.prototype.getInternalState = vi
     .fn()
     .mockImplementation(() => testInternalStream);
