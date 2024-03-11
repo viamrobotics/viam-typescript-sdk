@@ -46,14 +46,16 @@ let testInternalStream:
   | TestResponseStream<GetInternalStateResponse>
   | undefined;
 
-function pointCloudMapMockfn(requestMessage: GetPointCloudMapRequest){
+const pointCloudMapMockfn = (requestMessage: GetPointCloudMapRequest): TestResponseStream<GetPointCloudMapResponse>|undefined =>{
   if (requestMessage.getReturnEditedMap()) {
     return testPcdStreamEdited
   }
  return testPcdStream;
 }
+
 beforeEach(() => {
   testPcdStream = new TestResponseStream(pcdStream);
+  testPcdStreamEdited = new TestResponseStream(pcdStream);
   testInternalStream = new TestResponseStream(internalStream);
   RobotClient.prototype.createServiceClient = vi
     .fn()
@@ -61,7 +63,7 @@ beforeEach(() => {
 
   SLAMServiceClient.prototype.getPointCloudMap = vi
     .fn()
-    .mockImplementation(() => 
+    .mockImplementation( 
     pointCloudMapMockfn);
   SLAMServiceClient.prototype.getInternalState = vi
     .fn()
@@ -93,12 +95,21 @@ describe('getPointCloudMap tests', () => {
     const array = new Uint8Array([4, 13, 16, 25]);
     expect(promise).resolves.toStrictEqual(array);
 
+    // test map edit bool
     const promiseEdit = slam.getPointCloudMap(true);
+    // unused chunk
     const response3 = new GetPointCloudMapResponse();
-    const chunk3 = new Uint8Array([5, 38]);
+    const chunk3 = new Uint8Array([4, 27]);
     response3.setPointCloudPcdChunk(chunk3);
-    testPcdStreamEdited?.emit('data', response3);
+    testPcdStream?.emit('data', response3);
+    testPcdStream?.emit('end', { code: 0 });
+    // used chunk
+    const response3Edited = new GetPointCloudMapResponse();
+    const chunk3Edited = new Uint8Array([5, 38]);
+    response3Edited.setPointCloudPcdChunk(chunk3Edited);
+    testPcdStreamEdited?.emit('data', response3Edited);
     testPcdStreamEdited?.emit('end', { code: 0 });
+
     const arrayEdit = new Uint8Array([5, 38]);
     expect(promiseEdit).resolves.toStrictEqual(arrayEdit);
   });
