@@ -93,7 +93,7 @@ describe('getPointCloudMap tests', () => {
     const array = new Uint8Array([4, 13, 16, 25]);
     expect(promise).resolves.toStrictEqual(array);
 
-    const promiseEdit = slam.getPointCloudMap(returnEditedMap: true);
+    const promiseEdit = slam.getPointCloudMap(true);
     const response3 = new GetPointCloudMapResponse();
     const chunk3 = new Uint8Array([5, 38]);
     response3.setPointCloudPcdChunk(chunk3);
