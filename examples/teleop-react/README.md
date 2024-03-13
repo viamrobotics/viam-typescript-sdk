@@ -28,5 +28,5 @@ npm start
 This example assumes that you are working inside the Viam TypeScript SDK repository. If you want to use this example as a base for your project, make the following changes:
 
 * Remove the `preinstall: ...` line from `package.json`
-* Install the SDK: `npm install --save @viamrobotics/sdk@latest`
+* Install the SDK: `npm install @viamrobotics/sdk@latest`
 * You will also need to rename the components in the example code to match the actual component names in your configuration, for example, the camera could be named "cam" here but "camera" in your configuration. 
