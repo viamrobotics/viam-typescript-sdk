@@ -13,4 +13,4 @@ Edit `src/main.ts` to change the robot logic being run. Edit `static/index.html`
 This example assumes that you are working inside the Viam TypeScript SDK repository. If you want to use this example as a base for your project, make the following changes:
 
 * Remove the `preinstall: ...` line from `package.json`
-* Install the SDK: `npm install --save @viamrobotics/sdk@latest`
+* Install the SDK: `npm install @viamrobotics/sdk@latest`
