@@ -17,7 +17,7 @@ Build and connect to robots with TypeScript
 ### Installation
 
 ```
-npm install --save @viamrobotics/sdk
+npm install @viamrobotics/sdk
 ```
 
 ### Examples
