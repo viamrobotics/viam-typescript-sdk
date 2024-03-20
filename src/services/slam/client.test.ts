@@ -9,6 +9,7 @@ vi.mock('../../robot');
 import { EventDispatcher } from '../../events';
 import {
   GetInternalStateResponse,
+  GetPointCloudMapRequest,
   GetPointCloudMapResponse,
 } from '../../gen/service/slam/v1/slam_pb';
 import { SlamClient } from './client';
@@ -39,13 +40,26 @@ export class TestResponseStream<T> extends EventDispatcher {
 
 let pcdStream: ResponseStream<GetPointCloudMapResponse>;
 let testPcdStream: TestResponseStream<GetPointCloudMapResponse> | undefined;
+let testPcdStreamEdited:
+  | TestResponseStream<GetPointCloudMapResponse>
+  | undefined;
 let internalStream: ResponseStream<GetInternalStateResponse>;
 let testInternalStream:
   | TestResponseStream<GetInternalStateResponse>
   | undefined;
 
+const pointCloudMapMockfn = (
+  requestMessage: GetPointCloudMapRequest
+): TestResponseStream<GetPointCloudMapResponse> | undefined => {
+  if (requestMessage.getReturnEditedMap()) {
+    return testPcdStreamEdited;
+  }
+  return testPcdStream;
+};
+
 beforeEach(() => {
   testPcdStream = new TestResponseStream(pcdStream);
+  testPcdStreamEdited = new TestResponseStream(pcdStream);
   testInternalStream = new TestResponseStream(internalStream);
   RobotClient.prototype.createServiceClient = vi
     .fn()
@@ -53,7 +67,7 @@ beforeEach(() => {
 
   SLAMServiceClient.prototype.getPointCloudMap = vi
     .fn()
-    .mockImplementation(() => testPcdStream);
+    .mockImplementation(pointCloudMapMockfn);
   SLAMServiceClient.prototype.getInternalState = vi
     .fn()
     .mockImplementation(() => testInternalStream);
@@ -83,6 +97,24 @@ describe('getPointCloudMap tests', () => {
 
     const array = new Uint8Array([4, 13, 16, 25]);
     expect(promise).resolves.toStrictEqual(array);
+
+    // test map edit bool
+    const promiseEdit = slam.getPointCloudMap(true);
+    // unused chunk
+    const response3 = new GetPointCloudMapResponse();
+    const chunk3 = new Uint8Array([4, 27]);
+    response3.setPointCloudPcdChunk(chunk3);
+    testPcdStream?.emit('data', response3);
+    testPcdStream?.emit('end', { code: 0 });
+    // used chunk
+    const response3Edited = new GetPointCloudMapResponse();
+    const chunk3Edited = new Uint8Array([5, 38]);
+    response3Edited.setPointCloudPcdChunk(chunk3Edited);
+    testPcdStreamEdited?.emit('data', response3Edited);
+    testPcdStreamEdited?.emit('end', { code: 0 });
+
+    const arrayEdit = new Uint8Array([5, 38]);
+    expect(promiseEdit).resolves.toStrictEqual(arrayEdit);
   });
 
   it('end getPcdMap stream with wrong code', () => {

@@ -13,7 +13,7 @@ export interface Slam extends Resource {
   getPosition: () => Promise<SlamPosition>;
 
   /** Get the point cloud SLAM map. */
-  getPointCloudMap: () => Promise<Uint8Array>;
+  getPointCloudMap: (returnEditedMap?: boolean) => Promise<Uint8Array>;
 
   /**
    * Get the internal state of the SLAM algorithm required to continue
