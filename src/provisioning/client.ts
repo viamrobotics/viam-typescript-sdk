@@ -1,16 +1,16 @@
-import { Options } from '../types';
+import { type Options } from '../types';
 import pb from '../gen/provisioning/v1/provisioning_pb';
-import { ProvisioningServiceClient } from '../gen/provisioning/v1/provisioning_pb_service'
+import { ProvisioningServiceClient } from '../gen/provisioning/v1/provisioning_pb_service';
 import { RobotClient } from '../robot';
-import type { Provisioning } from './provisioning'
+import type { Provisioning } from './provisioning';
 import { promisify } from '../utils';
-import { CloudConfig, encodeCloudConfig } from './types';
+import { type CloudConfig, encodeCloudConfig } from './types';
 
 export class ProvisioningClient implements Provisioning {
   private client: ProvisioningServiceClient;
   private readonly options: Options;
-  
-  constructor(client: RobotClient, options: Options = {}){
+
+  constructor(client: RobotClient, options: Options = {}) {
     this.client = client.createServiceClient(ProvisioningServiceClient);
     this.options = options;
   }
@@ -24,7 +24,13 @@ export class ProvisioningClient implements Provisioning {
     const request = new pb.GetSmartMachineStatusRequest();
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetSmartMachineStatusRequest, pb.GetSmartMachineStatusResponse>(provisioningService.getSmartMachineStatus.bind(provisioningService), request);
+    const response = await promisify<
+      pb.GetSmartMachineStatusRequest,
+      pb.GetSmartMachineStatusResponse
+    >(
+      provisioningService.getSmartMachineStatus.bind(provisioningService),
+      request
+    );
     return response.toObject();
   }
 
@@ -37,28 +43,43 @@ export class ProvisioningClient implements Provisioning {
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetNetworkCredentialsRequest, pb.SetNetworkCredentialsResponse>(provisioningService.setNetworkCredentials.bind(provisioningService), request);
+    await promisify<
+      pb.SetNetworkCredentialsRequest,
+      pb.SetNetworkCredentialsResponse
+    >(
+      provisioningService.setNetworkCredentials.bind(provisioningService),
+      request
+    );
   }
 
   async setSmartMachineCredentials(cloud?: CloudConfig) {
     const provisioningService = this.ProvisioningService;
-    const request = new pb.SetSmartMachineCredentialsRequest;
+    const request = new pb.SetSmartMachineCredentialsRequest();
     if (cloud) {
       request.setCloud(encodeCloudConfig(cloud));
     }
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetSmartMachineCredentialsRequest, pb.SetSmartMachineCredentialsResponse>(provisioningService.setSmartMachineCredentials.bind(provisioningService), request);
+    await promisify<
+      pb.SetSmartMachineCredentialsRequest,
+      pb.SetSmartMachineCredentialsResponse
+    >(
+      provisioningService.setSmartMachineCredentials.bind(provisioningService),
+      request
+    );
   }
 
   async getNetworkList() {
     const provisioningService = this.ProvisioningService;
-    const request = new pb.GetNetworkListRequest;
+    const request = new pb.GetNetworkListRequest();
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetNetworkListRequest, pb.GetNetworkListResponse>(provisioningService.getNetworkList.bind(provisioningService), request);
+    const response = await promisify<
+      pb.GetNetworkListRequest,
+      pb.GetNetworkListResponse
+    >(provisioningService.getNetworkList.bind(provisioningService), request);
     return response.toObject().networksList;
   }
 }
