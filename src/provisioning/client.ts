@@ -15,12 +15,12 @@ export class ProvisioningClient implements Provisioning {
     this.options = options;
   }
 
-  private get ProvisioningService() {
+  private get service() {
     return this.client;
   }
 
   async getSmartMachineStatus() {
-    const provisioningService = this.ProvisioningService;
+    const { service } = this;
     const request = new pb.GetSmartMachineStatusRequest();
     this.options.requestLogger?.(request);
 
@@ -28,14 +28,14 @@ export class ProvisioningClient implements Provisioning {
       pb.GetSmartMachineStatusRequest,
       pb.GetSmartMachineStatusResponse
     >(
-      provisioningService.getSmartMachineStatus.bind(provisioningService),
+      service.getSmartMachineStatus.bind(service),
       request
     );
     return response.toObject();
   }
 
   async setNetworkCredentials(type: string, ssid: string, psk: string) {
-    const provisioningService = this.ProvisioningService;
+    const { service } = this;
     const request = new pb.SetNetworkCredentialsRequest();
     request.setType(type);
     request.setSsid(ssid);
@@ -47,13 +47,13 @@ export class ProvisioningClient implements Provisioning {
       pb.SetNetworkCredentialsRequest,
       pb.SetNetworkCredentialsResponse
     >(
-      provisioningService.setNetworkCredentials.bind(provisioningService),
+      service.setNetworkCredentials.bind(service),
       request
     );
   }
 
   async setSmartMachineCredentials(cloud?: CloudConfig) {
-    const provisioningService = this.ProvisioningService;
+    const { service } = this;
     const request = new pb.SetSmartMachineCredentialsRequest();
     if (cloud) {
       request.setCloud(encodeCloudConfig(cloud));
@@ -65,13 +65,13 @@ export class ProvisioningClient implements Provisioning {
       pb.SetSmartMachineCredentialsRequest,
       pb.SetSmartMachineCredentialsResponse
     >(
-      provisioningService.setSmartMachineCredentials.bind(provisioningService),
+      service.setSmartMachineCredentials.bind(service),
       request
     );
   }
 
   async getNetworkList() {
-    const provisioningService = this.ProvisioningService;
+    const { service } = this;
     const request = new pb.GetNetworkListRequest();
 
     this.options.requestLogger?.(request);
@@ -79,7 +79,7 @@ export class ProvisioningClient implements Provisioning {
     const response = await promisify<
       pb.GetNetworkListRequest,
       pb.GetNetworkListResponse
-    >(provisioningService.getNetworkList.bind(provisioningService), request);
+    >(service.getNetworkList.bind(service), request);
     return response.toObject().networksList;
   }
 }
