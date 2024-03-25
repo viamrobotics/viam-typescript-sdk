@@ -27,10 +27,7 @@ export class ProvisioningClient implements Provisioning {
     const response = await promisify<
       pb.GetSmartMachineStatusRequest,
       pb.GetSmartMachineStatusResponse
-    >(
-      service.getSmartMachineStatus.bind(service),
-      request
-    );
+    >(service.getSmartMachineStatus.bind(service), request);
     return response.toObject();
   }
 
@@ -46,10 +43,7 @@ export class ProvisioningClient implements Provisioning {
     await promisify<
       pb.SetNetworkCredentialsRequest,
       pb.SetNetworkCredentialsResponse
-    >(
-      service.setNetworkCredentials.bind(service),
-      request
-    );
+    >(service.setNetworkCredentials.bind(service), request);
   }
 
   async setSmartMachineCredentials(cloud?: CloudConfig) {
@@ -64,10 +58,7 @@ export class ProvisioningClient implements Provisioning {
     await promisify<
       pb.SetSmartMachineCredentialsRequest,
       pb.SetSmartMachineCredentialsResponse
-    >(
-      service.setSmartMachineCredentials.bind(service),
-      request
-    );
+    >(service.setSmartMachineCredentials.bind(service), request);
   }
 
   async getNetworkList() {
