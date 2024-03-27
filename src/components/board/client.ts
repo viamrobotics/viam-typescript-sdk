@@ -238,20 +238,16 @@ export class BoardClient implements Board {
 
       return new Promise<void>((resolve, reject) => {
       stream.on('status', (status) => {
-        console.log("STATUS")
-        console.log(status.code)
           if (status.code !== 0) {
             const error = {
               message: status.details,
               code: status.code,
               metadata: status.metadata,
             };
-            console.log("here")
             reject(error);
           }
         });
       stream.on('end', (end) => {
-        console.log("END")
         if (end === undefined) {
           const error = { message: 'Stream ended without a status code' };
           reject(error);

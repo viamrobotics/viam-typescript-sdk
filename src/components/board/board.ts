@@ -10,7 +10,7 @@ interface Status {
 type ValueOf<T> = T[keyof T];
 export const { PowerMode } = pb;
 export type PowerMode = ValueOf<typeof pb.PowerMode>;
-export type Tick = {
+export interface Tick {
   pinName: string
   high: boolean
   time: number
@@ -118,4 +118,3 @@ export interface Board extends Resource {
     extra?: StructType
   ): Promise<void>;
 }
-
