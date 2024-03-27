@@ -10,7 +10,11 @@ interface Status {
 type ValueOf<T> = T[keyof T];
 export const { PowerMode } = pb;
 export type PowerMode = ValueOf<typeof pb.PowerMode>;
-
+export type Tick = {
+  pinName: string
+  high: boolean
+  time: number
+}
 export type Duration = PBDuration.AsObject;
 
 /**
@@ -90,6 +94,17 @@ export interface Board extends Resource {
     extra?: StructType
   ): Promise<number>;
   /**
+   * Stream digitial interrupt ticks on the board.
+   * @param name - The name of the board.
+   * @param interrupts - Names of the interrupts to stream.
+   * @param queue - Array to put the ticks in.
+   */
+  streamTicks(
+    interrupts: string[],
+    queue: Tick[],
+    extra?: StructType
+  ): Promise<void>;
+  /**
    * Set power mode of the board.
    *
    * @param name - The name of the board.
@@ -103,3 +118,4 @@ export interface Board extends Resource {
     extra?: StructType
   ): Promise<void>;
 }
+

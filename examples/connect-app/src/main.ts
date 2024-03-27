@@ -1,58 +1,39 @@
+// This code must be run in a browser environment.
 import * as VIAM from '@viamrobotics/sdk';
 
-const ORG_ID = import.meta.env.VITE_ORG_ID;
-const API_KEY_ID = import.meta.env.VITE_API_KEY_ID;
-const API_KEY_SECRET = import.meta.env.VITE_API_KEY_SECRET;
+const main = async () => {
 
-async function connect(): Promise<VIAM.ViamClient> {
-  const opts: VIAM.ViamClientOptions = {
+
+  console.log("here????")
+  const host = 'penta-main.4hk6rzx88z.viam.cloud';
+
+  const machine = await VIAM.createRobotClient({
+    host,
     credential: {
-      type: 'api-key',
-      authEntity: API_KEY_ID,
-      payload: API_KEY_SECRET,
-    },
-  };
-
-  const client = await VIAM.createViamClient(opts);
-
-  return client;
-}
-
-const button = <HTMLButtonElement>document.getElementById('main-button');
-
-async function run(client: VIAM.ViamClient) {
-  try {
-    button.disabled = true;
-    const textElement = <HTMLParagraphElement>document.getElementById('text');
-    textElement.innerHTML = 'waiting for data...';
-
-    const dataList = await client.dataClient.tabularDataBySQL(
-      ORG_ID,
-      'select * from readings limit 5'
-    );
-    textElement.innerHTML = JSON.stringify(dataList, null, 2);
-  } finally {
-    button.disabled = false;
-  }
-}
-
-async function main() {
-  let client: VIAM.ViamClient;
-  try {
-    button.textContent = 'Connecting...';
-    client = await connect();
-    button.textContent = 'Click for data';
-  } catch (error) {
-    button.textContent = 'Unable to connect';
-    console.error(error);
-    return;
-  }
-
-  // Make the button in our app do something interesting
-  button.addEventListener('click', async () => {
-    await run(client);
+      type: 'api-key' ,
+      payload: 'fuz2myr6r1528mb6ayf5i3di17g6pevs',
+    } ,
+    authEntity: '3074554d-dd14-4e53-98b4-510a1ca58fe5',
+    signalingAddress: 'https://app.viam.com:443',
   });
-  button.disabled = false;
-}
 
-main();
+  // Note that the pin supplied is a placeholder. Please change this to a valid pin you are using.
+    // local
+    const localClient = new VIAM.BoardClient(machine, 'local');
+    const localReturnValue = await localClient.getGPIO('16');
+    console.log('local getGPIO return value:', localReturnValue);
+
+    // sensor-1
+    const sensor1Client = new VIAM.SensorClient(machine, 'sensor-1');
+    const sensor1ReturnValue = await sensor1Client.getReadings();
+    console.log('sensor-1 getReadings return value:', sensor1ReturnValue);
+
+  console.log('Resources:');
+  console.log(await machine.resourceNames());
+};
+
+main().catch((error) => {
+  alert('Does this work?');
+  console.log('here?')
+  console.error('encountered an error:', error);
+});
