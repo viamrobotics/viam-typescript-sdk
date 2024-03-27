@@ -220,7 +220,7 @@ export class BoardClient implements Board {
   }
 
 
- async streamTicks (interrupts: string[], queue: Tick[], extra = {}) {
+ async streamTicks(interrupts: string[], queue: Tick[], extra = {}) {
       const request = new pb.StreamTicksRequest();
       request.setName(this.name);
       request.setPinNamesList(interrupts);
@@ -252,7 +252,6 @@ export class BoardClient implements Board {
           const error = { message: 'Stream ended without a status code' };
           reject(error);
         } else if (end.code !== 0) {
-          console.log("end code not this")
           const error = {
             message: end.details,
             code: end.code,
