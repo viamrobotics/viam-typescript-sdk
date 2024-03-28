@@ -219,34 +219,33 @@ export class BoardClient implements Board {
     return response.getValue();
   }
 
+  async streamTicks(interrupts: string[], queue: Tick[], extra = {}) {
+    const request = new pb.StreamTicksRequest();
+    request.setName(this.name);
+    request.setPinNamesList(interrupts);
+    request.setExtra(Struct.fromJavaScript(extra));
+    this.options.requestLogger?.(request);
+    const stream = this.client.streamTicks(request);
+    stream.on('data', (response) => {
+      const tick: Tick = {
+        pinName: response.getPinName(),
+        high: response.getHigh(),
+        time: response.getTime(),
+      };
+      queue.push(tick);
+    });
 
- async streamTicks(interrupts: string[], queue: Tick[], extra = {}) {
-      const request = new pb.StreamTicksRequest();
-      request.setName(this.name);
-      request.setPinNamesList(interrupts);
-      request.setExtra(Struct.fromJavaScript(extra));
-      this.options.requestLogger?.(request);
-      const stream = this.client.streamTicks(request);
-      stream.on('data', (response) => {
-        const tick: Tick = {
-          pinName: response.getPinName(),
-          high: response.getHigh(),
-          time: response.getTime()
-        }
-        queue.push(tick)
-      });
-
-      return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       stream.on('status', (status) => {
-          if (status.code !== 0) {
-            const error = {
-              message: status.details,
-              code: status.code,
-              metadata: status.metadata,
-            };
-            reject(error);
-          }
-        });
+        if (status.code !== 0) {
+          const error = {
+            message: status.details,
+            code: status.code,
+            metadata: status.metadata,
+          };
+          reject(error);
+        }
+      });
       stream.on('end', (end) => {
         if (end === undefined) {
           const error = { message: 'Stream ended without a status code' };
@@ -259,10 +258,10 @@ export class BoardClient implements Board {
           };
           reject(error);
         }
-        resolve()
+        resolve();
       });
     });
-  };
+  }
 
   async setPowerMode(
     name: string,
