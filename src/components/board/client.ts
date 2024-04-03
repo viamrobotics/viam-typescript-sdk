@@ -7,7 +7,7 @@ import type { Options, StructType } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { Board, Duration, PowerMode } from './board';
+import type { Board, Duration, PowerMode, Tick } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -217,6 +217,50 @@ export class BoardClient implements Board {
       pb.GetDigitalInterruptValueResponse
     >(boardService.getDigitalInterruptValue.bind(boardService), request);
     return response.getValue();
+  }
+
+  async streamTicks(interrupts: string[], queue: Tick[], extra = {}) {
+    const request = new pb.StreamTicksRequest();
+    request.setName(this.name);
+    request.setPinNamesList(interrupts);
+    request.setExtra(Struct.fromJavaScript(extra));
+    this.options.requestLogger?.(request);
+    const stream = this.client.streamTicks(request);
+    stream.on('data', (response) => {
+      const tick: Tick = {
+        pinName: response.getPinName(),
+        high: response.getHigh(),
+        time: response.getTime(),
+      };
+      queue.push(tick);
+    });
+
+    return new Promise<void>((resolve, reject) => {
+      stream.on('status', (status) => {
+        if (status.code !== 0) {
+          const error = {
+            message: status.details,
+            code: status.code,
+            metadata: status.metadata,
+          };
+          reject(error);
+        }
+      });
+      stream.on('end', (end) => {
+        if (end === undefined) {
+          const error = { message: 'Stream ended without a status code' };
+          reject(error);
+        } else if (end.code !== 0) {
+          const error = {
+            message: end.details,
+            code: end.code,
+            metadata: end.metadata,
+          };
+          reject(error);
+        }
+        resolve();
+      });
+    });
   }
 
   async setPowerMode(
