@@ -1,4 +1,4 @@
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client';
+import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
 import { MLTrainingServiceClient } from '../gen/app/mltraining/v1/ml_training_pb_service';
 import pb from '../gen/app/mltraining/v1/ml_training_pb';
 import { promisify } from '../utils';
@@ -6,7 +6,7 @@ import { promisify } from '../utils';
 export type ModelTypeMap = pb.ModelTypeMap;
 export type TrainingStatusMap = pb.TrainingStatusMap;
 
-export class MLTrainingClient {
+export class MlTrainingClient {
   private service: MLTrainingServiceClient;
 
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
@@ -38,7 +38,7 @@ export class MLTrainingClient {
     return response.getId();
   }
 
-  async getTrainingJobRequest(id: string) {
+  async getTrainingJob(id: string) {
     const { service } = this;
 
     const req = new pb.GetTrainingJobRequest();
@@ -78,6 +78,7 @@ export class MLTrainingClient {
       service.cancelTrainingJob.bind(service),
       req
     );
+    return null;
   }
 
   async deleteCompletedTrainingJob(id: string) {
@@ -90,5 +91,6 @@ export class MLTrainingClient {
       pb.DeleteCompletedTrainingJobRequest,
       pb.DeleteCompletedTrainingJobResponse
     >(service.deleteCompletedTrainingJob.bind(service), req);
+    return null;
   }
 }
