@@ -59,6 +59,22 @@ beforeEach(() => {
         toObject: () => ({ networksList: [testNetworkInfo] }),
       });
     });
+
+  ProvisioningServiceClient.prototype.setNetworkCredentials = vi
+    .fn()
+    .mockImplementation((req: SetNetworkCredentialsRequest, _md, cb) => {
+      expect(req.getType()).toStrictEqual(type);
+      expect(req.getSsid()).toStrictEqual(ssid);
+      expect(req.getPsk()).toStrictEqual(psk);
+      cb(null, {});
+    });
+
+  ProvisioningServiceClient.prototype.setSmartMachineCredentials = vi
+    .fn()
+    .mockImplementation((req: SetSmartMachineCredentialsRequest, _md, cb) => {
+      expect(req.getCloud()).toStrictEqual(cloud);
+      cb(null, {});
+    });
 });
 
 it('getSmartMachineStatus', async () => {
@@ -71,4 +87,16 @@ it('getNetworkList', async () => {
   await expect(subject().getNetworkList()).resolves.toStrictEqual([
     testNetworkInfo,
   ]);
+});
+
+it('setNetworkCredentials', async () => {
+  await expect(
+    subject().setNetworkCredentials(type, ssid, psk)
+  ).resolves.toStrictEqual(undefined);
+});
+
+it('setSmartMachineCredentials', async () => {
+  await expect(
+    subject().setSmartMachineCredentials(cloud.toObject())
+  ).resolves.toStrictEqual(undefined);
 });
