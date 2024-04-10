@@ -1,11 +1,19 @@
 // @vitest-environment happy-dom
 
+import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { beforeEach, expect, it, vi } from 'vitest';
+import {
+  CloudConfig,
+  SetNetworkCredentialsRequest,
+  SetSmartMachineCredentialsRequest,
+} from '../gen/provisioning/v1/provisioning_pb';
 import { ProvisioningServiceClient } from '../gen/provisioning/v1/provisioning_pb_service';
-import { RobotClient } from '../robot';
-import { ProvisioningClient } from './client';
+import { ProvisioningClient } from './provisioning-client';
 
-let provisioning: ProvisioningClient;
+const subject = () =>
+  new ProvisioningClient('fakeServiceHost', {
+    transport: new FakeTransportBuilder().build(),
+  });
 
 const testProvisioningInfo = {
   fragmentId: 'id',
@@ -27,14 +35,15 @@ const testSmartMachineStatus = {
   latestConnectionAttempt: testNetworkInfo,
   errorsList: ['error', 'err'],
 };
+const type = 'type';
+const ssid = 'ssid';
+const psk = 'psk';
+const cloud = new CloudConfig();
+cloud.setId('id');
+cloud.setSecret('secret');
+cloud.setAppAddress('app_address');
 
 beforeEach(() => {
-  RobotClient.prototype.createServiceClient = vi
-    .fn()
-    .mockImplementation(
-      () => new ProvisioningServiceClient('test-provisioning')
-    );
-
   ProvisioningServiceClient.prototype.getSmartMachineStatus = vi
     .fn()
     .mockImplementation((_req, _md, cb) => {
@@ -50,18 +59,16 @@ beforeEach(() => {
         toObject: () => ({ networksList: [testNetworkInfo] }),
       });
     });
-
-  provisioning = new ProvisioningClient(new RobotClient('host'));
 });
 
 it('getSmartMachineStatus', async () => {
-  await expect(provisioning.getSmartMachineStatus()).resolves.toStrictEqual(
+  await expect(subject().getSmartMachineStatus()).resolves.toStrictEqual(
     testSmartMachineStatus
   );
 });
 
 it('getNetworkList', async () => {
-  await expect(provisioning.getNetworkList()).resolves.toStrictEqual([
+  await expect(subject().getNetworkList()).resolves.toStrictEqual([
     testNetworkInfo,
   ]);
 });
