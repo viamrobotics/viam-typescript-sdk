@@ -3,8 +3,11 @@ import { MLTrainingServiceClient } from '../gen/app/mltraining/v1/ml_training_pb
 import pb from '../gen/app/mltraining/v1/ml_training_pb';
 import { promisify } from '../utils';
 
-export type ModelTypeMap = pb.ModelTypeMap;
-export type TrainingStatusMap = pb.TrainingStatusMap;
+type ValueOf<T> = T[keyof T];
+export const { ModelType } = pb;
+export type ModelType = ValueOf<typeof pb.ModelType>;
+export const { TrainingStatus } = pb;
+export type TrainingStatus = ValueOf<typeof pb.TrainingStatus>;
 
 export class MlTrainingClient {
   private service: MLTrainingServiceClient;
@@ -18,7 +21,7 @@ export class MlTrainingClient {
     orgId: string,
     modelName: string,
     modelVersion: string,
-    modelType: ModelTypeMap[keyof ModelTypeMap],
+    modelType: ModelType,
     tagsList: string[]
   ) {
     const { service } = this;
@@ -51,10 +54,7 @@ export class MlTrainingClient {
     return response.getMetadata();
   }
 
-  async listTrainingJobs(
-    orgId: string,
-    status: TrainingStatusMap[keyof TrainingStatusMap]
-  ) {
+  async listTrainingJobs(orgId: string, status: TrainingStatus) {
     const { service } = this;
 
     const req = new pb.ListTrainingJobsRequest();

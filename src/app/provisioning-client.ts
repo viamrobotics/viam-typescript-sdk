@@ -3,13 +3,9 @@ import pb from '../gen/provisioning/v1/provisioning_pb';
 import { ProvisioningServiceClient } from '../gen/provisioning/v1/provisioning_pb_service';
 import { promisify } from '../utils';
 
-export type SmartMachineStatus = pb.GetSmartMachineStatusResponse.AsObject;
-export type NetworkInfo = pb.NetworkInfo.AsObject;
 export type CloudConfig = pb.CloudConfig.AsObject;
 
-export const encodeCloudConfig = (
-  obj: pb.CloudConfig.AsObject
-): pb.CloudConfig => {
+const encodeCloudConfig = (obj: CloudConfig): pb.CloudConfig => {
   const result = new pb.CloudConfig();
   result.setId(obj.id);
   result.setSecret(obj.secret);
