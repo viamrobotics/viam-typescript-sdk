@@ -8,7 +8,7 @@ export const { PaymentMethodType } = pb;
 export type PaymentMethodType = ValueOf<typeof pb.PaymentMethodType>;
 
 export type GetCurrentMonthUsageResponse =
-  Partial<pb.GetCurrentMonthUsageResponse> & {
+  Partial<pb.GetCurrentMonthUsageResponse.AsObject> & {
     startDate?: Date;
     endDate?: Date;
   };
@@ -16,12 +16,21 @@ export type GetCurrentMonthUsageResponse =
 const decodeMonthUsage = (
   proto: pb.GetCurrentMonthUsageResponse
 ): GetCurrentMonthUsageResponse => {
-  const result: GetCurrentMonthUsageResponse = proto.toObject();
-  if (proto.startDate != undefined) {
-    result.startDate = proto.getStartDate().toDate();
+  const result: GetCurrentMonthUsageResponse = {
+    cloudStorageUsageCost: proto.getCloudStorageUsageCost(),
+    dataUploadUsageCost: proto.getDataUploadUsageCost(),
+    dataEgresUsageCost: proto.getDataEgresUsageCost(),
+    remoteControlUsageCost: proto.getRemoteControlUsageCost(),
+    standardComputeUsageCost: proto.getStandardComputeUsageCost(),
+    discountAmount: proto.getDiscountAmount(),
+    totalUsageWithDiscount: proto.getTotalUsageWithDiscount(),
+    totalUsageWithoutDiscount: proto.getTotalUsageWithoutDiscount(),
+  };
+  if (proto.hasStartDate()) {
+    result.startDate = proto.getStartDate()?.toDate();
   }
-  if (proto.endDate != undefined) {
-    result.endDate = proto.getEndDate().toDate();
+  if (proto.hasEndDate()) {
+    result.endDate = proto.getEndDate()?.toDate();
   }
   return result;
 };
@@ -33,11 +42,11 @@ export class BillingClient {
     this.service = new BillingServiceClient(serviceHost, grpcOptions);
   }
 
-  async getCurrentMonthUsage(org_id: string) {
+  async getCurrentMonthUsage(orgId: string) {
     const { service } = this;
 
     const req = new pb.GetCurrentMonthUsageRequest();
-    req.setOrgId(org_id);
+    req.setOrgId(orgId);
 
     const response = await promisify<
       pb.GetCurrentMonthUsageRequest,
@@ -46,11 +55,11 @@ export class BillingClient {
     return decodeMonthUsage(response);
   }
 
-  async getOrgBillingInformation(org_id: string) {
+  async getOrgBillingInformation(orgId: string) {
     const { service } = this;
 
     const req = new pb.GetOrgBillingInformationRequest();
-    req.setOrgId(org_id);
+    req.setOrgId(orgId);
 
     const response = await promisify<
       pb.GetOrgBillingInformationRequest,
@@ -59,11 +68,11 @@ export class BillingClient {
     return response.toObject();
   }
 
-  async getInvoicesSummary(org_id: string) {
+  async getInvoicesSummary(orgId: string) {
     const { service } = this;
 
     const req = new pb.GetInvoicesSummaryRequest();
-    req.setOrgId(org_id);
+    req.setOrgId(orgId);
 
     const response = await promisify<
       pb.GetInvoicesSummaryRequest,
@@ -72,17 +81,17 @@ export class BillingClient {
     return response.toObject();
   }
 
-  async getInvoicePdf(id: string, org_id: string) {
+  async getInvoicePdf(id: string, orgId: string) {
     const { service } = this;
 
     const req = new pb.GetInvoicePdfRequest();
     req.setId(id);
-    req.setOrgId(org_id);
+    req.setOrgId(orgId);
 
     const response = await promisify<
       pb.GetInvoicePdfRequest,
       pb.GetInvoicePdfResponse
     >(service.getInvoicePdf.bind(service), req);
-    return response.chunk;
+    return response.getChunk();
   }
 }
