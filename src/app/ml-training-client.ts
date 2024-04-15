@@ -17,8 +17,8 @@ export class MlTrainingClient {
   }
 
   async submitTrainingJob(
-    datasetId: string,
     orgId: string,
+    datasetId: string,
     modelName: string,
     modelVersion: string,
     modelType: ModelType,
@@ -27,8 +27,8 @@ export class MlTrainingClient {
     const { service } = this;
 
     const req = new pb.SubmitTrainingJobRequest();
-    req.setDatasetId(datasetId);
     req.setOrganizationId(orgId);
+    req.setDatasetId(datasetId);
     req.setModelName(modelName);
     req.setModelVersion(modelVersion);
     req.setModelType(modelType);
