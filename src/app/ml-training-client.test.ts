@@ -37,8 +37,8 @@ describe('MlTrainingClient tests', () => {
 
     it('submit job training job', async () => {
       const response = await subject().submitTrainingJob(
-        'dataset_id',
         'org_id',
+        'dataset_id',
         'model_name',
         'model_version',
         type,
