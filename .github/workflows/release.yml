@@ -6,7 +6,7 @@ on:
 jobs:
   prepare:
     if: github.repository_owner == 'viamrobotics' && startsWith(github.ref_name, 'rc-')
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     outputs:
@@ -25,7 +25,7 @@ jobs:
         if: steps.is_organization_member.outputs.result == 'false'
 
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build + Lint + Test
         run: |
@@ -64,19 +64,19 @@ jobs:
       - name: Open PR
         uses: repo-sync/pull-request@v2
         with:
-          destination_branch: "main"
+          destination_branch: 'main'
           pr_title: ${{ steps.which_version.outputs.version }}
           pr_body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
 
   build:
     needs: prepare
     if: github.repository_owner == 'viamrobotics' && startsWith(github.ref_name, 'rc-')
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: rc-${{ needs.prepare.outputs.version }}
 
@@ -96,7 +96,7 @@ jobs:
   release:
     needs: [prepare, build]
     if: github.repository_owner == 'viamrobotics' && startsWith(github.ref_name, 'rc-')
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
 
