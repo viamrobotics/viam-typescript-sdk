@@ -1,4 +1,5 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { describe } from 'vitest';
 import { beforeEach, expect, it, vi } from 'vitest';
 import {
@@ -12,6 +13,14 @@ import {
 import { BillingServiceClient } from '../gen/app/v1/billing_pb_service';
 import { BillingClient, PaymentMethodType } from './billing-client';
 
+const SECONDS = 1;
+const NANOS = 2_000_000;
+const testStartDate = new Timestamp();
+testStartDate.setSeconds(SECONDS);
+testStartDate.setNanos(NANOS);
+const testEndDate = new Timestamp();
+testEndDate.setSeconds(SECONDS * 2);
+testEndDate.setNanos(NANOS);
 const testMonthUsage = {
   cloudStorageUsageCost: 1,
   dataUploadUsageCost: 2,
@@ -21,6 +30,8 @@ const testMonthUsage = {
   discountAmount: 6,
   totalUsageWithDiscount: 7,
   totalUsageWithoutDiscount: 8,
+  start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
+  end: new Date(SECONDS * 2000 + NANOS / 1_000_000),
 };
 const testInvoiceSummary = {
   id: 'id',
@@ -53,6 +64,8 @@ describe('BillingClient tests', () => {
         response.setDiscountAmount(6);
         response.setTotalUsageWithDiscount(7);
         response.setTotalUsageWithoutDiscount(8);
+        response.setStartDate(testStartDate);
+        response.setEndDate(testEndDate);
         cb(null, response);
       });
 

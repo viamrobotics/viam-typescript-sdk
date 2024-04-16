@@ -9,13 +9,15 @@ export type PaymentMethodType = ValueOf<typeof pb.PaymentMethodType>;
 
 export type GetCurrentMonthUsageResponse =
   Partial<pb.GetCurrentMonthUsageResponse.AsObject> & {
-    startDate?: Date;
-    endDate?: Date;
+    start?: Date;
+    end?: Date;
   };
 
 const decodeMonthUsage = (
   proto: pb.GetCurrentMonthUsageResponse
 ): GetCurrentMonthUsageResponse => {
+  const startDate = proto.getStartDate();
+  const endDate = proto.getEndDate();
   const result: GetCurrentMonthUsageResponse = {
     cloudStorageUsageCost: proto.getCloudStorageUsageCost(),
     dataUploadUsageCost: proto.getDataUploadUsageCost(),
@@ -25,13 +27,15 @@ const decodeMonthUsage = (
     discountAmount: proto.getDiscountAmount(),
     totalUsageWithDiscount: proto.getTotalUsageWithDiscount(),
     totalUsageWithoutDiscount: proto.getTotalUsageWithoutDiscount(),
+    start: startDate
+      ? new Date(
+          startDate.getSeconds() * 1000 + startDate.getNanos() / 1_000_000
+        )
+      : undefined,
+    end: endDate
+      ? new Date(endDate.getSeconds() * 1000 + endDate.getNanos() / 1_000_000)
+      : undefined,
   };
-  if (proto.hasStartDate()) {
-    result.startDate = proto.getStartDate()?.toDate();
-  }
-  if (proto.hasEndDate()) {
-    result.endDate = proto.getEndDate()?.toDate();
-  }
   return result;
 };
 
