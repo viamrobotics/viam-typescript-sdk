@@ -4,13 +4,13 @@ on:
   release:
     types: [published]
     secrets:
-        NPM_TOKEN:
-          required: true
+      NPM_TOKEN:
+        required: true
 
 jobs:
   publish:
     if: github.repository_owner == 'viamrobotics'
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
 
