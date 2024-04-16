@@ -9,9 +9,10 @@ import {
   GetInvoicePdfResponse,
   GetInvoicesSummaryRequest,
   GetOrgBillingInformationRequest,
+  PaymentMethodType,
 } from '../gen/app/v1/billing_pb';
 import { BillingServiceClient } from '../gen/app/v1/billing_pb_service';
-import { BillingClient, PaymentMethodType } from './billing-client';
+import { BillingClient } from './billing-client';
 
 const SECONDS = 1;
 const NANOS = 2_000_000;

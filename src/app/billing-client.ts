@@ -3,11 +3,7 @@ import { BillingServiceClient } from '../gen/app/v1/billing_pb_service';
 import pb from '../gen/app/v1/billing_pb';
 import { promisify } from '../utils';
 
-type ValueOf<T> = T[keyof T];
-export const { PaymentMethodType } = pb;
-export type PaymentMethodType = ValueOf<typeof pb.PaymentMethodType>;
-
-export type GetCurrentMonthUsageResponse =
+type GetCurrentMonthUsageResponse =
   Partial<pb.GetCurrentMonthUsageResponse.AsObject> & {
     start?: Date;
     end?: Date;
