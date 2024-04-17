@@ -8,7 +8,7 @@ import { DataClient } from './data-client';
 import { BillingClient } from './billing-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
-]
+
 export interface ViamClientOptions {
   serviceHost?: string;
   credential: Credential | AccessToken;

@@ -86,6 +86,7 @@ export {
   type ProvisioningClient,
 } from './app/provisioning-client';
 
+/**
  * Raw Protobuf interfaces for Billing.
  *
  * Generated with https://github.com/improbable-eng/grpc-web

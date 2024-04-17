@@ -78,4 +78,5 @@ describe('ViamClient', () => {
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
     expect(client.billingClient).toBeInstanceOf(BillingClient);
+  });
 });
