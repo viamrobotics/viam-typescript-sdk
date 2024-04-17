@@ -15,6 +15,8 @@ vi.mock('./viam-transport', () => {
 import { DataClient } from './data-client';
 import { BillingClient } from './billing-client';
 import { createViamClient, type ViamClientOptions } from './viam-client';
+import { MlTrainingClient } from './ml-training-client';
+import { ProvisioningClient } from './provisioning-client';
 
 describe('ViamClient', () => {
   let options: ViamClientOptions | undefined;
@@ -44,6 +46,8 @@ describe('ViamClient', () => {
       testCredential
     );
     expect(client.dataClient).toBeInstanceOf(DataClient);
+    expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
+    expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
     expect(client.billingClient).toBeInstanceOf(BillingClient);
   });
 
@@ -57,6 +61,8 @@ describe('ViamClient', () => {
       testCredential
     );
     expect(client.dataClient).toBeInstanceOf(DataClient);
+    expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
+    expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
     expect(client.billingClient).toBeInstanceOf(BillingClient);
   });
 
@@ -69,6 +75,7 @@ describe('ViamClient', () => {
       testAccessToken
     );
     expect(client.dataClient).toBeInstanceOf(DataClient);
+    expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
+    expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
     expect(client.billingClient).toBeInstanceOf(BillingClient);
-  });
 });

@@ -7,13 +7,13 @@ jobs:
   license_finder:
     if: github.repository_owner == 'viamrobotics'
     name: Audit 3rd-Party Licenses
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run license finder
         run: license_finder --prepare
