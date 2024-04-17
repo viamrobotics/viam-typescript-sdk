@@ -714,7 +714,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       proto.GetCloudMetadataRequest,
       proto.GetCloudMetadataResponse
     >(robotService.getCloudMetadata.bind(robotService), request);
-    return response.toObject();
+    const md = response.toObject();
+    return {
+      primaryOrgId: md.primaryOrgId,
+      locationId: md.locationId,
+      machineId: md.machineId,
+      machinePartId: md.machinePartId,
+    };
   }
 
   // RESOURCES
