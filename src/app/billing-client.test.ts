@@ -31,6 +31,8 @@ const testMonthUsage = {
   discountAmount: 6,
   totalUsageWithDiscount: 7,
   totalUsageWithoutDiscount: 8,
+  startDate: testStartDate.toObject(),
+  endDate: testEndDate.toObject(),
   start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
   end: new Date(SECONDS * 2000 + NANOS / 1_000_000),
 };

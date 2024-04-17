@@ -9,32 +9,6 @@ type GetCurrentMonthUsageResponse =
     end?: Date;
   };
 
-const decodeMonthUsage = (
-  proto: pb.GetCurrentMonthUsageResponse
-): GetCurrentMonthUsageResponse => {
-  const startDate = proto.getStartDate();
-  const endDate = proto.getEndDate();
-  const result: GetCurrentMonthUsageResponse = {
-    cloudStorageUsageCost: proto.getCloudStorageUsageCost(),
-    dataUploadUsageCost: proto.getDataUploadUsageCost(),
-    dataEgresUsageCost: proto.getDataEgresUsageCost(),
-    remoteControlUsageCost: proto.getRemoteControlUsageCost(),
-    standardComputeUsageCost: proto.getStandardComputeUsageCost(),
-    discountAmount: proto.getDiscountAmount(),
-    totalUsageWithDiscount: proto.getTotalUsageWithDiscount(),
-    totalUsageWithoutDiscount: proto.getTotalUsageWithoutDiscount(),
-    start: startDate
-      ? new Date(
-          startDate.getSeconds() * 1000 + startDate.getNanos() / 1_000_000
-        )
-      : undefined,
-    end: endDate
-      ? new Date(endDate.getSeconds() * 1000 + endDate.getNanos() / 1_000_000)
-      : undefined,
-  };
-  return result;
-};
-
 export class BillingClient {
   private service: BillingServiceClient;
 
@@ -52,7 +26,11 @@ export class BillingClient {
       pb.GetCurrentMonthUsageRequest,
       pb.GetCurrentMonthUsageResponse
     >(service.getCurrentMonthUsage.bind(service), req);
-    return decodeMonthUsage(response);
+
+    const result: GetCurrentMonthUsageResponse = response.toObject();
+    result.start = response.getStartDate()?.toDate();
+    result.end = response.getEndDate()?.toDate();
+    return result;
   }
 
   async getOrgBillingInformation(orgId: string) {
