@@ -7,6 +7,7 @@ import {
 import { DataClient } from './data-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
+import { DataSyncClient } from './data-sync-client';
 
 export interface ViamClientOptions {
   serviceHost?: string;
@@ -35,6 +36,7 @@ export class ViamClient {
   public dataClient: DataClient | undefined;
   public mlTrainingClient: MlTrainingClient | undefined;
   public provisioningClient: ProvisioningClient | undefined;
+  public dataSyncClient: DataSyncClient | undefined;
 
   constructor(transportFactory: grpc.TransportFactory, serviceHost: string) {
     this.transportFactory = transportFactory;
@@ -49,5 +51,6 @@ export class ViamClient {
       this.serviceHost,
       grpcOptions
     );
+    this.dataSyncClient = new DataSyncClient(this.serviceHost, grpcOptions);
   }
 }

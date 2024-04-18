@@ -16,6 +16,7 @@ import { DataClient } from './data-client';
 import { createViamClient, type ViamClientOptions } from './viam-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
+import { DataSyncClient } from './data-sync-client';
 
 describe('ViamClient', () => {
   let options: ViamClientOptions | undefined;
@@ -47,6 +48,7 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
+    expect(client.dataSyncClient).toBeInstanceOf(DataSyncClient);
   });
 
   it('create client with an api key credential and a custom service host', async () => {
@@ -61,6 +63,7 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
+    expect(client.dataSyncClient).toBeInstanceOf(DataSyncClient);
   });
 
   it('create client with an access token', async () => {
@@ -74,5 +77,6 @@ describe('ViamClient', () => {
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
+    expect(client.dataSyncClient).toBeInstanceOf(DataSyncClient);
   });
 });
