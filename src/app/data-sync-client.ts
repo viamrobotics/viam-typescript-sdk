@@ -71,13 +71,6 @@ const encodeSensorData = (obj: SensorData): pb.SensorData => {
   return proto;
 };
 
-/** Convert FileData to a Protobuf FileData */
-const encodeFileData = (obj: FileData): pb.FileData => {
-  const proto = new pb.FileData();
-  proto.setData(obj.data);
-  return proto;
-};
-
 /** Convert DataCaptureUploadMetadata to a Protobuf DataCaptureUploadMetadata */
 const encodeDataCaptureUploadMetadata = (
   obj: DataCaptureUploadMetadata
@@ -128,7 +121,9 @@ export class DataSyncClient {
       req.setMetadata(encodeUploadMetadata(metadata));
     }
     if (fileData) {
-      req.setFileContents(encodeFileData(fileData));
+      const proto = new pb.FileData();
+      proto.setData(fileData.data);
+      req.setFileContents(proto);
     }
 
     const response = await promisify<
