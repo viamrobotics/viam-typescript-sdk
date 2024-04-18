@@ -66,10 +66,52 @@ export class BillingClient {
     req.setId(id);
     req.setOrgId(orgId);
 
-    const response = await promisify<
-      pb.GetInvoicePdfRequest,
-      pb.GetInvoicePdfResponse
-    >(service.getInvoicePdf.bind(service), req);
-    return response.getChunk();
+    const chunks: Uint8Array[] = [];
+    const stream = service.getInvoicePdf(req);
+
+    stream.on('data', (response) => {
+      const chunk = response.getChunk_asU8();
+      chunks.push(chunk);
+    });
+
+    return new Promise<Uint8Array>((resolve, reject) => {
+      stream.on('status', (status) => {
+        if (status.code !== 0) {
+          const error = {
+            message: status.details,
+            code: status.code,
+            metadata: status.metadata,
+          };
+          reject(error);
+        }
+      });
+
+      stream.on('end', (end) => {
+        if (end === undefined) {
+          const error = { message: 'Stream ended without a status code' };
+          reject(error);
+        } else if (end.code !== 0) {
+          const error = {
+            message: end.details,
+            code: end.code,
+            metadata: end.metadata,
+          };
+          reject(error);
+        }
+        const arr = concatArrayU8(chunks);
+        resolve(arr);
+      });
+    });
   }
 }
+
+const concatArrayU8 = (arrays: Uint8Array[]) => {
+  const totalLength = arrays.reduce((acc, value) => acc + value.length, 0);
+  const result = new Uint8Array(totalLength);
+  let length = 0;
+  for (const array of arrays) {
+    result.set(array, length);
+    length += array.length;
+  }
+  return result;
+};

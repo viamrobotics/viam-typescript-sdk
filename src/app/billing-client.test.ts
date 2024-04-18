@@ -1,11 +1,12 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { describe } from 'vitest';
+import { afterEach, describe } from 'vitest';
 import { beforeEach, expect, it, vi } from 'vitest';
+import { type ResponseStream } from '../gen/robot/v1/robot_pb_service';
+import { EventDispatcher } from '../events';
 import {
   GetCurrentMonthUsageRequest,
   GetCurrentMonthUsageResponse,
-  GetInvoicePdfRequest,
   GetInvoicePdfResponse,
   GetInvoicesSummaryRequest,
   GetOrgBillingInformationRequest,
@@ -46,7 +47,32 @@ const testBillingInfo = {
   billingEmail: 'email@email.com',
   billingTier: 'platinum',
 };
-const testInvoicePdf = new Uint8Array([1, 2, 3, 4]);
+
+class TestResponseStream<T> extends EventDispatcher {
+  private stream: ResponseStream<any>;
+
+  constructor(stream: ResponseStream<any>) {
+    super();
+    this.stream = stream;
+  }
+
+  override on(
+    type: string,
+    handler: (message: any) => void
+  ): ResponseStream<T> {
+    super.on(type, handler);
+    return this;
+  }
+
+  cancel(): void {
+    this.listeners = {};
+    this.stream.cancel();
+  }
+}
+let getGetInvoicePdfStream: ResponseStream<GetInvoicePdfResponse>;
+let testGetInvoicePdfStream:
+  | TestResponseStream<GetInvoicePdfResponse>
+  | undefined;
 
 const subject = () =>
   new BillingClient('fakeServiceHost', {
@@ -55,6 +81,7 @@ const subject = () =>
 
 describe('BillingClient tests', () => {
   beforeEach(() => {
+    testGetInvoicePdfStream = new TestResponseStream(getGetInvoicePdfStream);
     vi.spyOn(BillingServiceClient.prototype, 'getCurrentMonthUsage')
       // @ts-expect-error compiler is matching incorrect function signature
       .mockImplementation((_req: GetCurrentMonthUsageRequest, _md, cb) => {
@@ -84,32 +111,45 @@ describe('BillingClient tests', () => {
         cb(null, { toObject: () => testInvoiceSummary });
       });
 
-    vi.spyOn(BillingServiceClient.prototype, 'getInvoicePdf')
-      // @ts-expect-error compiler is matching incorrect function signature
-      .mockImplementation((_req: GetInvoicePdfRequest, _md, cb) => {
-        const response = new GetInvoicePdfResponse();
-        response.setChunk(testInvoicePdf);
-        cb(null, response);
-      });
+    BillingServiceClient.prototype.getInvoicePdf = vi
+      .fn()
+      .mockImplementation(() => testGetInvoicePdfStream);
+  });
+
+  afterEach(() => {
+    testGetInvoicePdfStream = undefined;
   });
 
   it('getCurrentMonthUsage', async () => {
-    const response = await subject().getCurrentMonthUsage('org_id');
+    const response = await subject().getCurrentMonthUsage('orgId');
     expect(response).toEqual(testMonthUsage);
   });
 
   it('getOrgBillingInformation', async () => {
-    const response = await subject().getOrgBillingInformation('org_id');
+    const response = await subject().getOrgBillingInformation('orgId');
     expect(response).toEqual(testBillingInfo);
   });
 
   it('getInvoicesSummary', async () => {
-    const response = await subject().getInvoicesSummary('org_id');
+    const response = await subject().getInvoicesSummary('orgId');
     expect(response).toEqual(testInvoiceSummary);
   });
 
-  it('getInvoicePdf', async () => {
-    const response = await subject().getInvoicePdf('id', 'org_id');
-    expect(response).toEqual(testInvoicePdf);
+  it('getInvoicePdf', () => {
+    const promise = subject().getInvoicePdf('id', 'orgId');
+
+    const response1 = new GetInvoicePdfResponse();
+    const chunk1 = new Uint8Array([1, 2]);
+    response1.setChunk(chunk1);
+    testGetInvoicePdfStream?.emit('data', response1);
+
+    const response2 = new GetInvoicePdfResponse();
+    const chunk2 = new Uint8Array([3, 4]);
+    response2.setChunk(chunk2);
+    testGetInvoicePdfStream?.emit('data', response2);
+    testGetInvoicePdfStream?.emit('end', { code: 0 });
+
+    const array = new Uint8Array([1, 2, 3, 4]);
+    expect(promise).resolves.toStrictEqual(array);
   });
 });
