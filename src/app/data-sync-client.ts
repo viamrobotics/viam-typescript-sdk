@@ -1,4 +1,4 @@
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client';
+import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
 import { DataSyncServiceClient } from '../gen/app/datasync/v1/data_sync_pb_service';
 import pb from '../gen/app/datasync/v1/data_sync_pb';
 import { promisify } from '../utils';
