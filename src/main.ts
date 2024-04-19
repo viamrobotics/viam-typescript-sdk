@@ -87,6 +87,18 @@ export {
 } from './app/provisioning-client';
 
 /**
+ * Raw Protobuf interfaces for Billing.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link BillingClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as billingApi } from './gen/app/v1/billing_pb';
+export { type BillingClient } from './app/billing-client';
+
+/**
  * Raw Protobuf interfaces for an Arm component.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
