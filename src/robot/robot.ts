@@ -9,12 +9,7 @@ import type proto from '../gen/robot/v1/robot_pb';
 import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
 export type RobotStatusStream = ResponseStream<proto.Status[]>;
-export interface CloudMetadata {
-  primaryOrgId: string;
-  locationId: string;
-  machineId: string;
-  machinePartId: string;
-}
+export type CloudMetadata = proto.GetCloudMetadataResponse.AsObject;
 
 type Callback = (args: unknown) => void;
 
