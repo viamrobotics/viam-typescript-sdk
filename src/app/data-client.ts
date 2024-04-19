@@ -183,6 +183,267 @@ export class DataClient {
     return response.toObject().dataList;
   }
 
+  async deleteTabularData(orgId: string, deleteOlderThanDays: number) {
+    const { service } = this;
+
+    const req = new pb.DeleteTabularDataRequest();
+    req.setOrganizationId(orgId);
+    req.setDeleteOlderThanDays(deleteOlderThanDays);
+
+    const response = await promisify<
+      pb.DeleteTabularDataRequest,
+      pb.DeleteTabularDataResponse
+    >(service.deleteTabularData.bind(service), req);
+    return response.getDeletedCount();
+  }
+
+  async deleteBinaryDataByFilter(
+    includeInternalData: boolean,
+    filter?: pb.Filter
+  ) {
+    const { service } = this;
+
+    const req = new pb.DeleteBinaryDataByFilterRequest();
+    req.setFilter(filter ?? new pb.Filter());
+    req.setIncludeInternalData(includeInternalData);
+
+    const response = await promisify<
+      pb.DeleteBinaryDataByFilterRequest,
+      pb.DeleteTabularDataResponse
+    >(service.deleteBinaryDataByFilter.bind(service), req);
+    return response.getDeletedCount();
+  }
+
+  async deleteBinaryDataByIds(ids: BinaryID[]) {
+    const { service } = this;
+
+    const binaryIds: pb.BinaryID[] = ids.map(
+      ({ fileId, organizationId, locationId }) => {
+        const binaryId = new pb.BinaryID();
+        binaryId.setFileId(fileId);
+        binaryId.setOrganizationId(organizationId);
+        binaryId.setLocationId(locationId);
+        return binaryId;
+      }
+    );
+
+    const req = new pb.DeleteBinaryDataByIDsRequest();
+    req.setBinaryIdsList(binaryIds);
+
+    const response = await promisify<
+      pb.DeleteBinaryDataByIDsRequest,
+      pb.DeleteBinaryDataByIDsResponse
+    >(service.deleteBinaryDataByIDs.bind(service), req);
+    return response.getDeletedCount();
+  }
+
+  async addTagsToBinaryDataByIds(ids: BinaryID[], tags: string[]) {
+    const { service } = this;
+
+    const binaryIds: pb.BinaryID[] = ids.map(
+      ({ fileId, organizationId, locationId }) => {
+        const binaryId = new pb.BinaryID();
+        binaryId.setFileId(fileId);
+        binaryId.setOrganizationId(organizationId);
+        binaryId.setLocationId(locationId);
+        return binaryId;
+      }
+    );
+
+    const req = new pb.AddTagsToBinaryDataByIDsRequest();
+    req.setBinaryIdsList(binaryIds);
+    req.setTagsList(tags);
+
+    await promisify<
+      pb.AddTagsToBinaryDataByIDsRequest,
+      pb.AddTagsToBinaryDataByIDsResponse
+    >(service.addTagsToBinaryDataByIDs.bind(service), req);
+  }
+
+  async addTagsToBinaryDataByFilter(tags: string[], filter?: pb.Filter) {
+    const { service } = this;
+
+    const req = new pb.AddTagsToBinaryDataByFilterRequest();
+    req.setTagsList(tags);
+    req.setFilter(filter ?? new pb.Filter());
+
+    await promisify<
+      pb.AddTagsToBinaryDataByFilterRequest,
+      pb.AddTagsToBinaryDataByFilterResponse
+    >(service.addTagsToBinaryDataByFilter.bind(service), req);
+  }
+
+  async removeTagsFromBinaryDataByIds(ids: BinaryID[], tags: string[]) {
+    const { service } = this;
+
+    const binaryIds: pb.BinaryID[] = ids.map(
+      ({ fileId, organizationId, locationId }) => {
+        const binaryId = new pb.BinaryID();
+        binaryId.setFileId(fileId);
+        binaryId.setOrganizationId(organizationId);
+        binaryId.setLocationId(locationId);
+        return binaryId;
+      }
+    );
+
+    const req = new pb.RemoveTagsFromBinaryDataByIDsRequest();
+    req.setBinaryIdsList(binaryIds);
+    req.setTagsList(tags);
+
+    await promisify<
+      pb.RemoveTagsFromBinaryDataByIDsRequest,
+      pb.RemoveTagsFromBinaryDataByIDsResponse
+    >(service.removeTagsFromBinaryDataByIDs.bind(service), req);
+  }
+
+  async removeTagsFromBinaryDataByFilter(tags: string[], filter?: pb.Filter) {
+    const { service } = this;
+
+    const req = new pb.RemoveTagsFromBinaryDataByFilterRequest();
+    req.setTagsList(tags);
+    req.setFilter(filter ?? new pb.Filter());
+
+    await promisify<
+      pb.RemoveTagsFromBinaryDataByFilterRequest,
+      pb.RemoveTagsFromBinaryDataByFilterResponse
+    >(service.removeTagsFromBinaryDataByFilter.bind(service), req);
+  }
+
+  async tagsByFilter(filter?: pb.Filter) {
+    const { service } = this;
+
+    const req = new pb.TagsByFilterRequest();
+    req.setFilter(filter);
+
+    const response = await promisify<
+      pb.TagsByFilterRequest,
+      pb.TagsByFilterResponse
+    >(service.tagsByFilter.bind(service), req);
+    return response.getTagsList();
+  }
+
+  async addBoundingBoxToImageById(
+    id: BinaryID,
+    label: string,
+    xMinNormalized: number,
+    yMinNormalized: number,
+    xMaxNormalized: number,
+    yMaxNormalized: number
+  ) {
+    const { service } = this;
+
+    const binaryId = new pb.BinaryID();
+    binaryId.setFileId(id.fileId);
+    binaryId.setOrganizationId(id.organizationId);
+    binaryId.setLocationId(id.locationId);
+
+    const req = new pb.AddBoundingBoxToImageByIDRequest();
+    req.setBinaryId(binaryId);
+    req.setLabel(label);
+    req.setXMinNormalized(xMinNormalized);
+    req.setYMinNormalized(yMinNormalized);
+    req.setXMaxNormalized(xMaxNormalized);
+    req.setYMaxNormalized(yMaxNormalized);
+
+    const response = await promisify<
+      pb.AddBoundingBoxToImageByIDRequest,
+      pb.AddBoundingBoxToImageByIDResponse
+    >(service.addBoundingBoxToImageByID.bind(service), req);
+    return response.getBboxId();
+  }
+
+  async removeBoundingBoxFromImageById(id: BinaryID, bboxId: string) {
+    const { service } = this;
+
+    const binaryId = new pb.BinaryID();
+    binaryId.setFileId(id.fileId);
+    binaryId.setOrganizationId(id.organizationId);
+    binaryId.setLocationId(id.locationId);
+
+    const req = new pb.RemoveBoundingBoxFromImageByIDRequest();
+    req.setBinaryId(binaryId);
+    req.setBboxId(bboxId);
+
+    await promisify<
+      pb.RemoveBoundingBoxFromImageByIDRequest,
+      pb.RemoveBoundingBoxFromImageByIDResponse
+    >(service.removeBoundingBoxFromImageByID.bind(service), req);
+  }
+
+  async boundingBoxLabelsByFilter(filter?: pb.Filter) {
+    const { service } = this;
+
+    const req = new pb.BoundingBoxLabelsByFilterRequest();
+    req.setFilter(filter ?? new pb.Filter());
+
+    const response = await promisify<
+      pb.BoundingBoxLabelsByFilterRequest,
+      pb.BoundingBoxLabelsByFilterResponse
+    >(service.boundingBoxLabelsByFilter.bind(service), req);
+    return response.getLabelsList();
+  }
+
+  // async configureDatabaseUser(orgId: string, password: string) {}
+
+  async getDatabaseConnection(orgId: string) {
+    const { service } = this;
+
+    const req = new pb.GetDatabaseConnectionRequest();
+    req.setOrganizationId(orgId);
+
+    const response = await promisify<
+      pb.GetDatabaseConnectionRequest,
+      pb.GetDatabaseConnectionResponse
+    >(service.getDatabaseConnection.bind(service), req);
+    return response.toObject();
+  }
+
+  async addBinaryDataToDatasetByIds(ids: BinaryID[], datasetId: string) {
+    const { service } = this;
+
+    const binaryIds: pb.BinaryID[] = ids.map(
+      ({ fileId, organizationId, locationId }) => {
+        const binaryId = new pb.BinaryID();
+        binaryId.setFileId(fileId);
+        binaryId.setOrganizationId(organizationId);
+        binaryId.setLocationId(locationId);
+        return binaryId;
+      }
+    );
+
+    const req = new pb.AddBinaryDataToDatasetByIDsRequest();
+    req.setBinaryIdsList(binaryIds);
+    req.setDatasetId(datasetId);
+
+    await promisify<
+      pb.AddBinaryDataToDatasetByIDsRequest,
+      pb.AddBinaryDataToDatasetByIDsResponse
+    >(service.addBinaryDataToDatasetByIDs.bind(service), req);
+  }
+
+  async removeBinaryDataFromDatasetByIds(ids: BinaryID[], datasetId: string) {
+    const { service } = this;
+
+    const binaryIds: pb.BinaryID[] = ids.map(
+      ({ fileId, organizationId, locationId }) => {
+        const binaryId = new pb.BinaryID();
+        binaryId.setFileId(fileId);
+        binaryId.setOrganizationId(organizationId);
+        binaryId.setLocationId(locationId);
+        return binaryId;
+      }
+    );
+
+    const req = new pb.RemoveBinaryDataFromDatasetByIDsRequest();
+    req.setBinaryIdsList(binaryIds);
+    req.setDatasetId(datasetId);
+
+    await promisify<
+      pb.RemoveBinaryDataFromDatasetByIDsRequest,
+      pb.RemoveBinaryDataFromDatasetByIDsResponse
+    >(service.removeBinaryDataFromDatasetByIDs.bind(service), req);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   createFilter(options: FilterOptions): pb.Filter {
     const filter = new pb.Filter();
