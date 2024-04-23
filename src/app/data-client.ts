@@ -296,6 +296,7 @@ export class DataClient {
     >(service.removeTagsFromBinaryDataByIDs.bind(service), req);
   }
 
+   *   No `filter` implies all binary data.
   async removeTagsFromBinaryDataByFilter(tags: string[], filter?: pb.Filter) {
     const { service } = this;
 
