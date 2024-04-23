@@ -40,7 +40,7 @@ export type {
 } from './app/viam-transport';
 
 /**
- * Raw Protobuf interfaces for a Data service.
+ * Raw Protobuf interfaces for Data.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
  *
@@ -54,6 +54,49 @@ export {
   type DataClient,
   type FilterOptions,
 } from './app/data-client';
+
+/**
+ * Raw Protobuf interfaces for ML Training.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link MlTrainingClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as mlTrainingApi } from './gen/app/mltraining/v1/ml_training_pb';
+export {
+  type MlTrainingClient,
+  ModelType,
+  TrainingStatus,
+} from './app/ml-training-client';
+
+/**
+ * Raw Protobuf interfaces for Provisioning.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link ProvisioningClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as provisioningApi } from './gen/provisioning/v1/provisioning_pb';
+export {
+  type CloudConfig,
+  type ProvisioningClient,
+} from './app/provisioning-client';
+
+/**
+ * Raw Protobuf interfaces for Billing.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link BillingClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as billingApi } from './gen/app/v1/billing_pb';
+export { type BillingClient } from './app/billing-client';
 
 /**
  * Raw Protobuf interfaces for an Arm component.
