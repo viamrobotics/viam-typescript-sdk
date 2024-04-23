@@ -8,7 +8,6 @@ import {
   beforeEach,
   describe,
   expect,
-  type SpyInstance,
   it,
   vi,
   type MockInstance,
@@ -117,7 +116,7 @@ describe('DataClient tests', () => {
   });
 
   describe('tabularDataByFilter tests', () => {
-    let methodSpy: SpyInstance;
+    let methodSpy: MockInstance;
     const tabData1 = new TabularData();
     const tabData2 = new TabularData();
     tabData1.setData(Struct.fromJavaScript({ key: 'value1' }));
@@ -176,7 +175,7 @@ describe('DataClient tests', () => {
   binDataResponse.setDataList([binData1, binData2]);
 
   describe('binaryDataByFilter tests', () => {
-    let methodSpy: SpyInstance;
+    let methodSpy: MockInstance;
     beforeEach(() => {
       methodSpy = vi
         .spyOn(DataServiceClient.prototype, 'binaryDataByFilter')
@@ -217,7 +216,7 @@ describe('DataClient tests', () => {
   });
 
   describe('binaryDataById tests', () => {
-    let methodSpy: SpyInstance;
+    let methodSpy: MockInstance;
     beforeEach(() => {
       methodSpy = vi
         .spyOn(DataServiceClient.prototype, 'binaryDataByIDs')
