@@ -226,21 +226,21 @@ export class DataClient {
   /**
    * Filter and delete binary data.
    *
-   * @param includeInternalData Whether or not to delete internal data
    * @param filter Optional `pb.Filter` specifying binary data to delete. No
    *   `filter` implies all binary data.
+   * @param includeInternalData Whether or not to delete internal data. Default
+   *   is true
    * @returns The number of items deleted
    */
   async deleteBinaryDataByFilter(
-    includeInternalData: boolean,
-    filter?: pb.Filter
+    filter?: pb.Filter,
+    includeInternalData = true
   ) {
     const { service } = this;
 
     const req = new pb.DeleteBinaryDataByFilterRequest();
     req.setFilter(filter ?? new pb.Filter());
     req.setIncludeInternalData(includeInternalData);
-
     const response = await promisify<
       pb.DeleteBinaryDataByFilterRequest,
       pb.DeleteTabularDataResponse
@@ -280,11 +280,11 @@ export class DataClient {
   /**
    * Add tags to binary data, specified by ID.
    *
-   * @param ids The IDs of the data to be tagged. Must be non-empty.
    * @param tags The list of tags to add to specified binary data. Must be
    *   non-empty.
+   * @param ids The IDs of the data to be tagged. Must be non-empty.
    */
-  async addTagsToBinaryDataByIds(ids: BinaryID[], tags: string[]) {
+  async addTagsToBinaryDataByIds(tags: string[], ids: BinaryID[]) {
     const { service } = this;
 
     const binaryIds: pb.BinaryID[] = ids.map(
@@ -330,12 +330,12 @@ export class DataClient {
   /**
    * Remove tags from binary data, specified by ID.
    *
-   * @param ids The IDs of the data to be edited. Must be non-empty.
    * @param tags List of tags to remove from specified binary data. Must be
    *   non-empty.
+   * @param ids The IDs of the data to be edited. Must be non-empty.
    * @returns The number of items deleted
    */
-  async removeTagsFromBinaryDataByIds(ids: BinaryID[], tags: string[]) {
+  async removeTagsFromBinaryDataByIds(tags: string[], ids: BinaryID[]) {
     const { service } = this;
 
     const binaryIds: pb.BinaryID[] = ids.map(
@@ -352,10 +352,11 @@ export class DataClient {
     req.setBinaryIdsList(binaryIds);
     req.setTagsList(tags);
 
-    await promisify<
+    const response = await promisify<
       pb.RemoveTagsFromBinaryDataByIDsRequest,
       pb.RemoveTagsFromBinaryDataByIDsResponse
     >(service.removeTagsFromBinaryDataByIDs.bind(service), req);
+    return response.getDeletedCount();
   }
 
   /**
@@ -373,10 +374,11 @@ export class DataClient {
     req.setTagsList(tags);
     req.setFilter(filter ?? new pb.Filter());
 
-    await promisify<
+    const response = await promisify<
       pb.RemoveTagsFromBinaryDataByFilterRequest,
       pb.RemoveTagsFromBinaryDataByFilterResponse
     >(service.removeTagsFromBinaryDataByFilter.bind(service), req);
+    return response.getDeletedCount();
   }
 
   /**
