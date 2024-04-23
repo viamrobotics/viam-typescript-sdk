@@ -76,8 +76,9 @@ export class DataClient {
    * the metadata index of the data is out of the bounds of the returned
    * metadata list.
    *
-   * @param filter - Optional `pb.Filter` specifying tabular data to retrieve.
-   *   No `filter` implies all tabular data.
+   * @param filter Optional `pb.Filter` specifying tabular data to retrieve. No
+   *   `filter` implies all tabular data.
+   * @returns An array of data objects
    */
   async tabularDataByFilter(filter?: pb.Filter) {
     const { service } = this;
@@ -127,6 +128,15 @@ export class DataClient {
     return dataArray;
   }
 
+  /**
+   * Filter and download binary data. The returned metadata might be empty if
+   * the metadata index of the data is out of the bounds of the returned
+   * metadata list.
+   *
+   * @param filter Optional `pb.Filter` specifying binary data to retrieve. No
+   *   `filter` implies all tabular data.
+   * @returns An array of data objects
+   */
   async binaryDataByFilter(filter?: pb.Filter) {
     const { service } = this;
 
@@ -159,6 +169,12 @@ export class DataClient {
     return dataArray;
   }
 
+  /**
+   * Get binary data using the BinaryID.
+   *
+   * @param ids The IDs of the requested binary data
+   * @returns An array of data objects
+   */
   async binaryDataByIds(ids: BinaryID[]) {
     const { service } = this;
 
@@ -183,6 +199,16 @@ export class DataClient {
     return response.toObject().dataList;
   }
 
+  /**
+   * Delete tabular data older than a specified number of days.
+   *
+   * @param orgId The ID of organization to delete data from
+   * @param deleteOlderThanDays Delete data that was captured more than this
+   *   many days ago. For example if `delete_older_than_days` is 10, this
+   *   deletes any data that was captured more than 10 days ago. If it is 0, all
+   *   existing data is deleted.
+   * @returns The number of items deleted
+   */
   async deleteTabularData(orgId: string, deleteOlderThanDays: number) {
     const { service } = this;
 
@@ -197,6 +223,14 @@ export class DataClient {
     return response.getDeletedCount();
   }
 
+  /**
+   * Filter and delete binary data.
+   *
+   * @param includeInternalData Whether or not to delete internal data
+   * @param filter Optional `pb.Filter` specifying binary data to delete. No
+   *   `filter` implies all binary data.
+   * @returns The number of items deleted
+   */
   async deleteBinaryDataByFilter(
     includeInternalData: boolean,
     filter?: pb.Filter
@@ -214,6 +248,12 @@ export class DataClient {
     return response.getDeletedCount();
   }
 
+  /**
+   * Delete binary data, specified by ID.
+   *
+   * @param ids The IDs of the data to be deleted. Must be non-empty.
+   * @returns The number of items deleted
+   */
   async deleteBinaryDataByIds(ids: BinaryID[]) {
     const { service } = this;
 
@@ -237,6 +277,13 @@ export class DataClient {
     return response.getDeletedCount();
   }
 
+  /**
+   * Add tags to binary data, specified by ID.
+   *
+   * @param ids The IDs of the data to be tagged. Must be non-empty.
+   * @param tags The list of tags to add to specified binary data. Must be
+   *   non-empty.
+   */
   async addTagsToBinaryDataByIds(ids: BinaryID[], tags: string[]) {
     const { service } = this;
 
@@ -260,6 +307,13 @@ export class DataClient {
     >(service.addTagsToBinaryDataByIDs.bind(service), req);
   }
 
+  /**
+   * Add tags to binary data, specified by filter.
+   *
+   * @param tags The tags to add to the data
+   * @param filter Optional `pb.Filter` specifying binary data to add tags to.
+   *   No `filter` implies all binary data.
+   */
   async addTagsToBinaryDataByFilter(tags: string[], filter?: pb.Filter) {
     const { service } = this;
 
@@ -273,6 +327,14 @@ export class DataClient {
     >(service.addTagsToBinaryDataByFilter.bind(service), req);
   }
 
+  /**
+   * Remove tags from binary data, specified by ID.
+   *
+   * @param ids The IDs of the data to be edited. Must be non-empty.
+   * @param tags List of tags to remove from specified binary data. Must be
+   *   non-empty.
+   * @returns The number of items deleted
+   */
   async removeTagsFromBinaryDataByIds(ids: BinaryID[], tags: string[]) {
     const { service } = this;
 
@@ -296,7 +358,14 @@ export class DataClient {
     >(service.removeTagsFromBinaryDataByIDs.bind(service), req);
   }
 
+  /**
+   * Remove tags from binary data, specified by filter.
+   *
+   * @param tags List of tags to remove from specified binary data. Must be
+   *   non-empty.
+   * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
+   */
   async removeTagsFromBinaryDataByFilter(tags: string[], filter?: pb.Filter) {
     const { service } = this;
 
@@ -310,6 +379,13 @@ export class DataClient {
     >(service.removeTagsFromBinaryDataByFilter.bind(service), req);
   }
 
+  /**
+   * Get a list of tags using a filter.
+   *
+   * @param filter Optional `pb.Filter` specifying what data to get tags from.
+   *   No `filter` implies all data.
+   * @returns The list of tags
+   */
   async tagsByFilter(filter?: pb.Filter) {
     const { service } = this;
 
@@ -323,6 +399,21 @@ export class DataClient {
     return response.getTagsList();
   }
 
+  /**
+   * Add bounding box to an image.
+   *
+   * @param binary_id The ID of the image to add the bounding box to
+   * @param label A label for the bounding box
+   * @param x_min_normalized The min X value of the bounding box normalized from
+   *   0 to 1
+   * @param y_min_normalized The min Y value of the bounding box normalized from
+   *   0 to 1
+   * @param x_max_normalized The max X value of the bounding box normalized from
+   *   0 to 1
+   * @param y_max_normalized The max Y value of the bounding box normalized from
+   *   0 to 1
+   * @returns The bounding box ID
+   */
   async addBoundingBoxToImageById(
     id: BinaryID,
     label: string,
@@ -353,13 +444,19 @@ export class DataClient {
     return response.getBboxId();
   }
 
-  async removeBoundingBoxFromImageById(id: BinaryID, bboxId: string) {
+  /**
+   * Remove a bounding box from an image.
+   *
+   * @param binId The ID of the image to remove the bounding box from
+   * @param bboxId The ID of the bounding box to remove
+   */
+  async removeBoundingBoxFromImageById(binId: BinaryID, bboxId: string) {
     const { service } = this;
 
     const binaryId = new pb.BinaryID();
-    binaryId.setFileId(id.fileId);
-    binaryId.setOrganizationId(id.organizationId);
-    binaryId.setLocationId(id.locationId);
+    binaryId.setFileId(binId.fileId);
+    binaryId.setOrganizationId(binId.organizationId);
+    binaryId.setLocationId(binId.locationId);
 
     const req = new pb.RemoveBoundingBoxFromImageByIDRequest();
     req.setBinaryId(binaryId);
@@ -371,6 +468,13 @@ export class DataClient {
     >(service.removeBoundingBoxFromImageByID.bind(service), req);
   }
 
+  /**
+   * Get a list of bounding box labels using a Filter.
+   *
+   * @param filter Optional `pb.Filter` specifying what data to get tags from.
+   *   No `filter` implies all labels.
+   * @returns The list of bounding box labels
+   */
   async boundingBoxLabelsByFilter(filter?: pb.Filter) {
     const { service } = this;
 
@@ -386,6 +490,12 @@ export class DataClient {
 
   // async configureDatabaseUser(orgId: string, password: string) {}
 
+  /**
+   * Get a connection to access a MongoDB Atlas Data federation instance.
+   *
+   * @param orId Organization to retrieve connection for
+   * @returns Hostname of the federated database
+   */
   async getDatabaseConnection(orgId: string) {
     const { service } = this;
 
@@ -396,9 +506,15 @@ export class DataClient {
       pb.GetDatabaseConnectionRequest,
       pb.GetDatabaseConnectionResponse
     >(service.getDatabaseConnection.bind(service), req);
-    return response.toObject();
+    return response.getHostname();
   }
 
+  /**
+   * Add BinaryData to the provided dataset.
+   *
+   * @param ids The IDs of binary data to add to dataset
+   * @param datasetId The ID of the dataset to be added to
+   */
   async addBinaryDataToDatasetByIds(ids: BinaryID[], datasetId: string) {
     const { service } = this;
 
@@ -422,6 +538,12 @@ export class DataClient {
     >(service.addBinaryDataToDatasetByIDs.bind(service), req);
   }
 
+  /**
+   * Remove BinaryData from the provided dataset.
+   *
+   * @param ids The IDs of the binary data to remove from dataset
+   * @param datasetId The ID of the dataset to be removed from
+   */
   async removeBinaryDataFromDatasetByIds(ids: BinaryID[], datasetId: string) {
     const { service } = this;
 
