@@ -5,6 +5,7 @@ import {
   type AccessToken,
 } from './viam-transport';
 import { DataClient } from './data-client';
+import { AppClient } from './app-client';
 
 export interface ViamClientOptions {
   serviceHost?: string;
@@ -31,6 +32,7 @@ export class ViamClient {
   private serviceHost: string;
 
   public dataClient: DataClient | undefined;
+  public appClient: AppClient | undefined;
 
   constructor(transportFactory: grpc.TransportFactory, serviceHost: string) {
     this.transportFactory = transportFactory;
@@ -40,5 +42,6 @@ export class ViamClient {
   public connect() {
     const grpcOptions = { transport: this.transportFactory };
     this.dataClient = new DataClient(this.serviceHost, grpcOptions);
+    this.appClient = new AppClient(this.serviceHost, grpcOptions);
   }
 }
