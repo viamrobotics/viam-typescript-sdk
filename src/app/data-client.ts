@@ -599,6 +599,13 @@ export class DataClient {
     >(service.removeBinaryDataFromDatasetByIDs.bind(service), req);
   }
 
+  /**
+   * Create a new dataset.
+   *
+   * @param name The name of the new dataset
+   * @param orgId The ID of the organization the dataset is being created in
+   * @returns The ID of the dataset
+   */
   async createDataset(name: string, orgId: string) {
     const { datasetService: service } = this;
 
@@ -613,6 +620,11 @@ export class DataClient {
     return response.getId();
   }
 
+  /**
+   * Delete a dataset.
+   *
+   * @param id The ID of the dataset.
+   */
   async deleteDataset(id: string) {
     const { datasetService: service } = this;
 
@@ -625,6 +637,12 @@ export class DataClient {
     >(service.deleteDataset.bind(service), req);
   }
 
+  /**
+   * Rename a dataset.
+   *
+   * @param id The ID of the dataset
+   * @param name The new name of the dataset
+   */
   async renameDataset(id: string, name: string) {
     const { datasetService: service } = this;
 
@@ -638,6 +656,12 @@ export class DataClient {
     >(service.renameDataset.bind(service), req);
   }
 
+  /**
+   * List all of the datasets for an organization.
+   *
+   * @param orgId The ID of the organization
+   * @returns The list of datasets in the organization
+   */
   async listDatasetsByOrganizationID(orgId: string) {
     const { datasetService: service } = this;
 
@@ -650,14 +674,20 @@ export class DataClient {
     >(service.listDatasetsByOrganizationID.bind(service), req);
 
     const datasets: Dataset[] = [];
-    response.getDatasetsList().forEach((set) => {
+    for (const set of response.getDatasetsList()) {
       const dataset: Dataset = set.toObject();
       dataset.created = set.getTimeCreated()?.toDate();
       datasets.push(dataset);
-    });
+    }
     return datasets;
   }
 
+  /**
+   * List all of the datasets specified by the given dataset IDs.
+   *
+   * @param ids The list of IDs of the datasets
+   * @returns The list of datasets
+   */
   async listDatasetsByIds(ids: string[]) {
     const { datasetService: service } = this;
 
@@ -670,11 +700,11 @@ export class DataClient {
     >(service.listDatasetsByIDs.bind(service), req);
 
     const datasets: Dataset[] = [];
-    response.getDatasetsList().forEach((set) => {
+    for (const set of response.getDatasetsList()) {
       const dataset: Dataset = set.toObject();
       dataset.created = set.getTimeCreated()?.toDate();
       datasets.push(dataset);
-    });
+    }
     return datasets;
   }
 
