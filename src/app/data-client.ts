@@ -22,6 +22,10 @@ interface TabularData {
   timeReceived?: Date;
 }
 
+type Dataset = Partial<datasetPb.Dataset.AsObject> & {
+  created?: Date;
+};
+
 export class DataClient {
   private dataService: DataServiceClient;
   private datasetService: DatasetServiceClient;
@@ -593,6 +597,85 @@ export class DataClient {
       dataPb.RemoveBinaryDataFromDatasetByIDsRequest,
       dataPb.RemoveBinaryDataFromDatasetByIDsResponse
     >(service.removeBinaryDataFromDatasetByIDs.bind(service), req);
+  }
+
+  async createDataset(name: string, orgId: string) {
+    const { datasetService: service } = this;
+
+    const req = new datasetPb.CreateDatasetRequest();
+    req.setName(name);
+    req.setOrganizationId(orgId);
+
+    const response = await promisify<
+      datasetPb.CreateDatasetRequest,
+      datasetPb.CreateDatasetResponse
+    >(service.createDataset.bind(service), req);
+    return response.getId();
+  }
+
+  async deleteDataset(id: string) {
+    const { datasetService: service } = this;
+
+    const req = new datasetPb.DeleteDatasetRequest();
+    req.setId(id);
+
+    await promisify<
+      datasetPb.DeleteDatasetRequest,
+      datasetPb.DeleteDatasetResponse
+    >(service.deleteDataset.bind(service), req);
+  }
+
+  async renameDataset(id: string, name: string) {
+    const { datasetService: service } = this;
+
+    const req = new datasetPb.RenameDatasetRequest();
+    req.setId(id);
+    req.setName(name);
+
+    await promisify<
+      datasetPb.RenameDatasetRequest,
+      datasetPb.RenameDatasetResponse
+    >(service.renameDataset.bind(service), req);
+  }
+
+  async listDatasetsByOrganizationID(orgId: string) {
+    const { datasetService: service } = this;
+
+    const req = new datasetPb.ListDatasetsByOrganizationIDRequest();
+    req.setOrganizationId(orgId);
+
+    const response = await promisify<
+      datasetPb.ListDatasetsByOrganizationIDRequest,
+      datasetPb.ListDatasetsByOrganizationIDResponse
+    >(service.listDatasetsByOrganizationID.bind(service), req);
+
+    const datasets: Dataset[] = [];
+    response.getDatasetsList().forEach((set) => {
+      const dataset: Dataset = set.toObject();
+      dataset.created = set.getTimeCreated()?.toDate();
+      datasets.push(dataset);
+    });
+    return datasets;
+  }
+
+  async listDatasetsByIds(ids: string[]) {
+    const { datasetService: service } = this;
+
+    const req = new datasetPb.ListDatasetsByIDsRequest();
+    req.setIdsList(ids);
+
+    const response = await promisify<
+      datasetPb.ListDatasetsByIDsRequest,
+      datasetPb.ListDatasetsByIDsResponse
+    >(service.listDatasetsByIDs.bind(service), req);
+
+    const datasets: Dataset[] = [];
+    response.getDatasetsList().forEach((set) => {
+      const dataset: Dataset = set.toObject();
+      dataset.created = set.getTimeCreated()?.toDate();
+      datasets.push(dataset);
+    });
+    return datasets;
   }
 
   // eslint-disable-next-line class-methods-use-this
