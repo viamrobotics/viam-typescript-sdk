@@ -374,6 +374,7 @@ export class DataClient {
    *   non-empty.
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
+   * @returns The number of items deleted
    */
   async removeTagsFromBinaryDataByFilter(
     tags: string[],
