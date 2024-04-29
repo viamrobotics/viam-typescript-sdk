@@ -43,6 +43,7 @@ import {
   BoundingBoxLabelsByFilterRequest,
   AddBinaryDataToDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsRequest,
+  ConfigureDatabaseUserRequest,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
@@ -561,6 +562,31 @@ describe('DataClient tests', () => {
         expect.anything()
       );
       expect(promise).toEqual(['label1', 'label2']);
+    });
+  });
+
+  describe('configureDatabaseUser tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'configureDatabaseUser')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('configure database user', async () => {
+      const expectedRequest = new ConfigureDatabaseUserRequest();
+      expectedRequest.setOrganizationId('orgId');
+      expectedRequest.setPassword('password');
+
+      await subject().configureDatabaseUser('orgId', 'password');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
     });
   });
 

@@ -491,9 +491,9 @@ export class DataClient {
   }
 
   /**
-   * ConfigureDatabaseUser configures a database user for the Viam
-   * organization's MongoDB Atlas Data Federation instance. It can also be used
-   * to reset the password of the existing database user.
+   * Configure a database user for the Viam organization's MongoDB Atlas Data
+   * Federation instance. It can also be used to reset the password of the
+   * existing database user.
    *
    * @param orgId The ID of the organization
    * @param password The password of the user
