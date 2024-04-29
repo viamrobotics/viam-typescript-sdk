@@ -44,10 +44,13 @@ import {
   AddBinaryDataToDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsRequest,
   ConfigureDatabaseUserRequest,
+  AddBoundingBoxToImageByIDRequest,
+  GetDatabaseConnectionRequest,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
 import { DataClient } from './data-client';
+import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
 
 const subject = () =>
   new DataClient('fakeServiceHost', {
@@ -491,8 +494,10 @@ describe('DataClient tests', () => {
   });
 
   describe('addBoundingBoxToImageById tests', () => {
+    let methodSpy: MockInstance;
     beforeEach(() => {
-      vi.spyOn(DataServiceClient.prototype, 'addBoundingBoxToImageByID')
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'addBoundingBoxToImageByID')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementation((_req, _md, cb) => {
           cb(null, { getBboxId: () => 'bboxId' });
@@ -500,13 +505,26 @@ describe('DataClient tests', () => {
     });
 
     it('add bounding box to image', async () => {
+      const expectedRequest = new AddBoundingBoxToImageByIDRequest();
+      expectedRequest.setBinaryId(binaryId1);
+      expectedRequest.setLabel('label');
+      expectedRequest.setXMinNormalized(0);
+      expectedRequest.setYMinNormalized(0);
+      expectedRequest.setYMaxNormalized(1);
+      expectedRequest.setXMaxNormalized(1);
+
       const promise = await subject().addBoundingBoxToImageById(
         binaryId1.toObject(),
         'label',
-        1,
-        1,
         0,
-        0
+        0,
+        1,
+        1
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
       );
       expect(promise).toEqual('bboxId');
     });
@@ -591,8 +609,10 @@ describe('DataClient tests', () => {
   });
 
   describe('getDatabaseConnection tests', () => {
+    let methodSpy: MockInstance;
     beforeEach(() => {
-      vi.spyOn(DataServiceClient.prototype, 'getDatabaseConnection')
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'getDatabaseConnection')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementation((_req, _md, cb) => {
           cb(null, { getHostname: () => 'hostname' });
@@ -600,7 +620,15 @@ describe('DataClient tests', () => {
     });
 
     it('get database connection', async () => {
+      const expectedRequest = new GetDatabaseConnectionRequest();
+      expectedRequest.setOrganizationId('orgId');
+
       const promise = await subject().getDatabaseConnection('orgId');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
       expect(promise).toEqual('hostname');
     });
   });
@@ -658,6 +686,21 @@ describe('DataClient tests', () => {
         expect.anything(),
         expect.anything()
       );
+    });
+  });
+
+  describe('createDataset tests', () => {
+    beforeEach(() => {
+      vi.spyOn(DatasetServiceClient.prototype, 'createDataset')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getId: () => 'id' });
+        });
+    });
+
+    it('create dataset', async () => {
+      const response = await subject().createDataset('name', 'orgId');
+      expect(response).toEqual('id');
     });
   });
 
