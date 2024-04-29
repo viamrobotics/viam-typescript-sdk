@@ -204,8 +204,8 @@ export class DataClient {
    *
    * @param orgId The ID of organization to delete data from
    * @param deleteOlderThanDays Delete data that was captured more than this
-   *   many days ago. For example if `delete_older_than_days` is 10, this
-   *   deletes any data that was captured more than 10 days ago. If it is 0, all
+   *   many days ago. For example if `deleteOlderThanDays` is 10, this deletes
+   *   any data that was captured more than 10 days ago. If it is 0, all
    *   existing data is deleted.
    * @returns The number of items deleted
    */
@@ -404,16 +404,16 @@ export class DataClient {
   /**
    * Add bounding box to an image.
    *
-   * @param binary_id The ID of the image to add the bounding box to
+   * @param binaryId The ID of the image to add the bounding box to
    * @param label A label for the bounding box
-   * @param x_min_normalized The min X value of the bounding box normalized from
-   *   0 to 1
-   * @param y_min_normalized The min Y value of the bounding box normalized from
-   *   0 to 1
-   * @param x_max_normalized The max X value of the bounding box normalized from
-   *   0 to 1
-   * @param y_max_normalized The max Y value of the bounding box normalized from
-   *   0 to 1
+   * @param xMinNormalized The min X value of the bounding box normalized from 0
+   *   to 1
+   * @param yMinNormalized The min Y value of the bounding box normalized from 0
+   *   to 1
+   * @param xMaxNormalized The max X value of the bounding box normalized from 0
+   *   to 1
+   * @param yMaxNormalized The max Y value of the bounding box normalized from 0
+   *   to 1
    * @returns The bounding box ID
    */
   async addBoundingBoxToImageById(
@@ -490,7 +490,26 @@ export class DataClient {
     return response.getLabelsList();
   }
 
-  // async configureDatabaseUser(orgId: string, password: string) {}
+  /**
+   * ConfigureDatabaseUser configures a database user for the Viam
+   * organization's MongoDB Atlas Data Federation instance. It can also be used
+   * to reset the password of the existing database user.
+   *
+   * @param orgId The ID of the organization
+   * @param password The password of the user
+   */
+  async configureDatabaseUser(orgId: string, password: string) {
+    const { service } = this;
+
+    const req = new pb.ConfigureDatabaseUserRequest();
+    req.setOrganizationId(orgId);
+    req.setPassword(password);
+
+    await promisify<
+      pb.ConfigureDatabaseUserRequest,
+      pb.ConfigureDatabaseUserResponse
+    >(service.configureDatabaseUser.bind(service), req);
+  }
 
   /**
    * Get a connection to access a MongoDB Atlas Data federation instance.
