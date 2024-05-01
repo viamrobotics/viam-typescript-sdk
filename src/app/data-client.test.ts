@@ -73,7 +73,7 @@ describe('DataClient tests', () => {
   });
 
   const limit = 30;
-  const last = 'last';
+  const lastId = 'lastId';
   const countOnly = true;
   const includeInternalData = false;
 
@@ -142,7 +142,7 @@ describe('DataClient tests', () => {
     const tabDataResponse = new TabularDataByFilterResponse();
     tabDataResponse.setDataList([tabData1, tabData2]);
     tabDataResponse.setCount(limit);
-    tabDataResponse.setLast(last);
+    tabDataResponse.setLast(lastId);
 
     beforeEach(() => {
       methodSpy = vi
@@ -166,7 +166,7 @@ describe('DataClient tests', () => {
       expect(array[0]?.data).toMatchObject({ key: 'value1' });
       expect(array[1]?.data).toMatchObject({ key: 'value2' });
       expect(count).toEqual(count);
-      expect(last).toEqual(last);
+      expect(last).toEqual(lastId);
     });
 
     it('get filtered tabular data', async () => {
@@ -174,7 +174,7 @@ describe('DataClient tests', () => {
       dataReq.setFilter(filter);
       dataReq.setLimit(limit);
       dataReq.setSortOrder(Order.ORDER_UNSPECIFIED);
-      dataReq.setLast(last);
+      dataReq.setLast(lastId);
       const expectedRequest = new TabularDataByFilterRequest();
       expectedRequest.setDataRequest(dataReq);
       expectedRequest.setCountOnly(countOnly);
@@ -184,7 +184,7 @@ describe('DataClient tests', () => {
         filter,
         limit,
         undefined,
-        last,
+        lastId,
         countOnly,
         includeInternalData
       );
@@ -205,7 +205,7 @@ describe('DataClient tests', () => {
   const binDataResponse = new BinaryDataByFilterResponse();
   binDataResponse.setDataList([binData1, binData2]);
   binDataResponse.setCount(limit);
-  binDataResponse.setLast(last);
+  binDataResponse.setLast(lastId);
 
   describe('binaryDataByFilter tests', () => {
     let methodSpy: MockInstance;
@@ -230,7 +230,7 @@ describe('DataClient tests', () => {
       expect(array[0]?.binary).toEqual(bin1);
       expect(array[1]?.binary).toEqual(bin2);
       expect(count).toEqual(limit);
-      expect(last).toEqual(last);
+      expect(last).toEqual(lastId);
     });
 
     it('get filtered binary data', async () => {
@@ -238,7 +238,7 @@ describe('DataClient tests', () => {
       dataReq.setFilter(filter);
       dataReq.setLimit(limit);
       dataReq.setSortOrder(Order.ORDER_UNSPECIFIED);
-      dataReq.setLast(last);
+      dataReq.setLast(lastId);
       const expectedRequest = new BinaryDataByFilterRequest();
       expectedRequest.setDataRequest(dataReq);
       expectedRequest.setIncludeBinary(true);
@@ -249,7 +249,7 @@ describe('DataClient tests', () => {
         filter,
         limit,
         undefined,
-        last,
+        lastId,
         true,
         countOnly,
         false
