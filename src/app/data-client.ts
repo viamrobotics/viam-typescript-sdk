@@ -154,36 +154,44 @@ export class DataClient {
    *   `filter` implies all tabular data.
    * @returns An array of data objects
    */
-  async binaryDataByFilter(filter?: dataPb.Filter) {
+  async binaryDataByFilter(
+    filter?: dataPb.Filter,
+    limit?: number,
+    sortOrder?: Order,
+    last = '',
+    includeBinary = true,
+    countOnly = false,
+    includeInternalData = false
+  ) {
     const { dataService: service } = this;
 
-    let last = '';
     const dataArray: dataPb.BinaryData.AsObject[] = [];
     const dataReq = new dataPb.DataRequest();
     dataReq.setFilter(filter ?? new dataPb.Filter());
-    dataReq.setLimit(100);
-
-    for (;;) {
-      dataReq.setLast(last);
-
-      const req = new dataPb.BinaryDataByFilterRequest();
-      req.setDataRequest(dataReq);
-      req.setCountOnly(false);
-
-      // eslint-disable-next-line no-await-in-loop
-      const response = await promisify<
-        dataPb.BinaryDataByFilterRequest,
-        dataPb.BinaryDataByFilterResponse
-      >(service.binaryDataByFilter.bind(service), req);
-      const dataList = response.getDataList();
-      if (dataList.length === 0) {
-        break;
-      }
-      dataArray.push(...dataList.map((data) => data.toObject()));
-      last = response.getLast();
+    if (limit) {
+      dataReq.setLimit(limit);
     }
+    dataReq.setSortOrder(sortOrder ?? Order.ORDER_UNSPECIFIED);
+    dataReq.setLast(last);
 
-    return dataArray;
+    const req = new dataPb.BinaryDataByFilterRequest();
+    req.setDataRequest(dataReq);
+    req.setIncludeBinary(includeBinary);
+    req.setCountOnly(countOnly);
+    req.setIncludeInternalData(includeInternalData);
+
+    // eslint-disable-next-line no-await-in-loop
+    const response = await promisify<
+      dataPb.BinaryDataByFilterRequest,
+      dataPb.BinaryDataByFilterResponse
+    >(service.binaryDataByFilter.bind(service), req);
+    dataArray.push(...response.getDataList().map((data) => data.toObject()));
+
+    return {
+      array: dataArray,
+      count: response.getCount(),
+      last: response.getLast(),
+    };
   }
 
   /**
