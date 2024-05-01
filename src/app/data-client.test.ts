@@ -46,6 +46,7 @@ import {
   ConfigureDatabaseUserRequest,
   AddBoundingBoxToImageByIDRequest,
   GetDatabaseConnectionRequest,
+  Order,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
@@ -70,6 +71,11 @@ describe('DataClient tests', () => {
     componentName: 'testComponentName',
     componentType: 'testComponentType',
   });
+
+  const limit = 30;
+  const last = 'last';
+  const countOnly = true;
+  const includeInternalData = false;
 
   const binaryId1 = new BinaryID();
   binaryId1.setFileId('testFileId1');
@@ -135,6 +141,8 @@ describe('DataClient tests', () => {
     tabData2.setData(Struct.fromJavaScript({ key: 'value2' }));
     const tabDataResponse = new TabularDataByFilterResponse();
     tabDataResponse.setDataList([tabData1, tabData2]);
+    tabDataResponse.setCount(limit);
+    tabDataResponse.setLast(last);
 
     beforeEach(() => {
       methodSpy = vi
@@ -153,22 +161,33 @@ describe('DataClient tests', () => {
 
     it('get tabular data', async () => {
       const promise = await subject().tabularDataByFilter();
-      expect(promise.length).toEqual(2);
-      const [data1, data2] = promise;
-      expect(data1?.data).toMatchObject({ key: 'value1' });
-      expect(data2?.data).toMatchObject({ key: 'value2' });
+      const { array, count, last } = promise;
+      expect(array.length).toEqual(2);
+      expect(array[0]?.data).toMatchObject({ key: 'value1' });
+      expect(array[1]?.data).toMatchObject({ key: 'value2' });
+      expect(count).toEqual(count);
+      expect(last).toEqual(last);
     });
 
     it('get filtered tabular data', async () => {
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
-      dataReq.setLimit(100);
-      dataReq.setLast('');
+      dataReq.setLimit(limit);
+      dataReq.setSortOrder(Order.ORDER_UNSPECIFIED);
+      dataReq.setLast(last);
       const expectedRequest = new TabularDataByFilterRequest();
       expectedRequest.setDataRequest(dataReq);
-      expectedRequest.setCountOnly(false);
+      expectedRequest.setCountOnly(countOnly);
+      expectedRequest.setIncludeInternalData(includeInternalData);
 
-      await subject().tabularDataByFilter(filter);
+      await subject().tabularDataByFilter(
+        filter,
+        limit,
+        undefined,
+        last,
+        countOnly,
+        includeInternalData
+      );
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
@@ -185,6 +204,8 @@ describe('DataClient tests', () => {
   binData2.setBinary(bin2);
   const binDataResponse = new BinaryDataByFilterResponse();
   binDataResponse.setDataList([binData1, binData2]);
+  binDataResponse.setCount(limit);
+  binDataResponse.setLast(last);
 
   describe('binaryDataByFilter tests', () => {
     let methodSpy: MockInstance;
@@ -204,21 +225,35 @@ describe('DataClient tests', () => {
     });
     it('get binary data', async () => {
       const promise = await subject().binaryDataByFilter();
-      expect(promise.length).toEqual(2);
-      expect(promise[0]?.binary).toEqual(bin1);
-      expect(promise[1]?.binary).toEqual(bin2);
+      const { array, count, last } = promise;
+      expect(array.length).toEqual(2);
+      expect(array[0]?.binary).toEqual(bin1);
+      expect(array[1]?.binary).toEqual(bin2);
+      expect(count).toEqual(limit);
+      expect(last).toEqual(last);
     });
 
     it('get filtered binary data', async () => {
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
-      dataReq.setLimit(100);
-      dataReq.setLast('');
+      dataReq.setLimit(limit);
+      dataReq.setSortOrder(Order.ORDER_UNSPECIFIED);
+      dataReq.setLast(last);
       const expectedRequest = new BinaryDataByFilterRequest();
       expectedRequest.setDataRequest(dataReq);
-      expectedRequest.setCountOnly(false);
+      expectedRequest.setIncludeBinary(true);
+      expectedRequest.setCountOnly(countOnly);
+      expectedRequest.setIncludeInternalData(includeInternalData);
 
-      await subject().binaryDataByFilter(filter);
+      await subject().binaryDataByFilter(
+        filter,
+        limit,
+        undefined,
+        last,
+        true,
+        countOnly,
+        false
+      );
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
@@ -321,7 +356,7 @@ describe('DataClient tests', () => {
     it('do not delete internal binary data', async () => {
       const promise = await subject().deleteBinaryDataByFilter(
         undefined,
-        false
+        includeInternalData
       );
       expect(promise).toEqual(10);
     });
@@ -331,12 +366,13 @@ describe('DataClient tests', () => {
       expectedRequest.setFilter(filter);
       expectedRequest.setIncludeInternalData(true);
 
-      await subject().deleteBinaryDataByFilter(filter);
+      const promise = await subject().deleteBinaryDataByFilter(filter);
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
         expect.anything()
       );
+      expect(promise).toEqual(20);
     });
   });
 
