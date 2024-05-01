@@ -192,16 +192,15 @@ describe('AppClient tests', () => {
       vi.spyOn(
         AppServiceClient.prototype,
         'getOrganizationsWithAccessToLocation'
-      )
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.GetOrganizationsWithAccessToLocationRequest, cb) => {
-            const response =
-              new pb.GetOrganizationsWithAccessToLocationResponse();
-            response.setOrganizationIdentitiesList(orgIdentities);
-            cb(null, response);
-          }
-        );
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.GetOrganizationsWithAccessToLocationRequest, cb) => {
+          const response =
+            new pb.GetOrganizationsWithAccessToLocationResponse();
+          response.setOrganizationIdentitiesList(orgIdentities);
+          cb(null, response);
+        }
+      );
     });
 
     it('getOrganizationsWithAccessToLocation', async () => {
@@ -217,15 +216,17 @@ describe('AppClient tests', () => {
     orgDetail.setOrgName('name');
     const orgDetails = [orgDetail];
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listOrganizationsByUser')
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.ListOrganizationsByUserRequest, cb) => {
-            const response = new pb.ListOrganizationsByUserResponse();
-            response.setOrgsList(orgDetails);
-            cb(null, response);
-          }
-        );
+      vi.spyOn(
+        AppServiceClient.prototype,
+        'listOrganizationsByUser'
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.ListOrganizationsByUserRequest, cb) => {
+          const response = new pb.ListOrganizationsByUserResponse();
+          response.setOrgsList(orgDetails);
+          cb(null, response);
+        }
+      );
     });
 
     it('listOrganizationsByUser', async () => {
@@ -256,17 +257,16 @@ describe('AppClient tests', () => {
       vi.spyOn(
         AppServiceClient.prototype,
         'getOrganizationNamespaceAvailability'
-      )
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (req: pb.GetOrganizationNamespaceAvailabilityRequest, cb) => {
-            const response =
-              new pb.GetOrganizationNamespaceAvailabilityResponse();
-            const isAvailable = req.getPublicNamespace() === 'namespace';
-            response.setAvailable(isAvailable);
-            cb(null, response);
-          }
-        );
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (req: pb.GetOrganizationNamespaceAvailabilityRequest, cb) => {
+          const response =
+            new pb.GetOrganizationNamespaceAvailabilityResponse();
+          const isAvailable = req.getPublicNamespace() === 'namespace';
+          response.setAvailable(isAvailable);
+          cb(null, response);
+        }
+      );
     });
 
     it('getOrganizationNamespaceAvailability', async () => {
@@ -341,13 +341,15 @@ describe('AppClient tests', () => {
     expectedResponse.setInvitesList(invites);
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listOrganizationMembers')
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.ListOrganizationMembersRequest, cb) => {
-            cb(null, expectedResponse);
-          }
-        );
+      vi.spyOn(
+        AppServiceClient.prototype,
+        'listOrganizationMembers'
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.ListOrganizationMembersRequest, cb) => {
+          cb(null, expectedResponse);
+        }
+      );
     });
 
     it('listOrganizationMembers', async () => {
@@ -358,15 +360,17 @@ describe('AppClient tests', () => {
 
   describe('createOrganizationInvite tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'createOrganizationInvite')
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.CreateOrganizationInviteRequest, cb) => {
-            const response = new pb.CreateOrganizationInviteResponse();
-            response.setInvite(invite);
-            cb(null, response);
-          }
-        );
+      vi.spyOn(
+        AppServiceClient.prototype,
+        'createOrganizationInvite'
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.CreateOrganizationInviteRequest, cb) => {
+          const response = new pb.CreateOrganizationInviteResponse();
+          response.setInvite(invite);
+          cb(null, response);
+        }
+      );
     });
 
     it('createOrganizationInvite', async () => {
@@ -385,16 +389,15 @@ describe('AppClient tests', () => {
       vi.spyOn(
         AppServiceClient.prototype,
         'updateOrganizationInviteAuthorizations'
-      )
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.UpdateOrganizationInviteAuthorizationsRequest, cb) => {
-            const response =
-              new pb.UpdateOrganizationInviteAuthorizationsResponse();
-            response.setInvite(invite);
-            cb(null, response);
-          }
-        );
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.UpdateOrganizationInviteAuthorizationsRequest, cb) => {
+          const response =
+            new pb.UpdateOrganizationInviteAuthorizationsResponse();
+          response.setInvite(invite);
+          cb(null, response);
+        }
+      );
     });
 
     it('updateOrganizationInviteAuthorizations', async () => {
@@ -464,15 +467,17 @@ describe('AppClient tests', () => {
 
   describe('resendOrganizationInvite tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'resendOrganizationInvite')
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.ResendOrganizationInviteRequest, cb) => {
-            const response = new pb.ResendOrganizationInviteResponse();
-            response.setInvite(invite);
-            cb(null, response);
-          }
-        );
+      vi.spyOn(
+        AppServiceClient.prototype,
+        'resendOrganizationInvite'
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.ResendOrganizationInviteRequest, cb) => {
+          const response = new pb.ResendOrganizationInviteResponse();
+          response.setInvite(invite);
+          cb(null, response);
+        }
+      );
     });
 
     it('resendOrganizationInvite', async () => {
@@ -1671,17 +1676,16 @@ describe('AppClient tests', () => {
       vi.spyOn(
         AppServiceClient.prototype,
         'createKeyFromExistingKeyAuthorizations'
-      )
-        .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.CreateKeyFromExistingKeyAuthorizationsRequest, cb) => {
-            const response =
-              new pb.CreateKeyFromExistingKeyAuthorizationsResponse();
-            response.setKey('key');
-            response.setId('id');
-            cb(null, response);
-          }
-        );
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: pb.CreateKeyFromExistingKeyAuthorizationsRequest, cb) => {
+          const response =
+            new pb.CreateKeyFromExistingKeyAuthorizationsResponse();
+          response.setKey('key');
+          response.setId('id');
+          cb(null, response);
+        }
+      );
     });
 
     it('createKeyFromExistingKeyAuthorizations', async () => {
