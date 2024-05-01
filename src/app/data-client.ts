@@ -85,11 +85,23 @@ export class DataClient {
   /**
    * Filter and download tabular data. The returned metadata might be empty if
    * the metadata index of the data is out of the bounds of the returned
-   * metadata list.
+   * metadata list. The data will be paginated into pages of `limit` items, and
+   * the pagination ID will be included in the returned tuple.
    *
    * @param filter Optional `pb.Filter` specifying tabular data to retrieve. No
    *   `filter` implies all tabular data.
-   * @returns An array of data objects
+   * @param limit The maximum number of entries to include in a page. Defaults
+   *   to 50 if unspecfied
+   * @param sortOrder The desired sort order of the data
+   * @param last Optional string indicating the ID of the last-returned data. If
+   *   provided, the server will return the next data entries after the `last`
+   *   ID.
+   * @param countOnly Whether to return only the total count of entries
+   * @param includeInternalData Whether to retun internal data. Internal data is
+   *   used for Viam-specific data ingestion, like cloud SLAM. Defaults to
+   *   `false`.
+   * @returns An array of data objects, the count (number of entries), and the
+   *   last-returned page ID.
    */
   async tabularDataByFilter(
     filter?: dataPb.Filter,
@@ -151,8 +163,21 @@ export class DataClient {
    * metadata list.
    *
    * @param filter Optional `pb.Filter` specifying binary data to retrieve. No
-   *   `filter` implies all tabular data.
-   * @returns An array of data objects
+   *   `filter` implies all binary data.
+   * @param limit The maximum number of entries to include in a page. Defaults
+   *   to 50 if unspecfied
+   * @param sortOrder The desired sort order of the data
+   * @param last Optional string indicating the ID of the last-returned data. If
+   *   provided, the server will return the next data entries after the `last`
+   *   ID.
+   * @param includeBinary Whether to include binary file data with each
+   *   retrieved file
+   * @param countOnly Whether to return only the total count of entries
+   * @param includeInternalData Whether to retun internal data. Internal data is
+   *   used for Viam-specific data ingestion, like cloud SLAM. Defaults to
+   *   `false`.
+   * @returns An array of data objects, the count (number of entries), and the
+   *   last-returned page ID.
    */
   async binaryDataByFilter(
     filter?: dataPb.Filter,
