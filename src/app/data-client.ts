@@ -7,6 +7,9 @@ import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
 import { promisify } from '../utils';
 
+type ValueOf<T> = T[keyof T];
+export const { Order } = dataPb;
+export type Order = ValueOf<typeof dataPb.Order>;
 export type BinaryID = dataPb.BinaryID.AsObject;
 
 export type FilterOptions = Partial<dataPb.Filter.AsObject> & {
@@ -88,52 +91,58 @@ export class DataClient {
    *   `filter` implies all tabular data.
    * @returns An array of data objects
    */
-  async tabularDataByFilter(filter?: dataPb.Filter) {
+  async tabularDataByFilter(
+    filter?: dataPb.Filter,
+    limit?: number,
+    sortOrder?: Order,
+    last = '',
+    countOnly = false,
+    includeInternalData = false
+  ) {
     const { dataService: service } = this;
 
-    let last = '';
-    const dataArray: TabularData[] = [];
     const dataReq = new dataPb.DataRequest();
     dataReq.setFilter(filter ?? new dataPb.Filter());
-    dataReq.setLimit(100);
-
-    for (;;) {
-      dataReq.setLast(last);
-
-      const req = new dataPb.TabularDataByFilterRequest();
-      req.setDataRequest(dataReq);
-      req.setCountOnly(false);
-
-      // eslint-disable-next-line no-await-in-loop
-      const response = await promisify<
-        dataPb.TabularDataByFilterRequest,
-        dataPb.TabularDataByFilterResponse
-      >(service.tabularDataByFilter.bind(service), req);
-      const dataList = response.getDataList();
-      if (dataList.length === 0) {
-        break;
-      }
-      const mdListLength = response.getMetadataList().length;
-
-      dataArray.push(
-        ...dataList.map((data) => {
-          const mdIndex = data.getMetadataIndex();
-          const metadata =
-            mdListLength !== 0 && mdIndex >= mdListLength
-              ? new dataPb.CaptureMetadata().toObject()
-              : response.getMetadataList()[mdIndex]?.toObject();
-          return {
-            data: data.getData()?.toJavaScript(),
-            metadata,
-            timeRequested: data.getTimeRequested()?.toDate(),
-            timeReceived: data.getTimeReceived()?.toDate(),
-          };
-        })
-      );
-      last = response.getLast();
+    if (limit) {
+      dataReq.setLimit(limit);
     }
+    dataReq.setSortOrder(sortOrder ?? Order.ORDER_UNSPECIFIED);
+    dataReq.setLast(last);
 
-    return dataArray;
+    const req = new dataPb.TabularDataByFilterRequest();
+    req.setDataRequest(dataReq);
+    req.setCountOnly(countOnly);
+    req.setIncludeInternalData(includeInternalData);
+
+    // eslint-disable-next-line no-await-in-loop
+    const response = await promisify<
+      dataPb.TabularDataByFilterRequest,
+      dataPb.TabularDataByFilterResponse
+    >(service.tabularDataByFilter.bind(service), req);
+    const mdListLength = response.getMetadataList().length;
+
+    const dataArray: TabularData[] = [];
+    dataArray.push(
+      ...response.getDataList().map((data) => {
+        const mdIndex = data.getMetadataIndex();
+        const metadata =
+          mdListLength !== 0 && mdIndex >= mdListLength
+            ? new dataPb.CaptureMetadata().toObject()
+            : response.getMetadataList()[mdIndex]?.toObject();
+        return {
+          data: data.getData()?.toJavaScript(),
+          metadata,
+          timeRequested: data.getTimeRequested()?.toDate(),
+          timeReceived: data.getTimeReceived()?.toDate(),
+        };
+      })
+    );
+
+    return {
+      array: dataArray,
+      count: response.getCount(),
+      last: response.getLast(),
+    };
   }
 
   /**
