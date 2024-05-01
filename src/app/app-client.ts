@@ -1,20 +1,20 @@
 import * as pb from '../gen/app/v1/app_pb';
 import { type LogEntry } from '../gen/common/v1/common_pb';
 import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
-import { AppServiceClient } from '../gen/app/v1/app_pb_service';
+import { AppService, AppServiceClient } from '../gen/app/v1/app_pb_service';
 import { promisify } from '../utils';
-import { time, warn } from 'console';
-import type { UInt32Value } from 'google-protobuf/google/protobuf/wrappers_pb';
 import type { StructType } from '../types';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { PackageType, type PackageTypeMap } from '../gen/app/packages/v1/packages_pb';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { grpc } from '@improbable-eng/grpc-web';
 
 export class AppClient {
   private service: AppServiceClient;
+  private options: RpcOptions;
 
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
     this.service = new AppServiceClient(serviceHost, grpcOptions);
+    this.options = grpcOptions;
   }
 
   /**
@@ -53,7 +53,7 @@ export class AppClient {
       pb.CreateOrganizationResponse
     >(service.createOrganization.bind(service), req);
     const org = response.getOrganization();
-    return org ? org.toObject() : null;
+    return org?.toObject();
   }
 
   /**
@@ -219,17 +219,17 @@ export class AppClient {
    * @param orgId The id of the organization to create the invite for
    * @param email The email address of the user to generate an invite for
    * @param authorizations The authorizations to associate with the new invite
-   * @param sendEmailInvite Optional bool of whether to send an email invite (true) or automatically add a user.
+   * @param sendEmailInvite bool of whether to send an email invite (true) or automatically add a user.
    *   Defaults to true
    * @returns The organization invite
    */
-  async createOrganizationInvite(orgId: string, email: string, authorizations: pb.Authorization[], sendEmailInvite?: boolean) {
+  async createOrganizationInvite(orgId: string, email: string, authorizations: pb.Authorization[], sendEmailInvite: boolean = true) {
     const { service } = this;
     const req = new pb.CreateOrganizationInviteRequest();
     req.setOrganizationId(orgId);
     req.setEmail(email);
     req.setAuthorizationsList(authorizations);
-    req.setSendEmailInvite(sendEmailInvite ? sendEmailInvite : true);
+    req.setSendEmailInvite(sendEmailInvite ?? sendEmailInvite);
 
     const response = await promisify<
       pb.CreateOrganizationInviteRequest,
@@ -594,7 +594,7 @@ export class AppClient {
    * @param pageToken Optional string indicating which page of logs to query. Defaults to the most recent
    * @returns The robot requested logs and the page token for the next page of logs
    */
-  async getRobotPartLogs(id: string, filter?: string, levels?: string[], pageToken?: string) {
+  async getRobotPartLogs(id: string, filter?: string, levels?: string[], pageToken: string = '') {
     const { service } = this;
       const req = new pb.GetRobotPartLogsRequest();
     req.setId(id);
@@ -604,7 +604,6 @@ export class AppClient {
     if (levels) {
       req.setLevelsList(levels);
     }
-    pageToken = pageToken ? pageToken : '';
     req.setPageToken(pageToken);
 
     const response = await promisify<
@@ -619,14 +618,13 @@ export class AppClient {
    *
    * @param id The ID of the requested robot part
    * @param queue A queue to put the log entries into
-   * @param errorsOnly Optional bool to indicate whether or not only error-level logs should be returned. Defaults to true
    * @param filter Optional string to filter logs on
+   * @param errorsOnly Optional bool to indicate whether or not only error-level logs should be returned. Defaults to true
    */
-  async tailRobotPartLogs(id: string, queue: LogEntry.AsObject[], errorsOnly?: boolean, filter?: string) {
+  async tailRobotPartLogs(id: string, queue: LogEntry.AsObject[], filter?: string, errorsOnly: boolean = true) {
     const { service } = this;
     const req = new pb.TailRobotPartLogsRequest();
     req.setId(id);
-    errorsOnly = errorsOnly ? errorsOnly : true;
     req.setErrorsOnly(errorsOnly);
     if (filter) {
       req.setFilter(filter);
@@ -634,35 +632,35 @@ export class AppClient {
 
     const stream = service.tailRobotPartLogs(req);
     stream.on('data', (response) => {
-    	for (var log of response.toObject().logsList) {
-    	  queue.push(log);
-    	}
+        for (var log of response.toObject().logsList) {
+          queue.push(log);
+        }
     });
 
     return new Promise<void>((resolve, reject) => {
       stream.on('status', (status) => {
-    	if (status.code !== 0) {
-    	  const error = {
-    		message: status.details,
-    		code: status.code,
-    		metadata: status.metadata,
-    	  };
-    	  reject(error);
-    	}
+        if (status.code !== 0) {
+          const error = {
+            message: status.details,
+            code: status.code,
+            metadata: status.metadata,
+          };
+          reject(error);
+        }
       });
       stream.on('end', (end) => {
-    	if (end === undefined) {
-    	  const error = { message: 'Stream ended without a status code' };
-    	  reject(error);
-    	} else if (end.code !== 0) {
-    	  const error = {
-    		message: end.details,
-    		code: end.code,
-    		metadata: end.metadata,
-    	  };
-    	  reject(error);
-    	}
-    	resolve();
+        if (end === undefined) {
+          const error = { message: 'Stream ended without a status code' };
+          reject(error);
+        } else if (end.code !== 0) {
+          const error = {
+            message: end.details,
+            code: end.code,
+            metadata: end.metadata,
+          };
+          reject(error);
+        }
+        resolve();
       });
     });
   }
@@ -912,12 +910,9 @@ export class AppClient {
    * @param publicOnly Optional boolean, if true then only public fragments will be listed. Defaults to true.
    * @returns The list of fragment objects
    */
-  async listFragments(orgId: string, publicOnly?: boolean) {
+  async listFragments(orgId: string, publicOnly: boolean = true) {
     const { service } = this;
     const req = new pb.ListFragmentsRequest();
-    if (publicOnly === undefined) {
-      publicOnly = true;
-    }
     req.setOrganizationId(orgId);
     req.setShowPublic(publicOnly);
 
@@ -1330,7 +1325,6 @@ export class AppClient {
     return response.getUrl();
   }
 
-  // CR erodkin: I couldn't figure out how to do this right! how do I get the url?? ugh
   /**
    * Uploads a new module file.
    *
@@ -1338,44 +1332,37 @@ export class AppClient {
    * @param version The semver string representing the module's new version
    * @param platform The platform that the file is built to run on
    * @param file The file contents to be uploaded
+   * @returns url with module documentation, code, etc.
    */
   async uploadModuleFile(moduleId: string, version: string, platform: string, file: Uint8Array | string) {
-    const { service } = this;
+    const { service, options } = this;
     const req = new pb.UploadModuleFileRequest();
     const fileInfo = new pb.ModuleFileInfo;
     fileInfo.setModuleId(moduleId);
     fileInfo.setVersion(version);
     fileInfo.setPlatform(platform);
     req.setModuleFileInfo(fileInfo);
-    req.setFile(file);
 
-    const stream = service.uploadModuleFile();
-    stream.write(req);
-    return new Promise<void>((resolve, reject) => {
-      stream.on('status', (status) => {
-    	if (status.code !== 0) {
-    	  const error = {
-    		message: status.details,
-    		code: status.code,
-    		metadata: status.metadata,
-    	  };
-    	  reject(error);
-    	}
-      });
-      stream.on('end', (end) => {
-    	if (end === undefined) {
-    	  const error = { message: 'Stream ended without a status code' };
-    	  reject(error);
-    	} else if (end.code !== 0) {
-    	  const error = {
-    		message: end.details,
-    		code: end.code,
-    		metadata: end.metadata,
-    	  };
-    	  reject(error);
-    	}
-    	resolve();
-      });
+    const fileReq = new pb.UploadModuleFileRequest();
+    fileReq.setFile(file);
+
+    const client = grpc.client(AppService.UploadModuleFile, { host: service.serviceHost, transport: options.transport });
+
+    var url: string;
+
+    client.onMessage((message) => {
+      const resp = message as pb.UploadModuleFileResponse;
+      url = resp.getUrl();
+    });
+
+    client.send(req);
+    client.send(fileReq);
+    client.finishSend();
+
+    return new Promise<string>((resolve, _reject) => {
+      if (url) {
+        resolve(url);
+      }
     });
   }
 
@@ -1426,7 +1413,7 @@ export class AppClient {
     const { service } = this;
     const req = new pb.CreateKeyRequest();
     req.setAuthorizationsList(authorizations);
-    name = name ? name : new Date().toLocaleString();
+    name = name ?? new Date().toLocaleString();
     req.setName(name);
 
     const response = await promisify<
