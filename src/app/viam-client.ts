@@ -6,6 +6,9 @@ import {
 } from './viam-transport';
 import { DataClient } from './data-client';
 import { AppClient } from './app-client';
+import { BillingClient } from './billing-client';
+import { MlTrainingClient } from './ml-training-client';
+import { ProvisioningClient } from './provisioning-client';
 
 export interface ViamClientOptions {
   serviceHost?: string;
@@ -33,6 +36,9 @@ export class ViamClient {
 
   public dataClient: DataClient | undefined;
   public appClient: AppClient | undefined;
+  public mlTrainingClient: MlTrainingClient | undefined;
+  public provisioningClient: ProvisioningClient | undefined;
+  public billingClient: BillingClient | undefined;
 
   constructor(transportFactory: grpc.TransportFactory, serviceHost: string) {
     this.transportFactory = transportFactory;
@@ -43,5 +49,11 @@ export class ViamClient {
     const grpcOptions = { transport: this.transportFactory };
     this.dataClient = new DataClient(this.serviceHost, grpcOptions);
     this.appClient = new AppClient(this.serviceHost, grpcOptions);
+    this.mlTrainingClient = new MlTrainingClient(this.serviceHost, grpcOptions);
+    this.provisioningClient = new ProvisioningClient(
+      this.serviceHost,
+      grpcOptions
+    );
+    this.billingClient = new BillingClient(this.serviceHost, grpcOptions);
   }
 }

@@ -20,7 +20,7 @@ on:
 jobs:
   prepare:
     if: github.repository_owner == 'viamrobotics'
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     outputs:
@@ -33,7 +33,7 @@ jobs:
         with:
           organization: viamrobotics
           username: ${{ github.actor }}
-          token:  ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cancelling - not an organization member
         uses: andymckay/cancel-action@0.2
@@ -49,7 +49,7 @@ jobs:
           && sudo apt install gh -y
 
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build + Lint + Test
         run: |
@@ -110,12 +110,12 @@ jobs:
   build:
     needs: prepare
     if: github.repository_owner == 'viamrobotics'
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: rc-${{ needs.prepare.outputs.version }}
 
@@ -133,7 +133,7 @@ jobs:
   release:
     needs: [prepare, build]
     if: github.repository_owner == 'viamrobotics'
-    runs-on: [self-hosted, x64]
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
 
