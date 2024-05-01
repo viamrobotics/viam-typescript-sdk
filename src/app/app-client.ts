@@ -5,7 +5,10 @@ import { AppService, AppServiceClient } from '../gen/app/v1/app_pb_service';
 import { promisify } from '../utils';
 import type { StructType } from '../types';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
-import { PackageType, type PackageTypeMap } from '../gen/app/packages/v1/packages_pb';
+import {
+  PackageType,
+  type PackageTypeMap,
+} from '../gen/app/packages/v1/packages_pb';
 import { grpc } from '@improbable-eng/grpc-web';
 
 /**
@@ -14,13 +17,22 @@ import { grpc } from '@improbable-eng/grpc-web';
  * @param orgId The ID of the organization to create the role under
  * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
  * @param role The role to add ("owner" or "operator")
- * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
- * @param identityType The type of identity that the identity ID is (e.g., an api-key)
- * @param resourceId the ID of the resource the role is being created for
+ * @param resourceType The type of resource to create the role for ("robot",
+ *   "location", or "organization")
+ * @param identityType The type of identity that the identity ID is (e.g., an
+ *   api-key)
+ * @param resourceId The ID of the resource the role is being created for
  */
-export const createAuth = (orgId: string, entityId: string, role: string, resourceType: string, identityType: string, resourceId: string) : pb.Authorization => {
-  const auth = new pb.Authorization;
-  auth.setAuthorizationType("role");
+export const createAuth = (
+  orgId: string,
+  entityId: string,
+  role: string,
+  resourceType: string,
+  identityType: string,
+  resourceId: string
+): pb.Authorization => {
+  const auth = new pb.Authorization();
+  auth.setAuthorizationType('role');
   auth.setIdentityId(entityId);
   auth.setIdentityType(identityType);
   auth.setAuthorizationId(`${resourceType}_${role}`);
@@ -30,19 +42,25 @@ export const createAuth = (orgId: string, entityId: string, role: string, resour
   auth.setOrganizationId(orgId);
 
   return auth;
-}
+};
 
 /**
  * Creates an Authorization object specifically for a new API key.
  *
  * @param orgId The ID of the organization to create the role under
  * @param role The role to add ("owner" or "operator")
- * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
- * @param resourceId the ID of the resource the role is being created for
+ * @param resourceType The type of resource to create the role for ("robot",
+ *   "location", or "organization")
+ * @param resourceId The ID of the resource the role is being created for
  */
-export const createAuthForNewAPIKey = (orgId: string, role: string, resourceType: string, resourceId: string) : pb.Authorization => {
-  return createAuth(orgId, "", role, resourceType, "api-key", resourceId);
-  }
+export const createAuthForNewAPIKey = (
+  orgId: string,
+  role: string,
+  resourceType: string,
+  resourceId: string
+): pb.Authorization => {
+  return createAuth(orgId, '', role, resourceType, 'api-key', resourceId);
+};
 
 /**
  * Creates a new AuthorizedPermissions object
@@ -52,14 +70,18 @@ export const createAuthForNewAPIKey = (orgId: string, role: string, resourceType
  * @param permissions A list of permissions to check
  * @returns The AuthorizedPermissions object
  */
-export const createPermission = (resourceType: string, resourceId: string, permissions: string[]) : pb.AuthorizedPermissions => {
-  const permission = new pb.AuthorizedPermissions;
+export const createPermission = (
+  resourceType: string,
+  resourceId: string,
+  permissions: string[]
+): pb.AuthorizedPermissions => {
+  const permission = new pb.AuthorizedPermissions();
   permission.setResourceType(resourceType);
   permission.setResourceId(resourceId);
   permission.setPermissionsList(permissions);
 
   return permission;
-}
+};
 
 export class AppClient {
   private service: AppServiceClient;
@@ -122,7 +144,7 @@ export class AppClient {
       pb.ListOrganizationsRequest,
       pb.ListOrganizationsResponse
     >(service.listOrganizations.bind(service), req);
-    return response.toObject().organizationsList
+    return response.toObject().organizationsList;
   }
 
   /**
@@ -140,9 +162,8 @@ export class AppClient {
       pb.GetOrganizationsWithAccessToLocationRequest,
       pb.GetOrganizationsWithAccessToLocationResponse
     >(service.getOrganizationsWithAccessToLocation.bind(service), req);
-    return response.toObject().organizationIdentitiesList
+    return response.toObject().organizationIdentitiesList;
   }
-
 
   /**
    * List all organizations associated with a user.
@@ -165,7 +186,7 @@ export class AppClient {
   /**
    * Get details about an organization.
    *
-   * @param orgId the ID of the organization
+   * @param orgId The ID of the organization
    * @returns Details about the organization, if it exists
    */
   async getOrganization(orgId: string) {
@@ -208,7 +229,13 @@ export class AppClient {
    * @param cid Optional CRM ID to update the organization with
    * @returns The updated organization details
    */
-  async updateOrganization(orgId: string, name?: string, publicNamespace?: string, region?: string, cid?: string) {
+  async updateOrganization(
+    orgId: string,
+    name?: string,
+    publicNamespace?: string,
+    region?: string,
+    cid?: string
+  ) {
     const { service } = this;
     const req = new pb.UpdateOrganizationRequest();
     req.setOrganizationId(orgId);
@@ -252,7 +279,8 @@ export class AppClient {
    * Lists organization memebers and outstanding invites.
    *
    * @param orgId The id of the organization to query
-   * @returns An object containing organization members, pending invites, and org ID
+   * @returns An object containing organization members, pending invites, and
+   *   org ID
    */
   async listOrganizationMembers(orgId: string) {
     const { service } = this;
@@ -272,11 +300,16 @@ export class AppClient {
    * @param orgId The id of the organization to create the invite for
    * @param email The email address of the user to generate an invite for
    * @param authorizations The authorizations to associate with the new invite
-   * @param sendEmailInvite bool of whether to send an email invite (true) or automatically add a user.
-   *   Defaults to true
+   * @param sendEmailInvite Bool of whether to send an email invite (true) or
+   *   automatically add a user. Defaults to true
    * @returns The organization invite
    */
-  async createOrganizationInvite(orgId: string, email: string, authorizations: pb.Authorization[], sendEmailInvite = true) {
+  async createOrganizationInvite(
+    orgId: string,
+    email: string,
+    authorizations: pb.Authorization[],
+    sendEmailInvite = true
+  ) {
     const { service } = this;
     const req = new pb.CreateOrganizationInviteRequest();
     req.setOrganizationId(orgId);
@@ -300,7 +333,12 @@ export class AppClient {
    * @param removeAuthsList List of authorizations to remove from the invite
    * @returns The organization invite
    */
-  async updateOrganizationInviteAuthorizations(orgId: string, email: string, addAuthsList: pb.Authorization[], removeAuthsList: pb.Authorization[]) {
+  async updateOrganizationInviteAuthorizations(
+    orgId: string,
+    email: string,
+    addAuthsList: pb.Authorization[],
+    removeAuthsList: pb.Authorization[]
+  ) {
     const { service } = this;
     const req = new pb.UpdateOrganizationInviteAuthorizationsRequest();
     req.setOrganizationId(orgId);
@@ -376,7 +414,8 @@ export class AppClient {
    *
    * @param orgId The ID of the organization to create the location under
    * @param name The name of the location to create
-   * @param parentLocationId Optional name of a parent location to create the new location under
+   * @param parentLocationId Optional name of a parent location to create the
+   *   new location under
    * @returns The location object
    */
   async createLocation(orgId: string, name: string, parentLocationId?: string) {
@@ -418,11 +457,17 @@ export class AppClient {
    *
    * @param locId The ID of the location to update
    * @param name Optional string to update the location's name to
-   * @param parentLocId Optional string to update the location's parent location to
+   * @param parentLocId Optional string to update the location's parent location
+   *   to
    * @param region Optional string to update the location's region to
    * @returns The location object
    */
-  async updateLocation(locId: string, name?: string, parentLocId?: string, region?: string) {
+  async updateLocation(
+    locId: string,
+    name?: string,
+    parentLocId?: string,
+    region?: string
+  ) {
     const { service } = this;
     const req = new pb.UpdateLocationRequest();
     req.setLocationId(locId);
@@ -453,10 +498,10 @@ export class AppClient {
     const req = new pb.DeleteLocationRequest();
     req.setLocationId(locId);
 
-    await promisify<
-      pb.DeleteLocationRequest,
-      pb.DeleteLocationResponse
-    >(service.deleteLocation.bind(service), req);
+    await promisify<pb.DeleteLocationRequest, pb.DeleteLocationResponse>(
+      service.deleteLocation.bind(service),
+      req
+    );
   }
 
   /**
@@ -489,10 +534,10 @@ export class AppClient {
     req.setOrganizationId(orgId);
     req.setLocationId(locId);
 
-    await promisify<
-      pb.ShareLocationRequest,
-      pb.ShareLocationResponse
-    >(service.shareLocation.bind(service), req);
+    await promisify<pb.ShareLocationRequest, pb.ShareLocationResponse>(
+      service.shareLocation.bind(service),
+      req
+    );
   }
 
   /**
@@ -507,10 +552,10 @@ export class AppClient {
     req.setOrganizationId(orgId);
     req.setLocationId(locId);
 
-    await promisify<
-      pb.UnshareLocationRequest,
-      pb.UnshareLocationResponse
-    >(service.unshareLocation.bind(service), req);
+    await promisify<pb.UnshareLocationRequest, pb.UnshareLocationResponse>(
+      service.unshareLocation.bind(service),
+      req
+    );
   }
 
   /**
@@ -578,10 +623,10 @@ export class AppClient {
     const req = new pb.GetRobotRequest();
     req.setId(id);
 
-    const response = await promisify<
-      pb.GetRobotRequest,
-      pb.GetRobotResponse
-    >(service.getRobot.bind(service), req);
+    const response = await promisify<pb.GetRobotRequest, pb.GetRobotResponse>(
+      service.getRobot.bind(service),
+      req
+    );
     return response.toObject();
   }
 
@@ -640,17 +685,26 @@ export class AppClient {
   }
 
   /**
-   * Get a page of log entries for a specific robot part. Logs are sorted by descending time (newest first).
+   * Get a page of log entries for a specific robot part. Logs are sorted by
+   * descending time (newest first).
    *
    * @param id The ID of the requested robot part
    * @param filter Optional string to filter logs on
-   * @param levels Optional array of log levels to return. Defaults to returning all log levels
-   * @param pageToken Optional string indicating which page of logs to query. Defaults to the most recent
-   * @returns The robot requested logs and the page token for the next page of logs
+   * @param levels Optional array of log levels to return. Defaults to returning
+   *   all log levels
+   * @param pageToken Optional string indicating which page of logs to query.
+   *   Defaults to the most recent
+   * @returns The robot requested logs and the page token for the next page of
+   *   logs
    */
-  async getRobotPartLogs(id: string, filter?: string, levels?: string[], pageToken = '') {
+  async getRobotPartLogs(
+    id: string,
+    filter?: string,
+    levels?: string[],
+    pageToken = ''
+  ) {
     const { service } = this;
-      const req = new pb.GetRobotPartLogsRequest();
+    const req = new pb.GetRobotPartLogsRequest();
     req.setId(id);
     if (filter) {
       req.setFilter(filter);
@@ -668,14 +722,21 @@ export class AppClient {
   }
 
   /**
-   * Get a stream of log entries for a specific robot part. Logs are sorted by descending time (newest first).
+   * Get a stream of log entries for a specific robot part. Logs are sorted by
+   * descending time (newest first).
    *
    * @param id The ID of the requested robot part
    * @param queue A queue to put the log entries into
    * @param filter Optional string to filter logs on
-   * @param errorsOnly Optional bool to indicate whether or not only error-level logs should be returned. Defaults to true
+   * @param errorsOnly Optional bool to indicate whether or not only error-level
+   *   logs should be returned. Defaults to true
    */
-  async tailRobotPartLogs(id: string, queue: LogEntry.AsObject[], filter?: string, errorsOnly = true) {
+  async tailRobotPartLogs(
+    id: string,
+    queue: LogEntry.AsObject[],
+    filter?: string,
+    errorsOnly = true
+  ) {
     const { service } = this;
     const req = new pb.TailRobotPartLogsRequest();
     req.setId(id);
@@ -686,9 +747,9 @@ export class AppClient {
 
     const stream = service.tailRobotPartLogs(req);
     stream.on('data', (response) => {
-        for (const log of response.toObject().logsList) {
-          queue.push(log);
-        }
+      for (const log of response.toObject().logsList) {
+        queue.push(log);
+      }
     });
 
     return new Promise<void>((resolve, reject) => {
@@ -789,10 +850,10 @@ export class AppClient {
     const req = new pb.DeleteRobotPartRequest();
     req.setPartId(partId);
 
-    await promisify<
-      pb.DeleteRobotPartRequest,
-      pb.DeleteRobotPartResponse
-    >(service.deleteRobotPart.bind(service), req);
+    await promisify<pb.DeleteRobotPartRequest, pb.DeleteRobotPartResponse>(
+      service.deleteRobotPart.bind(service),
+      req
+    );
   }
 
   /**
@@ -823,10 +884,10 @@ export class AppClient {
     const req = new pb.MarkPartAsMainRequest();
     req.setPartId(partId);
 
-    await promisify<
-      pb.MarkPartAsMainRequest,
-      pb.MarkPartAsMainResponse
-    >(service.markPartAsMain.bind(service), req);
+    await promisify<pb.MarkPartAsMainRequest, pb.MarkPartAsMainResponse>(
+      service.markPartAsMain.bind(service),
+      req
+    );
   }
 
   /**
@@ -912,10 +973,10 @@ export class AppClient {
     req.setName(name);
     req.setLocation(locId);
 
-    const response = await promisify<
-      pb.NewRobotRequest,
-      pb.NewRobotResponse
-    >(service.newRobot.bind(service), req);
+    const response = await promisify<pb.NewRobotRequest, pb.NewRobotResponse>(
+      service.newRobot.bind(service),
+      req
+    );
     return response.getId();
   }
 
@@ -951,17 +1012,18 @@ export class AppClient {
     const req = new pb.DeleteRobotRequest();
     req.setId(id);
 
-    await promisify<
-      pb.DeleteRobotRequest,
-      pb.DeleteRobotResponse
-    >(service.deleteRobot.bind(service), req);
+    await promisify<pb.DeleteRobotRequest, pb.DeleteRobotResponse>(
+      service.deleteRobot.bind(service),
+      req
+    );
   }
 
   /**
    * Lists all fragments within an organization.
    *
    * @param orgId The ID of the organization to list fragments for
-   * @param publicOnly Optional boolean, if true then only public fragments will be listed. Defaults to true.
+   * @param publicOnly Optional boolean, if true then only public fragments will
+   *   be listed. Defaults to true.
    * @returns The list of fragment objects
    */
   async listFragments(orgId: string, publicOnly = true) {
@@ -998,7 +1060,7 @@ export class AppClient {
   /**
    * Creates a new fragment.
    *
-   * @param orgId the ID of the organization to create the fragment under
+   * @param orgId The ID of the organization to create the fragment under
    * @param name The name of the new fragment
    * @param config The new fragment's config
    * @returns The newly created fragment
@@ -1023,11 +1085,17 @@ export class AppClient {
    * @param id The ID of the fragment to update
    * @param name The name to update the fragment to
    * @param config The config to update the fragment to
-   * @param makePublic Optional boolean specifying whether the fragment should be public or not.
-   *   If not passed the visibility will be unchanged. Fragments are private by default when created
+   * @param makePublic Optional boolean specifying whether the fragment should
+   *   be public or not. If not passed the visibility will be unchanged.
+   *   Fragments are private by default when created
    * @returns The updated fragment
    */
-  async updateFragment(id: string, name: string, config: StructType, makePublic?: boolean) {
+  async updateFragment(
+    id: string,
+    name: string,
+    config: StructType,
+    makePublic?: boolean
+  ) {
     const { service } = this;
     const req = new pb.UpdateFragmentRequest();
     req.setId(id);
@@ -1054,10 +1122,10 @@ export class AppClient {
     const req = new pb.DeleteFragmentRequest();
     req.setId(id);
 
-    await promisify<
-      pb.DeleteFragmentRequest,
-      pb.DeleteFragmentResponse
-    >(service.deleteFragment.bind(service), req);
+    await promisify<pb.DeleteFragmentRequest, pb.DeleteFragmentResponse>(
+      service.deleteFragment.bind(service),
+      req
+    );
   }
 
   /**
@@ -1066,19 +1134,33 @@ export class AppClient {
    * @param orgId The ID of the organization to create the role under
    * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
    * @param role The role to add ("owner" or "operator")
-   * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
-   * @param resourceId the ID of the resource the role is being created for
+   * @param resourceType The type of resource to create the role for ("robot",
+   *   "location", or "organization")
+   * @param resourceId The ID of the resource the role is being created for
    */
-  async addRole(orgId: string, entityId: string, role: string, resourceType: string, resourceId: string) {
+  async addRole(
+    orgId: string,
+    entityId: string,
+    role: string,
+    resourceType: string,
+    resourceId: string
+  ) {
     const { service } = this;
     const req = new pb.AddRoleRequest();
-    const auth = createAuth(orgId, entityId, role, resourceType, "", resourceId);
+    const auth = createAuth(
+      orgId,
+      entityId,
+      role,
+      resourceType,
+      '',
+      resourceId
+    );
     req.setAuthorization(auth);
 
-    await promisify<
-      pb.AddRoleRequest,
-      pb.AddRoleResponse
-    >(service.addRole.bind(service), req);
+    await promisify<pb.AddRoleRequest, pb.AddRoleResponse>(
+      service.addRole.bind(service),
+      req
+    );
   }
 
   /**
@@ -1087,19 +1169,33 @@ export class AppClient {
    * @param orgId The ID of the organization to remove the role from
    * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
    * @param role The role to remove ("owner" or "operator")
-   * @param resourceType The type of resource to remove the role from ("robot", "location", or "organization")
-   * @param resourceId the ID of the resource the role is being removes from
+   * @param resourceType The type of resource to remove the role from ("robot",
+   *   "location", or "organization")
+   * @param resourceId The ID of the resource the role is being removes from
    */
-  async removeRole(orgId: string, entityId: string, role: string, resourceType: string, resourceId: string) {
+  async removeRole(
+    orgId: string,
+    entityId: string,
+    role: string,
+    resourceType: string,
+    resourceId: string
+  ) {
     const { service } = this;
     const req = new pb.RemoveRoleRequest();
-    const auth = createAuth(orgId, entityId, role, resourceType, "", resourceId);
+    const auth = createAuth(
+      orgId,
+      entityId,
+      role,
+      resourceType,
+      '',
+      resourceId
+    );
     req.setAuthorization(auth);
 
-    await promisify<
-      pb.RemoveRoleRequest,
-      pb.RemoveRoleResponse
-    >(service.removeRole.bind(service), req);
+    await promisify<pb.RemoveRoleRequest, pb.RemoveRoleResponse>(
+      service.removeRole.bind(service),
+      req
+    );
   }
 
   /**
@@ -1114,17 +1210,18 @@ export class AppClient {
     req.setOldAuthorization(oldAuth);
     req.setNewAuthorization(newAuth);
 
-    await promisify<
-      pb.ChangeRoleRequest,
-      pb.ChangeRoleResponse
-    >(service.changeRole.bind(service), req);
+    await promisify<pb.ChangeRoleRequest, pb.ChangeRoleResponse>(
+      service.changeRole.bind(service),
+      req
+    );
   }
 
   /**
    * List all authorizations for an organization.
    *
    * @param orgId The ID of the organization to list authorizations for
-   * @param resourceIds Optional list of IDs of resources to list authorizations for. If not provided, all resources will be included
+   * @param resourceIds Optional list of IDs of resources to list authorizations
+   *   for. If not provided, all resources will be included
    */
   async listAuthorizations(orgId: string, resourceIds?: string[]) {
     const { service } = this;
@@ -1177,7 +1274,6 @@ export class AppClient {
     return response.toObject();
   }
 
-
   /**
    * Create a new registry item.
    *
@@ -1185,7 +1281,11 @@ export class AppClient {
    * @param name The name of the registry item
    * @param type The type of the item in the registry.
    */
-  async createRegistryItem(orgId: string, name: string, type: keyof PackageTypeMap) {
+  async createRegistryItem(
+    orgId: string,
+    name: string,
+    type: keyof PackageTypeMap
+  ) {
     const { service } = this;
     const req = new pb.CreateRegistryItemRequest();
     req.setOrganizationId(orgId);
@@ -1206,7 +1306,12 @@ export class AppClient {
    * @param description A description of the item
    * @param visibility A visibility value to update to
    */
-  async updateRegistryItem(itemId: string, type: keyof PackageTypeMap, description: string, visibility: keyof pb.VisibilityMap) {
+  async updateRegistryItem(
+    itemId: string,
+    type: keyof PackageTypeMap,
+    description: string,
+    visibility: keyof pb.VisibilityMap
+  ) {
     const { service } = this;
     const req = new pb.UpdateRegistryItemRequest();
     req.setItemId(itemId);
@@ -1225,35 +1330,45 @@ export class AppClient {
    *
    * @param orgId The ID of the organization to query registry items for
    * @param types A list of types to query. If empty, will not filter on type
-   * @param visibilities A list of visibilities to query for. If empty, will not filter on visibility
-   * @param platforms A list of platforms to query for. If empty, will not filter on platform
-   * @param statuses A list of statuses to query for. If empty, will not filter on status
+   * @param visibilities A list of visibilities to query for. If empty, will not
+   *   filter on visibility
+   * @param platforms A list of platforms to query for. If empty, will not
+   *   filter on platform
+   * @param statuses A list of statuses to query for. If empty, will not filter
+   *   on status
    * @param searchTerm Optional search term to filter on
-   * @param pageToken Optional page token for results. If not provided, will return all results
+   * @param pageToken Optional page token for results. If not provided, will
+   *   return all results
    * @returns The list of registry items
    */
   async listRegistryItems(
-      orgId: string,
-      types: (keyof PackageTypeMap)[],
-      visibilities: (keyof pb.VisibilityMap)[],
-      platforms: string[],
-      statuses: (keyof pb.RegistryItemStatusMap)[],
-      searchTerm?: string,
-      pageToken?: string
+    orgId: string,
+    types: (keyof PackageTypeMap)[],
+    visibilities: (keyof pb.VisibilityMap)[],
+    platforms: string[],
+    statuses: (keyof pb.RegistryItemStatusMap)[],
+    searchTerm?: string,
+    pageToken?: string
   ) {
     const { service } = this;
     const req = new pb.ListRegistryItemsRequest();
     req.setOrganizationId(orgId);
-    req.setTypesList(types.map((type) => {
-      return PackageType[type];
-    }));
-    req.setVisibilitiesList(visibilities.map((visibility) => {
-      return pb.Visibility[visibility]
-    }));
+    req.setTypesList(
+      types.map((type) => {
+        return PackageType[type];
+      })
+    );
+    req.setVisibilitiesList(
+      visibilities.map((visibility) => {
+        return pb.Visibility[visibility];
+      })
+    );
     req.setPlatformsList(platforms);
-    req.setStatusesList(statuses.map((status) => {
-      return pb.RegistryItemStatus[status];
-    }));
+    req.setStatusesList(
+      statuses.map((status) => {
+        return pb.RegistryItemStatus[status];
+      })
+    );
     if (searchTerm) {
       req.setSearchTerm(searchTerm);
     }
@@ -1315,7 +1430,14 @@ export class AppClient {
    * @param entrypoint The executable to run to start the module program
    * @returns The module URL
    */
-  async updateModule(moduleId: string, visibility: keyof pb.VisibilityMap, url: string, description: string, models: pb.Model[], entrypoint: string) {
+  async updateModule(
+    moduleId: string,
+    visibility: keyof pb.VisibilityMap,
+    url: string,
+    description: string,
+    models: pb.Model[],
+    entrypoint: string
+  ) {
     const { service } = this;
     const req = new pb.UpdateModuleRequest();
     req.setModuleId(moduleId);
@@ -1335,16 +1457,22 @@ export class AppClient {
   /**
    * Uploads a new module file.
    *
-   * @param moduleId The ID of the module, formatted as `prefix:name` where prefix is the module owner's orgid or namespace
+   * @param moduleId The ID of the module, formatted as `prefix:name` where
+   *   prefix is the module owner's orgid or namespace
    * @param version The semver string representing the module's new version
    * @param platform The platform that the file is built to run on
    * @param file The file contents to be uploaded
-   * @returns url with module documentation, code, etc.
+   * @returns Url with module documentation, code, etc.
    */
-  async uploadModuleFile(moduleId: string, version: string, platform: string, file: Uint8Array | string) {
+  async uploadModuleFile(
+    moduleId: string,
+    version: string,
+    platform: string,
+    file: Uint8Array | string
+  ) {
     const { service, options } = this;
     const req = new pb.UploadModuleFileRequest();
-    const fileInfo = new pb.ModuleFileInfo;
+    const fileInfo = new pb.ModuleFileInfo();
     fileInfo.setModuleId(moduleId);
     fileInfo.setVersion(version);
     fileInfo.setPlatform(platform);
@@ -1353,7 +1481,10 @@ export class AppClient {
     const fileReq = new pb.UploadModuleFileRequest();
     fileReq.setFile(file);
 
-    const client = grpc.client(AppService.UploadModuleFile, { host: service.serviceHost, transport: options.transport });
+    const client = grpc.client(AppService.UploadModuleFile, {
+      host: service.serviceHost,
+      transport: options.transport,
+    });
 
     let url: string;
 
@@ -1384,10 +1515,10 @@ export class AppClient {
     const req = new pb.GetModuleRequest();
     req.setModuleId(moduleId);
 
-    const response = await promisify<
-      pb.GetModuleRequest,
-      pb.GetModuleResponse
-    >(service.getModule.bind(service), req);
+    const response = await promisify<pb.GetModuleRequest, pb.GetModuleResponse>(
+      service.getModule.bind(service),
+      req
+    );
     return response.toObject();
   }
 
@@ -1413,7 +1544,8 @@ export class AppClient {
    * Creates a new API key.
    *
    * @param authorizations The list of authorizations to provide for the API key
-   * @param name An optional name for the key. If none is passed, defaults to present timestamp
+   * @param name An optional name for the key. If none is passed, defaults to
+   *   present timestamp
    * @returns The new key and ID
    */
   async createKey(authorizations: pb.Authorization[], name?: string) {
@@ -1423,10 +1555,10 @@ export class AppClient {
     const setName = name ?? new Date().toLocaleString();
     req.setName(setName);
 
-    const response = await promisify<
-      pb.CreateKeyRequest,
-      pb.CreateKeyResponse
-    >(service.createKey.bind(service), req);
+    const response = await promisify<pb.CreateKeyRequest, pb.CreateKeyResponse>(
+      service.createKey.bind(service),
+      req
+    );
     return response.toObject();
   }
 
@@ -1440,16 +1572,16 @@ export class AppClient {
     const req = new pb.DeleteKeyRequest();
     req.setId(id);
 
-    await promisify<
-      pb.DeleteKeyRequest,
-      pb.DeleteKeyResponse
-    >(service.deleteKey.bind(service), req);
+    await promisify<pb.DeleteKeyRequest, pb.DeleteKeyResponse>(
+      service.deleteKey.bind(service),
+      req
+    );
   }
 
   /**
    * List all API keys for an organization.
    *
-   * @param orgId the ID of the organization to query
+   * @param orgId The ID of the organization to query
    * @returns The list of API keys
    */
   async listKeys(orgId: string) {
@@ -1457,10 +1589,10 @@ export class AppClient {
     const req = new pb.ListKeysRequest();
     req.setOrgId(orgId);
 
-    const response = await promisify<
-      pb.ListKeysRequest,
-      pb.ListKeysResponse
-    >(service.listKeys.bind(service), req);
+    const response = await promisify<pb.ListKeysRequest, pb.ListKeysResponse>(
+      service.listKeys.bind(service),
+      req
+    );
     return response.toObject().apiKeysList;
   }
 
@@ -1475,10 +1607,10 @@ export class AppClient {
     const req = new pb.RotateKeyRequest();
     req.setId(id);
 
-    const response = await promisify<
-      pb.RotateKeyRequest,
-      pb.RotateKeyResponse
-    >(service.rotateKey.bind(service), req);
+    const response = await promisify<pb.RotateKeyRequest, pb.RotateKeyResponse>(
+      service.rotateKey.bind(service),
+      req
+    );
     return response.toObject();
   }
 
