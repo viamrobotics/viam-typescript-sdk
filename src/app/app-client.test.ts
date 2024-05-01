@@ -24,11 +24,6 @@ describe('AppClient tests', () => {
   org.setPublicNamespace("namespace");
   org.setCreatedOn(new Timestamp());
 
-  const invite = new pb.OrganizationInvite();
-  invite.setOrganizationId("id");
-  invite.setEmail("email");
-  const invites = [invite];
-
   const location = new pb.Location();
   location.setCreatedOn(new Timestamp());
   location.setId("id");
@@ -99,6 +94,12 @@ describe('AppClient tests', () => {
   authorization.setIdentityType('api-key');
   authorization.setResourceType('robot');
   authorization.setOrganizationId('orgId');
+
+  const invite = new pb.OrganizationInvite();
+  invite.setEmail("email");
+  invite.setOrganizationId("id");
+  invite.setCreatedOn(new Timestamp());
+  invite.setAuthorizationsList([authorization]);
 
   const permission = new pb.AuthorizedPermissions();
   permission.setResourceType('robot');
@@ -239,7 +240,7 @@ describe('AppClient tests', () => {
        // @ts-expect-error compiler is matching incorrect function signature
       .mockImplementationOnce((req: pb.GetOrganizationNamespaceAvailabilityRequest, cb) => {
         const response = new pb.GetOrganizationNamespaceAvailabilityResponse();
-        const isAvailable = req.getPublicNamespace() === 'namespace' ? true : false;
+        const isAvailable = req.getPublicNamespace() === 'namespace';
         response.setAvailable(isAvailable);
         cb(null, response);
       });
@@ -273,7 +274,7 @@ describe('AppClient tests', () => {
   describe('deleteOrganization tests', () => {
     const expectedRequest = new pb.DeleteOrganizationRequest();
     let methodSpy: MockInstance;
-    expectedRequest.setOrganizationId(id);
+    expectedRequest.setOrganizationId('id');
 
     beforeEach(() => {
       methodSpy = vi.spyOn(AppServiceClient.prototype, 'deleteOrganization')
@@ -300,6 +301,7 @@ describe('AppClient tests', () => {
     orgMember.setDateAdded(new Timestamp());
     orgMember.setEmailsList(["email"]);
     const members = [orgMember];
+    const invites = [invite];
 
     const expectedResponse = new pb.ListOrganizationMembersResponse();
     expectedResponse.setOrganizationId('orgId');
@@ -338,13 +340,6 @@ describe('AppClient tests', () => {
   });
 
   describe('updateOrganizationInviteAuthorizations tests', () => {
-    const invite = new pb.OrganizationInvite();
-    invite.setEmail("email");
-    invite.setOrganizationId("id");
-    invite.setCreatedOn(new Timestamp());
-    const auth = new pb.Authorization();
-    auth.setOrganizationId("id");
-    invite.setAuthorizationsList([auth]);
     beforeEach(() => {
       vi.spyOn(AppServiceClient.prototype, 'updateOrganizationInviteAuthorizations')
        // @ts-expect-error compiler is matching incorrect function signature
@@ -356,7 +351,7 @@ describe('AppClient tests', () => {
     });
 
     it('updateOrganizationInviteAuthorizations', async () => {
-      const response = await subject().updateOrganizationInviteAuthorizations('orgId', 'email', [auth], []);
+      const response = await subject().updateOrganizationInviteAuthorizations('orgId', 'email', [authorization], []);
       expect(response).toEqual(invite.toObject());
     });
   });
@@ -763,11 +758,11 @@ describe('AppClient tests', () => {
         .mockImplementation(robotPartLogsMock);
       vi.spyOn(AppServiceClient.prototype, 'tailRobotPartLogs')
       // // CR erodkin: make sure we can delete all this?
-      //.mockImplementationOnce((_req: pb.TailRobotPartLogsRequest, cb) => {
-        //const response = new pb.TailRobotPartLogsResponse();
-        //response.setLogsList
-        //cb(null, response);
-      //});
+      // .mockImplementationOnce((_req: pb.TailRobotPartLogsRequest, cb) => {
+        // const response = new pb.TailRobotPartLogsResponse();
+        // response.setLogsList
+        // cb(null, response);
+      // });
     });
 
     afterEach(() => {
@@ -932,7 +927,7 @@ describe('AppClient tests', () => {
     });
 
     it('markPartForRestart', async () => {
-      const response = await subject().markPartForRestart('id');
+      await subject().markPartForRestart('id');
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),

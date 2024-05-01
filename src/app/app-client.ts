@@ -8,6 +8,59 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import { PackageType, type PackageTypeMap } from '../gen/app/packages/v1/packages_pb';
 import { grpc } from '@improbable-eng/grpc-web';
 
+/**
+ * Creates an Authorization object from auth details.
+ *
+ * @param orgId The ID of the organization to create the role under
+ * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+ * @param role The role to add ("owner" or "operator")
+ * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
+ * @param identityType The type of identity that the identity ID is (e.g., an api-key)
+ * @param resourceId the ID of the resource the role is being created for
+ */
+export const createAuth = (orgId: string, entityId: string, role: string, resourceType: string, identityType: string, resourceId: string) : pb.Authorization => {
+  const auth = new pb.Authorization;
+  auth.setAuthorizationType("role");
+  auth.setIdentityId(entityId);
+  auth.setIdentityType(identityType);
+  auth.setAuthorizationId(`${resourceType}_${role}`);
+  auth.setResourceType(resourceType);
+  auth.setOrganizationId(orgId);
+  auth.setResourceId(resourceId);
+  auth.setOrganizationId(orgId);
+
+  return auth;
+}
+
+/**
+ * Creates an Authorization object specifically for a new API key.
+ *
+ * @param orgId The ID of the organization to create the role under
+ * @param role The role to add ("owner" or "operator")
+ * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
+ * @param resourceId the ID of the resource the role is being created for
+ */
+export const createAuthForNewAPIKey = (orgId: string, role: string, resourceType: string, resourceId: string) : pb.Authorization => {
+  return createAuth(orgId, "", role, resourceType, "api-key", resourceId);
+  }
+
+/**
+ * Creates a new AuthorizedPermissions object
+ *
+ * @param resourceType The type of the resource to check permissions for
+ * @param resourceId The ID of the resource to check permissions for
+ * @param permissions A list of permissions to check
+ * @returns The AuthorizedPermissions object
+ */
+export const createPermission = (resourceType: string, resourceId: string, permissions: string[]) : pb.AuthorizedPermissions => {
+  const permission = new pb.AuthorizedPermissions;
+  permission.setResourceType(resourceType);
+  permission.setResourceId(resourceId);
+  permission.setPermissionsList(permissions);
+
+  return permission;
+}
+
 export class AppClient {
   private service: AppServiceClient;
   private options: RpcOptions;
@@ -223,13 +276,13 @@ export class AppClient {
    *   Defaults to true
    * @returns The organization invite
    */
-  async createOrganizationInvite(orgId: string, email: string, authorizations: pb.Authorization[], sendEmailInvite: boolean = true) {
+  async createOrganizationInvite(orgId: string, email: string, authorizations: pb.Authorization[], sendEmailInvite = true) {
     const { service } = this;
     const req = new pb.CreateOrganizationInviteRequest();
     req.setOrganizationId(orgId);
     req.setEmail(email);
     req.setAuthorizationsList(authorizations);
-    req.setSendEmailInvite(sendEmailInvite ?? sendEmailInvite);
+    req.setSendEmailInvite(sendEmailInvite);
 
     const response = await promisify<
       pb.CreateOrganizationInviteRequest,
@@ -308,7 +361,8 @@ export class AppClient {
   async resendOrganizationInvite(orgId: string, email: string) {
     const { service } = this;
     const req = new pb.ResendOrganizationInviteRequest();
-    req.setOrganizationId(orgId), req.setEmail(email);
+    req.setOrganizationId(orgId);
+    req.setEmail(email);
 
     const response = await promisify<
       pb.ResendOrganizationInviteRequest,
@@ -594,7 +648,7 @@ export class AppClient {
    * @param pageToken Optional string indicating which page of logs to query. Defaults to the most recent
    * @returns The robot requested logs and the page token for the next page of logs
    */
-  async getRobotPartLogs(id: string, filter?: string, levels?: string[], pageToken: string = '') {
+  async getRobotPartLogs(id: string, filter?: string, levels?: string[], pageToken = '') {
     const { service } = this;
       const req = new pb.GetRobotPartLogsRequest();
     req.setId(id);
@@ -621,7 +675,7 @@ export class AppClient {
    * @param filter Optional string to filter logs on
    * @param errorsOnly Optional bool to indicate whether or not only error-level logs should be returned. Defaults to true
    */
-  async tailRobotPartLogs(id: string, queue: LogEntry.AsObject[], filter?: string, errorsOnly: boolean = true) {
+  async tailRobotPartLogs(id: string, queue: LogEntry.AsObject[], filter?: string, errorsOnly = true) {
     const { service } = this;
     const req = new pb.TailRobotPartLogsRequest();
     req.setId(id);
@@ -632,7 +686,7 @@ export class AppClient {
 
     const stream = service.tailRobotPartLogs(req);
     stream.on('data', (response) => {
-        for (var log of response.toObject().logsList) {
+        for (const log of response.toObject().logsList) {
           queue.push(log);
         }
     });
@@ -910,7 +964,7 @@ export class AppClient {
    * @param publicOnly Optional boolean, if true then only public fragments will be listed. Defaults to true.
    * @returns The list of fragment objects
    */
-  async listFragments(orgId: string, publicOnly: boolean = true) {
+  async listFragments(orgId: string, publicOnly = true) {
     const { service } = this;
     const req = new pb.ListFragmentsRequest();
     req.setOrganizationId(orgId);
@@ -1007,42 +1061,6 @@ export class AppClient {
   }
 
   /**
-   * Creates an Authorization object from auth details.
-   *
-   * @param orgId The ID of the organization to create the role under
-   * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
-   * @param role The role to add ("owner" or "operator")
-   * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
-   * @param identityType The type of identity that the identity ID is (e.g., an api-key)
-   * @param resourceId the ID of the resource the role is being created for
-   */
-  createAuth(orgId: string, entityId: string, role: string, resourceType: string, identityType: string, resourceId: string) {
-    const auth = new pb.Authorization;
-    auth.setAuthorizationType("role");
-    auth.setIdentityId(entityId);
-    auth.setIdentityType(identityType);
-    auth.setAuthorizationId(`${resourceType}_${role}`);
-    auth.setResourceType(resourceType);
-    auth.setOrganizationId(orgId);
-    auth.setResourceId(resourceId);
-    auth.setOrganizationId(orgId);
-
-    return auth;
-  }
-
-  /**
-   * Creates an Authorization object specifically for a new API key.
-   *
-   * @param orgId The ID of the organization to create the role under
-   * @param role The role to add ("owner" or "operator")
-   * @param resourceType The type of resource to create the role for ("robot", "location", or "organization")
-   * @param resourceId the ID of the resource the role is being created for
-   */
-  createAuthForNewAPIKey(orgId: string, role: string, resourceType: string, resourceId: string) {
-    return this.createAuth(orgId, "", role, resourceType, "api-key", resourceId);
-  }
-
-  /**
    * Add a role under an organization.
    *
    * @param orgId The ID of the organization to create the role under
@@ -1054,7 +1072,7 @@ export class AppClient {
   async addRole(orgId: string, entityId: string, role: string, resourceType: string, resourceId: string) {
     const { service } = this;
     const req = new pb.AddRoleRequest();
-    const auth = this.createAuth(orgId, entityId, role, resourceType, "", resourceId);
+    const auth = createAuth(orgId, entityId, role, resourceType, "", resourceId);
     req.setAuthorization(auth);
 
     await promisify<
@@ -1075,7 +1093,7 @@ export class AppClient {
   async removeRole(orgId: string, entityId: string, role: string, resourceType: string, resourceId: string) {
     const { service } = this;
     const req = new pb.RemoveRoleRequest();
-    const auth = this.createAuth(orgId, entityId, role, resourceType, "", resourceId);
+    const auth = createAuth(orgId, entityId, role, resourceType, "", resourceId);
     req.setAuthorization(auth);
 
     await promisify<
@@ -1121,23 +1139,6 @@ export class AppClient {
       pb.ListAuthorizationsResponse
     >(service.listAuthorizations.bind(service), req);
     return response.toObject().authorizationsList;
-  }
-
-  /**
-   * Creates a new AuthorizedPermissions object
-   *
-   * @param resourceType The type of the resource to check permissions for
-   * @param resourceId The ID of the resource to check permissions for
-   * @param permissions A list of permissions to check
-   * @returns The AuthorizedPermissions object
-   */
-  createPermission(resourceType: string, resourceId: string, permissions: string[]) {
-    const permission = new pb.AuthorizedPermissions;
-    permission.setResourceType(resourceType);
-    permission.setResourceId(resourceId);
-    permission.setPermissionsList(permissions);
-
-    return permission;
   }
 
   /**
@@ -1243,10 +1244,16 @@ export class AppClient {
     const { service } = this;
     const req = new pb.ListRegistryItemsRequest();
     req.setOrganizationId(orgId);
-    req.setTypesList(types.map((type) => { return PackageType[type]; }));
-    req.setVisibilitiesList(visibilities.map((visibility) => { return pb.Visibility[visibility]; }));
+    req.setTypesList(types.map((type) => {
+      return PackageType[type];
+    }));
+    req.setVisibilitiesList(visibilities.map((visibility) => {
+      return pb.Visibility[visibility]
+    }));
     req.setPlatformsList(platforms);
-    req.setStatusesList(statuses.map((status) => { return pb.RegistryItemStatus[status]; }));
+    req.setStatusesList(statuses.map((status) => {
+      return pb.RegistryItemStatus[status];
+    }));
     if (searchTerm) {
       req.setSearchTerm(searchTerm);
     }
@@ -1348,7 +1355,7 @@ export class AppClient {
 
     const client = grpc.client(AppService.UploadModuleFile, { host: service.serviceHost, transport: options.transport });
 
-    var url: string;
+    let url: string;
 
     client.onMessage((message) => {
       const resp = message as pb.UploadModuleFileResponse;
@@ -1413,8 +1420,8 @@ export class AppClient {
     const { service } = this;
     const req = new pb.CreateKeyRequest();
     req.setAuthorizationsList(authorizations);
-    name = name ?? new Date().toLocaleString();
-    req.setName(name);
+    const setName = name ?? new Date().toLocaleString();
+    req.setName(setName);
 
     const response = await promisify<
       pb.CreateKeyRequest,
