@@ -83,8 +83,8 @@ export class DataClient {
   }
 
   /**
-   * Filter and download tabular data. The returned metadata might be empty if
-   * the metadata index of the data is out of the bounds of the returned
+   * Filter and get a page of tabular data. The returned metadata might be empty
+   * if the metadata index of the data is out of the bounds of the returned
    * metadata list. The data will be paginated into pages of `limit` items, and
    * the pagination ID will be included in the returned tuple.
    *
@@ -158,9 +158,10 @@ export class DataClient {
   }
 
   /**
-   * Filter and download binary data. The returned metadata might be empty if
-   * the metadata index of the data is out of the bounds of the returned
-   * metadata list.
+   * Filter and get a page of binary data. The returned metadata might be empty
+   * if the metadata index of the data is out of the bounds of the returned
+   * metadata list. The data will be paginated into pages of `limit` items, and
+   * the pagination ID will be included in the returned tuple.
    *
    * @param filter Optional `pb.Filter` specifying binary data to retrieve. No
    *   `filter` implies all binary data.
