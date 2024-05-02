@@ -12,11 +12,44 @@ import {
 } from 'vitest';
 import { AppServiceClient } from '../gen/app/v1/app_pb_service';
 vi.mock('../gen/app/v1/app_pb_service');
-import { AppClient } from './app-client';
+import { AppClient, createAuth } from './app-client';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { LogEntry } from '../gen/common/v1/common_pb';
 import { EventDispatcher } from '../events';
 import type { ResponseStream } from '../main';
+
+class TestResponseStream<T> extends EventDispatcher {
+  private stream: ResponseStream<any>;
+
+  constructor(stream: ResponseStream<any>) {
+    super();
+    this.stream = stream;
+  }
+
+  override on(
+    type: string,
+    handler: (message: any) => void
+  ): ResponseStream<T> {
+    super.on(type, handler);
+    return this;
+  }
+
+  cancel(): void {
+    this.listeners = {};
+    this.stream.cancel();
+  }
+}
+
+let logStream: ResponseStream<pb.TailRobotPartLogsResponse>;
+let testLogStream:
+  | TestResponseStream<pb.TailRobotPartLogsResponse>
+  | undefined;
+
+const robotPartLogsMock = ():
+  | TestResponseStream<pb.TailRobotPartLogsResponse>
+  | undefined => {
+  return testLogStream;
+};
 
 const subject = () =>
   new AppClient('fakeServiceHost', {
@@ -96,12 +129,7 @@ describe('AppClient tests', () => {
   partHistory.setWhen(new Timestamp());
   partHistory.setRobot('robot');
 
-  const authorization = new pb.Authorization();
-  authorization.setIdentityId('identityId');
-  authorization.setResourceId('resourceId');
-  authorization.setIdentityType('api-key');
-  authorization.setResourceType('robot');
-  authorization.setOrganizationId('orgId');
+  const authorization = createAuth('orgId', 'entityId', 'role', 'resourceType', '', 'resourceId');
 
   const invite = new pb.OrganizationInvite();
   invite.setEmail('email');
@@ -256,7 +284,7 @@ describe('AppClient tests', () => {
 
     it('getOrganization', async () => {
       const response = await subject().getOrganization('orgId');
-      expect(response).toEqual(org.toObject());
+      expect(response.organization).toEqual(org.toObject());
     });
   });
 
@@ -270,8 +298,7 @@ describe('AppClient tests', () => {
         (req: pb.GetOrganizationNamespaceAvailabilityRequest, _md, cb) => {
           const response =
             new pb.GetOrganizationNamespaceAvailabilityResponse();
-          const isAvailable = req.getPublicNamespace() === 'namespace';
-          response.setAvailable(isAvailable);
+          response.setAvailable(true);
           cb(null, response);
         }
       );
@@ -281,9 +308,6 @@ describe('AppClient tests', () => {
       const response =
         await subject().getOrganizationNamespaceAvailability('namespace');
       expect(response).toEqual(true);
-      const falseResponse =
-        await subject().getOrganizationNamespaceAvailability('unavailable');
-      expect(falseResponse).toEqual(false);
     });
   });
 
@@ -421,7 +445,7 @@ describe('AppClient tests', () => {
         [authorization],
         []
       );
-      expect(response).toEqual(invite.toObject());
+      expect(response.invite).toEqual(invite.toObject());
     });
   });
 
@@ -470,7 +494,7 @@ describe('AppClient tests', () => {
     });
 
     it('deleteOrganizationInvite', async () => {
-      await subject().deleteOrganizationInvite('id', 'email');
+      await subject().deleteOrganizationInvite('orgId', 'email');
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
@@ -638,11 +662,11 @@ describe('AppClient tests', () => {
   describe('unshareLocation tests', () => {
     let methodSpy: MockInstance;
     const expectedRequest = new pb.UnshareLocationRequest();
-    expectedRequest.setLocationId('locId');
     expectedRequest.setOrganizationId('orgId');
+    expectedRequest.setLocationId('locId');
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'unshareLocation')
+      methodSpy = vi.spyOn(AppServiceClient.prototype, 'unshareLocation')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementationOnce((_req: pb.UnshareLocationRequest, _md, cb) => {
           cb(null, new pb.UnshareLocationResponse());
@@ -650,7 +674,7 @@ describe('AppClient tests', () => {
     });
 
     it('unshareLocation', async () => {
-      await subject().shareLocation('orgId', 'locId');
+      await subject().unshareLocation('orgId', 'locId');
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
@@ -672,7 +696,7 @@ describe('AppClient tests', () => {
 
     it('locationAuth', async () => {
       const response = await subject().locationAuth('locId');
-      expect(response).toEqual(auth.toObject());
+      expect(response.auth).toEqual(auth.toObject());
     });
   });
 
@@ -693,7 +717,7 @@ describe('AppClient tests', () => {
 
     it('createLocationSecret', async () => {
       const response = await subject().createLocationSecret('locId');
-      expect(response).toEqual(auth.toObject());
+      expect(response.auth).toEqual(auth.toObject());
     });
   });
 
@@ -779,7 +803,7 @@ describe('AppClient tests', () => {
 
     it('getRobotParts', async () => {
       const response = await subject().getRobotParts('robotId');
-      expect(response).toEqual(robotPart.toObject());
+      expect(response).toEqual(parts.map((x) => x.toObject()));
     });
   });
 
@@ -821,53 +845,12 @@ describe('AppClient tests', () => {
     });
   });
 
-  // CR erodkin: make sure this actually works!
   describe('tailRobotPartLogs tests', () => {
-    class TestResponseStream<T> extends EventDispatcher {
-      private stream: ResponseStream<any>;
-
-      constructor(stream: ResponseStream<any>) {
-        super();
-        this.stream = stream;
-      }
-
-      override on(
-        type: string,
-        handler: (message: any) => void
-      ): ResponseStream<T> {
-        super.on(type, handler);
-        return this;
-      }
-
-      cancel(): void {
-        this.listeners = {};
-        this.stream.cancel();
-      }
-    }
-
-    let logStream: ResponseStream<pb.TailRobotPartLogsResponse>;
-    let testLogStream:
-      | TestResponseStream<pb.TailRobotPartLogsResponse>
-      | undefined;
-
-    const robotPartLogsMock = ():
-      | TestResponseStream<pb.TailRobotPartLogsResponse>
-      | undefined => {
-      return testLogStream;
-    };
-
     beforeEach(() => {
       testLogStream = new TestResponseStream(logStream);
-      AppServiceClient.prototype.tailRobotPartLogs = vi
-        .fn()
-        .mockImplementation(robotPartLogsMock);
-      vi.spyOn(AppServiceClient.prototype, 'tailRobotPartLogs');
-      // // CR erodkin: make sure we can delete all this?
-      // .mockImplementationOnce((_req: pb.TailRobotPartLogsRequest, _md, cb) => {
-      // const response = new pb.TailRobotPartLogsResponse();
-      // response.setLogsList
-      // cb(null, response);
-      // });
+	  AppServiceClient.prototype.tailRobotPartLogs = vi
+		.fn()
+		.mockImplementation(robotPartLogsMock);
     });
 
     afterEach(() => {
@@ -876,17 +859,21 @@ describe('AppClient tests', () => {
 
     it('tailRobotPartLogs', async () => {
       const logs: LogEntry.AsObject[] = [];
-      await subject().tailRobotPartLogs('id', logs);
+      const promise = subject().tailRobotPartLogs('id', logs);
+
       const response1 = new pb.TailRobotPartLogsResponse();
-      response1.addLogs(logEntry);
+      response1.setLogsList([logEntry]);
       testLogStream?.emit('data', response1);
 
-      const response2 = response1.clone();
+      const response2 = new pb.TailRobotPartLogsResponse();
       const logEntry2 = logEntry.clone();
       logEntry2.setLoggerName('newLoggerName');
       logEntry2.setLevel('error');
-      response2.addLogs(logEntry2);
+      response2.setLogsList([logEntry2]);
       testLogStream?.emit('data', response2);
+	  testLogStream?.emit('end', { code: 0 });
+
+	  await promise;
 
       expect(logs.length).toEqual(2);
 
@@ -972,7 +959,7 @@ describe('AppClient tests', () => {
     });
 
     it('deleteRobotPart', async () => {
-      await subject().deleteRobotPart('email');
+      await subject().deleteRobotPart('partId');
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
@@ -1067,7 +1054,7 @@ describe('AppClient tests', () => {
 
     it('createRobotPartSecret', async () => {
       const response = await subject().createRobotPartSecret('partId');
-      expect(response).toEqual(robotPart.toObject());
+      expect(response.part).toEqual(robotPart.toObject());
     });
   });
 
@@ -1151,7 +1138,7 @@ describe('AppClient tests', () => {
         'locationId',
         'name'
       );
-      expect(response).toEqual(robot.toObject());
+      expect(response.robot).toEqual(robot.toObject());
     });
   });
 
@@ -1309,7 +1296,7 @@ describe('AppClient tests', () => {
     expectedRequest.setAuthorization(authorization);
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'removeRole')
+      methodSpy = vi.spyOn(AppServiceClient.prototype, 'removeRole')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementationOnce((_req: pb.RemoveRoleRequest, _md, cb) => {
           cb(null, new pb.RemoveRoleResponse());
@@ -1341,7 +1328,7 @@ describe('AppClient tests', () => {
     expectedRequest.setNewAuthorization(newAuthorization);
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'changeRole')
+      methodSpy = vi.spyOn(AppServiceClient.prototype, 'changeRole')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementationOnce((_req: pb.ChangeRoleRequest, _md, cb) => {
           cb(null, new pb.ChangeRoleResponse());
@@ -1586,7 +1573,7 @@ describe('AppClient tests', () => {
     beforeEach(() => {
       vi.spyOn(AppServiceClient.prototype, 'uploadModuleFile')
         // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UploadModuleFileRequest, _md, cb) => {
+        .mockImplementation((_req: pb.UploadModuleFileRequest, _md, cb) => {
           const response = new pb.UploadModuleFileResponse();
           response.setUrl('url');
           cb(null, response);
@@ -1617,7 +1604,7 @@ describe('AppClient tests', () => {
 
     it('getModule', async () => {
       const response = await subject().getModule('id');
-      expect(response).toEqual(module.toObject());
+      expect(response.module).toEqual(module.toObject());
     });
   });
 

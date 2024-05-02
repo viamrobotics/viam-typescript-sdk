@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 import { type LogEntry } from '../gen/common/v1/common_pb';
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
+import { type RpcOptions, client } from '@improbable-eng/grpc-web/dist/typings/client.d';
 import { AppService, AppServiceClient } from '../gen/app/v1/app_pb_service';
 import { promisify } from '../utils';
 import type { StructType } from '../types';
@@ -1471,36 +1471,37 @@ export class AppClient {
     file: Uint8Array | string
   ) {
     const { service, options } = this;
+	const client = grpc.client(AppService.UploadModuleFile, {
+	  host: service.serviceHost,
+	  transport: options.transport,
+	});
+
+    return new Promise<string>((resolve, _reject) => {
     const req = new pb.UploadModuleFileRequest();
     const fileInfo = new pb.ModuleFileInfo();
     fileInfo.setModuleId(moduleId);
     fileInfo.setVersion(version);
     fileInfo.setPlatform(platform);
     req.setModuleFileInfo(fileInfo);
+	req.setFile(file);
 
     const fileReq = new pb.UploadModuleFileRequest();
+	fileReq.setModuleFileInfo(fileInfo);
     fileReq.setFile(file);
-
-    const client = grpc.client(AppService.UploadModuleFile, {
-      host: service.serviceHost,
-      transport: options.transport,
-    });
 
     let url: string;
 
     client.onMessage((message) => {
-      const resp = message as pb.UploadModuleFileResponse;
-      url = resp.getUrl();
+	  const resp = message as pb.UploadModuleFileResponse;
+	  url = resp.getUrl();
+	  client.close();
+	  resolve(url);
     });
 
+	client.start();
     client.send(req);
     client.send(fileReq);
-    client.finishSend();
-
-    return new Promise<string>((resolve, _reject) => {
-      if (url) {
-        resolve(url);
-      }
+	client.finishSend();
     });
   }
 
