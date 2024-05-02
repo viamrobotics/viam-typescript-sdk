@@ -41,9 +41,7 @@ class TestResponseStream<T> extends EventDispatcher {
 }
 
 let logStream: ResponseStream<pb.TailRobotPartLogsResponse>;
-let testLogStream:
-  | TestResponseStream<pb.TailRobotPartLogsResponse>
-  | undefined;
+let testLogStream: TestResponseStream<pb.TailRobotPartLogsResponse> | undefined;
 
 const robotPartLogsMock = ():
   | TestResponseStream<pb.TailRobotPartLogsResponse>
@@ -129,7 +127,14 @@ describe('AppClient tests', () => {
   partHistory.setWhen(new Timestamp());
   partHistory.setRobot('robot');
 
-  const authorization = createAuth('orgId', 'entityId', 'role', 'resourceType', '', 'resourceId');
+  const authorization = createAuth(
+    'orgId',
+    'entityId',
+    'role',
+    'resourceType',
+    '',
+    'resourceId'
+  );
 
   const invite = new pb.OrganizationInvite();
   invite.setEmail('email');
@@ -666,7 +671,8 @@ describe('AppClient tests', () => {
     expectedRequest.setLocationId('locId');
 
     beforeEach(() => {
-      methodSpy = vi.spyOn(AppServiceClient.prototype, 'unshareLocation')
+      methodSpy = vi
+        .spyOn(AppServiceClient.prototype, 'unshareLocation')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementationOnce((_req: pb.UnshareLocationRequest, _md, cb) => {
           cb(null, new pb.UnshareLocationResponse());
@@ -848,9 +854,9 @@ describe('AppClient tests', () => {
   describe('tailRobotPartLogs tests', () => {
     beforeEach(() => {
       testLogStream = new TestResponseStream(logStream);
-	  AppServiceClient.prototype.tailRobotPartLogs = vi
-		.fn()
-		.mockImplementation(robotPartLogsMock);
+      AppServiceClient.prototype.tailRobotPartLogs = vi
+        .fn()
+        .mockImplementation(robotPartLogsMock);
     });
 
     afterEach(() => {
@@ -871,9 +877,9 @@ describe('AppClient tests', () => {
       logEntry2.setLevel('error');
       response2.setLogsList([logEntry2]);
       testLogStream?.emit('data', response2);
-	  testLogStream?.emit('end', { code: 0 });
+      testLogStream?.emit('end', { code: 0 });
 
-	  await promise;
+      await promise;
 
       expect(logs.length).toEqual(2);
 
@@ -1296,7 +1302,8 @@ describe('AppClient tests', () => {
     expectedRequest.setAuthorization(authorization);
 
     beforeEach(() => {
-      methodSpy = vi.spyOn(AppServiceClient.prototype, 'removeRole')
+      methodSpy = vi
+        .spyOn(AppServiceClient.prototype, 'removeRole')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementationOnce((_req: pb.RemoveRoleRequest, _md, cb) => {
           cb(null, new pb.RemoveRoleResponse());
@@ -1328,7 +1335,8 @@ describe('AppClient tests', () => {
     expectedRequest.setNewAuthorization(newAuthorization);
 
     beforeEach(() => {
-      methodSpy = vi.spyOn(AppServiceClient.prototype, 'changeRole')
+      methodSpy = vi
+        .spyOn(AppServiceClient.prototype, 'changeRole')
         // @ts-expect-error compiler is matching incorrect function signature
         .mockImplementationOnce((_req: pb.ChangeRoleRequest, _md, cb) => {
           cb(null, new pb.ChangeRoleResponse());
@@ -1564,28 +1572,6 @@ describe('AppClient tests', () => {
         'newDescription',
         [],
         'entrypoint'
-      );
-      expect(response).toEqual('url');
-    });
-  });
-
-  describe('uploadModuleFile tests', () => {
-    beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'uploadModuleFile')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementation((_req: pb.UploadModuleFileRequest, _md, cb) => {
-          const response = new pb.UploadModuleFileResponse();
-          response.setUrl('url');
-          cb(null, response);
-        });
-    });
-
-    it('uploadModuleFile', async () => {
-      const response = await subject().uploadModuleFile(
-        'id',
-        '0.1.2',
-        'macOS',
-        'file'
       );
       expect(response).toEqual('url');
     });

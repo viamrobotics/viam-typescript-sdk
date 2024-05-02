@@ -1,7 +1,7 @@
 import * as pb from '../gen/app/v1/app_pb';
 import { type LogEntry } from '../gen/common/v1/common_pb';
-import { type RpcOptions, client } from '@improbable-eng/grpc-web/dist/typings/client.d';
-import { AppService, AppServiceClient } from '../gen/app/v1/app_pb_service';
+import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
+import { AppServiceClient } from '../gen/app/v1/app_pb_service';
 import { promisify } from '../utils';
 import type { StructType } from '../types';
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
@@ -9,7 +9,6 @@ import {
   PackageType,
   type PackageTypeMap,
 } from '../gen/app/packages/v1/packages_pb';
-import { grpc } from '@improbable-eng/grpc-web';
 
 /**
  * Creates an Authorization object from auth details.
@@ -85,11 +84,9 @@ export const createPermission = (
 
 export class AppClient {
   private service: AppServiceClient;
-  private options: RpcOptions;
 
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
     this.service = new AppServiceClient(serviceHost, grpcOptions);
-    this.options = grpcOptions;
   }
 
   /**
@@ -1452,57 +1449,6 @@ export class AppClient {
       pb.UpdateModuleResponse
     >(service.updateModule.bind(service), req);
     return response.getUrl();
-  }
-
-  /**
-   * Uploads a new module file.
-   *
-   * @param moduleId The ID of the module, formatted as `prefix:name` where
-   *   prefix is the module owner's orgid or namespace
-   * @param version The semver string representing the module's new version
-   * @param platform The platform that the file is built to run on
-   * @param file The file contents to be uploaded
-   * @returns Url with module documentation, code, etc.
-   */
-  async uploadModuleFile(
-    moduleId: string,
-    version: string,
-    platform: string,
-    file: Uint8Array | string
-  ) {
-    const { service, options } = this;
-	const client = grpc.client(AppService.UploadModuleFile, {
-	  host: service.serviceHost,
-	  transport: options.transport,
-	});
-
-    return new Promise<string>((resolve, _reject) => {
-    const req = new pb.UploadModuleFileRequest();
-    const fileInfo = new pb.ModuleFileInfo();
-    fileInfo.setModuleId(moduleId);
-    fileInfo.setVersion(version);
-    fileInfo.setPlatform(platform);
-    req.setModuleFileInfo(fileInfo);
-	req.setFile(file);
-
-    const fileReq = new pb.UploadModuleFileRequest();
-	fileReq.setModuleFileInfo(fileInfo);
-    fileReq.setFile(file);
-
-    let url: string;
-
-    client.onMessage((message) => {
-	  const resp = message as pb.UploadModuleFileResponse;
-	  url = resp.getUrl();
-	  client.close();
-	  resolve(url);
-    });
-
-	client.start();
-    client.send(req);
-    client.send(fileReq);
-	client.finishSend();
-    });
   }
 
   /**
