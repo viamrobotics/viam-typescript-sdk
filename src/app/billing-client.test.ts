@@ -1,8 +1,6 @@
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { afterEach, describe } from 'vitest';
-import { beforeEach, expect, it, vi } from 'vitest';
-import { type ResponseStream } from '../gen/robot/v1/robot_pb_service';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventDispatcher } from '../events';
 import {
   GetCurrentMonthUsageRequest,
@@ -13,6 +11,7 @@ import {
   PaymentMethodType,
 } from '../gen/app/v1/billing_pb';
 import { BillingServiceClient } from '../gen/app/v1/billing_pb_service';
+import { type ResponseStream } from '../gen/robot/v1/robot_pb_service';
 import { BillingClient } from './billing-client';
 
 const SECONDS = 1;
@@ -32,6 +31,9 @@ const testMonthUsage = {
   discountAmount: 6,
   totalUsageWithDiscount: 7,
   totalUsageWithoutDiscount: 8,
+  binaryDataCloudStorageUsageCost: 9,
+  otherCloudStorageUsageCost: 10,
+  perMachineUsageCost: 11,
   startDate: testStartDate.toObject(),
   endDate: testEndDate.toObject(),
   start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
@@ -94,6 +96,9 @@ describe('BillingClient tests', () => {
         response.setDiscountAmount(6);
         response.setTotalUsageWithDiscount(7);
         response.setTotalUsageWithoutDiscount(8);
+        response.setBinaryDataCloudStorageUsageCost(9);
+        response.setOtherCloudStorageUsageCost(10);
+        response.setPerMachineUsageCost(11);
         response.setStartDate(testStartDate);
         response.setEndDate(testEndDate);
         cb(null, response);
