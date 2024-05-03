@@ -2,11 +2,6 @@ import { type Duration as PBDuration } from 'google-protobuf/google/protobuf/dur
 import pb from '../../gen/component/board/v1/board_pb';
 import type { Resource, StructType } from '../../types';
 
-interface Status {
-  analogs: Record<string, number>;
-  digitalInterrupts: Record<string, number>;
-}
-
 type ValueOf<T> = T[keyof T];
 export const { PowerMode } = pb;
 export type PowerMode = ValueOf<typeof pb.PowerMode>;
@@ -22,13 +17,6 @@ export type Duration = PBDuration.AsObject;
  * components such as analog readers, and digital interrupts.
  */
 export interface Board extends Resource {
-  /** Get the status of the board. */
-  getStatus(extra?: StructType): Promise<Status>;
-  /**
-   * Get the high/low state of the given pin of a board.
-   *
-   * @param pin - The pin.
-   */
   getGPIO(pin: string, extra?: StructType): Promise<boolean>;
   /**
    * Set the high/low state of the given pin of a board.

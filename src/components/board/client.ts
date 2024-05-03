@@ -29,52 +29,6 @@ export class BoardClient implements Board {
     return this.client;
   }
 
-  private async getRawStatusResponse(extra = {}): Promise<pb.StatusResponse> {
-    const { boardService } = this;
-    const request = new pb.StatusRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
-
-    this.options.requestLogger?.(request);
-
-    return promisify<pb.StatusRequest, pb.StatusResponse>(
-      boardService.status.bind(boardService),
-      request
-    );
-  }
-
-  /**
-   * Get the status of the board as a raw protobuf response.
-   *
-   * @deprecated Use {@link BoardClient#getStatus} instead.
-   */
-  public async status(extra = {}): Promise<pb.StatusResponse> {
-    return this.getRawStatusResponse(extra);
-  }
-
-  async getStatus(extra = {}) {
-    const response = await this.getRawStatusResponse(extra);
-    const boardStatus = response.getStatus();
-
-    if (!boardStatus) {
-      throw new Error('no status');
-    }
-
-    const analogs: Record<string, number> = {};
-    for (const [key, value] of boardStatus.getAnalogsMap().entries()) {
-      analogs[key] = value.getValue();
-    }
-
-    const digitalInterrupts: Record<string, number> = {};
-    for (const [key, value] of boardStatus
-      .getDigitalInterruptsMap()
-      .entries()) {
-      digitalInterrupts[key] = value.getValue();
-    }
-
-    return { analogs, digitalInterrupts };
-  }
-
   async setGPIO(pin: string, high: boolean, extra = {}) {
     const { boardService } = this;
     const request = new pb.SetGPIORequest();

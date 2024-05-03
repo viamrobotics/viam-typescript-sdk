@@ -43,14 +43,12 @@ describe('moveOnGlobe', () => {
       type: 'component',
       subtype: 'base',
       name: 'myBase',
-      machinePartId: '',
     };
     const expectedMovementSensorName = {
       namespace: 'viam',
       type: 'component',
       subtype: 'movementsensor',
       name: 'myMovementsensor',
-      machinePartId: '',
     };
     const expectedMotionConfiguration = undefined;
     const expectedExtra = {};
@@ -91,14 +89,12 @@ describe('moveOnGlobe', () => {
           type: 'component',
           subtype: 'base',
           name: 'myBase',
-          machinePartId: '',
         },
         {
           namespace: 'viam',
           type: 'component',
           subtype: 'movementsensor',
           name: 'myMovementsensor',
-          machinePartId: '',
         }
       )
     ).resolves.toStrictEqual(testExecutionId);
@@ -137,14 +133,12 @@ describe('moveOnGlobe', () => {
       type: 'component',
       subtype: 'base',
       name: 'myBase',
-      machinePartId: '',
     };
     const expectedMovementSensorName = {
       namespace: 'viam',
       type: 'component',
       subtype: 'movementsensor',
       name: 'myMovementsensor',
-      machinePartId: '',
     };
     const expectedMotionConfiguration = {
       obstacleDetectorsList: [
@@ -154,14 +148,12 @@ describe('moveOnGlobe', () => {
             type: 'service',
             subtype: 'vision',
             name: 'myVisionService',
-            machinePartId: '',
           },
           camera: {
             namespace: 'viam',
             type: 'component',
             subtype: 'camera',
             name: 'myCamera',
-            machinePartId: '',
           },
         },
       ],
@@ -227,7 +219,6 @@ describe('stopPlan', () => {
       type: 'component',
       subtype: 'base',
       name: 'myBase',
-      machinePartId: '',
     };
     const expectedExtra = {};
     const mock = vi
@@ -253,7 +244,6 @@ describe('stopPlan', () => {
       type: 'component',
       subtype: 'base',
       name: 'myBase',
-      machinePartId: '',
     };
     const expectedExtra = { some: 'extra' };
     const mock = vi
@@ -320,7 +310,6 @@ describe('getPlan', () => {
       type: 'component',
       subtype: 'base',
       name: 'myBase',
-      machinePartId: '',
     };
     const expectedLastPlanOnly = false;
     const expectedExecutionID = '';
@@ -351,7 +340,6 @@ describe('getPlan', () => {
       type: 'component',
       subtype: 'base',
       name: 'myBase',
-      machinePartId: '',
     };
     const expectedLastPlanOnly = true;
     const expectedExecutionID = 'some specific executionID';

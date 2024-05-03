@@ -4,7 +4,14 @@ import {
   Struct,
   type JavaScriptValue,
 } from 'google-protobuf/google/protobuf/struct_pb';
-import { beforeEach, describe, expect, type SpyInstance, it, vi } from 'vitest';
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from 'vitest';
 import {
   BinaryData,
   BinaryDataByFilterRequest,
@@ -22,10 +29,36 @@ import {
   TabularDataByMQLRequest,
   TabularDataByMQLResponse,
   TagsFilter,
+  DeleteTabularDataRequest,
+  DeleteTabularDataResponse,
+  DeleteBinaryDataByFilterRequest,
+  DeleteBinaryDataByFilterResponse,
+  DeleteBinaryDataByIDsRequest,
+  AddTagsToBinaryDataByIDsRequest,
+  AddTagsToBinaryDataByFilterRequest,
+  RemoveTagsFromBinaryDataByIDsRequest,
+  RemoveTagsFromBinaryDataByFilterRequest,
+  TagsByFilterRequest,
+  RemoveBoundingBoxFromImageByIDRequest,
+  BoundingBoxLabelsByFilterRequest,
+  AddBinaryDataToDatasetByIDsRequest,
+  RemoveBinaryDataFromDatasetByIDsRequest,
+  ConfigureDatabaseUserRequest,
+  AddBoundingBoxToImageByIDRequest,
+  GetDatabaseConnectionRequest,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
 import { DataClient } from './data-client';
+import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
+import {
+  CreateDatasetRequest,
+  Dataset,
+  DeleteDatasetRequest,
+  ListDatasetsByIDsRequest,
+  ListDatasetsByOrganizationIDRequest,
+  RenameDatasetRequest,
+} from '../gen/app/dataset/v1/dataset_pb';
 
 const subject = () =>
   new DataClient('fakeServiceHost', {
@@ -33,6 +66,20 @@ const subject = () =>
   });
 
 describe('DataClient tests', () => {
+  const filter = subject().createFilter({
+    componentName: 'testComponentName',
+    componentType: 'testComponentType',
+  });
+
+  const binaryId1 = new BinaryID();
+  binaryId1.setFileId('testFileId1');
+  binaryId1.setOrganizationId('testOrgId');
+  binaryId1.setLocationId('testLocationId');
+  const binaryId2 = new BinaryID();
+  binaryId2.setFileId('testFileId1');
+  binaryId2.setOrganizationId('testOrgId');
+  binaryId2.setLocationId('testLocationId');
+
   describe('tabularDataBySQL tests', () => {
     const data: Record<string, JavaScriptValue>[] = [
       { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
@@ -49,11 +96,11 @@ describe('DataClient tests', () => {
     });
 
     it('get tabular data from SQL', async () => {
-      const response = await subject().tabularDataBySQL(
+      const promise = await subject().tabularDataBySQL(
         'some_org_id',
         'some_sql_query'
       );
-      expect(response).toEqual(data);
+      expect(promise).toEqual(data);
     });
   });
 
@@ -73,15 +120,15 @@ describe('DataClient tests', () => {
     });
 
     it('get tabular data from MQL', async () => {
-      const response = await subject().tabularDataByMQL('some_org_id', [
+      const promise = await subject().tabularDataByMQL('some_org_id', [
         new TextEncoder().encode('some_mql_query'),
       ]);
-      expect(response).toEqual(data);
+      expect(promise).toEqual(data);
     });
   });
 
   describe('tabularDataByFilter tests', () => {
-    let methodSpy: SpyInstance;
+    let methodSpy: MockInstance;
     const tabData1 = new TabularData();
     const tabData2 = new TabularData();
     tabData1.setData(Struct.fromJavaScript({ key: 'value1' }));
@@ -93,7 +140,7 @@ describe('DataClient tests', () => {
       methodSpy = vi
         .spyOn(DataServiceClient.prototype, 'tabularDataByFilter')
         // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: TabularDataByFilterRequest, _md, cb) => {
+        .mockImplementationOnce((_req, _md, cb) => {
           cb(null, tabDataResponse);
         })
         // @ts-expect-error compiler is matching incorrect function signature
@@ -113,11 +160,6 @@ describe('DataClient tests', () => {
     });
 
     it('get filtered tabular data', async () => {
-      const filter = subject().createFilter({
-        componentName: 'testComponentName',
-        componentType: 'testComponentType',
-      });
-
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
       dataReq.setLimit(100);
@@ -145,12 +187,12 @@ describe('DataClient tests', () => {
   binDataResponse.setDataList([binData1, binData2]);
 
   describe('binaryDataByFilter tests', () => {
-    let methodSpy: SpyInstance;
+    let methodSpy: MockInstance;
     beforeEach(() => {
       methodSpy = vi
         .spyOn(DataServiceClient.prototype, 'binaryDataByFilter')
         // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: BinaryDataByFilterRequest, _md, cb) => {
+        .mockImplementationOnce((_req, _md, cb) => {
           cb(null, binDataResponse);
         })
         // @ts-expect-error compiler is matching incorrect function signature
@@ -168,11 +210,6 @@ describe('DataClient tests', () => {
     });
 
     it('get filtered binary data', async () => {
-      const filter = subject().createFilter({
-        componentName: 'testComponentName',
-        componentType: 'testComponentType',
-      });
-
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
       dataReq.setLimit(100);
@@ -191,24 +228,15 @@ describe('DataClient tests', () => {
   });
 
   describe('binaryDataById tests', () => {
-    let methodSpy: SpyInstance;
+    let methodSpy: MockInstance;
     beforeEach(() => {
       methodSpy = vi
         .spyOn(DataServiceClient.prototype, 'binaryDataByIDs')
         // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementation((_req: BinaryDataByIDsRequest, _md, cb) => {
+        .mockImplementation((_req, _md, cb) => {
           cb(null, binDataResponse);
         });
     });
-
-    const binaryId1 = new BinaryID();
-    binaryId1.setFileId('testFileId1');
-    binaryId1.setOrganizationId('testOrgId');
-    binaryId1.setLocationId('testLocationId');
-    const binaryId2 = new BinaryID();
-    binaryId2.setFileId('testFileId1');
-    binaryId2.setOrganizationId('testOrgId');
-    binaryId2.setLocationId('testLocationId');
 
     it('get binary data by ids', async () => {
       const promise = await subject().binaryDataByIds([
@@ -226,6 +254,441 @@ describe('DataClient tests', () => {
       expectedRequest.setIncludeBinary(true);
 
       await subject().binaryDataByIds([binaryId1.toObject()]);
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('deleteTabularData tests', () => {
+    beforeEach(() => {
+      vi.spyOn(DataServiceClient.prototype, 'deleteTabularData')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((req: DeleteTabularDataRequest, _md, cb) => {
+          const response = new DeleteTabularDataResponse();
+          if (req.getDeleteOlderThanDays() >= 10) {
+            response.setDeletedCount(10);
+          } else {
+            response.setDeletedCount(5);
+          }
+
+          cb(null, response);
+        });
+    });
+
+    it('delete tabular data', async () => {
+      const promise = await subject().deleteTabularData('orgId', 20);
+      expect(promise).toEqual(10);
+    });
+
+    it('delete newer tabular data', async () => {
+      const promise = await subject().deleteTabularData('orgId', 5);
+      expect(promise).toEqual(5);
+    });
+  });
+
+  describe('deleteBinaryDataByFilter tests', () => {
+    let methodSpy: MockInstance;
+
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'deleteBinaryDataByFilter')
+        .mockImplementationOnce(
+          // @ts-expect-error compiler is matching incorrect function signature
+          (req: DeleteBinaryDataByFilterRequest, _md, cb) => {
+            const response = new DeleteBinaryDataByFilterResponse();
+            if (req.getIncludeInternalData()) {
+              response.setDeletedCount(20);
+            } else {
+              response.setDeletedCount(10);
+            }
+            cb(null, response);
+          }
+        )
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getDeletedCount: () => 10 });
+        });
+    });
+
+    it('delete binary data', async () => {
+      const promise = await subject().deleteBinaryDataByFilter();
+      expect(promise).toEqual(20);
+    });
+
+    it('do not delete internal binary data', async () => {
+      const promise = await subject().deleteBinaryDataByFilter(
+        undefined,
+        false
+      );
+      expect(promise).toEqual(10);
+    });
+
+    it('delete filtered binary data', async () => {
+      const expectedRequest = new DeleteBinaryDataByFilterRequest();
+      expectedRequest.setFilter(filter);
+      expectedRequest.setIncludeInternalData(true);
+
+      await subject().deleteBinaryDataByFilter(filter);
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('deleteBinaryDataByIds tests', () => {
+    beforeEach(() => {
+      vi.spyOn(
+        DataServiceClient.prototype,
+        'deleteBinaryDataByIDs'
+        // @ts-expect-error compiler is matching incorrect function signature
+      ).mockImplementation((req: DeleteBinaryDataByIDsRequest, _md, cb) => {
+        cb(null, { getDeletedCount: () => req.getBinaryIdsList().length });
+      });
+    });
+
+    it('delete binary data', async () => {
+      const promise1 = await subject().deleteBinaryDataByIds([
+        binaryId1.toObject(),
+      ]);
+      expect(promise1).toEqual(1);
+
+      const promise2 = await subject().deleteBinaryDataByIds([
+        binaryId1.toObject(),
+        binaryId2.toObject(),
+      ]);
+      expect(promise2).toEqual(2);
+    });
+  });
+
+  describe('addTagsToBinaryDataByIds tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'addTagsToBinaryDataByIDs')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('add tags to binary data', async () => {
+      const expectedRequest = new AddTagsToBinaryDataByIDsRequest();
+      expectedRequest.setBinaryIdsList([binaryId1, binaryId2]);
+      expectedRequest.setTagsList(['tag1', 'tag2']);
+
+      await subject().addTagsToBinaryDataByIds(
+        ['tag1', 'tag2'],
+        [binaryId1.toObject(), binaryId2.toObject()]
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('addTagsToBinaryDataByFilter tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'addTagsToBinaryDataByFilter')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('add tags to binary data', async () => {
+      const expectedRequest = new AddTagsToBinaryDataByFilterRequest();
+      expectedRequest.setFilter(filter);
+      expectedRequest.setTagsList(['tag1', 'tag2']);
+
+      await subject().addTagsToBinaryDataByFilter(['tag1', 'tag2'], filter);
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('removeTagsFromBinaryDataByIds tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'removeTagsFromBinaryDataByIDs')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getDeletedCount: () => 2 });
+        });
+    });
+
+    it('remove tags to binary data', async () => {
+      const expectedRequest = new RemoveTagsFromBinaryDataByIDsRequest();
+      expectedRequest.setBinaryIdsList([binaryId1, binaryId2]);
+      expectedRequest.setTagsList(['tag1', 'tag2']);
+
+      const promise = await subject().removeTagsFromBinaryDataByIds(
+        ['tag1', 'tag2'],
+        [binaryId1.toObject(), binaryId2.toObject()]
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual(2);
+    });
+  });
+
+  describe('removeTagsFromBinaryDataByFilter tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'removeTagsFromBinaryDataByFilter')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getDeletedCount: () => 5 });
+        });
+    });
+
+    it('remove tags to binary data', async () => {
+      const expectedRequest = new RemoveTagsFromBinaryDataByFilterRequest();
+      expectedRequest.setFilter(filter);
+      expectedRequest.setTagsList(['tag1', 'tag2']);
+
+      const promise = await subject().removeTagsFromBinaryDataByFilter(
+        ['tag1', 'tag2'],
+        filter
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual(5);
+    });
+  });
+
+  describe('tagsByFilter tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'tagsByFilter')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getTagsList: () => ['tag1', 'tag2'] });
+        });
+    });
+
+    it('get tags by filter', async () => {
+      const expectedRequest = new TagsByFilterRequest();
+      expectedRequest.setFilter(filter);
+
+      const promise = await subject().tagsByFilter(filter);
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual(['tag1', 'tag2']);
+    });
+  });
+
+  describe('addBoundingBoxToImageById tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'addBoundingBoxToImageByID')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getBboxId: () => 'bboxId' });
+        });
+    });
+
+    it('add bounding box to image', async () => {
+      const expectedRequest = new AddBoundingBoxToImageByIDRequest();
+      expectedRequest.setBinaryId(binaryId1);
+      expectedRequest.setLabel('label');
+      expectedRequest.setXMinNormalized(0);
+      expectedRequest.setYMinNormalized(0);
+      expectedRequest.setYMaxNormalized(1);
+      expectedRequest.setXMaxNormalized(1);
+
+      const promise = await subject().addBoundingBoxToImageById(
+        binaryId1.toObject(),
+        'label',
+        0,
+        0,
+        1,
+        1
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual('bboxId');
+    });
+  });
+
+  describe('removeBoundingBoxFromImageById tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'removeBoundingBoxFromImageByID')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('remove bounding box from image', async () => {
+      const expectedRequest = new RemoveBoundingBoxFromImageByIDRequest();
+      expectedRequest.setBinaryId(binaryId1);
+      expectedRequest.setBboxId('bboxId');
+
+      await subject().removeBoundingBoxFromImageById(
+        binaryId1.toObject(),
+        'bboxId'
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('boundingBoxLabelsByFilter tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'boundingBoxLabelsByFilter')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getLabelsList: () => ['label1', 'label2'] });
+        });
+    });
+
+    it('get bounding box labels', async () => {
+      const expectedRequest = new BoundingBoxLabelsByFilterRequest();
+      expectedRequest.setFilter(filter);
+
+      const promise = await subject().boundingBoxLabelsByFilter(filter);
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual(['label1', 'label2']);
+    });
+  });
+
+  describe('configureDatabaseUser tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'configureDatabaseUser')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('configure database user', async () => {
+      const expectedRequest = new ConfigureDatabaseUserRequest();
+      expectedRequest.setOrganizationId('orgId');
+      expectedRequest.setPassword('password');
+
+      await subject().configureDatabaseUser('orgId', 'password');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('getDatabaseConnection tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'getDatabaseConnection')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getHostname: () => 'hostname' });
+        });
+    });
+
+    it('get database connection', async () => {
+      const expectedRequest = new GetDatabaseConnectionRequest();
+      expectedRequest.setOrganizationId('orgId');
+
+      const promise = await subject().getDatabaseConnection('orgId');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual('hostname');
+    });
+  });
+
+  describe('addBinaryDataToDatasetByIds tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'addBinaryDataToDatasetByIDs')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('add binary data to dataset', async () => {
+      const expectedRequest = new AddBinaryDataToDatasetByIDsRequest();
+      expectedRequest.setBinaryIdsList([binaryId1, binaryId2]);
+      expectedRequest.setDatasetId('datasetId');
+
+      await subject().addBinaryDataToDatasetByIds(
+        [binaryId1.toObject(), binaryId2.toObject()],
+        'datasetId'
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('removeBinaryDataFromDatasetByIds tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataServiceClient.prototype, 'removeBinaryDataFromDatasetByIDs')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('remove binary data from dataset', async () => {
+      const expectedRequest = new RemoveBinaryDataFromDatasetByIDsRequest();
+      expectedRequest.setBinaryIdsList([binaryId1, binaryId2]);
+      expectedRequest.setDatasetId('datasetId');
+
+      await subject().removeBinaryDataFromDatasetByIds(
+        [binaryId1.toObject(), binaryId2.toObject()],
+        'datasetId'
+      );
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
         expect.anything(),
@@ -306,6 +769,166 @@ describe('DataClient tests', () => {
       expectedFilter.setTagsFilter(tagsFilter);
 
       expect(testFilter).toEqual(expectedFilter);
+    });
+  });
+});
+
+describe('DatasetClient tests', () => {
+  const dataset1 = new Dataset();
+  dataset1.setId('id1');
+  dataset1.setName('name1');
+  dataset1.setOrganizationId('orgId1');
+  const created1 = new Date(1, 1, 1, 1, 1, 1);
+  dataset1.setTimeCreated(Timestamp.fromDate(created1));
+  const dataset2 = new Dataset();
+  dataset2.setId('id2');
+  dataset2.setName('name2');
+  dataset2.setOrganizationId('orgId2');
+  const created2 = new Date(2, 2, 2, 2, 2, 2);
+  dataset2.setTimeCreated(Timestamp.fromDate(created2));
+  const datasets = [dataset1, dataset2];
+  const datasetIds = ['dataset1', 'dataset2'];
+
+  describe('createDataset tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DatasetServiceClient.prototype, 'createDataset')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getId: () => 'id' });
+        });
+    });
+
+    it('create dataset', async () => {
+      const expectedRequest = new CreateDatasetRequest();
+      expectedRequest.setName('name');
+      expectedRequest.setOrganizationId('orgId');
+
+      const promise = await subject().createDataset('name', 'orgId');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise).toEqual('id');
+    });
+  });
+
+  describe('deleteDataset tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DatasetServiceClient.prototype, 'deleteDataset')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('delete dataset', async () => {
+      const expectedRequest = new DeleteDatasetRequest();
+      expectedRequest.setId('id');
+
+      await subject().deleteDataset('id');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('renameDataset tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DatasetServiceClient.prototype, 'renameDataset')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, {});
+        });
+    });
+
+    it('rename dataset', async () => {
+      const expectedRequest = new RenameDatasetRequest();
+      expectedRequest.setId('id');
+      expectedRequest.setName('name');
+
+      await subject().renameDataset('id', 'name');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  describe('listDatasetsByOrganizationID tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DatasetServiceClient.prototype, 'listDatasetsByOrganizationID')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getDatasetsList: () => datasets });
+        });
+    });
+
+    it('list datasets by organization ID', async () => {
+      const expectedRequest = new ListDatasetsByOrganizationIDRequest();
+      expectedRequest.setOrganizationId('orgId');
+
+      const promise = await subject().listDatasetsByOrganizationID('orgId');
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise.length).toEqual(2);
+      const [set1, set2] = promise;
+      expect(set1?.id).toEqual('id1');
+      expect(set1?.name).toEqual('name1');
+      expect(set1?.organizationId).toEqual('orgId1');
+      expect(set1?.created).toEqual(dataset1.getTimeCreated()?.toDate());
+      expect(set2?.id).toEqual('id2');
+      expect(set2?.name).toEqual('name2');
+      expect(set2?.organizationId).toEqual('orgId2');
+      expect(set2?.created).toEqual(dataset2.getTimeCreated()?.toDate());
+    });
+  });
+
+  describe('listDatasetsByIDs tests', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DatasetServiceClient.prototype, 'listDatasetsByIDs')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req, _md, cb) => {
+          cb(null, { getDatasetsList: () => datasets });
+        });
+    });
+
+    it('list datasets by organization ID', async () => {
+      const expectedRequest = new ListDatasetsByIDsRequest();
+      expectedRequest.setIdsList(datasetIds);
+
+      const promise = await subject().listDatasetsByIds(datasetIds);
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(promise.length).toEqual(2);
+      const [set1, set2] = promise;
+      expect(set1?.id).toEqual('id1');
+      expect(set1?.name).toEqual('name1');
+      expect(set1?.organizationId).toEqual('orgId1');
+      expect(set1?.created).toEqual(dataset1.getTimeCreated()?.toDate());
+      expect(set2?.id).toEqual('id2');
+      expect(set2?.name).toEqual('name2');
+      expect(set2?.organizationId).toEqual('orgId2');
+      expect(set2?.created).toEqual(dataset2.getTimeCreated()?.toDate());
     });
   });
 });
