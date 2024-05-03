@@ -118,40 +118,43 @@ export class DataClient {
     if (limit) {
       dataReq.setLimit(limit);
     }
-    dataReq.setSortOrder(sortOrder ?? Order.ORDER_UNSPECIFIED);
-    dataReq.setLast(last);
+    if (sortOrder) {
+      dataReq.setSortOrder(sortOrder);
+    }
+    if (last) {
+      dataReq.setLast(last);
+    }
 
     const req = new dataPb.TabularDataByFilterRequest();
     req.setDataRequest(dataReq);
     req.setCountOnly(countOnly);
     req.setIncludeInternalData(includeInternalData);
 
-    // eslint-disable-next-line no-await-in-loop
     const response = await promisify<
       dataPb.TabularDataByFilterRequest,
       dataPb.TabularDataByFilterResponse
     >(service.tabularDataByFilter.bind(service), req);
     const mdListLength = response.getMetadataList().length;
 
-    const dataArray: TabularData[] = [];
-    dataArray.push(
-      ...response.getDataList().map((data) => {
-        const mdIndex = data.getMetadataIndex();
+    const data: TabularData[] = [];
+    data.push(
+      ...response.getDataList().map((tabData) => {
+        const mdIndex = tabData.getMetadataIndex();
         const metadata =
           mdListLength !== 0 && mdIndex >= mdListLength
             ? new dataPb.CaptureMetadata().toObject()
             : response.getMetadataList()[mdIndex]?.toObject();
         return {
-          data: data.getData()?.toJavaScript(),
+          data: tabData.getData()?.toJavaScript(),
           metadata,
-          timeRequested: data.getTimeRequested()?.toDate(),
-          timeReceived: data.getTimeReceived()?.toDate(),
+          timeRequested: tabData.getTimeRequested()?.toDate(),
+          timeReceived: tabData.getTimeReceived()?.toDate(),
         };
       })
     );
 
     return {
-      array: dataArray,
+      array: data,
       count: response.getCount(),
       last: response.getLast(),
     };
@@ -191,14 +194,17 @@ export class DataClient {
   ) {
     const { dataService: service } = this;
 
-    const dataArray: dataPb.BinaryData.AsObject[] = [];
     const dataReq = new dataPb.DataRequest();
     dataReq.setFilter(filter ?? new dataPb.Filter());
     if (limit) {
       dataReq.setLimit(limit);
     }
-    dataReq.setSortOrder(sortOrder ?? Order.ORDER_UNSPECIFIED);
-    dataReq.setLast(last);
+    if (sortOrder) {
+      dataReq.setSortOrder(sortOrder);
+    }
+    if (last) {
+      dataReq.setLast(last);
+    }
 
     const req = new dataPb.BinaryDataByFilterRequest();
     req.setDataRequest(dataReq);
@@ -206,15 +212,15 @@ export class DataClient {
     req.setCountOnly(countOnly);
     req.setIncludeInternalData(includeInternalData);
 
-    // eslint-disable-next-line no-await-in-loop
+    const data: dataPb.BinaryData.AsObject[] = [];
     const response = await promisify<
       dataPb.BinaryDataByFilterRequest,
       dataPb.BinaryDataByFilterResponse
     >(service.binaryDataByFilter.bind(service), req);
-    dataArray.push(...response.getDataList().map((data) => data.toObject()));
+    data.push(...response.getDataList().map((binData) => binData.toObject()));
 
     return {
-      array: dataArray,
+      array: data,
       count: response.getCount(),
       last: response.getLast(),
     };

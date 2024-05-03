@@ -173,7 +173,6 @@ describe('DataClient tests', () => {
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
       dataReq.setLimit(limit);
-      dataReq.setSortOrder(Order.ORDER_UNSPECIFIED);
       dataReq.setLast(lastId);
       const expectedRequest = new TabularDataByFilterRequest();
       expectedRequest.setDataRequest(dataReq);
@@ -237,7 +236,6 @@ describe('DataClient tests', () => {
       const dataReq = new DataRequest();
       dataReq.setFilter(filter);
       dataReq.setLimit(limit);
-      dataReq.setSortOrder(Order.ORDER_UNSPECIFIED);
       dataReq.setLast(lastId);
       const expectedRequest = new BinaryDataByFilterRequest();
       expectedRequest.setDataRequest(dataReq);
