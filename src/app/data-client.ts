@@ -212,58 +212,6 @@ export class DataClient {
     return response.toObject().dataList;
   }
 
-  async dataCaptureUpload(
-    dataList: Record<string, googleStructPb.JavaScriptValue>[],
-    partId: string,
-    componentType: string,
-    componentName: string,
-    methodName: string,
-    fileName: string,
-    tags?: string[],
-    dataRequestTimes?: [Date, Date][]
-  ) {
-    if (dataRequestTimes?.length !== dataList.length) {
-      throw new Error('dataRequestTimes and data lengths must be equal.');
-    }
-
-    const { dataSyncService: service } = this;
-
-    const metadata = new dataSyncPb.UploadMetadata();
-    metadata.setPartId(partId);
-    metadata.setComponentType(componentType);
-    metadata.setComponentName(componentName);
-    metadata.setMethodName(methodName);
-    metadata.setType(dataSyncPb.DataType.DATA_TYPE_TABULAR_SENSOR);
-    metadata.setFileName(fileName);
-    metadata.setTagsList(tags ?? []);
-
-    const sensorContents: dataSyncPb.SensorData[] = [];
-    for (const [i, data] of dataList.entries()) {
-      const sensorData = new dataSyncPb.SensorData();
-
-      const sensorMetadata = new dataSyncPb.SensorMetadata();
-      const dates = dataRequestTimes[i];
-      if (dates) {
-        sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
-        sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
-      }
-      sensorData.setMetadata(sensorMetadata);
-      sensorData.setStruct(googleStructPb.Struct.fromJavaScript(data));
-
-      sensorContents.push(sensorData);
-    }
-
-    const req = new dataSyncPb.DataCaptureUploadRequest();
-    req.setMetadata(metadata);
-    req.setSensorContentsList(sensorContents);
-
-    const response = await promisify<
-      dataSyncPb.DataCaptureUploadRequest,
-      dataSyncPb.DataCaptureUploadResponse
-    >(service.dataCaptureUpload.bind(service), req);
-    return response.getFileId();
-  }
-
   /**
    * Delete tabular data older than a specified number of days.
    *
@@ -764,6 +712,58 @@ export class DataClient {
       datasets.push(dataset);
     }
     return datasets;
+  }
+
+  async dataCaptureUpload(
+    dataList: Record<string, googleStructPb.JavaScriptValue>[],
+    partId: string,
+    componentType: string,
+    componentName: string,
+    methodName: string,
+    fileName: string,
+    tags?: string[],
+    dataRequestTimes?: [Date, Date][]
+  ) {
+    if (dataRequestTimes?.length !== dataList.length) {
+      throw new Error('dataRequestTimes and data lengths must be equal.');
+    }
+
+    const { dataSyncService: service } = this;
+
+    const metadata = new dataSyncPb.UploadMetadata();
+    metadata.setPartId(partId);
+    metadata.setComponentType(componentType);
+    metadata.setComponentName(componentName);
+    metadata.setMethodName(methodName);
+    metadata.setType(dataSyncPb.DataType.DATA_TYPE_TABULAR_SENSOR);
+    metadata.setFileName(fileName);
+    metadata.setTagsList(tags ?? []);
+
+    const sensorContents: dataSyncPb.SensorData[] = [];
+    for (const [i, data] of dataList.entries()) {
+      const sensorData = new dataSyncPb.SensorData();
+
+      const sensorMetadata = new dataSyncPb.SensorMetadata();
+      const dates = dataRequestTimes[i];
+      if (dates) {
+        sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
+        sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
+      }
+      sensorData.setMetadata(sensorMetadata);
+      sensorData.setStruct(googleStructPb.Struct.fromJavaScript(data));
+
+      sensorContents.push(sensorData);
+    }
+
+    const req = new dataSyncPb.DataCaptureUploadRequest();
+    req.setMetadata(metadata);
+    req.setSensorContentsList(sensorContents);
+
+    const response = await promisify<
+      dataSyncPb.DataCaptureUploadRequest,
+      dataSyncPb.DataCaptureUploadResponse
+    >(service.dataCaptureUpload.bind(service), req);
+    return response.getFileId();
   }
 
   // eslint-disable-next-line class-methods-use-this
