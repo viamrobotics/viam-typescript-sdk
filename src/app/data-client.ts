@@ -714,8 +714,32 @@ export class DataClient {
     return datasets;
   }
 
-  async dataCaptureUpload(
-    dataList: Record<string, googleStructPb.JavaScriptValue>[],
+  /**
+   * Uploads the content and metadata for tabular data.
+   *
+   * Upload tabular data collected on a robot through a specific component
+   * (e.g., a motor) along with the relevant metadata to app.viam.com. Tabular
+   * data can be found under the "Sensors" subtab of the Data tab on
+   * app.viam.com.
+   *
+   * @param tabularData The list of data to be uploaded, represented tabularly
+   *   as an array.
+   * @param partId The part ID of the component used to capture the data
+   * @param componentType The type of the component used to capture the data
+   *   (e.g., "movementSensor")
+   * @param componentName The name of the component used to capture the data
+   * @param methodName The name of the method used to capture the data.
+   * @param tags The list of tags to allow for tag-based filtering when
+   *   retrieving data
+   * @param dataRequestTimes The data request times containing `Date` objects
+   *   denoting the times this data was requested[0] by the robot and
+   *   received[1] from the appropriate sensor. Passing a list of tabular data
+   *   and Timestamps with length n > 1 will result in n datapoints being
+   *   uploaded, all tied to the same metadata.
+   * @returns The file ID of the uploaded data
+   */
+  async tabularDataCaptureUpload(
+    tabularData: Record<string, googleStructPb.JavaScriptValue>[],
     partId: string,
     componentType: string,
     componentName: string,
@@ -724,7 +748,7 @@ export class DataClient {
     tags?: string[],
     dataRequestTimes?: [Date, Date][]
   ) {
-    if (dataRequestTimes?.length !== dataList.length) {
+    if (dataRequestTimes?.length !== tabularData.length) {
       throw new Error('dataRequestTimes and data lengths must be equal.');
     }
 
@@ -740,7 +764,7 @@ export class DataClient {
     metadata.setTagsList(tags ?? []);
 
     const sensorContents: dataSyncPb.SensorData[] = [];
-    for (const [i, data] of dataList.entries()) {
+    for (const [i, data] of tabularData.entries()) {
       const sensorData = new dataSyncPb.SensorData();
 
       const sensorMetadata = new dataSyncPb.SensorMetadata();
