@@ -10,10 +10,7 @@ import { DataSyncServiceClient } from '../gen/app/datasync/v1/data_sync_pb_servi
 
 export type BinaryID = dataPb.BinaryID.AsObject;
 export type UploadMetadata = dataSyncPb.UploadMetadata.AsObject;
-import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { promisify } from '../utils';
-
-export type BinaryID = dataPb.BinaryID.AsObject;
 
 export type FilterOptions = Partial<dataPb.Filter.AsObject> & {
   endTime?: Date;
@@ -265,110 +262,6 @@ export class DataClient {
       dataSyncPb.DataCaptureUploadResponse
     >(service.dataCaptureUpload.bind(service), req);
     return response.getFileId();
-  }
-
-  async fileUploadRequest(
-    data: Uint8Array,
-    partId: string,
-    componentType?: string,
-    componentName?: string,
-    methodName?: string,
-    fileName?: string,
-    fileExtension?: string,
-    tags?: string[]
-  ) {
-    const { dataSyncService: service } = this;
-
-    const metadata = new dataSyncPb.UploadMetadata();
-    metadata.setPartId(partId);
-    metadata.setComponentType(componentType ?? '');
-    metadata.setComponentName(componentName ?? '');
-    metadata.setMethodName(methodName ?? '');
-    metadata.setType(dataSyncPb.DataType.DATA_TYPE_FILE);
-    metadata.setFileName(fileName ?? '');
-    metadata.setFileExtension(fileExtension ?? '');
-    metadata.setTagsList(tags ?? []);
-
-    const fileData = new dataSyncPb.FileData();
-    fileData.setData(data);
-
-    const req = new dataSyncPb.FileUploadRequest();
-    req.setMetadata(metadata);
-    req.setFileContents(fileData);
-
-    const stream = this.dataSyncService.fileUpload();
-    stream.write(req);
-
-    new Promise<string>((_, reject) => {
-      stream.on('status', (status) => {
-        if (status.code !== 0) {
-          const error = {
-            message: status.details,
-            code: status.code,
-            metadata: status.metadata,
-          };
-          reject(error);
-        }
-      });
-      stream.on('end', (end) => {
-        if (end === undefined) {
-          const error = { message: 'Stream ended without a status code' };
-          reject(error);
-        } else if (end.code !== 0) {
-          const error = {
-            message: end.details,
-            code: end.code,
-            metadata: end.metadata,
-          };
-          reject(error);
-        }
-      });
-    });
-
-    const response = await promisify<
-      dataSyncPb.FileUploadRequest,
-      dataSyncPb.FileUploadResponse
-    >(service.fileUpload.prototype.bind(service), req);
-    return response.getFileId();
-  }
-
-  async streamingDataCaptureUpload(
-    data: Uint8Array,
-    partId: string,
-    fileExtension: string,
-    componentType?: string,
-    componentName?: string,
-    methodName?: string,
-    fileName?: string,
-    tags?: string[],
-    dataRequestTimes?: [Date, Date]
-  ) {
-    const metadata = new dataSyncPb.UploadMetadata();
-    metadata.setPartId(partId);
-    metadata.setComponentName(componentType ?? '');
-    metadata.setComponentName(componentName ?? '');
-    metadata.setMethodName(methodName ?? '');
-    metadata.setType(dataSyncPb.DataType.DATA_TYPE_FILE);
-    metadata.setFileName(fileName ?? '');
-    metadata.setFileExtension(fileExtension);
-    metadata.setTagsList(tags ?? []);
-
-    const sensorMetadata = new dataSyncPb.SensorMetadata();
-    if (dataRequestTimes) {
-      sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[0]));
-      sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[1]));
-    }
-
-    const dataCaptureMetadata = new dataSyncPb.DataCaptureUploadMetadata();
-    dataCaptureMetadata.setUploadMetadata(metadata);
-    dataCaptureMetadata.setSensorMetadata(sensorMetadata);
-
-    const req = new dataSyncPb.StreamingDataCaptureUploadRequest();
-    req.setMetadata(dataCaptureMetadata);
-    req.setData(data);
-
-    const stream = this.dataSyncService.streamingDataCaptureUpload();
-    stream.write(req);
   }
 
   /**
