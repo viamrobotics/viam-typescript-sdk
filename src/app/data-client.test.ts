@@ -46,7 +46,6 @@ import {
   ConfigureDatabaseUserRequest,
   AddBoundingBoxToImageByIDRequest,
   GetDatabaseConnectionRequest,
-  Order,
 } from '../gen/app/data/v1/data_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 vi.mock('../gen/app/data/v1/data_pb_service');
