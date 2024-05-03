@@ -768,8 +768,12 @@ export class DataClient {
       const sensorMetadata = new dataSyncPb.SensorMetadata();
       const dates = dataRequestTimes[i];
       if (dates) {
-        sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
-        sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
+        if (dates[0]) {
+          sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
+        }
+        if (dates[1]) {
+          sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
+        }
       }
       sensorData.setMetadata(sensorMetadata);
       sensorData.setStruct(googleStructPb.Struct.fromJavaScript(data));
@@ -838,8 +842,14 @@ export class DataClient {
     const sensorData = new dataSyncPb.SensorData();
     const sensorMetadata = new dataSyncPb.SensorMetadata();
     if (dataRequestTimes) {
-      sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
-      sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
+      if (dataRequestTimes[0]) {
+        sensorMetadata.setTimeRequested(
+          Timestamp.fromDate(dataRequestTimes[0])
+        );
+      }
+      if (dataRequestTimes[1]) {
+        sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
+      }
     }
     sensorData.setMetadata(sensorMetadata);
     sensorData.setBinary(binaryData);
