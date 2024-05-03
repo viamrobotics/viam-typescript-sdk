@@ -59,6 +59,16 @@ import {
   ListDatasetsByOrganizationIDRequest,
   RenameDatasetRequest,
 } from '../gen/app/dataset/v1/dataset_pb';
+import { DataSyncServiceClient } from '../gen/app/datasync/v1/data_sync_pb_service';
+import {
+  DataCaptureUploadRequest,
+  DataCaptureUploadResponse,
+  DataType,
+  SensorData,
+  SensorMetadata,
+  UploadMetadata,
+} from '../gen/app/datasync/v1/data_sync_pb';
+import { l } from 'vite/dist/node/types.d-FdqQ54oU';
 
 const subject = () =>
   new DataClient('fakeServiceHost', {
@@ -929,6 +939,124 @@ describe('DatasetClient tests', () => {
       expect(set2?.name).toEqual('name2');
       expect(set2?.organizationId).toEqual('orgId2');
       expect(set2?.created).toEqual(dataset2.getTimeCreated()?.toDate());
+    });
+  });
+});
+
+describe('DataSyncClient tests', () => {
+  const partId = 'testPartId';
+  const componentType = 'testComponentType';
+  const componentName = 'testComponentName';
+  const methodName = 'testMethodName';
+  const fileExtension = '.png';
+  const tags = ['testTag1', 'testTag2'];
+  const timeRequested1 = new Date(1, 1, 1, 1, 1, 1);
+  const timeReceived1 = new Date(2, 2, 2, 2, 2, 2);
+  const dataRequestTimes1 = [timeRequested1, timeReceived1];
+  const timeRequested2 = new Date(3, 3, 3, 3, 3, 3);
+  const timeReceived2 = new Date(4, 4, 4, 4, 4, 4);
+  const dataRequestTimes2 = [timeRequested2, timeReceived2];
+  const tabularData1 = { key1: 1, key2: '2' };
+  const tabularData2 = { key3: [1, 2, 3], key4: { key4sub1: 1 } };
+  const binaryData = new Uint8Array([1, 2]);
+
+  const expectedRequest = new DataCaptureUploadRequest();
+  const metadata = new UploadMetadata();
+  metadata.setPartId(partId);
+  metadata.setComponentType(componentType);
+  metadata.setComponentName(componentName);
+  metadata.setMethodName(methodName);
+  metadata.setTagsList(tags);
+
+  describe('tabularDataCaptureUpload', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataSyncServiceClient.prototype, 'dataCaptureUpload')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req: DataCaptureUploadRequest, _md, cb) => {
+          const response = new DataCaptureUploadResponse();
+          response.setFileId('fileId');
+          cb(null, response);
+        });
+    });
+
+    it('tabular data capture upload', async () => {
+      metadata.setType(DataType.DATA_TYPE_TABULAR_SENSOR);
+      expectedRequest.setMetadata(metadata);
+      const sensorData1 = new SensorData();
+      const sensorMetadata1 = new SensorMetadata();
+      sensorMetadata1.setTimeRequested(Timestamp.fromDate(timeRequested1));
+      sensorMetadata1.setTimeReceived(Timestamp.fromDate(timeReceived1));
+      sensorData1.setMetadata(sensorMetadata1);
+      sensorData1.setStruct(Struct.fromJavaScript(tabularData1));
+      const sensorData2 = new SensorData();
+      const sensorMetadata2 = new SensorMetadata();
+      sensorMetadata2.setTimeRequested(Timestamp.fromDate(timeRequested2));
+      sensorMetadata2.setTimeReceived(Timestamp.fromDate(timeReceived2));
+      sensorData2.setMetadata(sensorMetadata2);
+      sensorData2.setStruct(Struct.fromJavaScript(tabularData2));
+      expectedRequest.setSensorContentsList([sensorData1, sensorData2]);
+
+      const response = await subject().tabularDataCaptureUpload(
+        [tabularData1, tabularData2],
+        partId,
+        componentType,
+        componentName,
+        methodName,
+        tags,
+        [dataRequestTimes1, dataRequestTimes2]
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(response).toStrictEqual('fileId');
+    });
+  });
+
+  describe('binaryDataCaptureUpload', () => {
+    let methodSpy: MockInstance;
+    beforeEach(() => {
+      methodSpy = vi
+        .spyOn(DataSyncServiceClient.prototype, 'dataCaptureUpload')
+        // @ts-expect-error compiler is matching incorrect function signature
+        .mockImplementation((_req: DataCaptureUploadRequest, _md, cb) => {
+          const response = new DataCaptureUploadResponse();
+          response.setFileId('fileId');
+          cb(null, response);
+        });
+    });
+
+    it('binary data capture upload', async () => {
+      metadata.setType(DataType.DATA_TYPE_BINARY_SENSOR);
+      metadata.setFileExtension(fileExtension);
+      expectedRequest.setMetadata(metadata);
+      const sensorData = new SensorData();
+      const sensorMetadata = new SensorMetadata();
+      sensorMetadata.setTimeRequested(Timestamp.fromDate(timeRequested1));
+      sensorMetadata.setTimeReceived(Timestamp.fromDate(timeReceived1));
+      sensorData.setMetadata(sensorMetadata);
+      sensorData.setBinary(binaryData);
+      expectedRequest.setSensorContentsList([sensorData]);
+
+      const response = await subject().binaryDataCaptureUpload(
+        binaryData,
+        partId,
+        componentType,
+        componentName,
+        methodName,
+        fileExtension,
+        tags,
+        dataRequestTimes1
+      );
+      expect(methodSpy).toHaveBeenCalledWith(
+        expectedRequest,
+        expect.anything(),
+        expect.anything()
+      );
+      expect(response).toStrictEqual('fileId');
     });
   });
 });
