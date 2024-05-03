@@ -7,10 +7,10 @@ import dataSyncPb from '../gen/app/datasync/v1/data_sync_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
 import { DataSyncServiceClient } from '../gen/app/datasync/v1/data_sync_pb_service';
+import { promisify } from '../utils';
 
 export type BinaryID = dataPb.BinaryID.AsObject;
 export type UploadMetadata = dataSyncPb.UploadMetadata.AsObject;
-import { promisify } from '../utils';
 
 export type FilterOptions = Partial<dataPb.Filter.AsObject> & {
   endTime?: Date;
