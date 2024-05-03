@@ -790,6 +790,75 @@ export class DataClient {
     return response.getFileId();
   }
 
+  /**
+   * Uploads the content and metadata for binary data.
+   *
+   * Upload binary data collected on a robot through a specific component (e.g.,
+   * a motor) along with the relevant metadata to app.viam.com. binary data can
+   * be found under the "Sensors" subtab of the Data tab on app.viam.com.
+   *
+   * @param binaryData The data to be uploaded, represented in bytes
+   * @param partId The part ID of the component used to capture the data
+   * @param componentType The type of the component used to capture the data
+   *   (e.g., "movementSensor")
+   * @param componentName The name of the component used to capture the data
+   * @param methodName The name of the method used to capture the data.
+   * @param fileExtension The file extension of binary data including the
+   *   period, e.g. .jpg, .png, .pcd. The backend will route the binary to its
+   *   corresponding mime type based on this extension. Files with a .jpeg,
+   *   .jpg, or .png extension will be saved to the images tab.
+   * @param tags The list of tags to allow for tag-based filtering when
+   *   retrieving data
+   * @param dataRequestTimes The data request times containing `Date` objects
+   *   denoting the times this data was requested[0] by the robot and
+   *   received[1] from the appropriate sensor. Passing a list of tabular data
+   *   and Timestamps with length n > 1 will result in n datapoints being
+   *   uploaded, all tied to the same metadata.
+   * @returns The file ID of the uploaded data
+   */
+  async binaryDataCaptureUpload(
+    binaryData: Uint8Array,
+    partId: string,
+    componentType: string,
+    componentName: string,
+    methodName: string,
+    fileExtension: string,
+    tags?: string[],
+    dataRequestTimes?: [Date, Date]
+  ) {
+    const { dataSyncService: service } = this;
+
+    const metadata = new dataSyncPb.UploadMetadata();
+    metadata.setPartId(partId);
+    metadata.setComponentType(componentType);
+    metadata.setComponentName(componentName);
+    metadata.setMethodName(methodName);
+    metadata.setType(dataSyncPb.DataType.DATA_TYPE_BINARY_SENSOR);
+    metadata.setTagsList(tags ?? []);
+    if (fileExtension) {
+      metadata.setFileExtension(fileExtension);
+    }
+
+    const sensorData = new dataSyncPb.SensorData();
+    const sensorMetadata = new dataSyncPb.SensorMetadata();
+    if (dataRequestTimes) {
+      sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
+      sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
+    }
+    sensorData.setMetadata(sensorMetadata);
+    sensorData.setBinary(binaryData);
+
+    const req = new dataSyncPb.DataCaptureUploadRequest();
+    req.setMetadata(metadata);
+    req.setSensorContentsList([sensorData]);
+
+    const response = await promisify<
+      dataSyncPb.DataCaptureUploadRequest,
+      dataSyncPb.DataCaptureUploadResponse
+    >(service.dataCaptureUpload.bind(service), req);
+    return response.getFileId();
+  }
+
   // eslint-disable-next-line class-methods-use-this
   createFilter(options: FilterOptions): dataPb.Filter {
     const filter = new dataPb.Filter();
