@@ -68,7 +68,6 @@ import {
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import { l } from 'vite/dist/node/types.d-FdqQ54oU';
 
 const subject = () =>
   new DataClient('fakeServiceHost', {
