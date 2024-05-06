@@ -56,6 +56,18 @@ export {
 } from './app/data-client';
 
 /**
+ * Raw Protobuf interfaces for an App service.
+ *
+ * Generated with https://github.com/improbable-eng/grpc-web
+ *
+ * @deprecated Use {@link AppClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export { default as appApi } from './gen/app/v1/app_pb';
+export { type AppClient } from './app/app-client';
+
+/**
  * Raw Protobuf interfaces for ML Training.
  *
  * Generated with https://github.com/improbable-eng/grpc-web
