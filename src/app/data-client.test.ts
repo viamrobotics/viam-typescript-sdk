@@ -160,10 +160,10 @@ describe('DataClient tests', () => {
 
     it('get tabular data', async () => {
       const promise = await subject().tabularDataByFilter();
-      const { array, count, last } = promise;
-      expect(array.length).toEqual(2);
-      expect(array[0]?.data).toMatchObject({ key: 'value1' });
-      expect(array[1]?.data).toMatchObject({ key: 'value2' });
+      const { data, count, last } = promise;
+      expect(data.length).toEqual(2);
+      expect(data[0]?.data).toMatchObject({ key: 'value1' });
+      expect(data[1]?.data).toMatchObject({ key: 'value2' });
       expect(count).toEqual(count);
       expect(last).toEqual(lastId);
     });
@@ -223,10 +223,10 @@ describe('DataClient tests', () => {
     });
     it('get binary data', async () => {
       const promise = await subject().binaryDataByFilter();
-      const { array, count, last } = promise;
-      expect(array.length).toEqual(2);
-      expect(array[0]?.binary).toEqual(bin1);
-      expect(array[1]?.binary).toEqual(bin2);
+      const { data, count, last } = promise;
+      expect(data.length).toEqual(2);
+      expect(data[0]?.binary).toEqual(bin1);
+      expect(data[1]?.binary).toEqual(bin2);
       expect(count).toEqual(limit);
       expect(last).toEqual(lastId);
     });

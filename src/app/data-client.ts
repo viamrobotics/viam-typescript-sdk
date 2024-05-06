@@ -136,25 +136,25 @@ export class DataClient {
     >(service.tabularDataByFilter.bind(service), req);
     const mdListLength = response.getMetadataList().length;
 
-    const data: TabularData[] = [];
-    data.push(
-      ...response.getDataList().map((tabData) => {
-        const mdIndex = tabData.getMetadataIndex();
+    const dataArray: TabularData[] = [];
+    dataArray.push(
+      ...response.getDataList().map((data) => {
+        const mdIndex = data.getMetadataIndex();
         const metadata =
           mdListLength !== 0 && mdIndex >= mdListLength
             ? new dataPb.CaptureMetadata().toObject()
             : response.getMetadataList()[mdIndex]?.toObject();
         return {
-          data: tabData.getData()?.toJavaScript(),
+          data: data.getData()?.toJavaScript(),
           metadata,
-          timeRequested: tabData.getTimeRequested()?.toDate(),
-          timeReceived: tabData.getTimeReceived()?.toDate(),
+          timeRequested: data.getTimeRequested()?.toDate(),
+          timeReceived: data.getTimeReceived()?.toDate(),
         };
       })
     );
 
     return {
-      array: data,
+      data: dataArray,
       count: response.getCount(),
       last: response.getLast(),
     };
@@ -212,15 +212,15 @@ export class DataClient {
     req.setCountOnly(countOnly);
     req.setIncludeInternalData(includeInternalData);
 
-    const data: dataPb.BinaryData.AsObject[] = [];
+    const dataArray: dataPb.BinaryData.AsObject[] = [];
     const response = await promisify<
       dataPb.BinaryDataByFilterRequest,
       dataPb.BinaryDataByFilterResponse
     >(service.binaryDataByFilter.bind(service), req);
-    data.push(...response.getDataList().map((binData) => binData.toObject()));
+    dataArray.push(...response.getDataList().map((data) => data.toObject()));
 
     return {
-      array: data,
+      data: dataArray,
       count: response.getCount(),
       last: response.getLast(),
     };
