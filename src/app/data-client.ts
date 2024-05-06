@@ -7,6 +7,9 @@ import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
 import { promisify } from '../utils';
 
+type ValueOf<T> = T[keyof T];
+export const { Order } = dataPb;
+export type Order = ValueOf<typeof dataPb.Order>;
 export type BinaryID = dataPb.BinaryID.AsObject;
 
 export type FilterOptions = Partial<dataPb.Filter.AsObject> & {
@@ -80,101 +83,147 @@ export class DataClient {
   }
 
   /**
-   * Filter and download tabular data. The returned metadata might be empty if
-   * the metadata index of the data is out of the bounds of the returned
-   * metadata list.
+   * Filter and get a page of tabular data. The returned metadata might be empty
+   * if the metadata index of the data is out of the bounds of the returned
+   * metadata list. The data will be paginated into pages of `limit` items, and
+   * the pagination ID will be included in the returned tuple.
    *
    * @param filter Optional `pb.Filter` specifying tabular data to retrieve. No
    *   `filter` implies all tabular data.
-   * @returns An array of data objects
+   * @param limit The maximum number of entries to include in a page. Defaults
+   *   to 50 if unspecfied
+   * @param sortOrder The desired sort order of the data
+   * @param last Optional string indicating the ID of the last-returned data. If
+   *   provided, the server will return the next data entries after the `last`
+   *   ID.
+   * @param countOnly Whether to return only the total count of entries
+   * @param includeInternalData Whether to retun internal data. Internal data is
+   *   used for Viam-specific data ingestion, like cloud SLAM. Defaults to
+   *   `false`.
+   * @returns An array of data objects, the count (number of entries), and the
+   *   last-returned page ID.
    */
-  async tabularDataByFilter(filter?: dataPb.Filter) {
+  async tabularDataByFilter(
+    filter?: dataPb.Filter,
+    limit?: number,
+    sortOrder?: Order,
+    last = '',
+    countOnly = false,
+    includeInternalData = false
+  ) {
     const { dataService: service } = this;
 
-    let last = '';
-    const dataArray: TabularData[] = [];
     const dataReq = new dataPb.DataRequest();
     dataReq.setFilter(filter ?? new dataPb.Filter());
-    dataReq.setLimit(100);
-
-    for (;;) {
+    if (limit) {
+      dataReq.setLimit(limit);
+    }
+    if (sortOrder) {
+      dataReq.setSortOrder(sortOrder);
+    }
+    if (last) {
       dataReq.setLast(last);
-
-      const req = new dataPb.TabularDataByFilterRequest();
-      req.setDataRequest(dataReq);
-      req.setCountOnly(false);
-
-      // eslint-disable-next-line no-await-in-loop
-      const response = await promisify<
-        dataPb.TabularDataByFilterRequest,
-        dataPb.TabularDataByFilterResponse
-      >(service.tabularDataByFilter.bind(service), req);
-      const dataList = response.getDataList();
-      if (dataList.length === 0) {
-        break;
-      }
-      const mdListLength = response.getMetadataList().length;
-
-      dataArray.push(
-        ...dataList.map((data) => {
-          const mdIndex = data.getMetadataIndex();
-          const metadata =
-            mdListLength !== 0 && mdIndex >= mdListLength
-              ? new dataPb.CaptureMetadata().toObject()
-              : response.getMetadataList()[mdIndex]?.toObject();
-          return {
-            data: data.getData()?.toJavaScript(),
-            metadata,
-            timeRequested: data.getTimeRequested()?.toDate(),
-            timeReceived: data.getTimeReceived()?.toDate(),
-          };
-        })
-      );
-      last = response.getLast();
     }
 
-    return dataArray;
+    const req = new dataPb.TabularDataByFilterRequest();
+    req.setDataRequest(dataReq);
+    req.setCountOnly(countOnly);
+    req.setIncludeInternalData(includeInternalData);
+
+    const response = await promisify<
+      dataPb.TabularDataByFilterRequest,
+      dataPb.TabularDataByFilterResponse
+    >(service.tabularDataByFilter.bind(service), req);
+    const mdListLength = response.getMetadataList().length;
+
+    const dataArray: TabularData[] = [];
+    dataArray.push(
+      ...response.getDataList().map((data) => {
+        const mdIndex = data.getMetadataIndex();
+        const metadata =
+          mdListLength !== 0 && mdIndex >= mdListLength
+            ? new dataPb.CaptureMetadata().toObject()
+            : response.getMetadataList()[mdIndex]?.toObject();
+        return {
+          data: data.getData()?.toJavaScript(),
+          metadata,
+          timeRequested: data.getTimeRequested()?.toDate(),
+          timeReceived: data.getTimeReceived()?.toDate(),
+        };
+      })
+    );
+
+    return {
+      data: dataArray,
+      count: response.getCount(),
+      last: response.getLast(),
+    };
   }
 
   /**
-   * Filter and download binary data. The returned metadata might be empty if
-   * the metadata index of the data is out of the bounds of the returned
-   * metadata list.
+   * Filter and get a page of binary data. The returned metadata might be empty
+   * if the metadata index of the data is out of the bounds of the returned
+   * metadata list. The data will be paginated into pages of `limit` items, and
+   * the pagination ID will be included in the returned tuple.
    *
    * @param filter Optional `pb.Filter` specifying binary data to retrieve. No
-   *   `filter` implies all tabular data.
-   * @returns An array of data objects
+   *   `filter` implies all binary data.
+   * @param limit The maximum number of entries to include in a page. Defaults
+   *   to 50 if unspecfied
+   * @param sortOrder The desired sort order of the data
+   * @param last Optional string indicating the ID of the last-returned data. If
+   *   provided, the server will return the next data entries after the `last`
+   *   ID.
+   * @param includeBinary Whether to include binary file data with each
+   *   retrieved file
+   * @param countOnly Whether to return only the total count of entries
+   * @param includeInternalData Whether to retun internal data. Internal data is
+   *   used for Viam-specific data ingestion, like cloud SLAM. Defaults to
+   *   `false`.
+   * @returns An array of data objects, the count (number of entries), and the
+   *   last-returned page ID.
    */
-  async binaryDataByFilter(filter?: dataPb.Filter) {
+  async binaryDataByFilter(
+    filter?: dataPb.Filter,
+    limit?: number,
+    sortOrder?: Order,
+    last = '',
+    includeBinary = true,
+    countOnly = false,
+    includeInternalData = false
+  ) {
     const { dataService: service } = this;
 
-    let last = '';
-    const dataArray: dataPb.BinaryData.AsObject[] = [];
     const dataReq = new dataPb.DataRequest();
     dataReq.setFilter(filter ?? new dataPb.Filter());
-    dataReq.setLimit(100);
-
-    for (;;) {
+    if (limit) {
+      dataReq.setLimit(limit);
+    }
+    if (sortOrder) {
+      dataReq.setSortOrder(sortOrder);
+    }
+    if (last) {
       dataReq.setLast(last);
-
-      const req = new dataPb.BinaryDataByFilterRequest();
-      req.setDataRequest(dataReq);
-      req.setCountOnly(false);
-
-      // eslint-disable-next-line no-await-in-loop
-      const response = await promisify<
-        dataPb.BinaryDataByFilterRequest,
-        dataPb.BinaryDataByFilterResponse
-      >(service.binaryDataByFilter.bind(service), req);
-      const dataList = response.getDataList();
-      if (dataList.length === 0) {
-        break;
-      }
-      dataArray.push(...dataList.map((data) => data.toObject()));
-      last = response.getLast();
     }
 
-    return dataArray;
+    const req = new dataPb.BinaryDataByFilterRequest();
+    req.setDataRequest(dataReq);
+    req.setIncludeBinary(includeBinary);
+    req.setCountOnly(countOnly);
+    req.setIncludeInternalData(includeInternalData);
+
+    const dataArray: dataPb.BinaryData.AsObject[] = [];
+    const response = await promisify<
+      dataPb.BinaryDataByFilterRequest,
+      dataPb.BinaryDataByFilterResponse
+    >(service.binaryDataByFilter.bind(service), req);
+    dataArray.push(...response.getDataList().map((data) => data.toObject()));
+
+    return {
+      data: dataArray,
+      count: response.getCount(),
+      last: response.getLast(),
+    };
   }
 
   /**
