@@ -731,7 +731,7 @@ export class DataClient {
    * @param methodName The name of the method used to capture the data.
    * @param tags The list of tags to allow for tag-based filtering when
    *   retrieving data
-   * @param dataRequestTimes Array of Date arrays, each containing two `Date`
+   * @param dataRequestTimes Array of Date tuples, each containing two `Date`
    *   objects denoting the times this data was requested[0] by the robot and
    *   received[1] from the appropriate sensor. Passing a list of tabular data
    *   and Timestamps with length n > 1 will result in n datapoints being
@@ -745,7 +745,7 @@ export class DataClient {
     componentName: string,
     methodName: string,
     tags?: string[],
-    dataRequestTimes?: Date[][]
+    dataRequestTimes?: [Date, Date][]
   ) {
     if (dataRequestTimes?.length !== tabularData.length) {
       throw new Error('dataRequestTimes and data lengths must be equal.');
@@ -768,12 +768,8 @@ export class DataClient {
       const sensorMetadata = new dataSyncPb.SensorMetadata();
       const dates = dataRequestTimes[i];
       if (dates) {
-        if (dates[0]) {
-          sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
-        }
-        if (dates[1]) {
-          sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
-        }
+        sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
+        sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
       }
       sensorData.setMetadata(sensorMetadata);
       sensorData.setStruct(googleStructPb.Struct.fromJavaScript(data));
@@ -811,9 +807,9 @@ export class DataClient {
    *   .jpg, or .png extension will be saved to the images tab.
    * @param tags The list of tags to allow for tag-based filtering when
    *   retrieving data
-   * @param dataRequestTimes Containing `Date` objects denoting the times this
-   *   data was requested[0] by the robot and received[1] from the appropriate
-   *   sensor.
+   * @param dataRequestTimes Tuple containing `Date` objects denoting the times
+   *   this data was requested[0] by the robot and received[1] from the
+   *   appropriate sensor.
    * @returns The file ID of the uploaded data
    */
   async binaryDataCaptureUpload(
@@ -824,7 +820,7 @@ export class DataClient {
     methodName: string,
     fileExtension: string,
     tags?: string[],
-    dataRequestTimes?: Date[]
+    dataRequestTimes?: [Date, Date]
   ) {
     const { dataSyncService: service } = this;
 
@@ -842,14 +838,8 @@ export class DataClient {
     const sensorData = new dataSyncPb.SensorData();
     const sensorMetadata = new dataSyncPb.SensorMetadata();
     if (dataRequestTimes) {
-      if (dataRequestTimes[0]) {
-        sensorMetadata.setTimeRequested(
-          Timestamp.fromDate(dataRequestTimes[0])
-        );
-      }
-      if (dataRequestTimes[1]) {
-        sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
-      }
+      sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
+      sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
     }
     sensorData.setMetadata(sensorMetadata);
     sensorData.setBinary(binaryData);
