@@ -17,6 +17,7 @@ import { BillingClient } from './billing-client';
 import { createViamClient, type ViamClientOptions } from './viam-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
+import { AppClient } from './app-client';
 
 describe('ViamClient', () => {
   let options: ViamClientOptions | undefined;
@@ -45,6 +46,7 @@ describe('ViamClient', () => {
       defaultServiceHost,
       testCredential
     );
+    expect(client.appClient).toBeInstanceOf(AppClient);
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
@@ -60,6 +62,7 @@ describe('ViamClient', () => {
       serviceHost,
       testCredential
     );
+    expect(client.appClient).toBeInstanceOf(AppClient);
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
@@ -74,6 +77,7 @@ describe('ViamClient', () => {
       defaultServiceHost,
       testAccessToken
     );
+    expect(client.appClient).toBeInstanceOf(AppClient);
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
     expect(client.provisioningClient).toBeInstanceOf(ProvisioningClient);
