@@ -3,14 +3,17 @@ import * as googleStructPb from 'google-protobuf/google/protobuf/struct_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import dataPb from '../gen/app/data/v1/data_pb';
 import datasetPb from '../gen/app/dataset/v1/dataset_pb';
+import dataSyncPb from '../gen/app/datasync/v1/data_sync_pb';
 import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
 import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
+import { DataSyncServiceClient } from '../gen/app/datasync/v1/data_sync_pb_service';
 import { promisify } from '../utils';
 
 type ValueOf<T> = T[keyof T];
 export const { Order } = dataPb;
 export type Order = ValueOf<typeof dataPb.Order>;
 export type BinaryID = dataPb.BinaryID.AsObject;
+export type UploadMetadata = dataSyncPb.UploadMetadata.AsObject;
 
 export type FilterOptions = Partial<dataPb.Filter.AsObject> & {
   endTime?: Date;
@@ -32,10 +35,12 @@ type Dataset = Partial<datasetPb.Dataset.AsObject> & {
 export class DataClient {
   private dataService: DataServiceClient;
   private datasetService: DatasetServiceClient;
+  private dataSyncService: DataSyncServiceClient;
 
   constructor(serviceHost: string, grpcOptions: RpcOptions) {
     this.dataService = new DataServiceClient(serviceHost, grpcOptions);
     this.datasetService = new DatasetServiceClient(serviceHost, grpcOptions);
+    this.dataSyncService = new DataSyncServiceClient(serviceHost, grpcOptions);
   }
 
   /**
@@ -756,6 +761,147 @@ export class DataClient {
       datasets.push(dataset);
     }
     return datasets;
+  }
+
+  /**
+   * Uploads the content and metadata for tabular data.
+   *
+   * Upload tabular data collected on a robot through a specific component
+   * (e.g., a motor) along with the relevant metadata to app.viam.com. Tabular
+   * data can be found under the "Sensors" subtab of the Data tab on
+   * app.viam.com.
+   *
+   * @param tabularData The list of data to be uploaded, represented tabularly
+   *   as an array.
+   * @param partId The part ID of the component used to capture the data
+   * @param componentType The type of the component used to capture the data
+   *   (e.g., "movementSensor")
+   * @param componentName The name of the component used to capture the data
+   * @param methodName The name of the method used to capture the data.
+   * @param tags The list of tags to allow for tag-based filtering when
+   *   retrieving data
+   * @param dataRequestTimes Array of Date tuples, each containing two `Date`
+   *   objects denoting the times this data was requested[0] by the robot and
+   *   received[1] from the appropriate sensor. Passing a list of tabular data
+   *   and Timestamps with length n > 1 will result in n datapoints being
+   *   uploaded, all tied to the same metadata.
+   * @returns The file ID of the uploaded data
+   */
+  async tabularDataCaptureUpload(
+    tabularData: Record<string, googleStructPb.JavaScriptValue>[],
+    partId: string,
+    componentType: string,
+    componentName: string,
+    methodName: string,
+    tags?: string[],
+    dataRequestTimes?: [Date, Date][]
+  ) {
+    if (dataRequestTimes?.length !== tabularData.length) {
+      throw new Error('dataRequestTimes and data lengths must be equal.');
+    }
+
+    const { dataSyncService: service } = this;
+
+    const metadata = new dataSyncPb.UploadMetadata();
+    metadata.setPartId(partId);
+    metadata.setComponentType(componentType);
+    metadata.setComponentName(componentName);
+    metadata.setMethodName(methodName);
+    metadata.setType(dataSyncPb.DataType.DATA_TYPE_TABULAR_SENSOR);
+    metadata.setTagsList(tags ?? []);
+
+    const sensorContents: dataSyncPb.SensorData[] = [];
+    for (const [i, data] of tabularData.entries()) {
+      const sensorData = new dataSyncPb.SensorData();
+
+      const sensorMetadata = new dataSyncPb.SensorMetadata();
+      const dates = dataRequestTimes[i];
+      if (dates) {
+        sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
+        sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
+      }
+      sensorData.setMetadata(sensorMetadata);
+      sensorData.setStruct(googleStructPb.Struct.fromJavaScript(data));
+
+      sensorContents.push(sensorData);
+    }
+
+    const req = new dataSyncPb.DataCaptureUploadRequest();
+    req.setMetadata(metadata);
+    req.setSensorContentsList(sensorContents);
+
+    const response = await promisify<
+      dataSyncPb.DataCaptureUploadRequest,
+      dataSyncPb.DataCaptureUploadResponse
+    >(service.dataCaptureUpload.bind(service), req);
+    return response.getFileId();
+  }
+
+  /**
+   * Uploads the content and metadata for binary data.
+   *
+   * Upload binary data collected on a robot through a specific component (e.g.,
+   * a motor) along with the relevant metadata to app.viam.com. binary data can
+   * be found under the "Sensors" subtab of the Data tab on app.viam.com.
+   *
+   * @param binaryData The data to be uploaded, represented in bytes
+   * @param partId The part ID of the component used to capture the data
+   * @param componentType The type of the component used to capture the data
+   *   (e.g., "movementSensor")
+   * @param componentName The name of the component used to capture the data
+   * @param methodName The name of the method used to capture the data.
+   * @param fileExtension The file extension of binary data including the
+   *   period, e.g. .jpg, .png, .pcd. The backend will route the binary to its
+   *   corresponding mime type based on this extension. Files with a .jpeg,
+   *   .jpg, or .png extension will be saved to the images tab.
+   * @param tags The list of tags to allow for tag-based filtering when
+   *   retrieving data
+   * @param dataRequestTimes Tuple containing `Date` objects denoting the times
+   *   this data was requested[0] by the robot and received[1] from the
+   *   appropriate sensor.
+   * @returns The file ID of the uploaded data
+   */
+  async binaryDataCaptureUpload(
+    binaryData: Uint8Array,
+    partId: string,
+    componentType: string,
+    componentName: string,
+    methodName: string,
+    fileExtension: string,
+    tags?: string[],
+    dataRequestTimes?: [Date, Date]
+  ) {
+    const { dataSyncService: service } = this;
+
+    const metadata = new dataSyncPb.UploadMetadata();
+    metadata.setPartId(partId);
+    metadata.setComponentType(componentType);
+    metadata.setComponentName(componentName);
+    metadata.setMethodName(methodName);
+    metadata.setType(dataSyncPb.DataType.DATA_TYPE_BINARY_SENSOR);
+    metadata.setTagsList(tags ?? []);
+    if (fileExtension) {
+      metadata.setFileExtension(fileExtension);
+    }
+
+    const sensorData = new dataSyncPb.SensorData();
+    const sensorMetadata = new dataSyncPb.SensorMetadata();
+    if (dataRequestTimes) {
+      sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
+      sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
+    }
+    sensorData.setMetadata(sensorMetadata);
+    sensorData.setBinary(binaryData);
+
+    const req = new dataSyncPb.DataCaptureUploadRequest();
+    req.setMetadata(metadata);
+    req.setSensorContentsList([sensorData]);
+
+    const response = await promisify<
+      dataSyncPb.DataCaptureUploadRequest,
+      dataSyncPb.DataCaptureUploadResponse
+    >(service.dataCaptureUpload.bind(service), req);
+    return response.getFileId();
   }
 
   // eslint-disable-next-line class-methods-use-this
