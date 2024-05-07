@@ -475,3 +475,8 @@ export type {
 export * from './types';
 
 export { doCommandFromClient, promisify } from './utils';
+
+export {
+  RECONNECTED,
+  DISCONNECTED,
+} from './events';
