@@ -475,3 +475,5 @@ export type {
 export * from './types';
 
 export { doCommandFromClient, promisify } from './utils';
+
+export { MachineConnectionEvent } from './events';

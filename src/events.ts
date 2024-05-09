@@ -1,7 +1,15 @@
 type Callback = (args: unknown) => void;
 
-export const RECONNECTED = 'reconnected';
-export const DISCONNECTED = 'disconnected';
+/**
+ * MachineConnectionEvent events are emitted by a Client's EventDispatcher when
+ * connection events occur.
+ *
+ * TODO: Emit 'connecting' and 'connected' events
+ */
+export enum MachineConnectionEvent {
+  RECONNECTED = 'reconnected',
+  DISCONNECTED = 'disconnected',
+}
 
 export class EventDispatcher {
   listeners: Partial<Record<string, Set<Callback>>> = {};
