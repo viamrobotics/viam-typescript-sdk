@@ -1,7 +1,7 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 import robotApi from '../gen/robot/v1/robot_pb';
-import { DISCONNECTED, events } from '../events';
+import { MachineConnectionEvent, events } from '../events';
 import { type ServiceError } from '../gen/robot/v1/robot_pb_service';
 
 const timeoutBlob = new Blob(
@@ -43,7 +43,7 @@ export default class GRPCConnectionManager {
         new grpc.Metadata(),
         (err) => {
           if (err) {
-            events.emit(DISCONNECTED, {});
+            events.emit(MachineConnectionEvent.DISCONNECTED, {});
             return;
           }
 

@@ -57,13 +57,13 @@ async function run(client: VIAM.RobotClient) {
 
 // This function is called when the robot is disconnected.
 // Feel free to replace it with whatever logic you want to test out!
-async function disconnected(event) {
+async function disconnected() {
   console.log('The robot has been disconnected. Trying reconnect...');
 }
 
 // This function is called when the robot is reconnected.
 // Feel free to replace it with whatever logic you want to test out!
-async function reconnected(event) {
+async function reconnected() {
   console.log('The robot has been reconnected. Work can be continued.');
 }
 
@@ -73,8 +73,8 @@ async function main() {
   try {
     client = await connect();
     console.log('connected!');
-    client.on('disconnected', disconnected);
-    client.on('reconnected', reconnected);
+    client.on(VIAM.MachineConnectionEvent.DISCONNECTED, disconnected);
+    client.on(VIAM.MachineConnectionEvent.RECONNECTED, reconnected);
   } catch (error) {
     console.log(error);
     return;

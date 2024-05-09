@@ -4,7 +4,7 @@ import type {
   Transform,
 } from '../gen/common/v1/common_pb';
 import type { StructType } from '../types';
-import { DISCONNECTED, RECONNECTED } from '../events';
+import { MachineConnectionEvent } from '../events';
 import type proto from '../gen/robot/v1/robot_pb';
 import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
 
@@ -161,10 +161,7 @@ export interface Robot {
    * @param listener - The function to call
    * @alpha
    */
-  on: (
-    type: typeof RECONNECTED | typeof DISCONNECTED,
-    listener: Callback
-  ) => void;
+  on: (type: MachineConnectionEvent, listener: Callback) => void;
 
   /**
    * Get app-related information about the robot.

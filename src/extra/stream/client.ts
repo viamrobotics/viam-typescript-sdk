@@ -1,4 +1,4 @@
-import { EventDispatcher, events } from '../../events';
+import { EventDispatcher, MachineConnectionEvent, events } from '../../events';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
@@ -39,7 +39,7 @@ export class StreamClient extends EventDispatcher implements Stream {
       this.emit('track', args);
     });
 
-    events.on('reconnected', () => {
+    events.on(MachineConnectionEvent.RECONNECTED, () => {
       for (const name of this.streams.values()) {
         void this.add(name);
       }

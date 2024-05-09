@@ -9,7 +9,7 @@ import {
 import { backOff } from 'exponential-backoff';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { DIAL_TIMEOUT } from '../constants';
-import { DISCONNECTED, EventDispatcher, RECONNECTED, events } from '../events';
+import { EventDispatcher, MachineConnectionEvent, events } from '../events';
 import type {
   PoseInFrame,
   ResourceName,
@@ -171,11 +171,11 @@ export class RobotClient extends EventDispatcher implements Robot {
       }
     );
 
-    events.on(RECONNECTED, () => {
-      this.emit(RECONNECTED, {});
+    events.on(MachineConnectionEvent.RECONNECTED, () => {
+      this.emit(MachineConnectionEvent.RECONNECTED, {});
     });
-    events.on(DISCONNECTED, () => {
-      this.emit(DISCONNECTED, {});
+    events.on(MachineConnectionEvent.DISCONNECTED, () => {
+      this.emit(MachineConnectionEvent.DISCONNECTED, {});
       if (this.noReconnect) {
         return;
       }
@@ -189,7 +189,7 @@ export class RobotClient extends EventDispatcher implements Robot {
             () => {
               // eslint-disable-next-line no-console
               console.debug('reconnected successfully!');
-              events.emit(RECONNECTED, {});
+              events.emit(MachineConnectionEvent.RECONNECTED, {});
             },
             (error) => {
               // eslint-disable-next-line no-console
@@ -476,9 +476,9 @@ export class RobotClient extends EventDispatcher implements Robot {
            * recover.
            */
           if (this.peerConn?.iceConnectionState === 'connected') {
-            events.emit(RECONNECTED, {});
+            events.emit(MachineConnectionEvent.RECONNECTED, {});
           } else if (this.peerConn?.iceConnectionState === 'closed') {
-            events.emit(DISCONNECTED, {});
+            events.emit(MachineConnectionEvent.DISCONNECTED, {});
           }
         });
 
