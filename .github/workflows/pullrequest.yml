@@ -1,9 +1,6 @@
 name: Pull Request Update
 
-on:
-  workflow_dispatch:
-  pull_request:
-    branches: [main, 'rc-*']
+on: [workflow_dispatch, pull_request]
 
 jobs:
   test:
