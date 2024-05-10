@@ -481,6 +481,12 @@ export class RobotClient extends EventDispatcher implements Robot {
             events.emit(MachineConnectionEvent.DISCONNECTED, {});
           }
         });
+        // There is not an iceconnectionstatechange nor connectionstatechange
+        // event when the peerConn closes. Instead, listen to the data channel
+        // closing and emit disconnect when that occurs.
+        webRTCConn.dataChannel.addEventListener('close', (event) => {
+          events.emit(MachineConnectionEvent.DISCONNECTED, event);
+        });
 
         this.transportFactory = webRTCConn.transportFactory;
 
