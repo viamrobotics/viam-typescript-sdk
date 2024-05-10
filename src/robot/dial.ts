@@ -1,3 +1,4 @@
+import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { DIAL_TIMEOUT } from '../constants';
 import { RobotClient } from './client';
 
@@ -159,13 +160,58 @@ const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
  * {@link DialWebRTCConf} or {@link DialDirectConf} is passed in as the first
  * argument.
  *
- * If connecting via WebRTC fails, then this function will automatically
- * re-attempt to connect via gRPC directly.
+ * Reconnect is enabled by default and disabled with `noReconnect`. When
+ * enabled, this function will re-attempt to reconnect if initial connection is
+ * unsuccessful using backoff.
+ *
+ * If `noReconnect` is specified and connecting via WebRTC fails, then this
+ * function will automatically re-attempt to connect via gRPC directly.
  */
 export const createRobotClient = async (
   conf: DialConf
 ): Promise<RobotClient> => {
-  let client;
+  validateDialConf(conf);
+
+  const backOffOpts: Partial<IBackOffOptions> = {
+    maxDelay: conf.reconnectMaxWait,
+    numOfAttempts: conf.reconnectMaxAttempts,
+    retry: (_error, attemptNumber) => {
+      // eslint-disable-next-line no-console
+      console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`);
+      // Always retry the next attempt
+      return true;
+    },
+  };
+
+  // Try to dial via WebRTC first.
+  if (isDialWebRTCConf(conf)) {
+    try {
+      return conf.noReconnect
+        ? await dialWebRTC(conf)
+        : await backOff(async () => dialWebRTC(conf), backOffOpts);
+    } catch {
+      // eslint-disable-next-line no-console
+      console.debug('Failed to connect via WebRTC');
+    }
+  }
+
+  try {
+    return conf.noReconnect
+      ? await dialDirect(conf)
+      : await backOff(async () => dialDirect(conf), backOffOpts);
+  } catch {
+    // eslint-disable-next-line no-console
+    console.debug('Failed to connect via gRPC');
+  }
+
+  throw new Error('Failed to connect to robot');
+};
+
+/**
+ * Validates a DialConf passed to createRobotClient. Throws an error for invalid
+ * configs.
+ */
+const validateDialConf = (conf: DialConf) => {
   if (conf.authEntity) {
     try {
       conf.authEntity = new URL(conf.authEntity).host;
@@ -186,29 +232,4 @@ export const createRobotClient = async (
       `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
     );
   }
-
-  // Try to dial via WebRTC first.
-  if (isDialWebRTCConf(conf)) {
-    try {
-      client = await dialWebRTC(conf);
-    } catch {
-      // eslint-disable-next-line no-console
-      console.debug('failed to connect via WebRTC...');
-    }
-  }
-
-  if (!client) {
-    try {
-      client = await dialDirect(conf);
-    } catch {
-      // eslint-disable-next-line no-console
-      console.debug('failed to connect via gRPC...');
-    }
-  }
-
-  if (!client) {
-    throw new Error('failed to connect to robot');
-  }
-
-  return client;
 };
