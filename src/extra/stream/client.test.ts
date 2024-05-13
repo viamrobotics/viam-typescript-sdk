@@ -4,24 +4,25 @@ import { vi, beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { RobotClient } from '../../robot';
 vi.mock('../../robot');
 
-import { events } from '../../events';
 import { StreamServiceClient } from '../../gen/stream/v1/stream_pb_service';
 vi.mock('../../gen/stream/v1/stream_pb_service');
 
 import { StreamClient } from './client';
-
-let streamClient: StreamClient;
+import { EventDispatcher } from '../../events';
 
 describe('StreamClient', () => {
+  let robotClient: RobotClient;
+  let streamClient: StreamClient;
+
   beforeEach(() => {
     vi.useFakeTimers();
 
     const fakehost = 'fakehost';
-    RobotClient.prototype.createServiceClient = vi
+
+    robotClient = new EventDispatcher() as RobotClient;
+    robotClient.createServiceClient = vi
       .fn()
       .mockImplementation(() => new StreamServiceClient(fakehost));
-
-    const robotClient = new RobotClient(fakehost);
     streamClient = new StreamClient(robotClient);
   });
 
@@ -36,7 +37,7 @@ describe('StreamClient', () => {
         done();
       });
 
-      events.emit('track', { mock: true });
+      robotClient.emit('track', { mock: true });
     }));
 
   it('getStream creates and returns a new stream', async () => {

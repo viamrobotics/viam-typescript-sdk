@@ -2,7 +2,6 @@
 
 import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { events } from '../events';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 vi.mock('../gen/robot/v1/robot_pb_service');
 import GRPCConnectionManager from './grpc-connection-manager';
@@ -13,8 +12,10 @@ const transport = new FakeTransportBuilder().build();
 let cm: GRPCConnectionManager;
 
 describe('GPRCConnectionManager', () => {
+  const onDisconnect = vi.fn();
+
   beforeEach(() => {
-    cm = new GRPCConnectionManager(host, transport);
+    cm = new GRPCConnectionManager(host, transport, onDisconnect);
     vi.mock('./gen/robot/v1/robot_pb_service');
   });
 
@@ -51,7 +52,6 @@ describe('GPRCConnectionManager', () => {
 
   it('successfully detect connection and then disconnect', async () => {
     const heartbeat = vi.spyOn(cm, 'heartbeat');
-    const disconnected = vi.spyOn(events, 'emit');
     RobotServiceClient.prototype.getOperations = vi
       .fn()
       .mockImplementationOnce((_req, _md, cb) => {
@@ -62,6 +62,6 @@ describe('GPRCConnectionManager', () => {
       });
     await expect(cm.start()).resolves.toBe(undefined);
     expect(heartbeat).toHaveBeenCalledOnce();
-    expect(disconnected).toHaveBeenCalledWith('disconnected', {});
+    expect(onDisconnect).toHaveBeenCalled();
   });
 });
