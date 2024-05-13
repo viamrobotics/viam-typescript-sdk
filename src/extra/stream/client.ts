@@ -1,4 +1,4 @@
-import { EventDispatcher, MachineConnectionEvent, events } from '../../events';
+import { EventDispatcher, MachineConnectionEvent } from '../../events';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
@@ -35,11 +35,11 @@ export class StreamClient extends EventDispatcher implements Stream {
      * future we'll want to partition here and have individual events for each
      * stream.
      */
-    events.on('track', (args) => {
+    client.on('track', (args) => {
       this.emit('track', args);
     });
 
-    events.on(MachineConnectionEvent.RECONNECTED, () => {
+    client.on(MachineConnectionEvent.RECONNECTED, () => {
       for (const name of this.streams.values()) {
         void this.add(name);
       }
