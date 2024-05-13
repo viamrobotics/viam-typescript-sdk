@@ -180,36 +180,29 @@ export class RobotClient extends EventDispatcher implements Robot {
         return;
       }
 
-      let retries = 0;
       // eslint-disable-next-line no-console
-      console.debug('connection closed, will try to reconnect');
-      void backOff(
-        async () =>
-          this.connect().then(
-            () => {
-              // eslint-disable-next-line no-console
-              console.debug('reconnected successfully!');
-              events.emit(MachineConnectionEvent.RECONNECTED, {});
-            },
-            (error) => {
-              // eslint-disable-next-line no-console
-              console.debug(`failed to reconnect - retries count: ${retries}`);
-              retries += 1;
-              if (retries === this.reconnectMaxAttempts) {
-                // eslint-disable-next-line no-console
-                console.debug(
-                  `reached max attempts: ${this.reconnectMaxAttempts}`
-                );
-              }
-              throw error;
-            }
-          ),
-        {
-          // default values taken from `exponential-backoff` library
-          maxDelay: this.reconnectMaxWait ?? Number.POSITIVE_INFINITY,
-          numOfAttempts: this.reconnectMaxAttempts ?? 10,
-        }
-      );
+      console.debug('Connection closed, will try to reconnect');
+      void backOff(async () => this.connect(), {
+        maxDelay: this.reconnectMaxWait,
+        numOfAttempts: this.reconnectMaxAttempts,
+        retry: (_error, attemptNumber) => {
+          // eslint-disable-next-line no-console
+          console.debug(
+            `Failed to connect, attempt ${attemptNumber} with backoff`
+          );
+          // Always retry the next attempt
+          return true;
+        },
+      })
+        .then(() => {
+          // eslint-disable-next-line no-console
+          console.debug('Reconnected successfully!');
+          events.emit(MachineConnectionEvent.RECONNECTED, {});
+        })
+        .catch(() => {
+          // eslint-disable-next-line no-console
+          console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
+        });
     });
   }
 
