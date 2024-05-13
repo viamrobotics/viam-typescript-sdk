@@ -5,8 +5,8 @@ import { RobotClient } from '../../robot';
 vi.mock('../../robot');
 
 import { events } from '../../events';
-import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
-vi.mock('../../gen/proto/stream/v1/stream_pb_service');
+import { StreamServiceClient } from '../../gen/stream/v1/stream_pb_service';
+vi.mock('../../gen/stream/v1/stream_pb_service');
 
 import { StreamClient } from './client';
 

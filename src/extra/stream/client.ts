@@ -1,8 +1,8 @@
 import { EventDispatcher, MachineConnectionEvent, events } from '../../events';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
-import pb from '../../gen/proto/stream/v1/stream_pb';
+import { StreamServiceClient } from '../../gen/stream/v1/stream_pb_service';
+import pb from '../../gen/stream/v1/stream_pb';
 import { promisify } from '../../utils';
 import type { Stream } from './stream';
 

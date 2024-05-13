@@ -8,5 +8,4 @@ lint:
 deps:
   - buf.build/googleapis/googleapis
   - buf.build/viamrobotics/api
-  - buf.build/erdaniels/gostream
   - buf.build/viamrobotics/goutils
