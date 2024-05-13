@@ -42,5 +42,3 @@ export class EventDispatcher {
     }
   }
 }
-
-export const events = new EventDispatcher();

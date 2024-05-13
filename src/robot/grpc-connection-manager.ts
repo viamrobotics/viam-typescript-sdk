@@ -1,7 +1,6 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
 import robotApi from '../gen/robot/v1/robot_pb';
-import { MachineConnectionEvent, events } from '../events';
 import { type ServiceError } from '../gen/robot/v1/robot_pb_service';
 
 const timeoutBlob = new Blob(
@@ -21,16 +20,19 @@ export default class GRPCConnectionManager {
   public connecting: Promise<void> | undefined;
   private connectResolve: (() => void) | undefined;
   private connectReject: ((reason: ServiceError) => void) | undefined;
+  private onDisconnect: () => void;
 
   constructor(
     serviceHost: string,
     transportFactory: grpc.TransportFactory,
+    onDisconnect: () => void,
     heartbeatIntervalMs = 10_000
   ) {
     this.innerTransportFactory = transportFactory;
     this.client = new RobotServiceClient(serviceHost, {
       transport: this.innerTransportFactory,
     });
+    this.onDisconnect = onDisconnect;
     this.heartbeatIntervalMs = heartbeatIntervalMs;
   }
 
@@ -43,7 +45,7 @@ export default class GRPCConnectionManager {
         new grpc.Metadata(),
         (err) => {
           if (err) {
-            events.emit(MachineConnectionEvent.DISCONNECTED, {});
+            this.onDisconnect();
             return;
           }
 

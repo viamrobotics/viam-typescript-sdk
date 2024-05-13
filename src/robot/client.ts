@@ -9,7 +9,7 @@ import {
 import { backOff } from 'exponential-backoff';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { DIAL_TIMEOUT } from '../constants';
-import { EventDispatcher, MachineConnectionEvent, events } from '../events';
+import { EventDispatcher, MachineConnectionEvent } from '../events';
 import type {
   PoseInFrame,
   ResourceName,
@@ -159,6 +159,9 @@ export class RobotClient extends EventDispatcher implements Robot {
           throw new Error(RobotClient.notConnectedYetStr);
         }
         return this.transportFactory(opts);
+      },
+      () => {
+        this.onDisconnect();
       }
     );
     this.sessionManager = new SessionManager(
@@ -170,40 +173,38 @@ export class RobotClient extends EventDispatcher implements Robot {
         return this.transportFactory(opts);
       }
     );
+  }
 
-    events.on(MachineConnectionEvent.RECONNECTED, () => {
-      this.emit(MachineConnectionEvent.RECONNECTED, {});
-    });
-    events.on(MachineConnectionEvent.DISCONNECTED, () => {
-      this.emit(MachineConnectionEvent.DISCONNECTED, {});
-      if (this.noReconnect) {
-        return;
-      }
+  private onDisconnect(event?: Event) {
+    this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
 
-      // eslint-disable-next-line no-console
-      console.debug('Connection closed, will try to reconnect');
-      void backOff(async () => this.connect(), {
-        maxDelay: this.reconnectMaxWait,
-        numOfAttempts: this.reconnectMaxAttempts,
-        retry: (_error, attemptNumber) => {
-          // eslint-disable-next-line no-console
-          console.debug(
-            `Failed to connect, attempt ${attemptNumber} with backoff`
-          );
-          // Always retry the next attempt
-          return true;
-        },
+    if (this.noReconnect) {
+      return;
+    }
+
+    // eslint-disable-next-line no-console
+    console.debug('Connection closed, will try to reconnect');
+    void backOff(async () => this.connect(), {
+      maxDelay: this.reconnectMaxWait,
+      numOfAttempts: this.reconnectMaxAttempts,
+      retry: (_error, attemptNumber) => {
+        // eslint-disable-next-line no-console
+        console.debug(
+          `Failed to connect, attempt ${attemptNumber} with backoff`
+        );
+        // Always retry the next attempt
+        return true;
+      },
+    })
+      .then(() => {
+        // eslint-disable-next-line no-console
+        console.debug('Reconnected successfully!');
+        this.emit(MachineConnectionEvent.RECONNECTED, {});
       })
-        .then(() => {
-          // eslint-disable-next-line no-console
-          console.debug('Reconnected successfully!');
-          events.emit(MachineConnectionEvent.RECONNECTED, {});
-        })
-        .catch(() => {
-          // eslint-disable-next-line no-console
-          console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
-        });
-    });
+      .catch(() => {
+        // eslint-disable-next-line no-console
+        console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
+      });
   }
 
   private get noReconnect() {
@@ -469,16 +470,16 @@ export class RobotClient extends EventDispatcher implements Robot {
            * recover.
            */
           if (this.peerConn?.iceConnectionState === 'connected') {
-            events.emit(MachineConnectionEvent.RECONNECTED, {});
+            this.emit(MachineConnectionEvent.RECONNECTED, {});
           } else if (this.peerConn?.iceConnectionState === 'closed') {
-            events.emit(MachineConnectionEvent.DISCONNECTED, {});
+            this.onDisconnect();
           }
         });
         // There is not an iceconnectionstatechange nor connectionstatechange
         // event when the peerConn closes. Instead, listen to the data channel
         // closing and emit disconnect when that occurs.
         webRTCConn.dataChannel.addEventListener('close', (event) => {
-          events.emit(MachineConnectionEvent.DISCONNECTED, event);
+          this.onDisconnect(event);
         });
 
         this.transportFactory = webRTCConn.transportFactory;
@@ -486,7 +487,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         webRTCConn.peerConnection.addEventListener('track', (event) => {
           const [eventStream] = event.streams;
           if (!eventStream) {
-            events.emit('track', event);
+            this.emit('track', event);
             throw new Error('expected event stream to exist');
           }
 
@@ -499,7 +500,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           Object.defineProperty(eventStream, 'id', {
             value: resName,
           });
-          events.emit('track', event);
+          this.emit('track', event);
         });
       } else {
         this.transportFactory = await dialDirect(this.serviceHost, opts);
