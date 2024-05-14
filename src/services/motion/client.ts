@@ -11,11 +11,11 @@ import {
   encodeWorldState,
   encodeTransform,
   encodeGeoPoint,
-  encodeGeoObstacle,
+  encodeGeoGeometry,
   encodeGeometry,
 } from '../../utils';
 import type {
-  GeoObstacle,
+  GeoGeometry,
   GeoPoint,
   Geometry,
   Options,
@@ -123,7 +123,7 @@ export class MotionClient implements Motion {
     componentName: ResourceName,
     movementSensorName: ResourceName,
     heading?: number,
-    obstaclesList?: GeoObstacle[],
+    obstaclesList?: GeoGeometry[],
     motionConfig?: MotionConfiguration,
     extra = {}
   ) {
@@ -138,7 +138,7 @@ export class MotionClient implements Motion {
       request.setHeading(heading);
     }
     if (obstaclesList) {
-      request.setObstaclesList(obstaclesList.map((x) => encodeGeoObstacle(x)));
+      request.setObstaclesList(obstaclesList.map((x) => encodeGeoGeometry(x)));
     }
     if (motionConfig) {
       request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));

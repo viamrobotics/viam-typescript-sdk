@@ -1,4 +1,4 @@
-import type { GeoObstacle, GeoPoint, Resource, StructType } from '../../types';
+import type { GeoGeometry, GeoPoint, Resource, StructType } from '../../types';
 import type {
   ModeMap,
   Waypoint,
@@ -45,7 +45,7 @@ export interface Navigation extends Resource {
   removeWayPoint: (id: string, extra?: StructType) => Promise<void>;
 
   /** Get a list of obstacles. */
-  getObstacles: (extra?: StructType) => Promise<GeoObstacle[]>;
+  getObstacles: (extra?: StructType) => Promise<GeoGeometry[]>;
 
   /** Gets the list of paths known to the navigation service. */
   getPaths: (extra?: StructType) => Promise<Path[]>;

@@ -1,5 +1,5 @@
 import type {
-  GeoObstacle,
+  GeoGeometry,
   Geometry,
   GeoPoint,
   Pose,
@@ -94,8 +94,9 @@ export interface Motion extends Resource {
     componentName: ResourceName,
     movementSensorName: ResourceName,
     heading?: number,
-    obstaclesList?: GeoObstacle[],
+    obstaclesList?: GeoGeometry[],
     motionConfiguration?: MotionConfiguration,
+    boundingRegion?: GeoGeometry[],
     extra?: StructType
   ) => Promise<string>;
 

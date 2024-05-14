@@ -19,7 +19,7 @@ export interface Resource {
 // Common Protobuf Types
 
 export type ResourceName = common.ResourceName.AsObject;
-export type GeoObstacle = common.GeoObstacle.AsObject;
+export type GeoGeometry = common.GeoGeometry.AsObject;
 export type GeoPoint = common.GeoPoint.AsObject;
 
 export const isValidGeoPoint = (value: GeoPoint) => {
