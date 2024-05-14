@@ -125,6 +125,7 @@ export class MotionClient implements Motion {
     heading?: number,
     obstaclesList?: GeoGeometry[],
     motionConfig?: MotionConfiguration,
+    boundingRegionsList?: GeoGeometry[],
     extra = {}
   ) {
     const { service } = this;
@@ -139,6 +140,9 @@ export class MotionClient implements Motion {
     }
     if (obstaclesList) {
       request.setObstaclesList(obstaclesList.map((x) => encodeGeoGeometry(x)));
+    }
+    if (boundingRegionsList) {
+      request.setBoundingRegionsList(boundingRegionsList.map((x) => encodeGeoGeometry(x)));
     }
     if (motionConfig) {
       request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));

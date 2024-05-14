@@ -88,6 +88,7 @@ export interface Motion extends Resource {
    *   the component.
    * @param heading - Compass heading, in degrees, to achieve at destination.
    * @param motionConfiguration - Optional motion configuration options.
+   * @param boundingRegion - Set of obstacles which the robot must remain within while navigating
    */
   moveOnGlobe: (
     destination: GeoPoint,
