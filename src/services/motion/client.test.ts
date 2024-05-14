@@ -51,7 +51,6 @@ describe('moveOnGlobe', () => {
       name: 'myMovementsensor',
     };
     const expectedMotionConfiguration = undefined;
-    // const expectedBoundingRegionsList = 
     const expectedExtra = {};
     const mock = vi
       .fn()
