@@ -142,7 +142,9 @@ export class MotionClient implements Motion {
       request.setObstaclesList(obstaclesList.map((x) => encodeGeoGeometry(x)));
     }
     if (boundingRegionsList) {
-      request.setBoundingRegionsList(boundingRegionsList.map((x) => encodeGeoGeometry(x)));
+      request.setBoundingRegionsList(
+        boundingRegionsList.map((x) => encodeGeoGeometry(x))
+      );
     }
     if (motionConfig) {
       request.setMotionConfiguration(encodeMotionConfiguration(motionConfig));
