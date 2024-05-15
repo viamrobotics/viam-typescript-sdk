@@ -202,11 +202,11 @@ export const encodeGeoPoint = (
   return result;
 };
 
-/** Convert a GeoObstacle object to a Protobuf Datatype */
-export const encodeGeoObstacle = (
-  obj: common.GeoObstacle.AsObject
-): common.GeoObstacle => {
-  const result = new common.GeoObstacle();
+/** Convert a GeoGeometry object to a Protobuf Datatype */
+export const encodeGeoGeometry = (
+  obj: common.GeoGeometry.AsObject
+): common.GeoGeometry => {
+  const result = new common.GeoGeometry();
 
   if (obj.location) {
     result.setLocation(encodeGeoPoint(obj.location));

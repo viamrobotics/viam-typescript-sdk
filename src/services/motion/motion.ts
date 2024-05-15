@@ -1,5 +1,5 @@
 import type {
-  GeoObstacle,
+  GeoGeometry,
   Geometry,
   GeoPoint,
   Pose,
@@ -88,14 +88,17 @@ export interface Motion extends Resource {
    *   the component.
    * @param heading - Compass heading, in degrees, to achieve at destination.
    * @param motionConfiguration - Optional motion configuration options.
+   * @param boundingRegion - Set of obstacles which the robot must remain within
+   *   while navigating
    */
   moveOnGlobe: (
     destination: GeoPoint,
     componentName: ResourceName,
     movementSensorName: ResourceName,
     heading?: number,
-    obstaclesList?: GeoObstacle[],
+    obstaclesList?: GeoGeometry[],
     motionConfiguration?: MotionConfiguration,
+    boundingRegion?: GeoGeometry[],
     extra?: StructType
   ) => Promise<string>;
 

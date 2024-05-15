@@ -127,6 +127,26 @@ describe('moveOnGlobe', () => {
         ],
       },
     ];
+    const expectedBoundingRegionsList = [
+      {
+        location: { latitude: 1, longitude: 2 },
+        geometriesList: [
+          {
+            center: {
+              x: 2,
+              y: 3,
+              z: 4,
+              oX: 5,
+              oY: 6,
+              oZ: 7,
+              theta: 8,
+            },
+            sphere: { radiusMm: 1 },
+            label: 'my label 2',
+          },
+        ],
+      },
+    ];
     const expectedHeading = 60;
     const expectedComponentName = {
       namespace: 'viam',
@@ -181,6 +201,9 @@ describe('moveOnGlobe', () => {
         expect(req.getObstaclesList().map((x) => x.toObject())).toEqual(
           expectedObstaclesList
         );
+        expect(req.getBoundingRegionsList().map((x) => x.toObject())).toEqual(
+          expectedBoundingRegionsList
+        );
         expect(req.getMotionConfiguration()?.toObject()).toStrictEqual(
           expectedMotionConfiguration
         );
@@ -203,6 +226,7 @@ describe('moveOnGlobe', () => {
         expectedHeading,
         expectedObstaclesList,
         expectedMotionConfiguration,
+        expectedBoundingRegionsList,
         expectedExtra
       )
     ).resolves.toStrictEqual(testExecutionId);
