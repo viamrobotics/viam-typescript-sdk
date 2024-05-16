@@ -3,11 +3,11 @@ type Callback = (args: unknown) => void;
 /**
  * MachineConnectionEvent events are emitted by a Client's EventDispatcher when
  * connection events occur.
- *
- * TODO: Emit 'connecting' and 'connected' events
  */
 export enum MachineConnectionEvent {
-  RECONNECTED = 'reconnected',
+  CONNECTING = 'connecting',
+  CONNECTED = 'connected',
+  DISCONNECTING = 'disconnecting',
   DISCONNECTED = 'disconnected',
 }
 
