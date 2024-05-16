@@ -50,7 +50,7 @@ afterEach(() => {
 
 it('get analog reading', async () => {
   await expect(board.readAnalogReader('test-reader')).resolves.toEqual(
-    testAnalogValue,
+    testAnalogValue
   );
 });
 
