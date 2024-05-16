@@ -1,0 +1,16 @@
+{
+  "name": "teleop-vanilla",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@viamrobotics/sdk": "file:../.."
+  }
+}
