@@ -35,8 +35,8 @@ beforeEach(() => {
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
         getValue: () => testValue,
-        getRangeMin: () => testAnalogMin,
-        getRangeMax: () => testAnalogMax,
+        getMinRange: () => testAnalogMin,
+        getMaxRange: () => testAnalogMax,
         getStepSize: () => testStepSize,
       });
     });
@@ -49,9 +49,9 @@ afterEach(() => {
 });
 
 it('get analog reading', async () => {
-  await expect(board.readAnalogReader('test-reader')).resolves.toStrictEqual([
+  await expect(board.readAnalogReader('test-reader')).resolves.toEqual(
     testAnalogValue,
-  ]);
+  );
 });
 
 export class TestResponseStream<T> extends EventDispatcher {
