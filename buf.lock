@@ -2,14 +2,9 @@
 version: v1
 deps:
   - remote: buf.build
-    owner: erdaniels
-    repository: gostream
-    commit: ae00de34a29e41ed96578beb4a84ae9e
-    digest: shake256:98cdbd37fd64db3f5b2e463863b1231af2653f155931de0655687758a0b312f8d60314060cd3caa8232f37e69fbb38de93057e6905aa29ee6aed4aca8b575421
-  - remote: buf.build
     owner: googleapis
     repository: googleapis
-    commit: 8daa2e27ab4b4fcd9fc5b4feb9f72095
+    commit: 522d453992234d9babc812c05f43717f
     digest: shake256:de26a277fc28b8b411ecf58729d78d32fcf15090ffd998a4469225b17889bfb51442eaab04bb7a8d88d203ecdf0a9febd4ffd52c18ed1c2229160c7bd353ca95
   - remote: buf.build
     owner: viamrobotics

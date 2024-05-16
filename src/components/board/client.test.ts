@@ -2,7 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BoardClient } from './client';
-import { type Tick } from './board';
+import { type Tick, type AnalogValue } from './board';
 import { EventDispatcher } from '../../events';
 import { type ResponseStream } from '../../gen/robot/v1/robot_pb_service';
 import { RobotClient } from '../../robot';
@@ -13,6 +13,46 @@ import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_servic
 vi.mock('../../gen/component/board/v1/board_pb_service');
 
 let board: BoardClient;
+const testAnalogMin = 0;
+const testAnalogMax = 5;
+const testStepSize = 0.1;
+const testValue = 2.2;
+
+const testAnalogValue: AnalogValue = {
+  value: testValue,
+  min: testAnalogMin,
+  max: testAnalogMax,
+  stepSize: testStepSize,
+};
+
+beforeEach(() => {
+  RobotClient.prototype.createServiceClient = vi
+    .fn()
+    .mockImplementation(() => new BoardServiceClient('mysensor'));
+
+  BoardServiceClient.prototype.readAnalogReader = vi
+    .fn()
+    .mockImplementation((_req, _md, cb) => {
+      cb(null, {
+        getValue: () => testValue,
+        getRangeMin: () => testAnalogMin,
+        getRangeMax: () => testAnalogMax,
+        getStepSize: () => testStepSize,
+      });
+    });
+
+  board = new BoardClient(new RobotClient('host'), 'test-board');
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+it('get analog reading', async () => {
+  await expect(board.readAnalogReader('test-reader')).resolves.toStrictEqual([
+    testAnalogValue,
+  ]);
+});
 
 export class TestResponseStream<T> extends EventDispatcher {
   private stream: ResponseStream<any>;

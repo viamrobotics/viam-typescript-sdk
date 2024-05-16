@@ -7,7 +7,7 @@ import type { Options, StructType } from '../../types';
 
 import pb from '../../gen/component/board/v1/board_pb';
 import { promisify, doCommandFromClient } from '../../utils';
-import type { Board, Duration, PowerMode, Tick } from './board';
+import type { AnalogValue, Board, Duration, PowerMode, Tick } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -138,7 +138,13 @@ export class BoardClient implements Board {
       pb.ReadAnalogReaderRequest,
       pb.ReadAnalogReaderResponse
     >(boardService.readAnalogReader.bind(boardService), request);
-    return response.getValue();
+    const value: AnalogValue = {
+      value: response.getValue(),
+      min: response.getMinRange(),
+      max: response.getMaxRange(),
+      stepSize: response.getStepSize(),
+    };
+    return value;
   }
 
   async writeAnalog(pin: string, value: number, extra = {}) {
