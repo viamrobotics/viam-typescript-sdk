@@ -4,8 +4,8 @@ import { vi, beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { RobotClient } from '../../robot';
 vi.mock('../../robot');
 
-import { StreamServiceClient } from '../../gen/proto/stream/v1/stream_pb_service';
-vi.mock('../../gen/proto/stream/v1/stream_pb_service');
+import { StreamServiceClient } from '../../gen/stream/v1/stream_pb_service';
+vi.mock('../../gen/stream/v1/stream_pb_service');
 
 import { StreamClient } from './client';
 import { EventDispatcher } from '../../events';

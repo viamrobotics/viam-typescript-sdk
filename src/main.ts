@@ -282,7 +282,7 @@ export { default as sensorsApi } from './gen/service/sensors/v1/sensors_pb';
  * @deprecated Use {@link StreamClient} instead.
  * @group Raw Protobufs
  */
-export { default as streamApi } from './gen/proto/stream/v1/stream_pb';
+export { default as streamApi } from './gen/stream/v1/stream_pb';
 export { type Stream, StreamClient } from './extra/stream';
 
 /**
