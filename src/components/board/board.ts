@@ -11,12 +11,7 @@ export interface Tick {
   time: number;
 }
 export type Duration = PBDuration.AsObject;
-export interface AnalogValue {
-  value: number;
-  min: number;
-  max: number;
-  stepSize: number;
-}
+export type AnalogValue = pb.ReadAnalogReaderResponse.AsObject
 
 /**
  * Represents a physical general purpose compute board that contains various
