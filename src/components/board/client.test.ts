@@ -20,8 +20,8 @@ const testValue = 2.2;
 
 const testAnalogValue: AnalogValue = {
   value: testValue,
-  min: testAnalogMin,
-  max: testAnalogMax,
+  minRange: testAnalogMin,
+  maxRange: testAnalogMax,
   stepSize: testStepSize,
 };
 
