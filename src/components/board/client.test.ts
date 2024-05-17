@@ -34,10 +34,6 @@ beforeEach(() => {
     .fn()
     .mockImplementation((_req, _md, cb) => {
       cb(null, {
-        getValue: () => testValue,
-        getMinRange: () => testAnalogMin,
-        getMaxRange: () => testAnalogMax,
-        getStepSize: () => testStepSize,
         toObject: () => testAnalogValue,
       });
     });
