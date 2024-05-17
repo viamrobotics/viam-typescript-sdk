@@ -138,7 +138,7 @@ export class BoardClient implements Board {
       pb.ReadAnalogReaderRequest,
       pb.ReadAnalogReaderResponse
     >(boardService.readAnalogReader.bind(boardService), request);
-      const value: AnalogValue = {
+    const value: AnalogValue = {
       value: response.getValue(),
       minRange: response.getMinRange(),
       maxRange: response.getMaxRange(),
