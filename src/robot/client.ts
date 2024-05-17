@@ -174,6 +174,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       }
     );
 
+    // For each connection event type, add a listener to capture that
+    // event and re-emit it with the 'connectionstatechange' event
+    // name. This makes it so consumers can listen to all connection
+    // state change events without needing to individually subscribe
+    // to all of them. 'connectionstatechange' should not be emitted
+    // directly. Instead, the RobotClient implementation should emit
+    // MachineConnectionEvents.
     for (const eventType of Object.values(MachineConnectionEvent)) {
       this.on(eventType, () => {
         this.emit('connectionstatechange', { eventType });
@@ -399,7 +406,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.peerConn?.iceConnectionState === 'connected';
   }
 
-  // TODO: refactor due to cognitive complexity
+  // TODO(RSDK-7672): refactor due to cognitive complexity
   // eslint-disable-next-line sonarjs/cognitive-complexity
   public async connect({
     authEntity = this.savedAuthEntity,
