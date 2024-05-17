@@ -38,6 +38,7 @@ beforeEach(() => {
         getMinRange: () => testAnalogMin,
         getMaxRange: () => testAnalogMax,
         getStepSize: () => testStepSize,
+        toObject: () => testAnalogValue,
       });
     });
 
