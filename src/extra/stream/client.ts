@@ -39,7 +39,7 @@ export class StreamClient extends EventDispatcher implements Stream {
       this.emit('track', args);
     });
 
-    client.on(MachineConnectionEvent.RECONNECTED, () => {
+    client.on(MachineConnectionEvent.CONNECTED, () => {
       for (const name of this.streams.values()) {
         void this.add(name);
       }

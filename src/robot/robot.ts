@@ -152,16 +152,22 @@ export interface Robot {
   ): RobotStatusStream;
 
   /**
-   * Call a function when an event of either 'reconnected' or 'disconnected' is
-   * triggered. Note that these events will only be triggered on WebRTC
-   * connections.
+   * Call a function when a connection event occurs.
    *
-   * @param type - The event ('reconnected' or 'disconnected') that was
-   *   triggered.
+   * Note that direct gRPC connections that disconnect will not emit a
+   * disconnect event. WebRTC connections that disconnect will emit a disconnect
+   * event. All connections emit events during manual calls of `connect` and
+   * `disconnect`.
+   *
+   * @param type - The event MachineConnectionEvent that was triggered, or all
+   *   connection events with 'connectionstatechange'.
    * @param listener - The function to call
    * @alpha
    */
-  on: (type: MachineConnectionEvent, listener: Callback) => void;
+  on: (
+    type: MachineConnectionEvent | 'connectionstatechange',
+    listener: Callback
+  ) => void;
 
   /**
    * Get app-related information about the robot.

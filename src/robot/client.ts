@@ -173,6 +173,19 @@ export class RobotClient extends EventDispatcher implements Robot {
         return this.transportFactory(opts);
       }
     );
+
+    // For each connection event type, add a listener to capture that
+    // event and re-emit it with the 'connectionstatechange' event
+    // name. This makes it so consumers can listen to all connection
+    // state change events without needing to individually subscribe
+    // to all of them. 'connectionstatechange' should not be emitted
+    // directly. Instead, the RobotClient implementation should emit
+    // MachineConnectionEvents.
+    for (const eventType of Object.values(MachineConnectionEvent)) {
+      this.on(eventType, () => {
+        this.emit('connectionstatechange', { eventType });
+      });
+    }
   }
 
   private onDisconnect(event?: Event) {
@@ -199,7 +212,6 @@ export class RobotClient extends EventDispatcher implements Robot {
       .then(() => {
         // eslint-disable-next-line no-console
         console.debug('Reconnected successfully!');
-        this.emit(MachineConnectionEvent.RECONNECTED, {});
       })
       .catch(() => {
         // eslint-disable-next-line no-console
@@ -376,6 +388,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async disconnect() {
+    this.emit(MachineConnectionEvent.DISCONNECTING, {});
     while (this.connecting) {
       // eslint-disable-next-line no-await-in-loop
       await this.connecting;
@@ -386,18 +399,23 @@ export class RobotClient extends EventDispatcher implements Robot {
       this.peerConn = undefined;
     }
     this.sessionManager.reset();
+    this.emit(MachineConnectionEvent.DISCONNECTED, {});
   }
 
   public isConnected(): boolean {
     return this.peerConn?.iceConnectionState === 'connected';
   }
 
+  // TODO(RSDK-7672): refactor due to cognitive complexity
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public async connect({
     authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
     priority,
     dialTimeout,
   }: ConnectOptions = {}) {
+    this.emit(MachineConnectionEvent.CONNECTING, {});
+
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -470,7 +488,7 @@ export class RobotClient extends EventDispatcher implements Robot {
            * recover.
            */
           if (this.peerConn?.iceConnectionState === 'connected') {
-            this.emit(MachineConnectionEvent.RECONNECTED, {});
+            this.emit(MachineConnectionEvent.CONNECTED, {});
           } else if (this.peerConn?.iceConnectionState === 'closed') {
             this.onDisconnect();
           }
@@ -586,6 +604,14 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.serviceHost,
         grpcOptions
       );
+
+      this.emit(MachineConnectionEvent.CONNECTED, {});
+    } catch (error) {
+      // Need to catch the error to properly emit disconnect but
+      // also throw the error so reconnect backoff keeps retrying.
+      // TODO(ethanlook): clean this up
+      this.emit(MachineConnectionEvent.DISCONNECTED, {});
+      throw error;
     } finally {
       this.connectResolve?.();
       this.connectResolve = undefined;
