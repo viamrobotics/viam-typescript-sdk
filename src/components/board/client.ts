@@ -138,7 +138,8 @@ export class BoardClient implements Board {
       pb.ReadAnalogReaderRequest,
       pb.ReadAnalogReaderResponse
     >(boardService.readAnalogReader.bind(boardService), request);
-    return response.getValue();
+
+    return response.toObject();
   }
 
   async writeAnalog(pin: string, value: number, extra = {}) {

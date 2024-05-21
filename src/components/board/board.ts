@@ -11,6 +11,7 @@ export interface Tick {
   time: number;
 }
 export type Duration = PBDuration.AsObject;
+export type AnalogValue = pb.ReadAnalogReaderResponse.AsObject;
 
 /**
  * Represents a physical general purpose compute board that contains various
@@ -63,7 +64,10 @@ export interface Board extends Resource {
    *
    * @param analogReader - The name of the analog reader.
    */
-  readAnalogReader(analogReader: string, extra?: StructType): Promise<number>;
+  readAnalogReader(
+    analogReader: string,
+    extra?: StructType
+  ): Promise<AnalogValue>;
   /**
    * Write an analog value to a pin on the board.
    *

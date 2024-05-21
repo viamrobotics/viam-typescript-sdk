@@ -149,6 +149,8 @@ export {
   BoardClient,
   type Duration,
   PowerMode,
+  type AnalogValue,
+  type Tick,
 } from './components/board';
 
 /**
