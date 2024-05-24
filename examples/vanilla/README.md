@@ -12,7 +12,7 @@ VITE_API_KEY_ID="<API_KEY_ID>"
 VITE_API_KEY="<API_KEY>"
 ```
 
-Make sure to build the TypeScript SDK, then run the example using Vite.
+Installing will build the TypeScript SDK, then you can run the example using Vite.
 
 ```
 cd examples/teleop-vanilla
