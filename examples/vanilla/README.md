@@ -1,12 +1,26 @@
 # Viam SDK Quickstart
 
-This example demonstrates how to connect to a robot and operate a motor on it.
+This example demonstrates how to connect to a robot. The example uses Vite + vanilla TypeScript and HTML.
 
 ## Usage
 
-Run `npm start` and visit `localhost:8000` in a browser. Press the button to execute the logic defined in `src/main.ts`.
+You must have a `.env` file in this directory with the following connection info which can be easily found in the TypeScript code sample for your machine.
 
-Edit `src/main.ts` to change the robot logic being run. Edit `static/index.html` to change the layout of the app.
+```
+VITE_HOST="<HOST>"
+VITE_API_KEY_ID="<API_KEY_ID>"
+VITE_API_KEY="<API_KEY>"
+```
+
+Make sure to build the TypeScript SDK, then run the example using Vite.
+
+```
+cd examples/teleop-vanilla
+npm install
+npm run dev
+```
+
+Edit `src/main.ts` to change the robot logic being run. Edit `index.html` to change the layout of the app.
 
 ### Base Project Template
 

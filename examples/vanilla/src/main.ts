@@ -1,90 +1,92 @@
 import * as VIAM from '@viamrobotics/sdk';
 
-async function connect(): Promise<VIAM.RobotClient> {
-  // You can remove this block entirely if your robot is not authenticated.
-  // Otherwise, replace with an actual secret.
-  const secret = '<SECRET>';
-  const credential = {
-    payload: secret,
-    type: 'robot-location-secret',
-  };
+const HOST = import.meta.env.VITE_HOST;
+const API_KEY_ID = import.meta.env.VITE_API_KEY_ID;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
-  // Replace with the host of your actual robot running Viam.
-  const host = '<HOST>';
+const connectionStatusEl = <HTMLElement>(
+  document.getElementById('connection-status')
+);
+const connectEl = <HTMLButtonElement>document.getElementById('connect');
+const disconnectEl = <HTMLButtonElement>document.getElementById('disconnect');
+const resourcesEl = <HTMLButtonElement>document.getElementById('resources');
 
-  // Replace with the signaling address. If you are running your robot on Viam,
-  // it is most likely https://app.viam.com:443.
-  const signalingAddress = '<SIGNALING ADDRESS>';
+let machine: VIAM.RobotClient | undefined = undefined;
 
-  // You can replace this with a different ICE server, append additional ICE
-  // servers, or omit entirely. This option is not strictly required but can
-  // make it easier to connect via WebRTC.
-  const iceServers = [{ urls: 'stun:global.stun.twilio.com:3478' }];
+const handleConnectionStateChange = (event: unknown) => {
+  updateConnectionStatus(
+    (event as { eventType: VIAM.MachineConnectionEvent }).eventType
+  );
+};
 
-  return VIAM.createRobotClient({
-    host,
-    credential,
-    authEntity: host,
-    signalingAddress,
-    iceServers,
-    // optional: configure reconnection options
-    reconnectMaxAttempts: 7,
-    reconnectMaxWait: 1000,
-  });
-}
-
-function button() {
-  return <HTMLButtonElement>document.getElementById('main-button');
-}
-
-// This function runs a motor component with a given name on your robot.
-// Feel free to replace it with whatever logic you want to test out!
-async function run(client: VIAM.RobotClient) {
-  // Replace with the name of a motor on your robot.
-  const name = '<MOTOR NAME>';
-  const mc = new VIAM.MotorClient(client, name);
-
-  try {
-    button().disabled = true;
-
-    console.log(await mc.getPosition());
-    await mc.goFor(100, 10);
-    console.log(await mc.getPosition());
-  } finally {
-    button().disabled = false;
+const updateConnectionStatus = (eventType: VIAM.MachineConnectionEvent) => {
+  switch (eventType) {
+    case VIAM.MachineConnectionEvent.CONNECTING:
+      connectionStatusEl.textContent = 'Connecting...';
+      break;
+    case VIAM.MachineConnectionEvent.CONNECTED:
+      connectionStatusEl.textContent = 'Connected';
+      break;
+    case VIAM.MachineConnectionEvent.DISCONNECTING:
+      connectionStatusEl.textContent = 'Disconnecting...';
+      break;
+    case VIAM.MachineConnectionEvent.DISCONNECTED:
+      connectionStatusEl.textContent = 'Disconnected';
+      break;
   }
-}
+};
 
-// This function is called when the robot is disconnected.
-// Feel free to replace it with whatever logic you want to test out!
-async function disconnected() {
-  console.log('The robot has been disconnected. Trying reconnect...');
-}
-
-// This function is called when the robot is reconnected.
-// Feel free to replace it with whatever logic you want to test out!
-async function reconnected() {
-  console.log('The robot has been reconnected. Work can be continued.');
-}
-
-async function main() {
-  // Connect to client
-  let client: VIAM.RobotClient;
-  try {
-    client = await connect();
-    console.log('connected!');
-    client.on(VIAM.MachineConnectionEvent.DISCONNECTED, disconnected);
-    client.on(VIAM.MachineConnectionEvent.RECONNECTED, reconnected);
-  } catch (error) {
-    console.log(error);
+const connect = async () => {
+  if (machine) {
+    await machine.connect();
     return;
   }
 
-  // Make the button in our app do something interesting
-  button().onclick = async () => {
-    await run(client);
-  };
-  button().disabled = false;
+  updateConnectionStatus(VIAM.MachineConnectionEvent.CONNECTING);
+
+  try {
+    machine = await VIAM.createRobotClient({
+      host: HOST,
+      credential: {
+        type: 'api-key',
+        payload: API_KEY,
+      },
+      authEntity: API_KEY_ID,
+      signalingAddress: 'https://app.viam.com:443',
+    });
+    updateConnectionStatus(VIAM.MachineConnectionEvent.CONNECTED);
+    machine.on('connectionstatechange', handleConnectionStateChange);
+  } catch {
+    updateConnectionStatus(VIAM.MachineConnectionEvent.DISCONNECTED);
+  }
+};
+
+const disconnect = async () => {
+  if (!machine) {
+    return;
+  }
+
+  await machine.disconnect();
+};
+
+const logResources = async () => {
+  console.log(
+    machine?.isConnected() ? await machine.resourceNames() : 'Not connected'
+  );
+};
+
+async function main() {
+  updateConnectionStatus(VIAM.MachineConnectionEvent.DISCONNECTED);
+
+  connectEl.addEventListener('click', async () => {
+    await connect();
+  });
+  disconnectEl.addEventListener('click', async () => {
+    await disconnect();
+  });
+  resourcesEl.addEventListener('click', async () => {
+    await logResources();
+  });
 }
 
 main();
