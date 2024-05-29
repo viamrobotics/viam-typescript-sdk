@@ -43,15 +43,12 @@ export interface Motor extends Resource {
   ): Promise<void>;
 
   /**
-   * Move the motor indefinitely at a specified speed. 
-   * Raise an error if position reporting is not supported.
+   * Move the motor indefinitely at a specified speed. Raise an error if
+   * position reporting is not supported.
    *
    * @param rpm - Speed in revolutions per minute.
    */
-  setRPM(
-    rpm: number,
-    extra?: StructType
-  ): Promise<void>;
+  setRPM(rpm: number, extra?: StructType): Promise<void>;
 
   /**
    * Set the current position of the motor as the new zero position, offset by a
