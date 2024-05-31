@@ -73,6 +73,21 @@ export class MotorClient implements Motor {
     );
   }
 
+  async setRPM(rpm: number, extra = {}) {
+    const { motorService } = this;
+    const request = new motorApi.SetRPMRequest();
+    request.setName(this.name);
+    request.setRpm(rpm);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    await promisify<motorApi.SetRPMRequest, motorApi.SetRPMResponse>(
+      motorService.setRPM.bind(motorService),
+      request
+    );
+  }
+
   async resetZeroPosition(offset: number, extra = {}) {
     const { motorService } = this;
     const request = new motorApi.ResetZeroPositionRequest();
