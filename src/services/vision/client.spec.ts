@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   Classification as PBClassification,
   Detection as PBDetection,
@@ -17,58 +17,113 @@ const visionClientName = 'test-vision';
 
 let vision: VisionClient;
 
+const classification: Classification = {
+  className: 'face',
+  confidence: 0.995_482_683_181_762_7,
+};
+const pbClassification = (() => {
+  const pb = new PBClassification();
+  pb.setClassName(classification.className);
+  pb.setConfidence(classification.confidence);
+  return pb;
+})();
+
+const detection: Detection = {
+  xMin: 251,
+  yMin: 225,
+  xMax: 416,
+  yMax: 451,
+  confidence: 0.995_482_683_181_762_7,
+  className: 'face',
+};
+const pbDetection = (() => {
+  const pb = new PBDetection();
+  pb.setClassName(detection.className);
+  pb.setConfidence(detection.confidence);
+  pb.setXMin(detection.xMin);
+  pb.setXMax(detection.xMax);
+  pb.setYMin(detection.yMin);
+  pb.setYMax(detection.yMax);
+  return pb;
+})();
+
+const pco: PointCloudObject = {
+  pointCloud: 'This is a PointCloudObject',
+  geometries: undefined,
+};
+const pbPCO = (() => {
+  const pb = new PBPointCloudObject();
+  pb.setPointCloud(pco.pointCloud);
+  return pb;
+})();
+
 describe('VisionClient Tests', () => {
   beforeEach(() => {
     RobotClient.prototype.createServiceClient = vi
       .fn()
       .mockImplementation(() => new VisionServiceClient(visionClientName));
 
+    VisionServiceClient.prototype.getDetections = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getDetectionsList: () => [pbDetection],
+        });
+      });
+    VisionServiceClient.prototype.getDetectionsFromCamera = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getDetectionsList: () => [pbDetection],
+        });
+      });
+    VisionServiceClient.prototype.getClassifications = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getClassificationsList: () => [pbClassification],
+        });
+      });
+    VisionServiceClient.prototype.getClassificationsFromCamera = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getClassificationsList: () => [pbClassification],
+        });
+      });
+    VisionServiceClient.prototype.getObjectPointClouds = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getObjectsList: () => [pbPCO],
+        });
+      });
+    VisionServiceClient.prototype.getProperties = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getClassificationsSupported: () => true,
+          getDetectionsSupported: () => true,
+          getObjectPointCloudsSupported: () => true,
+        });
+      });
+    VisionServiceClient.prototype.captureAllFromCamera = vi
+      .fn()
+      .mockImplementation((_req, _md, cb) => {
+        cb(null, {
+          getImage: () => undefined,
+          getClassificationsList: () => [pbClassification],
+          getDetectionsList: () => [pbDetection],
+          getObjectsList: () => [pbPCO],
+        });
+      });
+
     vision = new VisionClient(new RobotClient('host'), visionClientName);
   });
 
   describe('Detection Tests', () => {
-    const testDetection: Detection = {
-      xMin: 251,
-      yMin: 225,
-      xMax: 416,
-      yMax: 451,
-      confidence: 0.995_482_683_181_762_7,
-      className: 'face',
-    };
-    let detection: Mock<[], PBDetection>;
-    const encodeDetection = (det: Detection) => {
-      const pbDetection = new PBDetection();
-      pbDetection.setClassName(det.className);
-      pbDetection.setConfidence(det.confidence);
-      pbDetection.setXMin(det.xMin);
-      pbDetection.setXMax(det.xMax);
-      pbDetection.setYMin(det.yMin);
-      pbDetection.setYMax(det.yMax);
-      return pbDetection;
-    };
-
-    beforeEach(() => {
-      VisionServiceClient.prototype.getDetections = vi
-        .fn()
-        .mockImplementation((_req, _md, cb) => {
-          cb(null, {
-            getDetectionsList: () => [detection()],
-          });
-        });
-
-      VisionServiceClient.prototype.getDetectionsFromCamera = vi
-        .fn()
-        .mockImplementation((_req, _md, cb) => {
-          cb(null, {
-            getDetectionsList: () => [detection()],
-          });
-        });
-    });
-
     it('returns detections from a camera', async () => {
-      detection = vi.fn(() => encodeDetection(testDetection));
-
-      const expected = [testDetection];
+      const expected = [detection];
 
       await expect(
         vision.getDetectionsFromCamera('camera')
@@ -76,9 +131,7 @@ describe('VisionClient Tests', () => {
     });
 
     it('returns detections from an image', async () => {
-      detection = vi.fn(() => encodeDetection(testDetection));
-
-      const expected = [testDetection];
+      const expected = [detection];
 
       await expect(
         vision.getDetections(new Uint8Array(), 1, 1, 'image/jpeg')
@@ -87,40 +140,8 @@ describe('VisionClient Tests', () => {
   });
 
   describe('Classification Tests', () => {
-    const testClassification: Classification = {
-      className: 'face',
-      confidence: 0.995_482_683_181_762_7,
-    };
-    let classification: Mock<[], PBClassification>;
-    const encodeClassification = (cls: Classification) => {
-      const pbClassification = new PBClassification();
-      pbClassification.setClassName(cls.className);
-      pbClassification.setConfidence(cls.confidence);
-      return pbClassification;
-    };
-
-    beforeEach(() => {
-      VisionServiceClient.prototype.getClassifications = vi
-        .fn()
-        .mockImplementation((_req, _md, cb) => {
-          cb(null, {
-            getClassificationsList: () => [classification()],
-          });
-        });
-
-      VisionServiceClient.prototype.getClassificationsFromCamera = vi
-        .fn()
-        .mockImplementation((_req, _md, cb) => {
-          cb(null, {
-            getClassificationsList: () => [classification()],
-          });
-        });
-    });
-
     it('returns classifications from a camera', async () => {
-      classification = vi.fn(() => encodeClassification(testClassification));
-
-      const expected = [testClassification];
+      const expected = [classification];
 
       await expect(
         vision.getClassificationsFromCamera('camera', 1)
@@ -128,9 +149,7 @@ describe('VisionClient Tests', () => {
     });
 
     it('returns classifications from an image', async () => {
-      classification = vi.fn(() => encodeClassification(testClassification));
-
-      const expected = [testClassification];
+      const expected = [classification];
 
       await expect(
         vision.getClassifications(new Uint8Array(), 1, 1, 'image/jpeg', 1)
@@ -139,35 +158,40 @@ describe('VisionClient Tests', () => {
   });
 
   describe('Object Point Cloud Tests', () => {
-    const testPCO: PointCloudObject = {
-      pointCloud: 'This is a PointCloudObject',
-      geometries: undefined,
-    };
-    let pointCloudObject: Mock<[], PBPointCloudObject>;
-    const encodePCO = (pco: PointCloudObject) => {
-      const pbPCO = new PBPointCloudObject();
-      pbPCO.setPointCloud(pco.pointCloud);
-      return pbPCO;
-    };
-
-    beforeEach(() => {
-      VisionServiceClient.prototype.getObjectPointClouds = vi
-        .fn()
-        .mockImplementation((_req, _md, cb) => {
-          cb(null, {
-            getObjectsList: () => [pointCloudObject()],
-          });
-        });
-    });
-
     it('returns a PointCloudObject from a camera', async () => {
-      pointCloudObject = vi.fn(() => encodePCO(testPCO));
-
-      const expected = [testPCO];
+      const expected = [pco];
 
       await expect(
         vision.getObjectPointClouds('camera')
       ).resolves.toStrictEqual(expected);
+    });
+  });
+
+  describe('Properties', () => {
+    it('returns properties', async () => {
+      await expect(vision.getProperties()).resolves.toStrictEqual({
+        classificationsSupported: true,
+        detectionsSupported: true,
+        objectPointCloudsSupported: true,
+      });
+    });
+  });
+
+  describe('Capture All', () => {
+    it('returns captured values', async () => {
+      await expect(
+        vision.captureAllFromCamera('camera', {
+          returnImage: true,
+          returnClassifications: true,
+          returnDetections: true,
+          returnObjectPointClouds: true,
+        })
+      ).resolves.toStrictEqual({
+        image: undefined,
+        classifications: [classification],
+        detections: [detection],
+        objectPointClouds: [pco],
+      });
     });
   });
 });

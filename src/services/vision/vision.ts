@@ -1,6 +1,13 @@
 import type { MimeType } from '../../main';
 import type { Resource, StructType } from '../../types';
-import type { Classification, Detection, PointCloudObject } from './types';
+import type {
+  Classification,
+  Detection,
+  PointCloudObject,
+  Properties,
+  CaptureAllOptions,
+  CaptureAllResponse,
+} from './types';
 
 /** A service that enables various computer vision algorithms */
 export interface Vision extends Resource {
@@ -75,4 +82,29 @@ export interface Vision extends Resource {
     cameraName: string,
     extra?: StructType
   ) => Promise<PointCloudObject[]>;
+
+  /**
+   * Returns an object describing the properties of the vision service, namely
+   * booleans indicating whether classifications, detections, and 3d
+   * segmentation are supported.
+   *
+   * @returns - The properties of the vision service
+   */
+  getProperties: (extra?: StructType) => Promise<Properties>;
+
+  /**
+   * Returns the requested image, classifications, detections, and 3d point
+   * cloud objects in the next image given a camera.
+   *
+   * @param cameraName - The name of the camera to use for classification,
+   *   detection, and segmentation.
+   * @param opts - The fields desired in the response.
+   * @returns - The requested image, classifications, detections, and 3d point
+   *   cloud objects.
+   */
+  captureAllFromCamera: (
+    cameraName: string,
+    opts: CaptureAllOptions,
+    extra?: StructType
+  ) => Promise<CaptureAllResponse>;
 }
