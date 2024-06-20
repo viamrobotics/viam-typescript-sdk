@@ -1,11 +1,13 @@
 import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import pb from '../../gen/service/vision/v1/vision_pb';
 import { VisionServiceClient } from '../../gen/service/vision/v1/vision_pb_service';
+import commonPB from '../../gen/common/v1/common_pb';
 import type { MimeType } from '../../main';
 import type { RobotClient } from '../../robot';
 import type { Options, StructType } from '../../types';
 import { doCommandFromClient, promisify } from '../../utils';
 import type { Vision } from './vision';
+import type { CaptureAllOptions } from './types';
 
 /**
  * A gRPC-web client for a Vision service.
@@ -140,6 +142,65 @@ export class VisionClient implements Vision {
     >(service.getObjectPointClouds.bind(service), request);
 
     return response.getObjectsList().map((x) => x.toObject());
+  }
+
+  async getProperties(extra = {}) {
+    const { service } = this;
+    const request = new pb.GetPropertiesRequest();
+    request.setName(this.name);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.GetPropertiesRequest,
+      pb.GetPropertiesResponse
+    >(service.getProperties.bind(service), request);
+    return {
+      classificationsSupported: response.getClassificationsSupported(),
+      detectionsSupported: response.getDetectionsSupported(),
+      objectPointCloudsSupported: response.getObjectPointCloudsSupported(),
+    };
+  }
+
+  async captureAllFromCamera(
+    cameraName: string,
+    {
+      returnImage,
+      returnClassifications,
+      returnDetections,
+      returnObjectPointClouds,
+    }: CaptureAllOptions,
+    extra = {}
+  ) {
+    const { service } = this;
+    const request = new pb.CaptureAllFromCameraRequest();
+    request.setName(this.name);
+    request.setCameraName(cameraName);
+    request.setReturnImage(returnImage);
+    request.setReturnClassifications(returnClassifications);
+    request.setReturnDetections(returnDetections);
+    request.setReturnObjectPointClouds(returnObjectPointClouds);
+    request.setExtra(Struct.fromJavaScript(extra));
+
+    this.options.requestLogger?.(request);
+
+    const response = await promisify<
+      pb.CaptureAllFromCameraRequest,
+      pb.CaptureAllFromCameraResponse
+    >(service.captureAllFromCamera.bind(service), request);
+    return {
+      image: response.getImage()?.toObject(),
+      classifications: response
+        .getClassificationsList()
+        .map((classification: pb.Classification) => classification.toObject()),
+      detections: response
+        .getDetectionsList()
+        .map((detection: pb.Detection) => detection.toObject()),
+      objectPointClouds: response
+        .getObjectsList()
+        .map((pbObject: commonPB.PointCloudObject) => pbObject.toObject()),
+    };
   }
 
   async doCommand(command: StructType): Promise<StructType> {
