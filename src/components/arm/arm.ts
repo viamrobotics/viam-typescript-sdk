@@ -2,7 +2,7 @@ import type { JointPositions } from '../../gen/component/arm/v1/arm_pb';
 
 import type { Pose, Resource, StructType } from '../../types';
 
-export type ArmJointPositions = JointPositions;
+export type ArmJointPositions = JointPositions.AsObject;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
