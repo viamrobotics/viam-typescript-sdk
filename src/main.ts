@@ -120,7 +120,7 @@ export { type BillingClient } from './app/billing-client';
  * @group Raw Protobufs
  */
 export { default as armApi } from './gen/component/arm/v1/arm_pb';
-export { type Arm, ArmClient } from './components/arm';
+export { type Arm, type ArmJointPositions, ArmClient } from './components/arm';
 
 /**
  * Raw Protobuf interfaces for a Base component.

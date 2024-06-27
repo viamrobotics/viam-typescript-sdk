@@ -2,6 +2,8 @@ import type { JointPositions } from '../../gen/component/arm/v1/arm_pb';
 
 import type { Pose, Resource, StructType } from '../../types';
 
+export type ArmJointPositions = JointPositions.AsObject;
+
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
   /** Get the position of the end of the arm expressed as a pose */
@@ -26,7 +28,7 @@ export interface Arm extends Resource {
   ) => Promise<void>;
 
   /** Gets the current position of each joint. */
-  getJointPositions: (extra?: StructType) => Promise<JointPositions>;
+  getJointPositions: (extra?: StructType) => Promise<ArmJointPositions>;
 
   /** Stops the motion of the arm. */
   stop: (extra?: StructType) => Promise<void>;

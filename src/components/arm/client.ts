@@ -99,7 +99,7 @@ export class ArmClient implements Arm {
     if (!result) {
       throw new Error('no pose');
     }
-    return result;
+    return result.toObject();
   }
 
   async stop(extra = {}) {
