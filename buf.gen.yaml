@@ -4,14 +4,15 @@ inputs:
   - module: buf.build/viamrobotics/api
   - module: buf.build/viamrobotics/goutils
 plugins:
-  - local: protoc-gen-js
+  - local: protoc-gen-es
     out: src/gen
-    opt: import_style=commonjs
-  - local: protoc-gen-grpc-web
+    opt: target=ts
+  - local: protoc-gen-es
     out: src/gen
-    opt:
-      - import_style=commonjs
-      - mode=grpcwebtext
-  - local: protoc-gen-ts
+    opt: target=js
+  - local: protoc-gen-connect-es
     out: src/gen
-    opt: service=grpc-web
+    opt: target=ts
+  - local: protoc-gen-connect-es
+    out: src/gen
+    opt: target=js

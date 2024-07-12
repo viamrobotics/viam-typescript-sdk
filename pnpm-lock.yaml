@@ -5,6 +5,15 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@bufbuild/protobuf':
+    specifier: ^1.10.0
+    version: 1.10.0
+  '@connectrpc/connect':
+    specifier: ^1.4.0
+    version: 1.4.0(@bufbuild/protobuf@1.10.0)
+  '@connectrpc/connect-web':
+    specifier: ^1.4.0
+    version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0)
   '@viamrobotics/rpc':
     specifier: ^0.2.5
     version: 0.2.5
@@ -16,6 +25,12 @@ devDependencies:
   '@bufbuild/buf':
     specifier: ^1.34.0
     version: 1.34.0
+  '@bufbuild/protoc-gen-es':
+    specifier: ^1.10.0
+    version: 1.10.0(@bufbuild/protobuf@1.10.0)
+  '@connectrpc/protoc-gen-connect-es':
+    specifier: ^1.4.0
+    version: 1.4.0(@bufbuild/protoc-gen-es@1.10.0)(@connectrpc/connect@1.4.0)
   '@improbable-eng/grpc-web':
     specifier: ^0.15.0
     version: 0.15.0(google-protobuf@3.21.2)
@@ -287,6 +302,73 @@ packages:
       '@bufbuild/buf-linux-x64': 1.34.0
       '@bufbuild/buf-win32-arm64': 1.34.0
       '@bufbuild/buf-win32-x64': 1.34.0
+    dev: true
+
+  /@bufbuild/protobuf@1.10.0:
+    resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
+
+  /@bufbuild/protoc-gen-es@1.10.0(@bufbuild/protobuf@1.10.0):
+    resolution: {integrity: sha512-zBYBsVT/ul4uZb6F+kD7/k4sWNHVVbEPfJwKi0FDr+9VJo8MKIofI6pkr5ksBLr4fi/74r+e/75Xi/0clL5dXg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protobuf': 1.10.0
+    peerDependenciesMeta:
+      '@bufbuild/protobuf':
+        optional: true
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+      '@bufbuild/protoplugin': 1.10.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@bufbuild/protoplugin@1.10.0:
+    resolution: {integrity: sha512-u6NE4vL0lw1+EK4/PiE/SQB7fKO4LRJNTEScIXVOi2x88K/c8WKc/k0KyEaA0asVBMpwekJQZGnRyj04ZtN5Gg==}
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+      '@typescript/vfs': 1.5.3(typescript@4.5.2)
+      typescript: 4.5.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@connectrpc/connect-web@1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0):
+    resolution: {integrity: sha512-13aO4psFbbm7rdOFGV0De2Za64DY/acMspgloDlcOKzLPPs0yZkhp1OOzAQeiAIr7BM/VOHIA3p8mF0inxCYTA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+      '@connectrpc/connect': 1.4.0
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.10.0)
+    dev: false
+
+  /@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0):
+    resolution: {integrity: sha512-vZeOkKaAjyV4+RH3+rJZIfDFJAfr+7fyYr6sLDKbYX3uuTVszhFe9/YKf5DNqrDb5cKdKVlYkGn6DTDqMitAnA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+
+  /@connectrpc/protoc-gen-connect-es@1.4.0(@bufbuild/protoc-gen-es@1.10.0)(@connectrpc/connect@1.4.0):
+    resolution: {integrity: sha512-/7vQ8Q7mEBhV8qEVh/eifRQlQnf8EJ6weMwCD2DljVAQRlZYcW9SLxjYZhV1uM1ZZqQC7Cw2vvgXRg2XQswHBg==}
+    engines: {node: '>=16.0.0'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protoc-gen-es': ^1.7.2
+      '@connectrpc/connect': 1.4.0
+    peerDependenciesMeta:
+      '@bufbuild/protoc-gen-es':
+        optional: true
+      '@connectrpc/connect':
+        optional: true
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+      '@bufbuild/protoc-gen-es': 1.10.0(@bufbuild/protobuf@1.10.0)
+      '@bufbuild/protoplugin': 1.10.0
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.10.0)
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@devexpress/error-stack-parser@2.0.6:
@@ -1073,6 +1155,17 @@ packages:
     dependencies:
       '@typescript-eslint/types': 7.16.0
       eslint-visitor-keys: 3.4.3
+    dev: true
+
+  /@typescript/vfs@1.5.3(typescript@4.5.2):
+    resolution: {integrity: sha512-OSZ/o3wwD5VPZVdGGsXWk7sRGRtwrGnqA4zwmb33FTs7Wxmad0QTkQCbaNyqWA8hL09TCwAthdp8yjFA5G1lvw==}
+    peerDependencies:
+      typescript: '*'
+    dependencies:
+      debug: 4.3.5
+      typescript: 4.5.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@ungap/structured-clone@1.2.0:
@@ -4814,6 +4907,12 @@ packages:
       minimatch: 9.0.5
       shiki: 0.14.7
       typescript: 5.5.3
+    dev: true
+
+  /typescript@4.5.2:
+    resolution: {integrity: sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
     dev: true
 
   /typescript@5.5.3:

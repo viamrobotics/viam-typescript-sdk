@@ -7,21 +7,25 @@
   "module": "./dist/main.es.js",
   "types": "./dist/main.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src/gen"
   ],
   "exports": {
     ".": {
       "types": "./dist/main.d.ts",
       "import": "./dist/main.es.js",
       "require": "./dist/main.umd.js"
+    },
+    "./proto/*": {
+      "types": "./src/gen/*.ts",
+      "import": "./src/gen/*.js"
     }
   },
   "scripts": {
-    "build": "pnpm build:buf && pnpm build:bundle && pnpm build:types && pnpm build:copy-dts",
+    "build": "pnpm build:buf && pnpm build:bundle && pnpm build:types",
     "build:buf": "rm -rf src/gen && buf generate",
     "build:bundle": "vite build",
     "build:types": "tsc --project tsconfig.build.json",
-    "build:copy-dts": "copyfiles -u 1 \"src/gen/**/*.d.ts\" dist",
     "doc": "typedoc",
     "doc:watch": "typedoc --watch",
     "format": "pnpm _eslint --fix && pnpm _prettier --write",
@@ -46,11 +50,16 @@
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
   "dependencies": {
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-web": "^1.4.0",
     "@viamrobotics/rpc": "^0.2.5",
     "exponential-backoff": "^3.1.1"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.15.0-1",
+    "@bufbuild/buf": "^1.34.0",
+    "@bufbuild/protoc-gen-es": "^1.10.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.4.0",
     "@improbable-eng/grpc-web": "^0.15.0",
     "@improbable-eng/grpc-web-fake-transport": "^0.15.0",
     "@types/google-protobuf": "^3.15.6",

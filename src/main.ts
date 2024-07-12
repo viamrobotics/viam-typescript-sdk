@@ -244,7 +244,6 @@ export { type PowerSensor, PowerSensorClient } from './components/powersensor';
  * @alpha
  * @group Raw Protobufs
  */
-export { default as sensorApi } from './gen/component/sensor/v1/sensor_pb';
 export { type Sensor, SensorClient } from './components/sensor';
 
 /**
@@ -297,8 +296,6 @@ export { type Stream, StreamClient } from './extra/stream';
  * @alpha
  * @group Raw Protobufs
  */
-export { default as genericApi } from './gen/component/generic/v1/generic_pb';
-export { default as genericComponentApi } from './gen/component/generic/v1/generic_pb';
 export {
   type Generic as GenericComponent,
   GenericClient as GenericComponentClient,
@@ -427,7 +424,6 @@ export {
  * @alpha
  * @group Raw Protobufs
  */
-export { default as genericServiceApi } from './gen/service/generic/v1/generic_pb';
 export {
   type Generic as GenericService,
   GenericClient as GenericServiceClient,
