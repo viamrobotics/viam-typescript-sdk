@@ -1085,13 +1085,17 @@ export class AppClient {
    * @param makePublic Optional boolean specifying whether the fragment should
    *   be public or not. If not passed the visibility will be unchanged.
    *   Fragments are private by default when created
+   * @param visibility Optional specifying the updated fragment visibility. If
+   *   not passed, the visibility will be unchanged. If public is set and visibility
+   *   is set, they must not be conflicting.
    * @returns The updated fragment
    */
   async updateFragment(
     id: string,
     name: string,
     config: StructType,
-    makePublic?: boolean
+    makePublic?: boolean,
+    visibility?: keyof pb.FragmentVisibilityMap
   ) {
     const { service } = this;
     const req = new pb.UpdateFragmentRequest();
@@ -1100,6 +1104,9 @@ export class AppClient {
     req.setConfig(Struct.fromJavaScript(config));
     if (makePublic !== undefined) {
       req.setPublic(makePublic);
+    }
+    if (visibility!==undefined) {
+      req.setVisibility(pb.FragmentVisibility[visibility])
     }
 
     const response = await promisify<
