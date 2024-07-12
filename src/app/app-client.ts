@@ -1025,7 +1025,7 @@ export class AppClient {
    * @param fragmentVisibilities Optional list of fragment visibilities to include in returned list
    * @returns The list of fragment objects
    */
-  async listFragments(orgId: string, publicOnly = true, fragmentVisibilities: Array<FragmentVisibilityMap[keyof FragmentVisibilityMap]>=[]) {
+  async listFragments(orgId: string, publicOnly = true, fragmentVisibilities: FragmentVisibilityMap[keyof FragmentVisibilityMap][]=[]) {
     const { service } = this;
     const req = new pb.ListFragmentsRequest();
     req.setOrganizationId(orgId);
