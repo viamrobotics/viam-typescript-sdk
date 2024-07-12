@@ -16,40 +16,11 @@ You'll need to make sure the following tools are installed on your machine and a
 
 - Node.js
   - `node`
-  - `npm`
+  - `pnpm`
 - Protobuf
   - `protobuf`
   - `protoc-gen-grpc-web`
 
-### Makefile targets
+### Targets
 
-To get started, run `make all` to install development dependencies, run checks, build the distributable artifacts, and build docs:
-
-```shell
-# run sequentially
-make all
-
-# run in parallel
-make all -j
-```
-
-You can also use individual targets:
-
-```shell
-# setup development dependencies
-make setup
-
-# remove development dependencies
-make teardown
-
-# build artifacts
-make build
-
-# remove artifacts
-make clean
-
-# run tests, checks, and code formatting
-make test
-make lint
-make format
-```
+TODO(ethanlook): Update this

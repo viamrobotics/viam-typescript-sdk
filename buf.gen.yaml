@@ -1,15 +1,17 @@
-version: v1
+version: v2
+inputs:
+  - module: buf.build/googleapis/googleapis
+  - module: buf.build/viamrobotics/api
+  - module: buf.build/viamrobotics/goutils
 plugins:
-  - name: js
+  - local: protoc-gen-js
     out: src/gen
-    opt:
-      - import_style=commonjs
-  - name: grpc-web
+    opt: import_style=commonjs
+  - local: protoc-gen-grpc-web
     out: src/gen
     opt:
       - import_style=commonjs
       - mode=grpcwebtext
-  - name: ts
+  - local: protoc-gen-ts
     out: src/gen
-    opt:
-      - service=grpc-web
+    opt: service=grpc-web
