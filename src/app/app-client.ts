@@ -9,6 +9,7 @@ import {
   PackageType,
   type PackageTypeMap,
 } from '../gen/app/packages/v1/packages_pb';
+import type {FragmentVisibilityMap} from "../gen/app/v1/app_pb";
 
 /**
  * Creates an Authorization object from auth details.
@@ -1021,13 +1022,15 @@ export class AppClient {
    * @param orgId The ID of the organization to list fragments for
    * @param publicOnly Optional boolean, if true then only public fragments will
    *   be listed. Defaults to true.
+   * @param fragmentVisibilities Optional list of fragment visibilities to include in returned list
    * @returns The list of fragment objects
    */
-  async listFragments(orgId: string, publicOnly = true) {
+  async listFragments(orgId: string, publicOnly = true, fragmentVisibilities: Array<FragmentVisibilityMap[keyof FragmentVisibilityMap]>=[]) {
     const { service } = this;
     const req = new pb.ListFragmentsRequest();
     req.setOrganizationId(orgId);
     req.setShowPublic(publicOnly);
+    req.setFragmentVisibilityList(fragmentVisibilities)
 
     const response = await promisify<
       pb.ListFragmentsRequest,
