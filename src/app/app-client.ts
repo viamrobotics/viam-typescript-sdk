@@ -1021,8 +1021,11 @@ export class AppClient {
    *
    * @param orgId The ID of the organization to list fragments for
    * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities instead. If true then only public
-   * fragments will be listed. Defaults to true.
-   * @param fragmentVisibilities Optional list of fragment visibilities to include in returned list
+   * fragments will be listed. Defaults to true
+   * @param fragmentVisibilities Optional list of fragment visibilities to include in returned list.
+   * An empty fragmentVisibilities list defaults to normal publicOnly behavior (discludes unlisted public fragments)
+   * Otherwise, fragment visibilities should contain one of the three visibilities and takes precendence over the
+   * publicOnly field
    * @returns The list of fragment objects
    */
   async listFragments(orgId: string, publicOnly = true, fragmentVisibilities: FragmentVisibilityMap[keyof FragmentVisibilityMap][]=[]) {
@@ -1085,12 +1088,12 @@ export class AppClient {
    * @param id The ID of the fragment to update
    * @param name The name to update the fragment to
    * @param config The config to update the fragment to
-   * @param makePublic Optional boolean specifying whether the fragment should
+   * @param makePublic Optional, deprecated boolean specifying whether the fragment should
    *   be public or not. If not passed the visibility will be unchanged.
    *   Fragments are private by default when created
    * @param visibility Optional specifying the updated fragment visibility. If
    *   not passed, the visibility will be unchanged. If public is set and visibility
-   *   is set, they must not be conflicting.
+   *   is set, they must not be conflicting
    * @returns The updated fragment
    */
   async updateFragment(
