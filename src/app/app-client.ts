@@ -1020,8 +1020,8 @@ export class AppClient {
    * Lists all fragments within an organization.
    *
    * @param orgId The ID of the organization to list fragments for
-   * @param publicOnly Optional boolean, if true then only public fragments will
-   *   be listed. Defaults to true.
+   * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities instead. If true then only public
+   * fragments will be listed. Defaults to true.
    * @param fragmentVisibilities Optional list of fragment visibilities to include in returned list
    * @returns The list of fragment objects
    */
