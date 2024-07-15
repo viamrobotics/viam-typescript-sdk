@@ -1097,10 +1097,11 @@ export class AppClient {
    * @param makePublic Optional, deprecated boolean specifying whether the
    *   fragment should be public or not. If not passed, the visibility will be
    *   unchanged. Fragments are private by default when created
-   * @param visibility Optional FragmentVisibility specifying the updated fragment visibility. If
-   *   not passed, the visibility will be unchanged. If visibility is not set and makePublic is set,
-   *   makePublic takes effect. If makePublic and visibility are set, they must not be conflicting.
-   *   If neither is set, the fragment visibility will remain unchanged.
+   * @param visibility Optional FragmentVisibility specifying the updated
+   *   fragment visibility. If not passed, the visibility will be unchanged. If
+   *   visibility is not set and makePublic is set, makePublic takes effect. If
+   *   makePublic and visibility are set, they must not be conflicting. If
+   *   neither is set, the fragment visibility will remain unchanged.
    * @returns The updated fragment
    */
   async updateFragment(
