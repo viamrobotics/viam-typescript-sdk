@@ -580,7 +580,7 @@ export class DataClient {
   /**
    * Get a connection to access a MongoDB Atlas Data federation instance.
    *
-   * @param orId Organization to retrieve connection for
+   * @param orgId Organization to retrieve connection for
    * @returns Hostname of the federated database
    */
   async getDatabaseConnection(orgId: string) {
