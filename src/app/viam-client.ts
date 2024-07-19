@@ -3,6 +3,7 @@ import {
   createViamTransportFactory,
   type Credential,
   type AccessToken,
+  isCredential,
 } from './viam-transport';
 import { createRobotClient } from '../robot/dial';
 import { DataClient } from './data-client';
@@ -10,6 +11,7 @@ import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
+import { SharedSecret } from '../gen/app/v1/app_pb';
 
 export interface ViamClientOptions {
   serviceHost?: string;
@@ -77,28 +79,46 @@ export class ViamClient {
       throw new Error('Either a machine address or ID must be provided');
     }
     let address = host;
-    // let locationId: string | undefined = undefined;
+    let locationId: string | undefined = undefined;
+
+    // Get address if only ID was provided
     if (id !== undefined && host === undefined) {
       const parts = await this.appClient?.getRobotParts(id);
       const mainPart = parts?.find((part) => part.mainPart);
       address = mainPart?.fqdn;
-      // locationId = mainPart?.locationId;
+      locationId = mainPart?.locationId;
     }
 
-    // let creds = this.credential;
-    // if (!isCredential(creds)) {
-    //   if (locationId === undefined) {
-    //     if
-    //   }
-    // }
+    // If credential is AccessToken, then attempt to get the robot location secret
+    let creds = this.credential;
+    if (!isCredential(creds)) {
+      if (locationId === undefined) {
+        // If we don't have a location, try to get it from the address
+        const firstHalf = address!.split('.viam.');
+        const locationSplit = firstHalf[0]?.split('.');
+        if (locationSplit !== undefined) {
+          locationId = locationSplit[locationSplit.length - 1];
+        }
+      }
+      if (locationId !== undefined) {
+        // If we found the location, then attempt to get its secret
+        const location = await this.appClient?.getLocation(locationId);
+        const secret = location?.location?.auth?.secretsList.find(
+          (secret) => secret.state === SharedSecret.State.STATE_ENABLED
+        );
+        creds = {
+          type: 'robot-location-secret',
+          payload: secret?.secret,
+          authEntity: address,
+        } as Credential;
+      }
+    }
 
-    // We know `address` will always be defined because it will either be
-    // set from the user as a parameter, or from the `mainPart`.
     return createRobotClient({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       host: address!,
-      credential: this.credential,
-      authEntity: (this.credential as Credential).authEntity,
+      credential: creds,
+      authEntity: (creds as Credential).authEntity,
       signalingAddress: 'https://app.viam.com:443',
       reconnectMaxAttempts: 1,
     });
