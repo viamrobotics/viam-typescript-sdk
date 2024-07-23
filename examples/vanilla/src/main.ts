@@ -11,7 +11,6 @@ const connectEl = <HTMLButtonElement>document.getElementById('connect');
 const disconnectEl = <HTMLButtonElement>document.getElementById('disconnect');
 const resourcesEl = <HTMLButtonElement>document.getElementById('resources');
 
-// let client: VIAM.ViamClient | undefined = undefined;
 let machine: VIAM.RobotClient | undefined = undefined;
 
 const handleConnectionStateChange = (event: unknown) => {
