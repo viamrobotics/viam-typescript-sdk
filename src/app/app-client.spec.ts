@@ -289,7 +289,7 @@ describe('AppClient tests', () => {
 
     it('getOrganization', async () => {
       const response = await subject().getOrganization('orgId');
-      expect(response.organization).toEqual(org.toObject());
+      expect(response).toEqual(org.toObject());
     });
   });
 
@@ -423,7 +423,7 @@ describe('AppClient tests', () => {
         [],
         false
       );
-      expect(response.invite).toEqual(invite.toObject());
+      expect(response).toEqual(invite.toObject());
     });
   });
 
@@ -450,7 +450,7 @@ describe('AppClient tests', () => {
         [authorization],
         []
       );
-      expect(response.invite).toEqual(invite.toObject());
+      expect(response).toEqual(invite.toObject());
     });
   });
 
@@ -528,7 +528,7 @@ describe('AppClient tests', () => {
         'orgId',
         'email'
       );
-      expect(response.invite).toEqual(invite.toObject());
+      expect(response).toEqual(invite.toObject());
     });
   });
 
@@ -549,7 +549,7 @@ describe('AppClient tests', () => {
         'name',
         'parent'
       );
-      expect(response.location).toEqual(location.toObject());
+      expect(response).toEqual(location.toObject());
     });
   });
 
@@ -566,7 +566,7 @@ describe('AppClient tests', () => {
 
     it('getLocation', async () => {
       const response = await subject().getLocation('locId');
-      expect(response.location).toEqual(location.toObject());
+      expect(response).toEqual(location.toObject());
     });
   });
 
@@ -593,7 +593,7 @@ describe('AppClient tests', () => {
         'newParent',
         'newRegion'
       );
-      expect(response.location).toEqual(newLocation.toObject());
+      expect(response).toEqual(newLocation.toObject());
     });
   });
 
@@ -702,7 +702,7 @@ describe('AppClient tests', () => {
 
     it('locationAuth', async () => {
       const response = await subject().locationAuth('locId');
-      expect(response.auth).toEqual(auth.toObject());
+      expect(response).toEqual(auth.toObject());
     });
   });
 
@@ -723,7 +723,7 @@ describe('AppClient tests', () => {
 
     it('createLocationSecret', async () => {
       const response = await subject().createLocationSecret('locId');
-      expect(response.auth).toEqual(auth.toObject());
+      expect(response).toEqual(auth.toObject());
     });
   });
 
@@ -767,7 +767,7 @@ describe('AppClient tests', () => {
 
     it('getRobot', async () => {
       const response = await subject().getRobot('robotId');
-      expect(response.robot).toEqual(robot.toObject());
+      expect(response).toEqual(robot.toObject());
     });
   });
 
@@ -929,7 +929,7 @@ describe('AppClient tests', () => {
 
     it('updateRobotPart', async () => {
       const response = await subject().updateRobotPart('id', 'name', {});
-      expect(response.part).toEqual(robotPart.toObject());
+      expect(response).toEqual(robotPart.toObject());
     });
   });
 
@@ -1060,7 +1060,7 @@ describe('AppClient tests', () => {
 
     it('createRobotPartSecret', async () => {
       const response = await subject().createRobotPartSecret('partId');
-      expect(response.part).toEqual(robotPart.toObject());
+      expect(response).toEqual(robotPart.toObject());
     });
   });
 
@@ -1144,7 +1144,7 @@ describe('AppClient tests', () => {
         'locationId',
         'name'
       );
-      expect(response.robot).toEqual(robot.toObject());
+      expect(response).toEqual(robot.toObject());
     });
   });
 
@@ -1204,7 +1204,7 @@ describe('AppClient tests', () => {
 
     it('getFragment', async () => {
       const response = await subject().getFragment('id');
-      expect(response.fragment).toEqual(fragment.toObject());
+      expect(response).toEqual(fragment.toObject());
     });
   });
 
@@ -1221,7 +1221,7 @@ describe('AppClient tests', () => {
 
     it('createFragment', async () => {
       const response = await subject().createFragment('orgId', 'name', {});
-      expect(response.fragment).toEqual(fragment.toObject());
+      expect(response).toEqual(fragment.toObject());
     });
   });
 
@@ -1238,7 +1238,7 @@ describe('AppClient tests', () => {
 
     it('updateFragment', async () => {
       const response = await subject().updateFragment('id', 'name', {});
-      expect(response.fragment).toEqual(fragment.toObject());
+      expect(response).toEqual(fragment.toObject());
     });
   });
 
@@ -1407,7 +1407,7 @@ describe('AppClient tests', () => {
 
     it('getRegistryItem', async () => {
       const response = await subject().getRegistryItem('itemId');
-      expect(response.item).toEqual(registryItem.toObject());
+      expect(response).toEqual(registryItem.toObject());
     });
   });
 
@@ -1590,7 +1590,7 @@ describe('AppClient tests', () => {
 
     it('getModule', async () => {
       const response = await subject().getModule('id');
-      expect(response.module).toEqual(module.toObject());
+      expect(response).toEqual(module.toObject());
     });
   });
 

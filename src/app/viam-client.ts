@@ -85,8 +85,19 @@ export class ViamClient {
     if (id !== undefined && host === undefined) {
       const parts = await this.appClient?.getRobotParts(id);
       const mainPart = parts?.find((part) => part.mainPart);
-      address = mainPart?.fqdn;
-      locationId = mainPart?.locationId;
+      if (!mainPart) {
+        throw new Error(
+          `Could not find a main part for the machine with UUID: ${id}`
+        );
+      }
+      address = mainPart.fqdn;
+      locationId = mainPart.locationId;
+    }
+
+    if (!address) {
+      throw new Error(
+        'Host was not provided and could not be obtained from the machine ID'
+      );
     }
 
     // If credential is AccessToken, then attempt to get the robot location secret
@@ -94,17 +105,18 @@ export class ViamClient {
     if (!isCredential(creds)) {
       if (locationId === undefined) {
         // If we don't have a location, try to get it from the address
-        const firstHalf = address!.split('.viam.');
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const firstHalf = address.split('.viam.');
         const locationSplit = firstHalf[0]?.split('.');
         if (locationSplit !== undefined) {
-          locationId = locationSplit[locationSplit.length - 1];
+          locationId = locationSplit.at(-1);
         }
       }
       if (locationId !== undefined) {
         // If we found the location, then attempt to get its secret
         const location = await this.appClient?.getLocation(locationId);
-        const secret = location?.location?.auth?.secretsList.find(
-          (secret) => secret.state === SharedSecret.State.STATE_ENABLED
+        const secret = location?.auth?.secretsList.find(
+          (sec) => sec.state === SharedSecret.State.STATE_ENABLED
         );
         creds = {
           type: 'robot-location-secret',
@@ -116,7 +128,7 @@ export class ViamClient {
 
     return createRobotClient({
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      host: address!,
+      host: address,
       credential: creds,
       authEntity: (creds as Credential).authEntity,
       signalingAddress: 'https://app.viam.com:443',
