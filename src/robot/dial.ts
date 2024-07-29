@@ -16,6 +16,7 @@ export interface DialDirectConf {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
+  reconnectAbort?: { abort: boolean };
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
@@ -88,6 +89,7 @@ export interface DialWebRTCConf {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
+  reconnectAbort?: { abort: boolean };
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
@@ -178,13 +180,14 @@ export const createRobotClient = async (
     retry: (_error, attemptNumber) => {
       // eslint-disable-next-line no-console
       console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`);
-      // Always retry the next attempt
-      return true;
+
+      // Abort reconnects if the the caller specifies, otherwise retry
+      return !conf.reconnectAbort?.abort;
     },
   };
 
   // Try to dial via WebRTC first.
-  if (isDialWebRTCConf(conf)) {
+  if (isDialWebRTCConf(conf) && !conf.reconnectAbort?.abort) {
     try {
       return conf.noReconnect
         ? await dialWebRTC(conf)
@@ -195,13 +198,15 @@ export const createRobotClient = async (
     }
   }
 
-  try {
-    return conf.noReconnect
-      ? await dialDirect(conf)
-      : await backOff(async () => dialDirect(conf), backOffOpts);
-  } catch {
-    // eslint-disable-next-line no-console
-    console.debug('Failed to connect via gRPC');
+  if (!conf.reconnectAbort?.abort) {
+    try {
+      return conf.noReconnect
+        ? await dialDirect(conf)
+        : await backOff(async () => dialDirect(conf), backOffOpts);
+    } catch {
+      // eslint-disable-next-line no-console
+      console.debug('Failed to connect via gRPC');
+    }
   }
 
   throw new Error('Failed to connect to robot');
