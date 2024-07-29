@@ -22,6 +22,12 @@ export interface AccessToken {
   payload: string;
 }
 
+export const isCredential = (
+  object: Credential | AccessToken
+): object is Credential => {
+  return 'authEntity' in object;
+};
+
 /**
  * Initialize an authenticated transport factory that can access protected
  * resources.

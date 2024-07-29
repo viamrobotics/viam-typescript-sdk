@@ -16,18 +16,20 @@ import { AppClient, createAuth } from './app-client';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { LogEntry } from '../gen/common/v1/common_pb';
 import { EventDispatcher } from '../events';
-import type { ResponseStream } from '../main';
+import type { ResponseStream, ServiceError } from '../main';
+import { Message } from 'google-protobuf';
 
 class TestResponseStream<T> extends EventDispatcher {
-  private stream: ResponseStream<any>;
+  private stream: ResponseStream<unknown>;
 
-  constructor(stream: ResponseStream<any>) {
+  constructor(stream: ResponseStream<unknown>) {
     super();
     this.stream = stream;
   }
 
   override on(
     type: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handler: (message: any) => void
   ): ResponseStream<T> {
     super.on(type, handler);
@@ -165,13 +167,19 @@ describe('AppClient tests', () => {
 
   describe('getUserIDByEmail tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getUserIDByEmail')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetUserIDByEmailRequest, _md, cb) => {
-          const response = new pb.GetUserIDByEmailResponse();
-          response.setUserId('id');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getUserIDByEmail = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetUserIDByEmailRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetUserIDByEmailResponse();
+            response.setUserId('id');
+            cb(null, response);
+          }
+        );
     });
 
     it('getUserIDByEmail', async () => {
@@ -182,17 +190,19 @@ describe('AppClient tests', () => {
 
   describe('createOrganization tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'createOrganization'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.CreateOrganizationRequest, _md, cb) => {
-          const response = new pb.CreateOrganizationResponse();
-          response.setOrganization(org);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.createOrganization = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateOrganizationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateOrganizationResponse();
+            response.setOrganization(org);
+            cb(null, response);
+          }
+        );
     });
 
     it('createOrganization', async () => {
@@ -204,17 +214,19 @@ describe('AppClient tests', () => {
   describe('listOrganizations tests', () => {
     const organizations = [org];
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'listOrganizations'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.ListOrganizationsRequest, _md, cb) => {
-          const response = new pb.ListOrganizationsResponse();
-          response.setOrganizationsList(organizations);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.listOrganizations = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListOrganizationsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListOrganizationsResponse();
+            response.setOrganizationsList(organizations);
+            cb(null, response);
+          }
+        );
     });
 
     it('listOrganizations', async () => {
@@ -230,18 +242,20 @@ describe('AppClient tests', () => {
     const orgIdentities = [orgIdentity];
 
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'getOrganizationsWithAccessToLocation'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.GetOrganizationsWithAccessToLocationRequest, _md, cb) => {
-          const response =
-            new pb.GetOrganizationsWithAccessToLocationResponse();
-          response.setOrganizationIdentitiesList(orgIdentities);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.getOrganizationsWithAccessToLocation = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetOrganizationsWithAccessToLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response =
+              new pb.GetOrganizationsWithAccessToLocationResponse();
+            response.setOrganizationIdentitiesList(orgIdentities);
+            cb(null, response);
+          }
+        );
     });
 
     it('getOrganizationsWithAccessToLocation', async () => {
@@ -257,17 +271,19 @@ describe('AppClient tests', () => {
     orgDetail.setOrgName('name');
     const orgDetails = [orgDetail];
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'listOrganizationsByUser'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.ListOrganizationsByUserRequest, _md, cb) => {
-          const response = new pb.ListOrganizationsByUserResponse();
-          response.setOrgsList(orgDetails);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.listOrganizationsByUser = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListOrganizationsByUserRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListOrganizationsByUserResponse();
+            response.setOrgsList(orgDetails);
+            cb(null, response);
+          }
+        );
     });
 
     it('listOrganizationsByUser', async () => {
@@ -278,35 +294,43 @@ describe('AppClient tests', () => {
 
   describe('getOrganization tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getOrganization')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetOrganizationRequest, _md, cb) => {
-          const response = new pb.GetOrganizationResponse();
-          response.setOrganization(org);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getOrganization = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetOrganizationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetOrganizationResponse();
+            response.setOrganization(org);
+            cb(null, response);
+          }
+        );
     });
 
     it('getOrganization', async () => {
       const response = await subject().getOrganization('orgId');
-      expect(response.organization).toEqual(org.toObject());
+      expect(response).toEqual(org.toObject());
     });
   });
 
   describe('getOrganizationNamespaceAvailability tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'getOrganizationNamespaceAvailability'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (req: pb.GetOrganizationNamespaceAvailabilityRequest, _md, cb) => {
-          const response =
-            new pb.GetOrganizationNamespaceAvailabilityResponse();
-          response.setAvailable(true);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.getOrganizationNamespaceAvailability = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetOrganizationNamespaceAvailabilityRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response =
+              new pb.GetOrganizationNamespaceAvailabilityResponse();
+            response.setAvailable(true);
+            cb(null, response);
+          }
+        );
     });
 
     it('getOrganizationNamespaceAvailability', async () => {
@@ -318,17 +342,19 @@ describe('AppClient tests', () => {
 
   describe('updateOrganization tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'updateOrganization'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.UpdateOrganizationRequest, _md, cb) => {
-          const response = new pb.UpdateOrganizationResponse();
-          response.setOrganization(org);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.updateOrganization = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateOrganizationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.UpdateOrganizationResponse();
+            response.setOrganization(org);
+            cb(null, response);
+          }
+        );
     });
 
     it('updateOrganization', async () => {
@@ -350,14 +376,19 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteOrganization')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.DeleteOrganizationRequest, _md, cb) => {
+          (
+            _req: pb.DeleteOrganizationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             const response = new pb.DeleteOrganizationResponse();
             cb(null, response);
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteOrganization = methodSpy;
     });
 
     it('deleteOrganization', async () => {
@@ -384,15 +415,17 @@ describe('AppClient tests', () => {
     expectedResponse.setInvitesList(invites);
 
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'listOrganizationMembers'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.ListOrganizationMembersRequest, _md, cb) => {
-          cb(null, expectedResponse);
-        }
-      );
+      AppServiceClient.prototype.listOrganizationMembers = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListOrganizationMembersRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, expectedResponse);
+          }
+        );
     });
 
     it('listOrganizationMembers', async () => {
@@ -403,17 +436,19 @@ describe('AppClient tests', () => {
 
   describe('createOrganizationInvite tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'createOrganizationInvite'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.CreateOrganizationInviteRequest, _md, cb) => {
-          const response = new pb.CreateOrganizationInviteResponse();
-          response.setInvite(invite);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.createOrganizationInvite = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateOrganizationInviteRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateOrganizationInviteResponse();
+            response.setInvite(invite);
+            cb(null, response);
+          }
+        );
     });
 
     it('createOrganizationInvite', async () => {
@@ -423,24 +458,26 @@ describe('AppClient tests', () => {
         [],
         false
       );
-      expect(response.invite).toEqual(invite.toObject());
+      expect(response).toEqual(invite.toObject());
     });
   });
 
   describe('updateOrganizationInviteAuthorizations tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'updateOrganizationInviteAuthorizations'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.UpdateOrganizationInviteAuthorizationsRequest, _md, cb) => {
-          const response =
-            new pb.UpdateOrganizationInviteAuthorizationsResponse();
-          response.setInvite(invite);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.updateOrganizationInviteAuthorizations = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateOrganizationInviteAuthorizationsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response =
+              new pb.UpdateOrganizationInviteAuthorizationsResponse();
+            response.setInvite(invite);
+            cb(null, response);
+          }
+        );
     });
 
     it('updateOrganizationInviteAuthorizations', async () => {
@@ -450,7 +487,7 @@ describe('AppClient tests', () => {
         [authorization],
         []
       );
-      expect(response.invite).toEqual(invite.toObject());
+      expect(response).toEqual(invite.toObject());
     });
   });
 
@@ -462,13 +499,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteOrganizationMember')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.DeleteOrganizationMemberRequest, _md, cb) => {
+          (
+            _req: pb.DeleteOrganizationMemberRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.DeleteOrganizationInviteResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteOrganizationMember = methodSpy;
     });
 
     it('deleteOrganizationMember', async () => {
@@ -489,13 +531,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteOrganizationInvite')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.DeleteOrganizationInviteRequest, _md, cb) => {
+          (
+            _req: pb.DeleteOrganizationInviteRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.DeleteOrganizationInviteResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteOrganizationInvite = methodSpy;
     });
 
     it('deleteOrganizationInvite', async () => {
@@ -510,17 +557,19 @@ describe('AppClient tests', () => {
 
   describe('resendOrganizationInvite tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'resendOrganizationInvite'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.ResendOrganizationInviteRequest, _md, cb) => {
-          const response = new pb.ResendOrganizationInviteResponse();
-          response.setInvite(invite);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.resendOrganizationInvite = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ResendOrganizationInviteRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ResendOrganizationInviteResponse();
+            response.setInvite(invite);
+            cb(null, response);
+          }
+        );
     });
 
     it('resendOrganizationInvite', async () => {
@@ -528,19 +577,25 @@ describe('AppClient tests', () => {
         'orgId',
         'email'
       );
-      expect(response.invite).toEqual(invite.toObject());
+      expect(response).toEqual(invite.toObject());
     });
   });
 
   describe('createLocation tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'createLocation')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.CreateLocationRequest, _md, cb) => {
-          const response = new pb.CreateLocationResponse();
-          response.setLocation(location);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.createLocation = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateLocationResponse();
+            response.setLocation(location);
+            cb(null, response);
+          }
+        );
     });
 
     it('createLocation', async () => {
@@ -549,24 +604,30 @@ describe('AppClient tests', () => {
         'name',
         'parent'
       );
-      expect(response.location).toEqual(location.toObject());
+      expect(response).toEqual(location.toObject());
     });
   });
 
   describe('getLocation tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getLocation')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetLocationRequest, _md, cb) => {
-          const response = new pb.GetLocationResponse();
-          response.setLocation(location);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getLocation = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetLocationResponse();
+            response.setLocation(location);
+            cb(null, response);
+          }
+        );
     });
 
     it('getLocation', async () => {
       const response = await subject().getLocation('locId');
-      expect(response.location).toEqual(location.toObject());
+      expect(response).toEqual(location.toObject());
     });
   });
 
@@ -577,13 +638,19 @@ describe('AppClient tests', () => {
     newLocation.setParentLocationId('newParent');
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'updateLocation')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UpdateLocationRequest, _md, cb) => {
-          const response = new pb.UpdateLocationResponse();
-          response.setLocation(newLocation);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.updateLocation = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.UpdateLocationResponse();
+            response.setLocation(newLocation);
+            cb(null, response);
+          }
+        );
     });
 
     it('updateLocation', async () => {
@@ -593,7 +660,7 @@ describe('AppClient tests', () => {
         'newParent',
         'newRegion'
       );
-      expect(response.location).toEqual(newLocation.toObject());
+      expect(response).toEqual(newLocation.toObject());
     });
   });
 
@@ -604,11 +671,18 @@ describe('AppClient tests', () => {
     let methodSpy: MockInstance;
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteLocation')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.DeleteLocationRequest, _md, cb) => {
-          cb(null, new pb.DeleteLocationResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.DeleteLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.DeleteLocationResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteLocation = methodSpy;
     });
 
     it('deleteLocation', async () => {
@@ -624,13 +698,19 @@ describe('AppClient tests', () => {
   describe('listLocations tests', () => {
     const locations = [location];
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listLocations')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ListLocationsRequest, _md, cb) => {
-          const response = new pb.ListLocationsResponse();
-          response.setLocationsList(locations);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.listLocations = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListLocationsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListLocationsResponse();
+            response.setLocationsList(locations);
+            cb(null, response);
+          }
+        );
     });
 
     it('listLocations', async () => {
@@ -647,11 +727,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'shareLocation')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ShareLocationRequest, _md, cb) => {
-          cb(null, new pb.ShareLocationResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ShareLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.ShareLocationResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.shareLocation = methodSpy;
     });
 
     it('shareLocation', async () => {
@@ -672,11 +759,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'unshareLocation')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UnshareLocationRequest, _md, cb) => {
-          cb(null, new pb.UnshareLocationResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UnshareLocationRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.UnshareLocationResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.unshareLocation = methodSpy;
     });
 
     it('unshareLocation', async () => {
@@ -691,39 +785,47 @@ describe('AppClient tests', () => {
 
   describe('locationAuth tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'locationAuth')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.LocationAuthRequest, _md, cb) => {
-          const response = new pb.LocationAuthResponse();
-          response.setAuth(auth);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.locationAuth = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.LocationAuthRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.LocationAuthResponse();
+            response.setAuth(auth);
+            cb(null, response);
+          }
+        );
     });
 
     it('locationAuth', async () => {
       const response = await subject().locationAuth('locId');
-      expect(response.auth).toEqual(auth.toObject());
+      expect(response).toEqual(auth.toObject());
     });
   });
 
   describe('createLocationSecret tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'createLocationSecret'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.CreateLocationSecretRequest, _md, cb) => {
-          const response = new pb.CreateLocationSecretResponse();
-          response.setAuth(auth);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.createLocationSecret = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateLocationSecretRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateLocationSecretResponse();
+            response.setAuth(auth);
+            cb(null, response);
+          }
+        );
     });
 
     it('createLocationSecret', async () => {
       const response = await subject().createLocationSecret('locId');
-      expect(response.auth).toEqual(auth.toObject());
+      expect(response).toEqual(auth.toObject());
     });
   });
 
@@ -735,13 +837,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteLocationSecret')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.DeleteLocationSecretRequest, _md, cb) => {
+          (
+            _req: pb.DeleteLocationSecretRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.DeleteLocationSecretResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteLocationSecret = methodSpy;
     });
 
     it('deleteLocationSecret', async () => {
@@ -756,18 +863,24 @@ describe('AppClient tests', () => {
 
   describe('getRobot tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getRobot')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetRobotRequest, _md, cb) => {
-          const response = new pb.GetRobotResponse();
-          response.setRobot(robot);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getRobot = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRobotRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetRobotResponse();
+            response.setRobot(robot);
+            cb(null, response);
+          }
+        );
     });
 
     it('getRobot', async () => {
       const response = await subject().getRobot('robotId');
-      expect(response.robot).toEqual(robot.toObject());
+      expect(response).toEqual(robot.toObject());
     });
   });
 
@@ -775,17 +888,19 @@ describe('AppClient tests', () => {
     const roverRentalRobots = [roverRentalRobot];
 
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'getRoverRentalRobots'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.GetRoverRentalRobotsRequest, _md, cb) => {
-          const response = new pb.GetRoverRentalRobotsResponse();
-          response.setRobotsList(roverRentalRobots);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.getRoverRentalRobots = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRoverRentalRobotsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetRoverRentalRobotsResponse();
+            response.setRobotsList(roverRentalRobots);
+            cb(null, response);
+          }
+        );
     });
 
     it('getRoverRentalRobots', async () => {
@@ -798,13 +913,19 @@ describe('AppClient tests', () => {
     const parts = [robotPart];
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getRobotParts')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetRobotPartsRequest, _md, cb) => {
-          const response = new pb.GetRobotPartsResponse();
-          response.setPartsList(parts);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getRobotParts = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRobotPartsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetRobotPartsResponse();
+            response.setPartsList(parts);
+            cb(null, response);
+          }
+        );
     });
 
     it('getRobotParts', async () => {
@@ -818,11 +939,17 @@ describe('AppClient tests', () => {
     expectedResponse.setPart(robotPart);
     expectedResponse.setConfigJson('isJson: true');
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getRobotPart')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetRobotPartRequest, _md, cb) => {
-          cb(null, expectedResponse);
-        });
+      AppServiceClient.prototype.getRobotPart = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRobotPartRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, expectedResponse);
+          }
+        );
     });
 
     it('getRobotPart', async () => {
@@ -838,11 +965,17 @@ describe('AppClient tests', () => {
     expectedResponse.setNextPageToken('nextPage');
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getRobotPartLogs')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetRobotPartLogsRequest, _md, cb) => {
-          cb(null, expectedResponse);
-        });
+      AppServiceClient.prototype.getRobotPartLogs = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRobotPartLogsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, expectedResponse);
+          }
+        );
     });
 
     it('getRobotPartLogs', async () => {
@@ -897,17 +1030,19 @@ describe('AppClient tests', () => {
     const histories = [partHistory];
 
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'getRobotPartHistory'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.GetRobotPartHistoryRequest, _md, cb) => {
-          const response = new pb.GetRobotPartHistoryResponse();
-          response.setHistoryList(histories);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.getRobotPartHistory = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRobotPartHistoryRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetRobotPartHistoryResponse();
+            response.setHistoryList(histories);
+            cb(null, response);
+          }
+        );
     });
 
     it('getRobotPartHistory', async () => {
@@ -918,30 +1053,42 @@ describe('AppClient tests', () => {
 
   describe('updateRobotPart tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'updateRobotPart')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UpdateRobotPartRequest, _md, cb) => {
-          const response = new pb.UpdateRobotPartResponse();
-          response.setPart(robotPart);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.updateRobotPart = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateRobotPartRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.UpdateRobotPartResponse();
+            response.setPart(robotPart);
+            cb(null, response);
+          }
+        );
     });
 
     it('updateRobotPart', async () => {
       const response = await subject().updateRobotPart('id', 'name', {});
-      expect(response.part).toEqual(robotPart.toObject());
+      expect(response).toEqual(robotPart.toObject());
     });
   });
 
   describe('newRobotPart tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'newRobotPart')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.NewRobotPartRequest, _md, cb) => {
-          const response = new pb.NewRobotPartResponse();
-          response.setPartId('id');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.newRobotPart = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.NewRobotPartRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.NewRobotPartResponse();
+            response.setPartId('id');
+            cb(null, response);
+          }
+        );
     });
 
     it('newRobotPart', async () => {
@@ -957,11 +1104,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteRobotPart')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.DeleteRobotPartRequest, _md, cb) => {
-          cb(null, new pb.DeleteRobotPartResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.DeleteRobotPartRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.DeleteRobotPartResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteRobotPart = methodSpy;
     });
 
     it('deleteRobotPart', async () => {
@@ -978,13 +1132,19 @@ describe('AppClient tests', () => {
     const apiKeys = [apiKeyWithAuths];
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getRobotAPIKeys')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetRobotAPIKeysRequest, _md, cb) => {
-          const response = new pb.GetRobotAPIKeysResponse();
-          response.setApiKeysList(apiKeys);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getRobotAPIKeys = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRobotAPIKeysRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetRobotAPIKeysResponse();
+            response.setApiKeysList(apiKeys);
+            cb(null, response);
+          }
+        );
     });
 
     it('getRobotAPIKeys', async () => {
@@ -1000,11 +1160,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'markPartAsMain')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.MarkPartAsMainRequest, _md, cb) => {
-          cb(null, new pb.MarkPartAsMainResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.MarkPartAsMainRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.MarkPartAsMainResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.markPartAsMain = methodSpy;
     });
 
     it('markPartAsMain', async () => {
@@ -1024,13 +1191,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'markPartForRestart')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.MarkPartForRestartRequest, _md, cb) => {
+          (
+            _req: pb.MarkPartForRestartRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.MarkPartAsMainResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.markPartForRestart = methodSpy;
     });
 
     it('markPartForRestart', async () => {
@@ -1045,22 +1217,24 @@ describe('AppClient tests', () => {
 
   describe('createRobotPartSecret tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'createRobotPartSecret'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.CreateRobotPartSecretRequest, _md, cb) => {
-          const response = new pb.CreateRobotPartSecretResponse();
-          response.setPart(robotPart);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.createRobotPartSecret = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateRobotPartSecretRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateRobotPartSecretResponse();
+            response.setPart(robotPart);
+            cb(null, response);
+          }
+        );
     });
 
     it('createRobotPartSecret', async () => {
       const response = await subject().createRobotPartSecret('partId');
-      expect(response.part).toEqual(robotPart.toObject());
+      expect(response).toEqual(robotPart.toObject());
     });
   });
 
@@ -1072,13 +1246,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteRobotPartSecret')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.DeleteRobotPartSecretRequest, _md, cb) => {
+          (
+            _req: pb.DeleteRobotPartSecretRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.DeleteRobotPartSecretResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteRobotPartSecret = methodSpy;
     });
 
     it('deleteRobotPartSecret', async () => {
@@ -1095,13 +1274,19 @@ describe('AppClient tests', () => {
     const robots = [robot];
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listRobots')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ListRobotsRequest, _md, cb) => {
-          const response = new pb.ListRobotsResponse();
-          response.setRobotsList(robots);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.listRobots = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListRobotsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListRobotsResponse();
+            response.setRobotsList(robots);
+            cb(null, response);
+          }
+        );
     });
 
     it('listRobots', async () => {
@@ -1112,13 +1297,19 @@ describe('AppClient tests', () => {
 
   describe('newRobot tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'newRobot')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.NewRobotRequest, _md, cb) => {
-          const response = new pb.NewRobotResponse();
-          response.setId('robotId');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.newRobot = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.NewRobotRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.NewRobotResponse();
+            response.setId('robotId');
+            cb(null, response);
+          }
+        );
     });
 
     it('newRobot', async () => {
@@ -1129,13 +1320,19 @@ describe('AppClient tests', () => {
 
   describe('updateRobot tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'updateRobot')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UpdateRobotRequest, _md, cb) => {
-          const response = new pb.UpdateRobotResponse();
-          response.setRobot(robot);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.updateRobot = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateRobotRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.UpdateRobotResponse();
+            response.setRobot(robot);
+            cb(null, response);
+          }
+        );
     });
 
     it('updateRobot', async () => {
@@ -1144,7 +1341,7 @@ describe('AppClient tests', () => {
         'locationId',
         'name'
       );
-      expect(response.robot).toEqual(robot.toObject());
+      expect(response).toEqual(robot.toObject());
     });
   });
 
@@ -1155,11 +1352,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteRobot')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.DeleteRobotRequest, _md, cb) => {
-          cb(null, new pb.DeleteRobotResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.DeleteRobotRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.DeleteRobotResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteRobot = methodSpy;
     });
 
     it('deleteRobot', async () => {
@@ -1176,13 +1380,19 @@ describe('AppClient tests', () => {
     const fragments = [fragment];
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listFragments')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ListFragmentsRequest, _md, cb) => {
-          const response = new pb.ListFragmentsResponse();
-          response.setFragmentsList(fragments);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.listFragments = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListFragmentsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListFragmentsResponse();
+            response.setFragmentsList(fragments);
+            cb(null, response);
+          }
+        );
     });
 
     it('listFragments', async () => {
@@ -1193,52 +1403,70 @@ describe('AppClient tests', () => {
 
   describe('getFragment tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getFragment')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetFragmentRequest, _md, cb) => {
-          const response = new pb.GetFragmentResponse();
-          response.setFragment(fragment);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getFragment = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetFragmentRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetFragmentResponse();
+            response.setFragment(fragment);
+            cb(null, response);
+          }
+        );
     });
 
     it('getFragment', async () => {
       const response = await subject().getFragment('id');
-      expect(response.fragment).toEqual(fragment.toObject());
+      expect(response).toEqual(fragment.toObject());
     });
   });
 
   describe('createFragment tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'createFragment')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.CreateFragmentRequest, _md, cb) => {
-          const response = new pb.CreateFragmentResponse();
-          response.setFragment(fragment);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.createFragment = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateFragmentRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateFragmentResponse();
+            response.setFragment(fragment);
+            cb(null, response);
+          }
+        );
     });
 
     it('createFragment', async () => {
       const response = await subject().createFragment('orgId', 'name', {});
-      expect(response.fragment).toEqual(fragment.toObject());
+      expect(response).toEqual(fragment.toObject());
     });
   });
 
   describe('updateFragment tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'updateFragment')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UpdateFragmentRequest, _md, cb) => {
-          const response = new pb.UpdateFragmentResponse();
-          response.setFragment(fragment);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.updateFragment = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateFragmentRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.UpdateFragmentResponse();
+            response.setFragment(fragment);
+            cb(null, response);
+          }
+        );
     });
 
     it('updateFragment', async () => {
       const response = await subject().updateFragment('id', 'name', {});
-      expect(response.fragment).toEqual(fragment.toObject());
+      expect(response).toEqual(fragment.toObject());
     });
   });
 
@@ -1249,11 +1477,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteFragment')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.DeleteFragmentRequest, _md, cb) => {
-          cb(null, new pb.DeleteFragmentResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.DeleteFragmentRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.DeleteFragmentResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteFragment = methodSpy;
     });
 
     it('deleteFragment', async () => {
@@ -1273,11 +1508,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'addRole')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.AddRoleRequest, _md, cb) => {
-          cb(null, new pb.AddRoleResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.AddRoleRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.AddRoleResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.addRole = methodSpy;
     });
 
     it('addRole', async () => {
@@ -1303,11 +1545,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'removeRole')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.RemoveRoleRequest, _md, cb) => {
-          cb(null, new pb.RemoveRoleResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.RemoveRoleRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.RemoveRoleResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.removeRole = methodSpy;
     });
 
     it('removeRole', async () => {
@@ -1336,11 +1585,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'changeRole')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ChangeRoleRequest, _md, cb) => {
-          cb(null, new pb.ChangeRoleResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ChangeRoleRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.ChangeRoleResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.changeRole = methodSpy;
     });
 
     it('changeRole', async () => {
@@ -1357,17 +1613,19 @@ describe('AppClient tests', () => {
     const authorizations = [authorization];
 
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'listAuthorizations'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.ListAuthorizationsRequest, _md, cb) => {
-          const response = new pb.ListAuthorizationsResponse();
-          response.setAuthorizationsList(authorizations);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.listAuthorizations = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListAuthorizationsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListAuthorizationsResponse();
+            response.setAuthorizationsList(authorizations);
+            cb(null, response);
+          }
+        );
     });
 
     it('listAuthorizations', async () => {
@@ -1379,13 +1637,19 @@ describe('AppClient tests', () => {
   describe('checkPermissions tests', () => {
     const permissions = [permission];
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'checkPermissions')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.CheckPermissionsRequest, _md, cb) => {
-          const response = new pb.CheckPermissionsResponse();
-          response.setAuthorizedPermissionsList(permissions);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.checkPermissions = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CheckPermissionsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CheckPermissionsResponse();
+            response.setAuthorizedPermissionsList(permissions);
+            cb(null, response);
+          }
+        );
     });
 
     it('checkPermissions', async () => {
@@ -1396,18 +1660,24 @@ describe('AppClient tests', () => {
 
   describe('getRegistryItem tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getRegistryItem')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetRegistryItemRequest, _md, cb) => {
-          const response = new pb.GetRegistryItemResponse();
-          response.setItem(registryItem);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getRegistryItem = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetRegistryItemRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetRegistryItemResponse();
+            response.setItem(registryItem);
+            cb(null, response);
+          }
+        );
     });
 
     it('getRegistryItem', async () => {
       const response = await subject().getRegistryItem('itemId');
-      expect(response.item).toEqual(registryItem.toObject());
+      expect(response).toEqual(registryItem.toObject());
     });
   });
 
@@ -1420,13 +1690,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'createRegistryItem')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.CreateRegistryItemRequest, _md, cb) => {
+          (
+            _req: pb.CreateRegistryItemRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.CreateRegistryItemResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.createRegistryItem = methodSpy;
     });
 
     it('createRegistryItem', async () => {
@@ -1453,13 +1728,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'updateRegistryItem')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.UpdateRegistryItemRequest, _md, cb) => {
+          (
+            _req: pb.UpdateRegistryItemRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.UpdateRegistryItemResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.updateRegistryItem = methodSpy;
     });
 
     it('updateRegistryItem', async () => {
@@ -1481,17 +1761,19 @@ describe('AppClient tests', () => {
     const items = [registryItem];
 
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'listRegistryItems'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.ListRegistryItemsRequest, _md, cb) => {
-          const response = new pb.ListRegistryItemsResponse();
-          response.setItemsList(items);
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.listRegistryItems = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListRegistryItemsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListRegistryItemsResponse();
+            response.setItemsList(items);
+            cb(null, response);
+          }
+        );
     });
 
     it('listRegistryItems', async () => {
@@ -1515,13 +1797,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteRegistryItem')
+        .fn()
         .mockImplementationOnce(
-          // @ts-expect-error compiler is matching incorrect function signature
-          (_req: pb.DeleteRegistryItemRequest, _md, cb) => {
+          (
+            _req: pb.DeleteRegistryItemRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
             cb(null, new pb.DeleteRegistryItemResponse());
           }
         );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteRegistryItem = methodSpy;
     });
 
     it('deleteRegistryItem', async () => {
@@ -1536,14 +1823,20 @@ describe('AppClient tests', () => {
 
   describe('createModule tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'createModule')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.CreateModuleRequest, _md, cb) => {
-          const response = new pb.CreateModuleResponse();
-          response.setUrl('url');
-          response.setModuleId('id');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.createModule = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateModuleRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateModuleResponse();
+            response.setUrl('url');
+            response.setModuleId('id');
+            cb(null, response);
+          }
+        );
     });
 
     it('createModule', async () => {
@@ -1555,13 +1848,19 @@ describe('AppClient tests', () => {
 
   describe('updateModule tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'updateModule')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.UpdateModuleRequest, _md, cb) => {
-          const response = new pb.UpdateModuleResponse();
-          response.setUrl('url');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.updateModule = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.UpdateModuleRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.UpdateModuleResponse();
+            response.setUrl('url');
+            cb(null, response);
+          }
+        );
     });
 
     it('updateModule', async () => {
@@ -1579,18 +1878,24 @@ describe('AppClient tests', () => {
 
   describe('getModule tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'getModule')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.GetModuleRequest, _md, cb) => {
-          const response = new pb.GetModuleResponse();
-          response.setModule(module);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.getModule = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.GetModuleRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.GetModuleResponse();
+            response.setModule(module);
+            cb(null, response);
+          }
+        );
     });
 
     it('getModule', async () => {
       const response = await subject().getModule('id');
-      expect(response.module).toEqual(module.toObject());
+      expect(response).toEqual(module.toObject());
     });
   });
 
@@ -1598,13 +1903,19 @@ describe('AppClient tests', () => {
     const modules = [module];
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listModules')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ListModulesRequest, _md, cb) => {
-          const response = new pb.ListModulesResponse();
-          response.setModulesList(modules);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.listModules = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListModulesRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListModulesResponse();
+            response.setModulesList(modules);
+            cb(null, response);
+          }
+        );
     });
 
     it('listModules', async () => {
@@ -1615,14 +1926,20 @@ describe('AppClient tests', () => {
 
   describe('createKey tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'createKey')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.CreateKeyRequest, _md, cb) => {
-          const response = new pb.CreateKeyResponse();
-          response.setId('id');
-          response.setKey('key');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.createKey = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateKeyRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.CreateKeyResponse();
+            response.setId('id');
+            response.setKey('key');
+            cb(null, response);
+          }
+        );
     });
 
     it('createKey', async () => {
@@ -1639,11 +1956,18 @@ describe('AppClient tests', () => {
 
     beforeEach(() => {
       methodSpy = vi
-        .spyOn(AppServiceClient.prototype, 'deleteKey')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.DeleteKeyRequest, _md, cb) => {
-          cb(null, new pb.DeleteKeyResponse());
-        });
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.DeleteKeyRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            cb(null, new pb.DeleteKeyResponse());
+          }
+        );
+      // @ts-expect-error compiler is matching incorrect function signature
+      AppServiceClient.prototype.deleteKey = methodSpy;
     });
 
     it('deleteKey', async () => {
@@ -1660,13 +1984,19 @@ describe('AppClient tests', () => {
     const keys = [apiKeyWithAuths];
 
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'listKeys')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.ListKeysRequest, _md, cb) => {
-          const response = new pb.ListKeysResponse();
-          response.setApiKeysList(keys);
-          cb(null, response);
-        });
+      AppServiceClient.prototype.listKeys = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.ListKeysRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.ListKeysResponse();
+            response.setApiKeysList(keys);
+            cb(null, response);
+          }
+        );
     });
 
     it('listKeys', async () => {
@@ -1677,14 +2007,20 @@ describe('AppClient tests', () => {
 
   describe('rotateKey tests', () => {
     beforeEach(() => {
-      vi.spyOn(AppServiceClient.prototype, 'rotateKey')
-        // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: pb.RotateKeyRequest, _md, cb) => {
-          const response = new pb.RotateKeyResponse();
-          response.setId('newId');
-          response.setKey('eyK');
-          cb(null, response);
-        });
+      AppServiceClient.prototype.rotateKey = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.RotateKeyRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response = new pb.RotateKeyResponse();
+            response.setId('newId');
+            response.setKey('eyK');
+            cb(null, response);
+          }
+        );
     });
 
     it('rotateKey', async () => {
@@ -1696,19 +2032,21 @@ describe('AppClient tests', () => {
 
   describe('createKeyFromExistingKeyAuthorizations tests', () => {
     beforeEach(() => {
-      vi.spyOn(
-        AppServiceClient.prototype,
-        'createKeyFromExistingKeyAuthorizations'
-      ).mockImplementationOnce(
-        // @ts-expect-error compiler is matching incorrect function signature
-        (_req: pb.CreateKeyFromExistingKeyAuthorizationsRequest, _md, cb) => {
-          const response =
-            new pb.CreateKeyFromExistingKeyAuthorizationsResponse();
-          response.setKey('key');
-          response.setId('id');
-          cb(null, response);
-        }
-      );
+      AppServiceClient.prototype.createKeyFromExistingKeyAuthorizations = vi
+        .fn()
+        .mockImplementationOnce(
+          (
+            _req: pb.CreateKeyFromExistingKeyAuthorizationsRequest,
+            _md,
+            cb: (_: ServiceError | null, __: Message) => void
+          ) => {
+            const response =
+              new pb.CreateKeyFromExistingKeyAuthorizationsResponse();
+            response.setKey('key');
+            response.setId('id');
+            cb(null, response);
+          }
+        );
     });
 
     it('createKeyFromExistingKeyAuthorizations', async () => {
