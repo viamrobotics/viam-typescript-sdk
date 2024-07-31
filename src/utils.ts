@@ -215,3 +215,28 @@ export const encodeGeoGeometry = (
 
   return result;
 };
+
+export class VersionMetadataTransport implements grpc.Transport {
+  private transport: grpc.Transport;
+
+  constructor(transport: grpc.Transport) {
+    this.transport = transport;
+  }
+
+  sendMessage(msgBytes: Uint8Array): void {
+    this.transport.sendMessage(msgBytes);
+  }
+
+  finishSend(): void {
+    this.transport.finishSend();
+  }
+
+  cancel(): void {
+    this.transport.cancel();
+  }
+
+  start(metadata: grpc.Metadata): void {
+    metadata.set('viam-client', 'typescript;v0.1.2,v3.4.5');
+    this.transport.start(metadata);
+  }
+}

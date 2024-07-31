@@ -109,6 +109,7 @@ export class ViamTransport implements grpc.Transport {
 
   public start(metadata: grpc.Metadata): void {
     metadata.set('authorization', `Bearer ${this.accessToken}`);
+    metadata.set('viam-client', 'typescript;v0.1.2;v3.4.5');
     this.transport.start(metadata);
   }
 

@@ -36,7 +36,11 @@ import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_servi
 import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { ViamResponseStream } from '../responses';
-import { encodeResourceName, promisify } from '../utils';
+import {
+  encodeResourceName,
+  promisify,
+  VersionMetadataTransport,
+} from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot, RobotStatusStream } from './robot';
 import SessionManager from './session-manager';
@@ -525,9 +529,17 @@ export class RobotClient extends EventDispatcher implements Robot {
         await this.gRPCConnectionManager.start();
       }
 
-      const clientTransportFactory = this.sessionOptions?.disabled
-        ? this.transportFactory
-        : this.sessionManager.transportFactory;
+      const ctf: grpc.TransportFactory = (
+        options: grpc.TransportOptions
+      ): grpc.Transport => {
+        const tf = this.sessionOptions?.disabled
+          ? this.transportFactory
+          : this.sessionManager.transportFactory;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const transport = tf!(options);
+        return new VersionMetadataTransport(transport);
+      };
+      const clientTransportFactory = ctf;
       const grpcOptions = { transport: clientTransportFactory };
 
       this.robotServiceClient = new RobotServiceClient(
