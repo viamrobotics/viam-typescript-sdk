@@ -3,7 +3,6 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import common from './gen/common/v1/common_pb';
 import type { Options, StructType, Vector3 } from './types';
-import { version } from './main';
 import { apiVersion } from './api-version';
 
 type Callback<T> = (error: ServiceError | null, response: T | null) => void;
@@ -229,7 +228,10 @@ export class MetadataTransport implements grpc.Transport {
   ) {
     this.transport = transportFactory(opts);
     this.metadata = metadata ?? new grpc.Metadata();
-    this.metadata.set('viam-client', `typescript;v${version};${apiVersion}`);
+    this.metadata.set(
+      'viam-client',
+      `typescript;v${__VERSION__};${apiVersion}`
+    );
   }
 
   public start(metadata: grpc.Metadata): void {
