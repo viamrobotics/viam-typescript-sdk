@@ -216,27 +216,37 @@ export const encodeGeoGeometry = (
   return result;
 };
 
-export class VersionMetadataTransport implements grpc.Transport {
-  private transport: grpc.Transport;
+export class MetadataTransport implements grpc.Transport {
+  private metadata: grpc.Metadata;
+  protected readonly transport: grpc.Transport;
 
-  constructor(transport: grpc.Transport) {
-    this.transport = transport;
+  constructor(
+    transportFactory: grpc.TransportFactory,
+    opts: grpc.TransportOptions,
+    metadata?: grpc.Metadata
+  ) {
+    this.transport = transportFactory(opts);
+    this.metadata = metadata ?? new grpc.Metadata();
+    this.metadata.set('viam-client', 'typescript;v0.1.2;v3.4.5');
   }
 
-  sendMessage(msgBytes: Uint8Array): void {
+  public start(metadata: grpc.Metadata): void {
+    // eslint-disable-next-line unicorn/no-array-for-each
+    this.metadata.forEach((key, values) => {
+      metadata.set(key, values);
+    });
+    this.transport.start(metadata);
+  }
+
+  public sendMessage(msgBytes: Uint8Array): void {
     this.transport.sendMessage(msgBytes);
   }
 
-  finishSend(): void {
+  public finishSend(): void {
     this.transport.finishSend();
   }
 
-  cancel(): void {
+  public cancel(): void {
     this.transport.cancel();
-  }
-
-  start(metadata: grpc.Metadata): void {
-    metadata.set('viam-client', 'typescript;v0.1.2,v3.4.5');
-    this.transport.start(metadata);
   }
 }
