@@ -55,7 +55,7 @@ update-buf: $(node_modules)
 .PHONY: build-buf
 build-buf: $(node_modules) clean-buf
 	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/googleapis/googleapis)
-	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/viamrobotics/api) --path common,component,robot,service,app,provisioning,tagger,stream
+	$(buf) generate buf.build/viamrobotics/api:$$(cat api_version.lock) --path common,component,robot,service,app,provisioning,tagger,stream
 	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/viamrobotics/goutils)
 
 # js targets
