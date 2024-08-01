@@ -111,3 +111,6 @@ bin/
 
 # typedoc documentation
 docs/dist
+
+# build-time outputs
+src/api-version.ts
