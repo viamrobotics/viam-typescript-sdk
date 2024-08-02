@@ -16,6 +16,7 @@
     }
   },
   "scripts": {
+    "prebuild": "ts-node ./scripts/write-versions.ts",
     "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
     "build:bundle": "vite build",
     "build:types": "tsc --project tsconfig.build.json",
@@ -72,6 +73,7 @@
     "prettier": "^3.1.1",
     "prettier-plugin-jsdoc": "^1.1.1",
     "protoc-gen-js": "^3.21.2",
+    "ts-node": "^10.9.2",
     "ts-protoc-gen": "^0.15.0",
     "typedoc": "^0.25.4",
     "typescript": "^5.3.3",

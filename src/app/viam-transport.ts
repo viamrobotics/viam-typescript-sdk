@@ -3,6 +3,7 @@ import { dialDirect } from '@viamrobotics/rpc';
 
 import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
 import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
+import { MetadataTransport } from '../utils';
 
 /** A credential that can be exchanged to obtain an access token */
 export interface Credential {
@@ -94,33 +95,13 @@ const createWithCredential = async (
     new ViamTransport(transportFactory, opts, accessToken);
 };
 
-export class ViamTransport implements grpc.Transport {
-  private accessToken: string;
-  protected readonly transport: grpc.Transport;
-
+export class ViamTransport extends MetadataTransport {
   constructor(
     transportFactory: grpc.TransportFactory,
     opts: grpc.TransportOptions,
     accessToken: string
   ) {
-    this.transport = transportFactory(opts);
-    this.accessToken = accessToken;
-  }
-
-  public start(metadata: grpc.Metadata): void {
-    metadata.set('authorization', `Bearer ${this.accessToken}`);
-    this.transport.start(metadata);
-  }
-
-  public sendMessage(msgBytes: Uint8Array): void {
-    this.transport.sendMessage(msgBytes);
-  }
-
-  public finishSend(): void {
-    this.transport.finishSend();
-  }
-
-  public cancel(): void {
-    this.transport.cancel();
+    const md = new grpc.Metadata({ authorization: `Bearer ${accessToken}` });
+    super(transportFactory, opts, md);
   }
 }

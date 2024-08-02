@@ -3,6 +3,7 @@ import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 import type { ServiceError } from './gen/robot/v1/robot_pb_service';
 import common from './gen/common/v1/common_pb';
 import type { Options, StructType, Vector3 } from './types';
+import { apiVersion } from './api-version';
 
 type Callback<T> = (error: ServiceError | null, response: T | null) => void;
 
@@ -215,3 +216,41 @@ export const encodeGeoGeometry = (
 
   return result;
 };
+
+export class MetadataTransport implements grpc.Transport {
+  private metadata: grpc.Metadata;
+  protected readonly transport: grpc.Transport;
+
+  constructor(
+    transportFactory: grpc.TransportFactory,
+    opts: grpc.TransportOptions,
+    metadata?: grpc.Metadata
+  ) {
+    this.transport = transportFactory(opts);
+    this.metadata = metadata ?? new grpc.Metadata();
+    this.metadata.set(
+      'viam-client',
+      `typescript;v${__VERSION__};${apiVersion}`
+    );
+  }
+
+  public start(metadata: grpc.Metadata): void {
+    // eslint-disable-next-line unicorn/no-array-for-each
+    this.metadata.forEach((key, values) => {
+      metadata.set(key, values);
+    });
+    this.transport.start(metadata);
+  }
+
+  public sendMessage(msgBytes: Uint8Array): void {
+    this.transport.sendMessage(msgBytes);
+  }
+
+  public finishSend(): void {
+    this.transport.finishSend();
+  }
+
+  public cancel(): void {
+    this.transport.cancel();
+  }
+}
