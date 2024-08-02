@@ -16,7 +16,7 @@ export interface DialDirectConf {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
-  reconnectAbort?: { abort: boolean };
+  reconnectAbortSignal?: { abort: boolean };
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
@@ -89,7 +89,7 @@ export interface DialWebRTCConf {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
-  reconnectAbort?: { abort: boolean };
+  reconnectAbortSignal?: { abort: boolean };
   // WebRTC
   signalingAddress: string;
   iceServers?: ICEServer[];
@@ -182,12 +182,12 @@ export const createRobotClient = async (
       console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`);
 
       // Abort reconnects if the the caller specifies, otherwise retry
-      return !conf.reconnectAbort?.abort;
+      return !conf.reconnectAbortSignal?.abort;
     },
   };
 
   // Try to dial via WebRTC first.
-  if (isDialWebRTCConf(conf) && !conf.reconnectAbort?.abort) {
+  if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
     try {
       return conf.noReconnect
         ? await dialWebRTC(conf)
@@ -198,7 +198,7 @@ export const createRobotClient = async (
     }
   }
 
-  if (!conf.reconnectAbort?.abort) {
+  if (!conf.reconnectAbortSignal?.abort) {
     try {
       return conf.noReconnect
         ? await dialDirect(conf)

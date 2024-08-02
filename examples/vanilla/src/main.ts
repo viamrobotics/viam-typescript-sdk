@@ -12,7 +12,7 @@ const disconnectEl = <HTMLButtonElement>document.getElementById('disconnect');
 const resourcesEl = <HTMLButtonElement>document.getElementById('resources');
 
 let machine: VIAM.RobotClient | undefined = undefined;
-const reconnectAbort = { abort: false };
+const reconnectAbortSignal = { abort: false };
 
 const handleConnectionStateChange = (event: unknown) => {
   updateConnectionStatus(
@@ -43,7 +43,7 @@ const connect = async () => {
     return;
   }
 
-  reconnectAbort.abort = false;
+  reconnectAbortSignal.abort = false;
   updateConnectionStatus(VIAM.MachineConnectionEvent.CONNECTING);
 
   try {
@@ -55,7 +55,7 @@ const connect = async () => {
       },
       authEntity: API_KEY_ID,
       signalingAddress: 'https://app.viam.com:443',
-      reconnectAbort,
+      reconnectAbortSignal,
     });
     updateConnectionStatus(VIAM.MachineConnectionEvent.CONNECTED);
     machine.on('connectionstatechange', handleConnectionStateChange);
@@ -66,7 +66,7 @@ const connect = async () => {
 
 const disconnect = async () => {
   // If currently establishing initial connection, abort.
-  reconnectAbort.abort = true;
+  reconnectAbortSignal.abort = true;
 
   if (!machine) {
     return;
