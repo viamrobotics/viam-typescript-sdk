@@ -66,6 +66,7 @@ jobs:
 
       - name: Open PR
         run: |
+          sudo apt-get install -y gh
           gh pr create -t "v${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the release branch back into main upon successful release" -B "main" -H "release/v${{ steps.which_version.outputs.version }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
