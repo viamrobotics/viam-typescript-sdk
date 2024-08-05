@@ -61,12 +61,12 @@ jobs:
       - name: Add + Commit
         uses: EndBug/add-and-commit@v9
         with:
-          new_branch: v${{ steps.which_version.outputs.version }}
+          new_branch: release/v${{ steps.which_version.outputs.version }}
           message: Bump version to ${{ steps.which_version.outputs.version }}
 
       - name: Open PR
         run: |
-          gh pr create -t "v${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the release branch back into main upon successful release" -B "main" -H "v${{ steps.which_version.outputs.version }}"
+          gh pr create -t "v${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the release branch back into main upon successful release" -B "main" -H "release/v${{ steps.which_version.outputs.version }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -80,7 +80,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: v${{ needs.prepare.outputs.version }}
+          ref: release/v${{ needs.prepare.outputs.version }}
 
       - name: Build + Pack
         run: |
@@ -113,7 +113,7 @@ jobs:
           draft: true
           prerelease: false
           fail_on_unmatched_files: true
-          target_commitish: v${{ needs.prepare.outputs.version }}
+          target_commitish: release/v${{ needs.prepare.outputs.version }}
 
       - name: Publish Docs
         uses: peaceiris/actions-gh-pages@v3
