@@ -826,10 +826,9 @@ export class RobotClient extends EventDispatcher implements Robot {
     if (moduleName !== undefined) {
       request.setModuleName(moduleName);
     }
-    const response = await promisify<
-      proto.RestartModuleRequest,
-      proto.RestartModuleResponse
-    >(robotService.restartModule.bind(robotService), request);
-    return response.toObject();
+    await promisify<proto.RestartModuleRequest, proto.RestartModuleResponse>(
+      robotService.restartModule.bind(robotService),
+      request
+    );
   }
 }
