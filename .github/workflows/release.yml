@@ -2,28 +2,30 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'The type of version bump. Select "nobump" for no version change. See https://github.com/npm/node-semver#functions'
+        type: choice
+        required: true
+        default: nobump
+        options:
+          - major
+          - minor
+          - patch
+          - premajor
+          - preminor
+          - prepatch
+          - nobump # this action is custom for this action and does not exist in npm
 
 jobs:
   prepare:
-    if: github.repository_owner == 'viamrobotics' && startsWith(github.ref_name, 'rc-')
+    if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
     outputs:
       version: ${{ steps.which_version.outputs.version }}
     steps:
-      - name: Check if organization member
-        id: is_organization_member
-        uses: jamessingleton/is-organization-member@1.0.1
-        with:
-          organization: viamrobotics
-          username: ${{ github.actor }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Cancelling - not an organization member
-        uses: andymckay/cancel-action@0.2
-        if: steps.is_organization_member.outputs.result == 'false'
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -34,7 +36,8 @@ jobs:
 
       - name: Bump Version
         shell: bash
-        run: npm version $(npm pkg get version | sed -e 's/\"//g' -e 's/-rc.*//g') --no-git-tag-version
+        run: npm version ${{ inputs.version }} --no-git-tag-version
+        if: inputs.version != 'nobump'
 
       - name: Which Version
         id: which_version
@@ -58,19 +61,18 @@ jobs:
       - name: Add + Commit
         uses: EndBug/add-and-commit@v9
         with:
-          new_branch: rc-${{ steps.which_version.outputs.version }}
+          new_branch: release/v${{ steps.which_version.outputs.version }}
           message: Bump version to ${{ steps.which_version.outputs.version }}
 
       - name: Open PR
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: 'main'
-          pr_title: ${{ steps.which_version.outputs.version }}
-          pr_body: This is an auto-generated PR to merge the rc branch back into main upon successful release.
+        run: |
+          gh pr create -t "v${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the release branch back into main upon successful release" -B "main" -H "release/v${{ steps.which_version.outputs.version }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     needs: prepare
-    if: github.repository_owner == 'viamrobotics' && startsWith(github.ref_name, 'rc-')
+    if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -78,7 +80,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          ref: rc-${{ needs.prepare.outputs.version }}
+          ref: release/v${{ needs.prepare.outputs.version }}
 
       - name: Build + Pack
         run: |
@@ -95,7 +97,7 @@ jobs:
 
   release:
     needs: [prepare, build]
-    if: github.repository_owner == 'viamrobotics' && startsWith(github.ref_name, 'rc-')
+    if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -111,7 +113,7 @@ jobs:
           draft: true
           prerelease: false
           fail_on_unmatched_files: true
-          target_commitish: rc-${{ needs.prepare.outputs.version }}
+          target_commitish: release/v${{ needs.prepare.outputs.version }}
 
       - name: Publish Docs
         uses: peaceiris/actions-gh-pages@v3
