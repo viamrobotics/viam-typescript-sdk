@@ -176,4 +176,16 @@ export interface Robot {
    * @alpha
    */
   getCloudMetadata(): Promise<CloudMetadata>;
+
+  /**
+   * Restarts a module running on the machine with the given id or name.
+   *
+   * @param moduleId - The id matching the module_id field of the registry
+   *   module in your part configuration
+   * @param moduleName - The name matching the name field of the local/registry
+   *   module in your part configuration
+   * @group Modules
+   * @alpha
+   */
+  restartModule(moduleId?: string, moduleName?: string): Promise<void>;
 }
