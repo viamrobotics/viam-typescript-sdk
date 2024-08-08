@@ -36,7 +36,7 @@ jobs:
 
       - name: Bump Version
         shell: bash
-        run: npm version ${{ inputs.version }} --no-git-tag-version
+        run: npm version ${{ inputs.version }} --no-git-tag-version --preid "b"
         if: inputs.version != 'nobump'
 
       - name: Which Version
