@@ -33,10 +33,11 @@ export {
   type ViamClientOptions,
 } from './app/viam-client';
 
-export type {
-  Credential,
-  CredentialType,
-  AccessToken,
+export {
+  getAccessTokenFromCredential,
+  type Credential,
+  type CredentialType,
+  type AccessToken,
 } from './app/viam-transport';
 
 /**
