@@ -53,15 +53,10 @@ const createWithAccessToken = async (
     new ViamTransport(transportFactory, opts, accessToken.payload);
 };
 
-const createWithCredential = async (
-  serviceHost: string,
+export const getAccessTokenFromCredential = async (
+  host: string,
   credential: Credential
-): Promise<grpc.TransportFactory> => {
-  const transportFactory = await dialDirect(serviceHost);
-
-  const authClient = new AuthServiceClient(serviceHost, {
-    transport: transportFactory,
-  });
+) => {
   if (credential.type === 'robot-secret') {
     throw new Error(
       `credential type cannot be 'robot-secret'. Must be either 'robot-location-secret' or 'api-key'.`
@@ -71,6 +66,11 @@ const createWithCredential = async (
       `auth entity cannot be null, undefined, or an empty value.`
     );
   }
+
+  const transportFactory = await dialDirect(host);
+  const authClient = new AuthServiceClient(host, {
+    transport: transportFactory,
+  });
 
   const entity = credential.authEntity;
   const creds = new Credentials();
@@ -91,8 +91,21 @@ const createWithCredential = async (
     });
   });
 
+  return { type: 'access-token', payload: accessToken } as AccessToken;
+};
+
+const createWithCredential = async (
+  serviceHost: string,
+  credential: Credential
+): Promise<grpc.TransportFactory> => {
+  const accessToken = await getAccessTokenFromCredential(
+    serviceHost,
+    credential
+  );
+
+  const transportFactory = await dialDirect(serviceHost);
   return (opts: grpc.TransportOptions): ViamTransport =>
-    new ViamTransport(transportFactory, opts, accessToken);
+    new ViamTransport(transportFactory, opts, accessToken.payload);
 };
 
 export class ViamTransport extends MetadataTransport {
