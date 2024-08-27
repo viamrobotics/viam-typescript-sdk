@@ -189,8 +189,17 @@ export class VisionClient implements Vision {
       pb.CaptureAllFromCameraRequest,
       pb.CaptureAllFromCameraResponse
     >(service.captureAllFromCamera.bind(service), request);
+
+    const image = response.getImage();
+
     return {
-      image: response.getImage()?.toObject(),
+      image: image
+        ? {
+            format: image.getFormat(),
+            sourceName: image.getSourceName(),
+            image: image.getImage_asU8(),
+          }
+        : undefined,
       classifications: response
         .getClassificationsList()
         .map((classification: pb.Classification) => classification.toObject()),
