@@ -631,6 +631,18 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
   }
 
+  // SESSIONS
+
+  async getSessions() {
+    const { robotService } = this;
+    const request = new proto.GetSessionsRequest();
+    const response = await promisify<
+      proto.GetSessionsRequest,
+      proto.GetSessionsResponse
+    >(robotService.getSessions.bind(robotService), request);
+    return response.getSessionsList().map((session) => session.toObject());
+  }
+
   // OPERATIONS
 
   async getOperations() {
