@@ -15,6 +15,14 @@ type Callback = (args: unknown) => void;
 
 export interface Robot {
   /**
+   * Get the list of sessions currently connected to the robot.
+   *
+   * @group Sessions
+   * @alpha
+   */
+  getSessions(): Promise<proto.Session.AsObject[]>;
+
+  /**
    * Get the list of operations currently running on the robot.
    *
    * @group Operations
