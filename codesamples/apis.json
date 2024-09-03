@@ -1,69 +1,84 @@
 {
-    "arm": {
-        "client": "ArmClient",
-        "func": "getEndPosition",
-        "args": []
-    },
-    "base": {
-        "client": "BaseClient",
-        "func": "isMoving"
-    },
-    "motor": {
-        "client": "MotorClient",
-        "func": "isMoving",
-        "args": []
-    },
-    "board": {
-        "client": "BoardClient",
-        "func": "getGPIO",
-        "args": [
-            "'16'"
-        ],
-        "comment": "Note that the pin supplied is a placeholder. Please change this to a valid pin you are using."
-    },
-    "camera": {
-        "client": "CameraClient",
-        "func": "getImage",
-        "args": []
-    },
-    "encoder": {
-        "client": "EncoderClient",
-        "func": "getProperties",
-        "args": []
-    },
-    "gantry": {
-        "client": "GantryClient",
-        "func": "getLengths",
-        "args": []
-    },
-    "sensor": {
-        "client": "SensorClient",
-        "func": "getReadings",
-        "args": []
-    },
-    "movement_sensor": {
-        "client": "MovementSensorClient",
-        "func": "getLinearAcceleration",
-        "args": []
-    },
-    "power_sensor": {
-        "client": "PowerSensorClient",
-        "func": "getPower",
-        "args": []
-    },
-    "servo": {
-        "client": "ServoClient",
-        "func": "getPosition"
-    },
-    "motion": {
-        "client": "MotionClient",
-        "func": "getPose",
-        "args": [],
-        "comment": "Note this function requires additional arguments. Please provide valid arguments for function to work properly."
-    },
-    "data_manager": {
-        "client": "DataManagerClient",
-        "func": "sync",
-        "args": []
-    }
+  "arm": {
+    "importName": "ArmClient",
+    "func": "getEndPosition",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "base": {
+    "importName": "BaseClient",
+    "func": "isMoving",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "motor": {
+    "importName": "MotorClient",
+    "func": "isMoving",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "board": {
+    "importName": "BoardClient",
+    "func": "getGPIO",
+    "args": ["'16'"],
+    "comment": "Note that the pin supplied is a placeholder. Please change this to a valid pin you are using.",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "camera": {
+    "importName": "CameraClient",
+    "func": "getImage",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "encoder": {
+    "importName": "EncoderClient",
+    "func": "getProperties",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "gantry": {
+    "importName": "GantryClient",
+    "func": "getLengths",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "sensor": {
+    "importName": "SensorClient",
+    "func": "getReadings",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "movement_sensor": {
+    "importName": "MovementSensorClient",
+    "func": "getLinearAcceleration",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "power_sensor": {
+    "importName": "PowerSensorClient",
+    "func": "getPower",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "servo": {
+    "importName": "ServoClient",
+    "func": "getPosition",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "motion": {
+    "importName": "MotionClient",
+    "func": "getPose",
+    "args": [],
+    "comment": "Note this function requires additional arguments. Please provide valid arguments for function to work properly.",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "data_manager": {
+    "importName": "DataManagerClient",
+    "func": "sync",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  }
 }
