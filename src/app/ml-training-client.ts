@@ -61,9 +61,9 @@ export class MlTrainingClient {
 
     const response = await promisify<
       pb.SubmitCustomTrainingJobRequest,
-      pb.SubmitCustomTrainingJobResponse>(service.submitCustomTrainingJob.bind(service), req);
+      pb.SubmitCustomTrainingJobResponse
+    >(service.submitCustomTrainingJob.bind(service), req);
     return response.getId();
-
   }
 
   async getTrainingJob(id: string) {

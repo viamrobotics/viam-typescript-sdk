@@ -61,7 +61,7 @@ describe('MlTrainingClient tests', () => {
         });
     });
 
-    it('submit job training job', async () => {
+    it('submit custom training job', async () => {
       const response = await subject().submitCustomTrainingJob(
         'org_id',
         'dataset_id',
