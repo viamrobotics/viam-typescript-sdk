@@ -52,13 +52,17 @@ describe('MlTrainingClient tests', () => {
 
   describe('submitCustomTrainingJob tests', () => {
     beforeEach(() => {
-      vi.spyOn(MLTrainingServiceClient.prototype, 'submitCustomTrainingJob')
+      vi.spyOn(
+        MLTrainingServiceClient.prototype,
+        'submitCustomTrainingJob'
+      ).mockImplementationOnce(
         // @ts-expect-error compiler is matching incorrect function signature
-        .mockImplementationOnce((_req: SubmitCustomTrainingJobRequest, _md, cb) => {
+        (_req: SubmitCustomTrainingJobRequest, _md, cb) => {
           const response = new SubmitCustomTrainingJobResponse();
           response.setId('fakeId');
           cb(null, response);
-        });
+        }
+      );
     });
 
     it('submit custom training job', async () => {
