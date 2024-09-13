@@ -41,6 +41,31 @@ export class MlTrainingClient {
     return response.getId();
   }
 
+  async submitCustomTrainingJob(
+    orgId: string,
+    datasetId: string,
+    registryItemId: string,
+    registryItemVersion: string,
+    modelName: string,
+    modelVersion: string
+  ) {
+    const { service } = this;
+
+    const req = new pb.SubmitCustomTrainingJobRequest();
+    req.setOrganizationId(orgId);
+    req.setDatasetId(datasetId);
+    req.setRegistryItemId(registryItemId);
+    req.setRegistryItemVersion(registryItemVersion);
+    req.setModelName(modelName);
+    req.setModelVersion(modelVersion);
+
+    const response = await promisify<
+      pb.SubmitCustomTrainingJobRequest,
+      pb.SubmitCustomTrainingJobResponse
+    >(service.submitCustomTrainingJob.bind(service), req);
+    return response.getId();
+  }
+
   async getTrainingJob(id: string) {
     const { service } = this;
 

@@ -10,6 +10,8 @@ import {
   ModelType,
   SubmitTrainingJobRequest,
   SubmitTrainingJobResponse,
+  SubmitCustomTrainingJobRequest,
+  SubmitCustomTrainingJobResponse,
   TrainingJobMetadata,
   TrainingStatus,
 } from '../gen/app/mltraining/v1/ml_training_pb';
@@ -43,6 +45,34 @@ describe('MlTrainingClient tests', () => {
         'model_version',
         type,
         ['tag1']
+      );
+      expect(response).toEqual('fakeId');
+    });
+  });
+
+  describe('submitCustomTrainingJob tests', () => {
+    beforeEach(() => {
+      vi.spyOn(
+        MLTrainingServiceClient.prototype,
+        'submitCustomTrainingJob'
+      ).mockImplementationOnce(
+        // @ts-expect-error compiler is matching incorrect function signature
+        (_req: SubmitCustomTrainingJobRequest, _md, cb) => {
+          const response = new SubmitCustomTrainingJobResponse();
+          response.setId('fakeId');
+          cb(null, response);
+        }
+      );
+    });
+
+    it('submit custom training job', async () => {
+      const response = await subject().submitCustomTrainingJob(
+        'org_id',
+        'dataset_id',
+        'registry_item_id',
+        'registry_item_version',
+        'model_name',
+        'model_version'
       );
       expect(response).toEqual('fakeId');
     });
