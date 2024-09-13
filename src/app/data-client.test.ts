@@ -1036,8 +1036,8 @@ describe('DataSyncClient tests', () => {
         componentType,
         componentName,
         methodName,
-        tags,
-        [dataRequestTimes1, dataRequestTimes2]
+        [dataRequestTimes1, dataRequestTimes2],
+        tags
       );
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,
@@ -1080,8 +1080,8 @@ describe('DataSyncClient tests', () => {
         componentName,
         methodName,
         fileExtension,
-        tags,
-        dataRequestTimes1
+        dataRequestTimes1,
+        tags
       );
       expect(methodSpy).toHaveBeenCalledWith(
         expectedRequest,

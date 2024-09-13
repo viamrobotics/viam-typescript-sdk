@@ -793,10 +793,10 @@ export class DataClient {
     componentType: string,
     componentName: string,
     methodName: string,
-    tags?: string[],
-    dataRequestTimes?: [Date, Date][]
+    dataRequestTimes: [Date, Date][],
+    tags?: string[]
   ) {
-    if (dataRequestTimes?.length !== tabularData.length) {
+    if (dataRequestTimes.length !== tabularData.length) {
       throw new Error('dataRequestTimes and data lengths must be equal.');
     }
 
@@ -868,8 +868,8 @@ export class DataClient {
     componentName: string,
     methodName: string,
     fileExtension: string,
-    tags?: string[],
-    dataRequestTimes?: [Date, Date]
+    dataRequestTimes: [Date, Date],
+    tags?: string[]
   ) {
     const { dataSyncService: service } = this;
 
@@ -886,10 +886,8 @@ export class DataClient {
 
     const sensorData = new dataSyncPb.SensorData();
     const sensorMetadata = new dataSyncPb.SensorMetadata();
-    if (dataRequestTimes) {
-      sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
-      sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
-    }
+    sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
+    sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
     sensorData.setMetadata(sensorMetadata);
     sensorData.setBinary(binaryData);
 
