@@ -1,0 +1,321 @@
+import type {
+  AccessToken,
+  AppClient,
+  BaseClient,
+  Credential,
+  RobotClient,
+  StreamClient,
+  appApi,
+} from '@viamrobotics/sdk';
+import { useEffect, useRef, useState } from 'react';
+import {
+  getBaseClient,
+  getRobotClient,
+  getStreamClient,
+  getViamClient,
+} from './client.js';
+
+export const DISCONNECTED = 'disconnected';
+export const CONNECTING = 'connecting';
+export const DISCONNECTING = 'disconnecting';
+export const CONNECTED = 'connected';
+
+interface ClientStateDisconnected {
+  status: typeof DISCONNECTED;
+  error?: unknown;
+}
+
+interface ClientStateTransitioning {
+  status: typeof CONNECTING | typeof DISCONNECTING;
+}
+
+interface ClientStateConnected {
+  status: typeof CONNECTED;
+  client: RobotClient;
+  baseClient: BaseClient;
+  streamClient: StreamClient;
+}
+
+type ClientState =
+  | ClientStateDisconnected
+  | ClientStateTransitioning
+  | ClientStateConnected;
+
+export type ClientStatus = ClientState['status'];
+
+export interface RobotClientStore {
+  status: ClientStatus;
+  client?: RobotClient;
+  streamClient?: StreamClient;
+  baseClient?: BaseClient;
+  connectOrDisconnect: (
+    hostname: string,
+    credentials: Credential | AccessToken
+  ) => unknown;
+}
+
+export const useRobotClientStore = (): RobotClientStore => {
+  const [state, setState] = useState<ClientState>({ status: DISCONNECTED });
+
+  if (state.status === DISCONNECTED && state.error) {
+    console.warn('Connection error', state.error);
+  }
+
+  const connectOrDisconnect = (
+    hostname: string,
+    credentials: Credential | AccessToken
+  ): void => {
+    if (state.status === DISCONNECTED) {
+      setState({ status: CONNECTING });
+
+      getRobotClient(hostname, credentials)
+        .then((client) => {
+          const streamClient = getStreamClient(client);
+          const baseClient = getBaseClient(client);
+          setState({ status: CONNECTED, client, baseClient, streamClient });
+        })
+        .catch((error: unknown) => setState({ status: DISCONNECTED, error }));
+    } else if (state.status === CONNECTED) {
+      setState({ status: DISCONNECTING });
+
+      state.client
+        .disconnect()
+        .then(() => setState({ status: DISCONNECTED }))
+        .catch((error: unknown) => setState({ status: DISCONNECTED, error }));
+    }
+  };
+
+  return {
+    connectOrDisconnect,
+    status: state.status,
+    client: state.status === CONNECTED ? state.client : undefined,
+    baseClient: state.status === CONNECTED ? state.baseClient : undefined,
+    streamClient: state.status === CONNECTED ? state.streamClient : undefined,
+  };
+};
+
+export const useStream = (
+  streamClient: StreamClient | undefined,
+  cameraName: string
+): MediaStream | undefined => {
+  const okToConnectRef = useRef(true);
+  const [stream, setStream] = useState<MediaStream | undefined>();
+
+  useEffect(() => {
+    if (streamClient && okToConnectRef.current) {
+      okToConnectRef.current = false;
+
+      streamClient
+        .getStream(cameraName)
+        .then((mediaStream) => setStream(mediaStream))
+        .catch((error: unknown) => {
+          console.warn(`Unable to connect to camera ${cameraName}`, error);
+        });
+
+      return () => {
+        okToConnectRef.current = true;
+
+        streamClient.remove(cameraName).catch((error: unknown) => {
+          console.warn(`Unable to disconnect to camera ${cameraName}`, error);
+        });
+      };
+    }
+
+    return undefined;
+  }, [streamClient, cameraName]);
+
+  return stream;
+};
+
+export enum BrowserStateKey {
+  Loading,
+  Locations,
+  Machines,
+  MachineParts,
+  ControlMachinePart,
+}
+
+interface BrowserStateLoading {
+  key: BrowserStateKey.Loading;
+}
+
+interface BrowserStateLocations {
+  key: BrowserStateKey.Locations;
+  appClient: AppClient;
+}
+
+interface BrowserStateMachines {
+  key: BrowserStateKey.Machines;
+  appClient: AppClient;
+  location: appApi.Location.AsObject;
+}
+
+interface BrowserStateMachineParts {
+  key: BrowserStateKey.MachineParts;
+  appClient: AppClient;
+  location: appApi.Location.AsObject;
+  machine: appApi.Robot.AsObject;
+}
+
+interface BrowserStateControlMachinePart {
+  key: BrowserStateKey.ControlMachinePart;
+  appClient: AppClient;
+  location: appApi.Location.AsObject;
+  machine: appApi.Robot.AsObject;
+  machinePart: appApi.RobotPart.AsObject;
+}
+
+export type BrowserState =
+  | BrowserStateLoading
+  | BrowserStateLocations
+  | BrowserStateMachines
+  | BrowserStateMachineParts
+  | BrowserStateControlMachinePart;
+
+export type Breadcrumb = {
+  name: string;
+  onClick?: () => void;
+};
+
+export class BrowserStateStore {
+  constructor(
+    public readonly state: BrowserState,
+    private readonly onNewState: (newState: BrowserState) => void
+  ) {}
+
+  public breadcrumbs(): Breadcrumb[] {
+    const currentState = this.state;
+    switch (currentState.key) {
+      case BrowserStateKey.Loading:
+        return [];
+      case BrowserStateKey.Locations:
+        return [{ name: 'Locations' }];
+      case BrowserStateKey.Machines:
+        return [
+          { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
+          { name: currentState.location.name },
+          { name: 'Machines' },
+        ];
+      case BrowserStateKey.MachineParts:
+        return [
+          { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
+          {
+            name: currentState.location.name,
+            onClick: () =>
+              this.onLocationSelected(currentState)(currentState.location),
+          },
+          { name: currentState.machine.name },
+        ];
+      case BrowserStateKey.ControlMachinePart:
+        return [
+          { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
+          {
+            name: currentState.location.name,
+            onClick: () =>
+              this.onLocationSelected(currentState)(currentState.location),
+          },
+          {
+            name: currentState.machine.name,
+            onClick: () =>
+              this.onMachineSelected(currentState)(currentState.machine),
+          },
+          { name: currentState.machinePart.name },
+        ];
+    }
+  }
+
+  public onBrowseLocations(
+    currentState:
+      | BrowserStateMachines
+      | BrowserStateMachineParts
+      | BrowserStateControlMachinePart
+  ): () => void {
+    if (this.state !== currentState) {
+      throw new Error('wrong state');
+    }
+    return () => {
+      this.onNewState({
+        key: BrowserStateKey.Locations,
+        appClient: currentState.appClient,
+      });
+    };
+  }
+
+  public onLocationSelected(
+    currentState:
+      | BrowserStateLocations
+      | BrowserStateMachines
+      | BrowserStateMachineParts
+      | BrowserStateControlMachinePart
+  ): (location: appApi.Location.AsObject) => void {
+    if (this.state !== currentState) {
+      throw new Error('wrong state');
+    }
+    return (location: appApi.Location.AsObject) => {
+      this.onNewState({
+        key: BrowserStateKey.Machines,
+        appClient: currentState.appClient,
+        location,
+      });
+    };
+  }
+
+  public onMachineSelected(
+    currentState:
+      | BrowserStateMachines
+      | BrowserStateMachineParts
+      | BrowserStateControlMachinePart
+  ): (machine: appApi.Robot.AsObject) => void {
+    if (this.state !== currentState) {
+      throw new Error('wrong state');
+    }
+    return (machine: appApi.Robot.AsObject) => {
+      this.onNewState({
+        key: BrowserStateKey.MachineParts,
+        appClient: currentState.appClient,
+        location: currentState.location,
+        machine,
+      });
+    };
+  }
+
+  public onMachinePartSelected(
+    currentState: BrowserStateMachineParts | BrowserStateControlMachinePart
+  ): (part: appApi.RobotPart.AsObject) => void {
+    if (this.state !== currentState) {
+      throw new Error('wrong state');
+    }
+    return (part: appApi.RobotPart.AsObject) => {
+      this.onNewState({
+        key: BrowserStateKey.ControlMachinePart,
+        appClient: currentState.appClient,
+        location: currentState.location,
+        machine: currentState.machine,
+        machinePart: part,
+      });
+    };
+  }
+}
+
+export const useBrowserStateStore = (
+  creds: Credential | AccessToken
+): BrowserStateStore => {
+  const [browserState, setBrowserState] = useState<BrowserState>({
+    key: BrowserStateKey.Loading,
+  });
+
+  useEffect(() => {
+    async function connectViamClient() {
+      const client = await getViamClient(creds);
+      setBrowserState({
+        key: BrowserStateKey.Locations,
+        appClient: client.appClient!,
+      });
+    }
+    connectViamClient();
+  }, []);
+
+  return new BrowserStateStore(browserState, (newState: BrowserState) => {
+    setBrowserState(newState);
+  });
+};
