@@ -11,8 +11,7 @@ export interface AppProps {
   env: BuildEnvironment;
 }
 
-export const App = (props: AppProps): JSX.Element => {
-  const { env } = props;
+export const App = ({ env }: AppProps): JSX.Element => {
   const {
     isLoggedIn,
     isFetchingUserInfo,
