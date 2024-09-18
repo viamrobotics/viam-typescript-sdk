@@ -9,10 +9,7 @@ export interface BuildEnvironment {
 
 let env: BuildEnvironment | undefined;
 
-const throwNotSet = (envVarKey: string): never => {
-  throw new Error(`${envVarKey} not set`);
-};
-
+// import.meta.env is validated at build time in vite.config.ts
 export const getEnv = (): BuildEnvironment => {
   if (env) {
     return env;
@@ -22,14 +19,6 @@ export const getEnv = (): BuildEnvironment => {
     orgId: import.meta.env.VITE_APP_ORG_ID,
     isDev: import.meta.env.DEV,
   } as BuildEnvironment;
-
-  if (!buildEnv.baseUri) {
-    throwNotSet('VITE_BASE_URI');
-  }
-
-  if (!buildEnv.orgId) {
-    throwNotSet('VITE_APP_ORG_ID');
-  }
 
   if (
     import.meta.env.VITE_APP_API_KEY_ID &&
@@ -45,10 +34,6 @@ export const getEnv = (): BuildEnvironment => {
       case: 'third_party',
       clientId: import.meta.env.VITE_AUTH_CLIENT_ID,
     };
-  } else {
-    throwNotSet(
-      'VITE_APP_API_KEY_ID/VITE_APP_API_KEY_SECRET or VITE_AUTH_CLIENT_ID'
-    );
   }
 
   env = buildEnv;

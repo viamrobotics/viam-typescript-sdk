@@ -7,5 +7,5 @@
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
     "exactOptionalPropertyTypes": false
   },
-  "include": ["frontend/**/*.ts", "frontend/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
 }

@@ -17,7 +17,7 @@ export const MachinePartsList = (props: MachinesPartsListProps): JSX.Element => 
       setMachineParts(machineParts);
     }
     getMachineParts();
-  }, [appClient]);
+  }, [appClient, machine.id]);
 
   return (
     <div>

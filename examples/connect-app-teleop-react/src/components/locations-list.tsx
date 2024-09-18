@@ -17,7 +17,7 @@ export const LocationsList = (props: LocationsListProps): JSX.Element => {
       setLocations(locations);
     }
     getLocations();
-  }, [appClient]);
+  }, [appClient, orgId]);
 
   return (
     <div>
