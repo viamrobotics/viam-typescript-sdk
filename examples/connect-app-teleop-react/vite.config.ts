@@ -12,9 +12,6 @@ export default ({ mode }) => {
   if (!process.env.VITE_APP_ORG_ID) {
     throwNotSet('VITE_APP_ORG_ID');
   }
-  if (!process.env.VITE_APP_ORG_ID) {
-    throwNotSet('VITE_APP_ORG_ID');
-  }
   if (!(
     process.env.VITE_APP_API_KEY_ID &&
     process.env.VITE_APP_API_KEY_SECRET
