@@ -7,8 +7,7 @@ export interface LocationsListProps {
   onLocationSelected: (location: appApi.Location.AsObject) => unknown;
 }
 
-export const LocationsList = (props: LocationsListProps): JSX.Element => {
-  const { appClient, orgId, onLocationSelected } = props;
+export const LocationsList = ({ appClient, orgId, onLocationSelected }: LocationsListProps): JSX.Element => {
 
   const [locations, setLocations] = useState<appApi.Location.AsObject[]>([]);
   useEffect(() => {
