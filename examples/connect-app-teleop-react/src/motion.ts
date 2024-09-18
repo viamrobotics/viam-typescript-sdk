@@ -68,7 +68,7 @@ export const useMotionControls = (
   }, [base]);
 
   return [state, dispatch];
-}
+};
 
 const reduceMoveRequest = (
   state: MotionState,

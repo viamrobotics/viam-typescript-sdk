@@ -10,8 +10,8 @@ import {
 } from '@viamrobotics/sdk';
 
 const isAccessToken = (x: Credential | AccessToken): x is AccessToken => {
-  return x.type === "access-token";
-}
+  return x.type === 'access-token';
+};
 
 /**
  * Given a set of credentials, get a robot client.

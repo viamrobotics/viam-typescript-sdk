@@ -3,8 +3,8 @@ export interface BuildEnvironment {
   orgId: string;
   isDev: boolean;
   auth:
-  | { case: 'api_key'; apiKeyId: string; apiKeySecret: string }
-  | { case: 'third_party'; clientId: string };
+    | { case: 'api_key'; apiKeyId: string; apiKeySecret: string }
+    | { case: 'third_party'; clientId: string };
 }
 
 let env: BuildEnvironment | undefined;
@@ -15,7 +15,10 @@ export const getEnv = (): BuildEnvironment => {
     return env;
   }
   const buildEnv: BuildEnvironment = {
-    baseUri: import.meta.env.VITE_BASE_URI === '' ? 'http://localhost:9000' : import.meta.env.VITE_BASE_URI,
+    baseUri:
+      import.meta.env.VITE_BASE_URI === ''
+        ? 'http://localhost:9000'
+        : import.meta.env.VITE_BASE_URI,
     orgId: import.meta.env.VITE_APP_ORG_ID,
     isDev: import.meta.env.DEV,
   };
@@ -38,4 +41,4 @@ export const getEnv = (): BuildEnvironment => {
 
   env = buildEnv;
   return env;
-}
+};

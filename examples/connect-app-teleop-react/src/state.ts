@@ -175,7 +175,7 @@ export type BrowserState =
 export interface Breadcrumb {
   name: string;
   onClick?: () => void;
-};
+}
 
 export class BrowserStateStore {
   constructor(
@@ -311,7 +311,7 @@ export const useBrowserStateStore = (
     const connectViamClient = async () => {
       const client = await getViamClient(creds);
       if (!client.appClient) {
-        throw new Error("expected appClient");
+        throw new Error('expected appClient');
       }
       setBrowserState({
         key: BrowserStateKey.Locations,
@@ -319,8 +319,7 @@ export const useBrowserStateStore = (
       });
     };
 
-    connectViamClient()
-      .catch(console.error);;
+    connectViamClient().catch(console.error);
   }, [creds]);
 
   return new BrowserStateStore(browserState, (newState: BrowserState) => {

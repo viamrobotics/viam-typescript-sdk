@@ -12,10 +12,10 @@ export default ({ mode }) => {
   if (!process.env.VITE_APP_ORG_ID) {
     throwNotSet('VITE_APP_ORG_ID');
   }
-  if (!(
-    process.env.VITE_APP_API_KEY_ID &&
-    process.env.VITE_APP_API_KEY_SECRET
-  ) && !process.env.VITE_AUTH_CLIENT_ID) {
+  if (
+    !(process.env.VITE_APP_API_KEY_ID && process.env.VITE_APP_API_KEY_SECRET) &&
+    !process.env.VITE_AUTH_CLIENT_ID
+  ) {
     throwNotSet(
       'VITE_APP_API_KEY_ID/VITE_APP_API_KEY_SECRET or VITE_AUTH_CLIENT_ID'
     );
@@ -24,5 +24,4 @@ export default ({ mode }) => {
   return defineConfig({
     plugins: [react()],
   });
-}
-
+};
