@@ -28,7 +28,8 @@ BASE_PROD_URI="http://localhost:9000"
 viam auth-app register --application-name my-app --org-id "yourorgid" --redirect-uris "$BASE_DEV_URI,$BASE_PROD_URI,$BASE_DEV_URI/app/callback,$BASE_PROD_URI/app/callback" --origin-uris "$BASE_DEV_URI,$BASE_PROD_URI" --logout-uri "$BASE_DEV_URI"
 ```
 
-Note: If you want to use Firefox, you'll need a tool like [ngrok](https://ngrok.com/) since Firefox does not allow WebRTC on localhost hosted pages. You will also need to update the URI list in the command above in addition to using the `VITE_BASE_URI` environment variable (or set in .env) referring to your ngrok (or other proxy) endpoint.
+Note: If you want to use Firefox, you'll need a tool like [ngrok](https://ngrok.com/) since Firefox does not allow WebRTC on localhost hosted pages.
+You will also need to update the URI list in the command above in addition to using the `VITE_BASE_URI` environment variable (or set it in .env) to use your ngrok (or other proxy) endpoint.
 
 The response will look something like this:
 
