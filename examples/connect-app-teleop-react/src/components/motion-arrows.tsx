@@ -13,8 +13,7 @@ export interface MovementControlsProps {
   requestMotion: RequestMotion;
 }
 
-export function MotionArrows(props: MovementControlsProps): JSX.Element {
-  const { motionState, requestMotion } = props;
+export function MotionArrows({ motionState, requestMotion }: MovementControlsProps): JSX.Element {
   const { forward, backward, left, right } = motionState;
 
   return (
