@@ -9,12 +9,7 @@ export interface MachinePartControlProps {
   machinePart: appApi.RobotPart.AsObject;
 }
 
-export const MachinePartControl = (props: MachinePartControlProps): JSX.Element => {
-  const { 
-    credentials,
-    machinePart,
-  } = props;
-
+export const MachinePartControl = ({ credentials, machinePart }: MachinePartControlProps): JSX.Element => {
   const { connectOrDisconnect, streamClient, baseClient } = useRobotClientStore();
   const stream = useStream(streamClient, 'cam');
   const [motionState, requestMotion] = useMotionControls(baseClient);
