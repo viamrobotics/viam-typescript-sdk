@@ -3,31 +3,31 @@ export interface BuildEnvironment {
   orgId: string;
   isDev: boolean;
   auth:
-    | { case: 'api_key'; apiKeyId: string; apiKeySecret: string }
-    | { case: 'third_party'; clientId: string };
+  | { case: 'api_key'; apiKeyId: string; apiKeySecret: string }
+  | { case: 'third_party'; clientId: string };
 }
 
-let _env: BuildEnvironment;
+let env: BuildEnvironment | undefined;
 
-export function getEnv(): BuildEnvironment {
-  if (_env) {
-    return _env;
+const throwNotSet = (envVarKey: string): never => {
+  throw new Error(`${envVarKey} not set`);
+};
+
+export const getEnv = (): BuildEnvironment => {
+  if (env) {
+    return env;
   }
-  let env = {
-    baseUri: import.meta.env.VITE_BASE_URI ?? 'http://localhost:9000',
+  const buildEnv = {
+    baseUri: import.meta.env.VITE_BASE_URI === '' ? 'http://localhost:9000' : import.meta.env.VITE_BASE_URI,
     orgId: import.meta.env.VITE_APP_ORG_ID,
     isDev: import.meta.env.DEV,
   } as BuildEnvironment;
 
-  const throwNotSet = (envVarKey: string): never => {
-    throw new Error(`${envVarKey} not set`);
-  };
-
-  if (!env.baseUri) {
+  if (!buildEnv.baseUri) {
     throwNotSet('VITE_BASE_URI');
   }
 
-  if (!env.orgId) {
+  if (!buildEnv.orgId) {
     throwNotSet('VITE_APP_ORG_ID');
   }
 
@@ -35,13 +35,13 @@ export function getEnv(): BuildEnvironment {
     import.meta.env.VITE_APP_API_KEY_ID &&
     import.meta.env.VITE_APP_API_KEY_SECRET
   ) {
-    env.auth = {
+    buildEnv.auth = {
       case: 'api_key',
       apiKeyId: import.meta.env.VITE_APP_API_KEY_ID,
       apiKeySecret: import.meta.env.VITE_APP_API_KEY_SECRET,
     };
   } else if (import.meta.env.VITE_AUTH_CLIENT_ID) {
-    env.auth = {
+    buildEnv.auth = {
       case: 'third_party',
       clientId: import.meta.env.VITE_AUTH_CLIENT_ID,
     };
@@ -51,6 +51,6 @@ export function getEnv(): BuildEnvironment {
     );
   }
 
-  _env = env;
-  return _env;
+  env = buildEnv;
+  return env;
 }

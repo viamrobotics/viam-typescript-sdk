@@ -172,7 +172,7 @@ export type BrowserState =
   | BrowserStateMachineParts
   | BrowserStateControlMachinePart;
 
-export type Breadcrumb = {
+export interface Breadcrumb {
   name: string;
   onClick?: () => void;
 };
@@ -186,17 +186,20 @@ export class BrowserStateStore {
   public breadcrumbs(): Breadcrumb[] {
     const currentState = this.state;
     switch (currentState.key) {
-      case BrowserStateKey.Loading:
+      case BrowserStateKey.Loading: {
         return [];
-      case BrowserStateKey.Locations:
+      }
+      case BrowserStateKey.Locations: {
         return [{ name: 'Locations' }];
-      case BrowserStateKey.Machines:
+      }
+      case BrowserStateKey.Machines: {
         return [
           { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
           { name: currentState.location.name },
           { name: 'Machines' },
         ];
-      case BrowserStateKey.MachineParts:
+      }
+      case BrowserStateKey.MachineParts: {
         return [
           { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
           {
@@ -206,7 +209,8 @@ export class BrowserStateStore {
           },
           { name: currentState.machine.name },
         ];
-      case BrowserStateKey.ControlMachinePart:
+      }
+      case BrowserStateKey.ControlMachinePart: {
         return [
           { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
           {
@@ -221,6 +225,13 @@ export class BrowserStateStore {
           },
           { name: currentState.machinePart.name },
         ];
+      }
+    }
+  }
+
+  private validateState(currentState: BrowserState) {
+    if (this.state !== currentState) {
+      throw new Error('wrong state');
     }
   }
 
@@ -230,9 +241,7 @@ export class BrowserStateStore {
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
   ): () => void {
-    if (this.state !== currentState) {
-      throw new Error('wrong state');
-    }
+    this.validateState(currentState);
     return () => {
       this.onNewState({
         key: BrowserStateKey.Locations,
@@ -248,9 +257,7 @@ export class BrowserStateStore {
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
   ): (location: appApi.Location.AsObject) => void {
-    if (this.state !== currentState) {
-      throw new Error('wrong state');
-    }
+    this.validateState(currentState);
     return (location: appApi.Location.AsObject) => {
       this.onNewState({
         key: BrowserStateKey.Machines,
@@ -266,9 +273,7 @@ export class BrowserStateStore {
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
   ): (machine: appApi.Robot.AsObject) => void {
-    if (this.state !== currentState) {
-      throw new Error('wrong state');
-    }
+    this.validateState(currentState);
     return (machine: appApi.Robot.AsObject) => {
       this.onNewState({
         key: BrowserStateKey.MachineParts,
@@ -282,9 +287,7 @@ export class BrowserStateStore {
   public onMachinePartSelected(
     currentState: BrowserStateMachineParts | BrowserStateControlMachinePart
   ): (part: appApi.RobotPart.AsObject) => void {
-    if (this.state !== currentState) {
-      throw new Error('wrong state');
-    }
+    this.validateState(currentState);
     return (part: appApi.RobotPart.AsObject) => {
       this.onNewState({
         key: BrowserStateKey.ControlMachinePart,
@@ -305,15 +308,20 @@ export const useBrowserStateStore = (
   });
 
   useEffect(() => {
-    async function connectViamClient() {
+    const connectViamClient = async () => {
       const client = await getViamClient(creds);
+      if (!client.appClient) {
+        throw new Error("expected appClient");
+      }
       setBrowserState({
         key: BrowserStateKey.Locations,
-        appClient: client.appClient!,
+        appClient: client.appClient,
       });
-    }
-    connectViamClient();
-  }, []);
+    };
+
+    connectViamClient()
+      .catch(console.error);;
+  }, [creds]);
 
   return new BrowserStateStore(browserState, (newState: BrowserState) => {
     setBrowserState(newState);

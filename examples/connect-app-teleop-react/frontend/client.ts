@@ -9,7 +9,9 @@ import {
   type ViamClient,
 } from '@viamrobotics/sdk';
 
-const isCredential = (x: any): x is Credential => x;
+const isAccessToken = (x: Credential | AccessToken): x is AccessToken => {
+  return x.type === "access-token";
+}
 
 /**
  * Given a set of credentials, get a robot client.
@@ -24,7 +26,7 @@ export const getRobotClient = async (
   return createRobotClient({
     host: hostname,
     credential: credentials,
-    authEntity: isCredential(credentials) ? credentials.authEntity : '',
+    authEntity: isAccessToken(credentials) ? '' : credentials.authEntity,
     signalingAddress: 'https://app.viam.com:443',
     iceServers: [{ urls: 'stun:global.stun.twilio.com:3478' }],
   });
@@ -39,7 +41,7 @@ export const getRobotClient = async (
 export const getViamClient = async (
   credentials: AccessToken | Credential
 ): Promise<ViamClient> => {
-  return await createViamClient({
+  return createViamClient({
     credential: credentials,
   });
 };

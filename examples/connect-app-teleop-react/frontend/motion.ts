@@ -1,5 +1,5 @@
-import { useEffect, useReducer } from 'react';
 import type { BaseClient } from '@viamrobotics/sdk';
+import { useEffect, useReducer } from 'react';
 
 export interface MotionState {
   forward: boolean;
@@ -15,13 +15,11 @@ export interface MoveRequest {
   state: boolean;
 }
 
-export interface RequestMotion {
-  (request: MoveRequest): void;
-}
+export type RequestMotion = (request: MoveRequest) => void;
 
-export function useMotionControls(
+export const useMotionControls = (
   base: BaseClient | undefined
-): [state: MotionState, dispatch: RequestMotion] {
+): [state: MotionState, dispatch: RequestMotion] => {
   const [state, dispatch] = useReducer(reduceMoveRequest, {
     forward: false,
     backward: false,
@@ -57,7 +55,7 @@ export function useMotionControls(
         .setPower(linearPower, angularPower)
         .catch((error) => console.warn('Error setting base power', error));
     }
-  }, [yLinearPower, zAngularPower]);
+  }, [base, yLinearPower, zAngularPower]);
 
   useEffect(() => {
     return () => {
@@ -84,7 +82,7 @@ const reduceMoveRequest = (
 const mapKeyboardToMoveRequest = (
   event: KeyboardEvent
 ): MoveRequest | undefined => {
-  const isPressed = event.type === 'keydown' ? true : false;
+  const isPressed = event.type === 'keydown';
 
   switch (event.key) {
     case 'ArrowUp':
