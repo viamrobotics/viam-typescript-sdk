@@ -5,8 +5,7 @@ export interface VideoStreamProps {
   children?: ReactNode;
 }
 
-export const VideoStream = (props: VideoStreamProps): JSX.Element => {
-  const { stream, children } = props;
+export const VideoStream = ({ stream, children }: VideoStreamProps): JSX.Element => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
