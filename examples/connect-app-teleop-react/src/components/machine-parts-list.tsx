@@ -7,9 +7,7 @@ export interface MachinesPartsListProps {
   onMachinePartSelected: (machine: appApi.RobotPart.AsObject) => unknown;
 }
 
-export const MachinePartsList = (props: MachinesPartsListProps): JSX.Element => {
-  const { appClient, machine, onMachinePartSelected } = props;
-
+export const MachinePartsList = ({ appClient, machine, onMachinePartSelected }: MachinesPartsListProps): JSX.Element => {
   const [machineParts, setMachineParts] = useState<appApi.RobotPart.AsObject[]>([]);
   useEffect(() => {
     async function getMachineParts() {
