@@ -7,9 +7,7 @@ export interface MachinesListProps {
   onMachineSelected: (machine: appApi.Robot.AsObject) => unknown;
 }
 
-export const MachinesList = (props: MachinesListProps): JSX.Element => {
-  const { appClient, location, onMachineSelected } = props;
-
+export const MachinesList = ({ appClient, location, onMachineSelected }: MachinesListProps): JSX.Element => {
   const [machines, setMachines] = useState<appApi.Robot.AsObject[]>([]);
   useEffect(() => {
     async function getMachines() {
