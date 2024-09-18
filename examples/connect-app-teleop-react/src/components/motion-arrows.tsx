@@ -50,9 +50,8 @@ interface ArrowButtonProps {
   requestMotion: RequestMotion;
 }
 
-function ArrowButton(props: ArrowButtonProps): JSX.Element {
+function ArrowButton({ direction, active, requestMotion }: ArrowButtonProps): JSX.Element {
   const clickedRef = useRef(false);
-  const { direction, active, requestMotion } = props;
 
   const handleMouseDown = () => {
     clickedRef.current = true;
