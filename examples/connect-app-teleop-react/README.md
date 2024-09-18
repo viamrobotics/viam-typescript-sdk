@@ -10,7 +10,7 @@ There are two authentication options for this app:
 
 ### API Key
 
-Go to your organization settings and either create or copy the information for an API key listed "API Keys". The environment variables you'll need in the next step from this are:
+Go to your organization settings and either create or copy the information for an API key listed under "API Keys". The environment variables you'll need in the next step from this are:
 
 ```ini
 VITE_APP_ORG_ID=yourorgid
