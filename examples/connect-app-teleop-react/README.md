@@ -46,7 +46,7 @@ The environment variables you'll need in the next step from this are:
 ```ini
 VITE_APP_ORG_ID=yourorgid
 VITE_AUTH_CLIENT_ID=98c26d9a-435b-419f-b028-208e8d328e09 # the application_id
-VITE_AUTH_CLIENT_SECRET=somesecret
+VITE_AUTH_CLIENT_SECRET=somesecret # the client_secret
 ```
 
 ## Setup
