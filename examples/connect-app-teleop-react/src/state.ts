@@ -301,7 +301,7 @@ export class BrowserStateStore {
 }
 
 export const useBrowserStateStore = (
-  creds: Credential | AccessToken
+  creds: Credential | AccessToken | undefined
 ): BrowserStateStore => {
   const [browserState, setBrowserState] = useState<BrowserState>({
     key: BrowserStateKey.Loading,
@@ -309,6 +309,9 @@ export const useBrowserStateStore = (
 
   useEffect(() => {
     const connectViamClient = async () => {
+      if (!creds) {
+        return;
+      }
       const client = await getViamClient(creds);
       if (!client.appClient) {
         throw new Error('expected appClient');

@@ -1,5 +1,5 @@
 import { FusionAuthProvider, type FusionAuthProviderConfig } from '@fusionauth/react-sdk';
-import { StrictMode } from 'react';
+import { StrictMode, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 import { App } from './app.js';

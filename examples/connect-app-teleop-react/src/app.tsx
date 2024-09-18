@@ -1,5 +1,6 @@
 import { FusionAuthLogoutButton, useFusionAuth } from '@fusionauth/react-sdk';
 import { type AccessToken, type Credential } from '@viamrobotics/sdk';
+import { useEffect, useState } from 'react';
 import { LocationsList } from './components/locations-list.js';
 import { MachinePartControl } from './components/machine-part-control.js';
 import { MachinePartsList } from './components/machine-parts-list.js';
@@ -19,39 +20,54 @@ export const App = ({ env }: AppProps): JSX.Element => {
     startRegister,
   } = useFusionAuth()
 
-  let creds: AccessToken | Credential;
-  if (env.auth.case == "third_party") {
-    if (isFetchingUserInfo) {
+  let [creds, setCreds] = useState<Credential | AccessToken | undefined>(undefined);
+  const browerStateStore = useBrowserStateStore(creds);
+  
+  useEffect(() => {
+    if (env.auth.case == "third_party") {
+      if (!isLoggedIn) {
+        return;
+      }
+      const accessToken = getCookie("app.at");
+      if (accessToken === undefined) {
+        return;
+      }
+      setCreds({
+        type: 'access-token',
+        payload: accessToken,
+      });
+    } else {
+      setCreds({
+        type: 'api-key',
+        authEntity: env.auth.apiKeyId,
+        payload: env.auth.apiKeySecret,
+      });
+    }
+
+    return undefined;
+  }, [isLoggedIn])
+
+  if (!creds) {
+    if (env.auth.case == "third_party") {
+      if (isFetchingUserInfo) {
+        return <p>Loading...</p>
+      }
+
+      if (!isLoggedIn) {
+        return (
+          <div className='mx-2'>
+            <button onClick={() => startLogin()}>Login</button>
+            /
+            <button onClick={() => startRegister()}>Register</button>
+          </div>
+        );
+      }
+
+      return <p>Expected access token</p>;
+    } else {
       return <p>Loading...</p>
     }
-
-    if (!isLoggedIn) {
-      return (
-        <div className='mx-2'>
-          <button onClick={() => startLogin()}>Login</button>
-          /
-          <button onClick={() => startRegister()}>Register</button>
-        </div>
-      );
-    }
-
-    const accessToken = getCookie("app.at");
-    if (accessToken === undefined) {
-      return <p>Expected access token</p>;
-    }
-    creds = {
-      type: 'access-token',
-      payload: accessToken,
-    };
-  } else {
-    creds = {
-      type: 'api-key',
-      authEntity: env.auth.apiKeyId,
-      payload: env.auth.apiKeySecret,
-    }
   }
-
-  const browerStateStore = useBrowserStateStore(creds);
 
   return (
     <div className='mx-2'> 
