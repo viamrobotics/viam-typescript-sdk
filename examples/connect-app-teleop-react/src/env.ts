@@ -1,6 +1,5 @@
 export interface BuildEnvironment {
   baseUri: string;
-  orgId: string;
   isDev: boolean;
   auth:
     | { case: 'api_key'; apiKeyId: string; apiKeySecret: string }
@@ -18,7 +17,6 @@ export const getEnv = (): BuildEnvironment => {
     baseUri: !import.meta.env.VITE_BASE_URI
       ? 'http://localhost:9000'
       : import.meta.env.VITE_BASE_URI,
-    orgId: import.meta.env.VITE_APP_ORG_ID,
     isDev: import.meta.env.DEV,
   } as BuildEnvironment;
 

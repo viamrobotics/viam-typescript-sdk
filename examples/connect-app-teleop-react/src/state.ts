@@ -129,6 +129,7 @@ export const useStream = (
 
 export enum BrowserStateKey {
   Loading,
+  Organizations,
   Locations,
   Machines,
   MachineParts,
@@ -139,14 +140,21 @@ interface BrowserStateLoading {
   key: BrowserStateKey.Loading;
 }
 
+interface BrowserStateOrganizations {
+  key: BrowserStateKey.Organizations;
+  appClient: AppClient;
+}
+
 interface BrowserStateLocations {
   key: BrowserStateKey.Locations;
   appClient: AppClient;
+  organization: appApi.Organization.AsObject;
 }
 
 interface BrowserStateMachines {
   key: BrowserStateKey.Machines;
   appClient: AppClient;
+  organization: appApi.Organization.AsObject;
   location: appApi.Location.AsObject;
 }
 
@@ -154,12 +162,14 @@ interface BrowserStateMachineParts {
   key: BrowserStateKey.MachineParts;
   appClient: AppClient;
   location: appApi.Location.AsObject;
+  organization: appApi.Organization.AsObject;
   machine: appApi.Robot.AsObject;
 }
 
 interface BrowserStateControlMachinePart {
   key: BrowserStateKey.ControlMachinePart;
   appClient: AppClient;
+  organization: appApi.Organization.AsObject;
   location: appApi.Location.AsObject;
   machine: appApi.Robot.AsObject;
   machinePart: appApi.RobotPart.AsObject;
@@ -167,6 +177,7 @@ interface BrowserStateControlMachinePart {
 
 export type BrowserState =
   | BrowserStateLoading
+  | BrowserStateOrganizations
   | BrowserStateLocations
   | BrowserStateMachines
   | BrowserStateMachineParts
@@ -189,19 +200,49 @@ export class BrowserStateStore {
       case BrowserStateKey.Loading: {
         return [];
       }
+      case BrowserStateKey.Organizations: {
+        return [{ name: 'Organizations' }];
+      }
       case BrowserStateKey.Locations: {
-        return [{ name: 'Locations' }];
+        return [
+          {
+            name: 'Organizations',
+            onClick: this.onBrowseOrganizations(currentState),
+          },
+          { name: currentState.organization.name },
+          { name: 'Locations' },
+        ];
       }
       case BrowserStateKey.Machines: {
         return [
-          { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
+          {
+            name: 'Organizations',
+            onClick: this.onBrowseOrganizations(currentState),
+          },
+          {
+            name: currentState.organization.name,
+            onClick: () =>
+              this.onOrganizationSelected(currentState)(
+                currentState.organization
+              ),
+          },
           { name: currentState.location.name },
           { name: 'Machines' },
         ];
       }
       case BrowserStateKey.MachineParts: {
         return [
-          { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
+          {
+            name: 'Organizations',
+            onClick: this.onBrowseOrganizations(currentState),
+          },
+          {
+            name: currentState.organization.name,
+            onClick: () =>
+              this.onOrganizationSelected(currentState)(
+                currentState.organization
+              ),
+          },
           {
             name: currentState.location.name,
             onClick: () =>
@@ -212,7 +253,17 @@ export class BrowserStateStore {
       }
       case BrowserStateKey.ControlMachinePart: {
         return [
-          { name: 'Locations', onClick: this.onBrowseLocations(currentState) },
+          {
+            name: 'Organizations',
+            onClick: this.onBrowseOrganizations(currentState),
+          },
+          {
+            name: currentState.organization.name,
+            onClick: () =>
+              this.onOrganizationSelected(currentState)(
+                currentState.organization
+              ),
+          },
           {
             name: currentState.location.name,
             onClick: () =>
@@ -235,8 +286,9 @@ export class BrowserStateStore {
     }
   }
 
-  public onBrowseLocations(
+  public onBrowseOrganizations(
     currentState:
+      | BrowserStateLocations
       | BrowserStateMachines
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
@@ -244,8 +296,26 @@ export class BrowserStateStore {
     this.validateState(currentState);
     return () => {
       this.onNewState({
+        key: BrowserStateKey.Organizations,
+        appClient: currentState.appClient,
+      });
+    };
+  }
+
+  public onOrganizationSelected(
+    currentState:
+      | BrowserStateOrganizations
+      | BrowserStateLocations
+      | BrowserStateMachines
+      | BrowserStateMachineParts
+      | BrowserStateControlMachinePart
+  ): (organization: appApi.Organization.AsObject) => void {
+    this.validateState(currentState);
+    return (organization: appApi.Organization.AsObject) => {
+      this.onNewState({
         key: BrowserStateKey.Locations,
         appClient: currentState.appClient,
+        organization: organization,
       });
     };
   }
@@ -262,6 +332,7 @@ export class BrowserStateStore {
       this.onNewState({
         key: BrowserStateKey.Machines,
         appClient: currentState.appClient,
+        organization: currentState.organization,
         location,
       });
     };
@@ -278,6 +349,7 @@ export class BrowserStateStore {
       this.onNewState({
         key: BrowserStateKey.MachineParts,
         appClient: currentState.appClient,
+        organization: currentState.organization,
         location: currentState.location,
         machine,
       });
@@ -293,6 +365,7 @@ export class BrowserStateStore {
         key: BrowserStateKey.ControlMachinePart,
         appClient: currentState.appClient,
         location: currentState.location,
+        organization: currentState.organization,
         machine: currentState.machine,
         machinePart: part,
       });
@@ -317,7 +390,7 @@ export const useBrowserStateStore = (
         throw new Error('expected appClient');
       }
       setBrowserState({
-        key: BrowserStateKey.Locations,
+        key: BrowserStateKey.Organizations,
         appClient: client.appClient,
       });
     };

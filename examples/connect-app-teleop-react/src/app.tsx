@@ -5,6 +5,7 @@ import { LocationsList } from './components/locations-list.js';
 import { MachinePartControl } from './components/machine-part-control.js';
 import { MachinePartsList } from './components/machine-parts-list.js';
 import { MachinesList } from './components/machines-list.js';
+import { OrganizationsList } from './components/orgs-list.jsx';
 import type { BuildEnvironment } from './env.js';
 import { BrowserStateKey, BrowserStateStore, useBrowserStateStore, type Breadcrumb } from './state.js';
 
@@ -72,7 +73,7 @@ export const App = ({ env }: AppProps): JSX.Element => {
   return (
     <div className='mx-2'> 
       {env.auth.case == "third_party" ? <FusionAuthLogoutButton className="my-2 text-s" /> : <></>}
-      {renderState(env, creds, browerStateStore)}
+      {renderState(creds, browerStateStore)}
     </div>
   );
 };
@@ -103,20 +104,29 @@ function renderBreadcrumbs(breadcrumbs: Breadcrumb[]) {
 }
 
 function renderState(
-  env: BuildEnvironment, 
   creds: AccessToken | Credential, 
   store: BrowserStateStore,
 ): JSX.Element | string {
   // a simple router to avoid a routing dependency. Your own app may want
   // something more sophisticated
   switch (store.state.key) {
+    case BrowserStateKey.Organizations:
+      return (
+        <>
+          {renderBreadcrumbs(store.breadcrumbs())}
+          <OrganizationsList
+            appClient={store.state.appClient}
+            onOrganizationSelected={store.onOrganizationSelected(store.state)}
+          />
+        </>)
+        ;
     case BrowserStateKey.Locations:
       return (
         <>
           {renderBreadcrumbs(store.breadcrumbs())}
           <LocationsList
             appClient={store.state.appClient}
-            orgId={env.orgId} 
+            organization={store.state.organization} 
             onLocationSelected={store.onLocationSelected(store.state)}
           />
         </>)

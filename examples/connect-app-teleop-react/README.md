@@ -13,7 +13,6 @@ There are two authentication options for this app:
 Go to your organization settings and either create or copy the information for an API key listed under "API Keys". The environment variables you'll need in the next step from this are:
 
 ```ini
-VITE_APP_ORG_ID=yourorgid
 VITE_APP_API_KEY_ID=21d425b4-0aed-49da-82c9-1e9bda895863
 VITE_APP_API_KEY_SECRET=somesecret
 ```
@@ -45,7 +44,6 @@ Info: Successfully registered auth application
 The environment variables you'll need in the next step from this are:
 
 ```ini
-VITE_APP_ORG_ID=yourorgid
 VITE_AUTH_CLIENT_ID=98c26d9a-435b-419f-b028-208e8d328e09 # the application_id
 VITE_AUTH_CLIENT_SECRET=somesecret # the client_secret
 ```
@@ -63,7 +61,6 @@ The organization id, api key, and or client id/secret fields can be pre-filled f
 
 ```ini
 # examples/connect-app-teleop-react/.env
-VITE_APP_ORG_ID=yourorgid
 VITE_AUTH_CLIENT_ID=98c26d9a-435b-419f-b028-208e8d328e09
 VITE_AUTH_CLIENT_SECRET=somesecret
 ```
