@@ -114,3 +114,5 @@ docs/dist
 
 # build-time outputs
 src/api-version.ts
+
+*.DS_Store

@@ -1,0 +1,11 @@
+{
+  "extends": "@viamrobotics/typescript-config/base.json",
+  "compilerOptions": {
+    "types": ["vite/client", "react"],
+    "noEmit": true,
+
+    // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+}
