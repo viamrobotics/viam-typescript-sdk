@@ -1,17 +1,13 @@
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { DIAL_TIMEOUT } from '../constants';
+import type { AccessToken, Credential } from '../main';
 import { RobotClient } from './client';
-
-interface Credential {
-  type: string;
-  payload: string;
-}
 
 /** Options required to dial a robot via gRPC. */
 export interface DialDirectConf {
   authEntity?: string;
   host: string;
-  credential?: Credential;
+  credential?: Credential | AccessToken;
   disableSessions?: boolean;
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
@@ -84,7 +80,7 @@ interface ICEServer {
 export interface DialWebRTCConf {
   authEntity?: string;
   host: string;
-  credential?: Credential;
+  credential?: Credential | AccessToken;
   disableSessions?: boolean;
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
@@ -124,15 +120,11 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   }
   const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
-  let creds;
-  if (conf.credential) {
-    creds = conf.credential;
-  }
   await client.connect({
     authEntity: conf.authEntity ?? impliedURL,
-    creds,
     priority: conf.priority,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
+    creds: conf.credential,
   });
 
   // eslint-disable-next-line no-console
