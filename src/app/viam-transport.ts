@@ -1,9 +1,18 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import { dialDirect } from '@viamrobotics/rpc';
 
-import { AuthenticateRequest, Credentials } from '../gen/proto/rpc/v1/auth_pb';
+import {
+  AuthenticateRequest,
+  Credentials as PBCredentials,
+} from '../gen/proto/rpc/v1/auth_pb';
 import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
 import { MetadataTransport } from '../utils';
+
+/**
+ * Credentials are either used to obtain an access token or provide an existing
+ * one
+ */
+export type Credentials = Credential | AccessToken;
 
 /** A credential that can be exchanged to obtain an access token */
 export interface Credential {
@@ -23,9 +32,7 @@ export interface AccessToken {
   payload: string;
 }
 
-export const isCredential = (
-  object: Credential | AccessToken
-): object is Credential => {
+export const isCredential = (object: Credentials): object is Credential => {
   return 'authEntity' in object;
 };
 
@@ -73,7 +80,7 @@ export const getAccessTokenFromCredential = async (
   });
 
   const entity = credential.authEntity;
-  const creds = new Credentials();
+  const creds = new PBCredentials();
   creds.setType(credential.type);
   creds.setPayload(credential.payload);
 
