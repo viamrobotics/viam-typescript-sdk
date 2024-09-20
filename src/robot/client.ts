@@ -99,6 +99,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private savedCreds: Credentials | undefined;
 
+  private closed: boolean;
+
   private robotServiceClient: RobotServiceClient | undefined;
 
   private armServiceClient: ArmServiceClient | undefined;
@@ -182,12 +184,18 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.emit('connectionstatechange', { eventType });
       });
     }
+
+    this.closed = false;
   }
 
   private onDisconnect(event?: Event) {
     this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
 
     if (this.noReconnect) {
+      return;
+    }
+
+    if (this.closed) {
       return;
     }
 
@@ -395,6 +403,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       this.peerConn = undefined;
     }
     this.sessionManager.reset();
+    this.closed = true;
     this.emit(MachineConnectionEvent.DISCONNECTED, {});
   }
 
@@ -411,6 +420,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     dialTimeout,
   }: ConnectOptions = {}) {
     this.emit(MachineConnectionEvent.CONNECTING, {});
+    this.closed = false;
 
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
