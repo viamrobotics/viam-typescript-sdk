@@ -73,7 +73,7 @@ jobs:
 
   build:
     needs: prepare
-    if: github.repository_owner == 'viamrobotics'
+    # if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
@@ -89,7 +89,7 @@ jobs:
           sudo -u testbot bash -lc 'make build pack'
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: |
@@ -98,13 +98,13 @@ jobs:
 
   release:
     needs: [prepare, build]
-    if: github.repository_owner == 'viamrobotics'
+    # if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/viamrobotics/canon:amd64
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
 
       - name: Release
         uses: softprops/action-gh-release@v1
