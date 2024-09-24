@@ -4,7 +4,7 @@ import {
   RobotServiceClient,
   type ServiceError,
 } from '../gen/robot/v1/robot_pb_service';
-import { ConnectionClosedError } from '../rpc/connection-closed-error';
+import { ConnectionClosedError } from '../rpc';
 import SessionTransport from './session-transport';
 
 const timeoutBlob = new Blob(

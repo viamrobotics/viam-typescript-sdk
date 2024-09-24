@@ -90,17 +90,6 @@ export interface Credentials {
   payload: string;
 }
 
-declare global {
-  // eslint-disable-next-line vars-on-top,no-var
-  var VIAM:
-    | {
-        GRPC_TRANSPORT_FACTORY?: (
-          opts: CrossBrowserHttpTransportInit
-        ) => grpc.TransportFactory;
-      }
-    | undefined;
-}
-
 export const dialDirect = async (
   address: string,
   opts?: DialOptions

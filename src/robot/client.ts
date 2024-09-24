@@ -31,7 +31,7 @@ import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_servi
 import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { ViamResponseStream } from '../responses';
-import { dialDirect, dialWebRTC, type DialOptions } from '../rpc/dial';
+import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
 import { MetadataTransport, encodeResourceName, promisify } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot, RobotStatusStream } from './robot';

@@ -1,5 +1,5 @@
 import { grpc } from '@improbable-eng/grpc-web';
-import { dialDirect } from '../rpc/dial';
+import { dialDirect } from '../rpc';
 
 import {
   AuthenticateRequest,
