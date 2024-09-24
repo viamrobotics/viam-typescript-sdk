@@ -9,8 +9,8 @@ deps:
   - remote: buf.build
     owner: viamrobotics
     repository: api
-    commit: 2e0c7f2fae6c431b9add2760439c8dc5
-    digest: shake256:fc925bada98db2605e064fba52019322133725548e3d471816c4cd3df1fe5c107e8e536f2d3a2f06fb335ab45f8b3819de344df26ef72ee45e1a3e5128196f0c
+    commit: da03264fd1db49baaa28beb1e5029c8a
+    digest: shake256:88f9a9af6f13b8cee42ee400c383d58349ddba003118b27dc960a6afa9858421933cb13d7a4ba6e9cb63a7f0d3bf6ba142bd0ed0de0723201a82627ccc1a8ce8
   - remote: buf.build
     owner: viamrobotics
     repository: goutils
