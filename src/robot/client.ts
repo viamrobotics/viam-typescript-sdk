@@ -1,6 +1,5 @@
 /* eslint-disable max-classes-per-file */
 import { grpc } from '@improbable-eng/grpc-web';
-import { dialDirect, dialWebRTC, type DialOptions } from '@viamrobotics/rpc';
 import { backOff } from 'exponential-backoff';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { isCredential, type Credentials } from '../app/viam-transport';
@@ -32,6 +31,7 @@ import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_servi
 import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
 import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
 import { ViamResponseStream } from '../responses';
+import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
 import { MetadataTransport, encodeResourceName, promisify } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot, RobotStatusStream } from './robot';

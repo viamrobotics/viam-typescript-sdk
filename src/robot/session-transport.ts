@@ -1,5 +1,5 @@
-import { GRPCError } from '@viamrobotics/rpc';
 import { grpc } from '@improbable-eng/grpc-web';
+import { GRPCError } from '../rpc';
 import type SessionManager from './session-manager';
 
 export default class SessionTransport implements grpc.Transport {

@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ConnectionClosedError } from '@viamrobotics/rpc';
-import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
 import { grpc } from '@improbable-eng/grpc-web';
+import { FakeTransportBuilder } from '@improbable-eng/grpc-web-fake-transport';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
+import { ConnectionClosedError } from '../rpc';
 vi.mock('../gen/robot/v1/robot_pb_service');
 
 import SessionManager from './session-manager';
