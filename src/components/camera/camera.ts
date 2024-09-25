@@ -11,6 +11,8 @@ export interface Properties {
   intrinsicParameters?: IntrinsicParameters.AsObject;
   /** Camera distortion parameters, if available. */
   distortionParameters?: DistortionParameters.AsObject;
+  /** Camera frame rate parameters, if available. */
+  frameRate?: number;
 }
 
 export type MimeType =
