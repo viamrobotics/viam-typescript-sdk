@@ -1,19 +1,20 @@
-import { Elm } from './Main.elm';
 import * as VIAM from '@viamrobotics/sdk';
+import { Elm } from './Main.elm';
 
 async function connectWebRTC() {
-  const locationSecret = import.meta.env.VITE_SECRET;
-  const host = import.meta.env.VITE_WEBRTC_HOST;
-  const signalingAddress = import.meta.env.VITE_WEBRTC_SIGNALING_ADDRESS;
+  const host = import.meta.env.VITE_HOST;
+  const apiKeyId = import.meta.env.VITE_API_KEY_ID;
+  const apiKey = import.meta.env.VITE_API_KEY;
 
   return VIAM.createRobotClient({
     host,
-    credential: {
-      type: 'robot-location-secret',
-      payload: locationSecret,
+    credentials: {
+      authEntity: apiKeyId,
+      type: 'api-key',
+      payload: apiKey,
     },
-    authEntity: host,
-    signalingAddress,
+    signalingAddress: 'https://app.viam.com:443',
+    iceServers: [{ urls: 'stun:global.stun.twilio.com:3478' }],
   });
 }
 

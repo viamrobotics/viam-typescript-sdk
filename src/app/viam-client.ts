@@ -1,35 +1,30 @@
-import { grpc } from '@improbable-eng/grpc-web';
-import {
-  createViamTransportFactory,
-  type Credential,
-  type AccessToken,
-  isCredential,
-} from './viam-transport';
+import type { Transport } from '@connectrpc/connect';
+import { SharedSecret_State } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
-import { DataClient } from './data-client';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
+import { DataClient } from './data-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
-import { SharedSecret } from '../gen/app/v1/app_pb';
+import {
+  createViamTransport,
+  isCredential,
+  type Credential,
+  type Credentials,
+} from './viam-transport';
 
 export interface ViamClientOptions {
   serviceHost?: string;
-  credential: Credential | AccessToken;
+  credentials: Credentials;
 }
 
 /** Instantiate a connected gRPC client that interfaces with Viam app. */
 export const createViamClient = async ({
   serviceHost = 'https://app.viam.com',
-  credential,
+  credentials,
 }: ViamClientOptions): Promise<ViamClient> => {
-  const transportFactory = await createViamTransportFactory(
-    serviceHost,
-    credential
-  );
-  const client = new ViamClient(transportFactory, serviceHost, credential);
-  client.connect();
-  return client;
+  const transport = await createViamTransport(serviceHost, credentials);
+  return new ViamClient(transport, credentials);
 };
 
 interface ViamClientMachineConnectionOpts {
@@ -39,36 +34,24 @@ interface ViamClientMachineConnectionOpts {
 
 /** A gRPC client for method calls to Viam app. */
 export class ViamClient {
-  private transportFactory: grpc.TransportFactory;
-  private serviceHost: string;
-  private credential: Credential | AccessToken;
+  private transport: Transport;
+  private credentials: Credentials;
 
-  public dataClient: DataClient | undefined;
-  public appClient: AppClient | undefined;
-  public mlTrainingClient: MlTrainingClient | undefined;
-  public provisioningClient: ProvisioningClient | undefined;
-  public billingClient: BillingClient | undefined;
+  public readonly dataClient: DataClient;
+  public readonly appClient: AppClient;
+  public readonly mlTrainingClient: MlTrainingClient;
+  public readonly provisioningClient: ProvisioningClient;
+  public readonly billingClient: BillingClient;
 
-  constructor(
-    transportFactory: grpc.TransportFactory,
-    serviceHost: string,
-    credential: Credential | AccessToken
-  ) {
-    this.transportFactory = transportFactory;
-    this.serviceHost = serviceHost;
-    this.credential = credential;
-  }
+  constructor(transport: Transport, credentials: Credentials) {
+    this.transport = transport;
+    this.credentials = credentials;
 
-  public connect() {
-    const grpcOptions = { transport: this.transportFactory };
-    this.dataClient = new DataClient(this.serviceHost, grpcOptions);
-    this.appClient = new AppClient(this.serviceHost, grpcOptions);
-    this.mlTrainingClient = new MlTrainingClient(this.serviceHost, grpcOptions);
-    this.provisioningClient = new ProvisioningClient(
-      this.serviceHost,
-      grpcOptions
-    );
-    this.billingClient = new BillingClient(this.serviceHost, grpcOptions);
+    this.dataClient = new DataClient(this.transport);
+    this.appClient = new AppClient(this.transport);
+    this.mlTrainingClient = new MlTrainingClient(this.transport);
+    this.provisioningClient = new ProvisioningClient(this.transport);
+    this.billingClient = new BillingClient(this.transport);
   }
 
   public async connectToMachine({
@@ -83,8 +66,8 @@ export class ViamClient {
 
     // Get address if only ID was provided
     if (id !== undefined && host === undefined) {
-      const parts = await this.appClient?.getRobotParts(id);
-      const mainPart = parts?.find((part) => part.mainPart);
+      const parts = await this.appClient.getRobotParts(id);
+      const mainPart = parts.find((part) => part.mainPart);
       if (!mainPart) {
         throw new Error(
           `Could not find a main part for the machine with UUID: ${id}`
@@ -100,8 +83,8 @@ export class ViamClient {
       );
     }
 
-    // If credential is AccessToken, then attempt to get the robot location secret
-    let creds = this.credential;
+    // If credentials is AccessToken, then attempt to get the robot location secret
+    let creds = this.credentials;
     if (!isCredential(creds)) {
       if (locationId === undefined) {
         // If we don't have a location, try to get it from the address
@@ -114,9 +97,10 @@ export class ViamClient {
       }
       if (locationId !== undefined) {
         // If we found the location, then attempt to get its secret
-        const location = await this.appClient?.getLocation(locationId);
-        const secret = location?.auth?.secretsList.find(
-          (sec) => sec.state === SharedSecret.State.STATE_ENABLED
+        const location = await this.appClient.getLocation(locationId);
+        const secret = location?.auth?.secrets.find(
+          // eslint-disable-next-line camelcase
+          (sec) => sec.state === SharedSecret_State.ENABLED
         );
         creds = {
           type: 'robot-location-secret',
@@ -127,10 +111,8 @@ export class ViamClient {
     }
 
     return createRobotClient({
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       host: address,
-      credential: creds,
-      authEntity: (creds as Credential).authEntity,
+      credentials: creds,
       signalingAddress: 'https://app.viam.com:443',
       reconnectMaxAttempts: 1,
     });

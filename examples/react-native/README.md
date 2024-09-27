@@ -22,38 +22,42 @@ This example demonstrates how to connect to a robot using a React Native app. Fo
 
 ## Configuration
 
-Using Viam's TypeScript SDK with React Native requires some configurations. They are outlined below:
+Using Viam's TypeScript SDK with React Native requires some configurations. They are outlined below. Copying this project as a template is a good approach given the dependencies and polyfills requried. In the future, we hope to minimize the work neeed to get started here.
 
 ### Dependencies
 
 The following direct dependencies are required:
 
-- `react-native-webrtc`
-- `react-native-url-polyfill`
-- `@improbable-eng/grpc-web-react-native-transport`
+- fast-text-encoding
+- react-native-fast-encoder
+- react-native-fetch-api
+- react-native-url-polyfill
+- react-native-webrtc
+- web-streams-polyfill
 
-#### `index.js`
+In addition, polyfills and a custom gRPC Transport are provided at `polyfills.[native].ts` and `transport.ts` respectively.
 
-The `index.js` file was updated to include the following polyfills and updates:
+#### `App.tsx`
 
-- URL polyfill:
+The `App.tsx` file was updated to include the following polyfills and updates:
+
+- Polyfills:
 
   ```js
-  import 'react-native-url-polyfill/auto';
-  ```
+  import { polyfills } from "./polyfills";
+  polyfills();
 
-- React Native WebRTC globals:
-
-  ```js
-  import {registerGlobals} from 'react-native-webrtc';
-  registerGlobals();
   ```
 
 - GRPC connection configuration
   ```js
-  import {ReactNativeTransport} from '@improbable-eng/grpc-web-react-native-transport';
-  global.VIAM = {
-    GRPC_TRANSPORT_FACTORY: ReactNativeTransport,
+  import { GrpcWebTransportOptions } from "@connectrpc/connect-web";
+  import { createXHRGrpcWebTransport } from './transport';
+
+  globalThis.VIAM = {
+    GRPC_TRANSPORT_FACTORY: (opts: GrpcWebTransportOptions) => {
+      return createXHRGrpcWebTransport(opts);
+    }
   };
   ```
 

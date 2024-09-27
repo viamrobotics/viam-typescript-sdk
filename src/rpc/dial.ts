@@ -1,108 +1,116 @@
-import { grpc } from '@improbable-eng/grpc-web';
-import type { ProtobufMessage } from '@improbable-eng/grpc-web/dist/typings/message';
-import { Code } from '../gen/google/rpc/code_pb';
-import { Status } from '../gen/google/rpc/status_pb';
-import {
-  AuthenticateRequest,
-  AuthenticateResponse,
-  AuthenticateToRequest,
-  AuthenticateToResponse,
-  Credentials as PBCredentials,
-} from '../gen/proto/rpc/v1/auth_pb';
+import { Message } from '@bufbuild/protobuf';
+
+import type {
+  AnyMessage,
+  MethodInfo,
+  PartialMessage,
+  ServiceType,
+} from '@bufbuild/protobuf';
+
+import type {
+  CallOptions,
+  ContextValues,
+  StreamResponse,
+  Transport,
+  UnaryResponse,
+} from '@connectrpc/connect';
+import { Code, ConnectError, createPromiseClient } from '@connectrpc/connect';
 import {
   AuthService,
   ExternalAuthService,
-} from '../gen/proto/rpc/v1/auth_pb_service';
+} from '../gen/proto/rpc/v1/auth_connect';
 import {
-  CallRequest,
-  CallResponse,
-  CallUpdateRequest,
-  CallUpdateResponse,
-  ICECandidate,
-  OptionalWebRTCConfigRequest,
-  OptionalWebRTCConfigResponse,
-  WebRTCConfig,
-} from '../gen/proto/rpc/webrtc/v1/signaling_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_pb_service';
-import { ClientChannel } from './client-channel';
-import { ConnectionClosedError } from './connection-closed-error';
-import { addSdpFields, newPeerConnectionForClient } from './peer';
+  AuthenticateRequest,
+  Credentials as PBCredentials,
+} from '../gen/proto/rpc/v1/auth_pb';
+import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
+import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+import { newPeerConnectionForClient } from './peer';
 
-import type { CrossBrowserHttpTransportInit } from '@improbable-eng/grpc-web/dist/typings/transports/http/http';
-import { atob, btoa } from './polyfills';
+import { createGrpcWebTransport } from '@connectrpc/connect-web';
+import { isCredential, type Credentials } from '../app/viam-transport';
+import { SignalingExchange } from './signaling-exchange';
 
 export interface DialOptions {
-  authEntity?: string | undefined;
   credentials?: Credentials | undefined;
   webrtcOptions?: DialWebRTCOptions;
   externalAuthAddress?: string | undefined;
   externalAuthToEntity?: string | undefined;
 
-  // `accessToken` allows a pre-authenticated client to dial with
-  // an authorization header. Direct dial will have the access token
-  // appended to the "Authorization: Bearer" header. WebRTC dial will
-  // appened it to the signaling server communication
-  //
-  // If enabled, other auth options have no affect. Eg. authEntity, credentials,
-  // externalAuthAddress, externalAuthToEntity, webrtcOptions.signalingAccessToken
+  /**
+   * `accessToken` allows a pre-authenticated client to dial with an
+   * authorization header. Direct dial will have the access token appended to
+   * the "Authorization: Bearer" header. WebRTC dial will appened it to the
+   * signaling server communication
+   *
+   * If enabled, other auth options have no affect. Eg. authEntity, credentials,
+   * externalAuthAddress, externalAuthToEntity,
+   * webrtcOptions.signalingAccessToken
+   */
   accessToken?: string | undefined;
 
   // set timeout in milliseconds for dialing.
   dialTimeout?: number | undefined;
+
+  extraHeaders?: Headers;
 }
 
 export interface DialWebRTCOptions {
   disableTrickleICE: boolean;
   rtcConfig?: RTCConfiguration;
 
-  // signalingAuthEntity is the entity to authenticate as to the signaler.
-  signalingAuthEntity?: string;
-
-  // signalingExternalAuthAddress is the address to perform external auth yet.
-  // This is unlikely to be needed since the signaler is typically in the same
-  // place where authentication happens.
+  /**
+   * SignalingExternalAuthAddress is the address to perform external auth yet.
+   * This is unlikely to be needed since the signaler is typically in the same
+   * place where authentication happens.
+   */
   signalingExternalAuthAddress?: string;
 
-  // signalingExternalAuthToEntity is the entity to authenticate for after
-  // externally authenticating.
-  // This is unlikely to be needed since the signaler is typically in the same
-  // place where authentication happens.
+  /**
+   * SignalingExternalAuthToEntity is the entity to authenticate for after
+   * externally authenticating. This is unlikely to be needed since the signaler
+   * is typically in the same place where authentication happens.
+   */
   signalingExternalAuthToEntity?: string;
 
   // signalingCredentials are used to authenticate the request to the signaling server.
   signalingCredentials?: Credentials;
 
-  // `signalingAccessToken` allows a pre-authenticated client to dial with
-  // an authorization header to the signaling server. This skips the Authenticate()
-  // request to the singaling server or external auth but does not skip the
-  // AuthenticateTo() request to retrieve the credentials at the external auth
-  // endpoint.
-  //
-  // If enabled, other auth options have no affect. Eg. authEntity, credentials, signalingAuthEntity, signalingCredentials.
+  /**
+   * `signalingAccessToken` allows a pre-authenticated client to dial with an
+   * authorization header to the signaling server. This skips the Authenticate()
+   * request to the singaling server or external auth but does not skip the
+   * AuthenticateTo() request to retrieve the credentials at the external auth
+   * endpoint.
+   *
+   * If enabled, other auth options have no affect. Eg. authEntity, credentials,
+   * signalingAuthEntity, signalingCredentials.
+   */
   signalingAccessToken?: string;
 
   // `additionalSDPValues` is a collection of additional SDP values that we want to pass into the connection's call request.
   additionalSdpFields?: Record<string, string | number>;
 }
 
-export interface Credentials {
-  type: string;
-  payload: string;
+export type TransportFactory = (
+  // platform specific
+  init: TransportInitOptions
+) => Transport;
+
+interface TransportInitOptions {
+  baseUrl: string;
 }
 
 export const dialDirect = async (
   address: string,
   opts?: DialOptions
-): Promise<grpc.TransportFactory> => {
+): Promise<Transport> => {
   validateDialOptions(opts);
-  const defaultFactory = (
-    transportOpts: grpc.TransportOptions
-  ): grpc.Transport => {
-    const transFact: (
-      init: CrossBrowserHttpTransportInit
-    ) => grpc.TransportFactory =
-      window.VIAM?.GRPC_TRANSPORT_FACTORY ?? grpc.CrossBrowserHttpTransport;
-    return transFact({ withCredentials: false })(transportOpts);
+  const createTransport =
+    globalThis.VIAM?.GRPC_TRANSPORT_FACTORY ?? createGrpcWebTransport;
+
+  const transportOpts = {
+    baseUrl: address,
   };
 
   // Client already has access token with no external auth, skip Authenticate process.
@@ -110,275 +118,243 @@ export const dialDirect = async (
     opts?.accessToken &&
     !(opts.externalAuthAddress && opts.externalAuthToEntity)
   ) {
-    const md = new grpc.Metadata();
-    md.set('authorization', `Bearer ${opts.accessToken}`);
-    return (transportOpts: grpc.TransportOptions): grpc.Transport => {
-      return new AuthenticatedTransport(transportOpts, defaultFactory, md);
-    };
+    const headers = new Headers(opts.extraHeaders);
+    headers.set('authorization', `Bearer ${opts.accessToken}`);
+    return new AuthenticatedTransport(transportOpts, createTransport, headers);
   }
 
   if (!opts || (!opts.credentials && !opts.accessToken)) {
-    return defaultFactory;
+    return createTransport(transportOpts);
   }
 
-  return makeAuthenticatedTransportFactory(address, defaultFactory, opts);
+  return makeAuthenticatedTransport(
+    address,
+    createTransport,
+    opts,
+    transportOpts
+  );
 };
 
-const makeAuthenticatedTransportFactory = async (
+const addressCleanupRegex = /^.*:\/\//u;
+
+const makeAuthenticatedTransport = async (
   address: string,
-  defaultFactory: grpc.TransportFactory,
-  opts: DialOptions
-): Promise<grpc.TransportFactory> => {
-  let accessToken = '';
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  const getExtraMetadata = async (): Promise<grpc.Metadata> => {
-    const md = new grpc.Metadata();
-    // TODO(GOUT-10): handle expiration
-    if (accessToken === '') {
-      let thisAccessToken = '';
+  defaultFactory: TransportFactory,
+  opts: DialOptions,
+  transportOpts: TransportInitOptions
+): Promise<Transport> => {
+  const authHeaders = new Headers(opts.extraHeaders);
 
-      let pResolve: (value: grpc.Metadata) => void;
-      let pReject: (reason?: unknown) => void;
-
-      if (!opts.accessToken || opts.accessToken === '') {
-        const request = new AuthenticateRequest();
-        request.setEntity(opts.authEntity ?? address.replace(/^.*:\/\//u, ''));
-        if (opts.credentials) {
-          const creds = new PBCredentials();
-          creds.setType(opts.credentials.type);
-          creds.setPayload(opts.credentials.payload);
-          request.setCredentials(creds);
-        }
-
-        const done = new Promise<grpc.Metadata>((resolve, reject) => {
-          pResolve = resolve;
-          pReject = reject;
-        });
-
-        grpc.invoke(AuthService.Authenticate, {
-          request,
-          host: opts.externalAuthAddress ?? address,
-          transport: defaultFactory,
-          onMessage: (message: AuthenticateResponse) => {
-            thisAccessToken = message.getAccessToken();
-          },
-          onEnd: (
-            code: grpc.Code,
-            msg: string | undefined,
-            _trailers: grpc.Metadata
-          ) => {
-            if (code === grpc.Code.OK) {
-              pResolve(md);
-            } else {
-              pReject(msg);
-            }
-          },
-        });
-        await done;
-      } else {
-        thisAccessToken = opts.accessToken;
-      }
-
-      // eslint-disable-next-line require-atomic-updates
-      accessToken = thisAccessToken;
-
-      if (opts.externalAuthAddress && opts.externalAuthToEntity) {
-        const authMd = new grpc.Metadata();
-        authMd.set('authorization', `Bearer ${accessToken}`);
-
-        const done = new Promise<grpc.Metadata>((resolve, reject) => {
-          pResolve = resolve;
-          pReject = reject;
-        });
-        thisAccessToken = '';
-
-        const request = new AuthenticateToRequest();
-        request.setEntity(opts.externalAuthToEntity);
-        grpc.invoke(ExternalAuthService.AuthenticateTo, {
-          request,
-          host: opts.externalAuthAddress,
-          transport: defaultFactory,
-          metadata: authMd,
-          onMessage: (message: AuthenticateToResponse) => {
-            thisAccessToken = message.getAccessToken();
-          },
-          onEnd: (
-            code: grpc.Code,
-            msg: string | undefined,
-            _trailers: grpc.Metadata
-          ) => {
-            if (code === grpc.Code.OK) {
-              pResolve(authMd);
-            } else {
-              pReject(msg);
-            }
-          },
-        });
-        await done;
-        // eslint-disable-next-line require-atomic-updates
-        accessToken = thisAccessToken;
-      }
+  let accessToken;
+  if (!opts.accessToken || opts.accessToken === '') {
+    const request = new AuthenticateRequest({
+      entity:
+        isCredential(opts.credentials) && opts.credentials.authEntity
+          ? opts.credentials.authEntity
+          : address.replace(addressCleanupRegex, ''),
+    });
+    if (opts.credentials) {
+      request.credentials = new PBCredentials({
+        type: opts.credentials.type,
+        payload: opts.credentials.payload,
+      });
     }
-    md.set('authorization', `Bearer ${accessToken}`);
-    return md;
-  };
-  const extraMd = await getExtraMetadata();
-  return (transportOpts: grpc.TransportOptions): grpc.Transport => {
-    return new AuthenticatedTransport(transportOpts, defaultFactory, extraMd);
-  };
+
+    const resolvedAddress = opts.externalAuthAddress ?? address;
+    const transport = defaultFactory({ baseUrl: resolvedAddress });
+    const authClient = createPromiseClient(AuthService, transport);
+    const resp = await authClient.authenticate(request);
+    accessToken = resp.accessToken;
+  } else {
+    accessToken = opts.accessToken;
+  }
+
+  if (opts.externalAuthAddress && opts.externalAuthToEntity) {
+    const extAuthHeaders = new Headers();
+    extAuthHeaders.set('authorization', `Bearer ${accessToken}`);
+
+    accessToken = '';
+
+    const request = new AuthenticateRequest({
+      entity: opts.externalAuthToEntity,
+    });
+    const transport = defaultFactory({
+      baseUrl: opts.externalAuthAddress,
+    });
+    const externalAuthClient = createPromiseClient(
+      ExternalAuthService,
+      transport
+    );
+    const resp = await externalAuthClient.authenticateTo(request, {
+      headers: extAuthHeaders,
+    });
+    accessToken = resp.accessToken;
+  }
+  authHeaders.set('authorization', `Bearer ${accessToken}`);
+  return new AuthenticatedTransport(transportOpts, defaultFactory, authHeaders);
 };
 
-class AuthenticatedTransport implements grpc.Transport {
-  protected readonly opts: grpc.TransportOptions;
-  protected readonly transport: grpc.Transport;
-  protected readonly extraMetadata: grpc.Metadata;
+class AuthenticatedTransport implements Transport {
+  protected readonly transport: Transport;
+  protected readonly extraHeaders: Headers;
 
   constructor(
-    opts: grpc.TransportOptions,
-    defaultFactory: grpc.TransportFactory,
-    extraMetadata: grpc.Metadata
+    opts: TransportInitOptions,
+    defaultFactory: TransportFactory,
+    extraHeaders: Headers
   ) {
-    this.opts = opts;
-    this.extraMetadata = extraMetadata;
+    this.extraHeaders = extraHeaders;
     this.transport = defaultFactory(opts);
   }
 
-  public start(metadata: grpc.Metadata) {
-    // eslint-disable-next-line unicorn/no-array-for-each
-    this.extraMetadata.forEach((key: string, values: string | string[]) => {
-      metadata.set(key, values);
-    });
-    this.transport.start(metadata);
+  public async unary<
+    I extends Message<I> = AnyMessage,
+    O extends Message<O> = AnyMessage,
+  >(
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    message: PartialMessage<I>,
+    contextValues?: ContextValues
+  ): Promise<UnaryResponse<I, O>> {
+    const newHeaders = cloneHeaders(header);
+    for (const [key, value] of this.extraHeaders) {
+      newHeaders.set(key, value);
+    }
+    return this.transport.unary(
+      service,
+      method,
+      signal,
+      timeoutMs,
+      newHeaders,
+      message,
+      contextValues
+    );
   }
 
-  public sendMessage(msgBytes: Uint8Array) {
-    this.transport.sendMessage(msgBytes);
-  }
-
-  public finishSend() {
-    this.transport.finishSend();
-  }
-
-  public cancel() {
-    this.transport.cancel();
+  public async stream<
+    I extends Message<I> = AnyMessage,
+    O extends Message<O> = AnyMessage,
+  >(
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    input: AsyncIterable<PartialMessage<I>>,
+    contextValues?: ContextValues
+  ): Promise<StreamResponse<I, O>> {
+    const newHeaders = cloneHeaders(header);
+    for (const [key, value] of this.extraHeaders) {
+      newHeaders.set(key, value);
+    }
+    return this.transport.stream(
+      service,
+      method,
+      signal,
+      timeoutMs,
+      newHeaders,
+      input,
+      contextValues
+    );
   }
 }
 
+export const cloneHeaders = (headers: HeadersInit | undefined): Headers => {
+  const cloned = new Headers();
+  if (headers !== undefined) {
+    if (Array.isArray(headers)) {
+      for (const [key, value] of headers) {
+        cloned.append(key, value);
+      }
+    } else if ('forEach' in headers) {
+      if (typeof headers.forEach === 'function') {
+        // eslint-disable-next-line unicorn/no-array-for-each
+        headers.forEach((value, key) => {
+          cloned.append(key, value);
+        });
+      }
+    } else {
+      for (const [key, value] of Object.entries<string>(headers)) {
+        cloned.append(key, value);
+      }
+    }
+  }
+  return cloned;
+};
+
 export interface WebRTCConnection {
-  transportFactory: grpc.TransportFactory;
+  transport: Transport;
   peerConnection: RTCPeerConnection;
   dataChannel: RTCDataChannel;
 }
 
 const getOptionalWebRTCConfig = async (
   signalingAddress: string,
-  host: string,
-  opts?: DialOptions
+  callOpts: CallOptions,
+  dialOpts?: DialOptions
 ): Promise<WebRTCConfig> => {
-  const optsCopy = { ...opts } as DialOptions;
+  const optsCopy = { ...dialOpts } as DialOptions;
   const directTransport = await dialDirect(signalingAddress, optsCopy);
 
-  let pResolve: (value: WebRTCConfig) => void;
-  let pReject: (reason?: unknown) => void;
-
-  let result: WebRTCConfig | undefined;
-  const done = new Promise<WebRTCConfig>((resolve, reject) => {
-    pResolve = resolve;
-    pReject = reject;
-  });
-
-  grpc.unary(SignalingService.OptionalWebRTCConfig, {
-    request: new OptionalWebRTCConfigRequest(),
-    metadata: {
-      'rpc-host': host,
-    },
-    host: signalingAddress,
-    transport: directTransport,
-    onEnd: (resp: grpc.UnaryOutput<OptionalWebRTCConfigResponse>) => {
-      const { status, statusMessage, message } = resp;
-      if (status === grpc.Code.OK && message) {
-        result = message.getConfig();
-        if (!result) {
-          pResolve(new WebRTCConfig());
-          return;
-        }
-        pResolve(result);
-        // In some cases the `OptionalWebRTCConfig` method seems to be unimplemented, even
-        // when building `viam-server` from latest. Falling back to a default config seems
-        // harmless in these cases, and allows connection to continue.
-      } else if (status === grpc.Code.Unimplemented) {
-        pResolve(new WebRTCConfig());
-      } else {
-        pReject(statusMessage);
-      }
-    },
-  });
-
-  await done;
-
-  if (!result) {
-    throw new Error('no config');
+  const signalingClient = createPromiseClient(
+    SignalingService,
+    directTransport
+  );
+  try {
+    const resp = await signalingClient.optionalWebRTCConfig({}, callOpts);
+    return resp.config ?? new WebRTCConfig();
+  } catch (error) {
+    if (error instanceof ConnectError && error.code === Code.Unimplemented) {
+      return new WebRTCConfig();
+    }
+    throw error;
   }
-  return result;
 };
 
-// dialWebRTC makes a connection to given host by signaling with the address provided. A Promise is returned
-// upon successful connection that contains a transport factory to use with gRPC client as well as the WebRTC
-// PeerConnection itself. Care should be taken with the PeerConnection and is currently returned for experimental
-// use.
-// TODO(GOUT-7): figure out decent way to handle reconnect on connection termination
+/**
+ * DialWebRTC makes a connection to given host by signaling with the address
+ * provided. A Promise is returned upon successful connection that contains a
+ * transport factory to use with gRPC client as well as the WebRTC
+ * PeerConnection itself. Care should be taken with the PeerConnection and is
+ * currently returned for experimental use. TODO(GOUT-7): figure out decent way
+ * to handle reconnect on connection termination
+ */
 export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
-  opts?: DialOptions
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  dialOpts?: DialOptions
 ): Promise<WebRTCConnection> => {
   const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
-  validateDialOptions(opts);
+  validateDialOptions(dialOpts);
 
-  // TODO(RSDK-2836): In general, this logic should be in parity with the golang implementation.
-  // https://github.com/viamrobotics/goutils/blob/main/rpc/wrtc_client.go#L160-L175
-  const config = await getOptionalWebRTCConfig(
+  /**
+   * TODO(RSDK-2836): In general, this logic should be in parity with the golang
+   * implementation.
+   * https://github.com/viamrobotics/goutils/blob/main/rpc/wrtc_client.go#L160-L175
+   */
+  const callOpts = {
+    headers: {
+      'rpc-host': host,
+    },
+  };
+
+  /**
+   * First complete our WebRTC options, gathering any extra information like
+   * TURN servers from a cloud server.
+   */
+  const webrtcOpts = await processWebRTCOpts(
     usableSignalingAddress,
-    host,
-    opts
+    callOpts,
+    dialOpts
   );
-  const additionalIceServers: RTCIceServer[] = config
-    .toObject()
-    .additionalIceServersList.map((ice) => {
-      return {
-        urls: ice.urlsList,
-        credential: ice.credential,
-        username: ice.username,
-      };
-    });
-
-  const usableOpts = opts ?? {};
-
-  let webrtcOpts: DialWebRTCOptions;
-  if (usableOpts.webrtcOptions) {
-    // RSDK-8715: We deep copy here to avoid mutating the input config's `rtcConfig.iceServers`
-    // list.
-    webrtcOpts = JSON.parse(
-      JSON.stringify(usableOpts.webrtcOptions)
-    ) as DialWebRTCOptions;
-    if (webrtcOpts.rtcConfig) {
-      webrtcOpts.rtcConfig.iceServers = [
-        ...(webrtcOpts.rtcConfig.iceServers ?? []),
-        ...additionalIceServers,
-      ];
-    } else {
-      webrtcOpts.rtcConfig = { iceServers: additionalIceServers };
-    }
-  } else {
-    // use additional webrtc config as default
-    webrtcOpts = {
-      disableTrickleICE: config.getDisableTrickle(),
-      rtcConfig: {
-        iceServers: additionalIceServers,
-      },
-    };
-  }
+  // then derive options specifically for signaling against our target.
+  const exchangeOpts = processSignalingExchangeOpts(
+    usableSignalingAddress,
+    dialOpts
+  );
 
   const { pc, dc } = await newPeerConnectionForClient(
     webrtcOpts.disableTrickleICE,
@@ -387,301 +363,54 @@ export const dialWebRTC = async (
   );
   let successful = false;
 
+  let directTransport: Transport;
   try {
-    // replace auth entity and creds
-    let optsCopy = usableOpts;
-    optsCopy = { ...usableOpts } as DialOptions;
+    directTransport = await dialDirect(usableSignalingAddress, exchangeOpts);
+  } catch (error) {
+    pc.close();
+    throw error;
+  }
 
-    if (!usableOpts.accessToken) {
-      optsCopy.authEntity = usableOpts.webrtcOptions?.signalingAuthEntity;
-      if (!optsCopy.authEntity) {
-        optsCopy.authEntity = optsCopy.externalAuthAddress
-          ? usableOpts.externalAuthAddress?.replace(/^.*:\/\//u, '')
-          : usableSignalingAddress.replace(/^.*:\/\//u, '');
-      }
-      optsCopy.credentials = usableOpts.webrtcOptions?.signalingCredentials;
-      optsCopy.accessToken = usableOpts.webrtcOptions?.signalingAccessToken;
-    }
+  const signalingClient = createPromiseClient(
+    SignalingService,
+    directTransport
+  );
 
-    optsCopy.externalAuthAddress =
-      usableOpts.webrtcOptions?.signalingExternalAuthAddress;
-    optsCopy.externalAuthToEntity =
-      usableOpts.webrtcOptions?.signalingExternalAuthToEntity;
-
-    const directTransport = await dialDirect(usableSignalingAddress, optsCopy);
-    const client = grpc.client(SignalingService.Call, {
-      host: usableSignalingAddress,
-      transport: directTransport,
-    });
-
-    let uuid = '';
-    // only send once since exchange may end or ICE may end
-    let sentDoneOrErrorOnce = false;
-    const sendError = (err: string) => {
-      if (sentDoneOrErrorOnce) {
-        return;
-      }
-      sentDoneOrErrorOnce = true;
-      const callRequestUpdate = new CallUpdateRequest();
-      callRequestUpdate.setUuid(uuid);
-      const status = new Status();
-      status.setCode(Code.UNKNOWN);
-      status.setMessage(err);
-      callRequestUpdate.setError(status);
-      grpc.unary(SignalingService.CallUpdate, {
-        request: callRequestUpdate,
-        metadata: {
-          'rpc-host': host,
-        },
-        host: usableSignalingAddress,
-        transport: directTransport,
-        onEnd: (output: grpc.UnaryOutput<CallUpdateResponse>) => {
-          const { status: grpcStatus, statusMessage, message } = output;
-          if (grpcStatus === grpc.Code.OK && message) {
-            return;
-          }
-          console.error(statusMessage);
-        },
-      });
-    };
-    const sendDone = () => {
-      if (sentDoneOrErrorOnce) {
-        return;
-      }
-      sentDoneOrErrorOnce = true;
-      const callRequestUpdate = new CallUpdateRequest();
-      callRequestUpdate.setUuid(uuid);
-      callRequestUpdate.setDone(true);
-      grpc.unary(SignalingService.CallUpdate, {
-        request: callRequestUpdate,
-        metadata: {
-          'rpc-host': host,
-        },
-        host: usableSignalingAddress,
-        transport: directTransport,
-        onEnd: (output: grpc.UnaryOutput<CallUpdateResponse>) => {
-          const { status, statusMessage, message } = output;
-          if (status === grpc.Code.OK && message) {
-            return;
-          }
-          console.error(statusMessage);
-        },
-      });
-    };
-
-    let pResolve: (value: unknown) => void;
-    const remoteDescSet = new Promise<unknown>((resolve) => {
-      pResolve = resolve;
-    });
-    let exchangeDone = false;
-    if (!webrtcOpts.disableTrickleICE) {
-      // set up offer
-      const offerDesc = await pc.createOffer({});
-
-      let iceComplete = false;
-      let numCallUpdates = 0;
-      let maxCallUpdateDuration = 0;
-      let totalCallUpdateDuration = 0;
-
-      pc.addEventListener('iceconnectionstatechange', () => {
-        if (pc.iceConnectionState !== 'completed' || numCallUpdates === 0) {
-          return;
-        }
-        const averageCallUpdateDuration =
-          totalCallUpdateDuration / numCallUpdates;
-        console.groupCollapsed('Caller update statistics');
-        console.table({
-          num_updates: numCallUpdates,
-          average_duration: `${averageCallUpdateDuration}ms`,
-          max_duration: `${maxCallUpdateDuration}ms`,
-        });
-        console.groupEnd();
-      });
-      pc.addEventListener(
-        'icecandidate',
-        async (event: { candidate: RTCIceCandidateInit | null }) => {
-          await remoteDescSet;
-          if (exchangeDone) {
-            return;
-          }
-
-          if (event.candidate === null) {
-            iceComplete = true;
-            sendDone();
-            return;
-          }
-
-          if (event.candidate.candidate !== undefined) {
-            console.debug(`gathered local ICE ${event.candidate.candidate}`);
-          }
-          const iProto = iceCandidateToProto(event.candidate);
-          const callRequestUpdate = new CallUpdateRequest();
-          callRequestUpdate.setUuid(uuid);
-          callRequestUpdate.setCandidate(iProto);
-          const callUpdateStart = new Date();
-          grpc.unary(SignalingService.CallUpdate, {
-            request: callRequestUpdate,
-            metadata: {
-              'rpc-host': host,
-            },
-            host: usableSignalingAddress,
-            transport: directTransport,
-            onEnd: (output: grpc.UnaryOutput<CallUpdateResponse>) => {
-              const { status, statusMessage, message } = output;
-              if (status === grpc.Code.OK && message) {
-                numCallUpdates += 1;
-                const callUpdateEnd = new Date();
-                const callUpdateDuration =
-                  callUpdateEnd.getTime() - callUpdateStart.getTime();
-                if (callUpdateDuration > maxCallUpdateDuration) {
-                  maxCallUpdateDuration = callUpdateDuration;
-                }
-                totalCallUpdateDuration += callUpdateDuration;
-                return;
-              }
-              if (exchangeDone || iceComplete) {
-                return;
-              }
-              console.error('error sending candidate', statusMessage);
-            },
-          });
-        }
-      );
-
-      await pc.setLocalDescription(offerDesc);
-    }
-
-    // initialize cc here so we can use it in the callbacks
-    const cc = new ClientChannel(pc, dc);
-
+  const exchange = new SignalingExchange(
+    signalingClient,
+    callOpts,
+    pc,
+    dc,
+    webrtcOpts
+  );
+  try {
     // set timeout for dial attempt if a timeout is specified
-    if (usableOpts.dialTimeout) {
+    if (dialOpts?.dialTimeout) {
       setTimeout(() => {
         if (!successful) {
-          cc.close();
+          exchange.terminate();
         }
-      }, usableOpts.dialTimeout);
+      }, dialOpts.dialTimeout);
     }
 
-    let haveInit = false;
-    // TS says that CallResponse isn't a valid type here. More investigation required.
-    client.onMessage(async (message: ProtobufMessage) => {
-      const response = message as CallResponse;
+    const cc = await exchange.doExchange();
 
-      if (response.hasInit()) {
-        if (haveInit) {
-          sendError('got init stage more than once');
-          return;
-        }
-        const init = response.getInit();
-        if (init === undefined) {
-          sendError('no init in response');
-          return;
-        }
-        haveInit = true;
-        uuid = response.getUuid();
-
-        const remoteSDP = new RTCSessionDescription(
-          JSON.parse(atob(init.getSdp()))
-        );
-        if (cc.isClosed()) {
-          sendError('client channel is closed');
-          return;
-        }
-        await pc.setRemoteDescription(remoteSDP);
-
-        pResolve(true);
-
-        if (webrtcOpts.disableTrickleICE) {
-          exchangeDone = true;
-          sendDone();
-        }
-      } else if (response.hasUpdate()) {
-        if (!haveInit) {
-          sendError('got update stage before init stage');
-          return;
-        }
-        if (response.getUuid() !== uuid) {
-          sendError(`uuid mismatch; have=${response.getUuid()} want=${uuid}`);
-          return;
-        }
-        const update = response.getUpdate();
-        if (update === undefined) {
-          sendError('no update in response');
-          return;
-        }
-        const cand = update.getCandidate();
-        if (cand === undefined) {
-          return;
-        }
-        const iceCand = iceCandidateFromProto(cand);
-        if (iceCand.candidate !== undefined) {
-          console.debug(`received remote ICE ${iceCand.candidate}`);
-        }
-        try {
-          await pc.addIceCandidate(iceCand);
-        } catch (error) {
-          sendError(JSON.stringify(error));
-        }
-      } else {
-        sendError('unknown CallResponse stage');
-      }
-    });
-
-    let clientEndResolve: () => void;
-    let clientEndReject: (reason?: unknown) => void;
-    const clientEnd = new Promise<void>((resolve, reject) => {
-      clientEndResolve = resolve;
-      clientEndReject = reject;
-    });
-    client.onEnd(
-      (status: grpc.Code, statusMessage: string, _trailers: grpc.Metadata) => {
-        if (status === grpc.Code.OK) {
-          clientEndResolve();
-          return;
-        }
-        if (statusMessage === 'Response closed without headers') {
-          clientEndReject(new ConnectionClosedError('failed to dial'));
-          return;
-        }
-        if (cc.isClosed()) {
-          clientEndReject(
-            new ConnectionClosedError('client channel is closed')
-          );
-          return;
-        }
-        console.error(statusMessage);
-        clientEndReject(statusMessage);
-      }
-    );
-    client.start({ 'rpc-host': host });
-
-    const callRequest = new CallRequest();
-    const description = addSdpFields(
-      pc.localDescription,
-      usableOpts.webrtcOptions?.additionalSdpFields
-    );
-    const encodedSDP = btoa(JSON.stringify(description));
-    callRequest.setSdp(encodedSDP);
-    if (webrtcOpts.disableTrickleICE) {
-      callRequest.setDisableTrickle(webrtcOpts.disableTrickleICE);
+    if (dialOpts?.externalAuthAddress) {
+      // TODO(GOUT-11): prepare AuthenticateTo here  for client channel.
+      // eslint-disable-next-line sonarjs/no-duplicated-branches
+    } else if (dialOpts?.credentials?.type) {
+      // TODO(GOUT-11): prepare Authenticate here for client channel
     }
-    client.send(callRequest);
-
-    cc.ready
-      .then(() => clientEndResolve())
-      .catch((error) => clientEndReject(error));
-    await clientEnd;
-    await cc.ready;
-    exchangeDone = true;
-    sendDone();
 
     successful = true;
     return {
-      transportFactory: cc.transportFactory(),
+      transport: cc,
       peerConnection: pc,
       dataChannel: dc,
     };
+  } catch (error) {
+    console.error('error dialing', error); // eslint-disable-line no-console
+    throw error;
   } finally {
     if (!successful) {
       pc.close();
@@ -689,50 +418,93 @@ export const dialWebRTC = async (
   }
 };
 
-const iceCandidateFromProto = (i: ICECandidate): RTCIceCandidateInit => {
-  const candidate: RTCIceCandidateInit = {
-    candidate: i.getCandidate(),
-  };
-  if (i.hasSdpMid()) {
-    candidate.sdpMid = i.getSdpMid();
+const processWebRTCOpts = async (
+  signalingAddress: string,
+  callOpts: CallOptions,
+  dialOpts?: DialOptions
+): Promise<DialWebRTCOptions> => {
+  // Get TURN servers, if any.
+  const config = await getOptionalWebRTCConfig(
+    signalingAddress,
+    callOpts,
+    dialOpts
+  );
+  const additionalIceServers: RTCIceServer[] = config.additionalIceServers.map(
+    (ice) => {
+      return {
+        urls: ice.urls,
+        credential: ice.credential,
+        username: ice.username,
+      };
+    }
+  );
+
+  const usableDialOpts = dialOpts ?? {};
+
+  let webrtcOpts: DialWebRTCOptions;
+  if (usableDialOpts.webrtcOptions === undefined) {
+    // use additional webrtc config as default
+    webrtcOpts = {
+      disableTrickleICE: config.disableTrickle,
+      rtcConfig: {
+        iceServers: additionalIceServers,
+      },
+    };
+  } else {
+    // RSDK-8715: We deep copy here to avoid mutating the input config's `rtcConfig.iceServers` list.
+    webrtcOpts = JSON.parse(
+      JSON.stringify(usableDialOpts.webrtcOptions)
+    ) as DialWebRTCOptions;
+    if (webrtcOpts.rtcConfig === undefined) {
+      webrtcOpts.rtcConfig = { iceServers: additionalIceServers };
+    } else {
+      webrtcOpts.rtcConfig.iceServers = [
+        ...(webrtcOpts.rtcConfig.iceServers ?? []),
+        ...additionalIceServers,
+      ];
+    }
   }
-  if (i.hasSdpmLineIndex()) {
-    candidate.sdpMLineIndex = i.getSdpmLineIndex();
-  }
-  if (i.hasUsernameFragment()) {
-    candidate.usernameFragment = i.getUsernameFragment();
-  }
-  return candidate;
+
+  return webrtcOpts;
 };
 
-const iceCandidateToProto = (i: RTCIceCandidateInit): ICECandidate => {
-  const candidate = new ICECandidate();
-  if (i.candidate) {
-    candidate.setCandidate(i.candidate);
+const processSignalingExchangeOpts = (
+  signalingAddress: string,
+  dialOpts?: DialOptions
+) => {
+  // replace auth entity and creds
+  let optsCopy = dialOpts;
+  if (dialOpts) {
+    optsCopy = { ...dialOpts } as DialOptions;
+
+    if (!dialOpts.accessToken) {
+      if (
+        isCredential(optsCopy.credentials) &&
+        !optsCopy.credentials.authEntity
+      ) {
+        optsCopy.credentials.authEntity = optsCopy.externalAuthAddress
+          ? optsCopy.externalAuthAddress.replace(addressCleanupRegex, '')
+          : signalingAddress.replace(addressCleanupRegex, '');
+      }
+      optsCopy.credentials = dialOpts.webrtcOptions?.signalingCredentials;
+      optsCopy.accessToken = dialOpts.webrtcOptions?.signalingAccessToken;
+    }
+
+    optsCopy.externalAuthAddress =
+      dialOpts.webrtcOptions?.signalingExternalAuthAddress;
+    optsCopy.externalAuthToEntity =
+      dialOpts.webrtcOptions?.signalingExternalAuthToEntity;
   }
-  if (i.sdpMid) {
-    candidate.setSdpMid(i.sdpMid);
-  }
-  if (i.sdpMLineIndex) {
-    candidate.setSdpmLineIndex(i.sdpMLineIndex);
-  }
-  if (i.usernameFragment) {
-    candidate.setUsernameFragment(i.usernameFragment);
-  }
-  return candidate;
+  return optsCopy;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
+// eslint-disable-next-line sonarjs/cognitive-complexity -- it is not complex
 const validateDialOptions = (opts?: DialOptions) => {
   if (!opts) {
     return;
   }
 
   if (opts.accessToken && opts.accessToken.length > 0) {
-    if (opts.authEntity) {
-      throw new Error('cannot set authEntity with accessToken');
-    }
-
     if (opts.credentials) {
       throw new Error('cannot set credentials with accessToken');
     }
@@ -741,11 +513,6 @@ const validateDialOptions = (opts?: DialOptions) => {
       if (opts.webrtcOptions.signalingAccessToken) {
         throw new Error(
           'cannot set webrtcOptions.signalingAccessToken with accessToken'
-        );
-      }
-      if (opts.webrtcOptions.signalingAuthEntity) {
-        throw new Error(
-          'cannot set webrtcOptions.signalingAuthEntity with accessToken'
         );
       }
       if (opts.webrtcOptions.signalingCredentials) {
@@ -758,17 +525,11 @@ const validateDialOptions = (opts?: DialOptions) => {
 
   if (
     opts.webrtcOptions?.signalingAccessToken &&
-    opts.webrtcOptions.signalingAccessToken.length > 0
+    opts.webrtcOptions.signalingAccessToken.length > 0 &&
+    opts.webrtcOptions.signalingCredentials
   ) {
-    if (opts.webrtcOptions.signalingAuthEntity) {
-      throw new Error(
-        'cannot set webrtcOptions.signalingAuthEntity with webrtcOptions.signalingAccessToken'
-      );
-    }
-    if (opts.webrtcOptions.signalingCredentials) {
-      throw new Error(
-        'cannot set webrtcOptions.signalingCredentials with webrtcOptions.signalingAccessToken'
-      );
-    }
+    throw new Error(
+      'cannot set webrtcOptions.signalingCredentials with webrtcOptions.signalingAccessToken'
+    );
   }
 };

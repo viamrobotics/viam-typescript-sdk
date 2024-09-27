@@ -1,84 +1,95 @@
-import { grpc } from '@improbable-eng/grpc-web';
-import { GRPCError } from '../rpc';
+import type {
+  AnyMessage,
+  Message,
+  MethodInfo,
+  PartialMessage,
+  ServiceType,
+} from '@bufbuild/protobuf';
+import {
+  Code,
+  ConnectError,
+  type ContextValues,
+  type StreamResponse,
+  type Transport,
+  type UnaryResponse,
+} from '@connectrpc/connect';
+import { cloneHeaders } from '../rpc/dial';
 import type SessionManager from './session-manager';
 
-export default class SessionTransport implements grpc.Transport {
-  private readonly opts: grpc.TransportOptions;
-  protected readonly transport: grpc.Transport;
-  protected readonly sessionManager: SessionManager;
-
-  private mdProm: Promise<void> | undefined;
-  private mdPromResolve: (() => void) | undefined;
-
+export default class SessionTransport implements Transport {
   constructor(
-    opts: grpc.TransportOptions,
-    innerFactory: grpc.TransportFactory,
-    sessionManager: SessionManager
-  ) {
-    const actualOnEnd = opts.onEnd;
-    opts.onEnd = (err?: Error) => {
+    protected readonly deferredTransport: () => Transport,
+    protected readonly sessionManager: SessionManager
+  ) {}
+
+  private async getSessionMetadata(): Promise<Headers> {
+    try {
+      return await this.sessionManager.getSessionMetadata();
+    } catch (error) {
       if (
-        err &&
-        err instanceof GRPCError &&
-        err.code === grpc.Code.InvalidArgument.valueOf() &&
-        err.grpcMessage === 'SESSION_EXPIRED'
+        error instanceof ConnectError &&
+        error.code === Code.InvalidArgument &&
+        error.message === 'SESSION_EXPIRED'
       ) {
         this.sessionManager.reset();
       }
-      actualOnEnd(err);
-    };
-    const actualOnHeaders = opts.onHeaders;
-    opts.onHeaders = (headers: grpc.Metadata, status: number) => {
-      const gStatus = headers.has('grpc-status')
-        ? headers.get('grpc-status')
-        : undefined;
-      if (
-        gStatus &&
-        gStatus.length === 1 &&
-        gStatus[0] === `${grpc.Code.InvalidArgument}`
-      ) {
-        const gMsg = headers.has('grpc-message')
-          ? headers.get('grpc-message')
-          : undefined;
-        if (gMsg && gMsg.length === 1 && gMsg[0] === 'SESSION_EXPIRED') {
-          this.sessionManager.reset();
-        }
-      }
-      actualOnHeaders(headers, status);
-    };
-    this.opts = opts;
-    this.sessionManager = sessionManager;
-    this.transport = innerFactory(opts);
-    this.mdProm = new Promise<void>((resolve) => {
-      this.mdPromResolve = resolve;
-    });
+      throw error;
+    }
   }
 
-  public start(metadata: grpc.Metadata) {
-    this.sessionManager
-      .getSessionMetadata()
-      .then((md) => {
-        // eslint-disable-next-line unicorn/no-array-for-each
-        md.forEach((key: string, values: string | string[]) => {
-          metadata.set(key, values);
-        });
-        this.transport.start(metadata);
-        this.mdPromResolve?.();
-      })
-      .catch((error) => {
-        this.opts.onEnd(error);
-      });
+  public async unary<
+    I extends Message<I> = AnyMessage,
+    O extends Message<O> = AnyMessage,
+  >(
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    message: PartialMessage<I>,
+    contextValues?: ContextValues
+  ): Promise<UnaryResponse<I, O>> {
+    const md = await this.getSessionMetadata();
+    const newHeaders = cloneHeaders(header);
+    for (const [key, value] of md) {
+      newHeaders.set(key, value);
+    }
+    return this.deferredTransport().unary(
+      service,
+      method,
+      signal,
+      timeoutMs,
+      newHeaders,
+      message,
+      contextValues
+    );
   }
 
-  public sendMessage(msgBytes: Uint8Array) {
-    this.mdProm?.then(() => this.transport.sendMessage(msgBytes));
-  }
-
-  public finishSend() {
-    this.mdProm?.then(() => this.transport.finishSend());
-  }
-
-  public cancel() {
-    this.transport.cancel();
+  public async stream<
+    I extends Message<I> = AnyMessage,
+    O extends Message<O> = AnyMessage,
+  >(
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    input: AsyncIterable<PartialMessage<I>>,
+    contextValues?: ContextValues
+  ): Promise<StreamResponse<I, O>> {
+    const md = await this.getSessionMetadata();
+    const newHeaders = cloneHeaders(header);
+    for (const [key, value] of md) {
+      newHeaders.set(key, value);
+    }
+    return this.deferredTransport().stream(
+      service,
+      method,
+      signal,
+      timeoutMs,
+      newHeaders,
+      input,
+      contextValues
+    );
   }
 }

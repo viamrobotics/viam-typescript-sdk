@@ -1,7 +1,9 @@
+import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { GenericService } from '../../gen/component/generic/v1/generic_connect';
 import { RobotClient } from '../../robot';
-import { GenericServiceClient } from '../../gen/service/generic/v1/generic_pb_service';
+import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
-import type { Options, StructType } from '../../types';
 import type { Generic } from './generic';
 
 /**
@@ -10,22 +12,22 @@ import type { Generic } from './generic';
  * @group Clients
  */
 export class GenericClient implements Generic {
-  private client: GenericServiceClient;
+  private client: PromiseClient<typeof GenericService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(GenericServiceClient);
+    this.client = client.createServiceClient(GenericService);
     this.name = name;
     this.options = options;
   }
 
-  private get service() {
-    return this.client;
-  }
-
-  async doCommand(command: StructType): Promise<StructType> {
-    const { service } = this;
-    return doCommandFromClient(service, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

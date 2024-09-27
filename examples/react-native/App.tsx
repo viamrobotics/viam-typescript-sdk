@@ -5,8 +5,7 @@
  * @format
  */
 
-import React, {PropsWithoutRef} from 'react';
-import {useState} from 'react';
+import React, { PropsWithoutRef, useState } from 'react';
 import {
   Button,
   FlatList,
@@ -18,6 +17,17 @@ import {
 } from 'react-native';
 
 import * as VIAM from '@viamrobotics/sdk';
+import { polyfills } from "./polyfills";
+polyfills();
+
+import { GrpcWebTransportOptions } from "@connectrpc/connect-web";
+import { createXHRGrpcWebTransport } from './transport';
+
+globalThis.VIAM = {
+  GRPC_TRANSPORT_FACTORY: (opts: GrpcWebTransportOptions) => {
+    return createXHRGrpcWebTransport(opts);
+  }
+};
 
 type ResourceNameViewProps = PropsWithoutRef<{
   resourceName: VIAM.ResourceName;
@@ -41,19 +51,23 @@ function App(): React.JSX.Element {
   const [resourceNames, setResourceNames] = useState<VIAM.ResourceName[]>([]);
 
   async function connect() {
-    const host = '<HOST>';
-    const client = await VIAM.createRobotClient({
-      host,
-      credential: {
-        type: 'api-key',
-        payload: '<API_KEY>',
-      },
-      authEntity: '<API_KEY_ID>',
-      signalingAddress: 'https://app.viam.com:443',
-    });
-    setConnected(true);
-    const rns = await client.resourceNames();
-    setResourceNames(rns.sort((a, b) => (a.name < b.name ? -1 : 1)));
+    const host = 'test4-main.hrsdzs2gp3.viam.cloud';
+    try {
+      const client = await VIAM.createRobotClient({
+        host,
+        credentials: {
+          type: 'api-key',
+          authEntity: '2f862d8c-7824-4f1f-aca1-0a9fab38506a',
+          payload: '4ft2ch1zdxsjyj5trn4ppq4rk7crj2jc',
+        },
+        signalingAddress: 'https://app.viam.com:443',
+      });
+      setConnected(true);
+      const rns = await client.resourceNames();
+      setResourceNames(rns.sort((a, b) => (a.name < b.name ? -1 : 1)));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -66,7 +80,7 @@ function App(): React.JSX.Element {
       />
       <FlatList
         data={resourceNames}
-        renderItem={({item}) => <ResourceNameView resourceName={item} />}
+        renderItem={({ item }) => <ResourceNameView resourceName={item} />}
         keyExtractor={item =>
           `${item.namespace}/${item.type}/${item.subtype}:${item.name}`
         }

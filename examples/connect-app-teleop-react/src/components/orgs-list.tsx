@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 
 export interface OrganizationsListProps {
   appClient: AppClient;
-  onOrganizationSelected: (organization: appApi.Organization.AsObject) => unknown;
+  onOrganizationSelected: (organization: appApi.Organization) => unknown;
 }
 
 export const OrganizationsList = ({ appClient, onOrganizationSelected }: OrganizationsListProps): JSX.Element => {
 
-  const [organizations, setOrganizations] = useState<appApi.Organization.AsObject[]>([]);
+  const [organizations, setOrganizations] = useState<appApi.Organization[]>([]);
   useEffect(() => {
     async function getLocations() {
       const organizations = await appClient.listOrganizations();

@@ -1,9 +1,15 @@
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { ServoService } from '../../gen/component/servo/v1/servo_connect';
+import {
+  GetPositionRequest,
+  IsMovingRequest,
+  MoveRequest,
+  StopRequest,
+} from '../../gen/component/servo/v1/servo_pb';
 import type { RobotClient } from '../../robot';
-import { ServoServiceClient } from '../../gen/component/servo/v1/servo_pb_service';
-import type { Options, StructType } from '../../types';
-import pb from '../../gen/component/servo/v1/servo_pb';
-import { promisify, doCommandFromClient } from '../../utils';
+import type { Options } from '../../types';
+import { doCommandFromClient } from '../../utils';
 import type { Servo } from './servo';
 
 /**
@@ -12,81 +18,68 @@ import type { Servo } from './servo';
  * @group Clients
  */
 export class ServoClient implements Servo {
-  private client: ServoServiceClient;
+  private client: PromiseClient<typeof ServoService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(ServoServiceClient);
+    this.client = client.createServiceClient(ServoService);
     this.name = name;
     this.options = options;
   }
 
-  private get servoService() {
-    return this.client;
-  }
-
-  async move(angleDeg: number, extra: StructType = {}) {
-    const { servoService } = this;
-    const request = new pb.MoveRequest();
-    request.setName(this.name);
-    request.setAngleDeg(angleDeg);
-    request.setExtra(Struct.fromJavaScript(extra));
+  async move(angleDeg: number, extra = {}) {
+    const request = new MoveRequest({
+      name: this.name,
+      angleDeg,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.MoveRequest, pb.MoveResponse>(
-      servoService.move.bind(servoService),
-      request
-    );
+    await this.client.move(request);
   }
 
-  async getPosition(extra: StructType = {}) {
-    const { servoService } = this;
-    const request = new pb.GetPositionRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+  async getPosition(extra = {}) {
+    const request = new GetPositionRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPositionRequest,
-      pb.GetPositionResponse
-    >(servoService.getPosition.bind(servoService), request);
-
-    return response.getPositionDeg();
+    const resp = await this.client.getPosition(request);
+    return resp.positionDeg;
   }
 
   async stop(extra = {}) {
-    const { servoService } = this;
-    const request = new pb.StopRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new StopRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.StopRequest, pb.StopResponse>(
-      servoService.stop.bind(servoService),
-      request
-    );
+    await this.client.stop(request);
   }
 
   async isMoving() {
-    const { servoService } = this;
-    const request = new pb.IsMovingRequest();
-    request.setName(this.name);
+    const request = new IsMovingRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>(
-      servoService.isMoving.bind(servoService),
-      request
-    );
-    return response.getIsMoving();
+    const resp = await this.client.isMoving(request);
+    return resp.isMoving;
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const { servoService } = this;
-    return doCommandFromClient(servoService, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

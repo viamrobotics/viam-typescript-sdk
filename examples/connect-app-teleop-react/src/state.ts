@@ -148,31 +148,31 @@ interface BrowserStateOrganizations {
 interface BrowserStateLocations {
   key: BrowserStateKey.Locations;
   appClient: AppClient;
-  organization: appApi.Organization.AsObject;
+  organization: appApi.Organization;
 }
 
 interface BrowserStateMachines {
   key: BrowserStateKey.Machines;
   appClient: AppClient;
-  organization: appApi.Organization.AsObject;
-  location: appApi.Location.AsObject;
+  organization: appApi.Organization;
+  location: appApi.Location;
 }
 
 interface BrowserStateMachineParts {
   key: BrowserStateKey.MachineParts;
   appClient: AppClient;
-  location: appApi.Location.AsObject;
-  organization: appApi.Organization.AsObject;
-  machine: appApi.Robot.AsObject;
+  location: appApi.Location;
+  organization: appApi.Organization;
+  machine: appApi.Robot;
 }
 
 interface BrowserStateControlMachinePart {
   key: BrowserStateKey.ControlMachinePart;
   appClient: AppClient;
-  organization: appApi.Organization.AsObject;
-  location: appApi.Location.AsObject;
-  machine: appApi.Robot.AsObject;
-  machinePart: appApi.RobotPart.AsObject;
+  organization: appApi.Organization;
+  location: appApi.Location;
+  machine: appApi.Robot;
+  machinePart: appApi.RobotPart;
 }
 
 export type BrowserState =
@@ -309,9 +309,9 @@ export class BrowserStateStore {
       | BrowserStateMachines
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
-  ): (organization: appApi.Organization.AsObject) => void {
+  ): (organization: appApi.Organization) => void {
     this.validateState(currentState);
-    return (organization: appApi.Organization.AsObject) => {
+    return (organization: appApi.Organization) => {
       this.onNewState({
         key: BrowserStateKey.Locations,
         appClient: currentState.appClient,
@@ -326,9 +326,9 @@ export class BrowserStateStore {
       | BrowserStateMachines
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
-  ): (location: appApi.Location.AsObject) => void {
+  ): (location: appApi.Location) => void {
     this.validateState(currentState);
-    return (location: appApi.Location.AsObject) => {
+    return (location: appApi.Location) => {
       this.onNewState({
         key: BrowserStateKey.Machines,
         appClient: currentState.appClient,
@@ -343,9 +343,9 @@ export class BrowserStateStore {
       | BrowserStateMachines
       | BrowserStateMachineParts
       | BrowserStateControlMachinePart
-  ): (machine: appApi.Robot.AsObject) => void {
+  ): (machine: appApi.Robot) => void {
     this.validateState(currentState);
-    return (machine: appApi.Robot.AsObject) => {
+    return (machine: appApi.Robot) => {
       this.onNewState({
         key: BrowserStateKey.MachineParts,
         appClient: currentState.appClient,
@@ -358,9 +358,9 @@ export class BrowserStateStore {
 
   public onMachinePartSelected(
     currentState: BrowserStateMachineParts | BrowserStateControlMachinePart
-  ): (part: appApi.RobotPart.AsObject) => void {
+  ): (part: appApi.RobotPart) => void {
     this.validateState(currentState);
-    return (part: appApi.RobotPart.AsObject) => {
+    return (part: appApi.RobotPart) => {
       this.onNewState({
         key: BrowserStateKey.ControlMachinePart,
         appClient: currentState.appClient,

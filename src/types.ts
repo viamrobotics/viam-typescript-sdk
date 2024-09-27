@@ -1,7 +1,4 @@
-import type { JavaScriptValue } from 'google-protobuf/google/protobuf/struct_pb';
-
-import common from './gen/common/v1/common_pb';
-export type StructType = Record<string, JavaScriptValue>;
+import type { JsonValue, PartialMessage, Struct } from '@bufbuild/protobuf';
 
 export interface Options {
   requestLogger?: (req: unknown) => void;
@@ -13,14 +10,42 @@ export interface Resource {
    *
    * @param command - The command to execute.
    */
-  doCommand: (command: StructType) => Promise<StructType>;
+  doCommand(command: Struct): Promise<JsonValue>;
 }
 
-// Common Protobuf Types
+import * as commonApi from './gen/common/v1/common_pb';
 
-export type ResourceName = common.ResourceName.AsObject;
-export type GeoGeometry = common.GeoGeometry.AsObject;
-export type GeoPoint = common.GeoPoint.AsObject;
+export type Capsule = PartialMessage<commonApi.Capsule>;
+export type GeoGeometry = PartialMessage<commonApi.GeoGeometry>;
+export type GeoPoint = PartialMessage<commonApi.GeoPoint>;
+export type GeometriesInFrame = PartialMessage<commonApi.GeometriesInFrame>;
+export type Geometry = PartialMessage<commonApi.Geometry>;
+export type Orientation = PartialMessage<commonApi.Orientation>;
+export type Pose = PartialMessage<commonApi.Pose>;
+export type PoseInFrame = PartialMessage<commonApi.PoseInFrame>;
+export type RectangularPrism = PartialMessage<commonApi.RectangularPrism>;
+export type ResourceName = PartialMessage<commonApi.ResourceName>;
+export type Sphere = PartialMessage<commonApi.Sphere>;
+export type Transform = PartialMessage<commonApi.Transform>;
+export type Vector3 = PartialMessage<commonApi.Vector3>;
+export type WorldState = PartialMessage<commonApi.WorldState>;
+
+export const {
+  Capsule,
+  GeoGeometry,
+  GeoPoint,
+  GeometriesInFrame,
+  Geometry,
+  Orientation,
+  Pose,
+  PoseInFrame,
+  RectangularPrism,
+  ResourceName,
+  Sphere,
+  Transform,
+  Vector3,
+  WorldState,
+} = commonApi;
 
 export const isValidGeoPoint = (value: GeoPoint) => {
   const { latitude, longitude } = value;
@@ -32,18 +57,3 @@ export const isValidGeoPoint = (value: GeoPoint) => {
     Number.isNaN(longitude)
   );
 };
-
-// Spatial Math
-export type Vector3 = common.Vector3.AsObject;
-export type Orientation = common.Orientation.AsObject;
-
-// Motion
-export type Pose = common.Pose.AsObject;
-export type PoseInFrame = common.PoseInFrame.AsObject;
-export type Transform = common.Transform.AsObject;
-export type WorldState = common.WorldState.AsObject;
-export type GeometriesInFrame = common.GeometriesInFrame.AsObject;
-export type Geometry = common.Geometry.AsObject;
-export type Sphere = common.Sphere.AsObject;
-export type RectangularPrism = common.RectangularPrism.AsObject;
-export type Capsule = common.Capsule.AsObject;

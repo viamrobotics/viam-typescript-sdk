@@ -1,10 +1,9 @@
+import type { BaseClient, RobotClient, StreamClient } from '@viamrobotics/sdk';
 import { useEffect, useRef, useState } from 'react';
-import type { RobotClient, StreamClient, BaseClient } from '@viamrobotics/sdk';
 import {
-  getRobotClient,
   getBaseClient,
+  getRobotClient,
   getStreamClient,
-  getStream,
   type RobotCredentials,
 } from './client.js';
 

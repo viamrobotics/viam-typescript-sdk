@@ -3,22 +3,21 @@ export const version = __VERSION__;
 /**
  * Raw Protobuf interfaces for a Robot component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link RobotClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as robotApi } from './gen/robot/v1/robot_pb';
+export * as robotApi from './gen/robot/v1/robot_pb';
 export {
-  type Robot,
+  RobotClient,
+  createRobotClient,
+  type CloudMetadata,
   type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
-  type RobotStatusStream,
-  type CloudMetadata,
-  RobotClient,
-  createRobotClient,
+  type Robot,
 } from './robot';
 
 /**
@@ -34,224 +33,223 @@ export {
 } from './app/viam-client';
 
 export {
-  getAccessTokenFromCredential,
+  type AccessToken,
   type Credential,
   type CredentialType,
-  type AccessToken,
+  type Credentials,
 } from './app/viam-transport';
 
 /**
  * Raw Protobuf interfaces for Data.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link DataClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as dataApi } from './gen/app/data/v1/data_pb';
 export {
   type BinaryID,
   type DataClient,
   type FilterOptions,
 } from './app/data-client';
+export * as dataApi from './gen/app/data/v1/data_pb';
 
 /**
  * Raw Protobuf interfaces for an App service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link AppClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as appApi } from './gen/app/v1/app_pb';
 export { type AppClient } from './app/app-client';
+export * as appApi from './gen/app/v1/app_pb';
 
 /**
  * Raw Protobuf interfaces for ML Training.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link MlTrainingClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as mlTrainingApi } from './gen/app/mltraining/v1/ml_training_pb';
 export {
-  type MlTrainingClient,
   ModelType,
   TrainingStatus,
+  type MlTrainingClient,
 } from './app/ml-training-client';
+export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
 
 /**
  * Raw Protobuf interfaces for Provisioning.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link ProvisioningClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as provisioningApi } from './gen/provisioning/v1/provisioning_pb';
 export {
   type CloudConfig,
   type ProvisioningClient,
 } from './app/provisioning-client';
+export * as provisioningApi from './gen/provisioning/v1/provisioning_pb';
 
 /**
  * Raw Protobuf interfaces for Billing.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link BillingClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as billingApi } from './gen/app/v1/billing_pb';
 export { type BillingClient } from './app/billing-client';
+export * as billingApi from './gen/app/v1/billing_pb';
 
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link ArmClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as armApi } from './gen/component/arm/v1/arm_pb';
-export { type Arm, type ArmJointPositions, ArmClient } from './components/arm';
+export { ArmClient, type Arm, type ArmJointPositions } from './components/arm';
+export * as armApi from './gen/component/arm/v1/arm_pb';
 
 /**
  * Raw Protobuf interfaces for a Base component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link BaseClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as baseApi } from './gen/component/base/v1/base_pb';
-export { type Base, type BaseProperties, BaseClient } from './components/base';
+export { BaseClient, type Base, type BaseProperties } from './components/base';
+export * as baseApi from './gen/component/base/v1/base_pb';
 
 /**
  * Raw Protobuf interfaces for a Board component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link BoardClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as boardApi } from './gen/component/board/v1/board_pb';
 export {
-  type Board,
   BoardClient,
-  type Duration,
   PowerMode,
   type AnalogValue,
+  type Board,
   type Tick,
 } from './components/board';
+export * as boardApi from './gen/component/board/v1/board_pb';
 
 /**
  * Raw Protobuf interfaces for a Camera component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link CameraClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as cameraApi } from './gen/component/camera/v1/camera_pb';
-export { type Camera, type MimeType, CameraClient } from './components/camera';
+export { CameraClient, type Camera, type MimeType } from './components/camera';
+export * as cameraApi from './gen/component/camera/v1/camera_pb';
 
 /**
  * Raw Protobuf interfaces for an Encoder component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link EncoderClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as encoderApi } from './gen/component/encoder/v1/encoder_pb';
 export {
+  EncoderClient,
+  EncoderPositionType,
   type Encoder,
   type EncoderProperties,
-  EncoderPositionType,
-  EncoderClient,
 } from './components/encoder';
+export * as encoderApi from './gen/component/encoder/v1/encoder_pb';
 
 /**
  * Raw Protobuf interfaces for a Gantry component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link GantryClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as gantryApi } from './gen/component/gantry/v1/gantry_pb';
-export { type Gantry, GantryClient } from './components/gantry';
+export { GantryClient, type Gantry } from './components/gantry';
+export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
 
 /**
  * Raw Protobuf interfaces for a Motor component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link MotorClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as motorApi } from './gen/component/motor/v1/motor_pb';
-export { type Motor, MotorClient } from './components/motor';
+export { MotorClient, type Motor } from './components/motor';
+export * as motorApi from './gen/component/motor/v1/motor_pb';
 
 /**
  * Raw Protobuf interfaces for a MovementSensor component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link MovementSensorClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as movementSensorApi } from './gen/component/movementsensor/v1/movementsensor_pb';
 export {
-  type MovementSensor,
-  type MovementSensorProperties,
-  type MovementSensorPosition,
-  type MovementSensorAccuracy,
   MovementSensorClient,
+  type MovementSensor,
+  type MovementSensorAccuracy,
+  type MovementSensorPosition,
+  type MovementSensorProperties,
 } from './components/movementsensor';
+export * as movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb';
 
 /**
  * Raw Protobuf interfaces for a PowerSensor component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link PowerSensorClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as powerSensorApi } from './gen/component/powersensor/v1/powersensor_pb';
-export { type PowerSensor, PowerSensorClient } from './components/powersensor';
+export { PowerSensorClient, type PowerSensor } from './components/powersensor';
+export * as powerSensorApi from './gen/component/powersensor/v1/powersensor_pb';
 
 /**
  * Raw Protobuf interfaces generated with
- * https://github.com/improbable-eng/grpc-web for a Sensor component.
+ * https://github.com/connectrpc/connect-es for a Sensor component.
  *
  * @deprecated Use {@link SensorClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as sensorApi } from './gen/component/sensor/v1/sensor_pb';
-export { type Sensor, SensorClient } from './components/sensor';
+export { SensorClient, type Sensor } from './components/sensor';
+export * as sensorApi from './gen/component/sensor/v1/sensor_connect';
 
 /**
  * Raw Protobuf interfaces for a Sensors service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @example
  *
@@ -275,71 +273,70 @@ export { type Sensor, SensorClient } from './components/sensor';
  * @alpha
  * @group Raw Protobufs
  */
-export { default as sensorsApi } from './gen/service/sensors/v1/sensors_pb';
+export * as sensorsApi from './gen/service/sensors/v1/sensors_pb';
 
 /**
  * Raw Protobuf interfaces for a Stream.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link StreamClient} instead.
  * @group Raw Protobufs
  */
-export { default as streamApi } from './gen/stream/v1/stream_pb';
-export { type Stream, StreamClient } from './extra/stream';
+export { StreamClient, type Stream } from './extra/stream';
+export * as streamApi from './gen/stream/v1/stream_pb';
 
 /**
  * Raw Protobuf interfaces for a Generic component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link GenericComponentClient} instead.
- * @deprecated Renamed to genericComponentApi
  * @alpha
  * @group Raw Protobufs
  */
-export { default as genericApi } from './gen/component/generic/v1/generic_pb';
-export { default as genericComponentApi } from './gen/component/generic/v1/generic_pb';
 export {
-  type Generic as GenericComponent,
   GenericClient as GenericComponentClient,
+  type Generic as GenericComponent,
 } from './components/generic';
+export * as genericComponentApi from './gen/component/generic/v1/generic_connect';
 
 /**
  * Raw Protobuf interfaces for a Gripper component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link GripperClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as gripperApi } from './gen/component/gripper/v1/gripper_pb';
-export { type Gripper, GripperClient } from './components/gripper';
+export { GripperClient, type Gripper } from './components/gripper';
+export * as gripperApi from './gen/component/gripper/v1/gripper_pb';
 
 /**
  * Raw Protobuf interfaces for an InputController component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link GripperClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as inputControllerApi } from './gen/component/inputcontroller/v1/input_controller_pb';
 export * from './components/inputcontroller';
+export * as inputControllerApi from './gen/component/inputcontroller/v1/input_controller_pb';
 
 /**
  * Raw Protobuf interfaces for a Motion service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link MotionClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as motionApi } from './gen/service/motion/v1/motion_pb';
+export * as motionApi from './gen/service/motion/v1/motion_pb';
 export {
+  MotionClient,
   type CollisionSpecification,
   type Constraints,
   type GetPlanResponse,
@@ -350,116 +347,102 @@ export {
   type ObstacleDetector,
   type OrientationConstraint,
   type PlanState,
-  MotionClient,
 } from './services/motion';
 
-export { type DataManager, DataManagerClient } from './services/data-manager';
+export { DataManagerClient, type DataManager } from './services/data-manager';
 
 /**
  * Raw Protobuf interfaces for a Navigation service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link NavigationClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as navigationApi } from './gen/service/navigation/v1/navigation_pb';
+export * as navigationApi from './gen/service/navigation/v1/navigation_pb';
 export {
-  type ModeMap,
-  type Waypoint,
+  NavigationClient,
+  type Mode,
   type NavigationPosition,
   type NavigationProperties,
   type Path,
-  NavigationClient,
+  type Waypoint,
 } from './services/navigation';
 
 /**
  * Raw Protobuf interfaces for a Servo component.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link ServoClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as servoApi } from './gen/component/servo/v1/servo_pb';
-export { type Servo, ServoClient } from './components/servo';
+export { ServoClient, type Servo } from './components/servo';
+export * as servoApi from './gen/component/servo/v1/servo_pb';
 
 /**
  * Raw Protobuf interfaces for a Slam service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link SlamClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as slamApi } from './gen/service/slam/v1/slam_pb';
+export * as slamApi from './gen/service/slam/v1/slam_pb';
 export {
+  SlamClient,
   type SlamPosition,
   type SlamProperties,
-  SlamClient,
 } from './services/slam';
 
 /**
  * Raw Protobuf interfaces for a Vision service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link VisionClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as visionApi } from './gen/service/vision/v1/vision_pb';
+export * as visionApi from './gen/service/vision/v1/vision_pb';
 export {
-  type Detection,
-  type Classification,
-  type PointCloudObject,
   VisionClient,
+  type Classification,
+  type Detection,
+  type PointCloudObject,
 } from './services/vision';
 
 /**
  * Raw Protobuf interfaces for a Generic service.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @deprecated Use {@link GenericServiceClient} instead.
  * @alpha
  * @group Raw Protobufs
  */
-export { default as genericServiceApi } from './gen/service/generic/v1/generic_pb';
+export * as genericServiceApi from './gen/service/generic/v1/generic_connect';
 export {
-  type Generic as GenericService,
   GenericClient as GenericServiceClient,
+  type Generic as GenericService,
 } from './services/generic';
 
 /**
  * Raw Protobuf interfaces that are shared across multiple components and
  * services.
  *
- * Generated with https://github.com/improbable-eng/grpc-web
+ * Generated with https://github.com/connectrpc/connect-es
  *
  * @alpha
  * @group Raw Protobufs
  */
-export { default as commonApi } from './gen/common/v1/common_pb';
-
-/**
- * Raw Protobuf response and error types.
- *
- * Generated with https://github.com/improbable-eng/grpc-web
- *
- * @alpha
- * @group Raw Protobufs
- */
-export type {
-  ResponseStream,
-  ServiceError,
-} from './gen/robot/v1/robot_pb_service';
+export * as commonApi from './gen/common/v1/common_pb';
 
 export * from './types';
 
-export { doCommandFromClient, promisify } from './utils';
+export { doCommandFromClient } from './utils';
 
 export { MachineConnectionEvent } from './events';

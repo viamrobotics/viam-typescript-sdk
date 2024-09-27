@@ -5,10 +5,10 @@ import {
 } from 'react';
 
 import {
-  DISCONNECTED,
-  CONNECTING,
-  DISCONNECTING,
   CONNECTED,
+  CONNECTING,
+  DISCONNECTED,
+  DISCONNECTING,
   type ClientStatus,
 } from '../state.js';
 
@@ -33,24 +33,29 @@ const BUTTON_TEXT_BY_STATUS = {
   [CONNECTED]: 'Disconnect',
 };
 
-const INITIAL_HOSTNAME = import.meta.env.VITE_ROBOT_HOSTNAME ?? '';
-const INITIAL_SECRET = import.meta.env.VITE_ROBOT_SECRET ?? '';
+const INITIAL_HOSTNAME = import.meta.env.VITE_HOST ?? '';
+const INITIAL_API_KEY_ID = import.meta.env.VITE_API_KEY_ID ?? '';
+const INITIAL_API_KEY = import.meta.env.VITE_API_KEY ?? '';
 
 export const ConnectForm = (props: ConnectFormProps): JSX.Element => {
   const { status, onSubmit } = props;
   const [hostname, setHostname] = useState(INITIAL_HOSTNAME);
-  const [secret, setSecret] = useState(INITIAL_SECRET);
+  const [apiKeyId, setApiKeyId] = useState(INITIAL_API_KEY_ID);
+  const [apiKey, setApiKey] = useState(INITIAL_API_KEY);
   const disabled = DISABLED_BY_STATUS[status];
   const buttonText = BUTTON_TEXT_BY_STATUS[status];
 
   const handleHost: ChangeEventHandler<HTMLInputElement> = (event) => {
     setHostname(event.target.value);
   };
-  const handleSecret: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setSecret(event.target.value);
+  const handleApiKeyId: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setApiKeyId(event.target.value);
+  };
+  const handleApiKey: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setApiKeyId(event.target.value);
   };
   const handleSubmit: FormEventHandler = (event) => {
-    onSubmit({ hostname, secret });
+    onSubmit({ hostname, apiKeyId, apiKey });
     event.preventDefault();
   };
 
@@ -67,12 +72,22 @@ export const ConnectForm = (props: ConnectFormProps): JSX.Element => {
         />
       </label>
       <label className="flex flex-col mb-6">
-        Location Secret
+        API Key ID
+        <input
+          type="text"
+          className="px-1 border-solid border-2 border-black"
+          value={apiKeyId}
+          onChange={handleApiKeyId}
+          disabled={disabled}
+        />
+      </label>
+      <label className="flex flex-col mb-6">
+        API Key
         <input
           type="password"
           className="px-1 border-solid border-2 border-black"
-          value={secret}
-          onChange={handleSecret}
+          value={apiKey}
+          onChange={handleApiKey}
           disabled={disabled}
         />
       </label>

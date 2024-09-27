@@ -1,4 +1,10 @@
-import pb from '../../gen/service/slam/v1/slam_pb';
+import type { PartialMessage } from '@bufbuild/protobuf';
+import * as slamApi from '../../gen/service/slam/v1/slam_pb';
 
-export type SlamPosition = pb.GetPositionResponse.AsObject;
-export type SlamProperties = pb.GetPropertiesResponse.AsObject;
+export type SlamPosition = PartialMessage<slamApi.GetPositionResponse>;
+export type SlamProperties = PartialMessage<slamApi.GetPropertiesResponse>;
+
+export const {
+  GetPositionResponse: SlamPosition,
+  GetPropertiesResponse: SlamProperties,
+} = slamApi;

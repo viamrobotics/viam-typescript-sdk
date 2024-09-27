@@ -1,12 +1,12 @@
-import { appApi, type AccessToken, type Credential } from '@viamrobotics/sdk';
+import { appApi, type Credentials } from '@viamrobotics/sdk';
 import { useMotionControls } from '../motion';
 import { useRobotClientStore, useStream } from '../state';
 import { MotionArrows } from './motion-arrows';
 import { VideoStream } from './video-stream';
 
 export interface MachinePartControlProps {
-  credentials: Credential | AccessToken;
-  machinePart: appApi.RobotPart.AsObject;
+  credentials: Credentials;
+  machinePart: appApi.RobotPart;
 }
 
 export const MachinePartControl = ({ credentials, machinePart }: MachinePartControlProps): JSX.Element => {

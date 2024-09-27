@@ -1,9 +1,14 @@
-import { grpc } from '@improbable-eng/grpc-web';
-import robotApi from '../gen/robot/v1/robot_pb';
 import {
-  RobotServiceClient,
-  type ServiceError,
-} from '../gen/robot/v1/robot_pb_service';
+  Code,
+  ConnectError,
+  createPromiseClient,
+  type Transport,
+} from '@connectrpc/connect';
+import { RobotService } from '../gen/robot/v1/robot_connect';
+import {
+  SendSessionHeartbeatRequest,
+  StartSessionRequest,
+} from '../gen/robot/v1/robot_pb';
 import { ConnectionClosedError } from '../rpc';
 import SessionTransport from './session-transport';
 
@@ -17,9 +22,7 @@ const timeoutBlob = new Blob(
 );
 
 export default class SessionManager {
-  private readonly innerTransportFactory: grpc.TransportFactory;
-
-  private client: RobotServiceClient;
+  public readonly transport: Transport;
 
   private currentSessionID = '';
   private sessionsSupported: boolean | undefined;
@@ -27,29 +30,21 @@ export default class SessionManager {
 
   private starting: Promise<void> | undefined;
 
-  private startResolve: (() => void) | undefined;
-
-  private startReject: ((reason: ServiceError) => void) | undefined;
-
-  constructor(serviceHost: string, transportFactory: grpc.TransportFactory) {
-    this.innerTransportFactory = transportFactory;
-    this.client = new RobotServiceClient(serviceHost, {
-      transport: transportFactory,
-    });
+  private get client() {
+    const transport = this.deferredTransport();
+    return createPromiseClient(RobotService, transport);
   }
 
-  get transportFactory() {
-    return (opts: grpc.TransportOptions): grpc.Transport => {
-      return new SessionTransport(opts, this.innerTransportFactory, this);
-    };
+  constructor(private deferredTransport: () => Transport) {
+    this.transport = new SessionTransport(this.deferredTransport, this);
   }
 
   get sessionID() {
     return this.currentSessionID;
   }
 
-  private getSessionMetadataInner(): grpc.Metadata {
-    const md = new grpc.Metadata();
+  private getSessionMetadataInner(): Headers {
+    const md = new Headers();
     if (this.sessionsSupported && this.currentSessionID !== '') {
       md.set('viam-sid', this.currentSessionID);
     }
@@ -76,29 +71,32 @@ export default class SessionManager {
     }
 
     let worker: Worker | undefined;
-    const doHeartbeat = () => {
-      const sendHeartbeatReq = new robotApi.SendSessionHeartbeatRequest();
-      sendHeartbeatReq.setId(this.currentSessionID);
-      this.client.sendSessionHeartbeat(
-        sendHeartbeatReq,
-        new grpc.Metadata(),
-        (err) => {
-          if (err && ConnectionClosedError.isError(err)) {
-            /*
-             * We assume the connection closing will cause getSessionMetadata to be
-             * called again by way of a reset.
-             */
-            this.reset();
-            return;
-          }
-          // Otherwise we want to continue in case it was just a blip
-          if (worker) {
-            worker.postMessage(this.heartbeatIntervalMs);
-          } else {
-            setTimeout(() => doHeartbeat(), this.heartbeatIntervalMs);
-          }
+    const doHeartbeat = async () => {
+      const sendHeartbeatReq = new SendSessionHeartbeatRequest({
+        id: this.currentSessionID,
+      });
+      try {
+        await this.client.sendSessionHeartbeat(sendHeartbeatReq);
+      } catch (error) {
+        if (
+          error instanceof ConnectionClosedError ||
+          (error instanceof ConnectError && error.rawMessage === 'closed')
+        ) {
+          /**
+           * We assume the connection closing will cause getSessionMetadata to
+           * be called again by way of a reset.
+           */
+          this.reset();
+          return;
         }
-      );
+      }
+      if (worker) {
+        worker.postMessage(this.heartbeatIntervalMs);
+      } else {
+        setTimeout(() => {
+          doHeartbeat().catch(console.error); // eslint-disable-line no-console
+        }, this.heartbeatIntervalMs);
+      }
     };
 
     /*
@@ -110,15 +108,15 @@ export default class SessionManager {
       const url = window.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
-      worker.onmessage = () => {
-        doHeartbeat();
-      };
+      worker.addEventListener('message', () => {
+        doHeartbeat().catch(console.error); // eslint-disable-line no-console
+      });
     }
 
-    doHeartbeat();
+    doHeartbeat().catch(console.error); // eslint-disable-line no-console
   }
 
-  public async getSessionMetadata(): Promise<grpc.Metadata> {
+  public async getSessionMetadata(): Promise<Headers> {
     while (this.starting) {
       // eslint-disable-next-line no-await-in-loop
       await this.starting;
@@ -126,64 +124,52 @@ export default class SessionManager {
     if (this.sessionsSupported !== undefined) {
       return this.getSessionMetadataInner();
     }
-    this.starting = new Promise<void>((resolve, reject) => {
-      this.startResolve = resolve;
-      this.startReject = reject;
-    });
 
-    try {
-      const startSessionReq = new robotApi.StartSessionRequest();
-      if (this.currentSessionID !== '') {
-        startSessionReq.setResume(this.currentSessionID);
-      }
-      this.client.startSession(
-        startSessionReq,
-        new grpc.Metadata(),
-        (err, resp) => {
-          if (err) {
-            if (err.code === grpc.Code.Unimplemented.valueOf()) {
-              console.error('sessions unsupported; will not try again');
-              this.sessionsSupported = false;
-              this.startResolve?.();
-              return;
-            }
-            this.startReject?.(err);
-            return;
-          }
-          if (!resp) {
-            this.startReject?.({
-              code: grpc.Code.Internal,
-              message: 'expected response to start session',
-              metadata: new grpc.Metadata(),
-            });
-            return;
-          }
-          const heartbeatWindow = resp.getHeartbeatWindow();
-          if (!heartbeatWindow) {
-            this.startReject?.({
-              code: grpc.Code.Internal,
-              message: 'expected heartbeat window in response to start session',
-              metadata: new grpc.Metadata(),
-            });
-            return;
-          }
-          this.sessionsSupported = true;
-          this.currentSessionID = resp.getId();
-          this.heartbeatIntervalMs =
-            (heartbeatWindow.getSeconds() * 1e3 +
-              heartbeatWindow.getNanos() / 1e6) /
-            5;
-          this.startResolve?.();
-          this.heartbeat();
+    this.starting = new Promise<void>((resolve, reject) => {
+      (async () => {
+        const startSessionReq = new StartSessionRequest();
+        if (this.currentSessionID !== '') {
+          startSessionReq.resume = this.currentSessionID;
         }
-      );
-      await this.starting;
-      return this.getSessionMetadataInner();
-    } finally {
-      this.startResolve?.();
-      this.startResolve = undefined;
-      this.startReject = undefined;
-      this.starting = undefined;
-    }
+
+        let resp;
+        try {
+          resp = await this.client.startSession(startSessionReq);
+        } catch (error) {
+          if (
+            error instanceof ConnectError &&
+            error.code === Code.Unimplemented
+          ) {
+            console.error('sessions unsupported; will not try again'); // eslint-disable-line no-console
+            this.sessionsSupported = false;
+            return;
+          }
+          throw error;
+        }
+
+        const { heartbeatWindow } = resp;
+        if (!heartbeatWindow) {
+          throw new Error(
+            'expected heartbeat window in response to start session'
+          );
+        }
+        this.sessionsSupported = true;
+        this.currentSessionID = resp.id;
+        this.heartbeatIntervalMs =
+          (Number(heartbeatWindow.seconds) * 1e3 +
+            heartbeatWindow.nanos / 1e6) /
+          5;
+        resolve();
+        this.heartbeat().catch(console.error); // eslint-disable-line no-console
+      })()
+        .then(resolve)
+        .catch(reject)
+        .finally(() => {
+          this.starting = undefined;
+        });
+    });
+    await this.starting;
+
+    return this.getSessionMetadataInner();
   }
 }

@@ -1,13 +1,14 @@
 import {
-  createRobotClient,
-  StreamClient,
   BaseClient,
+  StreamClient,
+  createRobotClient,
   type RobotClient,
 } from '@viamrobotics/sdk';
 
 export interface RobotCredentials {
   hostname: string;
-  secret: string;
+  apiKeyId: string;
+  apiKey: string;
 }
 
 /**
@@ -19,14 +20,14 @@ export interface RobotCredentials {
 export const getRobotClient = async (
   credentials: RobotCredentials
 ): Promise<RobotClient> => {
-  const { hostname, secret } = credentials;
+  const { hostname, apiKey, apiKeyId } = credentials;
 
   return createRobotClient({
-    authEntity: hostname,
     host: hostname,
-    credential: {
-      type: 'robot-location-secret',
-      payload: secret,
+    credentials: {
+      authEntity: apiKeyId,
+      type: 'api-key',
+      payload: apiKey,
     },
     signalingAddress: 'https://app.viam.com:443',
     iceServers: [{ urls: 'stun:global.stun.twilio.com:3478' }],

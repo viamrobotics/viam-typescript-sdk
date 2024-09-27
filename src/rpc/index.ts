@@ -1,21 +1,18 @@
-import type { TransportFactory } from '@improbable-eng/grpc-web/dist/typings/transports/Transport';
-import type { CrossBrowserHttpTransportInit } from '@improbable-eng/grpc-web/dist/typings/transports/http/http';
+import type { Transport } from '@connectrpc/connect';
 
 declare global {
   // eslint-disable-next-line vars-on-top,no-var
   var VIAM:
     | {
-        GRPC_TRANSPORT_FACTORY?: (
-          opts: CrossBrowserHttpTransportInit
-        ) => TransportFactory;
+        GRPC_TRANSPORT_FACTORY?: (opts: unknown) => Transport;
       }
     | undefined;
 }
 
 export {
+  cloneHeaders,
   dialDirect,
   dialWebRTC,
-  type Credentials,
   type DialOptions,
   type DialWebRTCOptions,
   type WebRTCConnection,

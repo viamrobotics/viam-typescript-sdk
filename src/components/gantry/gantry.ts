@@ -1,4 +1,5 @@
-import type { Resource, StructType } from '../../types';
+import type { Struct } from '@bufbuild/protobuf';
+import type { Resource } from '../../types';
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {
@@ -13,11 +14,11 @@ export interface Gantry extends Resource {
   moveToPosition: (
     positionsMm: number[],
     speedsMmPerSec: number[],
-    extra?: StructType
+    extra?: Struct
   ) => Promise<void>;
 
   /** @returns The current position of each axis. */
-  getPosition: (extra?: StructType) => Promise<number[]>;
+  getPosition: (extra?: Struct) => Promise<number[]>;
 
   /**
    * Runs the homing sequence to find the start and end positions of the gantry
@@ -26,13 +27,13 @@ export interface Gantry extends Resource {
    * @returns A bool representing whether the gantry has run the homing sequence
    *   successfully.
    */
-  home: (extra?: StructType) => Promise<boolean>;
+  home: (extra?: Struct) => Promise<boolean>;
 
   /** @returns The lengths of the axes of the gantry in millimeters. */
-  getLengths: (extra?: StructType) => Promise<number[]>;
+  getLengths: (extra?: Struct) => Promise<number[]>;
 
   /** Stops the motion of the gantry. */
-  stop: (extra?: StructType) => Promise<void>;
+  stop: (extra?: Struct) => Promise<void>;
 
   /** Get if the gantry is currently moving. */
   isMoving: () => Promise<boolean>;

@@ -1,9 +1,15 @@
-import { CameraServiceClient } from '../../gen/component/camera/v1/camera_pb_service';
+import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
+import { CameraService } from '../../gen/component/camera/v1/camera_connect';
+import {
+  GetImageRequest,
+  GetPointCloudRequest,
+  RenderFrameRequest,
+} from '../../gen/component/camera/v1/camera_pb';
 import type { RobotClient } from '../../robot';
-import type { HttpBody } from '../../gen/google/api/httpbody_pb';
-import type { Options, StructType } from '../../types';
-import pb from '../../gen/component/camera/v1/camera_pb';
-import { promisify, doCommandFromClient } from '../../utils';
+import type { Options } from '../../types';
+import { doCommandFromClient } from '../../utils';
 import type { Camera, MimeType } from './camera';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
@@ -14,85 +20,68 @@ const PointCloudPCD: MimeType = 'pointcloud/pcd';
  * @group Clients
  */
 export class CameraClient implements Camera {
-  private client: CameraServiceClient;
+  private client: PromiseClient<typeof CameraService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(CameraServiceClient);
+    this.client = client.createServiceClient(CameraService);
     this.name = name;
     this.options = options;
   }
 
-  private get cameraService() {
-    return this.client;
-  }
-
   async getImage(mimeType: MimeType = '') {
-    const { cameraService } = this;
-    const request = new pb.GetImageRequest();
-    request.setName(this.name);
-    request.setMimeType(mimeType);
+    const request = new GetImageRequest({
+      name: this.name,
+      mimeType,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetImageRequest, pb.GetImageResponse>(
-      cameraService.getImage.bind(cameraService),
-      request
-    );
-
-    return response.getImage_asU8();
+    const resp = await this.client.getImage(request);
+    return resp.image;
   }
 
   async renderFrame(mimeType: MimeType = '') {
-    const { cameraService } = this;
-    const request = new pb.RenderFrameRequest();
-    request.setName(this.name);
-    request.setMimeType(mimeType);
+    const request = new RenderFrameRequest({
+      name: this.name,
+      mimeType,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.RenderFrameRequest, HttpBody>(
-      cameraService.renderFrame.bind(cameraService),
-      request
-    );
-
-    return new Blob([response.getData_asU8()], { type: mimeType });
+    const resp = await this.client.renderFrame(request);
+    return new Blob([resp.data], { type: mimeType });
   }
 
   async getPointCloud() {
-    const { cameraService } = this;
-    const request = new pb.GetPointCloudRequest();
-    request.setName(this.name);
-    request.setMimeType(PointCloudPCD);
+    const request = new GetPointCloudRequest({
+      name: this.name,
+      mimeType: PointCloudPCD,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPointCloudRequest,
-      pb.GetPointCloudResponse
-    >(cameraService.getPointCloud.bind(cameraService), request);
-
-    return response.getPointCloud_asU8();
+    const resp = await this.client.getPointCloud(request);
+    return resp.pointCloud;
   }
 
   async getProperties() {
-    const { cameraService } = this;
-    const request = new pb.GetPropertiesRequest();
-    request.setName(this.name);
+    const request = new GetPropertiesRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPropertiesRequest,
-      pb.GetPropertiesResponse
-    >(cameraService.getProperties.bind(cameraService), request);
-
-    return response.toObject();
+    return this.client.getProperties(request);
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const { cameraService } = this;
-    return doCommandFromClient(cameraService, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

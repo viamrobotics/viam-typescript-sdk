@@ -1,10 +1,11 @@
-import type { GeoGeometry, GeoPoint, Resource, StructType } from '../../types';
+import type { Struct } from '@bufbuild/protobuf';
+import type { GeoGeometry, GeoPoint, Resource } from '../../types';
 import type {
-  ModeMap,
-  Waypoint,
+  Mode,
   NavigationPosition,
   NavigationProperties,
   Path,
+  Waypoint,
 } from './types';
 
 /**
@@ -13,20 +14,20 @@ import type {
  */
 export interface Navigation extends Resource {
   /** Get the mode the robot is operating in. */
-  getMode: (extra?: StructType) => Promise<ModeMap[keyof ModeMap]>;
+  getMode: (extra?: Struct) => Promise<Mode>;
 
   /**
    * Set the mode the robot is operating in.
    *
    * @param mode - The mode for the service to operate in.
    */
-  setMode: (mode: ModeMap[keyof ModeMap], extra?: StructType) => Promise<void>;
+  setMode: (mode: Mode, extra?: Struct) => Promise<void>;
 
   /** Get the current location of the robot. */
-  getLocation: (extra?: StructType) => Promise<NavigationPosition>;
+  getLocation: (extra?: Struct) => Promise<NavigationPosition>;
 
   /** Get an array of waypoints currently in the service's data storage. */
-  getWayPoints: (extra?: StructType) => Promise<Waypoint[]>;
+  getWayPoints: (extra?: Struct) => Promise<Waypoint[]>;
 
   /**
    * Add a waypoint to the service's data storage.
@@ -34,7 +35,7 @@ export interface Navigation extends Resource {
    * @param location - The current location of the robot n the navigation
    *   service with latitude and longitude values.
    */
-  addWayPoint: (location: GeoPoint, extra?: StructType) => Promise<void>;
+  addWayPoint: (location: GeoPoint, extra?: Struct) => Promise<void>;
 
   /**
    * Remove a waypoint from the service's data storage.
@@ -42,13 +43,13 @@ export interface Navigation extends Resource {
    * @param id - The MongoDB ObjectID of the waypoint to remove from the
    *   service's data storage.
    */
-  removeWayPoint: (id: string, extra?: StructType) => Promise<void>;
+  removeWayPoint: (id: string, extra?: Struct) => Promise<void>;
 
   /** Get a list of obstacles. */
-  getObstacles: (extra?: StructType) => Promise<GeoGeometry[]>;
+  getObstacles: (extra?: Struct) => Promise<GeoGeometry[]>;
 
   /** Gets the list of paths known to the navigation service. */
-  getPaths: (extra?: StructType) => Promise<Path[]>;
+  getPaths: (extra?: Struct) => Promise<Path[]>;
 
   /** Gets information on the properties of the current navigation service. */
   getProperties: () => Promise<NavigationProperties>;

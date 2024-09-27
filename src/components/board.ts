@@ -1,8 +1,7 @@
 export {
-  type Board,
-  type Duration,
   PowerMode,
-  type Tick,
   type AnalogValue,
+  type Board,
+  type Tick,
 } from './board/board';
 export { BoardClient } from './board/client';

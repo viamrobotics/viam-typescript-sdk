@@ -1,7 +1,5 @@
-import { grpc } from '@improbable-eng/grpc-web';
-import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
-import robotApi from '../gen/robot/v1/robot_pb';
-import { type ServiceError } from '../gen/robot/v1/robot_pb_service';
+import { createPromiseClient, type Transport } from '@connectrpc/connect';
+import { RobotService } from '../gen/robot/v1/robot_connect';
 
 const timeoutBlob = new Blob(
   [
@@ -13,49 +11,36 @@ const timeoutBlob = new Blob(
 );
 
 export default class GRPCConnectionManager {
-  private innerTransportFactory: grpc.TransportFactory;
-  private client: RobotServiceClient;
-  private heartbeatIntervalMs: number;
-
   public connecting: Promise<void> | undefined;
-  private connectResolve: (() => void) | undefined;
-  private connectReject: ((reason: ServiceError) => void) | undefined;
-  private onDisconnect: () => void;
 
   constructor(
-    serviceHost: string,
-    transportFactory: grpc.TransportFactory,
-    onDisconnect: () => void,
-    heartbeatIntervalMs = 10_000
-  ) {
-    this.innerTransportFactory = transportFactory;
-    this.client = new RobotServiceClient(serviceHost, {
-      transport: this.innerTransportFactory,
-    });
-    this.onDisconnect = onDisconnect;
-    this.heartbeatIntervalMs = heartbeatIntervalMs;
+    private deferredTransport: () => Transport,
+    private onDisconnect: () => void,
+    private heartbeatIntervalMs = 10_000
+  ) {}
+
+  private get client() {
+    const transport = this.deferredTransport();
+    return createPromiseClient(RobotService, transport);
   }
 
   public heartbeat() {
     let worker: Worker | undefined;
-    const doHeartbeat = () => {
-      const getOperationsReq = new robotApi.GetOperationsRequest();
-      this.client.getOperations(
-        getOperationsReq,
-        new grpc.Metadata(),
-        (err) => {
-          if (err) {
-            this.onDisconnect();
-            return;
-          }
+    const doHeartbeat = async () => {
+      try {
+        await this.client.getOperations({});
+      } catch {
+        this.onDisconnect();
+        return;
+      }
 
-          if (worker) {
-            worker.postMessage(this.heartbeatIntervalMs);
-          } else {
-            setTimeout(() => doHeartbeat(), this.heartbeatIntervalMs);
-          }
-        }
-      );
+      if (worker) {
+        worker.postMessage(this.heartbeatIntervalMs);
+      } else {
+        setTimeout(() => {
+          doHeartbeat().catch(console.error); // eslint-disable-line no-console
+        }, this.heartbeatIntervalMs);
+      }
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -63,12 +48,12 @@ export default class GRPCConnectionManager {
       const url = window.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
-      worker.onmessage = () => {
-        doHeartbeat();
-      };
+      worker.addEventListener('message', () => {
+        doHeartbeat().catch(console.error); // eslint-disable-line no-console
+      });
     }
 
-    doHeartbeat();
+    doHeartbeat().catch(console.error); // eslint-disable-line no-console
   }
 
   public async start() {
@@ -77,24 +62,15 @@ export default class GRPCConnectionManager {
     }
 
     this.connecting = new Promise<void>((resolve, reject) => {
-      this.connectResolve = resolve;
-      this.connectReject = reject;
+      (async () => {
+        await this.client.getOperations({});
+      })()
+        .then(resolve)
+        .catch(reject)
+        .finally(() => {
+          this.connecting = undefined;
+        });
     });
-
-    // call heartbeat once at start
-    const getOperationsReq = new robotApi.GetOperationsRequest();
-    this.client.getOperations(
-      getOperationsReq,
-      new grpc.Metadata(),
-      (err, _resp) => {
-        if (err) {
-          this.connectReject?.(err);
-          console.debug('failed to connect');
-          return;
-        }
-        this.connectResolve?.();
-      }
-    );
 
     try {
       await this.connecting;

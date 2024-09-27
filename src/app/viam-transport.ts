@@ -1,12 +1,7 @@
-import { grpc } from '@improbable-eng/grpc-web';
 import { dialDirect } from '../rpc';
 
-import {
-  AuthenticateRequest,
-  Credentials as PBCredentials,
-} from '../gen/proto/rpc/v1/auth_pb';
-import { AuthServiceClient } from '../gen/proto/rpc/v1/auth_pb_service';
-import { MetadataTransport } from '../utils';
+import type { Transport } from '@connectrpc/connect';
+import { clientHeaders } from '../utils';
 
 /**
  * Credentials are either used to obtain an access token or provide an existing
@@ -32,96 +27,25 @@ export interface AccessToken {
   payload: string;
 }
 
-export const isCredential = (object: Credentials): object is Credential => {
-  return 'authEntity' in object;
+export const isCredential = (
+  object: Credentials | undefined
+): object is Credential => {
+  return object !== undefined && 'authEntity' in object;
 };
 
-/**
- * Initialize an authenticated transport factory that can access protected
- * resources.
- */
-export const createViamTransportFactory = async (
+/** Initialize an authenticated transport that can access protected resources. */
+export const createViamTransport = async (
   serviceHost: string,
   credential: Credential | AccessToken
-): Promise<grpc.TransportFactory> => {
+): Promise<Transport> => {
   if (credential.type === 'access-token') {
-    return createWithAccessToken(serviceHost, credential);
-  }
-  return createWithCredential(serviceHost, credential);
-};
-
-const createWithAccessToken = async (
-  serviceHost: string,
-  accessToken: AccessToken
-): Promise<grpc.TransportFactory> => {
-  const transportFactory = await dialDirect(serviceHost);
-
-  return (opts: grpc.TransportOptions): ViamTransport =>
-    new ViamTransport(transportFactory, opts, accessToken.payload);
-};
-
-export const getAccessTokenFromCredential = async (
-  host: string,
-  credential: Credential
-) => {
-  if (credential.type === 'robot-secret') {
-    throw new Error(
-      `credential type cannot be 'robot-secret'. Must be either 'robot-location-secret' or 'api-key'.`
-    );
-  } else if (!credential.authEntity) {
-    throw new Error(
-      `auth entity cannot be null, undefined, or an empty value.`
-    );
-  }
-
-  const transportFactory = await dialDirect(host);
-  const authClient = new AuthServiceClient(host, {
-    transport: transportFactory,
-  });
-
-  const entity = credential.authEntity;
-  const creds = new PBCredentials();
-  creds.setType(credential.type);
-  creds.setPayload(credential.payload);
-
-  const req = new AuthenticateRequest();
-  req.setEntity(entity);
-  req.setCredentials(creds);
-
-  const accessToken = await new Promise<string>((resolve, reject) => {
-    authClient.authenticate(req, new grpc.Metadata(), (err, response) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(response?.getAccessToken().toString() ?? '');
+    return dialDirect(serviceHost, {
+      accessToken: credential.payload,
+      extraHeaders: clientHeaders,
     });
-  });
-
-  return { type: 'access-token', payload: accessToken } as AccessToken;
-};
-
-const createWithCredential = async (
-  serviceHost: string,
-  credential: Credential
-): Promise<grpc.TransportFactory> => {
-  const accessToken = await getAccessTokenFromCredential(
-    serviceHost,
-    credential
-  );
-
-  const transportFactory = await dialDirect(serviceHost);
-  return (opts: grpc.TransportOptions): ViamTransport =>
-    new ViamTransport(transportFactory, opts, accessToken.payload);
-};
-
-export class ViamTransport extends MetadataTransport {
-  constructor(
-    transportFactory: grpc.TransportFactory,
-    opts: grpc.TransportOptions,
-    accessToken: string
-  ) {
-    const md = new grpc.Metadata({ authorization: `Bearer ${accessToken}` });
-    super(transportFactory, opts, md);
   }
-}
+  return dialDirect(serviceHost, {
+    credentials: credential,
+    extraHeaders: clientHeaders,
+  });
+};

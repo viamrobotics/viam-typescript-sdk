@@ -8,9 +8,9 @@ export interface Properties {
   /** Whether the camera supports the return of point cloud data. */
   supportsPcd: boolean;
   /** Camera intrinsic parameters, if available. */
-  intrinsicParameters?: IntrinsicParameters.AsObject;
+  intrinsicParameters?: IntrinsicParameters;
   /** Camera distortion parameters, if available. */
-  distortionParameters?: DistortionParameters.AsObject;
+  distortionParameters?: DistortionParameters;
   /** Camera frame rate parameters, if available. */
   frameRate?: number;
 }

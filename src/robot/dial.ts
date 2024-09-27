@@ -1,13 +1,13 @@
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
+import { isCredential } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
 import type { AccessToken, Credential } from '../main';
 import { RobotClient } from './client';
 
 /** Options required to dial a robot via gRPC. */
 export interface DialDirectConf {
-  authEntity?: string;
   host: string;
-  credential?: Credential | AccessToken;
+  credentials?: Credential | AccessToken;
   disableSessions?: boolean;
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
@@ -48,13 +48,8 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   }
   const client = new RobotClient(conf.host, undefined, sessOpts, clientConf);
 
-  let creds;
-  if (conf.credential) {
-    creds = conf.credential;
-  }
   await client.connect({
-    authEntity: conf.authEntity,
-    creds,
+    creds: conf.credentials,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
   });
 
@@ -78,9 +73,8 @@ interface ICEServer {
  *   infinity.
  */
 export interface DialWebRTCConf {
-  authEntity?: string;
   host: string;
-  credential?: Credential | AccessToken;
+  credentials?: Credential | AccessToken;
   disableSessions?: boolean;
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
@@ -121,10 +115,9 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
   await client.connect({
-    authEntity: conf.authEntity ?? impliedURL,
     priority: conf.priority,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
-    creds: conf.credential,
+    creds: conf.credentials,
   });
 
   // eslint-disable-next-line no-console
@@ -167,16 +160,24 @@ export const createRobotClient = async (
   validateDialConf(conf);
 
   const backOffOpts: Partial<IBackOffOptions> = {
-    maxDelay: conf.reconnectMaxWait,
-    numOfAttempts: conf.reconnectMaxAttempts,
-    retry: (_error, attemptNumber) => {
+    retry: (error, attemptNumber) => {
+      // TODO: This ought to check exceptional errors so as to not keep failing forever.
+
       // eslint-disable-next-line no-console
-      console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`);
+      console.debug(
+        `Failed to connect, attempt ${attemptNumber} with backoff; reason=${JSON.stringify(error)}`
+      );
 
       // Abort reconnects if the the caller specifies, otherwise retry
       return !conf.reconnectAbortSignal?.abort;
     },
   };
+  if (conf.reconnectMaxWait) {
+    backOffOpts.maxDelay = conf.reconnectMaxWait;
+  }
+  if (conf.reconnectMaxAttempts) {
+    backOffOpts.numOfAttempts = conf.reconnectMaxAttempts;
+  }
 
   // Try to dial via WebRTC first.
   if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
@@ -209,9 +210,9 @@ export const createRobotClient = async (
  * configs.
  */
 const validateDialConf = (conf: DialConf) => {
-  if (conf.authEntity) {
+  if (conf.credentials && isCredential(conf.credentials)) {
     try {
-      conf.authEntity = new URL(conf.authEntity).host;
+      conf.credentials.authEntity = new URL(conf.credentials.authEntity).host;
     } catch (error) {
       if (!(error instanceof TypeError)) {
         throw error;

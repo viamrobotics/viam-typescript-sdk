@@ -1,13 +1,24 @@
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
-
-import { Duration as PBDuration } from 'google-protobuf/google/protobuf/duration_pb';
-import { BoardServiceClient } from '../../gen/component/board/v1/board_pb_service';
 import type { RobotClient } from '../../robot';
-import type { Options, StructType } from '../../types';
+import type { Options } from '../../types';
 
-import pb from '../../gen/component/board/v1/board_pb';
-import { promisify, doCommandFromClient } from '../../utils';
-import type { Board, Duration, PowerMode, Tick } from './board';
+import { Duration, Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { BoardService } from '../../gen/component/board/v1/board_connect';
+import {
+  GetDigitalInterruptValueRequest,
+  GetGPIORequest,
+  PWMFrequencyRequest,
+  PWMRequest,
+  ReadAnalogReaderRequest,
+  SetGPIORequest,
+  SetPWMFrequencyRequest,
+  SetPWMRequest,
+  SetPowerModeRequest,
+  StreamTicksRequest,
+  WriteAnalogRequest,
+} from '../../gen/component/board/v1/board_pb';
+import { doCommandFromClient } from '../../utils';
+import { type Board, type PowerMode, type Tick } from './board';
 
 /**
  * A gRPC-web client for the Board component.
@@ -15,237 +26,169 @@ import type { Board, Duration, PowerMode, Tick } from './board';
  * @group Clients
  */
 export class BoardClient implements Board {
-  private client: BoardServiceClient;
+  private client: PromiseClient<typeof BoardService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(BoardServiceClient);
+    this.client = client.createServiceClient(BoardService);
     this.name = name;
     this.options = options;
   }
 
-  private get boardService() {
-    return this.client;
-  }
-
   async setGPIO(pin: string, high: boolean, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.SetGPIORequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setHigh(high);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new SetGPIORequest({
+      name: this.name,
+      pin,
+      high,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetGPIORequest, pb.SetGPIOResponse>(
-      boardService.setGPIO.bind(boardService),
-      request
-    );
+    await this.client.setGPIO(request);
   }
 
   async getGPIO(pin: string, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.GetGPIORequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetGPIORequest({
+      name: this.name,
+      pin,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetGPIORequest, pb.GetGPIOResponse>(
-      boardService.getGPIO.bind(boardService),
-      request
-    );
-    return response.getHigh();
+    const resp = await this.client.getGPIO(request);
+    return resp.high;
   }
 
   async getPWM(pin: string, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.PWMRequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new PWMRequest({
+      name: this.name,
+      pin,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.PWMRequest, pb.PWMResponse>(
-      boardService.pWM.bind(boardService),
-      request
-    );
-    return response.getDutyCyclePct();
+    const resp = await this.client.pWM(request);
+    return resp.dutyCyclePct;
   }
 
   async setPWM(pin: string, dutyCyle: number, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.SetPWMRequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setDutyCyclePct(dutyCyle);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new SetPWMRequest({
+      name: this.name,
+      pin,
+      dutyCyclePct: dutyCyle,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetPWMRequest, pb.SetPWMResponse>(
-      boardService.setPWM.bind(boardService),
-      request
-    );
+    await this.client.setPWM(request);
   }
 
   async getPWMFrequency(pin: string, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.PWMFrequencyRequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new PWMFrequencyRequest({
+      name: this.name,
+      pin,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.PWMFrequencyRequest,
-      pb.PWMFrequencyResponse
-    >(boardService.pWMFrequency.bind(boardService), request);
-    return response.getFrequencyHz();
+    const resp = await this.client.pWMFrequency(request);
+    return Number(resp.frequencyHz);
   }
 
   async setPWMFrequency(pin: string, frequencyHz: number, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.SetPWMFrequencyRequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setFrequencyHz(frequencyHz);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new SetPWMFrequencyRequest({
+      name: this.name,
+      pin,
+      frequencyHz: frequencyHz ? BigInt(frequencyHz) : undefined,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetPWMFrequencyRequest, pb.SetPWMFrequencyResponse>(
-      boardService.setPWMFrequency.bind(boardService),
-      request
-    );
+    await this.client.setPWMFrequency(request);
   }
 
   async readAnalogReader(analogReader: string, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.ReadAnalogReaderRequest();
-    request.setBoardName(this.name);
-    request.setAnalogReaderName(analogReader);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new ReadAnalogReaderRequest({
+      boardName: this.name,
+      analogReaderName: analogReader,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.ReadAnalogReaderRequest,
-      pb.ReadAnalogReaderResponse
-    >(boardService.readAnalogReader.bind(boardService), request);
-
-    return response.toObject();
+    return this.client.readAnalogReader(request);
   }
 
   async writeAnalog(pin: string, value: number, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.WriteAnalogRequest();
-    request.setName(this.name);
-    request.setPin(pin);
-    request.setValue(value);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new WriteAnalogRequest({
+      name: this.name,
+      pin,
+      value,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.WriteAnalogRequest, pb.WriteAnalogResponse>(
-      boardService.writeAnalog.bind(boardService),
-      request
-    );
+    await this.client.writeAnalog(request);
   }
 
-  async getDigitalInterruptValue(digitalInteruptName: string, extra = {}) {
-    const { boardService } = this;
-    const request = new pb.GetDigitalInterruptValueRequest();
-    request.setBoardName(this.name);
-    request.setDigitalInterruptName(digitalInteruptName);
-    request.setExtra(Struct.fromJavaScript(extra));
+  async getDigitalInterruptValue(digitalInterruptName: string, extra = {}) {
+    const request = new GetDigitalInterruptValueRequest({
+      boardName: this.name,
+      digitalInterruptName,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetDigitalInterruptValueRequest,
-      pb.GetDigitalInterruptValueResponse
-    >(boardService.getDigitalInterruptValue.bind(boardService), request);
-    return response.getValue();
+    const resp = await this.client.getDigitalInterruptValue(request);
+    return Number(resp.value);
   }
 
   async streamTicks(interrupts: string[], queue: Tick[], extra = {}) {
-    const request = new pb.StreamTicksRequest();
-    request.setName(this.name);
-    request.setPinNamesList(interrupts);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new StreamTicksRequest({
+      name: this.name,
+      pinNames: interrupts,
+      extra: Struct.fromJson(extra),
+    });
     this.options.requestLogger?.(request);
     const stream = this.client.streamTicks(request);
-    stream.on('data', (response) => {
-      const tick: Tick = {
-        pinName: response.getPinName(),
-        high: response.getHigh(),
-        time: response.getTime(),
-      };
-      queue.push(tick);
-    });
 
-    return new Promise<void>((resolve, reject) => {
-      stream.on('status', (status) => {
-        if (status.code !== 0) {
-          const error = {
-            message: status.details,
-            code: status.code,
-            metadata: status.metadata,
-          };
-          reject(error);
-        }
+    for await (const latest of stream) {
+      queue.push({
+        pinName: latest.pinName,
+        high: latest.high,
+        time: latest.time ? Number(latest.time) : 0,
       });
-      stream.on('end', (end) => {
-        if (end === undefined) {
-          const error = { message: 'Stream ended without a status code' };
-          reject(error);
-        } else if (end.code !== 0) {
-          const error = {
-            message: end.details,
-            code: end.code,
-            metadata: end.metadata,
-          };
-          reject(error);
-        }
-        resolve();
-      });
-    });
+    }
   }
 
-  async setPowerMode(
-    name: string,
-    powerMode: PowerMode,
-    duration?: Duration,
-    extra = {}
-  ) {
-    const { boardService } = this;
-    const request = new pb.SetPowerModeRequest();
-    request.setName(name);
-    request.setPowerMode(powerMode);
-    if (duration) {
-      const pbDuration = new PBDuration();
-      pbDuration.setNanos(duration.nanos);
-      pbDuration.setSeconds(duration.seconds);
-      request.setDuration(pbDuration);
-    }
-    request.setExtra(Struct.fromJavaScript(extra));
+  async setPowerMode(powerMode: PowerMode, duration?: Duration, extra = {}) {
+    const request = new SetPowerModeRequest({
+      name: this.name,
+      powerMode,
+      duration,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetPowerModeRequest, pb.SetPowerModeResponse>(
-      boardService.setPowerMode.bind(boardService),
-      request
-    );
+    await this.client.setPowerMode(request);
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const { boardService } = this;
-    return doCommandFromClient(boardService, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

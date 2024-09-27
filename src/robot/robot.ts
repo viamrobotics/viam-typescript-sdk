@@ -1,15 +1,10 @@
-import type {
-  PoseInFrame,
-  ResourceName,
-  Transform,
-} from '../gen/common/v1/common_pb';
-import type { StructType } from '../types';
+import type { Struct } from '@bufbuild/protobuf';
 import { MachineConnectionEvent } from '../events';
+import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
 import type proto from '../gen/robot/v1/robot_pb';
-import type { ResponseStream } from '../gen/robot/v1/robot_pb_service';
+import type { ResourceName } from '../types';
 
-export type RobotStatusStream = ResponseStream<proto.Status[]>;
-export type CloudMetadata = proto.GetCloudMetadataResponse.AsObject;
+export type CloudMetadata = proto.GetCloudMetadataResponse;
 
 type Callback = (args: unknown) => void;
 
@@ -20,7 +15,7 @@ export interface Robot {
    * @group Sessions
    * @alpha
    */
-  getSessions(): Promise<proto.Session.AsObject[]>;
+  getSessions(): Promise<proto.Session[]>;
 
   /**
    * Get the list of operations currently running on the robot.
@@ -58,7 +53,7 @@ export interface Robot {
    * @group Operations
    * @alpha
    */
-  stopAll(extra?: Map<string, StructType>): Promise<void>;
+  stopAll(extra?: Map<string, Struct>): Promise<void>;
 
   /**
    * Get the configuration of the frame system of a given robot.
@@ -124,7 +119,7 @@ export interface Robot {
    * @group Resources
    * @alpha
    */
-  resourceNames(): Promise<ResourceName.AsObject[]>;
+  resourceNames(): Promise<ResourceName[]>;
 
   /**
    * Get a list of all resource types.
@@ -142,7 +137,7 @@ export interface Robot {
    * @group Status
    * @alpha
    */
-  getStatus(resourceNames?: ResourceName.AsObject[]): Promise<proto.Status[]>;
+  getStatus(resourceNames?: ResourceName[]): Promise<proto.Status[]>;
 
   /**
    * Periodically receive the status of all statuses requested. An empty request
@@ -155,9 +150,9 @@ export interface Robot {
    * @alpha
    */
   streamStatus(
-    resourceNames?: ResourceName.AsObject[],
+    resourceNames?: ResourceName[],
     durationMs?: number
-  ): RobotStatusStream;
+  ): AsyncIterable<proto.Status[]>;
 
   /**
    * Call a function when a connection event occurs.

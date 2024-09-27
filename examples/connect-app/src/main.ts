@@ -6,7 +6,7 @@ const API_KEY_SECRET = import.meta.env.VITE_API_KEY_SECRET;
 
 async function connect(): Promise<VIAM.ViamClient> {
   const opts: VIAM.ViamClientOptions = {
-    credential: {
+    credentials: {
       type: 'api-key',
       authEntity: API_KEY_ID,
       payload: API_KEY_SECRET,

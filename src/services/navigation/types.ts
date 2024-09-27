@@ -1,7 +1,18 @@
-import pb from '../../gen/service/navigation/v1/navigation_pb';
+import type { PartialMessage } from '@bufbuild/protobuf';
+import * as navigationApi from '../../gen/service/navigation/v1/navigation_pb';
 
-export type ModeMap = pb.ModeMap;
-export type Waypoint = pb.Waypoint.AsObject;
-export type NavigationPosition = pb.GetLocationResponse.AsObject;
-export type Path = pb.Path.AsObject;
-export type NavigationProperties = pb.GetPropertiesResponse.AsObject;
+export type NavigationPosition =
+  PartialMessage<navigationApi.GetLocationResponse>;
+export type NavigationProperties =
+  PartialMessage<navigationApi.GetPropertiesResponse>;
+export type Mode = navigationApi.Mode;
+export type Path = PartialMessage<navigationApi.Path>;
+export type Waypoint = PartialMessage<navigationApi.Waypoint>;
+
+export const {
+  GetLocationResponse: NavigationPosition,
+  GetPropertiesResponse: NavigationProperties,
+  Mode,
+  Path,
+  Waypoint,
+} = navigationApi;

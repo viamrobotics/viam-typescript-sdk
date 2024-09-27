@@ -1,14 +1,23 @@
 // @vitest-environment happy-dom
 
-import { vi, beforeEach, afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../../robot';
 vi.mock('../../robot');
 
-import { StreamServiceClient } from '../../gen/stream/v1/stream_pb_service';
 vi.mock('../../gen/stream/v1/stream_pb_service');
 
-import { StreamClient } from './client';
+import {
+  ConnectError,
+  createPromiseClient,
+  createRouterTransport,
+  type Transport,
+} from '@connectrpc/connect';
 import { EventDispatcher } from '../../events';
+import { StreamService } from '../../gen/stream/v1/stream_connect';
+import { AddStreamResponse } from '../../gen/stream/v1/stream_pb';
+import { StreamClient } from './client';
+
+let mockTransport: Transport;
 
 describe('StreamClient', () => {
   let robotClient: RobotClient;
@@ -17,12 +26,12 @@ describe('StreamClient', () => {
   beforeEach(() => {
     vi.useFakeTimers();
 
-    const fakehost = 'fakehost';
-
     robotClient = new EventDispatcher() as RobotClient;
     robotClient.createServiceClient = vi
       .fn()
-      .mockImplementation(() => new StreamServiceClient(fakehost));
+      .mockImplementation(() =>
+        createPromiseClient(StreamService, mockTransport)
+      );
     streamClient = new StreamClient(robotClient);
   });
 
@@ -43,13 +52,17 @@ describe('StreamClient', () => {
   it('getStream creates and returns a new stream', async () => {
     const fakeCamName = 'fakecam';
     const fakeStream = { id: fakeCamName };
-    StreamServiceClient.prototype.addStream = vi
-      .fn()
-      .mockImplementation((_req, _md, cb) => {
-        cb(null, {});
-        streamClient.emit('track', { streams: [fakeStream] });
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        addStream: () => {
+          streamClient.emit('track', { streams: [fakeStream] });
+          return new AddStreamResponse();
+        },
       });
+    });
 
+    streamClient = new StreamClient(robotClient);
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
@@ -61,26 +74,36 @@ describe('StreamClient', () => {
   it('getStream fails when add stream fails', async () => {
     const fakeCamName = 'fakecam';
     const error = new Error('could not add stream');
-    StreamServiceClient.prototype.addStream = vi
-      .fn()
-      .mockImplementation((_req, _md, cb) => {
-        cb(error);
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        addStream: () => {
+          throw ConnectError.from(error);
+        },
       });
+    });
 
+    streamClient = new StreamClient(robotClient);
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(error);
+    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(
+      ConnectError.from(error)
+    );
     expect(addStream).toHaveBeenCalledOnce();
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
 
   it('getStream fails when timeout exceeded', async () => {
     const fakeCamName = 'fakecam';
-    StreamServiceClient.prototype.addStream = vi
-      .fn()
-      .mockImplementation((_req, _md, cb) => {
-        cb(null, {});
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        addStream: () => {
+          return new AddStreamResponse();
+        },
       });
+    });
 
+    streamClient = new StreamClient(robotClient);
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     const promise = streamClient.getStream(fakeCamName);
     vi.runAllTimers();
@@ -94,13 +117,17 @@ describe('StreamClient', () => {
   it('getStream can add the same stream twice', async () => {
     const fakeCamName = 'fakecam';
     const fakeStream = { id: fakeCamName };
-    StreamServiceClient.prototype.addStream = vi
-      .fn()
-      .mockImplementation((_req, _md, cb) => {
-        cb(null, {});
-        streamClient.emit('track', { streams: [fakeStream] });
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        addStream: () => {
+          streamClient.emit('track', { streams: [fakeStream] });
+          return new AddStreamResponse();
+        },
       });
+    });
 
+    streamClient = new StreamClient(robotClient);
+    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream

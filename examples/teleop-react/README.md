@@ -15,8 +15,9 @@ The connection hostname and secret fields can be pre-filled from a `.env` file i
 
 ```ini
 # examples/teleop-react/.env
-VITE_ROBOT_HOSTNAME=my-cool-robot.viam.cloud
-VITE_ROBOT_SECRET=super-secret-key
+VITE_HOST="<HOST>"
+VITE_API_KEY_ID="<API_KEY_ID>"
+VITE_API_KEY="<API_KEY>"
 ```
 
 ```shell
