@@ -1917,7 +1917,7 @@
 "@viamrobotics/sdk@file:viamrobotics-sdk.tgz":
   version "0.24.0"
   resolved "file:viamrobotics-sdk.tgz"
-  integrity sha512-iXXGKFUneO2SOM/KuRhepd3j3ZDBsaTYMYcAbYw+vaOljT013U/XudvHOEX82Xv/VMG5g7i3JIgKvjjX4XS99Q==
+  integrity sha512-PEvIaYlhbapu7OX1d6RSXA0V5uejfEtRUT4SAwDHyg/hEIL54ei6gzF6xe/X46Bvepp6v9eFLV5yyAs1mhka5Q==
   dependencies:
     "@bufbuild/protobuf" "^1.10.0"
     "@connectrpc/connect" "^1.5.0"
