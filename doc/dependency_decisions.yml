@@ -27,22 +27,13 @@
     :license_links: https://github.com/bufbuild/buf/blob/main/LICENSE
     :versions: []
     :when: 2023-05-01 18:09:18.081521457 Z
-- - :license
-  - '@improbable-eng/grpc-web'
-  - Apache 2.0
-  - :who:
-    :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
-    :license_links: https://www.npmjs.com/package/@improbable-eng/grpc-web
-    :versions: []
-    :when: 2023-05-01 18:11:37.804857463 Z
-- - :license
-  - '@improbable-eng/grpc-web-fake-transport'
-  - Apache 2.0
-  - :who:
-    :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
-    :license_links: https://www.npmjs.com/package/@improbable-eng/grpc-web-fake-transport
-    :versions: []
-    :when: 2023-05-01 18:11:37.804857463 Z
+- - :approve
+  - "@bufbuild/protobuf"
+  - :who: 
+    :why: 
+    :versions:
+    - 1.10.0
+    :when: 2024-09-30 14:52:13.805002459 Z
 - - :license
   - '@typescript-eslint/parser'
   - BSD-2-Clause
@@ -89,14 +80,6 @@
     :license_links: https://github.com/viamrobotics/js-config/blob/main/LICENSE
     :versions: []
     :when: 2023-12-28 23:30:28.297289000 Z
-- - :license
-  - protoc-gen-js
-  - MIT
-  - :who:
-    :why: 'TODO(RSDK-583): why is license finder unable to detect this license automatically?'
-    :license_links: https://github.com/yinzara/protoc-gen-js/blob/master/LICENSE
-    :versions: []
-    :when: 2023-05-12 14:28:29.173104997 Z
 - - :permit
   - ISC
   - :who:
