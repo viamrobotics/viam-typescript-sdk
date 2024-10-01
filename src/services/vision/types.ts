@@ -1,15 +1,15 @@
 import type { Image } from '../../gen/component/camera/v1/camera_pb';
 
-import type { PartialMessage } from '@bufbuild/protobuf';
+import type { PlainMessage } from '@bufbuild/protobuf';
 import * as commonApi from '../../gen/common/v1/common_pb';
 import * as visionApi from '../../gen/service/vision/v1/vision_pb';
 
-export type Classification = PartialMessage<visionApi.Classification>;
-export type Detection = PartialMessage<visionApi.Detection>;
+export type Classification = PlainMessage<visionApi.Classification>;
+export type Detection = PlainMessage<visionApi.Detection>;
 
 export const { Classification, Detection } = visionApi;
 
-export type PointCloudObject = PartialMessage<commonApi.PointCloudObject>;
+export type PointCloudObject = PlainMessage<commonApi.PointCloudObject>;
 
 export const { PointCloudObject } = commonApi;
 

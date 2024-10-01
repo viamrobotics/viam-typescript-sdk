@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamTicksResponse } from '../../gen/component/board/v1/board_pb';
 import { RobotClient } from '../../robot';
-import { type AnalogValue, type Tick } from './board';
+import { AnalogValue, type Tick } from './board';
 import { BoardClient } from './client';
 vi.mock('../../robot');
 
@@ -25,12 +25,12 @@ const testAnalogMax = 5;
 const testStepSize = 0.5;
 const testValue = 2;
 
-const testAnalogValue: AnalogValue = {
+const testAnalogValue: AnalogValue = new AnalogValue({
   value: testValue,
   minRange: testAnalogMin,
   maxRange: testAnalogMax,
   stepSize: testStepSize,
-};
+});
 
 let testTickStream: WritableIterable<PartialMessage<StreamTicksResponse>>;
 

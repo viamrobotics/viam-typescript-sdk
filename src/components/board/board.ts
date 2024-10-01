@@ -1,9 +1,9 @@
-import type { Duration, PartialMessage, Struct } from '@bufbuild/protobuf';
+import type { Duration, Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 import * as boardApi from '../../gen/component/board/v1/board_pb';
 
-export type AnalogValue = PartialMessage<boardApi.ReadAnalogReaderResponse>;
+export type AnalogValue = boardApi.ReadAnalogReaderResponse;
 export type PowerMode = boardApi.PowerMode;
 
 export const { ReadAnalogReaderResponse: AnalogValue, PowerMode } = boardApi;

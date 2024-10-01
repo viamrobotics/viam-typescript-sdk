@@ -1,8 +1,8 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type {
   GeoGeometry,
-  Geometry,
   GeoPoint,
+  Geometry,
   Pose,
   PoseInFrame,
   Resource,

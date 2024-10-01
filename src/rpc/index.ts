@@ -19,4 +19,3 @@ export {
 } from './dial';
 
 export { ConnectionClosedError } from './connection-closed-error';
-export { GRPCError } from './grpc-error';

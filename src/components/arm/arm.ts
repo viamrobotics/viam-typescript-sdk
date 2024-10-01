@@ -1,9 +1,9 @@
-import type { PartialMessage, Struct } from '@bufbuild/protobuf';
+import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 
-export type ArmJointPositions = PartialMessage<armApi.JointPositions>;
+export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
 export const { JointPositions: ArmJointPositions } = armApi;
 

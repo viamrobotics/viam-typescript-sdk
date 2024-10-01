@@ -1,8 +1,8 @@
-import type { PartialMessage, Struct } from '@bufbuild/protobuf';
+import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import * as pb from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import type { Resource } from '../../types';
 
-export type InputControllerEvent = PartialMessage<pb.Event>;
+export type InputControllerEvent = PlainMessage<pb.Event>;
 export const { Event: InputControllerEvent } = pb;
 
 /**

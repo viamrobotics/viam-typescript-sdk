@@ -1,9 +1,8 @@
-import type { PartialMessage, Struct } from '@bufbuild/protobuf';
-import type { Resource, Vector3 } from '../../types';
+import type { Resource, Struct, Vector3 } from '../../types';
 
 import * as baseApi from '../../gen/component/base/v1/base_pb';
 
-export type BaseProperties = PartialMessage<baseApi.GetPropertiesResponse>;
+export type BaseProperties = baseApi.GetPropertiesResponse;
 
 export const { GetPropertiesResponse: BaseProperties } = baseApi;
 

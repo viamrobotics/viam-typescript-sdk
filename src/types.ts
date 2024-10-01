@@ -1,4 +1,4 @@
-import type { JsonValue, PartialMessage, Struct } from '@bufbuild/protobuf';
+import { Struct, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';
 
 export interface Options {
   requestLogger?: (req: unknown) => void;
@@ -15,20 +15,20 @@ export interface Resource {
 
 import * as commonApi from './gen/common/v1/common_pb';
 
-export type Capsule = PartialMessage<commonApi.Capsule>;
-export type GeoGeometry = PartialMessage<commonApi.GeoGeometry>;
-export type GeoPoint = PartialMessage<commonApi.GeoPoint>;
-export type GeometriesInFrame = PartialMessage<commonApi.GeometriesInFrame>;
-export type Geometry = PartialMessage<commonApi.Geometry>;
-export type Orientation = PartialMessage<commonApi.Orientation>;
-export type Pose = PartialMessage<commonApi.Pose>;
-export type PoseInFrame = PartialMessage<commonApi.PoseInFrame>;
-export type RectangularPrism = PartialMessage<commonApi.RectangularPrism>;
-export type ResourceName = PartialMessage<commonApi.ResourceName>;
-export type Sphere = PartialMessage<commonApi.Sphere>;
-export type Transform = PartialMessage<commonApi.Transform>;
-export type Vector3 = PartialMessage<commonApi.Vector3>;
-export type WorldState = PartialMessage<commonApi.WorldState>;
+export type Capsule = PlainMessage<commonApi.Capsule>;
+export type GeoGeometry = PlainMessage<commonApi.GeoGeometry>;
+export type GeoPoint = PlainMessage<commonApi.GeoPoint>;
+export type GeometriesInFrame = PlainMessage<commonApi.GeometriesInFrame>;
+export type Geometry = PlainMessage<commonApi.Geometry>;
+export type Orientation = PlainMessage<commonApi.Orientation>;
+export type Pose = PlainMessage<commonApi.Pose>;
+export type PoseInFrame = PlainMessage<commonApi.PoseInFrame>;
+export type RectangularPrism = PlainMessage<commonApi.RectangularPrism>;
+export type ResourceName = PlainMessage<commonApi.ResourceName>;
+export type Sphere = PlainMessage<commonApi.Sphere>;
+export type Transform = PlainMessage<commonApi.Transform>;
+export type Vector3 = PlainMessage<commonApi.Vector3>;
+export type WorldState = PlainMessage<commonApi.WorldState>;
 
 export const {
   Capsule,
@@ -57,3 +57,5 @@ export const isValidGeoPoint = (value: GeoPoint) => {
     Number.isNaN(longitude)
   );
 };
+
+export { Struct, type JsonValue } from '@bufbuild/protobuf';

@@ -1,14 +1,11 @@
-import type { JsonValue, PartialMessage, Struct } from '@bufbuild/protobuf';
+import type { JsonValue, Struct } from '@bufbuild/protobuf';
 import type { Orientation, Resource, Vector3 } from '../../types';
 
 import * as sensorApi from '../../gen/component/movementsensor/v1/movementsensor_pb';
 
-export type MovementSensorAccuracy =
-  PartialMessage<sensorApi.GetAccuracyResponse>;
-export type MovementSensorPosition =
-  PartialMessage<sensorApi.GetPositionResponse>;
-export type MovementSensorProperties =
-  PartialMessage<sensorApi.GetPropertiesResponse>;
+export type MovementSensorAccuracy = sensorApi.GetAccuracyResponse;
+export type MovementSensorPosition = sensorApi.GetPositionResponse;
+export type MovementSensorProperties = sensorApi.GetPropertiesResponse;
 
 export const {
   GetAccuracyResponse: MovementSensorAccuracy,

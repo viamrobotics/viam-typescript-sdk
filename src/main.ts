@@ -93,7 +93,7 @@ export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
  * @group Raw Protobufs
  */
 export {
-  type CloudConfig,
+  CloudConfig,
   type ProvisioningClient,
 } from './app/provisioning-client';
 export * as provisioningApi from './gen/provisioning/v1/provisioning_pb';
@@ -119,7 +119,7 @@ export * as billingApi from './gen/app/v1/billing_pb';
  * @alpha
  * @group Raw Protobufs
  */
-export { ArmClient, type Arm, type ArmJointPositions } from './components/arm';
+export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
 export * as armApi from './gen/component/arm/v1/arm_pb';
 
 /**
@@ -131,7 +131,7 @@ export * as armApi from './gen/component/arm/v1/arm_pb';
  * @alpha
  * @group Raw Protobufs
  */
-export { BaseClient, type Base, type BaseProperties } from './components/base';
+export { BaseClient, BaseProperties, type Base } from './components/base';
 export * as baseApi from './gen/component/base/v1/base_pb';
 
 /**
@@ -144,9 +144,9 @@ export * as baseApi from './gen/component/base/v1/base_pb';
  * @group Raw Protobufs
  */
 export {
+  AnalogValue,
   BoardClient,
   PowerMode,
-  type AnalogValue,
   type Board,
   type Tick,
 } from './components/board';
@@ -176,8 +176,8 @@ export * as cameraApi from './gen/component/camera/v1/camera_pb';
 export {
   EncoderClient,
   EncoderPositionType,
+  EncoderProperties,
   type Encoder,
-  type EncoderProperties,
 } from './components/encoder';
 export * as encoderApi from './gen/component/encoder/v1/encoder_pb';
 
@@ -215,11 +215,11 @@ export * as motorApi from './gen/component/motor/v1/motor_pb';
  * @group Raw Protobufs
  */
 export {
+  MovementSensorAccuracy,
   MovementSensorClient,
+  MovementSensorPosition,
+  MovementSensorProperties,
   type MovementSensor,
-  type MovementSensorAccuracy,
-  type MovementSensorPosition,
-  type MovementSensorProperties,
 } from './components/movementsensor';
 export * as movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb';
 
@@ -336,16 +336,16 @@ export * as inputControllerApi from './gen/component/inputcontroller/v1/input_co
  */
 export * as motionApi from './gen/service/motion/v1/motion_pb';
 export {
+  CollisionSpecification,
+  Constraints,
+  LinearConstraint,
+  ListPlanStatusesResponse,
   MotionClient,
-  type CollisionSpecification,
-  type Constraints,
+  MotionConfiguration,
+  ObstacleDetector,
+  OrientationConstraint,
   type GetPlanResponse,
-  type LinearConstraint,
-  type ListPlanStatusesResponse,
   type Motion,
-  type MotionConfiguration,
-  type ObstacleDetector,
-  type OrientationConstraint,
   type PlanState,
 } from './services/motion';
 
@@ -363,11 +363,11 @@ export { DataManagerClient, type DataManager } from './services/data-manager';
 export * as navigationApi from './gen/service/navigation/v1/navigation_pb';
 export {
   NavigationClient,
+  NavigationPosition,
+  NavigationProperties,
+  Path,
+  Waypoint,
   type Mode,
-  type NavigationPosition,
-  type NavigationProperties,
-  type Path,
-  type Waypoint,
 } from './services/navigation';
 
 /**
@@ -392,11 +392,7 @@ export * as servoApi from './gen/component/servo/v1/servo_pb';
  * @group Raw Protobufs
  */
 export * as slamApi from './gen/service/slam/v1/slam_pb';
-export {
-  SlamClient,
-  type SlamPosition,
-  type SlamProperties,
-} from './services/slam';
+export { SlamClient, SlamPosition, SlamProperties } from './services/slam';
 
 /**
  * Raw Protobuf interfaces for a Vision service.
@@ -409,10 +405,10 @@ export {
  */
 export * as visionApi from './gen/service/vision/v1/vision_pb';
 export {
+  Classification,
+  Detection,
+  PointCloudObject,
   VisionClient,
-  type Classification,
-  type Detection,
-  type PointCloudObject,
 } from './services/vision';
 
 /**

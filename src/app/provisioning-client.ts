@@ -59,4 +59,4 @@ export class ProvisioningClient {
   }
 }
 
-export { type CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+export { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';

@@ -1,10 +1,9 @@
-import type { PartialMessage, Struct } from '@bufbuild/protobuf';
+import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 
-export type EncoderProperties =
-  PartialMessage<encoderApi.GetPropertiesResponse>;
+export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
 
 export const {
