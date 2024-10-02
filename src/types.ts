@@ -1,6 +1,6 @@
 import { Struct, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';
 
-export { ConnectError } from '@connectrpc/connect';
+export { Code, ConnectError } from '@connectrpc/connect';
 export { ConnectionClosedError } from './rpc';
 
 export interface Options {
