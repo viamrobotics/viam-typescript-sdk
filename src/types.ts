@@ -61,4 +61,9 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export { Duration, Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+export {
+  Duration,
+  Struct,
+  Timestamp,
+  type JsonValue,
+} from '@bufbuild/protobuf';
