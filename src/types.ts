@@ -66,4 +66,5 @@ export {
   Struct,
   Timestamp,
   type JsonValue,
+  type PlainMessage,
 } from '@bufbuild/protobuf';
