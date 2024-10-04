@@ -1,12 +1,23 @@
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
-import pb from '../../gen/service/navigation/v1/navigation_pb';
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
+import {
+  AddWaypointRequest,
+  GetLocationRequest,
+  GetModeRequest,
+  GetObstaclesRequest,
+  GetPathsRequest,
+  GetPropertiesRequest,
+  GetWaypointsRequest,
+  RemoveWaypointRequest,
+  SetModeRequest,
+} from '../../gen/service/navigation/v1/navigation_pb';
 import { RobotClient } from '../../robot';
-import { NavigationServiceClient } from '../../gen/service/navigation/v1/navigation_pb_service';
-import { doCommandFromClient, encodeGeoPoint, promisify } from '../../utils';
-import type { GeoPoint, Options, StructType } from '../../types';
+import type { GeoPoint, Options } from '../../types';
 import { isValidGeoPoint } from '../../types';
-import type { ModeMap } from './types';
+import { doCommandFromClient } from '../../utils';
 import type { Navigation } from './navigation';
+import type { Mode } from './types';
 
 /**
  * A gRPC-web client for a Navigation service.
@@ -14,178 +25,135 @@ import type { Navigation } from './navigation';
  * @group Clients
  */
 export class NavigationClient implements Navigation {
-  private client: NavigationServiceClient;
+  private client: PromiseClient<typeof NavigationService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(NavigationServiceClient);
+    this.client = client.createServiceClient(NavigationService);
     this.name = name;
     this.options = options;
   }
 
-  private get service() {
-    return this.client;
-  }
-
   async getMode(extra = {}) {
-    const { service } = this;
-
-    const request = new pb.GetModeRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetModeRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetModeRequest, pb.GetModeResponse>(
-      service.getMode.bind(service),
-      request
-    );
-
-    return response.getMode();
+    const resp = await this.client.getMode(request);
+    return resp.mode;
   }
 
-  async setMode(mode: ModeMap[keyof ModeMap], extra = {}) {
-    const { service } = this;
-
-    const request = new pb.SetModeRequest();
-    request.setName(this.name);
-    request.setMode(mode);
-    request.setExtra(Struct.fromJavaScript(extra));
+  async setMode(mode: Mode, extra = {}) {
+    const request = new SetModeRequest({
+      name: this.name,
+      mode,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.SetModeRequest, pb.SetModeResponse>(
-      service.setMode.bind(service),
-      request
-    );
+    await this.client.setMode(request);
   }
 
   async getLocation(extra = {}) {
-    const { service } = this;
-
-    const request = new pb.GetLocationRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetLocationRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetLocationRequest,
-      pb.GetLocationResponse
-    >(service.getLocation.bind(service), request);
+    const response = await this.client.getLocation(request);
 
-    const result = response.toObject();
-    if (!result.location) {
+    if (!response.location) {
       throw new Error('no location');
     }
-    if (!isValidGeoPoint(result.location)) {
+    if (!isValidGeoPoint(response.location)) {
       throw new Error('invalid location');
     }
-    return result;
+    return response;
   }
 
   async getWayPoints(extra = {}) {
-    const { service } = this;
-
-    const request = new pb.GetWaypointsRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetWaypointsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetWaypointsRequest,
-      pb.GetWaypointsResponse
-    >(service.getWaypoints.bind(service), request);
-
-    return response.getWaypointsList().map((x) => x.toObject());
+    const resp = await this.client.getWaypoints(request);
+    return resp.waypoints;
   }
 
   async addWayPoint(location: GeoPoint, extra = {}) {
-    const { service } = this;
-
-    const request = new pb.AddWaypointRequest();
-    request.setName(this.name);
-    request.setLocation(encodeGeoPoint(location));
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new AddWaypointRequest({
+      name: this.name,
+      location,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.AddWaypointRequest, pb.AddWaypointResponse>(
-      service.addWaypoint.bind(service),
-      request
-    );
+    await this.client.addWaypoint(request);
   }
 
   async removeWayPoint(id: string, extra = {}) {
-    const { service } = this;
-
-    const request = new pb.RemoveWaypointRequest();
-    request.setName(this.name);
-    request.setId(id);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new RemoveWaypointRequest({
+      name: this.name,
+      id,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.RemoveWaypointRequest, pb.RemoveWaypointResponse>(
-      service.removeWaypoint.bind(service),
-      request
-    );
+    await this.client.removeWaypoint(request);
   }
 
   async getObstacles(extra = {}) {
-    const { service } = this;
-
-    const request = new pb.GetObstaclesRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetObstaclesRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetObstaclesRequest,
-      pb.GetObstaclesResponse
-    >(service.getObstacles.bind(service), request);
-
-    return response.getObstaclesList().map((x) => x.toObject());
+    const resp = await this.client.getObstacles(request);
+    return resp.obstacles;
   }
 
   async getPaths(extra = {}) {
-    const { service } = this;
-
-    const request = new pb.GetPathsRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetPathsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.GetPathsRequest, pb.GetPathsResponse>(
-      service.getPaths.bind(service),
-      request
-    );
-
-    return response.getPathsList().map((x) => x.toObject());
+    const resp = await this.client.getPaths(request);
+    return resp.paths;
   }
 
   async getProperties() {
-    const { service } = this;
-
-    const request = new pb.GetPropertiesRequest();
-    request.setName(this.name);
+    const request = new GetPropertiesRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPropertiesRequest,
-      pb.GetPropertiesResponse
-    >(service.getProperties.bind(service), request);
-
-    return response.toObject();
+    return this.client.getProperties(request);
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const { service } = this;
-    return doCommandFromClient(service, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

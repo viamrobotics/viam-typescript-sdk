@@ -1,7 +1,7 @@
-import type { JavaScriptValue } from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';
 
-import common from './gen/common/v1/common_pb';
-export type StructType = Record<string, JavaScriptValue>;
+export { Code, ConnectError } from '@connectrpc/connect';
+export { ConnectionClosedError } from './rpc';
 
 export interface Options {
   requestLogger?: (req: unknown) => void;
@@ -13,14 +13,42 @@ export interface Resource {
    *
    * @param command - The command to execute.
    */
-  doCommand: (command: StructType) => Promise<StructType>;
+  doCommand(command: Struct): Promise<JsonValue>;
 }
 
-// Common Protobuf Types
+import * as commonApi from './gen/common/v1/common_pb';
 
-export type ResourceName = common.ResourceName.AsObject;
-export type GeoGeometry = common.GeoGeometry.AsObject;
-export type GeoPoint = common.GeoPoint.AsObject;
+export type Capsule = PlainMessage<commonApi.Capsule>;
+export type GeoGeometry = PlainMessage<commonApi.GeoGeometry>;
+export type GeoPoint = PlainMessage<commonApi.GeoPoint>;
+export type GeometriesInFrame = PlainMessage<commonApi.GeometriesInFrame>;
+export type Geometry = PlainMessage<commonApi.Geometry>;
+export type Orientation = PlainMessage<commonApi.Orientation>;
+export type Pose = PlainMessage<commonApi.Pose>;
+export type PoseInFrame = PlainMessage<commonApi.PoseInFrame>;
+export type RectangularPrism = PlainMessage<commonApi.RectangularPrism>;
+export type ResourceName = PlainMessage<commonApi.ResourceName>;
+export type Sphere = PlainMessage<commonApi.Sphere>;
+export type Transform = PlainMessage<commonApi.Transform>;
+export type Vector3 = PlainMessage<commonApi.Vector3>;
+export type WorldState = PlainMessage<commonApi.WorldState>;
+
+export const {
+  Capsule,
+  GeoGeometry,
+  GeoPoint,
+  GeometriesInFrame,
+  Geometry,
+  Orientation,
+  Pose,
+  PoseInFrame,
+  RectangularPrism,
+  ResourceName,
+  Sphere,
+  Transform,
+  Vector3,
+  WorldState,
+} = commonApi;
 
 export const isValidGeoPoint = (value: GeoPoint) => {
   const { latitude, longitude } = value;
@@ -33,17 +61,10 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-// Spatial Math
-export type Vector3 = common.Vector3.AsObject;
-export type Orientation = common.Orientation.AsObject;
-
-// Motion
-export type Pose = common.Pose.AsObject;
-export type PoseInFrame = common.PoseInFrame.AsObject;
-export type Transform = common.Transform.AsObject;
-export type WorldState = common.WorldState.AsObject;
-export type GeometriesInFrame = common.GeometriesInFrame.AsObject;
-export type Geometry = common.Geometry.AsObject;
-export type Sphere = common.Sphere.AsObject;
-export type RectangularPrism = common.RectangularPrism.AsObject;
-export type Capsule = common.Capsule.AsObject;
+export {
+  Duration,
+  Struct,
+  Timestamp,
+  type JsonValue,
+  type PlainMessage,
+} from '@bufbuild/protobuf';

@@ -14,11 +14,8 @@ export const addSdpFields = (
     type: localDescription?.type,
   };
   if (sdpFields) {
-    for (const key of Object.keys(sdpFields)) {
-      description.sdp = [
-        description.sdp,
-        `a=${key}:${sdpFields[key]}\r\n`,
-      ].join('');
+    for (const [key, value] of Object.entries(sdpFields)) {
+      description.sdp = [description.sdp, `a=${key}:${value}\r\n`].join('');
     }
   }
   return description;
@@ -62,8 +59,8 @@ export const newPeerConnectionForClient = async (
   });
   negotiationChannel.addEventListener(
     'message',
-    async (event: MessageEvent) => {
-      try {
+    (event: MessageEvent<string>) => {
+      (async () => {
         const description = new RTCSessionDescription(
           JSON.parse(atob(event.data)) as RTCSessionDescriptionInit
         );
@@ -80,26 +77,22 @@ export const newPeerConnectionForClient = async (
           );
           negotiationChannel.send(btoa(JSON.stringify(newDescription)));
         }
-      } catch (error) {
-        console.error(error);
-      }
+      })().catch(console.error); // eslint-disable-line no-console
     }
   );
 
-  peerConnection.addEventListener('negotiationneeded', async () => {
-    if (!negOpen) {
-      return;
-    }
-    try {
+  peerConnection.addEventListener('negotiationneeded', () => {
+    (async () => {
+      if (!negOpen) {
+        return;
+      }
       await peerConnection.setLocalDescription();
       const newDescription = addSdpFields(
         peerConnection.localDescription,
         additionalSdpFields
       );
       negotiationChannel.send(btoa(JSON.stringify(newDescription)));
-    } catch (error) {
-      console.error(error);
-    }
+    })().catch(console.error); // eslint-disable-line no-console
   });
 
   if (!disableTrickle) {

@@ -1,107 +1,56 @@
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
-import { BillingServiceClient } from '../gen/app/v1/billing_pb_service';
-import pb from '../gen/app/v1/billing_pb';
-import { promisify } from '../utils';
+import {
+  createPromiseClient,
+  type PromiseClient,
+  type Transport,
+} from '@connectrpc/connect';
+import { BillingService } from '../gen/app/v1/billing_connect';
+import type { GetCurrentMonthUsageResponse as PBGetCurrentMonthUsageResponse } from '../gen/app/v1/billing_pb';
 
-type GetCurrentMonthUsageResponse =
-  Partial<pb.GetCurrentMonthUsageResponse.AsObject> & {
+export type GetCurrentMonthUsageResponse =
+  Partial<PBGetCurrentMonthUsageResponse> & {
     start?: Date;
     end?: Date;
   };
 
 export class BillingClient {
-  private service: BillingServiceClient;
+  private client: PromiseClient<typeof BillingService>;
 
-  constructor(serviceHost: string, grpcOptions: RpcOptions) {
-    this.service = new BillingServiceClient(serviceHost, grpcOptions);
+  constructor(transport: Transport) {
+    this.client = createPromiseClient(BillingService, transport);
   }
 
   async getCurrentMonthUsage(orgId: string) {
-    const { service } = this;
-
-    const req = new pb.GetCurrentMonthUsageRequest();
-    req.setOrgId(orgId);
-
-    const response = await promisify<
-      pb.GetCurrentMonthUsageRequest,
-      pb.GetCurrentMonthUsageResponse
-    >(service.getCurrentMonthUsage.bind(service), req);
-
-    const result: GetCurrentMonthUsageResponse = response.toObject();
-    result.start = response.getStartDate()?.toDate();
-    result.end = response.getEndDate()?.toDate();
+    const result: GetCurrentMonthUsageResponse =
+      await this.client.getCurrentMonthUsage({
+        orgId,
+      });
+    result.start = result.startDate?.toDate();
+    result.end = result.endDate?.toDate();
     return result;
   }
 
   async getOrgBillingInformation(orgId: string) {
-    const { service } = this;
-
-    const req = new pb.GetOrgBillingInformationRequest();
-    req.setOrgId(orgId);
-
-    const response = await promisify<
-      pb.GetOrgBillingInformationRequest,
-      pb.GetOrgBillingInformationResponse
-    >(service.getOrgBillingInformation.bind(service), req);
-    return response.toObject();
+    return this.client.getOrgBillingInformation({
+      orgId,
+    });
   }
 
   async getInvoicesSummary(orgId: string) {
-    const { service } = this;
-
-    const req = new pb.GetInvoicesSummaryRequest();
-    req.setOrgId(orgId);
-
-    const response = await promisify<
-      pb.GetInvoicesSummaryRequest,
-      pb.GetInvoicesSummaryResponse
-    >(service.getInvoicesSummary.bind(service), req);
-    return response.toObject();
+    return this.client.getInvoicesSummary({
+      orgId,
+    });
   }
 
   async getInvoicePdf(id: string, orgId: string) {
-    const { service } = this;
-
-    const req = new pb.GetInvoicePdfRequest();
-    req.setId(id);
-    req.setOrgId(orgId);
-
-    const chunks: Uint8Array[] = [];
-    const stream = service.getInvoicePdf(req);
-
-    stream.on('data', (response) => {
-      const chunk = response.getChunk_asU8();
-      chunks.push(chunk);
+    const pdfParts = this.client.getInvoicePdf({
+      id,
+      orgId,
     });
-
-    return new Promise<Uint8Array>((resolve, reject) => {
-      stream.on('status', (status) => {
-        if (status.code !== 0) {
-          const error = {
-            message: status.details,
-            code: status.code,
-            metadata: status.metadata,
-          };
-          reject(error);
-        }
-      });
-
-      stream.on('end', (end) => {
-        if (end === undefined) {
-          const error = { message: 'Stream ended without a status code' };
-          reject(error);
-        } else if (end.code !== 0) {
-          const error = {
-            message: end.details,
-            code: end.code,
-            metadata: end.metadata,
-          };
-          reject(error);
-        }
-        const arr = concatArrayU8(chunks);
-        resolve(arr);
-      });
-    });
+    const chunks = [];
+    for await (const pdfPart of pdfParts) {
+      chunks.push(pdfPart.chunk);
+    }
+    return concatArrayU8(chunks);
   }
 }
 

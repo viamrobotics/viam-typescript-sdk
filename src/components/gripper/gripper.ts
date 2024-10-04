@@ -1,15 +1,16 @@
-import type { Resource, StructType } from '../../types';
+import type { Struct } from '@bufbuild/protobuf';
+import type { Resource } from '../../types';
 
 /** Represents a physical robotic gripper. */
 export interface Gripper extends Resource {
   /** Open a gripper of the underlying robot. */
-  open: (extra?: StructType) => Promise<void>;
+  open: (extra?: Struct) => Promise<void>;
 
   /** Request a gripper of the underlying robot to grab. */
-  grab: (extra?: StructType) => Promise<void>;
+  grab: (extra?: Struct) => Promise<void>;
 
   /** Stop a robot's gripper. */
-  stop: (extra?: StructType) => Promise<void>;
+  stop: (extra?: Struct) => Promise<void>;
 
   /** Report if the gripper is in motion. */
   isMoving: () => Promise<boolean>;

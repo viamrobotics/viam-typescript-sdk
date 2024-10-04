@@ -47,14 +47,14 @@ const connect = async () => {
   updateConnectionStatus(VIAM.MachineConnectionEvent.CONNECTING);
 
   try {
+    console.log(HOST, API_KEY, API_KEY_ID);
     machine = await VIAM.createRobotClient({
       host: HOST,
-      credential: {
+      credentials: {
         type: 'api-key',
         payload: API_KEY,
         authEntity: API_KEY_ID,
       },
-      authEntity: API_KEY_ID,
       signalingAddress: 'https://app.viam.com:443',
       reconnectAbortSignal,
     });

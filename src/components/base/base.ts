@@ -1,7 +1,10 @@
-import type { Resource, StructType, Vector3 } from '../../types';
-import pb from '../../gen/component/base/v1/base_pb';
+import type { Resource, Struct, Vector3 } from '../../types';
 
-export type BaseProperties = pb.GetPropertiesResponse.AsObject;
+import * as baseApi from '../../gen/component/base/v1/base_pb';
+
+export type BaseProperties = baseApi.GetPropertiesResponse;
+
+export const { GetPropertiesResponse: BaseProperties } = baseApi;
 
 /** Represents a physical base of a robot. */
 export interface Base extends Resource {
@@ -15,7 +18,7 @@ export interface Base extends Resource {
   moveStraight(
     distanceMm: number,
     mmPerSec: number,
-    extra?: StructType
+    extra?: Struct
   ): Promise<void>;
 
   /**
@@ -25,7 +28,7 @@ export interface Base extends Resource {
    * @param angleDeg - Degrees to spin.
    * @param degsPerSec - Angular speed, in degrees per second.
    */
-  spin(angleDeg: number, degsPerSec: number, extra?: StructType): Promise<void>;
+  spin(angleDeg: number, degsPerSec: number, extra?: Struct): Promise<void>;
 
   /**
    * Set the linear and angular power of a base from -1 to 1 in terms of power
@@ -34,11 +37,7 @@ export interface Base extends Resource {
    * @param linear - Desired linear power percentage from -1 to 1.
    * @param angular - Desired angular power percentage from -1 to 1.
    */
-  setPower(
-    linear: Vector3,
-    angular: Vector3,
-    extra?: StructType
-  ): Promise<void>;
+  setPower(linear: Vector3, angular: Vector3, extra?: Struct): Promise<void>;
 
   /**
    * Set the linear and angular velocity of a base.
@@ -46,18 +45,14 @@ export interface Base extends Resource {
    * @param linear - Desired linear velocity in millimeters per second.
    * @param angular - Desired angular velocity in degrees per second.
    */
-  setVelocity(
-    linear: Vector3,
-    angular: Vector3,
-    extra?: StructType
-  ): Promise<void>;
+  setVelocity(linear: Vector3, angular: Vector3, extra?: Struct): Promise<void>;
 
   /** Stop a base */
-  stop(extra?: StructType): Promise<void>;
+  stop(extra?: Struct): Promise<void>;
 
   /** Return true if the base is in motion. */
-  isMoving(extra?: StructType): Promise<boolean>;
+  isMoving(extra?: Struct): Promise<boolean>;
 
   /** Return the base's properties. */
-  getProperties(extra?: StructType): Promise<BaseProperties>;
+  getProperties(extra?: Struct): Promise<BaseProperties>;
 }

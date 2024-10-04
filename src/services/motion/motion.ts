@@ -1,20 +1,20 @@
+import type { Struct } from '@bufbuild/protobuf';
 import type {
   GeoGeometry,
-  Geometry,
   GeoPoint,
+  Geometry,
   Pose,
   PoseInFrame,
   Resource,
   ResourceName,
-  StructType,
   Transform,
   WorldState,
 } from '../../types';
 import type {
   Constraints,
-  MotionConfiguration,
   GetPlanResponse,
   ListPlanStatusesResponse,
+  MotionConfiguration,
 } from './types';
 
 /**
@@ -40,7 +40,7 @@ export interface Motion extends Resource {
     componentName: ResourceName,
     worldState?: WorldState,
     constraints?: Constraints,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<boolean>;
 
   /**
@@ -67,7 +67,7 @@ export interface Motion extends Resource {
     slamServiceName: ResourceName,
     motionConfiguration?: MotionConfiguration,
     obstacles?: Geometry[],
-    extra?: StructType
+    extra?: Struct
   ) => Promise<string>;
 
   /**
@@ -99,7 +99,7 @@ export interface Motion extends Resource {
     obstaclesList?: GeoGeometry[],
     motionConfiguration?: MotionConfiguration,
     boundingRegion?: GeoGeometry[],
-    extra?: StructType
+    extra?: Struct
   ) => Promise<string>;
 
   /**
@@ -108,7 +108,7 @@ export interface Motion extends Resource {
    *
    * @param componentName - The component to stop
    */
-  stopPlan: (componentName: ResourceName, extra?: StructType) => Promise<null>;
+  stopPlan: (componentName: ResourceName, extra?: Struct) => Promise<null>;
 
   /**
    * By default: returns the plan history of the most recent `moveOnGlobe()` or
@@ -135,7 +135,7 @@ export interface Motion extends Resource {
     componentName: ResourceName,
     lastPlanOnly?: boolean,
     executionId?: string,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<GetPlanResponse>;
 
   /**
@@ -153,7 +153,7 @@ export interface Motion extends Resource {
    */
   listPlanStatuses: (
     onlyActivePlans?: boolean,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<ListPlanStatusesResponse>;
 
   /**
@@ -170,6 +170,6 @@ export interface Motion extends Resource {
     componentName: ResourceName,
     destinationFrame: string,
     supplementalTransforms: Transform[],
-    extra?: StructType
+    extra?: Struct
   ) => Promise<PoseInFrame>;
 }

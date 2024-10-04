@@ -1,4 +1,16 @@
-import type { grpc } from '@improbable-eng/grpc-web';
+import type {
+  AnyMessage,
+  Message,
+  MethodInfo,
+  PartialMessage,
+  ServiceType,
+} from '@bufbuild/protobuf';
+import type {
+  ContextValues,
+  StreamResponse,
+  Transport,
+  UnaryResponse,
+} from '@connectrpc/connect';
 import {
   Request,
   RequestHeaders,
@@ -7,8 +19,10 @@ import {
   Stream,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { BaseChannel } from './base-channel';
-import { ClientStream } from './client-stream';
+import type { ClientStream, ClientStreamConstructor } from './client-stream';
 import { ConnectionClosedError } from './connection-closed-error';
+import { StreamClientStream } from './stream-client-stream';
+import { UnaryClientStream } from './unary-client-stream';
 
 // MaxStreamCount is the max number of streams a channel can have.
 const MaxStreamCount = 256;
@@ -17,13 +31,13 @@ interface activeClienStream {
   cs: ClientStream;
 }
 
-export class ClientChannel extends BaseChannel {
+export class ClientChannel extends BaseChannel implements Transport {
   private streamIDCounter = 0;
-  private readonly streams = new Map<number, activeClienStream>();
+  private readonly streams = new Map<string, activeClienStream>();
 
   constructor(pc: RTCPeerConnection, dc: RTCDataChannel) {
     super(pc, dc);
-    dc.addEventListener('message', (event: MessageEvent<'message'>) => {
+    dc.addEventListener('message', (event: MessageEvent<ArrayBuffer>) => {
       this.onChannelMessage(event);
     });
     pc.addEventListener('iceconnectionstatechange', () => {
@@ -38,133 +52,153 @@ export class ClientChannel extends BaseChannel {
     dc.addEventListener('close', () => this.onConnectionTerminated());
   }
 
-  public transportFactory(): grpc.TransportFactory {
-    return (opts: grpc.TransportOptions) => {
-      return this.newStream(this.nextStreamID(), opts);
-    };
-  }
-
   private onConnectionTerminated() {
     // we may call this twice but we know closed will be true at this point.
     this.closeWithReason(new ConnectionClosedError('data channel closed'));
-    const err = new ConnectionClosedError('connection terminated');
     for (const stream of this.streams.values()) {
-      stream.cs.closeWithRecvError(err);
+      stream.cs.closeWithRecvError();
     }
   }
 
-  private onChannelMessage(event: MessageEvent) {
-    let resp: Response;
-    try {
-      resp = Response.deserializeBinary(
-        new Uint8Array(event.data as ArrayBuffer)
-      );
-    } catch (error) {
-      console.error('error deserializing message', error);
-      return;
-    }
+  private onChannelMessage(event: MessageEvent<ArrayBuffer>) {
+    const resp = Response.fromBinary(new Uint8Array(event.data));
 
-    const stream = resp.getStream();
+    const { stream } = resp;
     if (stream === undefined) {
-      console.error('no stream id; discarding');
+      console.error('no stream id; discarding'); // eslint-disable-line no-console
       return;
     }
 
-    const id = stream.getId();
-    const activeStream = this.streams.get(id);
+    const { id } = stream;
+    const activeStream = this.streams.get(id.toString());
     if (activeStream === undefined) {
-      console.error('no stream for id; discarding', 'id', id);
+      console.error('no stream for id; discarding', 'id', id); // eslint-disable-line no-console
       return;
     }
     activeStream.cs.onResponse(resp);
   }
 
   private nextStreamID(): Stream {
-    const stream = new Stream();
-    const thisStreamId = this.streamIDCounter;
+    const thisId = this.streamIDCounter;
     this.streamIDCounter += 1;
-    stream.setId(thisStreamId);
-    return stream;
+    return new Stream({
+      id: BigInt(thisId),
+    });
   }
 
-  private newStream(
+  private newStream<
+    T extends ClientStream<I, O>,
+    I extends Message<I>,
+    O extends Message<O>,
+  >(
+    ClientCtor: ClientStreamConstructor<T, I, O>,
     stream: Stream,
-    opts: grpc.TransportOptions
-  ): grpc.Transport {
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    header: HeadersInit | undefined
+  ): T {
     if (this.isClosed()) {
-      return new FailingClientStream(
-        new ConnectionClosedError('connection closed'),
-        opts
-      );
+      throw new ConnectionClosedError('connection closed');
     }
-    let activeStream = this.streams.get(stream.getId());
-    if (activeStream === undefined) {
-      if (Object.keys(this.streams).length > MaxStreamCount) {
-        return new FailingClientStream(new Error('stream limit hit'), opts);
-      }
-      const clientStream = new ClientStream(
-        this,
-        stream,
-        (id: number) => this.removeStreamByID(id),
-        opts
-      );
-      activeStream = { cs: clientStream };
-      this.streams.set(stream.getId(), activeStream);
+    let activeStream = this.streams.get(stream.id.toString());
+    if (activeStream !== undefined) {
+      throw new Error('invariant: stream should not exist yet');
     }
-    return activeStream.cs;
+    if (Object.keys(this.streams).length > MaxStreamCount) {
+      throw new Error('stream limit hit');
+    }
+    const clientStream = new ClientCtor(
+      this,
+      stream,
+      (id: bigint) => this.removeStreamByID(id),
+      service,
+      method,
+      header
+    );
+    activeStream = { cs: clientStream };
+    this.streams.set(stream.id.toString(), activeStream);
+    return clientStream;
   }
 
-  private removeStreamByID(id: number) {
-    this.streams.delete(id);
+  private removeStreamByID(id: bigint) {
+    this.streams.delete(id.toString());
   }
 
   public writeHeaders(stream: Stream, headers: RequestHeaders) {
-    const request = new Request();
-    request.setStream(stream);
-    request.setHeaders(headers);
-    this.write(request);
+    this.write(
+      new Request({
+        stream,
+        type: {
+          case: 'headers',
+          value: headers,
+        },
+      })
+    );
   }
 
   public writeMessage(stream: Stream, msg: RequestMessage) {
-    const request = new Request();
-    request.setStream(stream);
-    request.setMessage(msg);
-    this.write(request);
+    this.write(
+      new Request({
+        stream,
+        type: {
+          case: 'message',
+          value: msg,
+        },
+      })
+    );
   }
 
   public writeReset(stream: Stream) {
-    const request = new Request();
-    request.setStream(stream);
-    request.setRstStream(true);
-    this.write(request);
-  }
-}
-
-class FailingClientStream implements grpc.Transport {
-  private readonly err: Error;
-  private readonly opts: grpc.TransportOptions;
-
-  constructor(err: Error, opts: grpc.TransportOptions) {
-    this.err = err;
-    this.opts = opts;
+    this.write(
+      new Request({
+        stream,
+        type: {
+          case: 'rstStream',
+          value: true,
+        },
+      })
+    );
   }
 
-  public start() {
-    setTimeout(() => this.opts.onEnd(this.err));
+  public async unary<
+    I extends Message<I> = AnyMessage,
+    O extends Message<O> = AnyMessage,
+  >(
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    message: PartialMessage<I>,
+    contextValues?: ContextValues
+  ): Promise<UnaryResponse<I, O>> {
+    return this.newStream<UnaryClientStream<I, O>, I, O>(
+      UnaryClientStream<I, O>,
+      this.nextStreamID(),
+      service,
+      method,
+      header
+    ).run(signal, timeoutMs, message, contextValues);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public sendMessage() {
-    // do nothing.
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  public finishSend() {
-    // do nothing.
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  public cancel() {
-    // do nothing.
+  public async stream<
+    I extends Message<I> = AnyMessage,
+    O extends Message<O> = AnyMessage,
+  >(
+    service: ServiceType,
+    method: MethodInfo<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    input: AsyncIterable<PartialMessage<I>>,
+    contextValues?: ContextValues
+  ): Promise<StreamResponse<I, O>> {
+    return this.newStream<StreamClientStream<I, O>, I, O>(
+      StreamClientStream<I, O>,
+      this.nextStreamID(),
+      service,
+      method,
+      header
+    ).run(signal, timeoutMs, input, contextValues);
   }
 }

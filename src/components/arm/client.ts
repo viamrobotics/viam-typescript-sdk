@@ -1,9 +1,18 @@
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { ArmService } from '../../gen/component/arm/v1/arm_connect';
+import {
+  GetEndPositionRequest,
+  GetJointPositionsRequest,
+  IsMovingRequest,
+  JointPositions,
+  MoveToJointPositionsRequest,
+  MoveToPositionRequest,
+  StopRequest,
+} from '../../gen/component/arm/v1/arm_pb';
 import type { RobotClient } from '../../robot';
-import pb from '../../gen/component/arm/v1/arm_pb';
-import { ArmServiceClient } from '../../gen/component/arm/v1/arm_pb_service';
-import type { Options, Pose, StructType } from '../../types';
-import { doCommandFromClient, encodePose, promisify } from '../../utils';
+import type { Options, Pose } from '../../types';
+import { doCommandFromClient } from '../../utils';
 import type { Arm } from './arm';
 
 /**
@@ -12,126 +21,105 @@ import type { Arm } from './arm';
  * @group Clients
  */
 export class ArmClient implements Arm {
-  private client: ArmServiceClient;
+  private client: PromiseClient<typeof ArmService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(ArmServiceClient);
+    this.client = client.createServiceClient(ArmService);
     this.name = name;
     this.options = options;
   }
 
-  private get ArmService() {
-    return this.client;
-  }
-
   async getEndPosition(extra = {}) {
-    const armService = this.ArmService;
-    const request = new pb.GetEndPositionRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetEndPositionRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetEndPositionRequest,
-      pb.GetEndPositionResponse
-    >(armService.getEndPosition.bind(armService), request);
-
-    const result = response.getPose();
+    const response = await this.client.getEndPosition(request);
+    const result = response.pose;
     if (!result) {
       throw new Error('no pose');
     }
-    return result.toObject();
+    return result;
   }
 
   async moveToPosition(pose: Pose, extra = {}) {
-    const armService = this.ArmService;
-
-    const request = new pb.MoveToPositionRequest();
-    request.setName(this.name);
-    request.setTo(encodePose(pose));
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new MoveToPositionRequest({
+      name: this.name,
+      to: pose,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.MoveToPositionRequest, pb.MoveToPositionResponse>(
-      armService.moveToPosition.bind(armService),
-      request
-    );
+    await this.client.moveToPosition(request);
   }
 
   async moveToJointPositions(jointPositionsList: number[], extra = {}) {
-    const armService = this.ArmService;
+    const newJointPositions = new JointPositions({
+      values: jointPositionsList,
+    });
 
-    const newJointPositions = new pb.JointPositions();
-    newJointPositions.setValuesList(jointPositionsList);
-
-    const request = new pb.MoveToJointPositionsRequest();
-    request.setName(this.name);
-    request.setPositions(newJointPositions);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new MoveToJointPositionsRequest({
+      name: this.name,
+      positions: newJointPositions,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<
-      pb.MoveToJointPositionsRequest,
-      pb.MoveToJointPositionsResponse
-    >(armService.moveToJointPositions.bind(armService), request);
+    await this.client.moveToJointPositions(request);
   }
 
   async getJointPositions(extra = {}) {
-    const armService = this.ArmService;
-    const request = new pb.GetJointPositionsRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetJointPositionsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetJointPositionsRequest,
-      pb.GetJointPositionsResponse
-    >(armService.getJointPositions.bind(armService), request);
+    const response = await this.client.getJointPositions(request);
 
-    const result = response.getPositions();
-
+    const result = response.positions;
     if (!result) {
       throw new Error('no pose');
     }
-    return result.toObject();
+    return result;
   }
 
   async stop(extra = {}) {
-    const armService = this.ArmService;
-    const request = new pb.StopRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new StopRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.StopRequest, pb.StopResponse>(
-      armService.stop.bind(armService),
-      request
-    );
+    await this.client.stop(request);
   }
 
   async isMoving() {
-    const armService = this.ArmService;
-    const request = new pb.IsMovingRequest();
-    request.setName(this.name);
+    const request = new IsMovingRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>(
-      armService.isMoving.bind(armService),
-      request
-    );
-    return response.getIsMoving();
+    const resp = await this.client.isMoving(request);
+    return resp.isMoving;
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const armService = this.ArmService;
-    return doCommandFromClient(armService, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

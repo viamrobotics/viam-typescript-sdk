@@ -31,7 +31,7 @@ test-watch: $(node_modules) build-buf
 lint: $(node_modules) build-buf
 	npm run lint
 	npm run typecheck
-	npm run check
+	npm run check -- --ignore=@bufbuild/protobuf
 
 .PHONY: format
 format: $(node_modules)

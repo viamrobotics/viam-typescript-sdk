@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 
 export interface MachinesListProps {
   appClient: AppClient;
-  location: appApi.Location.AsObject;
-  onMachineSelected: (machine: appApi.Robot.AsObject) => unknown;
+  location: appApi.Location;
+  onMachineSelected: (machine: appApi.Robot) => unknown;
 }
 
 export const MachinesList = ({ appClient, location, onMachineSelected }: MachinesListProps): JSX.Element => {
-  const [machines, setMachines] = useState<appApi.Robot.AsObject[]>([]);
+  const [machines, setMachines] = useState<appApi.Robot[]>([]);
   useEffect(() => {
     async function getMachines() {
       const machines = await appClient.listRobots(location.id);

@@ -1,46 +1,55 @@
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
-import * as googleStructPb from 'google-protobuf/google/protobuf/struct_pb';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import dataPb from '../gen/app/data/v1/data_pb';
-import datasetPb from '../gen/app/dataset/v1/dataset_pb';
-import dataSyncPb from '../gen/app/datasync/v1/data_sync_pb';
-import { DataServiceClient } from '../gen/app/data/v1/data_pb_service';
-import { DatasetServiceClient } from '../gen/app/dataset/v1/dataset_pb_service';
-import { DataSyncServiceClient } from '../gen/app/datasync/v1/data_sync_pb_service';
-import { promisify } from '../utils';
+import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+import {
+  createPromiseClient,
+  type PromiseClient,
+  type Transport,
+} from '@connectrpc/connect';
+import { DataService } from '../gen/app/data/v1/data_connect';
+import {
+  BinaryID,
+  CaptureInterval,
+  CaptureMetadata,
+  Filter,
+  Order,
+  TagsFilter,
+} from '../gen/app/data/v1/data_pb';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
+import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
+import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+import {
+  DataCaptureUploadRequest,
+  DataType,
+  SensorData,
+  SensorMetadata,
+  UploadMetadata,
+} from '../gen/app/datasync/v1/data_sync_pb';
 
-type ValueOf<T> = T[keyof T];
-export const { Order } = dataPb;
-export type Order = ValueOf<typeof dataPb.Order>;
-export type BinaryID = dataPb.BinaryID.AsObject;
-export type UploadMetadata = dataSyncPb.UploadMetadata.AsObject;
-
-export type FilterOptions = Partial<dataPb.Filter.AsObject> & {
+export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
   startTime?: Date;
   tags?: string[];
 };
 
 interface TabularData {
-  data?: Record<string, googleStructPb.JavaScriptValue>;
-  metadata?: dataPb.CaptureMetadata.AsObject;
+  data?: JsonValue;
+  metadata?: CaptureMetadata;
   timeRequested?: Date;
   timeReceived?: Date;
 }
 
-type Dataset = Partial<datasetPb.Dataset.AsObject> & {
+export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
 
 export class DataClient {
-  private dataService: DataServiceClient;
-  private datasetService: DatasetServiceClient;
-  private dataSyncService: DataSyncServiceClient;
+  private dataClient: PromiseClient<typeof DataService>;
+  private datasetClient: PromiseClient<typeof DatasetService>;
+  private dataSyncClient: PromiseClient<typeof DataSyncService>;
 
-  constructor(serviceHost: string, grpcOptions: RpcOptions) {
-    this.dataService = new DataServiceClient(serviceHost, grpcOptions);
-    this.datasetService = new DatasetServiceClient(serviceHost, grpcOptions);
-    this.dataSyncService = new DataSyncServiceClient(serviceHost, grpcOptions);
+  constructor(transport: Transport) {
+    this.dataClient = createPromiseClient(DataService, transport);
+    this.datasetClient = createPromiseClient(DatasetService, transport);
+    this.dataSyncClient = createPromiseClient(DataSyncService, transport);
   }
 
   /**
@@ -51,18 +60,11 @@ export class DataClient {
    * @returns An array of data objects
    */
   async tabularDataBySQL(organizationId: string, query: string) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.TabularDataBySQLRequest();
-    req.setOrganizationId(organizationId);
-    req.setSqlQuery(query);
-
-    const response = await promisify<
-      dataPb.TabularDataBySQLRequest,
-      dataPb.TabularDataBySQLResponse
-    >(service.tabularDataBySQL.bind(service), req);
-    const dataList = response.getDataList();
-    return dataList.map((struct) => struct.toJavaScript());
+    const resp = await this.dataClient.tabularDataBySQL({
+      organizationId,
+      sqlQuery: query,
+    });
+    return resp.data.map((value) => value.toJson());
   }
 
   /**
@@ -73,18 +75,11 @@ export class DataClient {
    * @returns An array of data objects
    */
   async tabularDataByMQL(organizationId: string, query: Uint8Array[]) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.TabularDataByMQLRequest();
-    req.setOrganizationId(organizationId);
-    req.setMqlBinaryList(query);
-
-    const response = await promisify<
-      dataPb.TabularDataByMQLRequest,
-      dataPb.TabularDataByMQLResponse
-    >(service.tabularDataByMQL.bind(service), req);
-    const dataList = response.getDataList();
-    return dataList.map((struct) => struct.toJavaScript());
+    const resp = await this.dataClient.tabularDataByMQL({
+      organizationId,
+      mqlBinary: query,
+    });
+    return resp.data.map((value) => value.toJson());
   }
 
   /**
@@ -109,59 +104,50 @@ export class DataClient {
    *   last-returned page ID.
    */
   async tabularDataByFilter(
-    filter?: dataPb.Filter,
+    filter?: Filter,
     limit?: number,
     sortOrder?: Order,
     last = '',
     countOnly = false,
     includeInternalData = false
   ) {
-    const { dataService: service } = this;
+    const dataReq = {
+      filter,
+      limit: limit ? BigInt(limit) : undefined,
+      sortOrder,
+      last,
+    };
 
-    const dataReq = new dataPb.DataRequest();
-    dataReq.setFilter(filter ?? new dataPb.Filter());
-    if (limit) {
-      dataReq.setLimit(limit);
-    }
-    if (sortOrder) {
-      dataReq.setSortOrder(sortOrder);
-    }
-    if (last) {
-      dataReq.setLast(last);
-    }
+    const req = {
+      dataRequest: dataReq,
+      countOnly,
+      includeInternalData,
+    };
 
-    const req = new dataPb.TabularDataByFilterRequest();
-    req.setDataRequest(dataReq);
-    req.setCountOnly(countOnly);
-    req.setIncludeInternalData(includeInternalData);
-
-    const response = await promisify<
-      dataPb.TabularDataByFilterRequest,
-      dataPb.TabularDataByFilterResponse
-    >(service.tabularDataByFilter.bind(service), req);
-    const mdListLength = response.getMetadataList().length;
+    const response = await this.dataClient.tabularDataByFilter(req);
+    const mdListLength = response.metadata.length;
 
     const dataArray: TabularData[] = [];
     dataArray.push(
-      ...response.getDataList().map((data) => {
-        const mdIndex = data.getMetadataIndex();
+      ...response.data.map((data) => {
+        const mdIndex = data.metadataIndex;
         const metadata =
           mdListLength !== 0 && mdIndex >= mdListLength
-            ? new dataPb.CaptureMetadata().toObject()
-            : response.getMetadataList()[mdIndex]?.toObject();
+            ? new CaptureMetadata()
+            : response.metadata[mdIndex];
         return {
-          data: data.getData()?.toJavaScript(),
+          data: data.data?.toJson(),
           metadata,
-          timeRequested: data.getTimeRequested()?.toDate(),
-          timeReceived: data.getTimeReceived()?.toDate(),
+          timeRequested: data.timeRequested?.toDate(),
+          timeReceived: data.timeRequested?.toDate(),
         };
       })
     );
 
     return {
       data: dataArray,
-      count: response.getCount(),
-      last: response.getLast(),
+      count: response.count,
+      last: response.last,
     };
   }
 
@@ -189,7 +175,7 @@ export class DataClient {
    *   last-returned page ID.
    */
   async binaryDataByFilter(
-    filter?: dataPb.Filter,
+    filter?: Filter,
     limit?: number,
     sortOrder?: Order,
     last = '',
@@ -197,37 +183,25 @@ export class DataClient {
     countOnly = false,
     includeInternalData = false
   ) {
-    const { dataService: service } = this;
+    const dataReq = {
+      filter,
+      limit: limit ? BigInt(limit) : undefined,
+      sortOrder,
+      last,
+    };
 
-    const dataReq = new dataPb.DataRequest();
-    dataReq.setFilter(filter ?? new dataPb.Filter());
-    if (limit) {
-      dataReq.setLimit(limit);
-    }
-    if (sortOrder) {
-      dataReq.setSortOrder(sortOrder);
-    }
-    if (last) {
-      dataReq.setLast(last);
-    }
+    const req = {
+      dataRequest: dataReq,
+      includeBinary,
+      countOnly,
+      includeInternalData,
+    };
 
-    const req = new dataPb.BinaryDataByFilterRequest();
-    req.setDataRequest(dataReq);
-    req.setIncludeBinary(includeBinary);
-    req.setCountOnly(countOnly);
-    req.setIncludeInternalData(includeInternalData);
-
-    const dataArray: dataPb.BinaryData.AsObject[] = [];
-    const response = await promisify<
-      dataPb.BinaryDataByFilterRequest,
-      dataPb.BinaryDataByFilterResponse
-    >(service.binaryDataByFilter.bind(service), req);
-    dataArray.push(...response.getDataList().map((data) => data.toObject()));
-
+    const response = await this.dataClient.binaryDataByFilter(req);
     return {
-      data: dataArray,
-      count: response.getCount(),
-      last: response.getLast(),
+      data: response.data,
+      count: response.count,
+      last: response.last,
     };
   }
 
@@ -238,51 +212,29 @@ export class DataClient {
    * @returns An array of data objects
    */
   async binaryDataByIds(ids: BinaryID[]) {
-    const { dataService: service } = this;
-
-    const binaryIds: dataPb.BinaryID[] = ids.map(
-      ({ fileId, organizationId, locationId }) => {
-        const binaryId = new dataPb.BinaryID();
-        binaryId.setFileId(fileId);
-        binaryId.setOrganizationId(organizationId);
-        binaryId.setLocationId(locationId);
-        return binaryId;
-      }
-    );
-
-    const req = new dataPb.BinaryDataByIDsRequest();
-    req.setBinaryIdsList(binaryIds);
-    req.setIncludeBinary(true);
-
-    const response = await promisify<
-      dataPb.BinaryDataByIDsRequest,
-      dataPb.BinaryDataByIDsResponse
-    >(service.binaryDataByIDs.bind(service), req);
-    return response.toObject().dataList;
+    const resp = await this.dataClient.binaryDataByIDs({
+      binaryIds: ids,
+      includeBinary: true,
+    });
+    return resp.data;
   }
 
   /**
    * Delete tabular data older than a specified number of days.
    *
-   * @param orgId The ID of organization to delete data from
+   * @param organizationId The ID of organization to delete data from
    * @param deleteOlderThanDays Delete data that was captured more than this
    *   many days ago. For example if `deleteOlderThanDays` is 10, this deletes
    *   any data that was captured more than 10 days ago. If it is 0, all
    *   existing data is deleted.
    * @returns The number of items deleted
    */
-  async deleteTabularData(orgId: string, deleteOlderThanDays: number) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.DeleteTabularDataRequest();
-    req.setOrganizationId(orgId);
-    req.setDeleteOlderThanDays(deleteOlderThanDays);
-
-    const response = await promisify<
-      dataPb.DeleteTabularDataRequest,
-      dataPb.DeleteTabularDataResponse
-    >(service.deleteTabularData.bind(service), req);
-    return response.getDeletedCount();
+  async deleteTabularData(organizationId: string, deleteOlderThanDays: number) {
+    const resp = await this.dataClient.deleteTabularData({
+      organizationId,
+      deleteOlderThanDays,
+    });
+    return resp.deletedCount;
   }
 
   /**
@@ -294,20 +246,12 @@ export class DataClient {
    *   is true
    * @returns The number of items deleted
    */
-  async deleteBinaryDataByFilter(
-    filter?: dataPb.Filter,
-    includeInternalData = true
-  ) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.DeleteBinaryDataByFilterRequest();
-    req.setFilter(filter ?? new dataPb.Filter());
-    req.setIncludeInternalData(includeInternalData);
-    const response = await promisify<
-      dataPb.DeleteBinaryDataByFilterRequest,
-      dataPb.DeleteTabularDataResponse
-    >(service.deleteBinaryDataByFilter.bind(service), req);
-    return response.getDeletedCount();
+  async deleteBinaryDataByFilter(filter?: Filter, includeInternalData = true) {
+    const resp = await this.dataClient.deleteBinaryDataByFilter({
+      filter,
+      includeInternalData,
+    });
+    return resp.deletedCount;
   }
 
   /**
@@ -317,26 +261,10 @@ export class DataClient {
    * @returns The number of items deleted
    */
   async deleteBinaryDataByIds(ids: BinaryID[]) {
-    const { dataService: service } = this;
-
-    const binaryIds: dataPb.BinaryID[] = ids.map(
-      ({ fileId, organizationId, locationId }) => {
-        const binaryId = new dataPb.BinaryID();
-        binaryId.setFileId(fileId);
-        binaryId.setOrganizationId(organizationId);
-        binaryId.setLocationId(locationId);
-        return binaryId;
-      }
-    );
-
-    const req = new dataPb.DeleteBinaryDataByIDsRequest();
-    req.setBinaryIdsList(binaryIds);
-
-    const response = await promisify<
-      dataPb.DeleteBinaryDataByIDsRequest,
-      dataPb.DeleteBinaryDataByIDsResponse
-    >(service.deleteBinaryDataByIDs.bind(service), req);
-    return response.getDeletedCount();
+    const resp = await this.dataClient.deleteBinaryDataByIDs({
+      binaryIds: ids,
+    });
+    return resp.deletedCount;
   }
 
   /**
@@ -347,26 +275,10 @@ export class DataClient {
    * @param ids The IDs of the data to be tagged. Must be non-empty.
    */
   async addTagsToBinaryDataByIds(tags: string[], ids: BinaryID[]) {
-    const { dataService: service } = this;
-
-    const binaryIds: dataPb.BinaryID[] = ids.map(
-      ({ fileId, organizationId, locationId }) => {
-        const binaryId = new dataPb.BinaryID();
-        binaryId.setFileId(fileId);
-        binaryId.setOrganizationId(organizationId);
-        binaryId.setLocationId(locationId);
-        return binaryId;
-      }
-    );
-
-    const req = new dataPb.AddTagsToBinaryDataByIDsRequest();
-    req.setBinaryIdsList(binaryIds);
-    req.setTagsList(tags);
-
-    await promisify<
-      dataPb.AddTagsToBinaryDataByIDsRequest,
-      dataPb.AddTagsToBinaryDataByIDsResponse
-    >(service.addTagsToBinaryDataByIDs.bind(service), req);
+    await this.dataClient.addTagsToBinaryDataByIDs({
+      tags,
+      binaryIds: ids,
+    });
   }
 
   /**
@@ -376,17 +288,11 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
    */
-  async addTagsToBinaryDataByFilter(tags: string[], filter?: dataPb.Filter) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.AddTagsToBinaryDataByFilterRequest();
-    req.setTagsList(tags);
-    req.setFilter(filter ?? new dataPb.Filter());
-
-    await promisify<
-      dataPb.AddTagsToBinaryDataByFilterRequest,
-      dataPb.AddTagsToBinaryDataByFilterResponse
-    >(service.addTagsToBinaryDataByFilter.bind(service), req);
+  async addTagsToBinaryDataByFilter(tags: string[], filter?: Filter) {
+    await this.dataClient.addTagsToBinaryDataByFilter({
+      tags,
+      filter,
+    });
   }
 
   /**
@@ -398,27 +304,11 @@ export class DataClient {
    * @returns The number of items deleted
    */
   async removeTagsFromBinaryDataByIds(tags: string[], ids: BinaryID[]) {
-    const { dataService: service } = this;
-
-    const binaryIds: dataPb.BinaryID[] = ids.map(
-      ({ fileId, organizationId, locationId }) => {
-        const binaryId = new dataPb.BinaryID();
-        binaryId.setFileId(fileId);
-        binaryId.setOrganizationId(organizationId);
-        binaryId.setLocationId(locationId);
-        return binaryId;
-      }
-    );
-
-    const req = new dataPb.RemoveTagsFromBinaryDataByIDsRequest();
-    req.setBinaryIdsList(binaryIds);
-    req.setTagsList(tags);
-
-    const response = await promisify<
-      dataPb.RemoveTagsFromBinaryDataByIDsRequest,
-      dataPb.RemoveTagsFromBinaryDataByIDsResponse
-    >(service.removeTagsFromBinaryDataByIDs.bind(service), req);
-    return response.getDeletedCount();
+    const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
+      tags,
+      binaryIds: ids,
+    });
+    return resp.deletedCount;
   }
 
   /**
@@ -430,21 +320,12 @@ export class DataClient {
    *   No `filter` implies all binary data.
    * @returns The number of items deleted
    */
-  async removeTagsFromBinaryDataByFilter(
-    tags: string[],
-    filter?: dataPb.Filter
-  ) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.RemoveTagsFromBinaryDataByFilterRequest();
-    req.setTagsList(tags);
-    req.setFilter(filter ?? new dataPb.Filter());
-
-    const response = await promisify<
-      dataPb.RemoveTagsFromBinaryDataByFilterRequest,
-      dataPb.RemoveTagsFromBinaryDataByFilterResponse
-    >(service.removeTagsFromBinaryDataByFilter.bind(service), req);
-    return response.getDeletedCount();
+  async removeTagsFromBinaryDataByFilter(tags: string[], filter?: Filter) {
+    const resp = await this.dataClient.removeTagsFromBinaryDataByFilter({
+      tags,
+      filter,
+    });
+    return resp.deletedCount;
   }
 
   /**
@@ -454,17 +335,9 @@ export class DataClient {
    *   No `filter` implies all data.
    * @returns The list of tags
    */
-  async tagsByFilter(filter?: dataPb.Filter) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.TagsByFilterRequest();
-    req.setFilter(filter);
-
-    const response = await promisify<
-      dataPb.TagsByFilterRequest,
-      dataPb.TagsByFilterResponse
-    >(service.tagsByFilter.bind(service), req);
-    return response.getTagsList();
+  async tagsByFilter(filter?: Filter) {
+    const resp = await this.dataClient.tagsByFilter({ filter });
+    return resp.tags;
   }
 
   /**
@@ -490,26 +363,15 @@ export class DataClient {
     xMaxNormalized: number,
     yMaxNormalized: number
   ) {
-    const { dataService: service } = this;
-
-    const binaryId = new dataPb.BinaryID();
-    binaryId.setFileId(id.fileId);
-    binaryId.setOrganizationId(id.organizationId);
-    binaryId.setLocationId(id.locationId);
-
-    const req = new dataPb.AddBoundingBoxToImageByIDRequest();
-    req.setBinaryId(binaryId);
-    req.setLabel(label);
-    req.setXMinNormalized(xMinNormalized);
-    req.setYMinNormalized(yMinNormalized);
-    req.setXMaxNormalized(xMaxNormalized);
-    req.setYMaxNormalized(yMaxNormalized);
-
-    const response = await promisify<
-      dataPb.AddBoundingBoxToImageByIDRequest,
-      dataPb.AddBoundingBoxToImageByIDResponse
-    >(service.addBoundingBoxToImageByID.bind(service), req);
-    return response.getBboxId();
+    const resp = await this.dataClient.addBoundingBoxToImageByID({
+      binaryId: id,
+      label,
+      xMinNormalized,
+      yMinNormalized,
+      xMaxNormalized,
+      yMaxNormalized,
+    });
+    return resp.bboxId;
   }
 
   /**
@@ -519,21 +381,10 @@ export class DataClient {
    * @param bboxId The ID of the bounding box to remove
    */
   async removeBoundingBoxFromImageById(binId: BinaryID, bboxId: string) {
-    const { dataService: service } = this;
-
-    const binaryId = new dataPb.BinaryID();
-    binaryId.setFileId(binId.fileId);
-    binaryId.setOrganizationId(binId.organizationId);
-    binaryId.setLocationId(binId.locationId);
-
-    const req = new dataPb.RemoveBoundingBoxFromImageByIDRequest();
-    req.setBinaryId(binaryId);
-    req.setBboxId(bboxId);
-
-    await promisify<
-      dataPb.RemoveBoundingBoxFromImageByIDRequest,
-      dataPb.RemoveBoundingBoxFromImageByIDResponse
-    >(service.removeBoundingBoxFromImageByID.bind(service), req);
+    await this.dataClient.removeBoundingBoxFromImageByID({
+      binaryId: binId,
+      bboxId,
+    });
   }
 
   /**
@@ -543,17 +394,11 @@ export class DataClient {
    *   No `filter` implies all labels.
    * @returns The list of bounding box labels
    */
-  async boundingBoxLabelsByFilter(filter?: dataPb.Filter) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.BoundingBoxLabelsByFilterRequest();
-    req.setFilter(filter ?? new dataPb.Filter());
-
-    const response = await promisify<
-      dataPb.BoundingBoxLabelsByFilterRequest,
-      dataPb.BoundingBoxLabelsByFilterResponse
-    >(service.boundingBoxLabelsByFilter.bind(service), req);
-    return response.getLabelsList();
+  async boundingBoxLabelsByFilter(filter?: Filter) {
+    const resp = await this.dataClient.boundingBoxLabelsByFilter({
+      filter,
+    });
+    return resp.labels;
   }
 
   /**
@@ -561,39 +406,24 @@ export class DataClient {
    * Federation instance. It can also be used to reset the password of the
    * existing database user.
    *
-   * @param orgId The ID of the organization
+   * @param organizationId The ID of the organization
    * @param password The password of the user
    */
-  async configureDatabaseUser(orgId: string, password: string) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.ConfigureDatabaseUserRequest();
-    req.setOrganizationId(orgId);
-    req.setPassword(password);
-
-    await promisify<
-      dataPb.ConfigureDatabaseUserRequest,
-      dataPb.ConfigureDatabaseUserResponse
-    >(service.configureDatabaseUser.bind(service), req);
+  async configureDatabaseUser(organizationId: string, password: string) {
+    await this.dataClient.configureDatabaseUser({ organizationId, password });
   }
 
   /**
    * Get a connection to access a MongoDB Atlas Data federation instance.
    *
-   * @param orgId Organization to retrieve connection for
+   * @param organizationId Organization to retrieve connection for
    * @returns Hostname of the federated database
    */
-  async getDatabaseConnection(orgId: string) {
-    const { dataService: service } = this;
-
-    const req = new dataPb.GetDatabaseConnectionRequest();
-    req.setOrganizationId(orgId);
-
-    const response = await promisify<
-      dataPb.GetDatabaseConnectionRequest,
-      dataPb.GetDatabaseConnectionResponse
-    >(service.getDatabaseConnection.bind(service), req);
-    return response.getHostname();
+  async getDatabaseConnection(organizationId: string) {
+    const resp = await this.dataClient.getDatabaseConnection({
+      organizationId,
+    });
+    return resp.hostname;
   }
 
   /**
@@ -603,26 +433,10 @@ export class DataClient {
    * @param datasetId The ID of the dataset to be added to
    */
   async addBinaryDataToDatasetByIds(ids: BinaryID[], datasetId: string) {
-    const { dataService: service } = this;
-
-    const binaryIds: dataPb.BinaryID[] = ids.map(
-      ({ fileId, organizationId, locationId }) => {
-        const binaryId = new dataPb.BinaryID();
-        binaryId.setFileId(fileId);
-        binaryId.setOrganizationId(organizationId);
-        binaryId.setLocationId(locationId);
-        return binaryId;
-      }
-    );
-
-    const req = new dataPb.AddBinaryDataToDatasetByIDsRequest();
-    req.setBinaryIdsList(binaryIds);
-    req.setDatasetId(datasetId);
-
-    await promisify<
-      dataPb.AddBinaryDataToDatasetByIDsRequest,
-      dataPb.AddBinaryDataToDatasetByIDsResponse
-    >(service.addBinaryDataToDatasetByIDs.bind(service), req);
+    await this.dataClient.addBinaryDataToDatasetByIDs({
+      binaryIds: ids,
+      datasetId,
+    });
   }
 
   /**
@@ -632,47 +446,26 @@ export class DataClient {
    * @param datasetId The ID of the dataset to be removed from
    */
   async removeBinaryDataFromDatasetByIds(ids: BinaryID[], datasetId: string) {
-    const { dataService: service } = this;
-
-    const binaryIds: dataPb.BinaryID[] = ids.map(
-      ({ fileId, organizationId, locationId }) => {
-        const binaryId = new dataPb.BinaryID();
-        binaryId.setFileId(fileId);
-        binaryId.setOrganizationId(organizationId);
-        binaryId.setLocationId(locationId);
-        return binaryId;
-      }
-    );
-
-    const req = new dataPb.RemoveBinaryDataFromDatasetByIDsRequest();
-    req.setBinaryIdsList(binaryIds);
-    req.setDatasetId(datasetId);
-
-    await promisify<
-      dataPb.RemoveBinaryDataFromDatasetByIDsRequest,
-      dataPb.RemoveBinaryDataFromDatasetByIDsResponse
-    >(service.removeBinaryDataFromDatasetByIDs.bind(service), req);
+    await this.dataClient.removeBinaryDataFromDatasetByIDs({
+      binaryIds: ids,
+      datasetId,
+    });
   }
 
   /**
    * Create a new dataset.
    *
    * @param name The name of the new dataset
-   * @param orgId The ID of the organization the dataset is being created in
+   * @param organizationId The ID of the organization the dataset is being
+   *   created in
    * @returns The ID of the dataset
    */
-  async createDataset(name: string, orgId: string) {
-    const { datasetService: service } = this;
-
-    const req = new datasetPb.CreateDatasetRequest();
-    req.setName(name);
-    req.setOrganizationId(orgId);
-
-    const response = await promisify<
-      datasetPb.CreateDatasetRequest,
-      datasetPb.CreateDatasetResponse
-    >(service.createDataset.bind(service), req);
-    return response.getId();
+  async createDataset(name: string, organizationId: string) {
+    const resp = await this.datasetClient.createDataset({
+      name,
+      organizationId,
+    });
+    return resp.id;
   }
 
   /**
@@ -681,15 +474,7 @@ export class DataClient {
    * @param id The ID of the dataset.
    */
   async deleteDataset(id: string) {
-    const { datasetService: service } = this;
-
-    const req = new datasetPb.DeleteDatasetRequest();
-    req.setId(id);
-
-    await promisify<
-      datasetPb.DeleteDatasetRequest,
-      datasetPb.DeleteDatasetResponse
-    >(service.deleteDataset.bind(service), req);
+    await this.datasetClient.deleteDataset({ id });
   }
 
   /**
@@ -699,42 +484,27 @@ export class DataClient {
    * @param name The new name of the dataset
    */
   async renameDataset(id: string, name: string) {
-    const { datasetService: service } = this;
-
-    const req = new datasetPb.RenameDatasetRequest();
-    req.setId(id);
-    req.setName(name);
-
-    await promisify<
-      datasetPb.RenameDatasetRequest,
-      datasetPb.RenameDatasetResponse
-    >(service.renameDataset.bind(service), req);
+    await this.datasetClient.renameDataset({ id, name });
   }
 
   /**
    * List all of the datasets for an organization.
    *
-   * @param orgId The ID of the organization
+   * @param organizationId The ID of the organization
    * @returns The list of datasets in the organization
    */
-  async listDatasetsByOrganizationID(orgId: string) {
-    const { datasetService: service } = this;
-
-    const req = new datasetPb.ListDatasetsByOrganizationIDRequest();
-    req.setOrganizationId(orgId);
-
-    const response = await promisify<
-      datasetPb.ListDatasetsByOrganizationIDRequest,
-      datasetPb.ListDatasetsByOrganizationIDResponse
-    >(service.listDatasetsByOrganizationID.bind(service), req);
-
-    const datasets: Dataset[] = [];
-    for (const set of response.getDatasetsList()) {
-      const dataset: Dataset = set.toObject();
-      dataset.created = set.getTimeCreated()?.toDate();
-      datasets.push(dataset);
-    }
-    return datasets;
+  async listDatasetsByOrganizationID(
+    organizationId: string
+  ): Promise<Dataset[]> {
+    const resp = await this.datasetClient.listDatasetsByOrganizationID({
+      organizationId,
+    });
+    return resp.datasets.map((ds) => {
+      return {
+        created: ds.timeCreated?.toDate(),
+        ...ds,
+      };
+    });
   }
 
   /**
@@ -743,24 +513,16 @@ export class DataClient {
    * @param ids The list of IDs of the datasets
    * @returns The list of datasets
    */
-  async listDatasetsByIds(ids: string[]) {
-    const { datasetService: service } = this;
-
-    const req = new datasetPb.ListDatasetsByIDsRequest();
-    req.setIdsList(ids);
-
-    const response = await promisify<
-      datasetPb.ListDatasetsByIDsRequest,
-      datasetPb.ListDatasetsByIDsResponse
-    >(service.listDatasetsByIDs.bind(service), req);
-
-    const datasets: Dataset[] = [];
-    for (const set of response.getDatasetsList()) {
-      const dataset: Dataset = set.toObject();
-      dataset.created = set.getTimeCreated()?.toDate();
-      datasets.push(dataset);
-    }
-    return datasets;
+  async listDatasetsByIds(ids: string[]): Promise<Dataset[]> {
+    const resp = await this.datasetClient.listDatasetsByIDs({
+      ids,
+    });
+    return resp.datasets.map((ds) => {
+      return {
+        created: ds.timeCreated?.toDate(),
+        ...ds,
+      };
+    });
   }
 
   /**
@@ -788,7 +550,7 @@ export class DataClient {
    * @returns The file ID of the uploaded data
    */
   async tabularDataCaptureUpload(
-    tabularData: Record<string, googleStructPb.JavaScriptValue>[],
+    tabularData: Record<string, JsonValue>[],
     partId: string,
     componentType: string,
     componentName: string,
@@ -800,41 +562,41 @@ export class DataClient {
       throw new Error('dataRequestTimes and data lengths must be equal.');
     }
 
-    const { dataSyncService: service } = this;
+    const metadata = new UploadMetadata({
+      partId,
+      componentType,
+      componentName,
+      methodName,
+      type: DataType.TABULAR_SENSOR,
+      tags,
+    });
 
-    const metadata = new dataSyncPb.UploadMetadata();
-    metadata.setPartId(partId);
-    metadata.setComponentType(componentType);
-    metadata.setComponentName(componentName);
-    metadata.setMethodName(methodName);
-    metadata.setType(dataSyncPb.DataType.DATA_TYPE_TABULAR_SENSOR);
-    metadata.setTagsList(tags ?? []);
-
-    const sensorContents: dataSyncPb.SensorData[] = [];
+    const sensorContents: SensorData[] = [];
     for (const [i, data] of tabularData.entries()) {
-      const sensorData = new dataSyncPb.SensorData();
-
-      const sensorMetadata = new dataSyncPb.SensorMetadata();
+      const sensorMetadata = new SensorMetadata();
       const dates = dataRequestTimes[i];
       if (dates) {
-        sensorMetadata.setTimeRequested(Timestamp.fromDate(dates[0]));
-        sensorMetadata.setTimeReceived(Timestamp.fromDate(dates[1]));
+        sensorMetadata.timeRequested = Timestamp.fromDate(dates[0]);
+        sensorMetadata.timeReceived = Timestamp.fromDate(dates[1]);
       }
-      sensorData.setMetadata(sensorMetadata);
-      sensorData.setStruct(googleStructPb.Struct.fromJavaScript(data));
-
-      sensorContents.push(sensorData);
+      sensorContents.push(
+        new SensorData({
+          metadata: sensorMetadata,
+          data: {
+            case: 'struct',
+            value: Struct.fromJson(data),
+          },
+        })
+      );
     }
 
-    const req = new dataSyncPb.DataCaptureUploadRequest();
-    req.setMetadata(metadata);
-    req.setSensorContentsList(sensorContents);
+    const req = new DataCaptureUploadRequest({
+      metadata,
+      sensorContents,
+    });
 
-    const response = await promisify<
-      dataSyncPb.DataCaptureUploadRequest,
-      dataSyncPb.DataCaptureUploadResponse
-    >(service.dataCaptureUpload.bind(service), req);
-    return response.getFileId();
+    const resp = await this.dataSyncClient.dataCaptureUpload(req);
+    return resp.fileId;
   }
 
   /**
@@ -871,91 +633,60 @@ export class DataClient {
     dataRequestTimes: [Date, Date],
     tags?: string[]
   ) {
-    const { dataSyncService: service } = this;
+    const metadata = new UploadMetadata({
+      partId,
+      componentType,
+      componentName,
+      methodName,
+      type: DataType.BINARY_SENSOR,
+      tags,
+      fileExtension,
+    });
 
-    const metadata = new dataSyncPb.UploadMetadata();
-    metadata.setPartId(partId);
-    metadata.setComponentType(componentType);
-    metadata.setComponentName(componentName);
-    metadata.setMethodName(methodName);
-    metadata.setType(dataSyncPb.DataType.DATA_TYPE_BINARY_SENSOR);
-    metadata.setTagsList(tags ?? []);
-    if (fileExtension) {
-      metadata.setFileExtension(fileExtension);
-    }
+    const sensorData = new SensorData({
+      metadata: {
+        timeRequested: Timestamp.fromDate(dataRequestTimes[0]),
+        timeReceived: Timestamp.fromDate(dataRequestTimes[1]),
+      },
+      data: {
+        case: 'binary',
+        value: binaryData,
+      },
+    });
 
-    const sensorData = new dataSyncPb.SensorData();
-    const sensorMetadata = new dataSyncPb.SensorMetadata();
-    sensorMetadata.setTimeRequested(Timestamp.fromDate(dataRequestTimes[0]));
-    sensorMetadata.setTimeReceived(Timestamp.fromDate(dataRequestTimes[1]));
-    sensorData.setMetadata(sensorMetadata);
-    sensorData.setBinary(binaryData);
+    const req = new DataCaptureUploadRequest({
+      metadata,
+      sensorContents: [sensorData],
+    });
 
-    const req = new dataSyncPb.DataCaptureUploadRequest();
-    req.setMetadata(metadata);
-    req.setSensorContentsList([sensorData]);
-
-    const response = await promisify<
-      dataSyncPb.DataCaptureUploadRequest,
-      dataSyncPb.DataCaptureUploadResponse
-    >(service.dataCaptureUpload.bind(service), req);
-    return response.getFileId();
+    const resp = await this.dataSyncClient.dataCaptureUpload(req);
+    return resp.fileId;
   }
 
   // eslint-disable-next-line class-methods-use-this
-  createFilter(options: FilterOptions): dataPb.Filter {
-    const filter = new dataPb.Filter();
-    if (options.componentName) {
-      filter.setComponentName(options.componentName);
-    }
-    if (options.componentType) {
-      filter.setComponentType(options.componentType);
-    }
-    if (options.method) {
-      filter.setMethod(options.method);
-    }
-    if (options.robotName) {
-      filter.setRobotName(options.robotName);
-    }
-    if (options.robotId) {
-      filter.setRobotId(options.robotId);
-    }
-    if (options.partName) {
-      filter.setPartName(options.partName);
-    }
-    if (options.partId) {
-      filter.setPartId(options.partId);
-    }
-    if (options.locationIdsList) {
-      filter.setLocationIdsList(options.locationIdsList);
-    }
-    if (options.organizationIdsList) {
-      filter.setOrganizationIdsList(options.organizationIdsList);
-    }
-    if (options.mimeTypeList) {
-      filter.setMimeTypeList(options.mimeTypeList);
-    }
-    if (options.bboxLabelsList) {
-      filter.setBboxLabelsList(options.bboxLabelsList);
-    }
+  createFilter(options: FilterOptions): Filter {
+    const filter = new Filter(options);
 
     if (options.startTime ?? options.endTime) {
-      const interval = new dataPb.CaptureInterval();
+      const interval = new CaptureInterval();
       if (options.startTime) {
-        interval.setStart(Timestamp.fromDate(options.startTime));
+        interval.start = Timestamp.fromDate(options.startTime);
       }
       if (options.endTime) {
-        interval.setEnd(Timestamp.fromDate(options.endTime));
+        interval.end = Timestamp.fromDate(options.endTime);
       }
-      filter.setInterval(interval);
+      filter.interval = interval;
     }
 
-    const tagsFilter = new dataPb.TagsFilter();
+    const tagsFilter = new TagsFilter();
     if (options.tags) {
-      tagsFilter.setTagsList(options.tags);
-      filter.setTagsFilter(tagsFilter);
+      tagsFilter.tags = options.tags;
+      filter.tagsFilter = tagsFilter;
     }
 
     return filter;
   }
 }
+
+export { type BinaryID, type Order } from '../gen/app/data/v1/data_pb';
+export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';

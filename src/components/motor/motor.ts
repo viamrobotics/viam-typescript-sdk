@@ -1,4 +1,5 @@
-import type { Resource, StructType } from '../../types';
+import type { Struct } from '@bufbuild/protobuf';
+import type { Resource } from '../../types';
 
 export interface Properties {
   /** Whether a motor supports position reporting. */
@@ -13,7 +14,7 @@ export interface Motor extends Resource {
    * @param power - A value between -1 and 1 where negative values indicate a
    *   backwards direction and positive values a forward direction.
    */
-  setPower(power: number, extra?: StructType): Promise<void>;
+  setPower(power: number, extra?: Struct): Promise<void>;
 
   /**
    * Turn the motor at a specified speed for either a specified number of
@@ -26,7 +27,7 @@ export interface Motor extends Resource {
    *   indefinitely. If this value is nonzero, this will block until the number
    *   of revolutions has been completed or another operation comes in.
    */
-  goFor(rpm: number, revolutions: number, extra?: StructType): Promise<void>;
+  goFor(rpm: number, revolutions: number, extra?: Struct): Promise<void>;
 
   /**
    * Move the motor to a specific position relative to its home position at a
@@ -36,11 +37,7 @@ export interface Motor extends Resource {
    * @param positionRevolutions - Number of revolutions relative to the motor's
    *   home position.
    */
-  goTo(
-    rpm: number,
-    positionRevolutions: number,
-    extra?: StructType
-  ): Promise<void>;
+  goTo(rpm: number, positionRevolutions: number, extra?: Struct): Promise<void>;
 
   /**
    * Move the motor indefinitely at a specified speed. Raise an error if
@@ -48,7 +45,7 @@ export interface Motor extends Resource {
    *
    * @param rpm - Speed in revolutions per minute.
    */
-  setRPM(rpm: number, extra?: StructType): Promise<void>;
+  setRPM(rpm: number, extra?: Struct): Promise<void>;
 
   /**
    * Set the current position of the motor as the new zero position, offset by a
@@ -56,22 +53,22 @@ export interface Motor extends Resource {
    *
    * @param offset - Position from which to offset the current position.
    */
-  resetZeroPosition(offset: number, extra?: StructType): Promise<void>;
+  resetZeroPosition(offset: number, extra?: Struct): Promise<void>;
 
   /** Turn the motor off. */
-  stop(extra?: StructType): Promise<void>;
+  stop(extra?: Struct): Promise<void>;
 
   /** Return the motor's properties. */
-  getProperties(extra?: StructType): Promise<Properties>;
+  getProperties(extra?: Struct): Promise<Properties>;
 
   /**
    * Return the position of the motor relative to its zero position. Raise an
    * error if position reporting is not supported.
    */
-  getPosition(extra?: StructType): Promise<number>;
+  getPosition(extra?: Struct): Promise<number>;
 
   /** Return true if the motor is on. */
-  isPowered(extra?: StructType): Promise<readonly [boolean, number]>;
+  isPowered(extra?: Struct): Promise<readonly [boolean, number]>;
 
   /** Return true if the motor is in motion. */
   isMoving(): Promise<boolean>;

@@ -1,19 +1,23 @@
-import type { Resource, StructType } from '../../types';
-import pb from '../../gen/component/encoder/v1/encoder_pb';
+import type { Struct } from '@bufbuild/protobuf';
+import type { Resource } from '../../types';
 
-export type EncoderProperties = pb.GetPropertiesResponse.AsObject;
+import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 
-type ValueOf<T> = T[keyof T];
-export const EncoderPositionType = pb.PositionType;
-export type EncoderPositionType = ValueOf<typeof pb.PositionType>;
+export type EncoderProperties = encoderApi.GetPropertiesResponse;
+export type EncoderPositionType = encoderApi.PositionType;
+
+export const {
+  GetPropertiesResponse: EncoderProperties,
+  PositionType: EncoderPositionType,
+} = encoderApi;
 
 /** Represents a physical encoder. */
 export interface Encoder extends Resource {
   /** Set the current position of the encoder as the new zero position. */
-  resetPosition(extra?: StructType): Promise<void>;
+  resetPosition(extra?: Struct): Promise<void>;
 
   /** Return the encoder's properties. */
-  getProperties(extra?: StructType): Promise<EncoderProperties>;
+  getProperties(extra?: Struct): Promise<EncoderProperties>;
 
   /**
    * Return the current position either in relative units (ticks away from a
@@ -24,6 +28,6 @@ export interface Encoder extends Resource {
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: StructType
+    extra?: Struct
   ): Promise<readonly [number, EncoderPositionType]>;
 }

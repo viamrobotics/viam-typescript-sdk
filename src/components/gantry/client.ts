@@ -1,9 +1,17 @@
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { GantryService } from '../../gen/component/gantry/v1/gantry_connect';
+import {
+  GetLengthsRequest,
+  GetPositionRequest,
+  HomeRequest,
+  IsMovingRequest,
+  MoveToPositionRequest,
+  StopRequest,
+} from '../../gen/component/gantry/v1/gantry_pb';
 import type { RobotClient } from '../../robot';
-import pb from '../../gen/component/gantry/v1/gantry_pb';
-import { GantryServiceClient } from '../../gen/component/gantry/v1/gantry_pb_service';
-import type { Options, StructType } from '../../types';
-import { doCommandFromClient, promisify } from '../../utils';
+import type { Options } from '../../types';
+import { doCommandFromClient } from '../../utils';
 import type { Gantry } from './gantry';
 
 /**
@@ -12,34 +20,26 @@ import type { Gantry } from './gantry';
  * @group Clients
  */
 export class GantryClient implements Gantry {
-  private client: GantryServiceClient;
+  private client: PromiseClient<typeof GantryService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(GantryServiceClient);
+    this.client = client.createServiceClient(GantryService);
     this.name = name;
     this.options = options;
   }
 
-  private get GantryService() {
-    return this.client;
-  }
-
   async getPosition(extra = {}) {
-    const gantryService = this.GantryService;
-    const request = new pb.GetPositionRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetPositionRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPositionRequest,
-      pb.GetPositionResponse
-    >(gantryService.getPosition.bind(gantryService), request);
-
-    return response.getPositionsMmList();
+    const resp = await this.client.getPosition(request);
+    return resp.positionsMm;
   }
 
   async moveToPosition(
@@ -47,84 +47,70 @@ export class GantryClient implements Gantry {
     speedsMmPerSec: number[],
     extra = {}
   ) {
-    const gantryService = this.GantryService;
-
-    const request = new pb.MoveToPositionRequest();
-    request.setName(this.name);
-    request.setPositionsMmList(positionsMm);
-    request.setSpeedsMmPerSecList(speedsMmPerSec);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new MoveToPositionRequest({
+      name: this.name,
+      positionsMm,
+      speedsMmPerSec,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.MoveToPositionRequest, pb.MoveToPositionResponse>(
-      gantryService.moveToPosition.bind(gantryService),
-      request
-    );
+    await this.client.moveToPosition(request);
   }
 
   async home(extra = {}) {
-    const gantryService = this.GantryService;
-    const request = new pb.HomeRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new HomeRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.HomeRequest, pb.HomeResponse>(
-      gantryService.home.bind(gantryService),
-      request
-    );
-
-    return response.getHomed();
+    const resp = await this.client.home(request);
+    return resp.homed;
   }
 
   async getLengths(extra = {}) {
-    const gantryService = this.GantryService;
-    const request = new pb.GetLengthsRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GetLengthsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetLengthsRequest,
-      pb.GetLengthsResponse
-    >(gantryService.getLengths.bind(gantryService), request);
-
-    return response.getLengthsMmList();
+    const resp = await this.client.getLengths(request);
+    return resp.lengthsMm;
   }
 
   async stop(extra = {}) {
-    const gantryService = this.GantryService;
-    const request = new pb.StopRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new StopRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.StopRequest, pb.StopResponse>(
-      gantryService.stop.bind(gantryService),
-      request
-    );
+    await this.client.stop(request);
   }
 
   async isMoving() {
-    const gantryService = this.GantryService;
-    const request = new pb.IsMovingRequest();
-    request.setName(this.name);
+    const request = new IsMovingRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>(
-      gantryService.isMoving.bind(gantryService),
-      request
-    );
-    return response.getIsMoving();
+    const resp = await this.client.isMoving(request);
+    return resp.isMoving;
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const gantryService = this.GantryService;
-    return doCommandFromClient(gantryService, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

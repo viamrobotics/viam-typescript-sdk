@@ -1,13 +1,13 @@
+export { MotionClient } from './motion/client';
 export type { Motion } from './motion/motion';
-export type {
+export {
+  CollisionSpecification,
   Constraints,
   LinearConstraint,
+  ListPlanStatusesResponse,
+  MotionConfiguration,
   ObstacleDetector,
   OrientationConstraint,
-  CollisionSpecification,
-  MotionConfiguration,
-  GetPlanResponse,
-  ListPlanStatusesResponse,
-  PlanState,
+  type GetPlanResponse,
+  type PlanState,
 } from './motion/types';
-export { MotionClient } from './motion/client';

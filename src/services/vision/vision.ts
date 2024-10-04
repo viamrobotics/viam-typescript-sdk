@@ -1,12 +1,13 @@
+import type { Struct } from '@bufbuild/protobuf';
 import type { MimeType } from '../../main';
-import type { Resource, StructType } from '../../types';
+import type { Resource } from '../../types';
 import type {
+  CaptureAllOptions,
+  CaptureAllResponse,
   Classification,
   Detection,
   PointCloudObject,
   Properties,
-  CaptureAllOptions,
-  CaptureAllResponse,
 } from './types';
 
 /** A service that enables various computer vision algorithms */
@@ -19,7 +20,7 @@ export interface Vision extends Resource {
    */
   getDetectionsFromCamera: (
     cameraName: string,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<Detection[]>;
 
   /**
@@ -36,7 +37,7 @@ export interface Vision extends Resource {
     width: number,
     height: number,
     mimeType: MimeType,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<Detection[]>;
 
   /**
@@ -49,7 +50,7 @@ export interface Vision extends Resource {
   getClassificationsFromCamera: (
     cameraName: string,
     count: number,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<Classification[]>;
 
   /**
@@ -68,7 +69,7 @@ export interface Vision extends Resource {
     height: number,
     mimeType: MimeType,
     count: number,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<Classification[]>;
 
   /**
@@ -80,7 +81,7 @@ export interface Vision extends Resource {
    */
   getObjectPointClouds: (
     cameraName: string,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<PointCloudObject[]>;
 
   /**
@@ -90,7 +91,7 @@ export interface Vision extends Resource {
    *
    * @returns - The properties of the vision service
    */
-  getProperties: (extra?: StructType) => Promise<Properties>;
+  getProperties: (extra?: Struct) => Promise<Properties>;
 
   /**
    * Returns the requested image, classifications, detections, and 3d point
@@ -105,6 +106,6 @@ export interface Vision extends Resource {
   captureAllFromCamera: (
     cameraName: string,
     opts: CaptureAllOptions,
-    extra?: StructType
+    extra?: Struct
   ) => Promise<CaptureAllResponse>;
 }

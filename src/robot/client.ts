@@ -1,40 +1,45 @@
 /* eslint-disable max-classes-per-file */
-import { grpc } from '@improbable-eng/grpc-web';
-import { backOff } from 'exponential-backoff';
-import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { Duration, type ServiceType } from '@bufbuild/protobuf';
+import {
+  createPromiseClient,
+  type PromiseClient,
+  type Transport,
+} from '@connectrpc/connect';
+import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
-import type {
-  PoseInFrame,
-  ResourceName,
-  Transform,
-} from '../gen/common/v1/common_pb';
-import { ArmServiceClient } from '../gen/component/arm/v1/arm_pb_service';
-import { BaseServiceClient } from '../gen/component/base/v1/base_pb_service';
-import { BoardServiceClient } from '../gen/component/board/v1/board_pb_service';
-import { EncoderServiceClient } from '../gen/component/encoder/v1/encoder_pb_service';
-import { GantryServiceClient } from '../gen/component/gantry/v1/gantry_pb_service';
-import { GenericServiceClient } from '../gen/component/generic/v1/generic_pb_service';
-import { GripperServiceClient } from '../gen/component/gripper/v1/gripper_pb_service';
-import { InputControllerServiceClient } from '../gen/component/inputcontroller/v1/input_controller_pb_service';
-import { MotorServiceClient } from '../gen/component/motor/v1/motor_pb_service';
-import { MovementSensorServiceClient } from '../gen/component/movementsensor/v1/movementsensor_pb_service';
-import { PowerSensorServiceClient } from '../gen/component/powersensor/v1/powersensor_pb_service';
-import { ServoServiceClient } from '../gen/component/servo/v1/servo_pb_service';
-import proto from '../gen/robot/v1/robot_pb';
-import type { Status } from '../gen/robot/v1/robot_pb_service';
-import { RobotServiceClient } from '../gen/robot/v1/robot_pb_service';
-import { MotionServiceClient } from '../gen/service/motion/v1/motion_pb_service';
-import { NavigationServiceClient } from '../gen/service/navigation/v1/navigation_pb_service';
-import { SensorsServiceClient } from '../gen/service/sensors/v1/sensors_pb_service';
-import { SLAMServiceClient } from '../gen/service/slam/v1/slam_pb_service';
-import { VisionServiceClient } from '../gen/service/vision/v1/vision_pb_service';
-import { ViamResponseStream } from '../responses';
+import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
+import { ArmService } from '../gen/component/arm/v1/arm_connect';
+import { BaseService } from '../gen/component/base/v1/base_connect';
+import { BoardService } from '../gen/component/board/v1/board_connect';
+import { EncoderService } from '../gen/component/encoder/v1/encoder_connect';
+import { GantryService } from '../gen/component/gantry/v1/gantry_connect';
+import { GenericService } from '../gen/component/generic/v1/generic_connect';
+import { GripperService } from '../gen/component/gripper/v1/gripper_connect';
+import { InputControllerService } from '../gen/component/inputcontroller/v1/input_controller_connect';
+import { MotorService } from '../gen/component/motor/v1/motor_connect';
+import { MovementSensorService } from '../gen/component/movementsensor/v1/movementsensor_connect';
+import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_connect';
+import { ServoService } from '../gen/component/servo/v1/servo_connect';
+import { RobotService } from '../gen/robot/v1/robot_connect';
+import {
+  DiscoveryQuery,
+  RestartModuleRequest,
+  Status,
+  TransformPCDRequest,
+  TransformPoseRequest,
+} from '../gen/robot/v1/robot_pb';
+import { MotionService } from '../gen/service/motion/v1/motion_connect';
+import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
+import { SensorsService } from '../gen/service/sensors/v1/sensors_connect';
+import { SLAMService } from '../gen/service/slam/v1/slam_connect';
+import { VisionService } from '../gen/service/vision/v1/vision_connect';
 import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
-import { MetadataTransport, encodeResourceName, promisify } from '../utils';
+import type { ResourceName } from '../types';
+import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
-import type { Robot, RobotStatusStream } from './robot';
+import type { Robot } from './robot';
 import SessionManager from './session-manager';
 
 interface WebRTCOptions {
@@ -58,20 +63,12 @@ interface SessionOptions {
 }
 
 export interface ConnectOptions {
-  authEntity?: string;
   creds?: Credentials;
   priority?: number;
 
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
-}
-
-abstract class ServiceClient {
-  constructor(
-    public serviceHost: string,
-    public options?: grpc.RpcOptions
-  ) {}
 }
 
 /**
@@ -89,55 +86,67 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private peerConn: RTCPeerConnection | undefined;
 
-  private transportFactory: grpc.TransportFactory | undefined;
+  private transport: Transport | undefined;
 
   private connecting: Promise<void> | undefined;
 
   private connectResolve: (() => void) | undefined;
 
-  private savedAuthEntity: string | undefined;
-
   private savedCreds: Credentials | undefined;
 
   private closed: boolean;
 
-  private robotServiceClient: RobotServiceClient | undefined;
+  private robotServiceClient: PromiseClient<typeof RobotService> | undefined;
 
-  private armServiceClient: ArmServiceClient | undefined;
+  private armServiceClient: PromiseClient<typeof ArmService> | undefined;
 
-  private baseServiceClient: BaseServiceClient | undefined;
+  private baseServiceClient: PromiseClient<typeof BaseService> | undefined;
 
-  private boardServiceClient: BoardServiceClient | undefined;
+  private boardServiceClient: PromiseClient<typeof BoardService> | undefined;
 
-  private encoderServiceClient: EncoderServiceClient | undefined;
-
-  private gantryServiceClient: GantryServiceClient | undefined;
-
-  private genericServiceClient: GenericServiceClient | undefined;
-
-  private gripperServiceClient: GripperServiceClient | undefined;
-
-  private movementSensorServiceClient: MovementSensorServiceClient | undefined;
-
-  private powerSensorServiceClient: PowerSensorServiceClient | undefined;
-
-  private inputControllerServiceClient:
-    | InputControllerServiceClient
+  private encoderServiceClient:
+    | PromiseClient<typeof EncoderService>
     | undefined;
 
-  private motorServiceClient: MotorServiceClient | undefined;
+  private gantryServiceClient: PromiseClient<typeof GantryService> | undefined;
 
-  private navigationServiceClient: NavigationServiceClient | undefined;
+  private genericServiceClient:
+    | PromiseClient<typeof GenericService>
+    | undefined;
 
-  private motionServiceClient: MotionServiceClient | undefined;
+  private gripperServiceClient:
+    | PromiseClient<typeof GripperService>
+    | undefined;
 
-  private visionServiceClient: VisionServiceClient | undefined;
+  private movementSensorServiceClient:
+    | PromiseClient<typeof MovementSensorService>
+    | undefined;
 
-  private sensorsServiceClient: SensorsServiceClient | undefined;
+  private powerSensorServiceClient:
+    | PromiseClient<typeof PowerSensorService>
+    | undefined;
 
-  private servoServiceClient: ServoServiceClient | undefined;
+  private inputControllerServiceClient:
+    | PromiseClient<typeof InputControllerService>
+    | undefined;
 
-  private slamServiceClient: SLAMServiceClient | undefined;
+  private motorServiceClient: PromiseClient<typeof MotorService> | undefined;
+
+  private navigationServiceClient:
+    | PromiseClient<typeof NavigationService>
+    | undefined;
+
+  private motionServiceClient: PromiseClient<typeof MotionService> | undefined;
+
+  private visionServiceClient: PromiseClient<typeof VisionService> | undefined;
+
+  private sensorsServiceClient:
+    | PromiseClient<typeof SensorsService>
+    | undefined;
+
+  private servoServiceClient: PromiseClient<typeof ServoService> | undefined;
+
+  private slamServiceClient: PromiseClient<typeof SLAMService> | undefined;
 
   constructor(
     serviceHost: string,
@@ -151,26 +160,22 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.directOptions = directOptions;
     this.sessionOptions = sessionOptions;
     this.gRPCConnectionManager = new GRPCConnectionManager(
-      serviceHost,
-      (opts: grpc.TransportOptions): grpc.Transport => {
-        if (!this.transportFactory) {
+      (): Transport => {
+        if (!this.transport) {
           throw new Error(RobotClient.notConnectedYetStr);
         }
-        return this.transportFactory(opts);
+        return this.transport;
       },
       () => {
         this.onDisconnect();
       }
     );
-    this.sessionManager = new SessionManager(
-      serviceHost,
-      (opts: grpc.TransportOptions): grpc.Transport => {
-        if (!this.transportFactory) {
-          throw new Error(RobotClient.notConnectedYetStr);
-        }
-        return this.transportFactory(opts);
+    this.sessionManager = new SessionManager((): Transport => {
+      if (!this.transport) {
+        throw new Error(RobotClient.notConnectedYetStr);
       }
-    );
+      return this.transport;
+    });
 
     // For each connection event type, add a listener to capture that
     // event and re-emit it with the 'connectionstatechange' event
@@ -201,18 +206,26 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     // eslint-disable-next-line no-console
     console.debug('Connection closed, will try to reconnect');
-    void backOff(async () => this.connect(), {
-      maxDelay: this.reconnectMaxWait,
-      numOfAttempts: this.reconnectMaxAttempts,
-      retry: (_error, attemptNumber) => {
+    const backOffOpts: Partial<IBackOffOptions> = {
+      retry: (error, attemptNumber) => {
+        // TODO: This ought to check exceptional errors so as to not keep failing forever.
+
         // eslint-disable-next-line no-console
         console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff`
+          `Failed to connect, attempt ${attemptNumber} with backoff; reason=${JSON.stringify(error)}`
         );
+
         // Always retry the next attempt
         return true;
       },
-    })
+    };
+    if (this.reconnectMaxWait) {
+      backOffOpts.maxDelay = this.reconnectMaxWait;
+    }
+    if (this.reconnectMaxAttempts) {
+      backOffOpts.numOfAttempts = this.reconnectMaxAttempts;
+    }
+    void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
         // eslint-disable-next-line no-console
         console.debug('Reconnected successfully!');
@@ -373,18 +386,15 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.slamServiceClient;
   }
 
-  createServiceClient<T extends ServiceClient>(
-    SC: new (serviceHost: string, options?: grpc.RpcOptions) => T
-  ): T {
-    const clientTransportFactory = this.sessionOptions?.disabled
-      ? this.transportFactory
-      : this.sessionManager.transportFactory;
+  createServiceClient<T extends ServiceType>(svcType: T): PromiseClient<T> {
+    const clientTransport = this.sessionOptions?.disabled
+      ? this.transport
+      : this.sessionManager.transport;
 
-    if (!clientTransportFactory) {
+    if (!clientTransport) {
       throw new Error(RobotClient.notConnectedYetStr);
     }
-    const grpcOptions = { transport: clientTransportFactory };
-    return new SC(this.serviceHost, grpcOptions);
+    return createPromiseClient(svcType, clientTransport);
   }
 
   get peerConnection() {
@@ -414,7 +424,6 @@ export class RobotClient extends EventDispatcher implements Robot {
   // TODO(RSDK-7672): refactor due to cognitive complexity
   // eslint-disable-next-line sonarjs/cognitive-complexity
   public async connect({
-    authEntity = this.savedAuthEntity,
     creds = this.savedCreds,
     priority,
     dialTimeout,
@@ -425,7 +434,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      while (this.connecting) {
+      while (this.connecting !== undefined) {
         // eslint-disable-next-line no-await-in-loop
         await this.connecting;
       }
@@ -448,12 +457,12 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     try {
       const opts: DialOptions = {
-        authEntity,
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions?.rtcConfig,
         },
         dialTimeout: dialTimeout ?? DIAL_TIMEOUT,
+        extraHeaders: clientHeaders,
       };
 
       if (creds) {
@@ -469,14 +478,12 @@ export class RobotClient extends EventDispatcher implements Robot {
         opts.webrtcOptions.additionalSdpFields = { 'x-priority': priority };
       }
 
-      // Save authEntity, creds
-      this.savedAuthEntity = authEntity;
+      // Save creds
       this.savedCreds = creds;
 
       if (this.webrtcOptions?.enabled) {
         // This should not have to be checked but tsc can't tell the difference...
         if (opts.webrtcOptions) {
-          opts.webrtcOptions.signalingAuthEntity = opts.authEntity;
           opts.webrtcOptions.signalingCredentials = opts.credentials;
         }
 
@@ -513,7 +520,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           this.onDisconnect(event);
         });
 
-        this.transportFactory = webRTCConn.transportFactory;
+        this.transport = webRTCConn.transport;
 
         webRTCConn.peerConnection.addEventListener('track', (event) => {
           const [eventStream] = event.streams;
@@ -534,95 +541,84 @@ export class RobotClient extends EventDispatcher implements Robot {
           this.emit('track', event);
         });
       } else {
-        this.transportFactory = await dialDirect(this.serviceHost, opts);
+        this.transport = await dialDirect(this.serviceHost, opts);
         await this.gRPCConnectionManager.start();
       }
 
-      const ctf: grpc.TransportFactory = (
-        options: grpc.TransportOptions
-      ): grpc.Transport => {
-        const tf = this.sessionOptions?.disabled
-          ? this.transportFactory
-          : this.sessionManager.transportFactory;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return new MetadataTransport(tf!, options);
-      };
-      const clientTransportFactory = ctf;
-      const grpcOptions = { transport: clientTransportFactory };
+      const clientTransport = this.sessionOptions?.disabled
+        ? this.transport
+        : this.sessionManager.transport;
 
-      this.robotServiceClient = new RobotServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.robotServiceClient = createPromiseClient(
+        RobotService,
+        clientTransport
       );
       // eslint-disable-next-line no-warning-comments
       // TODO(RSDK-144): these should be created as needed
-      this.armServiceClient = new ArmServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.armServiceClient = createPromiseClient(ArmService, clientTransport);
+      this.baseServiceClient = createPromiseClient(
+        BaseService,
+        clientTransport
       );
-      this.baseServiceClient = new BaseServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.boardServiceClient = createPromiseClient(
+        BoardService,
+        clientTransport
       );
-      this.boardServiceClient = new BoardServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.encoderServiceClient = createPromiseClient(
+        EncoderService,
+        clientTransport
       );
-      this.encoderServiceClient = new EncoderServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.gantryServiceClient = createPromiseClient(
+        GantryService,
+        clientTransport
       );
-      this.gantryServiceClient = new GantryServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.genericServiceClient = createPromiseClient(
+        GenericService,
+        clientTransport
       );
-      this.genericServiceClient = new GenericServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.gripperServiceClient = createPromiseClient(
+        GripperService,
+        clientTransport
       );
-      this.gripperServiceClient = new GripperServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.movementSensorServiceClient = createPromiseClient(
+        MovementSensorService,
+        clientTransport
       );
-      this.movementSensorServiceClient = new MovementSensorServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.powerSensorServiceClient = createPromiseClient(
+        PowerSensorService,
+        clientTransport
       );
-      this.powerSensorServiceClient = new PowerSensorServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.inputControllerServiceClient = createPromiseClient(
+        InputControllerService,
+        clientTransport
       );
-      this.inputControllerServiceClient = new InputControllerServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.motorServiceClient = createPromiseClient(
+        MotorService,
+        clientTransport
       );
-      this.motorServiceClient = new MotorServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.navigationServiceClient = createPromiseClient(
+        NavigationService,
+        clientTransport
       );
-      this.navigationServiceClient = new NavigationServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.motionServiceClient = createPromiseClient(
+        MotionService,
+        clientTransport
       );
-      this.motionServiceClient = new MotionServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.visionServiceClient = createPromiseClient(
+        VisionService,
+        clientTransport
       );
-      this.visionServiceClient = new VisionServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.sensorsServiceClient = createPromiseClient(
+        SensorsService,
+        clientTransport
       );
-      this.sensorsServiceClient = new SensorsServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.servoServiceClient = createPromiseClient(
+        ServoService,
+        clientTransport
       );
-      this.servoServiceClient = new ServoServiceClient(
-        this.serviceHost,
-        grpcOptions
-      );
-      this.slamServiceClient = new SLAMServiceClient(
-        this.serviceHost,
-        grpcOptions
+      this.slamServiceClient = createPromiseClient(
+        SLAMService,
+        clientTransport
       );
 
       this.emit(MachineConnectionEvent.CONNECTED, {});
@@ -647,67 +643,36 @@ export class RobotClient extends EventDispatcher implements Robot {
   // SESSIONS
 
   async getSessions() {
-    const { robotService } = this;
-    const request = new proto.GetSessionsRequest();
-    const response = await promisify<
-      proto.GetSessionsRequest,
-      proto.GetSessionsResponse
-    >(robotService.getSessions.bind(robotService), request);
-    return response.getSessionsList().map((session) => session.toObject());
+    const resp = await this.robotService.getSessions({});
+    return resp.sessions;
   }
 
   // OPERATIONS
 
   async getOperations() {
-    const { robotService } = this;
-    const request = new proto.GetOperationsRequest();
-    const response = await promisify<
-      proto.GetOperationsRequest,
-      proto.GetOperationsResponse
-    >(robotService.getOperations.bind(robotService), request);
-    return response.getOperationsList();
+    const resp = await this.robotService.getOperations({});
+    return resp.operations;
   }
 
   async cancelOperation(id: string) {
-    const { robotService } = this;
-    const request = new proto.CancelOperationRequest();
-    request.setId(id);
-    await promisify<
-      proto.CancelOperationRequest,
-      proto.CancelOperationResponse
-    >(robotService.cancelOperation.bind(robotService), request);
+    await this.robotService.cancelOperation({ id });
   }
 
   async blockForOperation(id: string) {
-    const { robotService } = this;
-    const request = new proto.BlockForOperationRequest();
-    request.setId(id);
-    await promisify<
-      proto.BlockForOperationRequest,
-      proto.BlockForOperationResponse
-    >(robotService.blockForOperation.bind(robotService), request);
+    await this.robotService.blockForOperation({ id });
   }
 
   async stopAll() {
-    const { robotService } = this;
-    const request = new proto.StopAllRequest();
-    await promisify<proto.StopAllRequest, proto.StopAllResponse>(
-      robotService.stopAll.bind(robotService),
-      request
-    );
+    await this.robotService.stopAll({});
   }
 
   // FRAME SYSTEM
 
   async frameSystemConfig(transforms: Transform[]) {
-    const { robotService } = this;
-    const request = new proto.FrameSystemConfigRequest();
-    request.setSupplementalTransformsList(transforms);
-    const response = await promisify<
-      proto.FrameSystemConfigRequest,
-      proto.FrameSystemConfigResponse
-    >(robotService.frameSystemConfig.bind(robotService), request);
-    return response.getFrameSystemConfigsList();
+    const resp = await this.robotService.frameSystemConfig({
+      supplementalTransforms: transforms,
+    });
+    return resp.frameSystemConfigs;
   }
 
   async transformPose(
@@ -715,16 +680,13 @@ export class RobotClient extends EventDispatcher implements Robot {
     destination: string,
     supplementalTransforms: Transform[]
   ) {
-    const { robotService } = this;
-    const request = new proto.TransformPoseRequest();
-    request.setSource(source);
-    request.setDestination(destination);
-    request.setSupplementalTransformsList(supplementalTransforms);
-    const response = await promisify<
-      proto.TransformPoseRequest,
-      proto.TransformPoseResponse
-    >(robotService.transformPose.bind(robotService), request);
-    const result = response.getPose();
+    const request = new TransformPoseRequest({
+      source,
+      destination,
+      supplementalTransforms,
+    });
+    const response = await this.robotService.transformPose(request);
+    const result = response.pose;
     if (!result) {
       // eslint-disable-next-line no-warning-comments
       // TODO: Can the response frame be undefined or null?
@@ -738,122 +700,78 @@ export class RobotClient extends EventDispatcher implements Robot {
     source: string,
     destination: string
   ) {
-    const { robotService } = this;
-    const request = new proto.TransformPCDRequest();
-    request.setPointCloudPcd(pointCloudPCD);
-    request.setSource(source);
-    request.setDestination(destination);
-    const response = await promisify<
-      proto.TransformPCDRequest,
-      proto.TransformPCDResponse
-    >(robotService.transformPCD.bind(robotService), request);
-    return response.getPointCloudPcd_asU8();
+    const request = new TransformPCDRequest({
+      pointCloudPcd: pointCloudPCD,
+      source,
+      destination,
+    });
+    const resp = await this.robotService.transformPCD(request);
+    return resp.pointCloudPcd;
   }
 
   // DISCOVERY
 
-  async discoverComponents(queries: proto.DiscoveryQuery[]) {
-    const { robotService } = this;
-    const request = new proto.DiscoverComponentsRequest();
-    request.setQueriesList(queries);
-    const response = await promisify<
-      proto.DiscoverComponentsRequest,
-      proto.DiscoverComponentsResponse
-    >(robotService.discoverComponents.bind(robotService), request);
-    return response.getDiscoveryList();
+  async discoverComponents(queries: DiscoveryQuery[]) {
+    const resp = await this.robotService.discoverComponents({
+      queries,
+    });
+    return resp.discovery;
   }
 
   // GET CLOUD METADATA
 
   async getCloudMetadata() {
-    const { robotService } = this;
-    const request = new proto.GetCloudMetadataRequest();
-    const response = await promisify<
-      proto.GetCloudMetadataRequest,
-      proto.GetCloudMetadataResponse
-    >(robotService.getCloudMetadata.bind(robotService), request);
-    return response.toObject();
+    return this.robotService.getCloudMetadata({});
   }
 
   // RESOURCES
 
   async resourceNames() {
-    const { robotService } = this;
-    const request = new proto.ResourceNamesRequest();
-    const response = await promisify<
-      proto.ResourceNamesRequest,
-      proto.ResourceNamesResponse
-    >(robotService.resourceNames.bind(robotService), request);
-    return response.getResourcesList().map((r) => r.toObject());
+    const resp = await this.robotService.resourceNames({});
+    return resp.resources;
   }
 
   async resourceRPCSubtypes() {
-    const { robotService } = this;
-    const request = new proto.ResourceRPCSubtypesRequest();
-    const response = await promisify<
-      proto.ResourceRPCSubtypesRequest,
-      proto.ResourceRPCSubtypesResponse
-    >(robotService.resourceRPCSubtypes.bind(robotService), request);
-    return response.getResourceRpcSubtypesList();
+    const resp = await this.robotService.resourceRPCSubtypes({});
+    return resp.resourceRpcSubtypes;
   }
 
   // STATUS
 
-  async getStatus(resourceNames: ResourceName.AsObject[] = []) {
-    const { robotService } = this;
-    const request = new proto.GetStatusRequest();
-    const encodedNames = resourceNames.map((rName) =>
-      encodeResourceName(rName)
-    );
-    request.setResourceNamesList(encodedNames);
-    const response = await promisify<
-      proto.GetStatusRequest,
-      proto.GetStatusResponse
-    >(robotService.getStatus.bind(robotService), request);
-    return response.getStatusList();
+  async getStatus(resourceNames: ResourceName[] = []) {
+    const resp = await this.robotService.getStatus({
+      resourceNames,
+    });
+    return resp.status;
   }
 
-  streamStatus(
-    resourceNames: ResourceName.AsObject[] = [],
+  async *streamStatus(
+    resourceNames: ResourceName[] = [],
     durationMs = 500
-  ): RobotStatusStream {
-    const { robotService } = this;
-    const request = new proto.StreamStatusRequest();
-    const encodedNames = resourceNames.map((rName) =>
-      encodeResourceName(rName)
-    );
-    request.setResourceNamesList(encodedNames);
-    request.setEvery(new Duration().setNanos(durationMs * 1e6));
-
-    const statusStream = robotService.streamStatus(request);
-    const stream = new ViamResponseStream<proto.Status[]>(statusStream);
-    statusStream.on('data', (response: proto.StreamStatusResponse) => {
-      stream.emit('data', response.getStatusList());
+  ): AsyncIterable<Status[]> {
+    const stream = this.robotService.streamStatus({
+      resourceNames,
+      every: new Duration({
+        nanos: durationMs * 1e6,
+      }),
     });
-    statusStream.on('status', (status: Status) => {
-      stream.emit('status', status);
-    });
-    statusStream.on('end', (status?: Status) => {
-      stream.emit('end', status);
-    });
-    return stream;
+    for await (const val of stream) {
+      yield val.status;
+    }
   }
 
   // MODULES
 
   async restartModule(moduleId?: string, moduleName?: string) {
-    const { robotService } = this;
-    const request = new proto.RestartModuleRequest();
-
+    const request = new RestartModuleRequest();
     if (moduleId !== undefined) {
-      request.setModuleId(moduleId);
+      request.idOrName.case = 'moduleId';
+      request.idOrName.value = moduleId;
     }
     if (moduleName !== undefined) {
-      request.setModuleName(moduleName);
+      request.idOrName.case = 'moduleName';
+      request.idOrName.value = moduleName;
     }
-    await promisify<proto.RestartModuleRequest, proto.RestartModuleResponse>(
-      robotService.restartModule.bind(robotService),
-      request
-    );
+    await this.robotService.restartModule(request);
   }
 }

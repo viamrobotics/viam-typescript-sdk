@@ -1,9 +1,12 @@
+import type { PromiseClient } from '@connectrpc/connect';
 import { EventDispatcher, MachineConnectionEvent } from '../../events';
+import { StreamService } from '../../gen/stream/v1/stream_connect';
+import {
+  AddStreamRequest,
+  RemoveStreamRequest,
+} from '../../gen/stream/v1/stream_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { StreamServiceClient } from '../../gen/stream/v1/stream_pb_service';
-import pb from '../../gen/stream/v1/stream_pb';
-import { promisify } from '../../utils';
 import type { Stream } from './stream';
 
 /*
@@ -20,13 +23,13 @@ const getValidSDPTrackName = (name: string) => {
  * @group Clients
  */
 export class StreamClient extends EventDispatcher implements Stream {
-  private client: StreamServiceClient;
+  private client: PromiseClient<typeof StreamService>;
   private readonly options: Options;
   private streams: Set<string>;
 
   constructor(client: RobotClient, options: Options = {}) {
     super();
-    this.client = client.createServiceClient(StreamServiceClient);
+    this.client = client.createServiceClient(StreamService);
     this.options = options;
     this.streams = new Set();
 
@@ -46,54 +49,36 @@ export class StreamClient extends EventDispatcher implements Stream {
     });
   }
 
-  private get streamService() {
-    return this.client;
-  }
-
   async add(name: string) {
-    const { streamService } = this;
-    const request = new pb.AddStreamRequest();
-    const valName = getValidSDPTrackName(name);
-    request.setName(valName);
+    const request = new AddStreamRequest({
+      name: getValidSDPTrackName(name),
+    });
     this.options.requestLogger?.(request);
     try {
-      await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
-        streamService.addStream.bind(streamService),
-        request
-      );
+      await this.client.addStream(request);
       this.streams.add(name);
     } catch {
       // Try again with just the resource name
-      request.setName(name);
+      request.name = name;
       this.options.requestLogger?.(request);
-      await promisify<pb.AddStreamRequest, pb.AddStreamResponse>(
-        streamService.addStream.bind(streamService),
-        request
-      );
+      await this.client.addStream(request);
       this.streams.add(name);
     }
   }
 
   async remove(name: string) {
-    const { streamService } = this;
-    const request = new pb.RemoveStreamRequest();
-    const valName = getValidSDPTrackName(name);
-    request.setName(valName);
+    const request = new RemoveStreamRequest({
+      name: getValidSDPTrackName(name),
+    });
     this.options.requestLogger?.(request);
     try {
-      await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
-        streamService.removeStream.bind(streamService),
-        request
-      );
+      await this.client.removeStream(request);
       this.streams.delete(name);
     } catch {
       // Try again with just the resource name
-      request.setName(name);
+      request.name = name;
       this.options.requestLogger?.(request);
-      await promisify<pb.RemoveStreamRequest, pb.RemoveStreamResponse>(
-        streamService.removeStream.bind(streamService),
-        request
-      );
+      await this.client.removeStream(request);
       this.streams.delete(name);
     }
   }

@@ -1,23 +1,16 @@
-import { type RpcOptions } from '@improbable-eng/grpc-web/dist/typings/client.d';
-import pb from '../gen/provisioning/v1/provisioning_pb';
-import { ProvisioningServiceClient } from '../gen/provisioning/v1/provisioning_pb_service';
-import { promisify } from '../utils';
-
-export type CloudConfig = pb.CloudConfig.AsObject;
-
-const encodeCloudConfig = (obj: CloudConfig): pb.CloudConfig => {
-  const result = new pb.CloudConfig();
-  result.setId(obj.id);
-  result.setSecret(obj.secret);
-  result.setAppAddress(obj.appAddress);
-  return result;
-};
+import {
+  createPromiseClient,
+  type PromiseClient,
+  type Transport,
+} from '@connectrpc/connect';
+import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
+import type { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
 
 export class ProvisioningClient {
-  private service: ProvisioningServiceClient;
+  private client: PromiseClient<typeof ProvisioningService>;
 
-  constructor(serviceHost: string, grpcOptions: RpcOptions = {}) {
-    this.service = new ProvisioningServiceClient(serviceHost, grpcOptions);
+  constructor(transport: Transport) {
+    this.client = createPromiseClient(ProvisioningService, transport);
   }
 
   /**
@@ -26,14 +19,7 @@ export class ProvisioningClient {
    * @returns The Smart Machine status
    */
   async getSmartMachineStatus() {
-    const { service } = this;
-    const request = new pb.GetSmartMachineStatusRequest();
-
-    const response = await promisify<
-      pb.GetSmartMachineStatusRequest,
-      pb.GetSmartMachineStatusResponse
-    >(service.getSmartMachineStatus.bind(service), request);
-    return response.toObject();
+    return this.client.getSmartMachineStatus({});
   }
 
   /**
@@ -45,16 +31,11 @@ export class ProvisioningClient {
    * @param psk - The network's passkey
    */
   async setNetworkCredentials(type: string, ssid: string, psk: string) {
-    const { service } = this;
-    const request = new pb.SetNetworkCredentialsRequest();
-    request.setType(type);
-    request.setSsid(ssid);
-    request.setPsk(psk);
-
-    await promisify<
-      pb.SetNetworkCredentialsRequest,
-      pb.SetNetworkCredentialsResponse
-    >(service.setNetworkCredentials.bind(service), request);
+    await this.client.setNetworkCredentials({
+      type,
+      ssid,
+      psk,
+    });
   }
 
   /**
@@ -64,16 +45,7 @@ export class ProvisioningClient {
    * @param cloud - The configuration of the Cloud
    */
   async setSmartMachineCredentials(cloud?: CloudConfig) {
-    const { service } = this;
-    const request = new pb.SetSmartMachineCredentialsRequest();
-    if (cloud) {
-      request.setCloud(encodeCloudConfig(cloud));
-    }
-
-    await promisify<
-      pb.SetSmartMachineCredentialsRequest,
-      pb.SetSmartMachineCredentialsResponse
-    >(service.setSmartMachineCredentials.bind(service), request);
+    await this.client.setSmartMachineCredentials({ cloud });
   }
 
   /**
@@ -82,13 +54,9 @@ export class ProvisioningClient {
    * @returns A list of networks
    */
   async getNetworkList() {
-    const { service } = this;
-    const request = new pb.GetNetworkListRequest();
-
-    const response = await promisify<
-      pb.GetNetworkListRequest,
-      pb.GetNetworkListResponse
-    >(service.getNetworkList.bind(service), request);
-    return response.toObject().networksList;
+    const resp = await this.client.getNetworkList({});
+    return resp.networks;
   }
 }
+
+export { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';

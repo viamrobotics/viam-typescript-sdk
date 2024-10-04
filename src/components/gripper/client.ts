@@ -1,9 +1,15 @@
-import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
+import {
+  GrabRequest,
+  IsMovingRequest,
+  OpenRequest,
+  StopRequest,
+} from '../../gen/component/gripper/v1/gripper_pb';
 import type { RobotClient } from '../../robot';
-import pb from '../../gen/component/gripper/v1/gripper_pb';
-import { GripperServiceClient } from '../../gen/component/gripper/v1/gripper_pb_service';
-import type { Options, StructType } from '../../types';
-import { promisify, doCommandFromClient } from '../../utils';
+import type { Options } from '../../types';
+import { doCommandFromClient } from '../../utils';
 import type { Gripper } from './gripper';
 
 /**
@@ -12,83 +18,66 @@ import type { Gripper } from './gripper';
  * @group Clients
  */
 export class GripperClient implements Gripper {
-  private client: GripperServiceClient;
+  private client: PromiseClient<typeof GripperService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(GripperServiceClient);
+    this.client = client.createServiceClient(GripperService);
     this.name = name;
     this.options = options;
   }
 
-  private get gripperService() {
-    return this.client;
-  }
-
   async open(extra = {}) {
-    const service = this.gripperService;
-
-    const request = new pb.OpenRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new OpenRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.OpenRequest, pb.OpenResponse>(
-      service.open.bind(service),
-      request
-    );
+    await this.client.open(request);
   }
 
   async grab(extra = {}) {
-    const service = this.gripperService;
-
-    const request = new pb.GrabRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new GrabRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.GrabRequest, pb.GrabResponse>(
-      service.grab.bind(service),
-      request
-    );
+    await this.client.grab(request);
   }
 
   async stop(extra = {}) {
-    const service = this.gripperService;
-
-    const request = new pb.StopRequest();
-    request.setName(this.name);
-    request.setExtra(Struct.fromJavaScript(extra));
+    const request = new StopRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
 
     this.options.requestLogger?.(request);
 
-    await promisify<pb.StopRequest, pb.StopResponse>(
-      service.stop.bind(service),
-      request
-    );
+    await this.client.stop(request);
   }
 
   async isMoving() {
-    const service = this.gripperService;
-
-    const request = new pb.IsMovingRequest();
-    request.setName(this.name);
+    const request = new IsMovingRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<pb.IsMovingRequest, pb.IsMovingResponse>(
-      service.isMoving.bind(service),
-      request
-    );
-
-    return response.getIsMoving();
+    const resp = await this.client.isMoving(request);
+    return resp.isMoving;
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const service = this.gripperService;
-    return doCommandFromClient(service, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }

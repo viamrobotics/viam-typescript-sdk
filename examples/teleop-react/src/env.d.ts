@@ -1,4 +1,5 @@
 interface ImportMetaEnv {
-  VITE_ROBOT_HOSTNAME?: string;
-  VITE_ROBOT_SECRET?: string;
+  VITE_HOST?: string;
+  VITE_API_KEY_ID?: string;
+  VITE_API_KEY?: string;
 }

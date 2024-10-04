@@ -1,3 +1,5 @@
+import { ConnectError } from '@connectrpc/connect';
+
 export class ConnectionClosedError extends Error {
   public override readonly name = 'ConnectionClosedError';
 
@@ -7,7 +9,10 @@ export class ConnectionClosedError extends Error {
   }
 
   static isError(error: unknown): boolean {
-    if (error instanceof ConnectionClosedError) {
+    if (
+      error instanceof ConnectionClosedError ||
+      (error instanceof ConnectError && error.rawMessage === 'closed')
+    ) {
       return true;
     }
     if (typeof error === 'string') {

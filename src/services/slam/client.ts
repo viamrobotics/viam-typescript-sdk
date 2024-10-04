@@ -1,8 +1,15 @@
-import pb from '../../gen/service/slam/v1/slam_pb';
-import { SLAMServiceClient } from '../../gen/service/slam/v1/slam_pb_service';
+import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { PromiseClient } from '@connectrpc/connect';
+import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
+import {
+  GetInternalStateRequest,
+  GetPointCloudMapRequest,
+  GetPositionRequest,
+  GetPropertiesRequest,
+} from '../../gen/service/slam/v1/slam_pb';
 import { RobotClient } from '../../robot';
-import type { Options, StructType } from '../../types';
-import { doCommandFromClient, promisify } from '../../utils';
+import type { Options } from '../../types';
+import { doCommandFromClient } from '../../utils';
 import type { Slam } from './slam';
 
 /**
@@ -11,144 +18,72 @@ import type { Slam } from './slam';
  * @group Clients
  */
 export class SlamClient implements Slam {
-  private client: SLAMServiceClient;
+  private client: PromiseClient<typeof SLAMService>;
   private readonly name: string;
   private readonly options: Options;
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
-    this.client = client.createServiceClient(SLAMServiceClient);
+    this.client = client.createServiceClient(SLAMService);
     this.name = name;
     this.options = options;
   }
 
-  private get service() {
-    return this.client;
-  }
-
   async getPosition() {
-    const { service } = this;
-
-    const request = new pb.GetPositionRequest();
-    request.setName(this.name);
+    const request = new GetPositionRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPositionRequest,
-      pb.GetPositionResponse
-    >(service.getPosition.bind(service), request);
-
-    return response.toObject();
+    return this.client.getPosition(request);
   }
 
   getPointCloudMap = async (returnEditedMap?: boolean): Promise<Uint8Array> => {
-    const request = new pb.GetPointCloudMapRequest();
-    request.setName(this.name);
-    if (returnEditedMap) {
-      request.setReturnEditedMap(returnEditedMap);
-    }
+    const request = new GetPointCloudMapRequest({
+      name: this.name,
+      returnEditedMap,
+    });
     this.options.requestLogger?.(request);
 
     const chunks: Uint8Array[] = [];
     const stream = this.client.getPointCloudMap(request);
-
-    stream.on('data', (response) => {
-      const chunk = response.getPointCloudPcdChunk_asU8();
-      chunks.push(chunk);
-    });
-
-    return new Promise<Uint8Array>((resolve, reject) => {
-      stream.on('status', (status) => {
-        if (status.code !== 0) {
-          const error = {
-            message: status.details,
-            code: status.code,
-            metadata: status.metadata,
-          };
-          reject(error);
-        }
-      });
-
-      stream.on('end', (end) => {
-        if (end === undefined) {
-          const error = { message: 'Stream ended without a status code' };
-          reject(error);
-        } else if (end.code !== 0) {
-          const error = {
-            message: end.details,
-            code: end.code,
-            metadata: end.metadata,
-          };
-          reject(error);
-        }
-        const arr = concatArrayU8(chunks);
-        resolve(arr);
-      });
-    });
+    for await (const chunk of stream) {
+      chunks.push(chunk.pointCloudPcdChunk);
+    }
+    return concatArrayU8(chunks);
   };
 
   getInternalState = async (): Promise<Uint8Array> => {
-    const request = new pb.GetInternalStateRequest();
-    request.setName(this.name);
+    const request = new GetInternalStateRequest({
+      name: this.name,
+    });
     this.options.requestLogger?.(request);
 
     const chunks: Uint8Array[] = [];
     const stream = this.client.getInternalState(request);
-
-    stream.on('data', (response) => {
-      const chunk = response.getInternalStateChunk_asU8();
-      chunks.push(chunk);
-    });
-
-    return new Promise<Uint8Array>((resolve, reject) => {
-      stream.on('status', (status) => {
-        if (status.code !== 0) {
-          const error = {
-            message: status.details,
-            code: status.code,
-            metadata: status.metadata,
-          };
-          reject(error);
-        }
-      });
-
-      stream.on('end', (end) => {
-        if (end === undefined) {
-          const error = { message: 'Stream ended without a status code' };
-          reject(error);
-        } else if (end.code !== 0) {
-          const error = {
-            message: end.details,
-            code: end.code,
-            metadata: end.metadata,
-          };
-          reject(error);
-        }
-        const arr = concatArrayU8(chunks);
-        resolve(arr);
-      });
-    });
+    for await (const chunk of stream) {
+      chunks.push(chunk.internalStateChunk);
+    }
+    return concatArrayU8(chunks);
   };
 
   async getProperties() {
-    const { service } = this;
-
-    const request = new pb.GetPropertiesRequest();
-    request.setName(this.name);
+    const request = new GetPropertiesRequest({
+      name: this.name,
+    });
 
     this.options.requestLogger?.(request);
 
-    const response = await promisify<
-      pb.GetPropertiesRequest,
-      pb.GetPropertiesResponse
-    >(service.getProperties.bind(service), request);
-
-    return response.toObject();
+    return this.client.getProperties(request);
   }
 
-  async doCommand(command: StructType): Promise<StructType> {
-    const { service } = this;
-    return doCommandFromClient(service, this.name, command, this.options);
+  async doCommand(command: Struct): Promise<JsonValue> {
+    return doCommandFromClient(
+      this.client.doCommand,
+      this.name,
+      command,
+      this.options
+    );
   }
 }
 

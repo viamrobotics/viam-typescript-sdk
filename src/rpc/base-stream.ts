@@ -1,44 +1,34 @@
-import type { grpc } from '@improbable-eng/grpc-web';
 import type { PacketMessage, Stream } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 
 // MaxMessageSize (2^25) is the maximum size a gRPC message can be.
 const MaxMessageSize = 33_554_432;
 
 export class BaseStream {
-  protected readonly stream: Stream;
-  private readonly onDone: (id: number) => void;
-  protected readonly opts: grpc.TransportOptions;
+  protected readonly grpcStream: Stream;
+  private readonly onDone: (id: bigint) => void;
   protected closed = false;
   private readonly packetBuf: Uint8Array[] = [];
   private packetBufSize = 0;
-  private err: Error | undefined;
 
-  constructor(
-    stream: Stream,
-    onDone: (id: number) => void,
-    opts: grpc.TransportOptions
-  ) {
-    this.stream = stream;
+  constructor(grpcStream: Stream, onDone: (id: bigint) => void) {
+    this.grpcStream = grpcStream;
     this.onDone = onDone;
-    this.opts = opts;
   }
 
-  public closeWithRecvError(err?: Error) {
+  public closeWithRecvError() {
     if (this.closed) {
       return;
     }
     this.closed = true;
-    this.err = err;
-    this.onDone(this.stream.getId());
-    // pretty sure passing the error does nothing.
-    this.opts.onEnd(this.err);
+    this.onDone(this.grpcStream.id);
   }
 
   protected processPacketMessage(msg: PacketMessage): Uint8Array | undefined {
-    const data = msg.getData_asU8();
+    const { data } = msg;
     if (data.length + this.packetBufSize > MaxMessageSize) {
       this.packetBuf.length = 0;
       this.packetBufSize = 0;
+      // eslint-disable-next-line no-console
       console.error(
         `message size larger than max ${MaxMessageSize}; discarding`
       );
@@ -46,7 +36,7 @@ export class BaseStream {
     }
     this.packetBuf.push(data);
     this.packetBufSize += data.length;
-    if (msg.getEom()) {
+    if (msg.eom) {
       const pktData = new Uint8Array(this.packetBufSize);
       let position = 0;
       for (const partialData of this.packetBuf) {
