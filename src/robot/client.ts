@@ -211,7 +211,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
         // eslint-disable-next-line no-console
-        console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`, error);
+        console.debug(
+          `Failed to connect, attempt ${attemptNumber} with backoff`,
+          error
+        );
 
         // Always retry the next attempt
         return true;

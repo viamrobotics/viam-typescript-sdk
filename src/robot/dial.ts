@@ -164,7 +164,10 @@ export const createRobotClient = async (
       // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
       // eslint-disable-next-line no-console
-      console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`, error);
+      console.debug(
+        `Failed to connect, attempt ${attemptNumber} with backoff`,
+        error
+      );
 
       // Abort reconnects if the the caller specifies, otherwise retry
       return !conf.reconnectAbortSignal?.abort;
