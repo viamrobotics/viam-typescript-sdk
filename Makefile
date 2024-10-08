@@ -95,7 +95,7 @@ build-docs: clean-docs build-buf
 .PHONY: install-playwright
 install-playwright:
 	cd e2e && npm install
-	cd e2e && npx playwright install --with-deps chrome
+	cd e2e && npx playwright install --with-deps
 
 e2e/bin/viam-server:
 	bash e2e/setup.sh
