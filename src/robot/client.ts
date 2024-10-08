@@ -212,7 +212,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         // eslint-disable-next-line no-console
         console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff; reason=${JSON.stringify(error)}`
+          `Failed to connect, attempt ${attemptNumber} with backoff`,
+          error
         );
 
         // Always retry the next attempt
