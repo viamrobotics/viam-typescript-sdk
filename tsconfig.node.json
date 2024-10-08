@@ -3,6 +3,6 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["./vite.config.ts", "./*.cjs", "./.*.cjs"],
-  "exclude": ["**/src/**", "**/examples/**", "**/scripts/**"]
+  "include": ["./vite.config.ts", "./playwright.config.ts", "./*.cjs", "./.*.cjs"],
+  "exclude": ["**/src/**", "**/e2e/**", "**/examples/**", "**/scripts/**"]
 }

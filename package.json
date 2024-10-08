@@ -33,6 +33,11 @@
     "typecheck": "concurrently -g npm:typecheck:*",
     "typecheck:src": "tsc",
     "typecheck:node": "tsc --project tsconfig.node.json",
+    "e2e:playwright": "playwright test",
+    "e2e:playwright-ui": "playwright test --ui",
+    "e2e:playwright-debug": "playwright test --debug",
+    "e2e:playwright-install": "playwright install",
+    "e2e:test-harness": "vite e2e",
     "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}'",
     "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
   },
@@ -53,6 +58,7 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.15.0-1",
+    "@playwright/test": "1.45.3",
     "@types/node": "^20.11.10",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
