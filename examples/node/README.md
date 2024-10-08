@@ -37,7 +37,7 @@ In addition, polyfills and a node specific gRPC Transport are provided in `main.
 
 #### `main.ts`
 
-The `App.tsx` file was updated to include the following polyfills and updates:
+The `main.ts` file was updated to include the following polyfills and updates:
 
 - WebRTC Polyfills:
 
