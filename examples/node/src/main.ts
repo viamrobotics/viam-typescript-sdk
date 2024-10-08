@@ -2,7 +2,6 @@ import VIAM = require('@viamrobotics/sdk');
 import wrtc = require('node-datachannel/polyfill');
 import connectNode = require('@connectrpc/connect-node');
 globalThis.VIAM = {
-  // @ts-ignore
   GRPC_TRANSPORT_FACTORY: (opts: any) =>
     connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
 };

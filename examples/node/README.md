@@ -22,9 +22,38 @@ npm start
 
 Edit `src/main.ts` to change the machine logic being run.
 
-### Base Project Template
+## Configuration
 
-This example assumes that you are working inside the Viam TypeScript SDK repository. If you want to use this example as a base for your project, make the following changes:
+Using Viam's TypeScript SDK with Node.js requires some configurations. They are outlined below. Copying this project as a template is a good approach given the dependencies and polyfills requried. In the future, we hope to minimize the work neeed to get started here.
 
-* Remove the `preinstall: ...` line from `package.json`
-* Install the SDK: `npm install @viamrobotics/sdk@latest`
+### Dependencies
+
+The following direct dependencies are required:
+
+- @connectrpc/connect-node
+- node-datachannel
+
+In addition, polyfills and a node specific gRPC Transport are provided in `main.ts`.
+
+#### `main.ts`
+
+The `App.tsx` file was updated to include the following polyfills and updates:
+
+- WebRTC Polyfills:
+
+  ```js
+import wrtc = require('node-datachannel/polyfill');
+for (const key in wrtc) {
+  (global as any)[key] = (wrtc as any)[key];
+}
+  ```
+
+- GRPC connection configuration
+  ```js
+import VIAM = require('@viamrobotics/sdk');
+globalThis.VIAM = {
+  // @ts-ignore
+  GRPC_TRANSPORT_FACTORY: (opts: any) =>
+    connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
+};
+  ```
