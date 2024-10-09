@@ -38,3 +38,37 @@ export const doCommandFromClient = async function doCommandFromClient(
   }
   return result;
 };
+
+export const enableDebugLogging = (
+  key?: string,
+  opts?: CallOptions
+): CallOptions => {
+  opts ??= { headers: {} as Record<string, string> } as CallOptions;
+  if (!key) {
+    key = '';
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    for (let i = 0; i < 6; i++) {
+      key += letters[Math.floor(Math.random() * 26)];
+    }
+  }
+  (opts.headers as Record<string, string>)['dtname'] = key;
+  return opts;
+};
+
+export const disableDebugLogging = (opts: CallOptions): void => {
+  delete (opts.headers as Record<string, string>)['dtname'];
+};
+
+export const addMetadata = (
+  key: string,
+  value: string,
+  opts?: CallOptions
+): CallOptions => {
+  opts ??= { headers: {} as Record<string, string> } as CallOptions;
+  (opts.headers as Record<string, string>)[key] = value;
+  return opts;
+};
+
+export const deleteMetadata = (opts: CallOptions, key: string): void => {
+  delete (opts.headers as Record<string, string>)[key];
+};
