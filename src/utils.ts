@@ -43,20 +43,28 @@ export const enableDebugLogging = (
   key?: string,
   opts?: CallOptions
 ): CallOptions => {
-  opts ??= { headers: {} as Record<string, string> } as CallOptions;
-  if (!key) {
-    key = '';
+  const finalOpts = opts ?? { headers: {} as Record<string, string> };
+  let finalKey = '';
+  if (key) {
+    finalKey = key;
+  } else {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
-    for (let i = 0; i < 6; i++) {
-      key += letters[Math.floor(Math.random() * 26)];
+    for (let i = 0; i < 6; i += 1) {
+      finalKey += letters[Math.floor(Math.random() * 26)];
     }
   }
-  (opts.headers as Record<string, string>)['dtname'] = key;
-  return opts;
+  (finalOpts.headers as Record<string, string>).dtname = finalKey;
+  return finalOpts;
 };
 
 export const disableDebugLogging = (opts: CallOptions): void => {
-  delete (opts.headers as Record<string, string>)['dtname'];
+  if (opts.headers) {
+    const { dtname, ...remainingHeaders } = opts.headers as Record<
+      string,
+      string
+    >;
+    opts.headers = remainingHeaders;
+  }
 };
 
 export const addMetadata = (
@@ -64,11 +72,16 @@ export const addMetadata = (
   value: string,
   opts?: CallOptions
 ): CallOptions => {
-  opts ??= { headers: {} as Record<string, string> } as CallOptions;
-  (opts.headers as Record<string, string>)[key] = value;
-  return opts;
+  const finalOpts =
+    opts ?? ({ headers: {} as Record<string, string> } as CallOptions);
+  (finalOpts.headers as Record<string, string>)[key] = value;
+  return finalOpts;
 };
 
 export const deleteMetadata = (opts: CallOptions, key: string): void => {
-  delete (opts.headers as Record<string, string>)[key];
+  const { [key]: _, ...remainingHeaders } = opts.headers as Record<
+    string,
+    string
+  >;
+  opts.headers = remainingHeaders;
 };
