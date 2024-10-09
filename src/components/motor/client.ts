@@ -35,7 +35,7 @@ export class MotorClient implements Motor {
     this.options = options;
   }
 
-  async setPower(power: number, extra = {}, callOptions?: CallOptions) {
+  async setPower(power: number, extra = {}, callOptions = this.callOptions) {
     const request = new SetPowerRequest({
       name: this.name,
       powerPct: power,
@@ -44,14 +44,14 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    await this.client.setPower(request, callOptions || this.callOptions);
+    await this.client.setPower(request, callOptions);
   }
 
   async goFor(
     rpm: number,
     revolutions: number,
     extra = {},
-    callOptions?: CallOptions
+    callOptions = this.callOptions
   ) {
     const request = new GoForRequest({
       name: this.name,
@@ -62,14 +62,14 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    await this.client.goFor(request, callOptions || this.callOptions);
+    await this.client.goFor(request, callOptions);
   }
 
   async goTo(
     rpm: number,
     positionRevolutions: number,
     extra = {},
-    callOptions?: CallOptions
+    callOptions = this.callOptions
   ) {
     const request = new GoToRequest({
       name: this.name,
@@ -80,10 +80,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    await this.client.goTo(request, callOptions || this.callOptions);
+    await this.client.goTo(request, callOptions);
   }
 
-  async setRPM(rpm: number, extra = {}, callOptions?: CallOptions) {
+  async setRPM(rpm: number, extra = {}, callOptions = this.callOptions) {
     const request = new SetRPMRequest({
       name: this.name,
       rpm,
@@ -92,13 +92,13 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    await this.client.setRPM(request, callOptions || this.callOptions);
+    await this.client.setRPM(request, callOptions);
   }
 
   async resetZeroPosition(
     offset: number,
     extra = {},
-    callOptions?: CallOptions
+    callOptions = this.callOptions
   ) {
     const request = new ResetZeroPositionRequest({
       name: this.name,
@@ -108,13 +108,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    await this.client.resetZeroPosition(
-      request,
-      callOptions || this.callOptions
-    );
+    await this.client.resetZeroPosition(request, callOptions);
   }
 
-  async stop(extra = {}, callOptions?: CallOptions) {
+  async stop(extra = {}, callOptions = this.callOptions) {
     const request = new StopRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -122,10 +119,10 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    await this.client.stop(request, callOptions || this.callOptions);
+    await this.client.stop(request, callOptions);
   }
 
-  async getProperties(extra = {}, callOptions?: CallOptions) {
+  async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -133,16 +130,13 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getProperties(
-      request,
-      callOptions || this.callOptions
-    );
+    const resp = await this.client.getProperties(request, callOptions);
     return {
       positionReporting: resp.positionReporting,
     };
   }
 
-  async getPosition(extra = {}, callOptions?: CallOptions) {
+  async getPosition(extra = {}, callOptions = this.callOptions) {
     const request = new GetPositionRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -150,14 +144,11 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getPosition(
-      request,
-      callOptions || this.callOptions
-    );
+    const resp = await this.client.getPosition(request, callOptions);
     return resp.position;
   }
 
-  async isPowered(extra = {}, callOptions?: CallOptions) {
+  async isPowered(extra = {}, callOptions = this.callOptions) {
     const request = new IsPoweredRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -165,24 +156,18 @@ export class MotorClient implements Motor {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.isPowered(
-      request,
-      callOptions || this.callOptions
-    );
+    const response = await this.client.isPowered(request, callOptions);
     return [response.isOn, response.powerPct] as const;
   }
 
-  async isMoving(callOptions?: CallOptions) {
+  async isMoving(callOptions = this.callOptions) {
     const request = new IsMovingRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.isMoving(
-      request,
-      callOptions || this.callOptions
-    );
+    const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
   }
 

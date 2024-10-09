@@ -2,7 +2,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
 import { SensorService } from '../../gen/component/sensor/v1/sensor_connect';
 import { doCommandFromClient } from '../../utils';
@@ -17,6 +17,7 @@ export class SensorClient implements Sensor {
   private client: PromiseClient<typeof SensorService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(SensorService);
@@ -24,7 +25,7 @@ export class SensorClient implements Sensor {
     this.options = options;
   }
 
-  async getReadings(extra = {}) {
+  async getReadings(extra = {}, callOptions = this.callOptions) {
     const request = new GetReadingsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -32,7 +33,7 @@ export class SensorClient implements Sensor {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getReadings(request);
+    const response = await this.client.getReadings(request, callOptions);
 
     const result: Record<string, JsonValue> = {};
     for (const key of Object.keys(response.readings)) {

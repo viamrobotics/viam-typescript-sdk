@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { ArmService } from '../../gen/component/arm/v1/arm_connect';
 import {
   GetEndPositionRequest,
@@ -24,6 +24,7 @@ export class ArmClient implements Arm {
   private client: PromiseClient<typeof ArmService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(ArmService);
@@ -31,7 +32,7 @@ export class ArmClient implements Arm {
     this.options = options;
   }
 
-  async getEndPosition(extra = {}) {
+  async getEndPosition(extra = {}, callOptions = this.callOptions) {
     const request = new GetEndPositionRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -39,7 +40,7 @@ export class ArmClient implements Arm {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getEndPosition(request);
+    const response = await this.client.getEndPosition(request, callOptions);
     const result = response.pose;
     if (!result) {
       throw new Error('no pose');
@@ -47,7 +48,7 @@ export class ArmClient implements Arm {
     return result;
   }
 
-  async moveToPosition(pose: Pose, extra = {}) {
+  async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
     const request = new MoveToPositionRequest({
       name: this.name,
       to: pose,
@@ -56,10 +57,14 @@ export class ArmClient implements Arm {
 
     this.options.requestLogger?.(request);
 
-    await this.client.moveToPosition(request);
+    await this.client.moveToPosition(request, callOptions);
   }
 
-  async moveToJointPositions(jointPositionsList: number[], extra = {}) {
+  async moveToJointPositions(
+    jointPositionsList: number[],
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const newJointPositions = new JointPositions({
       values: jointPositionsList,
     });
@@ -72,10 +77,10 @@ export class ArmClient implements Arm {
 
     this.options.requestLogger?.(request);
 
-    await this.client.moveToJointPositions(request);
+    await this.client.moveToJointPositions(request, callOptions);
   }
 
-  async getJointPositions(extra = {}) {
+  async getJointPositions(extra = {}, callOptions = this.callOptions) {
     const request = new GetJointPositionsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -83,7 +88,7 @@ export class ArmClient implements Arm {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getJointPositions(request);
+    const response = await this.client.getJointPositions(request, callOptions);
 
     const result = response.positions;
     if (!result) {
@@ -92,7 +97,7 @@ export class ArmClient implements Arm {
     return result;
   }
 
-  async stop(extra = {}) {
+  async stop(extra = {}, callOptions = this.callOptions) {
     const request = new StopRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -100,17 +105,17 @@ export class ArmClient implements Arm {
 
     this.options.requestLogger?.(request);
 
-    await this.client.stop(request);
+    await this.client.stop(request, callOptions);
   }
 
-  async isMoving() {
+  async isMoving(callOptions = this.callOptions) {
     const request = new IsMovingRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.isMoving(request);
+    const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
   }
 

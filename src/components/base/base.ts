@@ -51,7 +51,7 @@ export interface Base extends Resource {
   stop(extra?: Struct): Promise<void>;
 
   /** Return true if the base is in motion. */
-  isMoving(extra?: Struct): Promise<boolean>;
+  isMoving(): Promise<boolean>;
 
   /** Return the base's properties. */
   getProperties(extra?: Struct): Promise<BaseProperties>;

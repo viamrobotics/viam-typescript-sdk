@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
 import {
   GrabRequest,
@@ -21,6 +21,7 @@ export class GripperClient implements Gripper {
   private client: PromiseClient<typeof GripperService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(GripperService);
@@ -28,7 +29,7 @@ export class GripperClient implements Gripper {
     this.options = options;
   }
 
-  async open(extra = {}) {
+  async open(extra = {}, callOptions = this.callOptions) {
     const request = new OpenRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -36,10 +37,10 @@ export class GripperClient implements Gripper {
 
     this.options.requestLogger?.(request);
 
-    await this.client.open(request);
+    await this.client.open(request, callOptions);
   }
 
-  async grab(extra = {}) {
+  async grab(extra = {}, callOptions = this.callOptions) {
     const request = new GrabRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -47,10 +48,10 @@ export class GripperClient implements Gripper {
 
     this.options.requestLogger?.(request);
 
-    await this.client.grab(request);
+    await this.client.grab(request, callOptions);
   }
 
-  async stop(extra = {}) {
+  async stop(extra = {}, callOptions = this.callOptions) {
     const request = new StopRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -58,17 +59,17 @@ export class GripperClient implements Gripper {
 
     this.options.requestLogger?.(request);
 
-    await this.client.stop(request);
+    await this.client.stop(request, callOptions);
   }
 
-  async isMoving() {
+  async isMoving(callOptions = this.callOptions) {
     const request = new IsMovingRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.isMoving(request);
+    const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
   }
 
