@@ -51,10 +51,10 @@
   },
   "homepage": "https://github.com/viamrobotics/viam-typescript-sdk#readme",
   "dependencies": {
-    "exponential-backoff": "^3.1.1",
     "@bufbuild/protobuf": "^1.10.0",
-    "@connectrpc/connect": "^1.5.0",
-    "@connectrpc/connect-web": "^1.5.0"
+    "@connectrpc/connect": "^1.6.0",
+    "@connectrpc/connect-web": "^1.6.0",
+    "exponential-backoff": "^3.1.1"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.15.0-1",

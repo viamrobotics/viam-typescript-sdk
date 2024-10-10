@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { GantryService } from '../../gen/component/gantry/v1/gantry_connect';
 import {
   GetLengthsRequest,
@@ -23,6 +23,7 @@ export class GantryClient implements Gantry {
   private client: PromiseClient<typeof GantryService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(GantryService);
@@ -30,7 +31,7 @@ export class GantryClient implements Gantry {
     this.options = options;
   }
 
-  async getPosition(extra = {}) {
+  async getPosition(extra = {}, callOptions = this.callOptions) {
     const request = new GetPositionRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -38,14 +39,15 @@ export class GantryClient implements Gantry {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getPosition(request);
+    const resp = await this.client.getPosition(request, callOptions);
     return resp.positionsMm;
   }
 
   async moveToPosition(
     positionsMm: number[],
     speedsMmPerSec: number[],
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new MoveToPositionRequest({
       name: this.name,
@@ -56,10 +58,10 @@ export class GantryClient implements Gantry {
 
     this.options.requestLogger?.(request);
 
-    await this.client.moveToPosition(request);
+    await this.client.moveToPosition(request, callOptions);
   }
 
-  async home(extra = {}) {
+  async home(extra = {}, callOptions = this.callOptions) {
     const request = new HomeRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -67,11 +69,11 @@ export class GantryClient implements Gantry {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.home(request);
+    const resp = await this.client.home(request, callOptions);
     return resp.homed;
   }
 
-  async getLengths(extra = {}) {
+  async getLengths(extra = {}, callOptions = this.callOptions) {
     const request = new GetLengthsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -79,11 +81,11 @@ export class GantryClient implements Gantry {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getLengths(request);
+    const resp = await this.client.getLengths(request, callOptions);
     return resp.lengthsMm;
   }
 
-  async stop(extra = {}) {
+  async stop(extra = {}, callOptions = this.callOptions) {
     const request = new StopRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -91,26 +93,30 @@ export class GantryClient implements Gantry {
 
     this.options.requestLogger?.(request);
 
-    await this.client.stop(request);
+    await this.client.stop(request, callOptions);
   }
 
-  async isMoving() {
+  async isMoving(callOptions = this.callOptions) {
     const request = new IsMovingRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.isMoving(request);
+    const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
   }
 
-  async doCommand(command: Struct): Promise<JsonValue> {
+  async doCommand(
+    command: Struct,
+    callOptions = this.callOptions
+  ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
-      this.options
+      this.options,
+      callOptions
     );
   }
 }
