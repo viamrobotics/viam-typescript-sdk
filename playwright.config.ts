@@ -4,12 +4,13 @@ export default defineConfig({
   testDir: 'e2e/tests',
   outputDir: 'e2e/artifacts',
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : 3,
+  retries: process.env.CI === undefined ? 0 : 1,
+  workers: process.env.CI === undefined ? 3 : 1,
   reporter: [['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:5173',
-    trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
+    trace:
+      process.env.CI === undefined ? 'retain-on-failure' : 'on-first-retry',
   },
 
   projects: [

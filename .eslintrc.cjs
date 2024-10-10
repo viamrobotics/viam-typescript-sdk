@@ -30,6 +30,12 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/prefer-promise-reject-errors': 'warn',
     'unicorn/prefer-add-event-listener': 'warn',
+    '@typescript-eslint/strict-boolean-expressions': [
+      'error',
+      {
+        allowNullableBoolean: true,
+      },
+    ],
   },
   overrides: [
     {

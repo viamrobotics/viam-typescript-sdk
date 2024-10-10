@@ -173,10 +173,10 @@ export const createRobotClient = async (
       return !conf.reconnectAbortSignal?.abort;
     },
   };
-  if (conf.reconnectMaxWait) {
+  if (conf.reconnectMaxWait !== undefined) {
     backOffOpts.maxDelay = conf.reconnectMaxWait;
   }
-  if (conf.reconnectMaxAttempts) {
+  if (conf.reconnectMaxAttempts !== undefined) {
     backOffOpts.numOfAttempts = conf.reconnectMaxAttempts;
   }
 
@@ -221,12 +221,15 @@ const validateDialConf = (conf: DialConf) => {
     }
   }
 
-  if (conf.reconnectMaxAttempts && !isPosInt(conf.reconnectMaxAttempts)) {
+  if (
+    conf.reconnectMaxAttempts !== undefined &&
+    !isPosInt(conf.reconnectMaxAttempts)
+  ) {
     throw new Error(
       `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
     );
   }
-  if (conf.reconnectMaxWait && !isPosInt(conf.reconnectMaxWait)) {
+  if (conf.reconnectMaxWait !== undefined && !isPosInt(conf.reconnectMaxWait)) {
     throw new Error(
       `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
     );

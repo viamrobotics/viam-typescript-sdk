@@ -242,8 +242,9 @@ export class SignalingExchange {
     try {
       await this.pc.addIceCandidate(cand);
     } catch (error) {
+      console.log('error adding ice candidate', error); // eslint-disable-line no-console
       await this.sendError(JSON.stringify(error));
-      return false;
+      throw error;
     }
 
     return true;
@@ -263,7 +264,7 @@ export class SignalingExchange {
       return;
     }
 
-    if (!this.callUuid) {
+    if (this.callUuid === undefined) {
       throw new Error(callUUIDUnset);
     }
 
@@ -307,7 +308,7 @@ export class SignalingExchange {
     if (this.sentDoneOrErrorOnce) {
       return;
     }
-    if (!this.callUuid) {
+    if (this.callUuid === undefined) {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
@@ -337,7 +338,7 @@ export class SignalingExchange {
     if (this.sentDoneOrErrorOnce) {
       return;
     }
-    if (!this.callUuid) {
+    if (this.callUuid === undefined) {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
@@ -365,13 +366,13 @@ const iceCandidateFromProto = (i: ICECandidate) => {
   const candidate: RTCIceCandidateInit = {
     candidate: i.candidate,
   };
-  if (i.sdpMid) {
+  if (i.sdpMid !== undefined) {
     candidate.sdpMid = i.sdpMid;
   }
-  if (i.sdpmLineIndex) {
+  if (i.sdpmLineIndex !== undefined) {
     candidate.sdpMLineIndex = i.sdpmLineIndex;
   }
-  if (i.usernameFragment) {
+  if (i.usernameFragment !== undefined) {
     candidate.usernameFragment = i.usernameFragment;
   }
   return candidate;
@@ -379,16 +380,16 @@ const iceCandidateFromProto = (i: ICECandidate) => {
 
 const iceCandidateToProto = (i: RTCIceCandidateInit) => {
   const candidate = new ICECandidate();
-  if (i.candidate) {
+  if (i.candidate !== undefined) {
     candidate.candidate = i.candidate;
   }
-  if (i.sdpMid) {
+  if (i.sdpMid !== undefined && i.sdpMid !== null) {
     candidate.sdpMid = i.sdpMid;
   }
-  if (i.sdpMLineIndex) {
+  if (i.sdpMLineIndex !== undefined && i.sdpMLineIndex !== null) {
     candidate.sdpmLineIndex = i.sdpMLineIndex;
   }
-  if (i.usernameFragment) {
+  if (i.usernameFragment !== undefined && i.usernameFragment !== null) {
     candidate.usernameFragment = i.usernameFragment;
   }
   return candidate;
