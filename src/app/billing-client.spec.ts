@@ -10,6 +10,11 @@ import {
   GetInvoicePdfResponse,
   GetInvoicesSummaryResponse,
   PaymentMethodType,
+  ResourceUsageCosts,
+  ResourceUsageCostsBySource,
+  SourceType,
+  UsageCost,
+  UsageCostType,
 } from '../gen/app/v1/billing_pb';
 import {
   BillingClient,
@@ -38,6 +43,17 @@ const testMonthUsage: GetCurrentMonthUsageResponse = {
   binaryDataCloudStorageUsageCost: 9,
   otherCloudStorageUsageCost: 10,
   perMachineUsageCost: 11,
+  subtotal: 12,
+  resourceUsageCostsBySource: [
+    new ResourceUsageCostsBySource({
+      sourceType: SourceType.ORG,
+      resourceUsageCosts: new ResourceUsageCosts({
+        usageCosts: [
+          new UsageCost({ resourceType: UsageCostType.UNSPECIFIED, cost: 13 }),
+        ],
+      }),
+    }),
+  ],
   startDate: testStartDate,
   endDate: testEndDate,
   start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
@@ -81,6 +97,20 @@ describe('BillingClient tests', () => {
             binaryDataCloudStorageUsageCost: 9,
             otherCloudStorageUsageCost: 10,
             perMachineUsageCost: 11,
+            subtotal: 12,
+            resourceUsageCostsBySource: [
+              new ResourceUsageCostsBySource({
+                sourceType: SourceType.ORG,
+                resourceUsageCosts: new ResourceUsageCosts({
+                  usageCosts: [
+                    new UsageCost({
+                      resourceType: UsageCostType.UNSPECIFIED,
+                      cost: 13,
+                    }),
+                  ],
+                }),
+              }),
+            ],
             startDate: testStartDate,
             endDate: testEndDate,
           } as GetCurrentMonthUsageResponse;
