@@ -116,9 +116,12 @@ export const dialDirect = async (
   // Client already has access token with no external auth, skip Authenticate process.
   if (
     opts?.accessToken !== undefined &&
+    opts.accessToken !== '' &&
     !(
       opts.externalAuthAddress !== undefined &&
-      opts.externalAuthToEntity !== undefined
+      opts.externalAuthAddress !== '' &&
+      opts.externalAuthToEntity !== undefined &&
+      opts.externalAuthToEntity !== ''
     )
   ) {
     const headers = new Headers(opts.extraHeaders);
@@ -177,7 +180,9 @@ const makeAuthenticatedTransport = async (
 
   if (
     opts.externalAuthAddress !== undefined &&
-    opts.externalAuthToEntity !== undefined
+    opts.externalAuthAddress !== '' &&
+    opts.externalAuthToEntity !== undefined &&
+    opts.externalAuthToEntity !== ''
   ) {
     const extAuthHeaders = new Headers();
     extAuthHeaders.set('authorization', `Bearer ${accessToken}`);
@@ -404,7 +409,10 @@ export const dialWebRTC = async (
 
     const cc = await exchange.doExchange();
 
-    if (dialOpts?.externalAuthAddress !== undefined) {
+    if (
+      dialOpts?.externalAuthAddress !== undefined &&
+      dialOpts.externalAuthAddress !== ''
+    ) {
       // TODO(GOUT-11): prepare AuthenticateTo here  for client channel.
       // eslint-disable-next-line sonarjs/no-duplicated-branches
     } else if (dialOpts?.credentials?.type !== undefined) {
@@ -492,9 +500,10 @@ const processSignalingExchangeOpts = (
         !optsCopy.credentials.authEntity
       ) {
         optsCopy.credentials.authEntity =
-          optsCopy.externalAuthAddress === undefined
-            ? signalingAddress.replace(addressCleanupRegex, '')
-            : optsCopy.externalAuthAddress.replace(addressCleanupRegex, '');
+          optsCopy.externalAuthAddress !== undefined &&
+          optsCopy.externalAuthAddress !== ''
+            ? optsCopy.externalAuthAddress.replace(addressCleanupRegex, '')
+            : signalingAddress.replace(addressCleanupRegex, '');
       }
       optsCopy.credentials = dialOpts.webrtcOptions?.signalingCredentials;
       optsCopy.accessToken = dialOpts.webrtcOptions?.signalingAccessToken;

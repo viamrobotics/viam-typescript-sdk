@@ -264,7 +264,7 @@ export class SignalingExchange {
       return;
     }
 
-    if (this.callUuid === undefined) {
+    if (this.callUuid === undefined || this.callUuid === '') {
       throw new Error(callUUIDUnset);
     }
 
@@ -308,7 +308,7 @@ export class SignalingExchange {
     if (this.sentDoneOrErrorOnce) {
       return;
     }
-    if (this.callUuid === undefined) {
+    if (this.callUuid === undefined || this.callUuid === '') {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
@@ -338,7 +338,7 @@ export class SignalingExchange {
     if (this.sentDoneOrErrorOnce) {
       return;
     }
-    if (this.callUuid === undefined) {
+    if (this.callUuid === undefined || this.callUuid === '') {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
