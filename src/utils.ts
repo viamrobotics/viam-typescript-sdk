@@ -23,7 +23,7 @@ export const doCommandFromClient = async function doCommandFromClient(
   name: string,
   command: Struct,
   options: Options = {},
-  callOptions: CallOptions
+  callOptions: CallOptions = { headers: {} as Record<string, string> }
 ): Promise<JsonValue> {
   const request = new DoCommandRequest({
     name,
