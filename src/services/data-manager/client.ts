@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { DataManagerService } from '../../gen/service/datamanager/v1/data_manager_connect.js';
 import { SyncRequest } from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import type { RobotClient } from '../../robot';
@@ -11,6 +11,7 @@ export class DataManagerClient implements DataManager {
   private client: PromiseClient<typeof DataManagerService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(DataManagerService);
@@ -18,7 +19,7 @@ export class DataManagerClient implements DataManager {
     this.options = options;
   }
 
-  async sync(extra = {}) {
+  async sync(extra = {}, callOptions = this.callOptions) {
     const request = new SyncRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -26,7 +27,7 @@ export class DataManagerClient implements DataManager {
 
     this.options.requestLogger?.(request);
 
-    await this.client.sync(request);
+    await this.client.sync(request, callOptions);
   }
 
   async doCommand(command: Struct): Promise<JsonValue> {

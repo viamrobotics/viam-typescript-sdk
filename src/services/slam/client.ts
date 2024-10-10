@@ -1,5 +1,5 @@
 import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
 import {
   GetInternalStateRequest,
@@ -21,6 +21,7 @@ export class SlamClient implements Slam {
   private client: PromiseClient<typeof SLAMService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(SLAMService);
@@ -28,17 +29,20 @@ export class SlamClient implements Slam {
     this.options = options;
   }
 
-  async getPosition() {
+  async getPosition(callOptions = this.callOptions) {
     const request = new GetPositionRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    return this.client.getPosition(request);
+    return this.client.getPosition(request, callOptions);
   }
 
-  getPointCloudMap = async (returnEditedMap?: boolean): Promise<Uint8Array> => {
+  getPointCloudMap = async (
+    returnEditedMap?: boolean,
+    callOptions = this.callOptions
+  ): Promise<Uint8Array> => {
     const request = new GetPointCloudMapRequest({
       name: this.name,
       returnEditedMap,
@@ -46,35 +50,37 @@ export class SlamClient implements Slam {
     this.options.requestLogger?.(request);
 
     const chunks: Uint8Array[] = [];
-    const stream = this.client.getPointCloudMap(request);
+    const stream = this.client.getPointCloudMap(request, callOptions);
     for await (const chunk of stream) {
       chunks.push(chunk.pointCloudPcdChunk);
     }
     return concatArrayU8(chunks);
   };
 
-  getInternalState = async (): Promise<Uint8Array> => {
+  getInternalState = async (
+    callOptions = this.callOptions
+  ): Promise<Uint8Array> => {
     const request = new GetInternalStateRequest({
       name: this.name,
     });
     this.options.requestLogger?.(request);
 
     const chunks: Uint8Array[] = [];
-    const stream = this.client.getInternalState(request);
+    const stream = this.client.getInternalState(request, callOptions);
     for await (const chunk of stream) {
       chunks.push(chunk.internalStateChunk);
     }
     return concatArrayU8(chunks);
   };
 
-  async getProperties() {
+  async getProperties(callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    return this.client.getProperties(request);
+    return this.client.getProperties(request, callOptions);
   }
 
   async doCommand(command: Struct): Promise<JsonValue> {

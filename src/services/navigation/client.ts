@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
 import {
   AddWaypointRequest,
@@ -28,6 +28,7 @@ export class NavigationClient implements Navigation {
   private client: PromiseClient<typeof NavigationService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(NavigationService);
@@ -35,7 +36,7 @@ export class NavigationClient implements Navigation {
     this.options = options;
   }
 
-  async getMode(extra = {}) {
+  async getMode(extra = {}, callOptions = this.callOptions) {
     const request = new GetModeRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -43,11 +44,11 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getMode(request);
+    const resp = await this.client.getMode(request, callOptions);
     return resp.mode;
   }
 
-  async setMode(mode: Mode, extra = {}) {
+  async setMode(mode: Mode, extra = {}, callOptions = this.callOptions) {
     const request = new SetModeRequest({
       name: this.name,
       mode,
@@ -56,10 +57,10 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    await this.client.setMode(request);
+    await this.client.setMode(request, callOptions);
   }
 
-  async getLocation(extra = {}) {
+  async getLocation(extra = {}, callOptions = this.callOptions) {
     const request = new GetLocationRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -67,7 +68,7 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getLocation(request);
+    const response = await this.client.getLocation(request, callOptions);
 
     if (!response.location) {
       throw new Error('no location');
@@ -78,7 +79,7 @@ export class NavigationClient implements Navigation {
     return response;
   }
 
-  async getWayPoints(extra = {}) {
+  async getWayPoints(extra = {}, callOptions = this.callOptions) {
     const request = new GetWaypointsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -86,11 +87,15 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getWaypoints(request);
+    const resp = await this.client.getWaypoints(request, callOptions);
     return resp.waypoints;
   }
 
-  async addWayPoint(location: GeoPoint, extra = {}) {
+  async addWayPoint(
+    location: GeoPoint,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new AddWaypointRequest({
       name: this.name,
       location,
@@ -99,10 +104,10 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    await this.client.addWaypoint(request);
+    await this.client.addWaypoint(request, callOptions);
   }
 
-  async removeWayPoint(id: string, extra = {}) {
+  async removeWayPoint(id: string, extra = {}, callOptions = this.callOptions) {
     const request = new RemoveWaypointRequest({
       name: this.name,
       id,
@@ -111,10 +116,10 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    await this.client.removeWaypoint(request);
+    await this.client.removeWaypoint(request, callOptions);
   }
 
-  async getObstacles(extra = {}) {
+  async getObstacles(extra = {}, callOptions = this.callOptions) {
     const request = new GetObstaclesRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -122,11 +127,11 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getObstacles(request);
+    const resp = await this.client.getObstacles(request, callOptions);
     return resp.obstacles;
   }
 
-  async getPaths(extra = {}) {
+  async getPaths(extra = {}, callOptions = this.callOptions) {
     const request = new GetPathsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -134,18 +139,18 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getPaths(request);
+    const resp = await this.client.getPaths(request, callOptions);
     return resp.paths;
   }
 
-  async getProperties() {
+  async getProperties(callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    return this.client.getProperties(request);
+    return this.client.getProperties(request, callOptions);
   }
 
   async doCommand(command: Struct): Promise<JsonValue> {

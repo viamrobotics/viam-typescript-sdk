@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
@@ -35,6 +35,7 @@ export class MotionClient implements Motion {
   private client: PromiseClient<typeof MotionService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MotionService);
@@ -47,7 +48,8 @@ export class MotionClient implements Motion {
     componentName: ResourceName,
     worldState?: WorldState,
     constraints?: Constraints,
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new MoveRequest({
       name: this.name,
@@ -60,7 +62,7 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.move(request);
+    const resp = await this.client.move(request, callOptions);
     return resp.success;
   }
 
@@ -70,7 +72,8 @@ export class MotionClient implements Motion {
     slamServiceName: ResourceName,
     motionConfig?: MotionConfiguration,
     obstacles?: Geometry[],
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new MoveOnMapRequest({
       name: this.name,
@@ -84,7 +87,7 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.moveOnMap(request);
+    const resp = await this.client.moveOnMap(request, callOptions);
     return resp.executionId;
   }
 
@@ -96,7 +99,8 @@ export class MotionClient implements Motion {
     obstaclesList?: GeoGeometry[],
     motionConfig?: MotionConfiguration,
     boundingRegionsList?: GeoGeometry[],
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new MoveOnGlobeRequest({
       name: this.name,
@@ -112,11 +116,15 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.moveOnGlobe(request);
+    const resp = await this.client.moveOnGlobe(request, callOptions);
     return resp.executionId;
   }
 
-  async stopPlan(componentName: ResourceName, extra = {}) {
+  async stopPlan(
+    componentName: ResourceName,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new StopPlanRequest({
       name: this.name,
       componentName,
@@ -125,7 +133,7 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    await this.client.stopPlan(request);
+    await this.client.stopPlan(request, callOptions);
     return null;
   }
 
@@ -133,7 +141,8 @@ export class MotionClient implements Motion {
     componentName: ResourceName,
     lastPlanOnly?: boolean,
     executionId?: string,
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new GetPlanRequest({
       name: this.name,
@@ -145,10 +154,14 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    return this.client.getPlan(request);
+    return this.client.getPlan(request, callOptions);
   }
 
-  async listPlanStatuses(onlyActivePlans?: boolean, extra = {}) {
+  async listPlanStatuses(
+    onlyActivePlans?: boolean,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new ListPlanStatusesRequest({
       name: this.name,
       onlyActivePlans,
@@ -157,14 +170,15 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    return this.client.listPlanStatuses(request);
+    return this.client.listPlanStatuses(request, callOptions);
   }
 
   async getPose(
     componentName: ResourceName,
     destinationFrame: string,
     supplementalTransforms: Transform[],
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new GetPoseRequest({
       name: this.name,
@@ -176,7 +190,7 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getPose(request);
+    const response = await this.client.getPose(request, callOptions);
 
     const result = response.pose;
 
