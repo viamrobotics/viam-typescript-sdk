@@ -22,7 +22,8 @@ export const doCommandFromClient = async function doCommandFromClient(
   doCommander: doCommand,
   name: string,
   command: Struct,
-  options: Options = {}
+  options: Options = {},
+  callOptions: CallOptions
 ): Promise<JsonValue> {
   const request = new DoCommandRequest({
     name,
@@ -31,7 +32,7 @@ export const doCommandFromClient = async function doCommandFromClient(
 
   options.requestLogger?.(request);
 
-  const response = await doCommander(request);
+  const response = await doCommander(request, callOptions);
   const result = response.result?.toJson();
   if (!result) {
     return {};

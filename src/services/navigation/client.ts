@@ -153,12 +153,16 @@ export class NavigationClient implements Navigation {
     return this.client.getProperties(request, callOptions);
   }
 
-  async doCommand(command: Struct): Promise<JsonValue> {
+  async doCommand(
+    command: Struct,
+    callOptions = this.callOptions
+  ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
-      this.options
+      this.options,
+      callOptions
     );
   }
 }
