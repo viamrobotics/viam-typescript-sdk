@@ -21,8 +21,6 @@ jobs:
       - name: Update api
         run: |
           echo ${{ github.event.client_payload.tag }} > api_version.lock
-          sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make update-buf'
 
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v6
