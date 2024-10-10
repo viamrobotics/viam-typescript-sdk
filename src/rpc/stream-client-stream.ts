@@ -82,7 +82,7 @@ export class StreamClientStream<
     if (signal) {
       opt.signal = signal;
     }
-    if (timeoutMs) {
+    if (timeoutMs !== undefined) {
       opt.timeoutMs = timeoutMs;
     }
 

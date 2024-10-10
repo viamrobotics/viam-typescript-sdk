@@ -196,7 +196,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   private onDisconnect(event?: Event) {
     this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
 
-    if (this.noReconnect) {
+    if (this.noReconnect !== undefined && this.noReconnect) {
       return;
     }
 
@@ -220,10 +220,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         return true;
       },
     };
-    if (this.reconnectMaxWait) {
+    if (this.reconnectMaxWait !== undefined) {
       backOffOpts.maxDelay = this.reconnectMaxWait;
     }
-    if (this.reconnectMaxAttempts) {
+    if (this.reconnectMaxAttempts !== undefined) {
       backOffOpts.numOfAttempts = this.reconnectMaxAttempts;
     }
     void backOff(async () => this.connect(), backOffOpts)

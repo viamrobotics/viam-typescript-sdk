@@ -104,7 +104,7 @@ export default class SessionManager {
      * case in the future we make this toggleable (e.g. foreground).
      */
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (this.backgroundHeartbeat && globalThis.Worker) {
+    if (this.backgroundHeartbeat && globalThis.Worker !== undefined) {
       const url = window.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
