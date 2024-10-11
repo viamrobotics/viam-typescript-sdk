@@ -113,7 +113,7 @@ export class DataClient {
   ) {
     const dataReq = {
       filter,
-      limit: limit ? BigInt(limit) : undefined,
+      limit: limit === undefined ? undefined : BigInt(limit),
       sortOrder,
       last,
     };
@@ -185,7 +185,7 @@ export class DataClient {
   ) {
     const dataReq = {
       filter,
-      limit: limit ? BigInt(limit) : undefined,
+      limit: limit === undefined ? undefined : BigInt(limit),
       sortOrder,
       last,
     };

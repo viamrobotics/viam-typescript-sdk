@@ -8,6 +8,7 @@ module.exports = {
   customCss: './docs/docs.css',
   cname: 'ts.viam.dev',
   disableSources: true,
+  exclude: ['e2e/**/*.spec.ts'],
   // see: https://typedoc.org/options/organization/#kindsortorder
   kindSortOrder: [
     'Function',

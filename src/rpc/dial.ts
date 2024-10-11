@@ -115,15 +115,24 @@ export const dialDirect = async (
 
   // Client already has access token with no external auth, skip Authenticate process.
   if (
-    opts?.accessToken &&
-    !(opts.externalAuthAddress && opts.externalAuthToEntity)
+    opts?.accessToken !== undefined &&
+    opts.accessToken !== '' &&
+    !(
+      opts.externalAuthAddress !== undefined &&
+      opts.externalAuthAddress !== '' &&
+      opts.externalAuthToEntity !== undefined &&
+      opts.externalAuthToEntity !== ''
+    )
   ) {
     const headers = new Headers(opts.extraHeaders);
     headers.set('authorization', `Bearer ${opts.accessToken}`);
     return new AuthenticatedTransport(transportOpts, createTransport, headers);
   }
 
-  if (!opts || (!opts.credentials && !opts.accessToken)) {
+  if (
+    opts === undefined ||
+    (opts.credentials === undefined && opts.accessToken === undefined)
+  ) {
     return createTransport(transportOpts);
   }
 
@@ -146,7 +155,7 @@ const makeAuthenticatedTransport = async (
   const authHeaders = new Headers(opts.extraHeaders);
 
   let accessToken;
-  if (!opts.accessToken || opts.accessToken === '') {
+  if (opts.accessToken === undefined || opts.accessToken === '') {
     const request = new AuthenticateRequest({
       entity:
         isCredential(opts.credentials) && opts.credentials.authEntity
@@ -169,7 +178,12 @@ const makeAuthenticatedTransport = async (
     accessToken = opts.accessToken;
   }
 
-  if (opts.externalAuthAddress && opts.externalAuthToEntity) {
+  if (
+    opts.externalAuthAddress !== undefined &&
+    opts.externalAuthAddress !== '' &&
+    opts.externalAuthToEntity !== undefined &&
+    opts.externalAuthToEntity !== ''
+  ) {
     const extAuthHeaders = new Headers();
     extAuthHeaders.set('authorization', `Bearer ${accessToken}`);
 
@@ -385,7 +399,7 @@ export const dialWebRTC = async (
   );
   try {
     // set timeout for dial attempt if a timeout is specified
-    if (dialOpts?.dialTimeout) {
+    if (dialOpts?.dialTimeout !== undefined) {
       setTimeout(() => {
         if (!successful) {
           exchange.terminate();
@@ -395,10 +409,13 @@ export const dialWebRTC = async (
 
     const cc = await exchange.doExchange();
 
-    if (dialOpts?.externalAuthAddress) {
+    if (
+      dialOpts?.externalAuthAddress !== undefined &&
+      dialOpts.externalAuthAddress !== ''
+    ) {
       // TODO(GOUT-11): prepare AuthenticateTo here  for client channel.
       // eslint-disable-next-line sonarjs/no-duplicated-branches
-    } else if (dialOpts?.credentials?.type) {
+    } else if (dialOpts?.credentials?.type !== undefined) {
       // TODO(GOUT-11): prepare Authenticate here for client channel
     }
 
@@ -477,14 +494,16 @@ const processSignalingExchangeOpts = (
   if (dialOpts) {
     optsCopy = { ...dialOpts } as DialOptions;
 
-    if (!dialOpts.accessToken) {
+    if (dialOpts.accessToken === undefined) {
       if (
         isCredential(optsCopy.credentials) &&
         !optsCopy.credentials.authEntity
       ) {
-        optsCopy.credentials.authEntity = optsCopy.externalAuthAddress
-          ? optsCopy.externalAuthAddress.replace(addressCleanupRegex, '')
-          : signalingAddress.replace(addressCleanupRegex, '');
+        optsCopy.credentials.authEntity =
+          optsCopy.externalAuthAddress !== undefined &&
+          optsCopy.externalAuthAddress !== ''
+            ? optsCopy.externalAuthAddress.replace(addressCleanupRegex, '')
+            : signalingAddress.replace(addressCleanupRegex, '');
       }
       optsCopy.credentials = dialOpts.webrtcOptions?.signalingCredentials;
       optsCopy.accessToken = dialOpts.webrtcOptions?.signalingAccessToken;
@@ -504,18 +523,18 @@ const validateDialOptions = (opts?: DialOptions) => {
     return;
   }
 
-  if (opts.accessToken && opts.accessToken.length > 0) {
+  if (opts.accessToken !== undefined && opts.accessToken.length > 0) {
     if (opts.credentials) {
       throw new Error('cannot set credentials with accessToken');
     }
 
-    if (opts.webrtcOptions) {
-      if (opts.webrtcOptions.signalingAccessToken) {
+    if (opts.webrtcOptions !== undefined) {
+      if (opts.webrtcOptions.signalingAccessToken !== undefined) {
         throw new Error(
           'cannot set webrtcOptions.signalingAccessToken with accessToken'
         );
       }
-      if (opts.webrtcOptions.signalingCredentials) {
+      if (opts.webrtcOptions.signalingCredentials !== undefined) {
         throw new Error(
           'cannot set webrtcOptions.signalingCredentials with accessToken'
         );
@@ -524,9 +543,9 @@ const validateDialOptions = (opts?: DialOptions) => {
   }
 
   if (
-    opts.webrtcOptions?.signalingAccessToken &&
+    opts.webrtcOptions?.signalingAccessToken !== undefined &&
     opts.webrtcOptions.signalingAccessToken.length > 0 &&
-    opts.webrtcOptions.signalingCredentials
+    opts.webrtcOptions.signalingCredentials !== undefined
   ) {
     throw new Error(
       'cannot set webrtcOptions.signalingCredentials with webrtcOptions.signalingAccessToken'

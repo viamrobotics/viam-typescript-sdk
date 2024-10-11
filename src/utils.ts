@@ -34,7 +34,7 @@ export const doCommandFromClient = async function doCommandFromClient(
 
   const response = await doCommander(request, callOptions);
   const result = response.result?.toJson();
-  if (!result) {
+  if (result === undefined) {
     return {};
   }
   return result;

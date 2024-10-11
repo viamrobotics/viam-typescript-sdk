@@ -77,7 +77,7 @@ export class ViamClient {
       locationId = mainPart.locationId;
     }
 
-    if (!address) {
+    if (address === undefined || address === '') {
       throw new Error(
         'Host was not provided and could not be obtained from the machine ID'
       );

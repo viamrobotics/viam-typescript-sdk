@@ -54,9 +54,9 @@ update-buf: $(node_modules)
 
 .PHONY: build-buf
 build-buf: $(node_modules) clean-buf
-	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/googleapis/googleapis)
+	$(buf) generate buf.build/googleapis/googleapis
 	$(buf) generate buf.build/viamrobotics/api:$$(cat api_version.lock) --path common,component,robot,service,app,provisioning,tagger,stream
-	$(buf) generate $$(./scripts/get-buf-lock-version.js buf.build/viamrobotics/goutils)
+	$(buf) generate buf.build/viamrobotics/goutils
 
 # js targets
 
@@ -89,3 +89,20 @@ clean-docs:
 .PHONY: build-docs
 build-docs: clean-docs build-buf
 	npm run doc
+
+# e2e tests
+
+.PHONY: install-playwright
+install-playwright:
+	cd e2e && npm install
+	cd e2e && npx playwright install --with-deps
+
+e2e/bin/viam-server:
+	bash e2e/setup.sh
+
+.PHONY: run-e2e-server
+run-e2e-server: e2e/bin/viam-server
+	e2e/bin/viam-server --config=./e2e/server_config.json
+
+test-e2e: e2e/bin/viam-server build install-playwright
+	cd e2e && npm run e2e:playwright

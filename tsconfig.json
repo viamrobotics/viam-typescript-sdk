@@ -3,11 +3,11 @@
   "compilerOptions": {
     "types": ["vite/client", "node"],
     "noEmit": true,
-    "rootDir": "src",
+    "rootDirs": ["src", "e2e"],
     "outDir": "dist",
 
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
     "exactOptionalPropertyTypes": false,
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "e2e/**/*.ts"],
 }
