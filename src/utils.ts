@@ -46,13 +46,13 @@ export const enableDebugLogging = (
 ): CallOptions => {
   const finalOpts = opts ?? { headers: {} as Record<string, string> };
   let finalKey = '';
-  if (key) {
-    finalKey = key;
-  } else {
+  if (key === undefined) {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     for (let i = 0; i < 6; i += 1) {
       finalKey += letters[Math.floor(Math.random() * 26)];
     }
+  } else {
+    finalKey = key;
   }
   (finalOpts.headers as Record<string, string>).dtname = finalKey;
   return finalOpts;
