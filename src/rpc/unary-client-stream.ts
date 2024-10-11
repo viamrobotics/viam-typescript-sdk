@@ -60,7 +60,7 @@ export class UnaryClientStream<
     if (signal) {
       opt.signal = signal;
     }
-    if (timeoutMs) {
+    if (timeoutMs !== undefined) {
       opt.timeoutMs = timeoutMs;
     }
     return runUnaryCall<I, O>(opt);
