@@ -37,6 +37,6 @@ To use this SDK with React Native, read the [documentation](/ReactNative.md) or 
 
 ## License
 
-Copyright 2022-2023 Viam Inc.
+Copyright 2022-2024 Viam Inc.
 
 Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE) file
