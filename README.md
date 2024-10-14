@@ -28,6 +28,10 @@ npm install @viamrobotics/sdk
 
 [https://ts.viam.dev](https://ts.viam.dev/)
 
+## Node
+
+To use this SDK with node, read the [documentation](/Node.md) or view the [example](/examples/node/)
+
 ## React Native
 
 To use this SDK with React Native, read the [documentation](/ReactNative.md) or view the [example](/examples/react-native/)

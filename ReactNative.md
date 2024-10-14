@@ -1,6 +1,6 @@
 # React Native & Viam's TypeScript SDK
 
-Viam's React Native support is still experimental. Therefore, we've provided this document for with detailed instructions on including Viam in your React Native project.
+This document contains detailed instructions on including Viam in your React Native project. For an runnable example, see the [examples directory](/examples/react-native/).
 
 ## Requirements
 
@@ -11,63 +11,102 @@ This document assumes you already have a React Native project. If not, follow th
 
 ### Dependencies
 
-You must use the latest version of Viam's TypeScript SDK, `>=0.11.0`, alongside a few other direct dependencies: `react-native-webrtc`, `react-native-url-polyfill`, and `@improbable-eng/grpc-web-react-native-transport`.
+You must use the latest version of Viam's TypeScript SDK, `>=0.26.1`, alongside a few other direct dependencies:
+
+- `fast-text-encoding`
+- `react-native-fast-encoder`
+- `react-native-fetch-api`
+- `react-native-url-polyfill`
+- `react-native-webrtc`
+- `web-streams-polyfill`
 
 You can use either Yarn or NPM to install the dependencies. This document will use NPM, but either will work.
 
-`npm install @viamrobotics/sdk react-native-webrtc react-native-url-polyfill @improbable-eng/grpc-web-react-native-transport`
+`npm install @viamrobotics/sdk fast-text-encoding react-native-fast-encoder react-native-fetch-api react-native-url-polyfill react-native-webrtc web-streams-polyfill`
 
-### Configuration
+### Polyfills
 
-#### `index.js`
+Using the SDK with React Native also requires a number of polyfills. You can find these at [polyfills.native.ts](/examples/react-native/polyfills.native.ts) and [polyfills.ts](/examples/react-native/polyfills.ts). They are also pasted in their entirety below. You can copy these directly into your application.
 
-You will also have to update your `index.js`. These updates should be placed above all other imports or customizations.
+```ts
+// polyfills.native.ts
 
-Firstly, you will have to import the URL polyfill:
-
-```js
+// Dervied from https://raw.githubusercontent.com/connectrpc/examples-es/refs/heads/main/react-native
+import TextEncoder from 'react-native-fast-encoder';
+// @ts-expect-error -- missing type declarations
+import { polyfillGlobal } from 'react-native/Libraries/Utilities/PolyfillFunctions';
+// @ts-expect-error -- missing type declarations
+import { fetch, Headers, Request, Response } from 'react-native-fetch-api';
 import 'react-native-url-polyfill/auto';
-```
-
-Then, you have to register the React Native WebRTC globals:
-
-```js
 import { registerGlobals } from 'react-native-webrtc';
-registerGlobals();
+import { ReadableStream } from 'web-streams-polyfill';
+
+export function polyfills() {
+  polyfillGlobal('TextDecoder', () => TextEncoder);
+  polyfillGlobal('TextEncoder', () => TextEncoder);
+  registerGlobals();
+  polyfillGlobal('ReadableStream', () => ReadableStream);
+  polyfillGlobal(
+    'fetch',
+    () =>
+      (...args: Parameters<typeof window.fetch>) =>
+        fetch(args[0], {
+          ...args[1],
+          // Inject textStreaming: https://github.com/react-native-community/fetch/issues/15
+          reactNative: { textStreaming: true },
+        })
+  );
+  polyfillGlobal('Headers', () => Headers);
+  polyfillGlobal('Request', () => Request);
+  polyfillGlobal('Response', () => Response);
+  // Polyfill async.Iterator. For some reason, the Babel presets and plugins are not doing the trick.
+  // Code from here: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-3.html#caveats
+  (Symbol as any).asyncIterator =
+    Symbol.asyncIterator || Symbol.for('Symbol.asyncIterator');
+}
 ```
 
-Finally, you will have to update add the GRPC connection configuration:
+```ts
+// polyfills.ts
 
-```js
-import { ReactNativeTransport } from '@improbable-eng/grpc-web-react-native-transport';
-global.VIAM = {
-  GRPC_TRANSPORT_FACTORY: ReactNativeTransport,
+// From https://raw.githubusercontent.com/connectrpc/examples-es/refs/heads/main/react-native
+// No polyfills needed for web
+export function polyfills() {}
+```
+
+### Transport
+
+Communicating with your Viam machine in React Native requires the use of a custom transport. You can find it in the examples directory at [transport.ts](/examples/react-native/transport.ts). You can copy that file as is and put it in your project's root directory (sibling to the `polyfill` files).
+
+## Configuration
+
+### `App.tsx`
+
+You will also have to update your `App.tsx` to import and install the `polyfills` and update the Viam transport factory.
+
+```tsx
+// App.tsx
+
+// React imports here
+// e.g.
+// import React, { useState } from 'react';
+
+// ADD THE FOLLOWING LINES
+import * as VIAM from '@viamrobotics/sdk';
+import { polyfills } from './polyfills';
+polyfills();
+
+import { GrpcWebTransportOptions } from '@connectrpc/connect-web';
+import { createXHRGrpcWebTransport } from './transport';
+
+globalThis.VIAM = {
+  GRPC_TRANSPORT_FACTORY: (opts: GrpcWebTransportOptions) => {
+    return createXHRGrpcWebTransport(opts);
+  },
 };
 ```
 
-Your final `index.js` might look something like this:
-
-```js
-/** @format */
-
-import 'react-native-url-polyfill/auto';
-
-import { registerGlobals } from 'react-native-webrtc';
-registerGlobals();
-
-import { ReactNativeTransport } from '@improbable-eng/grpc-web-react-native-transport';
-global.VIAM = {
-  GRPC_TRANSPORT_FACTORY: ReactNativeTransport,
-};
-
-import { AppRegistry } from 'react-native';
-import App from './App';
-import { name as appName } from './app.json';
-
-AppRegistry.registerComponent(appName, () => App);
-```
-
-#### `metro.config.js`
+### `metro.config.js`
 
 In addition, your `metro.config.js` file needs to be updated as well. `react-native` and `react-native-webrtc` require conflicting versions of the library `event-target-shim`. Because of that, we need to tell the Metro Bundler to package this library properly. The following is a full example of what the `metro.config.js` file could look like. If you have made any changes yourself to the bundler, yours will look different.
 
@@ -127,8 +166,7 @@ To use the SDK, you can use similar instructions to those found on the [document
 ```tsx
 // App.tsx
 
-import React, { PropsWithoutRef } from 'react';
-import { useState } from 'react';
+import React, { PropsWithoutRef, useState } from 'react';
 import {
   Button,
   FlatList,
@@ -140,6 +178,17 @@ import {
 } from 'react-native';
 
 import * as VIAM from '@viamrobotics/sdk';
+import { polyfills } from './polyfills';
+polyfills();
+
+import { GrpcWebTransportOptions } from '@connectrpc/connect-web';
+import { createXHRGrpcWebTransport } from './transport';
+
+globalThis.VIAM = {
+  GRPC_TRANSPORT_FACTORY: (opts: GrpcWebTransportOptions) => {
+    return createXHRGrpcWebTransport(opts);
+  },
+};
 
 type ResourceNameViewProps = PropsWithoutRef<{
   resourceName: VIAM.ResourceName;
@@ -163,19 +212,23 @@ function App(): React.JSX.Element {
   const [resourceNames, setResourceNames] = useState<VIAM.ResourceName[]>([]);
 
   async function connect() {
-    const host = 'YOUR_HOST';
-    const client = await VIAM.createRobotClient({
-      host,
-      credential: {
-        type: 'api-key',
-        payload: 'YOUR_API_KEY',
-      },
-      authEntity: 'YOUR_API_KEY_ID',
-      signalingAddress: 'https://app.viam.com:443',
-    });
-    setConnected(true);
-    const rns = await client.resourceNames();
-    setResourceNames(rns.sort((a, b) => (a.name < b.name ? -1 : 1)));
+    const host = 'test4-main.hrsdzs2gp3.viam.cloud';
+    try {
+      const client = await VIAM.createRobotClient({
+        host,
+        credentials: {
+          type: 'api-key',
+          authEntity: '2f862d8c-7824-4f1f-aca1-0a9fab38506a',
+          payload: '4ft2ch1zdxsjyj5trn4ppq4rk7crj2jc',
+        },
+        signalingAddress: 'https://app.viam.com:443',
+      });
+      setConnected(true);
+      const rns = await client.resourceNames();
+      setResourceNames(rns.sort((a, b) => (a.name < b.name ? -1 : 1)));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
