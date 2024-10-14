@@ -10,7 +10,6 @@ Build and connect to robots with TypeScript
 
 > **Warning**
 > This is a beta release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
-> TS SDK only works in a browser environment.
 
 ## Usage
 
@@ -28,12 +27,16 @@ npm install @viamrobotics/sdk
 
 [https://ts.viam.dev](https://ts.viam.dev/)
 
+## Node
+
+To use this SDK with node, read the [documentation](/Node.md) or view the [example](/examples/node/)
+
 ## React Native
 
 To use this SDK with React Native, read the [documentation](/ReactNative.md) or view the [example](/examples/react-native/)
 
 ## License
 
-Copyright 2022-2023 Viam Inc.
+Copyright 2022-2024 Viam Inc.
 
 Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE) file

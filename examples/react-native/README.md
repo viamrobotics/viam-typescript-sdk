@@ -35,7 +35,7 @@ The following direct dependencies are required:
 - react-native-webrtc
 - web-streams-polyfill
 
-In addition, polyfills and a custom gRPC Transport are provided at `polyfills.[native].ts` and `transport.ts` respectively.
+In addition, polyfills and a custom gRPC Transport are provided at `polyfills.native.ts` and `transport.ts` respectively.
 
 #### `App.tsx`
 
@@ -44,12 +44,12 @@ The `App.tsx` file was updated to include the following polyfills and updates:
 - Polyfills:
 
   ```js
-  import { polyfills } from "./polyfills";
+  import {polyfills} from './polyfills';
   polyfills();
-
   ```
 
 - GRPC connection configuration
+
   ```js
   import { GrpcWebTransportOptions } from "@connectrpc/connect-web";
   import { createXHRGrpcWebTransport } from './transport';
