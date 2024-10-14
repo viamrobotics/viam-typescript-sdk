@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { EncoderService } from '../../gen/component/encoder/v1/encoder_connect';
 import {
   GetPositionRequest,
@@ -20,6 +20,7 @@ export class EncoderClient implements Encoder {
   private client: PromiseClient<typeof EncoderService>;
   private readonly name: string;
   private readonly options: Options;
+  public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(EncoderService);
@@ -27,7 +28,7 @@ export class EncoderClient implements Encoder {
     this.options = options;
   }
 
-  async resetPosition(extra = {}) {
+  async resetPosition(extra = {}, callOptions = this.callOptions) {
     const request = new ResetPositionRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -35,10 +36,10 @@ export class EncoderClient implements Encoder {
 
     this.options.requestLogger?.(request);
 
-    await this.client.resetPosition(request);
+    await this.client.resetPosition(request, callOptions);
   }
 
-  async getProperties(extra = {}) {
+  async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -46,12 +47,13 @@ export class EncoderClient implements Encoder {
 
     this.options.requestLogger?.(request);
 
-    return this.client.getProperties(request);
+    return this.client.getProperties(request, callOptions);
   }
 
   async getPosition(
     positionType: EncoderPositionType = EncoderPositionType.UNSPECIFIED,
-    extra = {}
+    extra = {},
+    callOptions = this.callOptions
   ) {
     const request = new GetPositionRequest({
       name: this.name,
@@ -61,16 +63,20 @@ export class EncoderClient implements Encoder {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getPosition(request);
+    const response = await this.client.getPosition(request, callOptions);
     return [response.value, response.positionType] as const;
   }
 
-  async doCommand(command: Struct): Promise<JsonValue> {
+  async doCommand(
+    command: Struct,
+    callOptions = this.callOptions
+  ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
-      this.options
+      this.options,
+      callOptions
     );
   }
 }

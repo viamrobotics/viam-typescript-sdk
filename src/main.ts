@@ -439,6 +439,12 @@ export * as commonApi from './gen/common/v1/common_pb';
 
 export * from './types';
 
-export { doCommandFromClient } from './utils';
+export {
+  addMetadata,
+  deleteMetadata,
+  disableDebugLogging,
+  doCommandFromClient,
+  enableDebugLogging,
+} from './utils';
 
 export { MachineConnectionEvent } from './events';
