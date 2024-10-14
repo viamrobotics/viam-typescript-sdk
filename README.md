@@ -10,7 +10,6 @@ Build and connect to robots with TypeScript
 
 > **Warning**
 > This is a beta release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
-> TS SDK only works in a browser environment.
 
 ## Usage
 
