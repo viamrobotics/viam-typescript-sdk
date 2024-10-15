@@ -1,6 +1,6 @@
 import type { JsonValue, Struct } from '@bufbuild/protobuf';
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
-import { GenericService } from '../../gen/component/generic/v1/generic_connect';
+import { GenericService } from '../../gen/service/generic/v1/generic_connect';
 import { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
