@@ -402,7 +402,7 @@ export const dialWebRTC = async (
     if (dialOpts?.dialTimeout !== undefined) {
       setTimeout(() => {
         if (!successful) {
-          exchange.terminate();
+          exchange.terminate(new Error('timed out'));
         }
       }, dialOpts.dialTimeout);
     }

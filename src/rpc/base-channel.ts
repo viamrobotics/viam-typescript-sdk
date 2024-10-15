@@ -40,10 +40,6 @@ export class BaseChannel {
     });
   }
 
-  public close() {
-    this.closeWithReason(undefined);
-  }
-
   public isClosed() {
     return this.closed;
   }
@@ -52,7 +48,7 @@ export class BaseChannel {
     return this.closedReason;
   }
 
-  protected closeWithReason(err?: Error) {
+  public closeWithReason(err: Error) {
     if (this.closed) {
       return;
     }
