@@ -73,7 +73,7 @@ export class SignalingExchange {
       .then(() => {
         this.exchangeDone = true;
       })
-      .catch(console.error); // eslint-disable-line no-console
+      .catch(console.error);
 
     // Initiate now the call now that all of our handlers are setup.
     const callResponses = this.signalingClient.call(callRequest, this.callOpts);
@@ -127,8 +127,8 @@ export class SignalingExchange {
     }
   }
 
-  public terminate() {
-    this.clientChannel.close();
+  public terminate(err: Error) {
+    this.clientChannel.closeWithReason(err);
   }
 
   private async processCallResponses(
