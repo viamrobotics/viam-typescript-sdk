@@ -1,6 +1,8 @@
-import VIAM = require('@viamrobotics/sdk');
-import wrtc = require('node-datachannel/polyfill');
-import connectNode = require('@connectrpc/connect-node');
+const VIAM = require('@viamrobotics/sdk');
+const wrtc = require('node-datachannel/polyfill');
+const connectNode = require('@connectrpc/connect-node');
+
+// @ts-expect-error
 globalThis.VIAM = {
   GRPC_TRANSPORT_FACTORY: (opts: any) =>
     connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
@@ -12,7 +14,7 @@ for (const key in wrtc) {
 async function connect() {
   const host = process.env.HOST;
   const apiKeyId = process.env.API_KEY_ID;
-  const apiKeySecret = process.env.API_KEY_SECRET;
+  const apiKeySecret = process.env.API_KEY;
   if (!host) {
     throw new Error('must set HOST env var');
   }

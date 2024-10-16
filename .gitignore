@@ -116,3 +116,5 @@ docs/dist
 src/api-version.ts
 
 *.DS_Store
+
+playwright-report/
