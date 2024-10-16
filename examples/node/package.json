@@ -15,11 +15,12 @@
     "set-value": ">=4.0.1",
     "ts-loader": "^8.0.14",
     "ts-protoc-gen": "^0.14.0",
+    "tsx": "^4.19.1",
     "typescript": "^5.2.2"
   },
   "scripts": {
     "preinstall": "make -C ../.. build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx tsc && node --env-file=.env src/main.js"
+    "start": "tsx --env-file=.env src/main.ts"
   }
 }
