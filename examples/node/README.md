@@ -1,10 +1,10 @@
-# Viam SDK Quickstart - Node
+# Viam SDK Quickstart - Node.js
 
 This example demonstrates how to connect to a machine using Node.js.
 
 ## Usage
 
-You must have a `.env` file in this directory with the following connection info which can be easily found in the TypeScript code sample for your machine.
+You must have a `.env` file in this directory with the following connection info which can be easily found in the TypeScript code sample for your machine. Use the `authEntity` value from the Code Sample as the `API_KEY_ID` and the `payload` value as the `API_KEY`.
 
 ```
 HOST="<HOST>"
@@ -42,18 +42,18 @@ The `main.ts` file was updated to include the following polyfills and updates:
 - WebRTC Polyfills:
 
   ```js
-import wrtc = require('node-datachannel/polyfill');
-for (const key in wrtc) {
-  (global as any)[key] = (wrtc as any)[key];
-}
+  const wrtc = require('node-datachannel/polyfill');
+  for (const key in wrtc) {
+    (global as any)[key] = (wrtc as any)[key];
+  }
   ```
 
 - GRPC connection configuration
   ```js
-import VIAM = require('@viamrobotics/sdk');
-globalThis.VIAM = {
-  // @ts-ignore
-  GRPC_TRANSPORT_FACTORY: (opts: any) =>
-    connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
-};
+  const VIAM = require('@viamrobotics/sdk');
+  globalThis.VIAM = {
+    // @ts-ignore
+    GRPC_TRANSPORT_FACTORY: (opts: any) =>
+      connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
+  };
   ```

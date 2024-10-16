@@ -1,10 +1,10 @@
-# Node & Viam's TypeScript SDK
+# Node.js & Viam's TypeScript SDK
 
-This document contains detailed instructions on including Viam in your Node project. For a runnable example, see the [examples directory](/examples/node/).
+This document contains detailed instructions on including Viam in your Node.js project. For a runnable example, see the [examples directory](/examples/node/).
 
 ## Requirements
 
-This document assumes you already have Node installed. If not, follow the [instructions](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs) provided by Node.
+This document assumes you already have Node.js >= version 20 installed. If not, follow the [instructions](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs) provided by Node.js.
 
 ### Dependencies
 
@@ -19,12 +19,12 @@ You can use either Yarn or NPM to install the dependencies. This document will u
 
 ### Polyfills
 
-Using the SDK with Node also requires the use of some polyfills. In your application's entrypoint (`main.ts`, `index.ts`, or something similar), you will need to register those polyfills:
+Using the SDK with Node.js also requires the use of some polyfills. In your application's entrypoint (`main.ts`, `index.ts`, or something similar), you will need to register those polyfills:
 
 ```ts
 // main.ts
 
-import wrtc = require('node-datachannel/polyfill');
+const wrtc = require('node-datachannel/polyfill');
 for (const key in wrtc) {
   (global as any)[key] = (wrtc as any)[key];
 }
@@ -32,12 +32,12 @@ for (const key in wrtc) {
 
 ### Transport
 
-Communicating with your Viam machine in Node requires the use of a custom transport. In your app's entrypoint, you will also need to register the custom transport:
+Communicating with your Viam machine in Node.js requires the use of a custom transport. In your app's entrypoint, you will also need to register the custom transport:
 
 ```ts
 // main.ts
 
-import connectNode = require('@connectrpc/connect-node');
+const connectNode = require('@connectrpc/connect-node');
 globalThis.VIAM = {
   GRPC_TRANSPORT_FACTORY: (opts: any) =>
     connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
@@ -51,9 +51,9 @@ To use the SDK, you can use similar instructions to those found on the [document
 ```ts
 // main.ts
 
-import VIAM = require('@viamrobotics/sdk');
-import wrtc = require('node-datachannel/polyfill');
-import connectNode = require('@connectrpc/connect-node');
+const VIAM = require('@viamrobotics/sdk');
+const wrtc = require('node-datachannel/polyfill');
+const connectNode = require('@connectrpc/connect-node');
 globalThis.VIAM = {
   GRPC_TRANSPORT_FACTORY: (opts: any) =>
     connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
