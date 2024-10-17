@@ -46,7 +46,7 @@ globalThis.VIAM = {
 
 ## Using the SDK
 
-To use the SDK, you can use similar instructions to those found on the [documentation site](https://docs.viam.com/build/program/). Below is an example of how you could use the SDK to display a list of resources on the connected device:
+To use the SDK, you can use similar instructions to those found on the [documentation site](https://docs.viam.com/sdks/). Below is an example of how you could use the SDK to display a list of resources on the connected device:
 
 ```ts
 // main.ts
@@ -95,7 +95,7 @@ connect().catch((e) => {
 });
 ```
 
-In the above example, it is assumed that certain environment variables are set (`HOST`, `API_KEY_ID`, and `API_KEY_SECRET`). You can set those in the process or have a `.env` file set them automatically. If you use a `.env.` file, be sure to exclude it from version control.
+In the above example, it is assumed that certain environment variables are set (`HOST`, `API_KEY_ID`, and `API_KEY_SECRET`). You can set those in the process or have a `.env` file set them automatically. If you use a `.env` file, be sure to exclude it from version control.
 
 In your terminal, you can run:
 

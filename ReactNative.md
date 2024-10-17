@@ -161,7 +161,7 @@ Some of the new dependencies install platform-specific plugins. Be sure to run `
 
 ## Using the SDK
 
-To use the SDK, you can use similar instructions to those found on the [documentation site](https://docs.viam.com/build/program/). Below is an example of how you could use the SDK to display a list of resources on the connected device:
+To use the SDK, you can use similar instructions to those found on the [documentation site](https://docs.viam.com/sdks/). Below is an example of how you could use the SDK to display a list of resources on the connected device:
 
 ```tsx
 // App.tsx
