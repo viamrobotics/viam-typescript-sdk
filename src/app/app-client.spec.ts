@@ -1256,6 +1256,35 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('listMachineFragment tests', () => {
+    let request: pb.ListMachineFragmentsRequest;
+    const response = [fragment];
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          listMachineFragments: (req) => {
+            request = req;
+            return new pb.ListMachineFragmentsResponse({
+              fragments: response,
+            });
+          },
+        });
+      });
+    });
+
+    it('listMachineFragments', async () => {
+      const machineId = 'MACHINE_ID';
+      const additionalFragmentIds = ['FRAGMENT ID 1', 'FRAGMENT ID 2'];
+      const resp = await subject().listMachineFragments(
+        machineId,
+        additionalFragmentIds
+      );
+      expect(request.machineId).toEqual(machineId);
+      expect(request.additionalFragmentIds).toEqual(additionalFragmentIds);
+      expect(resp).toEqual(response);
+    });
+  });
+
   describe('addRole tests', () => {
     const expectedRequest = new pb.AddRoleRequest({
       authorization,

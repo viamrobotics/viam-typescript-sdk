@@ -1,9 +1,5 @@
 import type { Struct } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  type PromiseClient,
-  type Transport,
-} from '@connectrpc/connect';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
 import {
@@ -114,10 +110,10 @@ export const createPermission = (
 };
 
 export class AppClient {
-  private client: PromiseClient<typeof AppService>;
+  private client: Client<typeof AppService>;
 
   constructor(transport: Transport) {
-    this.client = createPromiseClient(AppService, transport);
+    this.client = createClient(AppService, transport);
   }
 
   /**
@@ -825,6 +821,27 @@ export class AppClient {
    */
   async deleteFragment(id: string) {
     await this.client.deleteFragment({ id });
+  }
+
+  /**
+   * @param machineId The machine ID used to filter fragments defined in a
+   *   machine's parts. Also returns any fragments nested within the fragments
+   *   defined in parts.
+   * @param additionalFragmentIds Additional fragment IDs to append to the
+   *   response. Useful when needing to view fragments that will be
+   *   provisionally added to the machine alongside existing fragments.
+   * @returns The list of top level and nested fragments for a machine, as well
+   *   as additionally specified fragment IDs.
+   */
+  async listMachineFragments(
+    machineId: string,
+    additionalFragmentIds?: string[]
+  ): Promise<Fragment[]> {
+    const resp = await this.client.listMachineFragments({
+      machineId,
+      additionalFragmentIds,
+    });
+    return resp.fragments;
   }
 
   /**
