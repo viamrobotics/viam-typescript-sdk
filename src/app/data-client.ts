@@ -1,4 +1,4 @@
-import { BSON } from 'mongodb';
+// import { BSON } from 'mongodb';
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import {
   createPromiseClient,
@@ -65,7 +65,9 @@ export class DataClient {
       organizationId,
       sqlQuery: query,
     });
-    return resp.rawData.map((bsonBytes) => BSON.deserialize(bsonBytes));
+    return resp.data.map((value) => value.toJson());
+    // return resp.rawData.map((bsonBytes) => BSON.deserialize(bsonBytes));
+
   }
 
   /**
@@ -80,7 +82,8 @@ export class DataClient {
       organizationId,
       mqlBinary: query,
     });
-    return resp.rawData.map((bsonBytes) => BSON.deserialize(bsonBytes));
+    return resp.data.map((value) => value.toJson());
+    // return resp.rawData.map((bsonBytes) => BSON.deserialize(bsonBytes));
   }
 
   /**
