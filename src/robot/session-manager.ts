@@ -1,7 +1,7 @@
 import {
   Code,
   ConnectError,
-  createPromiseClient,
+  createClient,
   type Transport,
 } from '@connectrpc/connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
@@ -32,7 +32,7 @@ export default class SessionManager {
 
   private get client() {
     const transport = this.deferredTransport();
-    return createPromiseClient(RobotService, transport);
+    return createClient(RobotService, transport);
   }
 
   constructor(private deferredTransport: () => Transport) {
@@ -78,6 +78,14 @@ export default class SessionManager {
       try {
         await this.client.sendSessionHeartbeat(sendHeartbeatReq);
       } catch (error) {
+        if (
+          error instanceof ConnectError &&
+          error.code === Code.Unimplemented
+        ) {
+          console.error('sessions unsupported; will not try again'); // eslint-disable-line no-console
+          this.sessionsSupported = false;
+          return;
+        }
         if (
           error instanceof ConnectionClosedError ||
           (error instanceof ConnectError && error.rawMessage === 'closed')
