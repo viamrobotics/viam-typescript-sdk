@@ -1,4 +1,4 @@
-import { BSON } from 'bsonfy'
+import { BSON } from 'bsonfy';
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
