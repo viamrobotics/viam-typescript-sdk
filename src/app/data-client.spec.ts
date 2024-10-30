@@ -124,7 +124,7 @@ describe('DataClient tests', () => {
         'some_sql_query'
       );
       const result = promise as typeof data;
-      expect(result[0].key1).toBeInstanceOf(Date);
+      expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
   });
@@ -152,7 +152,7 @@ describe('DataClient tests', () => {
         new TextEncoder().encode('some_mql_query'),
       ]);
       const result = promise as typeof data;
-      expect(result[0].key1).toBeInstanceOf(Date);
+      expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
   });
