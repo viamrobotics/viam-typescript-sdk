@@ -123,6 +123,8 @@ describe('DataClient tests', () => {
         'some_org_id',
         'some_sql_query'
       );
+      // @ts-ignore
+      expect(promise[0].key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
   });
@@ -149,6 +151,8 @@ describe('DataClient tests', () => {
       const promise = await subject().tabularDataByMQL('some_org_id', [
         new TextEncoder().encode('some_mql_query'),
       ]);
+      // @ts-ignore
+      expect(promise[0].key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
   });
