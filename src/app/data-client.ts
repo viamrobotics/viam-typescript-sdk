@@ -66,7 +66,6 @@ export class DataClient {
       sqlQuery: query,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
-    // return resp.data.map((value) => value.toJson());
   }
 
   /**
@@ -81,7 +80,7 @@ export class DataClient {
       organizationId,
       mqlBinary: query,
     });
-    return resp.data.map((value) => value.toJson());
+    return resp.rawData.map((value) => BSON.deserialize(value));
   }
 
   /**

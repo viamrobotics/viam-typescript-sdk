@@ -72,6 +72,7 @@ import {
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
 import { DataClient, type FilterOptions } from './data-client';
+import { DateTime } from '../gen/google/type/datetime_pb';
 vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
@@ -87,6 +88,7 @@ describe('DataClient tests', () => {
   const lastId = 'lastId';
   const countOnly = true;
   const includeInternalData = false;
+  const startDate = new Date(1, 1, 1, 1, 1, 1);
 
   const binaryId1 = new BinaryID({
     fileId: 'testFileId1',
@@ -100,8 +102,9 @@ describe('DataClient tests', () => {
   });
 
   describe('tabularDataBySQL tests', () => {
-    const data: Record<string, JsonValue>[] = [
-      { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
+    type returnType = JsonValue | Date;
+    const data: Record<string, returnType>[] = [
+      { key1: startDate, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
     ];
 
     beforeEach(() => {
@@ -109,7 +112,6 @@ describe('DataClient tests', () => {
         service(DataService, {
           tabularDataBySQL: () => {
             return new TabularDataBySQLResponse({
-              // data: data.map((x) => Struct.fromJson(x)),
               rawData: data.map((x) => BSON.serialize(x)),
             });
           },
@@ -127,8 +129,9 @@ describe('DataClient tests', () => {
   });
 
   describe('tabularDataByMQL tests', () => {
-    const data: Record<string, JsonValue>[] = [
-      { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
+    type returnType = JsonValue | Date;
+    const data: Record<string, returnType>[] = [
+      { key1: startDate, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
     ];
 
     beforeEach(() => {
@@ -136,7 +139,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           tabularDataByMQL: () => {
             return new TabularDataByMQLResponse({
-              data: data.map((x) => Struct.fromJson(x)),
+              rawData: data.map((x) => BSON.serialize(x)),
             });
           },
         });
