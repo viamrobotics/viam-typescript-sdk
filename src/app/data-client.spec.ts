@@ -72,7 +72,6 @@ import {
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
 import { DataClient, type FilterOptions } from './data-client';
-import { DateTime } from '../gen/google/type/datetime_pb';
 vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
