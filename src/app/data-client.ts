@@ -1,3 +1,4 @@
+import { BSON } from 'bsonfy'
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import {
   createPromiseClient,
@@ -64,7 +65,8 @@ export class DataClient {
       organizationId,
       sqlQuery: query,
     });
-    return resp.data.map((value) => value.toJson());
+    return resp.rawData.map((value) => BSON.deserialize(value));
+    // return resp.data.map((value) => value.toJson());
   }
 
   /**

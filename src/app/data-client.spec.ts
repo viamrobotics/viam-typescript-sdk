@@ -1,3 +1,4 @@
+import { BSON } from 'bsonfy'
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -108,7 +109,8 @@ describe('DataClient tests', () => {
         service(DataService, {
           tabularDataBySQL: () => {
             return new TabularDataBySQLResponse({
-              data: data.map((x) => Struct.fromJson(x)),
+              // data: data.map((x) => Struct.fromJson(x)),
+              rawData: data.map((x) => BSON.serialize(x)),
             });
           },
         });
