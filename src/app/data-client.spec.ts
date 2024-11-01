@@ -1,3 +1,4 @@
+import { BSON } from 'bsonfy';
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -86,6 +87,7 @@ describe('DataClient tests', () => {
   const lastId = 'lastId';
   const countOnly = true;
   const includeInternalData = false;
+  const startDate = new Date(1, 1, 1, 1, 1, 1);
 
   const binaryId1 = new BinaryID({
     fileId: 'testFileId1',
@@ -99,8 +101,9 @@ describe('DataClient tests', () => {
   });
 
   describe('tabularDataBySQL tests', () => {
-    const data: Record<string, JsonValue>[] = [
-      { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
+    type returnType = JsonValue | Date;
+    const data: Record<string, returnType>[] = [
+      { key1: startDate, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
     ];
 
     beforeEach(() => {
@@ -108,7 +111,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           tabularDataBySQL: () => {
             return new TabularDataBySQLResponse({
-              data: data.map((x) => Struct.fromJson(x)),
+              rawData: data.map((x) => BSON.serialize(x)),
             });
           },
         });
@@ -120,13 +123,16 @@ describe('DataClient tests', () => {
         'some_org_id',
         'some_sql_query'
       );
+      const result = promise as typeof data;
+      expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
   });
 
   describe('tabularDataByMQL tests', () => {
-    const data: Record<string, JsonValue>[] = [
-      { key1: 1, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
+    type returnType = JsonValue | Date;
+    const data: Record<string, returnType>[] = [
+      { key1: startDate, key2: '2', key3: [1, 2, 3], key4: { key4sub1: 1 } },
     ];
 
     beforeEach(() => {
@@ -134,7 +140,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           tabularDataByMQL: () => {
             return new TabularDataByMQLResponse({
-              data: data.map((x) => Struct.fromJson(x)),
+              rawData: data.map((x) => BSON.serialize(x)),
             });
           },
         });
@@ -145,6 +151,8 @@ describe('DataClient tests', () => {
       const promise = await subject().tabularDataByMQL('some_org_id', [
         new TextEncoder().encode('some_mql_query'),
       ]);
+      const result = promise as typeof data;
+      expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
   });
