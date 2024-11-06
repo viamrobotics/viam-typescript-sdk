@@ -90,12 +90,16 @@ describe('moveOnGlobe', () => {
           type: 'component',
           subtype: 'base',
           name: 'myBase',
+          remotePath: [],
+          localName: '',
         },
         {
           namespace: 'viam',
           type: 'component',
           subtype: 'movementsensor',
           name: 'myMovementsensor',
+          remotePath: [],
+          localName: '',
         }
       )
     ).resolves.toStrictEqual(testExecutionId);
