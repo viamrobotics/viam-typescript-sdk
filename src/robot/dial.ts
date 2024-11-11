@@ -81,6 +81,7 @@ export interface DialWebRTCConf {
   reconnectMaxWait?: number;
   reconnectAbortSignal?: { abort: boolean };
   // WebRTC
+  serviceHost?: string;
   signalingAddress: string;
   iceServers?: ICEServer[];
   priority?: number;
@@ -94,7 +95,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   // eslint-disable-next-line no-console
   console.debug('dialing via WebRTC...');
 
-  const impliedURL = conf.host;
+  const impliedURL = conf.serviceHost ?? conf.host;
   const { signalingAddress } = conf;
   const iceServers = conf.iceServers ?? [];
 
