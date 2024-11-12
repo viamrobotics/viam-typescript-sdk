@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "prebuild": "node ./scripts/write-versions",
+    "prebuild": "node ./scripts/write-versions.js",
     "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
     "build:bundle": "vite build",
     "build:types": "tsc --project tsconfig.build.json",
