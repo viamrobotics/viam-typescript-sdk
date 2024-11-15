@@ -1,4 +1,4 @@
-const fs = require('node:fs');
+import fs from 'node:fs';
 
 const apiVersion = fs.readFileSync('./api_version.lock').toString().trim();
 fs.writeFileSync(
