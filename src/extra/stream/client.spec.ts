@@ -17,7 +17,7 @@ import { StreamService } from '../../gen/stream/v1/stream_connect';
 import {
   AddStreamResponse,
   GetStreamOptionsResponse,
-  SetStreamOptionsResponse
+  SetStreamOptionsResponse,
 } from '../../gen/stream/v1/stream_pb';
 import { StreamClient } from './client';
 
@@ -151,7 +151,7 @@ describe('StreamClient', () => {
           return new GetStreamOptionsResponse({
             resolutions: Array.from({ length: 5 }, () => ({})),
           });
-        }
+        },
       });
     });
     streamClient = new StreamClient(robotClient);
@@ -179,7 +179,7 @@ describe('StreamClient', () => {
       service(StreamService, {
         setStreamOptions: () => {
           return new SetStreamOptionsResponse();
-        }
+        },
       });
     });
 
@@ -204,8 +204,7 @@ describe('StreamClient', () => {
     await expect(
       streamClient.setOptions(fakeCamName, 1920, 1080)
     ).rejects.toThrow(ConnectError.from(error));
-  })
-
+  });
 
   it('resetOptions does not throw if SetStreamOptions succeeds', async () => {
     const fakeCamName = 'fakecam';
@@ -213,12 +212,14 @@ describe('StreamClient', () => {
       service(StreamService, {
         setStreamOptions: () => {
           return new SetStreamOptionsResponse();
-        }
+        },
       });
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(streamClient.resetOptions(fakeCamName)).resolves.toBeUndefined();
+    await expect(
+      streamClient.resetOptions(fakeCamName)
+    ).resolves.toBeUndefined();
   });
 
   it('resetOptions throws error if SetStreamOptions fails', async () => {
@@ -233,6 +234,8 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(ConnectError.from(error));
+    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(
+      ConnectError.from(error)
+    );
   });
 });

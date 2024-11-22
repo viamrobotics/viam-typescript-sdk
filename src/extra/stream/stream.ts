@@ -1,6 +1,4 @@
-import {
-  Resolution
-} from '../../gen/stream/v1/stream_pb';
+import { Resolution } from '../../gen/stream/v1/stream_pb';
 
 export interface Stream {
   /** Add a stream by name. */

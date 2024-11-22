@@ -6,7 +6,7 @@ import {
   RemoveStreamRequest,
   GetStreamOptionsRequest,
   SetStreamOptionsRequest,
-  Resolution
+  Resolution,
 } from '../../gen/stream/v1/stream_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
@@ -88,8 +88,8 @@ export class StreamClient extends EventDispatcher implements Stream {
 
   /**
    * Get the available livestream resolutions for a camera component. If the
-   * stream client cannot find any available resolutions, an empty list
-   * will be returned.
+   * stream client cannot find any available resolutions, an empty list will be
+   * returned.
    *
    * @param resourceName - The name of a camera component.
    * @returns A list of available resolutions for livestreaming.
@@ -128,7 +128,8 @@ export class StreamClient extends EventDispatcher implements Stream {
     const request = new SetStreamOptionsRequest({
       name: getValidSDPTrackName(name),
       resolution: {
-        width, height,
+        width,
+        height,
       },
     });
     this.options.requestLogger?.(request);
