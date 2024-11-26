@@ -14,7 +14,11 @@ import {
 } from '@connectrpc/connect';
 import { EventDispatcher } from '../../events';
 import { StreamService } from '../../gen/stream/v1/stream_connect';
-import { AddStreamResponse } from '../../gen/stream/v1/stream_pb';
+import {
+  AddStreamResponse,
+  GetStreamOptionsResponse,
+  SetStreamOptionsResponse,
+} from '../../gen/stream/v1/stream_pb';
 import { StreamClient } from './client';
 
 let mockTransport: Transport;
@@ -137,5 +141,101 @@ describe('StreamClient', () => {
     );
     expect(addStream).toHaveBeenCalledTimes(2);
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
+  });
+
+  it('getOptions returns an array of resolutions if GetStreamOptions succeeds', async () => {
+    const fakeCamName = 'fakecam';
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        getStreamOptions: () => {
+          return new GetStreamOptionsResponse({
+            resolutions: Array.from({ length: 5 }, () => ({})),
+          });
+        },
+      });
+    });
+    streamClient = new StreamClient(robotClient);
+    await expect(streamClient.getOptions(fakeCamName)).resolves.toHaveLength(5);
+  });
+
+  it('getOptions returns an empty array if GetStreamOptions fails', async () => {
+    const fakeCamName = 'fakecam';
+    const error = new Error('could not get stream options');
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        getStreamOptions: () => {
+          throw ConnectError.from(error);
+        },
+      });
+    });
+
+    streamClient = new StreamClient(robotClient);
+    await expect(streamClient.getOptions(fakeCamName)).resolves.toHaveLength(0);
+  });
+
+  it('setOptions does not throw if SetStreamOptions succeeds', async () => {
+    const fakeCamName = 'fakecam';
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        setStreamOptions: () => {
+          return new SetStreamOptionsResponse();
+        },
+      });
+    });
+
+    streamClient = new StreamClient(robotClient);
+    await expect(
+      streamClient.setOptions(fakeCamName, 1920, 1080)
+    ).resolves.toBeUndefined();
+  });
+
+  it('setOptions throws error if SetStreamOptions fails', async () => {
+    const fakeCamName = 'fakecam';
+    const error = new Error('could not set stream options');
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        setStreamOptions: () => {
+          throw ConnectError.from(error);
+        },
+      });
+    });
+
+    streamClient = new StreamClient(robotClient);
+    await expect(
+      streamClient.setOptions(fakeCamName, 1920, 1080)
+    ).rejects.toThrow(ConnectError.from(error));
+  });
+
+  it('resetOptions does not throw if SetStreamOptions succeeds', async () => {
+    const fakeCamName = 'fakecam';
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        setStreamOptions: () => {
+          return new SetStreamOptionsResponse();
+        },
+      });
+    });
+
+    streamClient = new StreamClient(robotClient);
+    await expect(
+      streamClient.resetOptions(fakeCamName)
+    ).resolves.toBeUndefined();
+  });
+
+  it('resetOptions throws error if SetStreamOptions fails', async () => {
+    const fakeCamName = 'fakecam';
+    const error = new Error('could not set stream options');
+    mockTransport = createRouterTransport(({ service }) => {
+      service(StreamService, {
+        setStreamOptions: () => {
+          throw ConnectError.from(error);
+        },
+      });
+    });
+
+    streamClient = new StreamClient(robotClient);
+    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(
+      ConnectError.from(error)
+    );
   });
 });
