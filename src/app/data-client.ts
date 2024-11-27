@@ -83,6 +83,9 @@ export class DataClient {
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
 
+
+  
+
   /**
    * Filter and get a page of tabular data. The returned metadata might be empty
    * if the metadata index of the data is out of the bounds of the returned
@@ -686,6 +689,42 @@ export class DataClient {
     }
 
     return filter;
+  }
+
+
+
+  /**
+   * Gets the most recent tabular data captured from the specified data source, as long as it was synced within the last year.
+   * 
+   * @param partId The ID of the part that owns the data
+   * @param resourceName The name of the requested resource that captured the data
+   * @param resourceSubtype The subtype of the requested resource that captured the data
+   * @param methodName The data capture method name
+   * @returns A tuple containing [timeCaptured, timeSynced, payload] or null if no data has been synced
+   */
+  async getLatestTabularData(
+    partId: string,
+    resourceName: string,
+    resourceSubtype: string,
+    methodName: string
+  ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
+    const resp = await this.dataClient.getLatestTabularData({
+      partId,
+      resourceName,
+      resourceSubtype,
+      methodName,
+    });
+
+    if (!resp.payload) {
+      return null;
+    }
+    
+
+    return [
+      resp.timeCaptured.toDate(),
+      resp.timeSynced.toDate(),
+      resp.payload.toJson() as Record<string, JsonValue>,
+    ];
   }
 }
 
