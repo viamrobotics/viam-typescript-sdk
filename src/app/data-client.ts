@@ -699,14 +699,15 @@ export class DataClient {
    *   the data
    * @param methodName The data capture method name
    * @returns A tuple containing [timeCaptured, timeSynced, payload] or null if
-   *   no data has been synced
+   *   no data has been synced for the specified resource or the most recently
+   *   captured data was over a year ago
    */
   async getLatestTabularData(
     partId: string,
     resourceName: string,
     resourceSubtype: string,
     methodName: string
-  ) {
+  ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
     const resp = await this.dataClient.getLatestTabularData({
       partId,
       resourceName,
