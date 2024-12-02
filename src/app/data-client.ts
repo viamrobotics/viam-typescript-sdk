@@ -714,13 +714,13 @@ export class DataClient {
       methodName,
     });
 
-    if (!resp.payload) {
+    if (!resp.payload || !resp.timeCaptured || !resp.timeSynced) {
       return null;
     }
 
     return [
-      resp.timeCaptured?.toDate(),
-      resp.timeSynced?.toDate(),
+      resp.timeCaptured.toDate(),
+      resp.timeSynced.toDate(),
       resp.payload.toJson() as Record<string, JsonValue>,
     ];
   }
