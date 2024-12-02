@@ -707,7 +707,7 @@ export class DataClient {
     resourceName: string,
     resourceSubtype: string,
     methodName: string
-  ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
+  ) {
     const resp = await this.dataClient.getLatestTabularData({
       partId,
       resourceName,
@@ -721,8 +721,8 @@ export class DataClient {
     
 
     return [
-      resp.timeCaptured.toDate(),
-      resp.timeSynced.toDate(),
+      resp.timeCaptured?.toDate(),
+      resp.timeSynced?.toDate(),
       resp.payload.toJson() as Record<string, JsonValue>,
     ];
   }
