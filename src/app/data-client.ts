@@ -699,7 +699,7 @@ export class DataClient {
    *   the data
    * @param methodName The data capture method name
    * @returns A tuple containing [timeCaptured, timeSynced, payload] or null if
-   *   no data has been synced for the specified resource or the most recently
+   *   no data has been synced for the specified resource OR the most recently
    *   captured data was over a year ago
    */
   async getLatestTabularData(
