@@ -846,7 +846,7 @@ describe('DataClient tests', () => {
             return new GetLatestTabularDataResponse({
               timeCaptured: Timestamp.fromDate(timeCaptured),
               timeSynced: Timestamp.fromDate(timeSynced),
-              payload: Struct.fromJson(payload)
+              payload: Struct.fromJson(payload),
             });
           },
         });
@@ -860,7 +860,7 @@ describe('DataClient tests', () => {
         partId: 'testPartId',
         resourceName: 'testResource',
         resourceSubtype: 'testSubtype',
-        methodName: 'testMethod'
+        methodName: 'testMethod',
       });
 
       const result = await subject().getLatestTabularData(
