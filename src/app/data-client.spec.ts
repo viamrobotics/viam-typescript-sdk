@@ -47,6 +47,8 @@ import {
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
+  GetLatestTabularDataRequest,
+  GetLatestTabularDataResponse,
 } from '../gen/app/data/v1/data_pb';
 import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
 import {
@@ -828,6 +830,67 @@ describe('DataClient tests', () => {
       });
 
       expect(testFilter).toEqual(expectedFilter);
+    });
+  });
+
+  describe('getLatestTabularData tests', () => {
+    const timeCaptured = new Date(2024, 1, 1);
+    const timeSynced = new Date(2024, 1, 2);
+    const payload = { key: 'value' };
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getLatestTabularData: (req) => {
+            capReq = req;
+            return new GetLatestTabularDataResponse({
+              timeCaptured: Timestamp.fromDate(timeCaptured),
+              timeSynced: Timestamp.fromDate(timeSynced),
+              payload: Struct.fromJson(payload),
+            });
+          },
+        });
+      });
+    });
+
+    let capReq: GetLatestTabularDataRequest;
+
+    it('get latest tabular data', async () => {
+      const expectedRequest = new GetLatestTabularDataRequest({
+        partId: 'testPartId',
+        resourceName: 'testResource',
+        resourceSubtype: 'testSubtype',
+        methodName: 'testMethod',
+      });
+
+      const result = await subject().getLatestTabularData(
+        'testPartId',
+        'testResource',
+        'testSubtype',
+        'testMethod'
+      );
+
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual([timeCaptured, timeSynced, payload]);
+    });
+
+    it('returns null when no data available', async () => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getLatestTabularData: () => {
+            return new GetLatestTabularDataResponse({});
+          },
+        });
+      });
+
+      const result = await subject().getLatestTabularData(
+        'testPartId',
+        'testResource',
+        'testSubtype',
+        'testMethod'
+      );
+
+      expect(result).toBeNull();
     });
   });
 });

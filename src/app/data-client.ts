@@ -687,6 +687,44 @@ export class DataClient {
 
     return filter;
   }
+
+  /**
+   * Gets the most recent tabular data captured from the specified data source,
+   * as long as it was synced within the last year.
+   *
+   * @param partId The ID of the part that owns the data
+   * @param resourceName The name of the requested resource that captured the
+   *   data
+   * @param resourceSubtype The subtype of the requested resource that captured
+   *   the data
+   * @param methodName The data capture method name
+   * @returns A tuple containing [timeCaptured, timeSynced, payload] or null if
+   *   no data has been synced for the specified resource OR the most recently
+   *   captured data was over a year ago
+   */
+  async getLatestTabularData(
+    partId: string,
+    resourceName: string,
+    resourceSubtype: string,
+    methodName: string
+  ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
+    const resp = await this.dataClient.getLatestTabularData({
+      partId,
+      resourceName,
+      resourceSubtype,
+      methodName,
+    });
+
+    if (!resp.payload || !resp.timeCaptured || !resp.timeSynced) {
+      return null;
+    }
+
+    return [
+      resp.timeCaptured.toDate(),
+      resp.timeSynced.toDate(),
+      resp.payload.toJson() as Record<string, JsonValue>,
+    ];
+  }
 }
 
 export { type BinaryID, type Order } from '../gen/app/data/v1/data_pb';
