@@ -21,7 +21,7 @@
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "express-session": "^1.18.1",
     "nocache": "^4.0.0"
   },
