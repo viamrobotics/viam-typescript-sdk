@@ -11,8 +11,4 @@ test('check resource names and multiple statuses', async ({ page }) => {
   await expect(resourceNames.getByText('base1')).toHaveCount(1);
   await expect(resourceNames.getByText('servo1')).toHaveCount(1);
   await expect(resourceNames.getByText('builtin')).toHaveCount(1);
-
-  // 3 status iterations * 3 resource names (see main.ts for loop)
-  const statuses = page.getByTestId('statuses').getByTestId('status');
-  await expect(statuses).toHaveCount(9);
 });

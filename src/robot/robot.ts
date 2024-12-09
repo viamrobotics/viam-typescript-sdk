@@ -130,31 +130,6 @@ export interface Robot {
   resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtype[]>;
 
   /**
-   * Get a list of all statuses requested. An empty request signifies all
-   * resources.
-   *
-   * @param resourceNames - The list of resources for which to receive statuses.
-   * @group Status
-   * @alpha
-   */
-  getStatus(resourceNames?: ResourceName[]): Promise<proto.Status[]>;
-
-  /**
-   * Periodically receive the status of all statuses requested. An empty request
-   * signifies all resources.
-   *
-   * @param resourceNames - The list of resources for which to receive statuses.
-   *   Default is [].
-   * @param duration - How often to send a new status. Default is 0.5 seconds.
-   * @group Status
-   * @alpha
-   */
-  streamStatus(
-    resourceNames?: ResourceName[],
-    durationMs?: number
-  ): AsyncIterable<proto.Status[]>;
-
-  /**
    * Call a function when a connection event occurs.
    *
    * Note that direct gRPC connections that disconnect will not emit a
