@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { Duration, type ServiceType } from '@bufbuild/protobuf';
+import { type ServiceType } from '@bufbuild/protobuf';
 import {
   createPromiseClient,
   type PromiseClient,
@@ -26,17 +26,14 @@ import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
   DiscoveryQuery,
   RestartModuleRequest,
-  Status,
   TransformPCDRequest,
   TransformPoseRequest,
 } from '../gen/robot/v1/robot_pb';
 import { MotionService } from '../gen/service/motion/v1/motion_connect';
 import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
-import { SensorsService } from '../gen/service/sensors/v1/sensors_connect';
 import { SLAMService } from '../gen/service/slam/v1/slam_connect';
 import { VisionService } from '../gen/service/vision/v1/vision_connect';
 import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
-import type { ResourceName } from '../types';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
@@ -139,10 +136,6 @@ export class RobotClient extends EventDispatcher implements Robot {
   private motionServiceClient: PromiseClient<typeof MotionService> | undefined;
 
   private visionServiceClient: PromiseClient<typeof VisionService> | undefined;
-
-  private sensorsServiceClient:
-    | PromiseClient<typeof SensorsService>
-    | undefined;
 
   private servoServiceClient: PromiseClient<typeof ServoService> | undefined;
 
@@ -364,13 +357,6 @@ export class RobotClient extends EventDispatcher implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.visionServiceClient;
-  }
-
-  get sensorsService() {
-    if (!this.sensorsServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
-    return this.sensorsServiceClient;
   }
 
   get servoService() {
@@ -609,10 +595,6 @@ export class RobotClient extends EventDispatcher implements Robot {
         VisionService,
         clientTransport
       );
-      this.sensorsServiceClient = createPromiseClient(
-        SensorsService,
-        clientTransport
-      );
       this.servoServiceClient = createPromiseClient(
         ServoService,
         clientTransport
@@ -735,30 +717,6 @@ export class RobotClient extends EventDispatcher implements Robot {
   async resourceRPCSubtypes() {
     const resp = await this.robotService.resourceRPCSubtypes({});
     return resp.resourceRpcSubtypes;
-  }
-
-  // STATUS
-
-  async getStatus(resourceNames: ResourceName[] = []) {
-    const resp = await this.robotService.getStatus({
-      resourceNames,
-    });
-    return resp.status;
-  }
-
-  async *streamStatus(
-    resourceNames: ResourceName[] = [],
-    durationMs = 500
-  ): AsyncIterable<Status[]> {
-    const stream = this.robotService.streamStatus({
-      resourceNames,
-      every: new Duration({
-        nanos: durationMs * 1e6,
-      }),
-    });
-    for await (const val of stream) {
-      yield val.status;
-    }
   }
 
   // MODULES

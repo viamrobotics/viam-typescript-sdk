@@ -247,35 +247,6 @@ export { SensorClient, type Sensor } from './components/sensor';
 export * as sensorApi from './gen/component/sensor/v1/sensor_connect';
 
 /**
- * Raw Protobuf interfaces for a Sensors service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @example
- *
- * ```ts
- * import { grpc } from '@improbable-eng/grpc-web';
- *
- * const client = {}; // replace with a connected robot client
- *
- * const request = new sensorsApi.GetSensorsRequest();
- * request.setName('mysensors');
- *
- * client.sensorsService.getSensors(
- *   request,
- *   new grpc.Metadata(),
- *   (error, response) => {
- *     // do something with error or response
- *   }
- * );
- * ```
- *
- * @alpha
- * @group Raw Protobufs
- */
-export * as sensorsApi from './gen/service/sensors/v1/sensors_pb';
-
-/**
  * Raw Protobuf interfaces for a Stream.
  *
  * Generated with https://github.com/connectrpc/connect-es
