@@ -17,26 +17,6 @@ const main = async () => {
     resNamesDiv.append(resNameDiv);
   }
   document.body.append(resNamesDiv);
-
-  const stream = machine.streamStatus(resourceNames);
-  const statusesDiv = document.createElement('div');
-  statusesDiv.dataset.testid = 'statuses';
-
-  let i = 0;
-  for await (const statuses of stream) {
-    for await (const status of statuses) {
-      const statusDiv = document.createElement('div');
-      statusDiv.textContent = status.toJsonString();
-      statusDiv.dataset.testid = 'status';
-      statusesDiv.append(statusDiv);
-    }
-
-    i += 1;
-    if (i >= 3) {
-      break;
-    }
-  }
-  document.body.append(statusesDiv);
 };
 
 main().catch(console.error); // eslint-disable-line no-console
