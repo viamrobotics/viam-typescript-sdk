@@ -28,6 +28,8 @@ import {
   DeleteBinaryDataByFilterResponse,
   DeleteBinaryDataByIDsResponse,
   DeleteTabularDataResponse,
+  ExportTabularDataRequest,
+  ExportTabularDataResponse,
   Filter,
   GetDatabaseConnectionRequest,
   GetDatabaseConnectionResponse,
@@ -100,6 +102,106 @@ describe('DataClient tests', () => {
     fileId: 'testFileId1',
     organizationId: 'testOrgId',
     locationId: 'testLocationId',
+  });
+
+  describe('exportTabularData tests', () => {
+    const sharedAttributes = {
+      partId: 'partId1',
+      resourceName: 'resource1',
+      resourceSubtype: 'resource1:subtype',
+      methodName: 'Readings',
+      organizationId: 'orgId1',
+      locationId: 'locationId1',
+      robotName: 'robot1',
+      robotId: 'robotId1',
+      partName: 'part1',
+      tags: [],
+    }
+    const timeCaptured1 = new Date(2024, 1, 1);
+    const timeCaptured2 = new Date(2024, 1, 2);
+    const tabDataResponse1 = new ExportTabularDataResponse({
+      ...sharedAttributes,
+      methodParameters: Struct.fromJson({ key: 'param1' }),
+      timeCaptured: Timestamp.fromDate(timeCaptured1),
+      payload: Struct.fromJson({ key: 'value1' })
+    });
+    const tabDataResponse2 = new ExportTabularDataResponse({
+      ...sharedAttributes,
+      methodParameters: Struct.fromJson({ key: 'param2' }),
+      timeCaptured: Timestamp.fromDate(timeCaptured2),
+      payload: Struct.fromJson({ key: 'value2' })
+    });
+
+    let capReq: ExportTabularDataRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          exportTabularData: (req) => ({
+            [Symbol.asyncIterator]: async function* () {
+              await new Promise((resolve) => {
+                resolve('');
+              });
+              capReq = req;
+              yield tabDataResponse1;
+              yield tabDataResponse2;
+            }
+          }),
+        });
+      });
+    });
+
+    it('gets tabular data', async () => {
+      const data = await subject().exportTabularData(
+        'partId1',
+        'resource1',
+        'resource1:subtype',
+        'Readings',
+      );
+
+      expect(data.length).toEqual(2);
+      const {
+        methodParameters: methodParameters1,
+        timeCaptured: timeCaptured1,
+        payload: payload1,
+        ...attributes1
+      } = data[0];
+      const {
+        methodParameters: methodParameters2,
+        timeCaptured: timeCaptured2,
+        payload: payload2,
+        ...attributes2
+      } = data[1];
+      expect(attributes1).toMatchObject(sharedAttributes);
+      expect(methodParameters1).toMatchObject({ key: 'param1' });
+      expect(timeCaptured1).toEqual(timeCaptured1);
+      expect(payload1).toMatchObject({ key: 'value1' });
+      expect(attributes2).toMatchObject(sharedAttributes);
+      expect(methodParameters2).toMatchObject({ key: 'param2' });
+      expect(timeCaptured2).toEqual(timeCaptured2);
+      expect(payload2).toMatchObject({ key: 'value2' });
+    });
+
+    it('gets tabular data for an interval', async () => {
+      const data = await subject().exportTabularData(
+        'partId1',
+        'resource1',
+        'resource1:subtype',
+        'Readings',
+        timeCaptured1,
+        timeCaptured2
+      );
+      const expectedRequest = new ExportTabularDataRequest({
+        partId: 'partId1',
+        resourceName: 'resource1',
+        resourceSubtype: 'resource1:subtype',
+        methodName: 'Readings',
+        interval: {
+          start: Timestamp.fromDate(timeCaptured1),
+          end: Timestamp.fromDate(timeCaptured2),
+        }
+      });
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
   });
 
   describe('tabularDataBySQL tests', () => {
