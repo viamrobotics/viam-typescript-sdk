@@ -38,6 +38,22 @@ interface TabularData {
   timeReceived?: Date;
 }
 
+interface TabularDataPoint {
+  partId: string;
+  resourceName: string;
+  resourceSubtype: string;
+  methodName: string;
+  timeCaptured: Date;
+  organizationId: string;
+  locationId: string;
+  robotName: string;
+  robotId: string;
+  partName: string;
+  methodParameters: JsonValue;
+  tags: string[];
+  payload: JsonValue;
+}
+
 export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
@@ -51,6 +67,55 @@ export class DataClient {
     this.dataClient = createPromiseClient(DataService, transport);
     this.datasetClient = createPromiseClient(DatasetService, transport);
     this.dataSyncClient = createPromiseClient(DataSyncService, transport);
+  }
+
+  async exportTabularData(
+    partId: string,
+    resourceName: string,
+    resourceSubtype: string,
+    methodName: string,
+    startTime?: Date,
+    endTime?: Date
+  ) {
+    const interval = new CaptureInterval();
+    if (startTime) {
+      interval.start = Timestamp.fromDate(startTime);
+    }
+    if (endTime) {
+      interval.end = Timestamp.fromDate(endTime);
+    }
+
+    const req = {
+      partId,
+      resourceName,
+      resourceSubtype,
+      methodName,
+      interval,
+    };
+
+    const responses = this.dataClient.exportTabularData(req);
+
+    const dataArray: TabularDataPoint[] = [];
+
+    for await (const response of responses) {
+      dataArray.push({
+        partId: response.partId,
+        resourceName: response.resourceName,
+        resourceSubtype: response.resourceSubtype,
+        methodName: response.methodName,
+        timeCaptured: response.timeCaptured?.toDate(),
+        organizationId: response.organizationId,
+        locationId: response.locationId,
+        robotName: response.robotName,
+        robotId: response.robotId,
+        partName: response.partName,
+        methodParameters: response.methodParameters.toJson(),
+        tags: response.tags,
+        payload: response.payload.toJson(),
+      });
+    }
+
+    return dataArray;
   }
 
   /**
