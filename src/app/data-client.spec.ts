@@ -137,7 +137,7 @@ describe('DataClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(DataService, {
           exportTabularData: (req) => ({
-            [Symbol.asyncIterator]: async function* () {
+            [Symbol.asyncIterator]: async function* generateResponses() {
               await new Promise((resolve) => {
                 resolve('');
               });
@@ -159,30 +159,26 @@ describe('DataClient tests', () => {
       );
 
       expect(data.length).toEqual(2);
-      const {
-        methodParameters: methodParameters1,
+
+      const expectedResponse1 = {
+        ...sharedAttributes,
+        methodParameters: { key: 'param1' },
         timeCaptured: timeCaptured1,
-        payload: payload1,
-        ...attributes1
-      } = data[0];
-      const {
-        methodParameters: methodParameters2,
+        payload: { key: 'value1' },
+      };
+      const expectedResponse2 = {
+        ...sharedAttributes,
+        methodParameters: { key: 'param2' },
         timeCaptured: timeCaptured2,
-        payload: payload2,
-        ...attributes2
-      } = data[1];
-      expect(attributes1).toMatchObject(sharedAttributes);
-      expect(methodParameters1).toMatchObject({ key: 'param1' });
-      expect(timeCaptured1).toEqual(timeCaptured1);
-      expect(payload1).toMatchObject({ key: 'value1' });
-      expect(attributes2).toMatchObject(sharedAttributes);
-      expect(methodParameters2).toMatchObject({ key: 'param2' });
-      expect(timeCaptured2).toEqual(timeCaptured2);
-      expect(payload2).toMatchObject({ key: 'value2' });
+        payload: { key: 'value2' },
+      };
+
+      expect(data[0]).toMatchObject(expectedResponse1);
+      expect(data[1]).toMatchObject(expectedResponse2);
     });
 
     it('gets tabular data for an interval', async () => {
-      const data = await subject().exportTabularData(
+      await subject().exportTabularData(
         'partId1',
         'resource1',
         'resource1:subtype',
@@ -190,6 +186,7 @@ describe('DataClient tests', () => {
         timeCaptured1,
         timeCaptured2
       );
+
       const expectedRequest = new ExportTabularDataRequest({
         partId: 'partId1',
         resourceName: 'resource1',
@@ -200,6 +197,7 @@ describe('DataClient tests', () => {
           end: Timestamp.fromDate(timeCaptured2),
         }
       });
+
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
