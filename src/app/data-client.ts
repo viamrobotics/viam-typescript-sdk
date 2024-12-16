@@ -69,6 +69,19 @@ export class DataClient {
     this.dataSyncClient = createPromiseClient(DataSyncService, transport);
   }
 
+  /**
+   * Obtain unified tabular data and metadata from the specified data source.
+   *
+   * @param partId The ID of the part that owns the data
+   * @param resourceName The name of the requested resource that captured the
+   *   data
+   * @param resourceSubtype The subtype of the requested resource that captured
+   *   the data
+   * @param methodName The data capture method name
+   * @param startTime Optional start time (`Date` object) for requesting a specific range of data
+   * @param endTime Optional end time (`Date` object) for requesting a specific range of data
+   * @returns An array of unified tabular data and metadata.
+   */
   async exportTabularData(
     partId: string,
     resourceName: string,
