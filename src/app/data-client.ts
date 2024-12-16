@@ -43,15 +43,15 @@ interface TabularDataPoint {
   resourceName: string;
   resourceSubtype: string;
   methodName: string;
-  timeCaptured: Date;
+  timeCaptured: Date | undefined;
   organizationId: string;
   locationId: string;
   robotName: string;
   robotId: string;
   partName: string;
-  methodParameters: JsonValue;
+  methodParameters: JsonValue | undefined;
   tags: string[];
-  payload: JsonValue;
+  payload: JsonValue | undefined;
 }
 
 export type Dataset = Partial<PBDataset> & {
@@ -122,9 +122,9 @@ export class DataClient {
         robotName: response.robotName,
         robotId: response.robotId,
         partName: response.partName,
-        methodParameters: response.methodParameters.toJson(),
+        methodParameters: response.methodParameters?.toJson(),
         tags: response.tags,
-        payload: response.payload.toJson(),
+        payload: response.payload?.toJson(),
       });
     }
 
