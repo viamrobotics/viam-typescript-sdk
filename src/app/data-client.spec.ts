@@ -138,9 +138,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           exportTabularData: (req) => ({
             [Symbol.asyncIterator]: async function* generateResponses() {
-              await new Promise((resolve) => {
-                resolve('');
-              });
+              await Promise.resolve();
               capReq = req;
               yield tabDataResponse1;
               yield tabDataResponse2;
