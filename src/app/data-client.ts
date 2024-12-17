@@ -43,15 +43,15 @@ interface TabularDataPoint {
   resourceName: string;
   resourceSubtype: string;
   methodName: string;
-  timeCaptured: Date | undefined;
+  timeCaptured: Date;
   organizationId: string;
   locationId: string;
   robotName: string;
   robotId: string;
   partName: string;
-  methodParameters: JsonValue | undefined;
+  methodParameters: JsonValue;
   tags: string[];
-  payload: JsonValue | undefined;
+  payload: JsonValue;
 }
 
 export type Dataset = Partial<PBDataset> & {
@@ -118,15 +118,15 @@ export class DataClient {
         resourceName: response.resourceName,
         resourceSubtype: response.resourceSubtype,
         methodName: response.methodName,
-        timeCaptured: response.timeCaptured?.toDate(),
+        timeCaptured: response.timeCaptured!.toDate(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         organizationId: response.organizationId,
         locationId: response.locationId,
         robotName: response.robotName,
         robotId: response.robotId,
         partName: response.partName,
-        methodParameters: response.methodParameters?.toJson(),
+        methodParameters: response.methodParameters!.toJson(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         tags: response.tags,
-        payload: response.payload?.toJson(),
+        payload: response.payload!.toJson(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
       });
     }
 
