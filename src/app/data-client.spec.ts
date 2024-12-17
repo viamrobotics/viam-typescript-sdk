@@ -116,20 +116,20 @@ describe('DataClient tests', () => {
       robotId: 'robotId1',
       partName: 'part1',
       tags: [],
-    }
+    };
     const timeCaptured1 = new Date(2024, 1, 1);
     const timeCaptured2 = new Date(2024, 1, 2);
     const tabDataResponse1 = new ExportTabularDataResponse({
       ...sharedAttributes,
       methodParameters: Struct.fromJson({ key: 'param1' }),
       timeCaptured: Timestamp.fromDate(timeCaptured1),
-      payload: Struct.fromJson({ key: 'value1' })
+      payload: Struct.fromJson({ key: 'value1' }),
     });
     const tabDataResponse2 = new ExportTabularDataResponse({
       ...sharedAttributes,
       methodParameters: Struct.fromJson({ key: 'param2' }),
       timeCaptured: Timestamp.fromDate(timeCaptured2),
-      payload: Struct.fromJson({ key: 'value2' })
+      payload: Struct.fromJson({ key: 'value2' }),
     });
 
     let capReq: ExportTabularDataRequest;
@@ -142,7 +142,7 @@ describe('DataClient tests', () => {
               capReq = req;
               yield tabDataResponse1;
               yield tabDataResponse2;
-            }
+            },
           }),
         });
       });
@@ -153,7 +153,7 @@ describe('DataClient tests', () => {
         'partId1',
         'resource1',
         'resource1:subtype',
-        'Readings',
+        'Readings'
       );
 
       expect(data.length).toEqual(2);
@@ -193,7 +193,7 @@ describe('DataClient tests', () => {
         interval: {
           start: Timestamp.fromDate(timeCaptured1),
           end: Timestamp.fromDate(timeCaptured2),
-        }
+        },
       });
 
       expect(capReq).toStrictEqual(expectedRequest);
