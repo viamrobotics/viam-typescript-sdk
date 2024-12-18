@@ -155,10 +155,17 @@ export class DataClient {
    * @param query The MQL query to run as a list of BSON documents
    * @returns An array of data objects
    */
-  async tabularDataByMQL(organizationId: string, query: Uint8Array[]) {
+  async tabularDataByMQL(
+    organizationId: string,
+    query: Uint8Array[] | Record<string, Date | JsonValue>[]
+  ) {
+    const binary: Uint8Array[] =
+      query[0] instanceof Uint8Array
+        ? (query as Uint8Array[])
+        : query.map((value) => BSON.serialize(value));
     const resp = await this.dataClient.tabularDataByMQL({
       organizationId,
-      mqlBinary: query,
+      mqlBinary: binary,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
