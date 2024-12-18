@@ -722,7 +722,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   // MACHINE STATUS
 
   async getMachineStatus() {
-    return await this.robotService.getMachineStatus({});
+    return this.robotService.getMachineStatus({});
   }
 
   // MODULES
