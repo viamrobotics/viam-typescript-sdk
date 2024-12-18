@@ -719,6 +719,12 @@ export class RobotClient extends EventDispatcher implements Robot {
     return resp.resourceRpcSubtypes;
   }
 
+  // MACHINE STATUS
+
+  async getMachineStatus() {
+    return this.robotService.getMachineStatus({});
+  }
+
   // MODULES
 
   async restartModule(moduleId?: string, moduleName?: string) {
