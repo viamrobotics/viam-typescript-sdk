@@ -157,7 +157,7 @@ export class DataClient {
    */
   async tabularDataByMQL(
     organizationId: string,
-    query: Uint8Array[] | Record<string, JsonValue>
+    query: Uint8Array[] | Record<string, Date | JsonValue>[]
   ) {
     const binary: Uint8Array[] =
       query[0] instanceof Uint8Array

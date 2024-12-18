@@ -249,7 +249,7 @@ describe('DataClient tests', () => {
 
     it('get tabular data from MQL', async () => {
       const promise = await subject().tabularDataByMQL('some_org_id', [
-        new TextEncoder().encode('some_mql_query'),
+        { query: 'some_mql_query' },
       ]);
       const result = promise as typeof data;
       expect(result[0]?.key1).toBeInstanceOf(Date);
