@@ -155,7 +155,7 @@ export interface Robot {
    */
   getCloudMetadata(): Promise<CloudMetadata>;
 
-    /**
+  /**
    * Get the current status of the robot.
    *
    * @alpha
