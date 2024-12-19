@@ -156,6 +156,13 @@ export interface Robot {
   getCloudMetadata(): Promise<CloudMetadata>;
 
   /**
+   * Get the current status of the robot.
+   *
+   * @alpha
+   */
+  getMachineStatus(): Promise<proto.GetMachineStatusResponse>;
+
+  /**
    * Restarts a module running on the machine with the given id or name.
    *
    * @param moduleId - The id matching the module_id field of the registry
