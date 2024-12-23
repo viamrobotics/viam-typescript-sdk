@@ -781,10 +781,10 @@ export class DataClient {
    *
    * @param partId The ID of the part that owns the data
    * @param resourceName The name of the requested resource that captured the
-   *   data
+   *   data. Ex: "my-sensor"
    * @param resourceSubtype The subtype of the requested resource that captured
-   *   the data
-   * @param methodName The data capture method name
+   *   the data. Ex: "rdk:component:sensor"
+   * @param methodName The data capture method name. Ex: "Readings"
    * @returns A tuple containing [timeCaptured, timeSynced, payload] or null if
    *   no data has been synced for the specified resource OR the most recently
    *   captured data was over a year ago
