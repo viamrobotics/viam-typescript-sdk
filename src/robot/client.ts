@@ -701,6 +701,13 @@ export class RobotClient extends EventDispatcher implements Robot {
     return resp.discovery;
   }
 
+  // GET MODELS FROM MODULES
+
+  async getModelsFromModules() {
+    const resp = await this.robotService.getModelsFromModules();
+    return resp.model;
+  }
+
   // GET CLOUD METADATA
 
   async getCloudMetadata() {
