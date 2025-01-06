@@ -2,6 +2,12 @@ name: Update Protos + Open PR
 
 on:
   workflow_dispatch:
+    inputs:
+      api_version:
+        description: 'The version number of the API in buf.build'
+        type: string
+        required: true
+
   repository_dispatch:
     types:
       - protos-updated
@@ -16,9 +22,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Update api
+      - name: Update API
+        if: ${{ !inputs.api_version }} # called from outside
         run: |
           echo ${{ github.event.client_payload.tag }} > api_version.lock
+
+      - name: Update API
+        if: ${{ inputs.api_version }} # called manually
+        run: |
+          echo ${{ inputs.api_version }} > api_version.lock
 
       - name: Add + Commit + Open PR
         uses: peter-evans/create-pull-request@v7
