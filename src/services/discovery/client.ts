@@ -7,7 +7,10 @@ import {
 } from '../../gen/service/discovery/v1/discovery_pb';
 import type { RobotClient } from '../../robot';
 import { doCommandFromClient } from '../../utils';
+import type { Options } from '../../types';
 import type { Discovery } from './discovery';
+
+
 
 /**
  * A gRPC-web client for a Vision service.

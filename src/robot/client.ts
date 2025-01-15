@@ -29,6 +29,7 @@ import {
   TransformPCDRequest,
   TransformPoseRequest,
 } from '../gen/robot/v1/robot_pb';
+import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
 import { MotionService } from '../gen/service/motion/v1/motion_connect';
 import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
 import { SLAMService } from '../gen/service/slam/v1/slam_connect';
@@ -132,6 +133,8 @@ export class RobotClient extends EventDispatcher implements Robot {
   private navigationServiceClient:
     | PromiseClient<typeof NavigationService>
     | undefined;
+
+  private discoveryServiceClient: PromiseClient<typeof DiscoveryService> | undefined;
 
   private motionServiceClient: PromiseClient<typeof MotionService> | undefined;
 
@@ -344,7 +347,12 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
     return this.navigationServiceClient;
   }
-
+  get discoveryService() {
+    if (!this.discoveryServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.discoveryServiceClient;
+  }
   get motionService() {
     if (!this.motionServiceClient) {
       throw new Error(RobotClient.notConnectedYetStr);
@@ -601,6 +609,10 @@ export class RobotClient extends EventDispatcher implements Robot {
       );
       this.slamServiceClient = createPromiseClient(
         SLAMService,
+        clientTransport
+      );
+      this.discoveryServiceClient = createPromiseClient(
+        DiscoveryService,
         clientTransport
       );
 
