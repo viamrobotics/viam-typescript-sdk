@@ -183,4 +183,12 @@ export interface Robot {
    * @alpha
    */
   restartModule(moduleId?: string, moduleName?: string): Promise<void>;
+
+  /**
+   * Get version information about the robot, such as platform, version, and api
+   * version.
+   *
+   * @alpha
+   */
+  getVersion(): Promise<proto.GetVersionResponse>;
 }

@@ -744,6 +744,12 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.robotService.getMachineStatus({});
   }
 
+  // VERSION INFO
+
+  async getVersion() {
+    return this.robotService.getVersion({});
+  }
+
   // MODULES
 
   async restartModule(moduleId?: string, moduleName?: string) {
