@@ -45,7 +45,7 @@ export class DiscoveryClient implements Discovery {
       request,
       callOptions
     );
-    return resp.discovery;
+    return resp.discoveries;
   }
 
   async doCommand(
