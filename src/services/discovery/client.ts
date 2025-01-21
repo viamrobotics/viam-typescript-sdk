@@ -29,13 +29,11 @@ export class DiscoveryClient implements Discovery {
   }
 
   async discoverResources(
-    discoveryName: string,
     extra = {},
     callOptions = this.callOptions
   ) {
     const request = new DiscoverResourcesRequest({
       name: this.name,
-      discoveryName,
       extra: Struct.fromJson(extra),
     });
 

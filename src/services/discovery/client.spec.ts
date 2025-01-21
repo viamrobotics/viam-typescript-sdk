@@ -26,7 +26,7 @@ describe('DiscoveryClient Tests', () => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(DiscoveryService, {
         discoverResources: () =>
-          new DiscoverResourcesResponse({ discovery: [discoveries] }),
+          new DiscoverResourcesResponse({ discoveries: [discoveries] }),
       });
     });
 
