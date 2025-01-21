@@ -7,7 +7,6 @@ import {
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
 import {
-  DiscoverResourcesRequest,
   DiscoverResourcesResponse,
 } from '../../gen/service/discovery/v1/discovery_pb';
 import { RobotClient } from '../../robot';
