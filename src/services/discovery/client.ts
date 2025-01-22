@@ -34,7 +34,7 @@ export class DiscoveryClient implements Discovery {
   ) {
     const request = new DiscoverResourcesRequest({
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);

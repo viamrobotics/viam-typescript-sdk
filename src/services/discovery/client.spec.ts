@@ -43,7 +43,7 @@ describe('DiscoveryClient Tests', () => {
       const expected = [discoveries];
 
       await expect(
-        discovery.discoverResources('discovery')
+        discovery.discoverResources()
       ).resolves.toStrictEqual(expected);
     });
   });
