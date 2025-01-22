@@ -24,7 +24,8 @@ import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_
 import { ServoService } from '../gen/component/servo/v1/servo_connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
-  DiscoveryQuery, // deprecated, remove on march 10th
+  // DiscoveryQuery deprecated, remove on march 10th
+  DiscoveryQuery,
   GetModelsFromModulesRequest,
   RestartModuleRequest,
   TransformPCDRequest,
@@ -712,7 +713,9 @@ export class RobotClient extends EventDispatcher implements Robot {
   // DISCOVERY - deprecated, remove on march 10th
 
   async discoverComponents(queries: DiscoveryQuery[]) {
-    console.warn("RobotClient.discover_components is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.")
+    console.warn(
+      'RobotClient.discover_components is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.'
+    );
     const resp = await this.robotService.discoverComponents({
       queries,
     });
