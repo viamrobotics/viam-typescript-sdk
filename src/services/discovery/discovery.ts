@@ -10,7 +10,5 @@ export interface Discovery extends Resource {
    * @param discoveryName - The name of the discovery service.
    * @returns - The list of ComponentConfigs.
    */
-  discoverResources: (
-    extra?: Struct
-  ) => Promise<ComponentConfig[]>;
+  discoverResources: (extra?: Struct) => Promise<ComponentConfig[]>;
 }

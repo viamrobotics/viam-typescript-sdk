@@ -120,9 +120,7 @@ export interface Robot {
    * @group ComponentConfig
    * @alpha
    */
-  getModelsFromModules(
-    
-  ): Promise<ModuleModel[]>;
+  getModelsFromModules(): Promise<ModuleModel[]>;
 
   /**
    * Get a list of all resources on the robot.

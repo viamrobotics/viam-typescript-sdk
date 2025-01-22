@@ -6,9 +6,7 @@ import {
 } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
-import {
-  DiscoverResourcesResponse,
-} from '../../gen/service/discovery/v1/discovery_pb';
+import { DiscoverResourcesResponse } from '../../gen/service/discovery/v1/discovery_pb';
 import { RobotClient } from '../../robot';
 import { DiscoveryClient } from './client';
 import { ComponentConfig } from '../../gen/app/v1/robot_pb';
@@ -35,16 +33,19 @@ describe('DiscoveryClient Tests', () => {
       .mockImplementation(() =>
         createPromiseClient(DiscoveryService, mockTransport)
       );
-    discovery = new DiscoveryClient(new RobotClient('host'), discoveryClientName);
+    discovery = new DiscoveryClient(
+      new RobotClient('host'),
+      discoveryClientName
+    );
   });
 
   describe('Discovery Resources Tests', () => {
     it('returns resources from a machine', async () => {
       const expected = [discoveries];
 
-      await expect(
-        discovery.discoverResources()
-      ).resolves.toStrictEqual(expected);
+      await expect(discovery.discoverResources()).resolves.toStrictEqual(
+        expected
+      );
     });
   });
 });

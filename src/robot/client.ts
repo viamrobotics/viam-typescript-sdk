@@ -135,7 +135,9 @@ export class RobotClient extends EventDispatcher implements Robot {
     | PromiseClient<typeof NavigationService>
     | undefined;
 
-  private discoveryServiceClient: PromiseClient<typeof DiscoveryService> | undefined;
+  private discoveryServiceClient:
+    | PromiseClient<typeof DiscoveryService>
+    | undefined;
 
   private motionServiceClient: PromiseClient<typeof MotionService> | undefined;
 
@@ -719,7 +721,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   // GET MODELS FROM MODULES
 
   async getModelsFromModules() {
-    const request = new GetModelsFromModulesRequest({})
+    const request = new GetModelsFromModulesRequest({});
     const resp = await this.robotService.getModelsFromModules(request);
     return resp.models;
   }

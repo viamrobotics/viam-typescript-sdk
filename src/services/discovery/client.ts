@@ -1,15 +1,11 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
-import {
-  DiscoverResourcesRequest,
-} from '../../gen/service/discovery/v1/discovery_pb';
+import { DiscoverResourcesRequest } from '../../gen/service/discovery/v1/discovery_pb';
 import type { RobotClient } from '../../robot';
 import { doCommandFromClient } from '../../utils';
 import type { Options } from '../../types';
 import type { Discovery } from './discovery';
-
-
 
 /**
  * A gRPC-web client for a Vision service.
@@ -28,21 +24,15 @@ export class DiscoveryClient implements Discovery {
     this.options = options;
   }
 
-  async discoverResources(
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async discoverResources(extra = {}, callOptions = this.callOptions) {
     const request = new DiscoverResourcesRequest({
       name: this.name,
-      extra: extra,
+      extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.discoverResources(
-      request,
-      callOptions
-    );
+    const resp = await this.client.discoverResources(request, callOptions);
     return resp.discoveries;
   }
 
