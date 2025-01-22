@@ -33,7 +33,7 @@ export class DiscoveryClient implements Discovery {
     callOptions = this.callOptions
   ) {
     const request = new DiscoverResourcesRequest({
-      discoveryName: this.name,
+      name: this.name,
       extra: Struct.fromJson(extra),
     });
 

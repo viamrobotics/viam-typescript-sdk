@@ -25,6 +25,7 @@ import { ServoService } from '../gen/component/servo/v1/servo_connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
   DiscoveryQuery,
+  GetModelsFromModulesRequest,
   RestartModuleRequest,
   TransformPCDRequest,
   TransformPoseRequest,
@@ -347,12 +348,14 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
     return this.navigationServiceClient;
   }
+
   get discoveryService() {
     if (!this.discoveryServiceClient) {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.discoveryServiceClient;
   }
+
   get motionService() {
     if (!this.motionServiceClient) {
       throw new Error(RobotClient.notConnectedYetStr);
@@ -716,7 +719,8 @@ export class RobotClient extends EventDispatcher implements Robot {
   // GET MODELS FROM MODULES
 
   async getModelsFromModules() {
-    const resp = await this.robotService.getModelsFromModules();
+    const request = new GetModelsFromModulesRequest({})
+    const resp = await this.robotService.getModelsFromModules(request);
     return resp.models;
   }
 
