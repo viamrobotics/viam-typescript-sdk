@@ -28,7 +28,11 @@ export class SwitchClient implements Switch {
     this.options = options;
   }
 
-  async setPosition(position: number, extra = {}, callOptions = this.callOptions) {
+  async setPosition(
+    position: number,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new SetPositionRequest({
       name: this.name,
       position,
@@ -76,4 +80,4 @@ export class SwitchClient implements Switch {
       callOptions
     );
   }
-} 
+}

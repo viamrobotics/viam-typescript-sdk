@@ -11,4 +11,4 @@ export interface Switch extends Resource {
 
   /** Get the total number of positions available on the switch. */
   getNumberOfPositions: (extra?: Struct) => Promise<number>;
-} 
+}
