@@ -104,7 +104,7 @@ export interface Robot {
   ): Promise<Uint8Array>;
 
   /**
-   * Deprecated: v0.38.0, use the Discovery Service APIs instead.
+   * Deprecated: v0.36.0, use the Discovery Service APIs instead.
    *
    * Get the list of discovered component configurations.
    *
