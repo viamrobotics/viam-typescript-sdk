@@ -714,7 +714,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   async discoverComponents(queries: DiscoveryQuery[]) {
     console.warn(
-      'RobotClient.discover_components is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.'
+      'RobotClient.discoverComponents is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.'
     );
     const resp = await this.robotService.discoverComponents({
       queries,
