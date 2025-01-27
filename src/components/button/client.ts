@@ -1,9 +1,7 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { ButtonService } from '../../gen/component/button/v1/button_connect';
-import {
-  PushRequest,
-} from '../../gen/component/button/v1/button_pb';
+import { PushRequest } from '../../gen/component/button/v1/button_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
@@ -49,4 +47,4 @@ export class ButtonClient implements Button {
       callOptions
     );
   }
-} 
+}

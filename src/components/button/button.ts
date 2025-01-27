@@ -5,4 +5,4 @@ import type { Resource } from '../../types';
 export interface Button extends Resource {
   /** Press the button. */
   press: (extra?: Struct) => Promise<void>;
-} 
+}
