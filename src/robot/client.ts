@@ -24,11 +24,14 @@ import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_
 import { ServoService } from '../gen/component/servo/v1/servo_connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
+  // DiscoveryQuery deprecated, remove on march 10th
   DiscoveryQuery,
+  GetModelsFromModulesRequest,
   RestartModuleRequest,
   TransformPCDRequest,
   TransformPoseRequest,
 } from '../gen/robot/v1/robot_pb';
+import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
 import { MotionService } from '../gen/service/motion/v1/motion_connect';
 import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
 import { SLAMService } from '../gen/service/slam/v1/slam_connect';
@@ -131,6 +134,10 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private navigationServiceClient:
     | PromiseClient<typeof NavigationService>
+    | undefined;
+
+  private discoveryServiceClient:
+    | PromiseClient<typeof DiscoveryService>
     | undefined;
 
   private motionServiceClient: PromiseClient<typeof MotionService> | undefined;
@@ -343,6 +350,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.navigationServiceClient;
+  }
+
+  get discoveryService() {
+    if (!this.discoveryServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.discoveryServiceClient;
   }
 
   get motionService() {
@@ -603,6 +617,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         SLAMService,
         clientTransport
       );
+      this.discoveryServiceClient = createPromiseClient(
+        DiscoveryService,
+        clientTransport
+      );
 
       this.emit(MachineConnectionEvent.CONNECTED, {});
     } catch (error) {
@@ -692,13 +710,24 @@ export class RobotClient extends EventDispatcher implements Robot {
     return resp.pointCloudPcd;
   }
 
-  // DISCOVERY
+  // DISCOVERY - deprecated, remove on march 10th
 
   async discoverComponents(queries: DiscoveryQuery[]) {
+    console.warn(
+      'RobotClient.discoverComponents is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.'
+    );
     const resp = await this.robotService.discoverComponents({
       queries,
     });
     return resp.discovery;
+  }
+
+  // GET MODELS FROM MODULES
+
+  async getModelsFromModules() {
+    const request = new GetModelsFromModulesRequest({});
+    const resp = await this.robotService.getModelsFromModules(request);
+    return resp.models;
   }
 
   // GET CLOUD METADATA

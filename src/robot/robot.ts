@@ -3,6 +3,7 @@ import { MachineConnectionEvent } from '../events';
 import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
 import type proto from '../gen/robot/v1/robot_pb';
 import type { ResourceName } from '../types';
+import type { ModuleModel } from '../gen/robot/v1/robot_pb';
 
 export type CloudMetadata = proto.GetCloudMetadataResponse;
 
@@ -103,6 +104,8 @@ export interface Robot {
   ): Promise<Uint8Array>;
 
   /**
+   * Deprecated: v0.36.0, use the Discovery Service APIs instead.
+   *
    * Get the list of discovered component configurations.
    *
    * @param queries - The list of component models to discovery.
@@ -112,6 +115,14 @@ export interface Robot {
   discoverComponents(
     queries: proto.DiscoveryQuery[]
   ): Promise<proto.Discovery[]>;
+
+  /**
+   * Get the list of discovered component configurations.
+   *
+   * @group ComponentConfig
+   * @alpha
+   */
+  getModelsFromModules(): Promise<ModuleModel[]>;
 
   /**
    * Get a list of all resources on the robot.
@@ -173,12 +184,4 @@ export interface Robot {
    * @alpha
    */
   restartModule(moduleId?: string, moduleName?: string): Promise<void>;
-
-  /**
-   * Get version information about the robot, such as platform, version, and api
-   * version.
-   *
-   * @alpha
-   */
-  getVersion(): Promise<proto.GetVersionResponse>;
 }
