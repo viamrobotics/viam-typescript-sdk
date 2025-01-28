@@ -281,6 +281,18 @@ export * as sensorApi from './gen/component/sensor/v1/sensor_connect';
 export { StreamClient, type Stream } from './extra/stream';
 export * as streamApi from './gen/stream/v1/stream_pb';
 
+export { SwitchClient, type Switch } from './components/switch';
+/**
+ * Raw Protobuf interfaces for a Switch component.
+ *
+ * Generated with https://github.com/connectrpc/connect-es
+ *
+ * @deprecated Use {@link SwitchClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export * as switchApi from './gen/component/switch/v1/switch_pb';
+
 /**
  * Raw Protobuf interfaces for a Generic component.
  *
