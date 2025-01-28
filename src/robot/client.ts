@@ -713,6 +713,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   // DISCOVERY - deprecated, remove on march 10th
 
   async discoverComponents(queries: DiscoveryQuery[]) {
+    // eslint-disable-next-line no-console
     console.warn(
       'RobotClient.discoverComponents is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.'
     );

@@ -60,10 +60,7 @@ export const enableDebugLogging = (
 
 export const disableDebugLogging = (opts: CallOptions): void => {
   if (opts.headers) {
-    const { dtname, ...remainingHeaders } = opts.headers as Record<
-      string,
-      string
-    >;
+    const { _, ...remainingHeaders } = opts.headers as Record<string, string>;
     opts.headers = remainingHeaders;
   }
 };
