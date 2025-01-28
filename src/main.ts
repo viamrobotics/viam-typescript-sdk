@@ -1,6 +1,5 @@
 export const version = __VERSION__;
 
-
 export {
   RobotClient,
   RobotClient as Client,
