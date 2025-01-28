@@ -24,7 +24,7 @@ export class ButtonClient implements Button {
     this.options = options;
   }
 
-  async press(extra = {}, callOptions = this.callOptions) {
+  async push(extra = {}, callOptions = this.callOptions) {
     const request = new PushRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
