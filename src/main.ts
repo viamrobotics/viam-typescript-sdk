@@ -66,6 +66,7 @@ export * as dataApi from './gen/app/data/v1/data_pb';
  */
 export { type AppClient } from './app/app-client';
 export * as appApi from './gen/app/v1/app_pb';
+export * as appRobotApi from './gen/app/v1/robot_pb';
 
 /**
  * Raw Protobuf interfaces for ML Training.
