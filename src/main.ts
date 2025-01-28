@@ -152,6 +152,18 @@ export {
 } from './components/board';
 export * as boardApi from './gen/component/board/v1/board_pb';
 
+export { ButtonClient, type Button } from './components/button';
+/**
+ * Raw Protobuf interfaces for a Button component.
+ *
+ * Generated with https://github.com/connectrpc/connect-es
+ *
+ * @deprecated Use {@link ButtonClient} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export * as buttonApi from './gen/component/button/v1/button_pb';
+
 /**
  * Raw Protobuf interfaces for a Camera component.
  *
