@@ -164,6 +164,18 @@ export * as boardApi from './gen/component/board/v1/board_pb';
 export { CameraClient, type Camera, type MimeType } from './components/camera';
 export * as cameraApi from './gen/component/camera/v1/camera_pb';
 
+export { DiscoveryClient, type Discovery } from './services/discovery';
+/**
+ * Raw Protobuf interfaces for a Discovery service.
+ *
+ * Generated with https://github.com/connectrpc/connect-es
+ *
+ * @deprecated Use {@link DiscoveryService} instead.
+ * @alpha
+ * @group Raw Protobufs
+ */
+export * as discoveryApi from './gen/service/discovery/v1/discovery_pb';
+
 /**
  * Raw Protobuf interfaces for an Encoder component.
  *
