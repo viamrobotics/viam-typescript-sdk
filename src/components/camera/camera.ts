@@ -1,3 +1,4 @@
+import type { Struct } from '@bufbuild/protobuf';
 import type {
   DistortionParameters,
   IntrinsicParameters,
@@ -31,7 +32,7 @@ export interface Camera extends Resource {
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
    */
-  getImage: (mimeType?: MimeType) => Promise<Uint8Array>;
+  getImage: (mimeType?: MimeType, extra?: Struct) => Promise<Uint8Array>;
 
   /**
    * Render a frame from a camera to an HTTP response.
@@ -39,10 +40,10 @@ export interface Camera extends Resource {
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
    */
-  renderFrame: (mimeType?: MimeType) => Promise<Blob>;
+  renderFrame: (mimeType?: MimeType, extra?: Struct) => Promise<Blob>;
 
   /** Return a point cloud from a camera. */
-  getPointCloud: () => Promise<Uint8Array>;
+  getPointCloud: (extra?: Struct) => Promise<Uint8Array>;
 
   /** Return the camera properties. */
   getProperties: () => Promise<Properties>;
