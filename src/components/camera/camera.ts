@@ -1,4 +1,4 @@
-import type {  Struct } from '@bufbuild/protobuf';
+import type { Struct } from '@bufbuild/protobuf';
 import type {
   DistortionParameters,
   IntrinsicParameters,

@@ -31,7 +31,11 @@ export class CameraClient implements Camera {
     this.options = options;
   }
 
-  async getImage(mimeType: MimeType = '', extra = {}, callOptions = this.callOptions) {
+  async getImage(
+    mimeType: MimeType = '',
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new GetImageRequest({
       name: this.name,
       mimeType,
@@ -44,7 +48,11 @@ export class CameraClient implements Camera {
     return resp.image;
   }
 
-  async renderFrame(mimeType: MimeType = '', extra = {}, callOptions = this.callOptions) {
+  async renderFrame(
+    mimeType: MimeType = '',
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new RenderFrameRequest({
       name: this.name,
       mimeType,
