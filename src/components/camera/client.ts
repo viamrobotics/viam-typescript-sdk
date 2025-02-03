@@ -1,4 +1,4 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import { type JsonValue, Struct } from '@bufbuild/protobuf';
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
@@ -31,10 +31,11 @@ export class CameraClient implements Camera {
     this.options = options;
   }
 
-  async getImage(mimeType: MimeType = '', callOptions = this.callOptions) {
+  async getImage(mimeType: MimeType = '', extra = {}, callOptions = this.callOptions) {
     const request = new GetImageRequest({
       name: this.name,
       mimeType,
+      extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
@@ -43,10 +44,11 @@ export class CameraClient implements Camera {
     return resp.image;
   }
 
-  async renderFrame(mimeType: MimeType = '', callOptions = this.callOptions) {
+  async renderFrame(mimeType: MimeType = '', extra = {}, callOptions = this.callOptions) {
     const request = new RenderFrameRequest({
       name: this.name,
       mimeType,
+      extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
@@ -55,10 +57,11 @@ export class CameraClient implements Camera {
     return new Blob([resp.data], { type: mimeType });
   }
 
-  async getPointCloud(callOptions = this.callOptions) {
+  async getPointCloud(extra = {}, callOptions = this.callOptions) {
     const request = new GetPointCloudRequest({
       name: this.name,
       mimeType: PointCloudPCD,
+      extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
