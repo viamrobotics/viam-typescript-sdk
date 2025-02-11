@@ -255,6 +255,16 @@ describe('DataClient tests', () => {
       expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
     });
+
+    it('get tabular data from MQL with useRecentData = true', async () => {
+      const promise = await subject().tabularDataByMQL('some_org_id', [
+        { query: 'some_mql_query' },
+      ], true
+    );
+      const result = promise as typeof data;
+      expect(result[0]?.key1).toBeInstanceOf(Date);
+      expect(promise).toEqual(data);
+    });
   });
 
   describe('tabularDataByFilter tests', () => {
