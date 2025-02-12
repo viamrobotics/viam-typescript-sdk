@@ -153,11 +153,14 @@ export class DataClient {
    *
    * @param organizationId The ID of the organization that owns the data
    * @param query The MQL query to run as a list of BSON documents
+   * @param useRecentData Whether to query blob storage or your recent data
+   *   store. Defaults to false
    * @returns An array of data objects
    */
   async tabularDataByMQL(
     organizationId: string,
-    query: Uint8Array[] | Record<string, Date | JsonValue>[]
+    query: Uint8Array[] | Record<string, Date | JsonValue>[],
+    useRecentData?: boolean
   ) {
     const binary: Uint8Array[] =
       query[0] instanceof Uint8Array
@@ -166,6 +169,7 @@ export class DataClient {
     const resp = await this.dataClient.tabularDataByMQL({
       organizationId,
       mqlBinary: binary,
+      useRecentData,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
