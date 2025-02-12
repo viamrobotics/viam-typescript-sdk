@@ -2,7 +2,11 @@ import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import type { MLModel } from './ml-model';
 import { Struct, type Options } from '../../types';
 import type { RobotClient } from '../../robot';
-import { MetadataRequest } from '../../gen/service/mlmodel/v1/mlmodel_pb';
+import {
+  FlatTensors,
+  InferRequest,
+  MetadataRequest,
+} from '../../gen/service/mlmodel/v1/mlmodel_pb';
 import { MLModelService } from '../../gen/service/mlmodel/v1/mlmodel_connect';
 
 export class MLModelClient implements MLModel {
@@ -26,5 +30,21 @@ export class MLModelClient implements MLModel {
     this.options.requestLogger?.(request);
 
     return this.client.metadata(request, callOptions);
+  }
+
+  async infer(
+    inputTensors: FlatTensors,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
+    const request = new InferRequest({
+      name: this.name,
+      inputTensors,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    return this.client.infer(request, callOptions);
   }
 }
