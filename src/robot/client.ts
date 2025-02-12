@@ -41,6 +41,7 @@ import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
 import SessionManager from './session-manager';
+import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 
 interface WebRTCOptions {
   enabled: boolean;
@@ -116,6 +117,10 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private gripperServiceClient:
     | PromiseClient<typeof GripperService>
+    | undefined;
+
+  private mlModelServiceClient:
+    | PromiseClient<typeof MLModelService>
     | undefined;
 
   private movementSensorServiceClient:
@@ -315,6 +320,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.gripperServiceClient;
+  }
+
+  get mlModelService() {
+    if (!this.mlModelServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.mlModelServiceClient;
   }
 
   get movementSensorService() {
@@ -579,6 +591,10 @@ export class RobotClient extends EventDispatcher implements Robot {
       );
       this.gripperServiceClient = createPromiseClient(
         GripperService,
+        clientTransport
+      );
+      this.mlModelServiceClient = createPromiseClient(
+        MLModelService,
         clientTransport
       );
       this.movementSensorServiceClient = createPromiseClient(
