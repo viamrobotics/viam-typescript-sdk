@@ -1,6 +1,6 @@
 export type { MLModel } from './ml-model';
 export { MLModelClient } from './client';
-export {
+export type {
   FlatTensors,
   InferResponse,
   MetadataResponse,
