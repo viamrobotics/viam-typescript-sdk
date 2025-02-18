@@ -11,6 +11,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Camera, MimeType } from './camera';
+import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
 
@@ -29,6 +30,16 @@ export class CameraClient implements Camera {
     this.client = client.createServiceClient(CameraService);
     this.name = name;
     this.options = options;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    const request = new GetGeometriesRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    const response = await this.client.getGeometries(request, callOptions);
+    return response.geometries;
   }
 
   async getImage(
