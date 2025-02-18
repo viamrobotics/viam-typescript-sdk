@@ -18,7 +18,7 @@ import type { InputController, InputControllerEvent } from './input-controller';
  */
 export class InputControllerClient implements InputController {
   private client: PromiseClient<typeof InputControllerService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

@@ -21,7 +21,7 @@ import type { Gantry } from './gantry';
  */
 export class GantryClient implements Gantry {
   private client: PromiseClient<typeof GantryService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

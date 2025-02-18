@@ -19,7 +19,7 @@ import type { Gripper } from './gripper';
  */
 export class GripperClient implements Gripper {
   private client: PromiseClient<typeof GripperService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

@@ -22,7 +22,7 @@ import type { Arm } from './arm';
  */
 export class ArmClient implements Arm {
   private client: PromiseClient<typeof ArmService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
