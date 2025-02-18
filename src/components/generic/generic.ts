@@ -5,4 +5,4 @@ import type { Struct, Resource } from '../../types';
 export interface Generic extends Resource {
   /** Get the geometries of the component in their current configuration */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
-} // eslint-disable-line @typescript-eslint/no-empty-interface
+}
