@@ -1,13 +1,18 @@
 import type { Resource, Struct, Vector3 } from '../../types';
 
 import * as baseApi from '../../gen/component/base/v1/base_pb';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 export type BaseProperties = baseApi.GetPropertiesResponse;
 
 export const { GetPropertiesResponse: BaseProperties } = baseApi;
 
 /** Represents a physical base of a robot. */
+
 export interface Base extends Resource {
+  /** Get the geometries of the component in their current configuration */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Move a base in a straight line by a given distance at a given speed. This
    * method blocks until completed or cancelled.
