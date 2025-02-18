@@ -14,6 +14,7 @@ import type { RobotClient } from '../../robot';
 import type { Options, Pose } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Arm } from './arm';
+import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -46,6 +47,16 @@ export class ArmClient implements Arm {
       throw new Error('no pose');
     }
     return result;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    const request = new GetGeometriesRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    const response = await this.client.getGeometries(request, callOptions);
+    return response.geometries;
   }
 
   async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
