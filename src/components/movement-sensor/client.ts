@@ -24,7 +24,7 @@ import type { MovementSensor } from './movement-sensor';
  */
 export class MovementSensorClient implements MovementSensor {
   private client: PromiseClient<typeof MovementSensorService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

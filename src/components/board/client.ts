@@ -27,7 +27,7 @@ import { type Board, type PowerMode, type Tick } from './board';
  */
 export class BoardClient implements Board {
   private client: PromiseClient<typeof BoardService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

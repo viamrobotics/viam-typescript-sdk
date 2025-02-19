@@ -20,7 +20,7 @@ import type { PowerSensor } from './power-sensor';
 
 export class PowerSensorClient implements PowerSensor {
   private client: PromiseClient<typeof PowerSensorService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

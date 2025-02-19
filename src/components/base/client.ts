@@ -23,7 +23,7 @@ import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
  */
 export class BaseClient implements Base {
   private client: PromiseClient<typeof BaseService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

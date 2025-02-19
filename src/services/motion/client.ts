@@ -33,7 +33,7 @@ import { type Constraints, type MotionConfiguration } from './types';
  */
 export class MotionClient implements Motion {
   private client: PromiseClient<typeof MotionService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

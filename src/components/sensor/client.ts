@@ -15,7 +15,7 @@ import type { Sensor } from './sensor';
  */
 export class SensorClient implements Sensor {
   private client: PromiseClient<typeof SensorService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

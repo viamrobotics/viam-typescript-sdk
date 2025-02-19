@@ -13,7 +13,7 @@ import type { Generic } from './generic';
  */
 export class GenericClient implements Generic {
   private client: PromiseClient<typeof GenericService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

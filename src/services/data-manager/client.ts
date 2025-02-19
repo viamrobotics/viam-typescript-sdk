@@ -9,7 +9,7 @@ import type { DataManager } from './data-manager';
 
 export class DataManagerClient implements DataManager {
   private client: PromiseClient<typeof DataManagerService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

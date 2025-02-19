@@ -14,7 +14,7 @@ import type { Discovery } from './discovery';
  */
 export class DiscoveryClient implements Discovery {
   private client: PromiseClient<typeof DiscoveryService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
