@@ -22,7 +22,7 @@ const PointCloudPCD: MimeType = 'pointcloud/pcd';
  */
 export class CameraClient implements Camera {
   private client: PromiseClient<typeof CameraService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

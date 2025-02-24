@@ -8,6 +8,9 @@ export interface Options {
 }
 
 export interface Resource {
+  /** The name of the resource. */
+  readonly name: string;
+
   /**
    * Send/Receive arbitrary commands to the resource.
    *

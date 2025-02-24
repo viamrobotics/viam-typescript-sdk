@@ -18,7 +18,7 @@ import { EncoderPositionType, type Encoder } from './encoder';
  */
 export class EncoderClient implements Encoder {
   private client: PromiseClient<typeof EncoderService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
