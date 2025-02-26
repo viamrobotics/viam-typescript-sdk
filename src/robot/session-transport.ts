@@ -14,13 +14,13 @@ import {
   type UnaryResponse,
 } from '@connectrpc/connect';
 import { cloneHeaders } from '../rpc/dial';
-import type SessionManager from './session-manager';
+import SessionManager from './session-manager';
 
 export default class SessionTransport implements Transport {
   constructor(
     protected readonly deferredTransport: () => Transport,
     protected readonly sessionManager: SessionManager
-  ) {}
+  ) { }
 
   private async getSessionMetadata(): Promise<Headers> {
     try {
@@ -49,10 +49,13 @@ export default class SessionTransport implements Transport {
     message: PartialMessage<I>,
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> {
-    const md = await this.getSessionMetadata();
     const newHeaders = cloneHeaders(header);
-    for (const [key, value] of md) {
-      newHeaders.set(key, value);
+    const methodPath = `/${service.typeName}/${method.name}`;
+    if (SessionManager.heartbeatMonitoredMethods.has(methodPath)) {
+      const md = await this.getSessionMetadata();
+      for (const [key, value] of md) {
+        newHeaders.set(key, value);
+      }
     }
     return this.deferredTransport().unary(
       service,
@@ -77,10 +80,13 @@ export default class SessionTransport implements Transport {
     input: AsyncIterable<PartialMessage<I>>,
     contextValues?: ContextValues
   ): Promise<StreamResponse<I, O>> {
-    const md = await this.getSessionMetadata();
     const newHeaders = cloneHeaders(header);
-    for (const [key, value] of md) {
-      newHeaders.set(key, value);
+    const methodPath = `/${service.typeName}/${method.name}`;
+    if (SessionManager.heartbeatMonitoredMethods.has(methodPath)) {
+      const md = await this.getSessionMetadata();
+      for (const [key, value] of md) {
+        newHeaders.set(key, value);
+      }
     }
     return this.deferredTransport().stream(
       service,
