@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        # CR erodkin: this part is probably good though
+        with:
+          token: ${{ secrets.REPO_READ_TOKEN }}
 
       - name: Update API
         if: ${{ !inputs.api_version }} # called from outside
@@ -42,6 +45,9 @@ jobs:
           title: Automated Protos Update
           body: This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes
           team-reviewers: sdk-netcode
+          # CR erodkin: not sure this part is actually necessary
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_READ_TOKEN }}
 
       - name: Notify slack of failure
         uses: slackapi/slack-github-action@v1.24.0
