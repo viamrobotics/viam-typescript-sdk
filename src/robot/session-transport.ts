@@ -20,7 +20,7 @@ export default class SessionTransport implements Transport {
   constructor(
     protected readonly deferredTransport: () => Transport,
     protected readonly sessionManager: SessionManager
-  ) { }
+  ) {}
 
   private async getSessionMetadata(): Promise<Headers> {
     try {
