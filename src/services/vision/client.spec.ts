@@ -74,7 +74,7 @@ describe('VisionClient Tests', () => {
             classifications: [classification],
             detections: [detection],
             objects: [pco],
-            extra: extra,
+            extra,
           }),
       });
     });
@@ -157,7 +157,7 @@ describe('VisionClient Tests', () => {
         classifications: [classification],
         detections: [detection],
         objectPointClouds: [pco],
-        extra: extra,
+        extra,
       });
     });
   });
