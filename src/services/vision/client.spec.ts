@@ -4,6 +4,7 @@ import {
   createPromiseClient,
   createRouterTransport,
 } from '@connectrpc/connect';
+import { Struct } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { VisionService } from '../../gen/service/vision/v1/vision_connect';
 import {
@@ -44,6 +45,8 @@ const pco: PointCloudObject = new PointCloudObject({
   geometries: undefined,
 });
 
+const extra: Struct = Struct.fromJson({ key: 'value' });
+
 describe('VisionClient Tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
@@ -71,6 +74,7 @@ describe('VisionClient Tests', () => {
             classifications: [classification],
             detections: [detection],
             objects: [pco],
+            extra,
           }),
       });
     });
@@ -153,6 +157,7 @@ describe('VisionClient Tests', () => {
         classifications: [classification],
         detections: [detection],
         objectPointClouds: [pco],
+        extra,
       });
     });
   });

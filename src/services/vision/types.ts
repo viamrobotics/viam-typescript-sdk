@@ -1,6 +1,6 @@
 import type { Image } from '../../gen/component/camera/v1/camera_pb';
 
-import type { PlainMessage } from '@bufbuild/protobuf';
+import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import * as commonApi from '../../gen/common/v1/common_pb';
 import * as visionApi from '../../gen/service/vision/v1/vision_pb';
 
@@ -34,4 +34,5 @@ export interface CaptureAllResponse {
   classifications: Classification[];
   detections: Detection[];
   objectPointClouds: PointCloudObject[];
+  extra: Struct | undefined;
 }
