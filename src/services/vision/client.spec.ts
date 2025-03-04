@@ -45,7 +45,7 @@ const pco: PointCloudObject = new PointCloudObject({
   geometries: undefined,
 });
 
-const extra: Struct = Struct.fromJson({"key": "value"})
+const extra: Struct = Struct.fromJson({ key: 'value' });
 
 describe('VisionClient Tests', () => {
   beforeEach(() => {
