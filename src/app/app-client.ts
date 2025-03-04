@@ -11,6 +11,10 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
+  GetLocationMetadataResponse,
+  GetOrganizationMetadataResponse,
+  GetRobotMetadataResponse,
+  GetRobotPartMetadataResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   ListOrganizationMembersResponse,
@@ -29,6 +33,10 @@ import {
   RobotPartHistoryEntry,
   RotateKeyResponse,
   RoverRentalRobot,
+  UpdateLocationMetadataResponse,
+  UpdateOrganizationMetadataResponse,
+  UpdateRobotMetadataResponse,
+  UpdateRobotPartMetadataResponse,
   Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
@@ -1174,5 +1182,101 @@ export class AppClient {
     id: string
   ): Promise<CreateKeyFromExistingKeyAuthorizationsResponse> {
     return this.client.createKeyFromExistingKeyAuthorizations({ id });
+  }
+
+  /**
+   * Retrieves user-defined metadata for an organization.
+   *
+   * @param organizationId The ID of the organization
+   * @returns The metadata associated with the organization
+   */
+  async getOrganizationMetadata(organizationId: string): Promise<GetOrganizationMetadataResponse> {
+    return this.client.getOrganizationMetadata({ organizationId });
+  }
+
+  /**
+   * Updates user-defined metadata for an organization.
+   *
+   * @param organizationId The ID of the organization
+   * @param data The metadata to update
+   * @returns Response indicating success or failure
+   */
+  async updateOrganizationMetadata(
+    organizationId: string, 
+    data: Record<string, any>
+  ): Promise<UpdateOrganizationMetadataResponse> {
+    return this.client.updateOrganizationMetadata({ organizationId, data });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a location.
+   *
+   * @param locationId The ID of the location
+   * @returns The metadata associated with the location
+   */
+  async getLocationMetadata(locationId: string): Promise<GetLocationMetadataResponse> {
+    return this.client.getLocationMetadata({ locationId });
+  }
+
+  /**
+   * Updates user-defined metadata for a location.
+   *
+   * @param locationId The ID of the location
+   * @param data The metadata to update
+   * @returns Response indicating success or failure
+   */
+  async updateLocationMetadata(
+    locationId: string, 
+    data: Record<string, any>
+  ): Promise<UpdateLocationMetadataResponse> {
+    return this.client.updateLocationMetadata({ locationId, data });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a robot.
+   *
+   * @param id The ID of the robot
+   * @returns The metadata associated with the robot
+   */
+  async getRobotMetadata(id: string): Promise<GetRobotMetadataResponse> {
+    return this.client.getRobotMetadata({ id });
+  }
+
+  /**
+   * Updates user-defined metadata for a robot.
+   *
+   * @param id The ID of the robot
+   * @param data The metadata to update
+   * @returns Response indicating success or failure
+   */
+  async updateRobotMetadata(
+    id: string, 
+    data: Record<string, any>
+  ): Promise<UpdateRobotMetadataResponse> {
+    return this.client.updateRobotMetadata({ id, data });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a robot part.
+   *
+   * @param id The ID of the robot part
+   * @returns The metadata associated with the robot part
+   */
+  async getRobotPartMetadata(id: string): Promise<GetRobotPartMetadataResponse> {
+    return this.client.getRobotPartMetadata({ id });
+  }
+
+  /**
+   * Updates user-defined metadata for a robot part.
+   *
+   * @param id The ID of the robot part
+   * @param data The metadata to update
+   * @returns Response indicating success or failure
+   */
+  async updateRobotPartMetadata(
+    id: string, 
+    data: Record<string, any>
+  ): Promise<UpdateRobotPartMetadataResponse> {
+    return this.client.updateRobotPartMetadata({ id, data });
   }
 }
