@@ -190,6 +190,7 @@ export class VisionClient implements Vision {
       classifications: response.classifications,
       detections: response.detections,
       objectPointClouds: response.objects,
+      extra: response.extra,
     };
   }
 
