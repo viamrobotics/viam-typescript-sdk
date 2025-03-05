@@ -1190,7 +1190,9 @@ export class AppClient {
    * @param id The ID of the organization
    * @returns The metadata associated with the organization
    */
-  async getOrganizationMetadata(id: string): Promise<GetOrganizationMetadataResponse> {
+  async getOrganizationMetadata(
+    id: string
+  ): Promise<GetOrganizationMetadataResponse> {
     return this.client.getOrganizationMetadata({ organizationId: id });
   }
 
@@ -1202,7 +1204,7 @@ export class AppClient {
    * @returns Response indicating success or failure
    */
   async updateOrganizationMetadata(
-    id: string, 
+    id: string,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateOrganizationMetadataResponse> {
@@ -1227,7 +1229,7 @@ export class AppClient {
    * @returns Response indicating success or failure
    */
   async updateLocationMetadata(
-    id: string, 
+    id: string,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateLocationMetadataResponse> {
@@ -1252,7 +1254,7 @@ export class AppClient {
    * @returns Response indicating success or failure
    */
   async updateRobotMetadata(
-    id: string, 
+    id: string,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateRobotMetadataResponse> {
@@ -1265,7 +1267,9 @@ export class AppClient {
    * @param id The ID of the robot part
    * @returns The metadata associated with the robot part
    */
-  async getRobotPartMetadata(id: string): Promise<GetRobotPartMetadataResponse> {
+  async getRobotPartMetadata(
+    id: string
+  ): Promise<GetRobotPartMetadataResponse> {
     return this.client.getRobotPartMetadata({ id });
   }
 
@@ -1277,7 +1281,7 @@ export class AppClient {
    * @returns Response indicating success or failure
    */
   async updateRobotPartMetadata(
-    id: string, 
+    id: string,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateRobotPartMetadataResponse> {
