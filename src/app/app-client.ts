@@ -40,6 +40,7 @@ import {
   Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
+import { Any } from '@bufbuild/protobuf'; 
 
 /**
  * Creates an Authorization object from auth details.
@@ -1205,8 +1206,7 @@ export class AppClient {
    */
   async updateOrganizationMetadata(
     id: string,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    data: Record<string, any>
+    data: Record<string, Any>
   ): Promise<UpdateOrganizationMetadataResponse> {
     return this.client.updateOrganizationMetadata({ organizationId: id, data });
   }
@@ -1230,8 +1230,7 @@ export class AppClient {
    */
   async updateLocationMetadata(
     id: string,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    data: Record<string, any>
+    data: Record<string, Any>
   ): Promise<UpdateLocationMetadataResponse> {
     return this.client.updateLocationMetadata({ locationId: id, data });
   }
@@ -1255,8 +1254,7 @@ export class AppClient {
    */
   async updateMachineMetadata(
     id: string,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    data: Record<string, any>
+    data: Record<string, Any>
   ): Promise<UpdateRobotMetadataResponse> {
     return this.client.updateRobotMetadata({ id, data });
   }
@@ -1282,8 +1280,7 @@ export class AppClient {
    */
   async updateMachinePartMetadata(
     id: string,
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    data: Record<string, any>
+    data: Record<string, Any>
   ): Promise<UpdateRobotPartMetadataResponse> {
     return this.client.updateRobotPartMetadata({ id, data });
   }
