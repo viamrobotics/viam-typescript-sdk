@@ -1237,23 +1237,23 @@ export class AppClient {
   }
 
   /**
-   * Retrieves user-defined metadata for a robot.
+   * Retrieves user-defined metadata for a machine.
    *
-   * @param id The ID of the robot
-   * @returns The metadata associated with the robot
+   * @param id The ID of the machine
+   * @returns The metadata associated with the machine
    */
-  async getRobotMetadata(id: string): Promise<GetRobotMetadataResponse> {
+  async getMachineMetadata(id: string): Promise<GetRobotMetadataResponse> {
     return this.client.getRobotMetadata({ id });
   }
 
   /**
    * Updates user-defined metadata for a robot.
    *
-   * @param id The ID of the robot
+   * @param id The ID of the machine
    * @param data The metadata to update
    * @returns Response indicating success or failure
    */
-  async updateRobotMetadata(
+  async updateMachineMetadata(
     id: string,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
@@ -1262,25 +1262,25 @@ export class AppClient {
   }
 
   /**
-   * Retrieves user-defined metadata for a robot part.
+   * Retrieves user-defined metadata for a machine part.
    *
-   * @param id The ID of the robot part
-   * @returns The metadata associated with the robot part
+   * @param id The ID of the machine part
+   * @returns The metadata associated with the machine part
    */
-  async getRobotPartMetadata(
+  async getMachinePartMetadata(
     id: string
   ): Promise<GetRobotPartMetadataResponse> {
     return this.client.getRobotPartMetadata({ id });
   }
 
   /**
-   * Updates user-defined metadata for a robot part.
+   * Updates user-defined metadata for a machine part.
    *
-   * @param id The ID of the robot part
+   * @param id The ID of the machine part
    * @param data The metadata to update
    * @returns Response indicating success or failure
    */
-  async updateRobotPartMetadata(
+  async updateMachinePartMetadata(
     id: string,
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
