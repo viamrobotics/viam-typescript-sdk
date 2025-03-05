@@ -1187,49 +1187,49 @@ export class AppClient {
   /**
    * Retrieves user-defined metadata for an organization.
    *
-   * @param organizationId The ID of the organization
+   * @param id The ID of the organization
    * @returns The metadata associated with the organization
    */
-  async getOrganizationMetadata(organizationId: string): Promise<GetOrganizationMetadataResponse> {
-    return this.client.getOrganizationMetadata({ organizationId });
+  async getOrganizationMetadata(id: string): Promise<GetOrganizationMetadataResponse> {
+    return this.client.getOrganizationMetadata({ organizationId: id });
   }
 
   /**
    * Updates user-defined metadata for an organization.
    *
-   * @param organizationId The ID of the organization
+   * @param id The ID of the organization
    * @param data The metadata to update
    * @returns Response indicating success or failure
    */
   async updateOrganizationMetadata(
-    organizationId: string, 
+    id: string, 
     data: Record<string, any>
   ): Promise<UpdateOrganizationMetadataResponse> {
-    return this.client.updateOrganizationMetadata({ organizationId, data });
+    return this.client.updateOrganizationMetadata({ organizationId: id, data });
   }
 
   /**
    * Retrieves user-defined metadata for a location.
    *
-   * @param locationId The ID of the location
+   * @param id The ID of the location
    * @returns The metadata associated with the location
    */
-  async getLocationMetadata(locationId: string): Promise<GetLocationMetadataResponse> {
-    return this.client.getLocationMetadata({ locationId });
+  async getLocationMetadata(id: string): Promise<GetLocationMetadataResponse> {
+    return this.client.getLocationMetadata({ locationId: id });
   }
 
   /**
    * Updates user-defined metadata for a location.
    *
-   * @param locationId The ID of the location
+   * @param id The ID of the location
    * @param data The metadata to update
    * @returns Response indicating success or failure
    */
   async updateLocationMetadata(
-    locationId: string, 
+    id: string, 
     data: Record<string, any>
   ): Promise<UpdateLocationMetadataResponse> {
-    return this.client.updateLocationMetadata({ locationId, data });
+    return this.client.updateLocationMetadata({ locationId: id, data });
   }
 
   /**
