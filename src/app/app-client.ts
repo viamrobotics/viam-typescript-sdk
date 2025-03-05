@@ -40,7 +40,7 @@ import {
   Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
-import { Any } from '@bufbuild/protobuf'; 
+import { Any } from '@bufbuild/protobuf';
 
 /**
  * Creates an Authorization object from auth details.
