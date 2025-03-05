@@ -1203,6 +1203,7 @@ export class AppClient {
    */
   async updateOrganizationMetadata(
     id: string, 
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateOrganizationMetadataResponse> {
     return this.client.updateOrganizationMetadata({ organizationId: id, data });
@@ -1227,6 +1228,7 @@ export class AppClient {
    */
   async updateLocationMetadata(
     id: string, 
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateLocationMetadataResponse> {
     return this.client.updateLocationMetadata({ locationId: id, data });
@@ -1251,6 +1253,7 @@ export class AppClient {
    */
   async updateRobotMetadata(
     id: string, 
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateRobotMetadataResponse> {
     return this.client.updateRobotMetadata({ id, data });
@@ -1275,6 +1278,7 @@ export class AppClient {
    */
   async updateRobotPartMetadata(
     id: string, 
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     data: Record<string, any>
   ): Promise<UpdateRobotPartMetadataResponse> {
     return this.client.updateRobotPartMetadata({ id, data });
