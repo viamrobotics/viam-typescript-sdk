@@ -33,10 +33,6 @@ import {
   RobotPartHistoryEntry,
   RotateKeyResponse,
   RoverRentalRobot,
-  UpdateLocationMetadataResponse,
-  UpdateOrganizationMetadataResponse,
-  UpdateRobotMetadataResponse,
-  UpdateRobotPartMetadataResponse,
   Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
@@ -1202,13 +1198,12 @@ export class AppClient {
    *
    * @param id The ID of the organization
    * @param data The metadata to update
-   * @returns Response indicating success or failure
    */
   async updateOrganizationMetadata(
     id: string,
     data: Record<string, Any>
-  ): Promise<UpdateOrganizationMetadataResponse> {
-    return this.client.updateOrganizationMetadata({ organizationId: id, data });
+  ): Promise<void> {
+    await this.client.updateOrganizationMetadata({ organizationId: id, data });
   }
 
   /**
@@ -1226,13 +1221,12 @@ export class AppClient {
    *
    * @param id The ID of the location
    * @param data The metadata to update
-   * @returns Response indicating success or failure
    */
   async updateLocationMetadata(
     id: string,
     data: Record<string, Any>
-  ): Promise<UpdateLocationMetadataResponse> {
-    return this.client.updateLocationMetadata({ locationId: id, data });
+  ): Promise<void> {
+    await this.client.updateLocationMetadata({ locationId: id, data });
   }
 
   /**
@@ -1250,13 +1244,12 @@ export class AppClient {
    *
    * @param id The ID of the machine
    * @param data The metadata to update
-   * @returns Response indicating success or failure
    */
   async updateMachineMetadata(
     id: string,
     data: Record<string, Any>
-  ): Promise<UpdateRobotMetadataResponse> {
-    return this.client.updateRobotMetadata({ id, data });
+  ): Promise<void> {
+    await this.client.updateRobotMetadata({ id, data });
   }
 
   /**
@@ -1276,12 +1269,11 @@ export class AppClient {
    *
    * @param id The ID of the machine part
    * @param data The metadata to update
-   * @returns Response indicating success or failure
    */
   async updateMachinePartMetadata(
     id: string,
     data: Record<string, Any>
-  ): Promise<UpdateRobotPartMetadataResponse> {
-    return this.client.updateRobotPartMetadata({ id, data });
+  ): Promise<void> {
+    await this.client.updateRobotPartMetadata({ id, data });
   }
 }
