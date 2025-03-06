@@ -104,22 +104,9 @@ export interface Robot {
   ): Promise<Uint8Array>;
 
   /**
-   * Deprecated: v0.36.0, use the Discovery Service APIs instead.
+   * Get the list of models provided by modules on the machine.
    *
-   * Get the list of discovered component configurations.
-   *
-   * @param queries - The list of component models to discovery.
-   * @group Discovery
-   * @alpha
-   */
-  discoverComponents(
-    queries: proto.DiscoveryQuery[]
-  ): Promise<proto.Discovery[]>;
-
-  /**
-   * Get the list of discovered component configurations.
-   *
-   * @group ComponentConfig
+   * @group Resources
    * @alpha
    */
   getModelsFromModules(): Promise<ModuleModel[]>;
