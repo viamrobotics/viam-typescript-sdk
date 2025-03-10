@@ -204,40 +204,61 @@ export default class SessionManager {
   }
 
   private async applyHeartbeatMonitoredMethods(): Promise<void> {
-    const client = createClient(ServerReflection, this.transport);
-    const request = new ServerReflectionRequest({
-      host: this.host,
-      messageRequest: { case: 'listServices', value: '' },
-    });
-    const responseStream = client.serverReflectionInfo(
-      createAsyncIterable([request]),
-      { timeoutMs: 10_000 }
-    );
-    for await (const serviceResponse of responseStream) {
-      const fdpRequests = (
-        serviceResponse.messageResponse.value as ListServiceResponse
-      ).service.map((service) => {
-        return new ServerReflectionRequest({
-          messageRequest: { case: 'fileContainingSymbol', value: service.name },
-        });
+    try {
+      const client = createClient(ServerReflection, this.transport);
+      const request = new ServerReflectionRequest({
+        host: this.host,
+        messageRequest: { case: 'listServices', value: '' },
       });
-      const fdpResponseStream = client.serverReflectionInfo(
-        createAsyncIterable(fdpRequests),
+      const responseStream = client.serverReflectionInfo(
+        createAsyncIterable([request]),
         { timeoutMs: 10_000 }
       );
-      for await (const fdpResponse of fdpResponseStream) {
-        for (const fdp of (
-          fdpResponse.messageResponse.value as FileDescriptorResponse
-        ).fileDescriptorProto) {
-          const protoFile = FileDescriptorProto.fromBinary(fdp);
-          for (const service of protoFile.service) {
-            for (const method of service.method) {
-              SessionManager.heartbeatMonitoredMethods[
-                `/${protoFile.package}.${service.name}/${method.name}`
-              ] = SessionManager.hasHeartbeatOption(method.options);
+      for await (const serviceResponse of responseStream) {
+        const fdpRequests = (
+          serviceResponse.messageResponse.value as ListServiceResponse
+        ).service.map((service) => {
+          return new ServerReflectionRequest({
+            messageRequest: { case: 'fileContainingSymbol', value: service.name },
+          });
+        });
+        const fdpResponseStream = client.serverReflectionInfo(
+          createAsyncIterable(fdpRequests),
+          { timeoutMs: 10_000 }
+        );
+        for await (const fdpResponse of fdpResponseStream) {
+          for (const fdp of (
+            fdpResponse.messageResponse.value as FileDescriptorResponse
+          ).fileDescriptorProto) {
+            const protoFile = FileDescriptorProto.fromBinary(fdp);
+            for (const service of protoFile.service) {
+              for (const method of service.method) {
+                SessionManager.heartbeatMonitoredMethods[
+                  `/${protoFile.package}.${service.name}/${method.name}`
+                ] = SessionManager.hasHeartbeatOption(method.options);
+              }
             }
           }
         }
+      }
+    } catch {
+      // If can't get heartbeat monitored methods via reflection, use defaults.
+      SessionManager.heartbeatMonitoredMethods = {
+        "/viam.component.arm.v1.ArmService/MoveToPosition": true,
+        "/viam.component.arm.v1.ArmService/MoveToJointPositions": true,
+        "/viam.component.arm.v1.ArmService/MoveThroughJointPositions": true,
+        "/viam.component.base.v1.BaseService/MoveStraight": true,
+        "/viam.component.base.v1.BaseService/Spin": true,
+        "/viam.component.base.v1.BaseService/SetPower": true,
+        "/viam.component.base.v1.BaseService/SetVelocity": true,
+        "/viam.component.gantry.v1.GantryService/MoveToPosition": true,
+        "/viam.component.gripper.v1.GripperService/Open": true,
+        "/viam.component.gripper.v1.GripperService/Grab": true,
+        "/viam.component.motor.v1.MotorService/SetPower": true,
+        "/viam.component.motor.v1.MotorService/GoFor": true,
+        "/viam.component.motor.v1.MotorService/GoTo": true,
+        "/viam.component.motor.v1.MotorService/SetRPM": true,
+        "/viam.component.servo.v1.ServoService/Move": true,
       }
     }
   }
