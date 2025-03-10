@@ -219,7 +219,10 @@ export default class SessionManager {
           serviceResponse.messageResponse.value as ListServiceResponse
         ).service.map((service) => {
           return new ServerReflectionRequest({
-            messageRequest: { case: 'fileContainingSymbol', value: service.name },
+            messageRequest: {
+              case: 'fileContainingSymbol',
+              value: service.name,
+            },
           });
         });
         const fdpResponseStream = client.serverReflectionInfo(
@@ -244,22 +247,22 @@ export default class SessionManager {
     } catch {
       // If can't get heartbeat monitored methods via reflection, use defaults.
       SessionManager.heartbeatMonitoredMethods = {
-        "/viam.component.arm.v1.ArmService/MoveToPosition": true,
-        "/viam.component.arm.v1.ArmService/MoveToJointPositions": true,
-        "/viam.component.arm.v1.ArmService/MoveThroughJointPositions": true,
-        "/viam.component.base.v1.BaseService/MoveStraight": true,
-        "/viam.component.base.v1.BaseService/Spin": true,
-        "/viam.component.base.v1.BaseService/SetPower": true,
-        "/viam.component.base.v1.BaseService/SetVelocity": true,
-        "/viam.component.gantry.v1.GantryService/MoveToPosition": true,
-        "/viam.component.gripper.v1.GripperService/Open": true,
-        "/viam.component.gripper.v1.GripperService/Grab": true,
-        "/viam.component.motor.v1.MotorService/SetPower": true,
-        "/viam.component.motor.v1.MotorService/GoFor": true,
-        "/viam.component.motor.v1.MotorService/GoTo": true,
-        "/viam.component.motor.v1.MotorService/SetRPM": true,
-        "/viam.component.servo.v1.ServoService/Move": true,
-      }
+        '/viam.component.arm.v1.ArmService/MoveToPosition': true,
+        '/viam.component.arm.v1.ArmService/MoveToJointPositions': true,
+        '/viam.component.arm.v1.ArmService/MoveThroughJointPositions': true,
+        '/viam.component.base.v1.BaseService/MoveStraight': true,
+        '/viam.component.base.v1.BaseService/Spin': true,
+        '/viam.component.base.v1.BaseService/SetPower': true,
+        '/viam.component.base.v1.BaseService/SetVelocity': true,
+        '/viam.component.gantry.v1.GantryService/MoveToPosition': true,
+        '/viam.component.gripper.v1.GripperService/Open': true,
+        '/viam.component.gripper.v1.GripperService/Grab': true,
+        '/viam.component.motor.v1.MotorService/SetPower': true,
+        '/viam.component.motor.v1.MotorService/GoFor': true,
+        '/viam.component.motor.v1.MotorService/GoTo': true,
+        '/viam.component.motor.v1.MotorService/SetRPM': true,
+        '/viam.component.servo.v1.ServoService/Move': true,
+      };
     }
   }
 
