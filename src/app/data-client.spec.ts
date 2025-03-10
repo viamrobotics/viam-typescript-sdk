@@ -93,17 +93,8 @@ describe('DataClient tests', () => {
   const includeInternalData = false;
   const startDate = new Date(1, 1, 1, 1, 1, 1);
 
-  const binaryId1 = new BinaryID({
-    fileId: 'testFileId1',
-    organizationId: 'testOrgId',
-    locationId: 'testLocationId',
-  });
-  const binaryId2 = new BinaryID({
-    fileId: 'testFileId1',
-    organizationId: 'testOrgId',
-    locationId: 'testLocationId',
-  });
-
+  const binaryId1 = 'testID1';
+  const binaryId2 = 'testID2';
   describe('exportTabularData tests', () => {
     const sharedAttributes = {
       partId: 'partId1',
@@ -426,7 +417,7 @@ describe('DataClient tests', () => {
 
     it('get binary data by id', async () => {
       const expectedRequest = new BinaryDataByIDsRequest({
-        binaryIds: [binaryId1],
+        binaryDataIds: [binaryId1],
         includeBinary: true,
       });
 
@@ -515,7 +506,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           deleteBinaryDataByIDs: (req) => {
             return new DeleteBinaryDataByIDsResponse({
-              deletedCount: BigInt(req.binaryIds.length),
+              deletedCount: BigInt(req.binaryDataIds.length),
             });
           },
         });
@@ -549,7 +540,7 @@ describe('DataClient tests', () => {
 
     it('add tags to binary data', async () => {
       const expectedRequest = new AddTagsToBinaryDataByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryId1, binaryId2],
         tags: ['tag1', 'tag2'],
       });
 
@@ -602,7 +593,7 @@ describe('DataClient tests', () => {
 
     it('remove tags to binary data', async () => {
       const expectedRequest = new RemoveTagsFromBinaryDataByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryId1, binaryId2],
         tags: ['tag1', 'tag2'],
       });
 
@@ -688,7 +679,7 @@ describe('DataClient tests', () => {
 
     it('add bounding box to image', async () => {
       const expectedRequest = new AddBoundingBoxToImageByIDRequest({
-        binaryId: binaryId1,
+        binaryDataId: binaryId1,
         label: 'label',
         xMinNormalized: 0,
         yMinNormalized: 0,
@@ -724,7 +715,7 @@ describe('DataClient tests', () => {
 
     it('remove bounding box from image', async () => {
       const expectedRequest = new RemoveBoundingBoxFromImageByIDRequest({
-        binaryId: binaryId1,
+        binaryDataId: binaryId1,
         bboxId: 'bboxId',
       });
 
@@ -824,7 +815,7 @@ describe('DataClient tests', () => {
 
     it('add binary data to dataset', async () => {
       const expectedRequest = new AddBinaryDataToDatasetByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryId1, binaryId2],
         datasetId: 'datasetId',
       });
 
@@ -851,7 +842,7 @@ describe('DataClient tests', () => {
 
     it('remove binary data from dataset', async () => {
       const expectedRequest = new RemoveBinaryDataFromDatasetByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryId1, binaryId2],
         datasetId: 'datasetId',
       });
 
@@ -1249,7 +1240,7 @@ describe('DataSyncClient tests', () => {
           dataCaptureUpload: (req) => {
             capReq = req;
             return new DataCaptureUploadResponse({
-              fileId: 'fileId',
+              binaryDataId: 'fileId',
             });
           },
         });
