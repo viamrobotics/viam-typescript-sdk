@@ -170,12 +170,15 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.onDisconnect();
       }
     );
-    this.sessionManager = new SessionManager((): Transport => {
-      if (!this.transport) {
-        throw new Error(RobotClient.notConnectedYetStr);
+    this.sessionManager = new SessionManager(
+      this.serviceHost,
+      (): Transport => {
+        if (!this.transport) {
+          throw new Error(RobotClient.notConnectedYetStr);
+        }
+        return this.transport;
       }
-      return this.transport;
-    });
+    );
 
     // For each connection event type, add a listener to capture that
     // event and re-emit it with the 'connectionstatechange' event

@@ -20,7 +20,7 @@ export default class SessionTransport implements Transport {
   constructor(
     protected readonly deferredTransport: () => Transport,
     protected readonly sessionManager: SessionManager
-  ) {}
+  ) { }
 
   private async getSessionMetadata(): Promise<Headers> {
     try {
@@ -51,7 +51,7 @@ export default class SessionTransport implements Transport {
   ): Promise<UnaryResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
-    if (SessionManager.heartbeatMonitoredMethods.has(methodPath)) {
+    if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
       for (const [key, value] of md) {
         newHeaders.set(key, value);
@@ -82,7 +82,7 @@ export default class SessionTransport implements Transport {
   ): Promise<StreamResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
-    if (SessionManager.heartbeatMonitoredMethods.has(methodPath)) {
+    if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
       for (const [key, value] of md) {
         newHeaders.set(key, value);
