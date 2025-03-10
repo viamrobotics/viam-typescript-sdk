@@ -11,6 +11,10 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
+  GetLocationMetadataResponse,
+  GetOrganizationMetadataResponse,
+  GetRobotMetadataResponse,
+  GetRobotPartMetadataResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   ListOrganizationMembersResponse,
@@ -32,6 +36,7 @@ import {
   Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
+import { Any } from '@bufbuild/protobuf';
 
 /**
  * Creates an Authorization object from auth details.
@@ -1174,5 +1179,101 @@ export class AppClient {
     id: string
   ): Promise<CreateKeyFromExistingKeyAuthorizationsResponse> {
     return this.client.createKeyFromExistingKeyAuthorizations({ id });
+  }
+
+  /**
+   * Retrieves user-defined metadata for an organization.
+   *
+   * @param id The ID of the organization
+   * @returns The metadata associated with the organization
+   */
+  async getOrganizationMetadata(
+    id: string
+  ): Promise<GetOrganizationMetadataResponse> {
+    return this.client.getOrganizationMetadata({ organizationId: id });
+  }
+
+  /**
+   * Updates user-defined metadata for an organization.
+   *
+   * @param id The ID of the organization
+   * @param data The metadata to update
+   */
+  async updateOrganizationMetadata(
+    id: string,
+    data: Record<string, Any>
+  ): Promise<void> {
+    await this.client.updateOrganizationMetadata({ organizationId: id, data });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a location.
+   *
+   * @param id The ID of the location
+   * @returns The metadata associated with the location
+   */
+  async getLocationMetadata(id: string): Promise<GetLocationMetadataResponse> {
+    return this.client.getLocationMetadata({ locationId: id });
+  }
+
+  /**
+   * Updates user-defined metadata for a location.
+   *
+   * @param id The ID of the location
+   * @param data The metadata to update
+   */
+  async updateLocationMetadata(
+    id: string,
+    data: Record<string, Any>
+  ): Promise<void> {
+    await this.client.updateLocationMetadata({ locationId: id, data });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a machine.
+   *
+   * @param id The ID of the machine
+   * @returns The metadata associated with the machine
+   */
+  async getMachineMetadata(id: string): Promise<GetRobotMetadataResponse> {
+    return this.client.getRobotMetadata({ id });
+  }
+
+  /**
+   * Updates user-defined metadata for a robot.
+   *
+   * @param id The ID of the machine
+   * @param data The metadata to update
+   */
+  async updateMachineMetadata(
+    id: string,
+    data: Record<string, Any>
+  ): Promise<void> {
+    await this.client.updateRobotMetadata({ id, data });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a machine part.
+   *
+   * @param id The ID of the machine part
+   * @returns The metadata associated with the machine part
+   */
+  async getMachinePartMetadata(
+    id: string
+  ): Promise<GetRobotPartMetadataResponse> {
+    return this.client.getRobotPartMetadata({ id });
+  }
+
+  /**
+   * Updates user-defined metadata for a machine part.
+   *
+   * @param id The ID of the machine part
+   * @param data The metadata to update
+   */
+  async updateMachinePartMetadata(
+    id: string,
+    data: Record<string, Any>
+  ): Promise<void> {
+    await this.client.updateRobotPartMetadata({ id, data });
   }
 }
