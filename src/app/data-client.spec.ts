@@ -17,7 +17,6 @@ import {
   BinaryDataByFilterResponse,
   BinaryDataByIDsRequest,
   BinaryDataByIDsResponse,
-  BinaryID,
   BoundingBoxLabelsByFilterRequest,
   BoundingBoxLabelsByFilterResponse,
   CaptureInterval,
