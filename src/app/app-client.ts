@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import { Any, Struct } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -12,7 +12,6 @@ import {
   Fragment,
   FragmentVisibility,
   GetLocationMetadataResponse,
-  GetOrganizationMetadataResponse,
   GetRobotMetadataResponse,
   GetRobotPartMetadataResponse,
   GetRobotPartLogsResponse,
@@ -36,7 +35,6 @@ import {
   Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
-import { Any } from '@bufbuild/protobuf';
 
 /**
  * Creates an Authorization object from auth details.
@@ -1185,14 +1183,18 @@ export class AppClient {
    * Retrieves user-defined metadata for an organization.
    *
    * @param id The ID of the organization
-   * @returns The metadata associated with the organization
+   * @returns The metadata associated with the organization as a plain JS object
    */
   async getOrganizationMetadata(
     id: string
-  ): Promise<GetOrganizationMetadataResponse> {
-    return this.client.getOrganizationMetadata({ organizationId: id });
+  ): Promise<Record<string, unknown>> {
+    const response = await this.client.getOrganizationMetadata({ organizationId: id });
+    if (!(response.data instanceof Struct)) {
+      return {};
+    }
+    return response.data.toJson() as Record<string, unknown>;
   }
-
+    
   /**
    * Updates user-defined metadata for an organization.
    *
@@ -1201,9 +1203,23 @@ export class AppClient {
    */
   async updateOrganizationMetadata(
     id: string,
-    data: Record<string, Any>
+    data: Record<string, unknown>
   ): Promise<void> {
-    await this.client.updateOrganizationMetadata({ organizationId: id, data });
+    const convertedData: Record<string, Any> = {};
+
+    for (const [key, value] of Object.entries(data)) {
+      if (value === null || value === undefined) {
+        continue; 
+      }
+  
+      try {
+        convertedData[key] = Any.pack(value as never); 
+      } catch {
+        throw new Error(`Invalid metadata value for key "${key}"`);
+      }
+    }
+  
+    await this.client.updateOrganizationMetadata({ organizationId: id, data: convertedData });
   }
 
   /**
@@ -1212,8 +1228,12 @@ export class AppClient {
    * @param id The ID of the location
    * @returns The metadata associated with the location
    */
-  async getLocationMetadata(id: string): Promise<GetLocationMetadataResponse> {
-    return this.client.getLocationMetadata({ locationId: id });
+  async getLocationMetadata(id: string): Promise<Record<string, unknown>> {
+    const response = await this.client.getLocationMetadata({ locationId: id });
+    if (!(response.data instanceof Struct)) {
+      return {}; 
+    }
+    return response.data.toJson() as Record<string, unknown>; 
   }
 
   /**
@@ -1235,8 +1255,12 @@ export class AppClient {
    * @param id The ID of the machine
    * @returns The metadata associated with the machine
    */
-  async getMachineMetadata(id: string): Promise<GetRobotMetadataResponse> {
-    return this.client.getRobotMetadata({ id });
+  async getMachineMetadata(id: string): Promise<Record<string, unknown>> {
+    const response = await this.client.getRobotMetadata({ id });
+    if (!(response.data instanceof Struct)) {
+      return {}; 
+    }
+    return response.data.toJson() as Record<string, unknown>; 
   }
 
   /**
@@ -1260,8 +1284,12 @@ export class AppClient {
    */
   async getMachinePartMetadata(
     id: string
-  ): Promise<GetRobotPartMetadataResponse> {
-    return this.client.getRobotPartMetadata({ id });
+  ): Promise<Record<string, unknown>> {
+    const response = await this.client.getRobotPartMetadata({ id });
+    if (!(response.data instanceof Struct)) {
+      return {}; 
+    }
+    return response.data.toJson() as Record<string, unknown>; 
   }
 
   /**

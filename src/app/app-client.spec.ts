@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 
-import { Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
+import { Any, Struct, Value, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -1733,4 +1733,58 @@ describe('AppClient tests', () => {
       expect(response.id).toEqual('id');
     });
   });
+
+  describe('getOrganizationMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getOrganizationMetadata: () => new pb.GetOrganizationMetadataResponse(),
+        });
+      });
+    });
+
+    it('should return an empty object if response.data is not an instance of Struct', async () => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getOrganizationMetadata: () =>
+            new pb.GetOrganizationMetadataResponse({ data: {} }),
+        });
+      });
+  
+      const response = await subject().getOrganizationMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('should return a plain JavaScript object if response.data is a Struct', async () => {
+      const mockStructData = {
+        key1: 'value1',
+      };
+      
+      const structInstance = Struct.fromJson(mockStructData);
+      console.log('Struct Instance:', structInstance);
+
+      const packedData = Any.pack(structInstance);
+      console.log('Packed Data Type:', typeof packedData);
+      console.log('Packed Data Content:', packedData);
+
+      const testResponse = new pb.GetOrganizationMetadataResponse({
+        data: packedData,
+      });
+      
+      console.log('Test Response before Mock:', testResponse);
+
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getOrganizationMetadata: () => testResponse,
+        });
+      });
+  
+      const response = await subject().getOrganizationMetadata('orgId');
+      console.log('Test Response:', response);
+
+      expect(response).toEqual({
+        key1: 'value1',
+      });
+    });
+  });  
 });
