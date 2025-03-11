@@ -1787,4 +1787,62 @@ describe('AppClient tests', () => {
       });
     });
   });  
+
+  describe('updateOrganizationMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateOrganizationMetadata: () => new pb.UpdateOrganizationMetadataResponse(),
+        });
+      });
+    });
+
+    it('should handle empty metadata correctly', async () => {
+      let capturedRequest;
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateOrganizationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateOrganizationMetadataResponse();
+          },
+        });
+      });
+  
+      await subject().updateOrganizationMetadata('orgId', {});
+  
+      expect(capturedRequest).toEqual({
+        organizationId: 'orgId',
+        data: Struct.fromJson({}), // Should be an empty Struct
+      });
+    });
+
+    it('should successfully update metadata with valid data', async () => {
+      const metadata = {
+        key1: 'value1',
+        key2: 42,
+        key3: true,
+      };
+ 
+      const expectedStruct = Struct.fromJson(metadata);      
+  
+      let capturedRequest;
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateOrganizationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateOrganizationMetadataResponse();
+          },
+        });
+      });
+  
+      await subject().updateOrganizationMetadata('orgId', metadata);
+  
+      expect(capturedRequest).toMatchObject({
+        organizationId: 'orgId',
+        data: expect.objectContaining({
+          fields: expectedStruct.fields, 
+        }),
+      });
+    });  
+  });  
 });

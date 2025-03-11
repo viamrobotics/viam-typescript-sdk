@@ -1205,21 +1205,12 @@ export class AppClient {
     id: string,
     data: Record<string, unknown>
   ): Promise<void> {
-    const convertedData: Record<string, Any> = {};
+    const convertedData = Struct.fromJson(data);
 
-    for (const [key, value] of Object.entries(data)) {
-      if (value === null || value === undefined) {
-        continue; 
-      }
-  
-      try {
-        convertedData[key] = Any.pack(value as never); 
-      } catch {
-        throw new Error(`Invalid metadata value for key "${key}"`);
-      }
-    }
-  
-    await this.client.updateOrganizationMetadata({ organizationId: id, data: convertedData });
+    await this.client.updateOrganizationMetadata({ 
+      organizationId: id, 
+      data: convertedData,
+    });
   }
 
   /**
