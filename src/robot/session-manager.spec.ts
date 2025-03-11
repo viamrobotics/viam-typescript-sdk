@@ -27,7 +27,7 @@ const mockGetHeartBeatWindow = new Duration({
 
 describe('SessionManager', () => {
   beforeEach(() => {
-    sm = new SessionManager(() => mockTransport);
+    sm = new SessionManager('', () => mockTransport);
   });
 
   it('no session initially', () => {
