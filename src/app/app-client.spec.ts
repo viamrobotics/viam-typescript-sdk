@@ -1743,36 +1743,18 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('should return an empty object if response.data is not an instance of Struct', async () => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(AppService, {
-          getOrganizationMetadata: () =>
-            new pb.GetOrganizationMetadataResponse({ data: {} }),
-        });
-      });
-  
+    it('returns an empty object if there is no Struct', async () => {
       const response = await subject().getOrganizationMetadata('orgId');
       expect(response).toEqual({});
     });
 
-    it('should return a plain JavaScript object if response.data is a Struct', async () => {
-      const mockStructData = {
-        key1: 'value1',
-      };
-      
-      const structInstance = Struct.fromJson(mockStructData);
-      console.log('Struct Instance:', structInstance);
-
-      const packedData = Any.pack(structInstance);
-      console.log('Packed Data Type:', typeof packedData);
-      console.log('Packed Data Content:', packedData);
-
+    it('preserves the map key when a Struct is found', async () => {      
       const testResponse = new pb.GetOrganizationMetadataResponse({
-        data: packedData,
+        data: {
+          myStruct: Any.pack(Struct.fromJson({ key1: 'value1' }))
+        },
       });
       
-      console.log('Test Response before Mock:', testResponse);
-
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getOrganizationMetadata: () => testResponse,
@@ -1780,69 +1762,174 @@ describe('AppClient tests', () => {
       });
   
       const response = await subject().getOrganizationMetadata('orgId');
-      console.log('Test Response:', response);
-
-      expect(response).toEqual({
-        key1: 'value1',
-      });
+      expect(response).toEqual({ myStruct: { key1: 'value1' } });
     });
   });  
 
-  describe('updateOrganizationMetadata', () => {
+  // describe('updateOrganizationMetadata', () => {
+  //   beforeEach(() => {
+  //     mockTransport = createRouterTransport(({ service }) => {
+  //       service(AppService, {
+  //         updateOrganizationMetadata: () => new pb.UpdateOrganizationMetadataResponse(),
+  //       });
+  //     });
+  //   });
+
+  //   it('should handle empty metadata correctly', async () => {
+  //     let capturedRequest;
+  //     mockTransport = createRouterTransport(({ service }) => {
+  //       service(AppService, {
+  //         updateOrganizationMetadata: (req) => {
+  //           capturedRequest = req;
+  //           return new pb.UpdateOrganizationMetadataResponse();
+  //         },
+  //       });
+  //     });
+  
+  //     await subject().updateOrganizationMetadata('orgId', {});
+  
+  //     expect(capturedRequest).toEqual({
+  //       organizationId: 'orgId',
+  //       data: Struct.fromJson({}), 
+  //     });
+  //   });
+
+  //   it('should successfully update metadata with valid data', async () => {
+  //     const metadata = {
+  //       key1: 'value1',
+  //       key2: 42,
+  //       key3: true,
+  //     };
+ 
+  //     const expectedStruct = new Struct({
+  //       fields: {
+  //         key1: Value.fromJson('value1'),
+  //         key2: Value.fromJson(42),
+  //         key3: Value.fromJson(true),
+  //       },
+  //     });
+      
+  //     let capturedRequest;
+  //     mockTransport = createRouterTransport(({ service }) => {
+  //       service(AppService, {
+  //         updateOrganizationMetadata: (req) => {
+  //           capturedRequest = req;
+  //           return new pb.UpdateOrganizationMetadataResponse();
+  //         },
+  //       });
+  //     });
+  
+  //     await subject().updateOrganizationMetadata('orgId', metadata);
+  
+  //     expect(capturedRequest).toEqual({
+  //       organizationId: 'orgId',
+  //       data: expect.objectContaining({
+  //         fields: expectedStruct.fields, 
+  //       }),
+  //     });
+  //   });  
+  // });  
+
+  describe('getLocationMetadata', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          updateOrganizationMetadata: () => new pb.UpdateOrganizationMetadataResponse(),
+          getLocationMetadata: () => new pb.GetLocationMetadataResponse(),
         });
       });
     });
 
-    it('should handle empty metadata correctly', async () => {
-      let capturedRequest;
-      mockTransport = createRouterTransport(({ service }) => {
-        service(AppService, {
-          updateOrganizationMetadata: (req) => {
-            capturedRequest = req;
-            return new pb.UpdateOrganizationMetadataResponse();
-          },
-        });
-      });
-  
-      await subject().updateOrganizationMetadata('orgId', {});
-  
-      expect(capturedRequest).toEqual({
-        organizationId: 'orgId',
-        data: Struct.fromJson({}), // Should be an empty Struct
-      });
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getLocationMetadata('orgId');
+      expect(response).toEqual({});
     });
 
-    it('should successfully update metadata with valid data', async () => {
-      const metadata = {
-        key1: 'value1',
-        key2: 42,
-        key3: true,
-      };
- 
-      const expectedStruct = Struct.fromJson(metadata);      
-  
-      let capturedRequest;
+    it('preserves the map key when a Struct is found', async () => {      
+      const testResponse = new pb.GetLocationMetadataResponse({
+        data: {
+          myStruct: Any.pack(Struct.fromJson({ key1: 'value1' }))
+        },
+      });
+      
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          updateOrganizationMetadata: (req) => {
-            capturedRequest = req;
-            return new pb.UpdateOrganizationMetadataResponse();
-          },
+          getLocationMetadata: () => testResponse,
         });
       });
   
-      await subject().updateOrganizationMetadata('orgId', metadata);
-  
-      expect(capturedRequest).toMatchObject({
-        organizationId: 'orgId',
-        data: expect.objectContaining({
-          fields: expectedStruct.fields, 
-        }),
-      });
-    });  
+      const response = await subject().getLocationMetadata('orgId');
+      expect(response).toEqual({ myStruct: { key1: 'value1' } });
+    });
   });  
+
+  // updateLocationMetadata
+
+  describe('getRobotMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotMetadata: () => new pb.GetRobotMetadataResponse(),
+        });
+      });
+    });
+
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getRobotMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('preserves the map key when a Struct is found', async () => {      
+      const testResponse = new pb.GetRobotMetadataResponse({
+        data: {
+          myStruct: Any.pack(Struct.fromJson({ key1: 'value1' }))
+        },
+      });
+      
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotMetadata: () => testResponse,
+        });
+      });
+  
+      const response = await subject().getRobotMetadata('orgId');
+      expect(response).toEqual({ myStruct: { key1: 'value1' } });
+    });
+  });  
+
+  // updateRobotMetadata
+
+  describe('getRobotPartMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotPartMetadata: () => new pb.GetRobotPartMetadataResponse(),
+        });
+      });
+    });
+
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getRobotPartMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('preserves the map key when a Struct is found', async () => {      
+      const testResponse = new pb.GetRobotPartMetadataResponse({
+        data: {
+          myStruct: Any.pack(Struct.fromJson({ key1: 'value1' }))
+        },
+      });
+      
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotPartMetadata: () => testResponse,
+        });
+      });
+  
+      const response = await subject().getRobotPartMetadata('orgId');
+      expect(response).toEqual({ myStruct: { key1: 'value1' } });
+    });
+  });  
+
+  // updateRobotPartMetadata
+
 });

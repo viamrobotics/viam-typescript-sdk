@@ -1,4 +1,5 @@
-import { Any, Struct } from '@bufbuild/protobuf';
+import type { Any, JsonValue } from '@bufbuild/protobuf';
+import { Struct } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -11,7 +12,6 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
-  GetLocationMetadataResponse,
   GetRobotMetadataResponse,
   GetRobotPartMetadataResponse,
   GetRobotPartLogsResponse,
@@ -110,6 +110,27 @@ export const createPermission = (
     resourceId,
     permissions,
   });
+};
+
+/**
+ * Decodes a map<string, google.protobuf.Any> into a
+ * record of plain JavaScript objects keyed by the same map keys.
+ *
+ * @param data A record of string -> google.protobuf.Any
+ * @returns A record whose keys match `data`,
+ *          with values unpacked from Struct messages
+ */
+export const decodeMetadataMap = (data: Record<string, Any>): Record<string, JsonValue> => {
+  const result: Record<string, JsonValue> = {};
+
+  for (const [key, anyValue] of Object.entries(data)) {
+    if (anyValue.typeUrl === 'type.googleapis.com/google.protobuf.Struct') {
+      const structValue = Struct.fromBinary(anyValue.value);
+      result[key] = structValue.toJson() as JsonValue;
+    }
+  }
+
+  return result;
 };
 
 export class AppClient {
@@ -1187,12 +1208,9 @@ export class AppClient {
    */
   async getOrganizationMetadata(
     id: string
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<string, JsonValue>> {
     const response = await this.client.getOrganizationMetadata({ organizationId: id });
-    if (!(response.data instanceof Struct)) {
-      return {};
-    }
-    return response.data.toJson() as Record<string, unknown>;
+    return decodeMetadataMap(response.data);
   }
     
   /**
@@ -1206,6 +1224,19 @@ export class AppClient {
     data: Record<string, unknown>
   ): Promise<void> {
     const convertedData = Struct.fromJson(data);
+    // Create a new Struct with the provided data
+    // const convertedData = new Struct();
+    
+    // // Manually populate the fields
+    // const fields = {};
+    
+    // // Convert each value in data to a Value object
+    // Object.entries(data).forEach(([key, value]) => {
+    //   fields[key] = Value.fromJson(value);
+    // });
+  
+    // // Set the fields property of the Struct
+    // convertedData.fields = fields;
 
     await this.client.updateOrganizationMetadata({ 
       organizationId: id, 
@@ -1219,12 +1250,9 @@ export class AppClient {
    * @param id The ID of the location
    * @returns The metadata associated with the location
    */
-  async getLocationMetadata(id: string): Promise<Record<string, unknown>> {
+  async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getLocationMetadata({ locationId: id });
-    if (!(response.data instanceof Struct)) {
-      return {}; 
-    }
-    return response.data.toJson() as Record<string, unknown>; 
+    return decodeMetadataMap(response.data);
   }
 
   /**
@@ -1241,26 +1269,23 @@ export class AppClient {
   }
 
   /**
-   * Retrieves user-defined metadata for a machine.
+   * Retrieves user-defined metadata for a robot.
    *
-   * @param id The ID of the machine
-   * @returns The metadata associated with the machine
+   * @param id The ID of the robot
+   * @returns The metadata associated with the robot
    */
-  async getMachineMetadata(id: string): Promise<Record<string, unknown>> {
+  async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotMetadata({ id });
-    if (!(response.data instanceof Struct)) {
-      return {}; 
-    }
-    return response.data.toJson() as Record<string, unknown>; 
+    return decodeMetadataMap(response.data);
   }
 
   /**
    * Updates user-defined metadata for a robot.
    *
-   * @param id The ID of the machine
+   * @param id The ID of the robot
    * @param data The metadata to update
    */
-  async updateMachineMetadata(
+  async updateRobotMetadata(
     id: string,
     data: Record<string, Any>
   ): Promise<void> {
@@ -1268,28 +1293,25 @@ export class AppClient {
   }
 
   /**
-   * Retrieves user-defined metadata for a machine part.
+   * Retrieves user-defined metadata for a robot part.
    *
-   * @param id The ID of the machine part
-   * @returns The metadata associated with the machine part
+   * @param id The ID of the robot part
+   * @returns The metadata associated with the robot part
    */
-  async getMachinePartMetadata(
+  async getRobotPartMetadata(
     id: string
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotPartMetadata({ id });
-    if (!(response.data instanceof Struct)) {
-      return {}; 
-    }
-    return response.data.toJson() as Record<string, unknown>; 
+    return decodeMetadataMap(response.data);
   }
 
   /**
-   * Updates user-defined metadata for a machine part.
+   * Updates user-defined metadata for a machine robot.
    *
-   * @param id The ID of the machine part
+   * @param id The ID of the machine robot
    * @param data The metadata to update
    */
-  async updateMachinePartMetadata(
+  async updateRobotPartMetadata(
     id: string,
     data: Record<string, Any>
   ): Promise<void> {
