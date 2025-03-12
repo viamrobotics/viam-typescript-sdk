@@ -1283,9 +1283,9 @@ export class AppClient {
   }
 
   /**
-   * Updates user-defined metadata for a machine robot.
+   * Updates user-defined metadata for a robot part.
    *
-   * @param id The ID of the machine robot
+   * @param id The ID of the robot part
    * @param data The metadata to update
    */
   async updateRobotPartMetadata(
