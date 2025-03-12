@@ -558,8 +558,8 @@ describe('DataClient tests', () => {
     });
 
     it('delete binary data by ids', async () => {
-      // const promise1 = await subject().deleteBinaryDataByIds([binaryId1]);
-      // expect(promise1).toEqual(1n);
+      const promise1 = await subject().deleteBinaryDataByIds([binaryId1]);
+      expect(promise1).toEqual(1n);
 
       const promise2 = await subject().deleteBinaryDataByIds([
         binaryId1,
