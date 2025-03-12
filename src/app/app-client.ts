@@ -1181,7 +1181,7 @@ export class AppClient {
    * Retrieves user-defined metadata for an organization.
    *
    * @param id The ID of the organization
-   * @returns The metadata associated with the organization as a plain JS object
+   * @returns The metadata associated with the organization
    */
   async getOrganizationMetadata(
     id: string
