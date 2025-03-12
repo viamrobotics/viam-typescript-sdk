@@ -1,5 +1,5 @@
 import type { JsonValue } from '@bufbuild/protobuf';
-import { Any, Struct, Value } from '@bufbuild/protobuf';
+import { Struct } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -12,8 +12,6 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
-  GetRobotMetadataResponse,
-  GetRobotPartMetadataResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   ListOrganizationMembersResponse,
@@ -111,22 +109,6 @@ export const createPermission = (
     permissions,
   });
 };
-
-/**
- * Converts a JavaScript object into a Protobuf-compatible metadata structure.
- *
- * @param data - An object containing key-value pairs to be converted.
- * @returns A record where each key maps to an `Any`-wrapped Protobuf `Value`.
- */
-export const convertToAnyMetadata = (data: Record<string, any>): Record<string, Any> => {
-  const convertedData: Record<string, Any> = {};
-
-  for (const [key, val] of Object.entries(data)) {
-    convertedData[key] = Any.pack(Value.fromJson(val));
-  }
-
-  return convertedData;
-}
 
 export class AppClient {
   private client: Client<typeof AppService>;
@@ -1221,7 +1203,7 @@ export class AppClient {
   ): Promise<void> {
     await this.client.updateOrganizationMetadata({ 
       organizationId: id, 
-      data: convertToAnyMetadata(data),
+      data: Struct.fromJson(data),
     });
   }
 
@@ -1247,7 +1229,7 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateLocationMetadata({ locationId: id, data: convertToAnyMetadata(data) });
+    await this.client.updateLocationMetadata({ locationId: id, data: Struct.fromJson(data) });
   }
 
   /**
@@ -1272,7 +1254,7 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateRobotMetadata({ id, data: convertToAnyMetadata(data) });
+    await this.client.updateRobotMetadata({ id, data: Struct.fromJson(data) });
   }
 
   /**
@@ -1299,6 +1281,6 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateRobotPartMetadata({ id, data: convertToAnyMetadata(data) });
+    await this.client.updateRobotPartMetadata({ id, data: Struct.fromJson(data) });
   }
 }

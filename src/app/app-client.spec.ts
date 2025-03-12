@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 
-import { Any, Struct, Timestamp, Value, type PartialMessage } from '@bufbuild/protobuf';
+import { Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -1764,37 +1764,38 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // describe('updateOrganizationMetadata', () => {
-  //   let capturedRequest: pb.UpdateOrganizationMetadataRequest | undefined;
+  describe('updateOrganizationMetadata', () => {
+    let capturedRequest: pb.UpdateOrganizationMetadataRequest;
 
-  //   beforeEach(() => {
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateOrganizationMetadata: (req) => {
-  //           capturedRequest = req;
-  //           return new pb.UpdateOrganizationMetadataResponse();
-  //         },
-  //       });
-  //     });
-  //     capturedRequest = undefined;
-  //   });
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateOrganizationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateOrganizationMetadataResponse();
+          },
+        });
+      });
+    });
 
-  //   it('should handle empty metadata correctly', async () => {  
-  //     await subject().updateOrganizationMetadata('orgId', {});
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateOrganizationMetadata('orgId', {});
   
-  //     expect(capturedRequest?.organizationId).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({});      
-  //   });
+      expect(capturedRequest).toEqual({
+        organizationId: 'orgId',
+        data: Struct.fromJson({}), 
+      });
+    });
 
-  //   it('should successfully update metadata with valid data', async () => { 
-  //     await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
   
-  //     expect(capturedRequest?.organizationId).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({
-  //       key1: Any.pack(Value.fromJson('value1')),
-  //     });
-  //   });  
-  // });  
+      expect(capturedRequest).toEqual({
+        organizationId: 'orgId',
+        data: Struct.fromJson( { key1: 'value1'} ), 
+      });
+    });  
+  });  
 
   describe('getLocationMetadata', () => {
     beforeEach(() => {
@@ -1826,37 +1827,38 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // describe('updateLocationMetadata', () => {
-  //   let capturedRequest: pb.UpdateLocationMetadataResponse | undefined;
+  describe('updateLocationMetadata', () => {
+    let capturedRequest: pb.UpdateLocationMetadataResponse;
 
-  //   beforeEach(() => {
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateLocationMetadata: (req) => {
-  //           capturedRequest = req;
-  //           return new pb.UpdateLocationMetadataResponse();
-  //         },
-  //       });
-  //     });
-  //     capturedRequest = undefined;
-  //   });
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateLocationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateLocationMetadataResponse();
+          },
+        });
+      });
+    });
 
-  //   it('should handle empty metadata correctly', async () => {  
-  //     await subject().updateLocationMetadata('orgId', {});
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateLocationMetadata('locId', {});
   
-  //     expect(capturedRequest?.locationId).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({});      
-  //   });
+      expect(capturedRequest).toEqual({
+        locationId: 'locId',
+        data: Struct.fromJson({}), 
+      });
+    });
 
-  //   it('should successfully update metadata with valid data', async () => { 
-  //     await subject().updateLocationMetadata('orgId', { key1: 'value1' });
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateLocationMetadata('locId', { key1: 'value1' });
   
-  //     expect(capturedRequest?.locationId).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({
-  //       key1: Any.pack(Value.fromJson('value1')),
-  //     });
-  //   });  
-  // });  
+      expect(capturedRequest).toEqual({
+        locationId: 'locId',
+        data: Struct.fromJson( { key1: 'value1'} ), 
+      });
+    });  
+  });  
 
   describe('getRobotMetadata', () => {
     beforeEach(() => {
@@ -1888,37 +1890,38 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // describe('updateRobotMetadata', () => {
-  //   let capturedRequest: pb.UpdateRobotMetadataResponse | undefined;
+  describe('updateRobotMetadata', () => {
+    let capturedRequest: pb.UpdateRobotMetadataResponse;
 
-  //   beforeEach(() => {
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateRobotMetadata: (req) => {
-  //           capturedRequest = req;
-  //           return new pb.UpdateRobotMetadataResponse();
-  //         },
-  //       });
-  //     });
-  //     capturedRequest = undefined;
-  //   });
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateRobotMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateLocationMetadataResponse();
+          },
+        });
+      });
+    });
 
-  //   it('should handle empty metadata correctly', async () => {  
-  //     await subject().updateRobotMetadata('orgId', {});
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateRobotMetadata('robotId', {});
   
-  //     expect(capturedRequest?.id).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({});      
-  //   });
+      expect(capturedRequest).toEqual({
+        id: 'robotId',
+        data: Struct.fromJson({}), 
+      });
+    });
 
-  //   it('should successfully update metadata with valid data', async () => { 
-  //     await subject().updateRobotMetadata('orgId', { key1: 'value1' });
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateRobotMetadata('robotId', { key1: 'value1' });
   
-  //     expect(capturedRequest?.id).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({
-  //       key1: Any.pack(Value.fromJson('value1')),
-  //     });
-  //   });  
-  // });  
+      expect(capturedRequest).toEqual({
+        id: 'robotId',
+        data: Struct.fromJson( { key1: 'value1'} ), 
+      });
+    });  
+  });  
 
   describe('getRobotPartMetadata', () => {
     beforeEach(() => {
@@ -1950,35 +1953,36 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // describe('updateRobotPartMetadata', () => {
-  //   let capturedRequest: pb.UpdateRobotPartMetadataResponse | undefined;
+  describe('updateRobotPartMetadata', () => {
+    let capturedRequest: pb.UpdateRobotPartMetadataResponse;
 
-  //   beforeEach(() => {
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateRobotPartMetadata: (req) => {
-  //           capturedRequest = req;
-  //           return new pb.UpdateRobotPartMetadataResponse();
-  //         },
-  //       });
-  //     });
-  //     capturedRequest = undefined;
-  //   });
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateRobotPartMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateRobotPartMetadataResponse();
+          },
+        });
+      });
+    });
 
-  //   it('should handle empty metadata correctly', async () => {  
-  //     await subject().updateRobotPartMetadata('orgId', {});
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateRobotPartMetadata('robotPartId', {});
   
-  //     expect(capturedRequest?.id).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({});      
-  //   });
+      expect(capturedRequest).toEqual({
+        id: 'robotPartId',
+        data: Struct.fromJson({}), 
+      });
+    });
 
-  //   it('should successfully update metadata with valid data', async () => { 
-  //     await subject().updateRobotPartMetadata('orgId', { key1: 'value1' });
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateRobotPartMetadata('robotPartId', { key1: 'value1' });
   
-  //     expect(capturedRequest?.id).toBe('orgId');
-  //     expect(capturedRequest?.data).toEqual({
-  //       key1: Any.pack(Value.fromJson('value1')),
-  //     });
-  //   });  
-  // });  
+      expect(capturedRequest).toEqual({
+        id: 'robotPartId',
+        data: Struct.fromJson( { key1: 'value1'} ), 
+      });
+    });  
+  });  
 });
