@@ -113,27 +113,6 @@ export const createPermission = (
 };
 
 /**
- * Decodes a map<string, google.protobuf.Any> into a
- * record of plain JavaScript objects keyed by the same map keys.
- *
- * @param data A record of string -> google.protobuf.Any
- * @returns A record whose keys match `data`,
- *          with values unpacked from Struct messages
- */
-export const decodeMetadataMap = (data: Record<string, Any>): Record<string, JsonValue> => {
-  const result: Record<string, JsonValue> = {};
-
-  for (const [key, anyValue] of Object.entries(data)) {
-    if (anyValue.typeUrl === 'type.googleapis.com/google.protobuf.Struct') {
-      const structValue = Struct.fromBinary(anyValue.value);
-      result[key] = structValue.toJson() as JsonValue;
-    }
-  }
-
-  return result;
-};
-
-/**
  * Converts a JavaScript object into a Protobuf-compatible metadata structure.
  *
  * @param data - An object containing key-value pairs to be converted.
@@ -1225,9 +1204,9 @@ export class AppClient {
   async getOrganizationMetadata(
     id: string
   ): Promise<Record<string, JsonValue>> {
-    const response = await this.client.getOrganizationMetadata({ organizationId: id });
-    return decodeMetadataMap(response.data);
-    // return response.data.toJson();
+    const response = await this.client.getOrganizationMetadata({ organizationId: id });  
+    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    return jsonResponse.data ?? {};
   }
     
   /**
@@ -1254,7 +1233,8 @@ export class AppClient {
    */
   async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getLocationMetadata({ locationId: id });
-    return decodeMetadataMap(response.data);
+    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    return jsonResponse.data ?? {};
   }
 
   /**
@@ -1278,7 +1258,8 @@ export class AppClient {
    */
   async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotMetadata({ id });
-    return decodeMetadataMap(response.data);
+    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    return jsonResponse.data ?? {};
   }
 
   /**
@@ -1304,8 +1285,9 @@ export class AppClient {
     id: string
   ): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotPartMetadata({ id });
-    return decodeMetadataMap(response.data);
-  }
+    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    return jsonResponse.data ?? {}; 
+    }
 
   /**
    * Updates user-defined metadata for a machine robot.
