@@ -1,5 +1,5 @@
 import type { Any, JsonValue } from '@bufbuild/protobuf';
-import { Struct } from '@bufbuild/protobuf';
+import { Struct, Value } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -1221,22 +1221,12 @@ export class AppClient {
    */
   async updateOrganizationMetadata(
     id: string,
-    data: Record<string, unknown>
+    data: Record<string, JsonValue>
   ): Promise<void> {
-    const convertedData = Struct.fromJson(data);
-    // Create a new Struct with the provided data
-    // const convertedData = new Struct();
-    
-    // // Manually populate the fields
-    // const fields = {};
-    
-    // // Convert each value in data to a Value object
-    // Object.entries(data).forEach(([key, value]) => {
-    //   fields[key] = Value.fromJson(value);
-    // });
-  
-    // // Set the fields property of the Struct
-    // convertedData.fields = fields;
+    const convertedData = new Struct({ fields: {} });
+    for (const [key, val] of Object.entries(data)) {
+      convertedData.fields[key] = Value.fromJson(val);
+    }
 
     await this.client.updateOrganizationMetadata({ 
       organizationId: id, 
@@ -1263,9 +1253,14 @@ export class AppClient {
    */
   async updateLocationMetadata(
     id: string,
-    data: Record<string, Any>
+    data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateLocationMetadata({ locationId: id, data });
+    const convertedData = new Struct({ fields: {} });
+    for (const [key, val] of Object.entries(data)) {
+      convertedData.fields[key] = Value.fromJson(val);
+    }
+
+    await this.client.updateLocationMetadata({ locationId: id, data: convertedData });
   }
 
   /**
@@ -1287,9 +1282,13 @@ export class AppClient {
    */
   async updateRobotMetadata(
     id: string,
-    data: Record<string, Any>
+    data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateRobotMetadata({ id, data });
+    const convertedData = new Struct({ fields: {} });
+    for (const [key, val] of Object.entries(data)) {
+      convertedData.fields[key] = Value.fromJson(val);
+    }
+    await this.client.updateRobotMetadata({ id, data: convertedData });
   }
 
   /**
@@ -1313,8 +1312,12 @@ export class AppClient {
    */
   async updateRobotPartMetadata(
     id: string,
-    data: Record<string, Any>
+    data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateRobotPartMetadata({ id, data });
+    const convertedData = new Struct({ fields: {} });
+    for (const [key, val] of Object.entries(data)) {
+      convertedData.fields[key] = Value.fromJson(val);
+    }
+    await this.client.updateRobotPartMetadata({ id, data: convertedData });
   }
 }

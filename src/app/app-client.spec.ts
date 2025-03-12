@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 
-import { Any, Struct, Value, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
+import { Any, Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -1766,69 +1766,38 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // describe('updateOrganizationMetadata', () => {
-  //   beforeEach(() => {
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateOrganizationMetadata: () => new pb.UpdateOrganizationMetadataResponse(),
-  //       });
-  //     });
-  //   });
+  describe('updateOrganizationMetadata', () => {
+    let capturedRequest: pb.UpdateOrganizationMetadataRequest | undefined;
 
-  //   it('should handle empty metadata correctly', async () => {
-  //     let capturedRequest;
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateOrganizationMetadata: (req) => {
-  //           capturedRequest = req;
-  //           return new pb.UpdateOrganizationMetadataResponse();
-  //         },
-  //       });
-  //     });
-  
-  //     await subject().updateOrganizationMetadata('orgId', {});
-  
-  //     expect(capturedRequest).toEqual({
-  //       organizationId: 'orgId',
-  //       data: Struct.fromJson({}), 
-  //     });
-  //   });
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateOrganizationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateOrganizationMetadataResponse();
+          },
+        });
+      });
+      capturedRequest = undefined;
+    });
 
-  //   it('should successfully update metadata with valid data', async () => {
-  //     const metadata = {
-  //       key1: 'value1',
-  //       key2: 42,
-  //       key3: true,
-  //     };
- 
-  //     const expectedStruct = new Struct({
-  //       fields: {
-  //         key1: Value.fromJson('value1'),
-  //         key2: Value.fromJson(42),
-  //         key3: Value.fromJson(true),
-  //       },
-  //     });
-      
-  //     let capturedRequest;
-  //     mockTransport = createRouterTransport(({ service }) => {
-  //       service(AppService, {
-  //         updateOrganizationMetadata: (req) => {
-  //           capturedRequest = req;
-  //           return new pb.UpdateOrganizationMetadataResponse();
-  //         },
-  //       });
-  //     });
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateOrganizationMetadata('orgId', {});
   
-  //     await subject().updateOrganizationMetadata('orgId', metadata);
+      expect(capturedRequest?.organizationId).toBe('orgId');
+      expect(capturedRequest?.data?.fields?.toJson()).toEqual({});      
+    });
+
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
   
-  //     expect(capturedRequest).toEqual({
-  //       organizationId: 'orgId',
-  //       data: expect.objectContaining({
-  //         fields: expectedStruct.fields, 
-  //       }),
-  //     });
-  //   });  
-  // });  
+      expect(capturedRequest?.organizationId).toBe('orgId');
+
+      const struct = capturedRequest?.data as Struct;
+      expect(struct.toJson()).toEqual({ key1: { stringValue: 'value1' } });
+
+    });  
+  });  
 
   describe('getLocationMetadata', () => {
     beforeEach(() => {
