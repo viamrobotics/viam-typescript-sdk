@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 
-import { Any, Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
+import { Any, Struct, Timestamp, Value, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -1785,17 +1785,16 @@ describe('AppClient tests', () => {
       await subject().updateOrganizationMetadata('orgId', {});
   
       expect(capturedRequest?.organizationId).toBe('orgId');
-      expect(capturedRequest?.data?.fields?.toJson()).toEqual({});      
+      expect(capturedRequest?.data).toEqual({});      
     });
 
     it('should successfully update metadata with valid data', async () => { 
       await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
   
       expect(capturedRequest?.organizationId).toBe('orgId');
-
-      const struct = capturedRequest?.data as Struct;
-      expect(struct.toJson()).toEqual({ key1: { stringValue: 'value1' } });
-
+      expect(capturedRequest?.data).toEqual({
+        key1: Any.pack(Value.fromJson('value1')),
+      });
     });  
   });  
 
@@ -1831,7 +1830,37 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // updateLocationMetadata
+  describe('updateLocationMetadata', () => {
+    let capturedRequest: pb.UpdateLocationMetadataResponse | undefined;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateLocationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateLocationMetadataResponse();
+          },
+        });
+      });
+      capturedRequest = undefined;
+    });
+
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateLocationMetadata('orgId', {});
+  
+      expect(capturedRequest?.locationId).toBe('orgId');
+      expect(capturedRequest?.data).toEqual({});      
+    });
+
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateLocationMetadata('orgId', { key1: 'value1' });
+  
+      expect(capturedRequest?.locationId).toBe('orgId');
+      expect(capturedRequest?.data).toEqual({
+        key1: Any.pack(Value.fromJson('value1')),
+      });
+    });  
+  });  
 
   describe('getRobotMetadata', () => {
     beforeEach(() => {
@@ -1865,7 +1894,37 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // updateRobotMetadata
+  describe('updateRobotMetadata', () => {
+    let capturedRequest: pb.UpdateRobotMetadataResponse | undefined;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateRobotMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateRobotMetadataResponse();
+          },
+        });
+      });
+      capturedRequest = undefined;
+    });
+
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateRobotMetadata('orgId', {});
+  
+      expect(capturedRequest?.id).toBe('orgId');
+      expect(capturedRequest?.data).toEqual({});      
+    });
+
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateRobotMetadata('orgId', { key1: 'value1' });
+  
+      expect(capturedRequest?.id).toBe('orgId');
+      expect(capturedRequest?.data).toEqual({
+        key1: Any.pack(Value.fromJson('value1')),
+      });
+    });  
+  });  
 
   describe('getRobotPartMetadata', () => {
     beforeEach(() => {
@@ -1899,6 +1958,35 @@ describe('AppClient tests', () => {
     });
   });  
 
-  // updateRobotPartMetadata
+  describe('updateRobotPartMetadata', () => {
+    let capturedRequest: pb.UpdateRobotPartMetadataResponse | undefined;
 
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateRobotPartMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateRobotPartMetadataResponse();
+          },
+        });
+      });
+      capturedRequest = undefined;
+    });
+
+    it('should handle empty metadata correctly', async () => {  
+      await subject().updateRobotPartMetadata('orgId', {});
+  
+      expect(capturedRequest?.id).toBe('orgId');
+      expect(capturedRequest?.data).toEqual({});      
+    });
+
+    it('should successfully update metadata with valid data', async () => { 
+      await subject().updateRobotPartMetadata('orgId', { key1: 'value1' });
+  
+      expect(capturedRequest?.id).toBe('orgId');
+      expect(capturedRequest?.data).toEqual({
+        key1: Any.pack(Value.fromJson('value1')),
+      });
+    });  
+  });  
 });

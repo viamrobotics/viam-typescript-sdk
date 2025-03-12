@@ -1,5 +1,5 @@
-import type { Any, JsonValue } from '@bufbuild/protobuf';
-import { Struct, Value } from '@bufbuild/protobuf';
+import type { JsonValue } from '@bufbuild/protobuf';
+import { Any, Struct, Value } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -132,6 +132,22 @@ export const decodeMetadataMap = (data: Record<string, Any>): Record<string, Jso
 
   return result;
 };
+
+/**
+ * Converts a JavaScript object into a Protobuf-compatible metadata structure.
+ *
+ * @param data - An object containing key-value pairs to be converted.
+ * @returns A record where each key maps to an `Any`-wrapped Protobuf `Value`.
+ */
+export const convertToAnyMetadata = (data: Record<string, any>): Record<string, Any> => {
+  const convertedData: Record<string, Any> = {};
+
+  for (const [key, val] of Object.entries(data)) {
+    convertedData[key] = Any.pack(Value.fromJson(val));
+  }
+
+  return convertedData;
+}
 
 export class AppClient {
   private client: Client<typeof AppService>;
@@ -1211,6 +1227,7 @@ export class AppClient {
   ): Promise<Record<string, JsonValue>> {
     const response = await this.client.getOrganizationMetadata({ organizationId: id });
     return decodeMetadataMap(response.data);
+    // return response.data.toJson();
   }
     
   /**
@@ -1223,14 +1240,9 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    const convertedData = new Struct({ fields: {} });
-    for (const [key, val] of Object.entries(data)) {
-      convertedData.fields[key] = Value.fromJson(val);
-    }
-
     await this.client.updateOrganizationMetadata({ 
       organizationId: id, 
-      data: convertedData,
+      data: convertToAnyMetadata(data),
     });
   }
 
@@ -1255,12 +1267,7 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    const convertedData = new Struct({ fields: {} });
-    for (const [key, val] of Object.entries(data)) {
-      convertedData.fields[key] = Value.fromJson(val);
-    }
-
-    await this.client.updateLocationMetadata({ locationId: id, data: convertedData });
+    await this.client.updateLocationMetadata({ locationId: id, data: convertToAnyMetadata(data) });
   }
 
   /**
@@ -1284,11 +1291,7 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    const convertedData = new Struct({ fields: {} });
-    for (const [key, val] of Object.entries(data)) {
-      convertedData.fields[key] = Value.fromJson(val);
-    }
-    await this.client.updateRobotMetadata({ id, data: convertedData });
+    await this.client.updateRobotMetadata({ id, data: convertToAnyMetadata(data) });
   }
 
   /**
@@ -1314,10 +1317,6 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    const convertedData = new Struct({ fields: {} });
-    for (const [key, val] of Object.entries(data)) {
-      convertedData.fields[key] = Value.fromJson(val);
-    }
-    await this.client.updateRobotPartMetadata({ id, data: convertedData });
+    await this.client.updateRobotPartMetadata({ id, data: convertToAnyMetadata(data) });
   }
 }
