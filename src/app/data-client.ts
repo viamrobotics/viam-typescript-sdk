@@ -58,6 +58,13 @@ export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
 
+const logDeprecationWarning = () => {
+  // eslint-disable-next-line no-console
+  console.warn(
+    'The BinaryID type is deprecated and will be removed in a future release. Please migrate to the BinaryDataId field instead.'
+  );
+};
+
 export class DataClient {
   private dataClient: PromiseClient<typeof DataService>;
   private datasetClient: PromiseClient<typeof DatasetService>;
@@ -311,6 +318,7 @@ export class DataClient {
       });
       return resp.data;
     }
+    logDeprecationWarning();
     const resp = await this.dataClient.binaryDataByIDs({
       binaryIds: ids as BinaryID[],
       includeBinary: true,
@@ -366,6 +374,7 @@ export class DataClient {
       });
       return resp.deletedCount;
     }
+    logDeprecationWarning();
     const resp = await this.dataClient.deleteBinaryDataByIDs({
       binaryIds: ids as BinaryID[],
     });
@@ -380,15 +389,18 @@ export class DataClient {
    * @param ids The IDs of the data to be tagged. Must be non-empty.
    */
   async addTagsToBinaryDataByIds(tags: string[], ids: string[] | BinaryID[]) {
-    await (Array.isArray(ids) && typeof ids[0] === 'string'
-      ? this.dataClient.addTagsToBinaryDataByIDs({
-          tags,
-          binaryDataIds: ids as string[],
-        })
-      : this.dataClient.addTagsToBinaryDataByIDs({
-          tags,
-          binaryIds: ids as BinaryID[],
-        }));
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      await this.dataClient.addTagsToBinaryDataByIDs({
+        tags,
+        binaryDataIds: ids as string[],
+      });
+      return;
+    }
+    logDeprecationWarning();
+    await this.dataClient.addTagsToBinaryDataByIDs({
+      tags,
+      binaryIds: ids as BinaryID[],
+    });
   }
 
   /**
@@ -424,6 +436,7 @@ export class DataClient {
       });
       return resp.deletedCount;
     }
+    logDeprecationWarning();
     const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
       tags,
       binaryIds: ids as BinaryID[],
@@ -494,6 +507,7 @@ export class DataClient {
       });
       return resp.bboxId;
     }
+    logDeprecationWarning();
     const resp = await this.dataClient.addBoundingBoxToImageByID({
       binaryId,
       label,
@@ -515,15 +529,18 @@ export class DataClient {
     binId: string | BinaryID,
     bboxId: string
   ) {
-    await (typeof binId === 'string'
-      ? this.dataClient.removeBoundingBoxFromImageByID({
-          binaryDataId: binId,
-          bboxId,
-        })
-      : this.dataClient.removeBoundingBoxFromImageByID({
-          binaryId: binId,
-          bboxId,
-        }));
+    if (typeof binId === 'string') {
+      await this.dataClient.removeBoundingBoxFromImageByID({
+        binaryDataId: binId,
+        bboxId,
+      });
+      return;
+    }
+    logDeprecationWarning();
+    await this.dataClient.removeBoundingBoxFromImageByID({
+      binaryId: binId,
+      bboxId,
+    });
   }
 
   /**
@@ -575,15 +592,18 @@ export class DataClient {
     ids: string[] | BinaryID[],
     datasetId: string
   ) {
-    await (Array.isArray(ids) && typeof ids[0] === 'string'
-      ? this.dataClient.addBinaryDataToDatasetByIDs({
-          binaryDataIds: ids as string[],
-          datasetId,
-        })
-      : this.dataClient.addBinaryDataToDatasetByIDs({
-          binaryIds: ids as BinaryID[],
-          datasetId,
-        }));
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      await this.dataClient.addBinaryDataToDatasetByIDs({
+        binaryDataIds: ids as string[],
+        datasetId,
+      });
+      return;
+    }
+    logDeprecationWarning();
+    await this.dataClient.addBinaryDataToDatasetByIDs({
+      binaryIds: ids as BinaryID[],
+      datasetId,
+    });
   }
 
   /**
@@ -596,15 +616,18 @@ export class DataClient {
     ids: string[] | BinaryID[],
     datasetId: string
   ) {
-    await (Array.isArray(ids) && typeof ids[0] === 'string'
-      ? this.dataClient.removeBinaryDataFromDatasetByIDs({
-          binaryDataIds: ids as string[],
-          datasetId,
-        })
-      : this.dataClient.removeBinaryDataFromDatasetByIDs({
-          binaryIds: ids as BinaryID[],
-          datasetId,
-        }));
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      await this.dataClient.removeBinaryDataFromDatasetByIDs({
+        binaryDataIds: ids as string[],
+        datasetId,
+      });
+      return;
+    }
+    logDeprecationWarning();
+    await this.dataClient.removeBinaryDataFromDatasetByIDs({
+      binaryIds: ids as BinaryID[],
+      datasetId,
+    });
   }
 
   /**
