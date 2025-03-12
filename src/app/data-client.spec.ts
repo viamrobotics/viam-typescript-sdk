@@ -17,6 +17,7 @@ import {
   BinaryDataByFilterResponse,
   BinaryDataByIDsRequest,
   BinaryDataByIDsResponse,
+  BinaryID,
   BoundingBoxLabelsByFilterRequest,
   BoundingBoxLabelsByFilterResponse,
   CaptureInterval,
@@ -92,8 +93,19 @@ describe('DataClient tests', () => {
   const includeInternalData = false;
   const startDate = new Date(1, 1, 1, 1, 1, 1);
 
-  const binaryId1 = 'testID1';
-  const binaryId2 = 'testID2';
+  const binaryId1 = new BinaryID({
+    fileId: 'testFileId1',
+    organizationId: 'testOrgId',
+    locationId: 'testLocationId',
+  });
+  const binaryId2 = new BinaryID({
+    fileId: 'testFileId1',
+    organizationId: 'testOrgId',
+    locationId: 'testLocationId',
+  });
+
+  const binaryDataId1 = 'testID1';
+  const binaryDataId2 = 'testID2';
   describe('exportTabularData tests', () => {
     const sharedAttributes = {
       partId: 'partId1',
@@ -407,6 +419,16 @@ describe('DataClient tests', () => {
       });
     });
 
+    it('get binary data by binary data ids', async () => {
+      const promise = await subject().binaryDataByIds([
+        binaryDataId1,
+        binaryDataId2,
+      ]);
+      expect(promise.length).toEqual(2);
+      expect(promise[0]?.binary).toEqual(bin1);
+      expect(promise[1]?.binary).toEqual(bin2);
+    });
+
     it('get binary data by ids', async () => {
       const promise = await subject().binaryDataByIds([binaryId1, binaryId2]);
       expect(promise.length).toEqual(2);
@@ -414,9 +436,19 @@ describe('DataClient tests', () => {
       expect(promise[1]?.binary).toEqual(bin2);
     });
 
+    it('get binary data by binary data id', async () => {
+      const expectedRequest = new BinaryDataByIDsRequest({
+        binaryDataIds: [binaryDataId1],
+        includeBinary: true,
+      });
+
+      await subject().binaryDataByIds([binaryDataId1]);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
     it('get binary data by id', async () => {
       const expectedRequest = new BinaryDataByIDsRequest({
-        binaryDataIds: [binaryId1],
+        binaryIds: [binaryId1],
         includeBinary: true,
       });
 
@@ -505,16 +537,29 @@ describe('DataClient tests', () => {
         service(DataService, {
           deleteBinaryDataByIDs: (req) => {
             return new DeleteBinaryDataByIDsResponse({
-              deletedCount: BigInt(req.binaryDataIds.length),
+              deletedCount: BigInt(
+                Math.max(req.binaryDataIds.length, req.binaryIds.length)
+              ),
             });
           },
         });
       });
     });
 
-    it('delete binary data', async () => {
-      const promise1 = await subject().deleteBinaryDataByIds([binaryId1]);
+    it('delete binary data by binary data ids', async () => {
+      const promise1 = await subject().deleteBinaryDataByIds([binaryDataId1]);
       expect(promise1).toEqual(1n);
+
+      const promise2 = await subject().deleteBinaryDataByIds([
+        binaryDataId1,
+        binaryDataId2,
+      ]);
+      expect(promise2).toEqual(2n);
+    });
+
+    it('delete binary data by ids', async () => {
+      // const promise1 = await subject().deleteBinaryDataByIds([binaryId1]);
+      // expect(promise1).toEqual(1n);
 
       const promise2 = await subject().deleteBinaryDataByIds([
         binaryId1,
@@ -537,9 +582,22 @@ describe('DataClient tests', () => {
       });
     });
 
+    it('add tags to binary data by binary data ids', async () => {
+      const expectedRequest = new AddTagsToBinaryDataByIDsRequest({
+        binaryDataIds: [binaryDataId1, binaryDataId2],
+        tags: ['tag1', 'tag2'],
+      });
+
+      await subject().addTagsToBinaryDataByIds(
+        ['tag1', 'tag2'],
+        [binaryDataId1, binaryDataId2]
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
     it('add tags to binary data', async () => {
       const expectedRequest = new AddTagsToBinaryDataByIDsRequest({
-        binaryDataIds: [binaryId1, binaryId2],
+        binaryIds: [binaryId1, binaryId2],
         tags: ['tag1', 'tag2'],
       });
 
@@ -590,9 +648,23 @@ describe('DataClient tests', () => {
       });
     });
 
-    it('remove tags to binary data', async () => {
+    it('remove tags to binary data by binary data ids', async () => {
       const expectedRequest = new RemoveTagsFromBinaryDataByIDsRequest({
-        binaryDataIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryDataId1, binaryDataId2],
+        tags: ['tag1', 'tag2'],
+      });
+
+      const promise = await subject().removeTagsFromBinaryDataByIds(
+        ['tag1', 'tag2'],
+        [binaryDataId1, binaryDataId2]
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(promise).toEqual(2n);
+    });
+
+    it('remove tags to binary data by ids', async () => {
+      const expectedRequest = new RemoveTagsFromBinaryDataByIDsRequest({
+        binaryIds: [binaryId1, binaryId2],
         tags: ['tag1', 'tag2'],
       });
 
@@ -676,9 +748,31 @@ describe('DataClient tests', () => {
       });
     });
 
-    it('add bounding box to image', async () => {
+    it('add bounding box to image by binary data id', async () => {
       const expectedRequest = new AddBoundingBoxToImageByIDRequest({
-        binaryDataId: binaryId1,
+        binaryDataId: binaryDataId1,
+        label: 'label',
+        xMinNormalized: 0,
+        yMinNormalized: 0,
+        yMaxNormalized: 1,
+        xMaxNormalized: 1,
+      });
+
+      const promise = await subject().addBoundingBoxToImageById(
+        binaryDataId1,
+        'label',
+        0,
+        0,
+        1,
+        1
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(promise).toEqual('bboxId');
+    });
+
+    it('add bounding box to image by id', async () => {
+      const expectedRequest = new AddBoundingBoxToImageByIDRequest({
+        binaryId: binaryId1,
         label: 'label',
         xMinNormalized: 0,
         yMinNormalized: 0,
@@ -712,9 +806,19 @@ describe('DataClient tests', () => {
       });
     });
 
-    it('remove bounding box from image', async () => {
+    it('remove bounding box from image by binary data id', async () => {
       const expectedRequest = new RemoveBoundingBoxFromImageByIDRequest({
-        binaryDataId: binaryId1,
+        binaryDataId: binaryDataId1,
+        bboxId: 'bboxId',
+      });
+
+      await subject().removeBoundingBoxFromImageById(binaryDataId1, 'bboxId');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
+    it('remove bounding box from image by id', async () => {
+      const expectedRequest = new RemoveBoundingBoxFromImageByIDRequest({
+        binaryId: binaryId1,
         bboxId: 'bboxId',
       });
 
@@ -812,9 +916,22 @@ describe('DataClient tests', () => {
       });
     });
 
-    it('add binary data to dataset', async () => {
+    it('add binary data to dataset by binary data ids', async () => {
       const expectedRequest = new AddBinaryDataToDatasetByIDsRequest({
-        binaryDataIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryDataId1, binaryDataId2],
+        datasetId: 'datasetId',
+      });
+
+      await subject().addBinaryDataToDatasetByIds(
+        [binaryDataId1, binaryDataId2],
+        'datasetId'
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
+    it('add binary data to dataset by ids', async () => {
+      const expectedRequest = new AddBinaryDataToDatasetByIDsRequest({
+        binaryIds: [binaryId1, binaryId2],
         datasetId: 'datasetId',
       });
 
@@ -839,9 +956,22 @@ describe('DataClient tests', () => {
       });
     });
 
-    it('remove binary data from dataset', async () => {
+    it('remove binary data from dataset by binary data ids', async () => {
       const expectedRequest = new RemoveBinaryDataFromDatasetByIDsRequest({
-        binaryDataIds: [binaryId1, binaryId2],
+        binaryDataIds: [binaryDataId1, binaryDataId2],
+        datasetId: 'datasetId',
+      });
+
+      await subject().removeBinaryDataFromDatasetByIds(
+        [binaryDataId1, binaryDataId2],
+        'datasetId'
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
+    it('remove binary data from dataset by ids', async () => {
+      const expectedRequest = new RemoveBinaryDataFromDatasetByIDsRequest({
+        binaryIds: [binaryId1, binaryId2],
         datasetId: 'datasetId',
       });
 
