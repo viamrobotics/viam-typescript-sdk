@@ -1738,7 +1738,8 @@ describe('AppClient tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getOrganizationMetadata: () => new pb.GetOrganizationMetadataResponse(),
+          getOrganizationMetadata: () =>
+            new pb.GetOrganizationMetadataResponse(),
         });
       });
     });
@@ -1748,21 +1749,21 @@ describe('AppClient tests', () => {
       expect(response).toEqual({});
     });
 
-    it('preserves the map key when a Struct is found', async () => {      
+    it('preserves the map key when a Struct is found', async () => {
       const testResponse = new pb.GetOrganizationMetadataResponse({
         data: Struct.fromJson({ key1: 'value1' }),
       });
-      
+
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getOrganizationMetadata: () => testResponse,
         });
       });
-  
+
       const response = await subject().getOrganizationMetadata('orgId');
-      expect(response).toEqual( { key1: 'value1' } );
+      expect(response).toEqual({ key1: 'value1' });
     });
-  });  
+  });
 
   describe('updateOrganizationMetadata', () => {
     let capturedRequest: pb.UpdateOrganizationMetadataRequest;
@@ -1778,24 +1779,24 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('should handle empty metadata correctly', async () => {  
+    it('should handle empty metadata correctly', async () => {
       await subject().updateOrganizationMetadata('orgId', {});
-  
+
       expect(capturedRequest).toEqual({
         organizationId: 'orgId',
-        data: Struct.fromJson({}), 
+        data: Struct.fromJson({}),
       });
     });
 
-    it('should successfully update metadata with valid data', async () => { 
+    it('should successfully update metadata with valid data', async () => {
       await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
-  
+
       expect(capturedRequest).toEqual({
         organizationId: 'orgId',
-        data: Struct.fromJson( { key1: 'value1'} ), 
+        data: Struct.fromJson({ key1: 'value1' }),
       });
-    });  
-  });  
+    });
+  });
 
   describe('getLocationMetadata', () => {
     beforeEach(() => {
@@ -1811,21 +1812,21 @@ describe('AppClient tests', () => {
       expect(response).toEqual({});
     });
 
-    it('preserves the map key when a Struct is found', async () => {      
+    it('preserves the map key when a Struct is found', async () => {
       const testResponse = new pb.GetLocationMetadataResponse({
         data: Struct.fromJson({ key1: 'value1' }),
       });
-      
+
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getLocationMetadata: () => testResponse,
         });
       });
-  
+
       const response = await subject().getLocationMetadata('orgId');
-      expect(response).toEqual( { key1: 'value1' } );
+      expect(response).toEqual({ key1: 'value1' });
     });
-  });  
+  });
 
   describe('updateLocationMetadata', () => {
     let capturedRequest: pb.UpdateLocationMetadataResponse;
@@ -1841,24 +1842,24 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('should handle empty metadata correctly', async () => {  
+    it('should handle empty metadata correctly', async () => {
       await subject().updateLocationMetadata('locId', {});
-  
+
       expect(capturedRequest).toEqual({
         locationId: 'locId',
-        data: Struct.fromJson({}), 
+        data: Struct.fromJson({}),
       });
     });
 
-    it('should successfully update metadata with valid data', async () => { 
+    it('should successfully update metadata with valid data', async () => {
       await subject().updateLocationMetadata('locId', { key1: 'value1' });
-  
+
       expect(capturedRequest).toEqual({
         locationId: 'locId',
-        data: Struct.fromJson( { key1: 'value1'} ), 
+        data: Struct.fromJson({ key1: 'value1' }),
       });
-    });  
-  });  
+    });
+  });
 
   describe('getRobotMetadata', () => {
     beforeEach(() => {
@@ -1874,21 +1875,21 @@ describe('AppClient tests', () => {
       expect(response).toEqual({});
     });
 
-    it('preserves the map key when a Struct is found', async () => {      
+    it('preserves the map key when a Struct is found', async () => {
       const testResponse = new pb.GetRobotMetadataResponse({
         data: Struct.fromJson({ key1: 'value1' }),
       });
-      
+
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobotMetadata: () => testResponse,
         });
       });
-  
+
       const response = await subject().getRobotMetadata('orgId');
-      expect(response).toEqual( { key1: 'value1' } );
+      expect(response).toEqual({ key1: 'value1' });
     });
-  });  
+  });
 
   describe('updateRobotMetadata', () => {
     let capturedRequest: pb.UpdateRobotMetadataResponse;
@@ -1904,24 +1905,24 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('should handle empty metadata correctly', async () => {  
+    it('should handle empty metadata correctly', async () => {
       await subject().updateRobotMetadata('robotId', {});
-  
+
       expect(capturedRequest).toEqual({
         id: 'robotId',
-        data: Struct.fromJson({}), 
+        data: Struct.fromJson({}),
       });
     });
 
-    it('should successfully update metadata with valid data', async () => { 
+    it('should successfully update metadata with valid data', async () => {
       await subject().updateRobotMetadata('robotId', { key1: 'value1' });
-  
+
       expect(capturedRequest).toEqual({
         id: 'robotId',
-        data: Struct.fromJson( { key1: 'value1'} ), 
+        data: Struct.fromJson({ key1: 'value1' }),
       });
-    });  
-  });  
+    });
+  });
 
   describe('getRobotPartMetadata', () => {
     beforeEach(() => {
@@ -1937,21 +1938,21 @@ describe('AppClient tests', () => {
       expect(response).toEqual({});
     });
 
-    it('preserves the map key when a Struct is found', async () => {      
+    it('preserves the map key when a Struct is found', async () => {
       const testResponse = new pb.GetRobotPartMetadataResponse({
         data: Struct.fromJson({ key1: 'value1' }),
       });
-      
+
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobotPartMetadata: () => testResponse,
         });
       });
-  
+
       const response = await subject().getRobotPartMetadata('orgId');
-      expect(response).toEqual( { key1: 'value1' } );
+      expect(response).toEqual({ key1: 'value1' });
     });
-  });  
+  });
 
   describe('updateRobotPartMetadata', () => {
     let capturedRequest: pb.UpdateRobotPartMetadataResponse;
@@ -1967,22 +1968,24 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('should handle empty metadata correctly', async () => {  
+    it('should handle empty metadata correctly', async () => {
       await subject().updateRobotPartMetadata('robotPartId', {});
-  
+
       expect(capturedRequest).toEqual({
         id: 'robotPartId',
-        data: Struct.fromJson({}), 
+        data: Struct.fromJson({}),
       });
     });
 
-    it('should successfully update metadata with valid data', async () => { 
-      await subject().updateRobotPartMetadata('robotPartId', { key1: 'value1' });
-  
+    it('should successfully update metadata with valid data', async () => {
+      await subject().updateRobotPartMetadata('robotPartId', {
+        key1: 'value1',
+      });
+
       expect(capturedRequest).toEqual({
         id: 'robotPartId',
-        data: Struct.fromJson( { key1: 'value1'} ), 
+        data: Struct.fromJson({ key1: 'value1' }),
       });
-    });  
-  });  
+    });
+  });
 });

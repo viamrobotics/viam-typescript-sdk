@@ -1186,11 +1186,15 @@ export class AppClient {
   async getOrganizationMetadata(
     id: string
   ): Promise<Record<string, JsonValue>> {
-    const response = await this.client.getOrganizationMetadata({ organizationId: id });  
-    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    const response = await this.client.getOrganizationMetadata({
+      organizationId: id,
+    });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
     return jsonResponse.data ?? {};
   }
-    
+
   /**
    * Updates user-defined metadata for an organization.
    *
@@ -1201,8 +1205,8 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateOrganizationMetadata({ 
-      organizationId: id, 
+    await this.client.updateOrganizationMetadata({
+      organizationId: id,
       data: Struct.fromJson(data),
     });
   }
@@ -1215,7 +1219,9 @@ export class AppClient {
    */
   async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getLocationMetadata({ locationId: id });
-    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
     return jsonResponse.data ?? {};
   }
 
@@ -1229,7 +1235,10 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateLocationMetadata({ locationId: id, data: Struct.fromJson(data) });
+    await this.client.updateLocationMetadata({
+      locationId: id,
+      data: Struct.fromJson(data),
+    });
   }
 
   /**
@@ -1240,7 +1249,9 @@ export class AppClient {
    */
   async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotMetadata({ id });
-    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
     return jsonResponse.data ?? {};
   }
 
@@ -1263,13 +1274,13 @@ export class AppClient {
    * @param id The ID of the robot part
    * @returns The metadata associated with the robot part
    */
-  async getRobotPartMetadata(
-    id: string
-  ): Promise<Record<string, JsonValue>> {
+  async getRobotPartMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotPartMetadata({ id });
-    const jsonResponse = response.toJson() as { data?: Record<string, JsonValue> };
-    return jsonResponse.data ?? {}; 
-    }
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
 
   /**
    * Updates user-defined metadata for a machine robot.
@@ -1281,6 +1292,9 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateRobotPartMetadata({ id, data: Struct.fromJson(data) });
+    await this.client.updateRobotPartMetadata({
+      id,
+      data: Struct.fromJson(data),
+    });
   }
 }
