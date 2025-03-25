@@ -20,16 +20,18 @@ export class BillingClient {
   }
 
   /**
-   * Get the data usage information for the current month for a given organization.
-   *
-   * @param orgId - The organization ID.
+   * Get the data usage information for the current month for a given
+   * organization.
    *
    * @example
+   *
    * ```ts
    * const billing = new VIAM.BillingClient(machine, 'my_billing');
    * const usage = await billing.getCurrentMonthUsage('<organization-id>');
    * console.log(usage);
    * ```
+   *
+   * @param orgId - The organization ID.
    */
   async getCurrentMonthUsage(orgId: string) {
     const result: GetCurrentMonthUsageResponse =
@@ -42,16 +44,20 @@ export class BillingClient {
   }
 
   /**
-   * Get the billing information (payment method, billing tier, etc.) for a given org.
-   *
-   * @param orgId - The organization ID.
+   * Get the billing information (payment method, billing tier, etc.) for a
+   * given org.
    *
    * @example
+   *
    * ```ts
    * const billing = new VIAM.BillingClient(machine, 'my_billing');
-   * const billingInfo = await billing.getOrgBillingInformation('<organization-id>');
+   * const billingInfo = await billing.getOrgBillingInformation(
+   *   '<organization-id>'
+   * );
    * console.log(billingInfo);
    * ```
+   *
+   * @param orgId - The organization ID.
    */
   async getOrgBillingInformation(orgId: string) {
     return this.client.getOrgBillingInformation({
@@ -62,14 +68,17 @@ export class BillingClient {
   /**
    * Get total outstanding balance plus invoice summaries for a given org.
    *
-   * @param orgId - The organization ID.
-   *
    * @example
+   *
    * ```ts
    * const billing = new VIAM.BillingClient(machine, 'my_billing');
-   * const invoicesSummary = await billing.getInvoicesSummary('<organization-id>');
+   * const invoicesSummary = await billing.getInvoicesSummary(
+   *   '<organization-id>'
+   * );
    * console.log(invoicesSummary);
    * ```
+   *
+   * @param orgId - The organization ID.
    */
   async getInvoicesSummary(orgId: string) {
     return this.client.getInvoicesSummary({
@@ -80,14 +89,19 @@ export class BillingClient {
   /**
    * Get invoice PDF data.
    *
-   * @param id - The invoice ID.
-   * @param orgId - The organization ID.
    * @example
+   *
    * ```ts
    * const billing = new VIAM.BillingClient(machine, 'my_billing');
-   * const invoicePdf = await billing.getInvoicePdf('<invoice-id>', '<organization-id>');
+   * const invoicePdf = await billing.getInvoicePdf(
+   *   '<invoice-id>',
+   *   '<organization-id>'
+   * );
    * console.log(invoicePdf);
    * ```
+   *
+   * @param id - The invoice ID.
+   * @param orgId - The organization ID.
    */
 
   async getInvoicePdf(id: string, orgId: string) {
