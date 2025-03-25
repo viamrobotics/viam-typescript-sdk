@@ -1739,18 +1739,21 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getAppContent: () =>
-            new pb.GetAppContentResponse ({
-              blobPath: "/path/to/blob",
-              entrypoint: "index.html",
-            })
+            new pb.GetAppContentResponse({
+              blobPath: '/path/to/blob',
+              entrypoint: 'index.html',
+            }),
         });
       });
     });
 
     it('getAppContent', async () => {
-      const response = await subject().getAppContent('publicNamespace', 'machineName');
-      expect(response.blobPath).toEqual("/path/to/blob");
-      expect(response.entrypoint).toEqual("index.html");
+      const response = await subject().getAppContent(
+        'publicNamespace',
+        'machineName'
+      );
+      expect(response.blobPath).toEqual('/path/to/blob');
+      expect(response.entrypoint).toEqual('index.html');
     });
   });
 

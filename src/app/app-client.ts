@@ -1185,12 +1185,12 @@ export class AppClient {
    * @param name The name of the app
    * @returns The blob path and entrypoint of the app content
    */
-    async getAppContent(
-      publicNamespace: string,
-      name: string,
-    ): Promise<GetAppContentResponse> {
-      return this.client.getAppContent({ publicNamespace, name });
-    }
+  async getAppContent(
+    publicNamespace: string,
+    name: string
+  ): Promise<GetAppContentResponse> {
+    return this.client.getAppContent({ publicNamespace, name });
+  }
 
   /**
    * Retrieves user-defined metadata for an organization.
