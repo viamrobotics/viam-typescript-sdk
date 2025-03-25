@@ -15,6 +15,14 @@ export interface Resource {
    * Send/Receive arbitrary commands to the resource.
    *
    * @param command - The command to execute.
+   *
+   * @example
+   * ```ts
+   * const result = await resource.doCommand({
+   *   name: 'myCommand',
+   *   args: { key: 'value' },
+   * });
+   * ```
    */
   doCommand(command: Struct): Promise<JsonValue>;
 }
