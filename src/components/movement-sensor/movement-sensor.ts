@@ -18,21 +18,31 @@ export const {
  * position, and/or speed.
  */
 export interface MovementSensor extends Resource {
-  /** Get linear velocity across x/y/z axes.
+  /**
+   * Get linear velocity across x/y/z axes.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const linearVelocity = await movementSensor.getLinearVelocity();
    * ```
    */
   getLinearVelocity(extra?: Struct): Promise<Vector3>;
 
-  /** Get the angular velocity across x/y/z axes.
+  /**
+   * Get the angular velocity across x/y/z axes.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const angularVelocity = await movementSensor.getAngularVelocity();
    * ```
    */
@@ -43,8 +53,12 @@ export interface MovementSensor extends Resource {
    * is East, 180 is South, and 270 is West.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const compassHeading = await movementSensor.getCompassHeading();
    * ```
    */
@@ -54,58 +68,88 @@ export interface MovementSensor extends Resource {
    * Get the current orientation of the sensor.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const orientation = await movementSensor.getOrientation();
    * ```
    */
   getOrientation(extra?: Struct): Promise<Orientation>;
 
-  /** Get the current position latitude, longitude, and altitude.
+  /**
+   * Get the current position latitude, longitude, and altitude.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const position = await movementSensor.getPosition();
    * ```
    */
   getPosition(extra?: Struct): Promise<MovementSensorPosition>;
 
-  /** Get the properties of this movement sensor.
+  /**
+   * Get the properties of this movement sensor.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const properties = await movementSensor.getProperties();
    * ```
    */
   getProperties(extra?: Struct): Promise<MovementSensorProperties>;
 
-  /** Get the accuracy of various sensors.
+  /**
+   * Get the accuracy of various sensors.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const accuracy = await movementSensor.getAccuracy();
    * ```
    */
   getAccuracy(extra?: Struct): Promise<MovementSensorAccuracy>;
 
-  /** Get linear acceleration across x/y/z axes.
+  /**
+   * Get linear acceleration across x/y/z axes.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
-   * const linearAcceleration = await movementSensor.getLinearAcceleration();
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
+   * const linearAcceleration =
+   *   await movementSensor.getLinearAcceleration();
    * ```
    */
   getLinearAcceleration(extra?: Struct): Promise<Vector3>;
 
-  /** Return the readings of a sensor.
+  /**
+   * Return the readings of a sensor.
    *
    * @example
+   *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
    * const readings = await movementSensor.getReadings();
    * ```
    */
