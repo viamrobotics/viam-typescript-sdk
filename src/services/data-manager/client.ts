@@ -22,14 +22,18 @@ export class DataManagerClient implements DataManager {
   /**
    * Sync data stored on the machine to the cloud.
    *
-   * @param extra - Extra arguments to pass to the sync request.
-   * @param callOptions - Call options for the sync request.
-   *
    * @example
+   *
    * ```ts
-   * const dataManager = new VIAM.DataManagerClient(machine, 'my_data_manager');
+   * const dataManager = new VIAM.DataManagerClient(
+   *   machine,
+   *   'my_data_manager'
+   * );
    * await dataManager.sync();
    * ```
+   *
+   * @param extra - Extra arguments to pass to the sync request.
+   * @param callOptions - Call options for the sync request.
    */
   async sync(extra = {}, callOptions = this.callOptions) {
     const request = new SyncRequest({
@@ -45,16 +49,23 @@ export class DataManagerClient implements DataManager {
   /**
    * Do a command on the data manager.
    *
+   * @example
+   *
+   * ```ts
+   * const dataManager = new VIAM.DataManagerClient(
+   *   machine,
+   *   'my_data_manager'
+   * );
+   * await dataManager.doCommand(new Struct({ cmd: 'test', data1: 500 }));
+   * ```
+   *
    * @param command - The command to do.
    * @param callOptions - Call options for the command.
-   *
-   * @example
-   * ```ts
-   * const dataManager = new VIAM.DataManagerClient(machine, 'my_data_manager');
-   * await dataManager.doCommand(new Struct({"cmd": "test", "data1": 500}));
-   * ```
    */
-  async doCommand(command: Struct, callOptions = this.callOptions): Promise<JsonValue> {
+  async doCommand(
+    command: Struct,
+    callOptions = this.callOptions
+  ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
