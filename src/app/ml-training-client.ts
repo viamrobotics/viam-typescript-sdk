@@ -115,7 +115,10 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const mlTraining = new VIAM.MlTrainingClient(
+   *   machine,
+   *   'my_ml_training'
+   * );
    * const job = await mlTraining.getTrainingJob('<training-job-id>');
    * console.log(job);
    * ```
@@ -133,7 +136,10 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const mlTraining = new VIAM.MlTrainingClient(
+   *   machine,
+   *   'my_ml_training'
+   * );
    * const jobs = await mlTraining.listTrainingJobs(
    *   '<organization-id>',
    *   TrainingStatus.RUNNING
@@ -155,7 +161,10 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const mlTraining = new VIAM.MlTrainingClient(
+   *   machine,
+   *   'my_ml_training'
+   * );
    * await mlTraining.cancelTrainingJob('<training-job-id>');
    * ```
    *
