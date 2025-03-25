@@ -33,10 +33,8 @@ export interface Camera extends Resource {
   /**
    * Return a frame from a camera.
    *
-   * @param mimeType - A specific MIME type to request. This is not necessarily
-   *   the same type that will be returned.
-   *
    * @example
+   *
    * ```ts
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const image = await camera.getImage();
@@ -45,39 +43,45 @@ export interface Camera extends Resource {
    * const base64Image = btoa(
    *   Array.from(image)
    *     .map((byte) => String.fromCharCode(byte))
-   *     .join(""),
+   *     .join('')
    * );
    *
    * // Convert image to base64 and display it
-   * const imageElement = document.createElement("img");
+   * const imageElement = document.createElement('img');
    * imageElement.src = `data:image/jpeg;base64,${base64Image}`;
-   * const imageContainer = document.getElementById("#imageContainer");
+   * const imageContainer = document.getElementById('#imageContainer');
    * if (imageContainer) {
-   *     imageContainer.innerHTML = "";
-   *     imageContainer.appendChild(imageElement);
+   *   imageContainer.innerHTML = '';
+   *   imageContainer.appendChild(imageElement);
    * }
    * ```
+   *
+   * @param mimeType - A specific MIME type to request. This is not necessarily
+   *   the same type that will be returned.
    */
   getImage: (mimeType?: MimeType, extra?: Struct) => Promise<Uint8Array>;
 
   /**
    * Render a frame from a camera to an HTTP response.
    *
-   * @param mimeType - A specific MIME type to request. This is not necessarily
-   *   the same type that will be returned.
-   *
    * @example
+   *
    * ```ts
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const mimeType = 'image/jpeg';
    * const image = await camera.renderFrame(mimeType);
    * ```
+   *
+   * @param mimeType - A specific MIME type to request. This is not necessarily
+   *   the same type that will be returned.
    */
   renderFrame: (mimeType?: MimeType, extra?: Struct) => Promise<Blob>;
 
-  /** Return a point cloud from a camera.
+  /**
+   * Return a point cloud from a camera.
    *
    * @example
+   *
    * ```ts
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const pointCloud = await camera.getPointCloud();
@@ -85,9 +89,11 @@ export interface Camera extends Resource {
    */
   getPointCloud: (extra?: Struct) => Promise<Uint8Array>;
 
-  /** Return the camera properties.
+  /**
+   * Return the camera properties.
    *
    * @example
+   *
    * ```ts
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const properties = await camera.getProperties();
