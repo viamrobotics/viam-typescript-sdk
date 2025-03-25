@@ -20,16 +20,13 @@ export class MlTrainingClient {
   /**
    * Submit a training job.
    *
-   * @param organizationId - The organization ID.
-   * @param datasetId - The dataset ID.
-   * @param modelName - The model name.
-   * @param modelVersion - The model version.
-   * @param modelType - The model type.
-   * @param tags - The tags.
-   *
    * @example
+   *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const mlTraining = new VIAM.MlTrainingClient(
+   *   machine,
+   *   'my_ml_training'
+   * );
    * await mlTraining.submitTrainingJob(
    *   '<organization-id>',
    *   '<dataset-id>',
@@ -39,6 +36,13 @@ export class MlTrainingClient {
    *   ['tag1', 'tag2']
    * );
    * ```
+   *
+   * @param organizationId - The organization ID.
+   * @param datasetId - The dataset ID.
+   * @param modelName - The model name.
+   * @param modelVersion - The model version.
+   * @param modelType - The model type.
+   * @param tags - The tags.
    */
   async submitTrainingJob(
     organizationId: string,
@@ -62,16 +66,13 @@ export class MlTrainingClient {
   /**
    * Submit a training job from a custom training script.
    *
-   * @param organizationId - The organization ID.
-   * @param datasetId - The dataset ID.
-   * @param registryItemId - The registry item ID.
-   * @param registryItemVersion - The registry item version.
-   * @param modelName - The model name.
-   * @param modelVersion - The model version.
-   *
    * @example
+   *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const mlTraining = new VIAM.MlTrainingClient(
+   *   machine,
+   *   'my_ml_training'
+   * );
    * await mlTraining.submitCustomTrainingJob(
    *   '<organization-id>',
    *   '<dataset-id>',
@@ -81,6 +82,13 @@ export class MlTrainingClient {
    *   '1.0.0'
    * );
    * ```
+   *
+   * @param organizationId - The organization ID.
+   * @param datasetId - The dataset ID.
+   * @param registryItemId - The registry item ID.
+   * @param registryItemVersion - The registry item version.
+   * @param modelName - The model name.
+   * @param modelVersion - The model version.
    */
   async submitCustomTrainingJob(
     organizationId: string,
@@ -101,55 +109,58 @@ export class MlTrainingClient {
     return resp.id;
   }
 
- /**
-  * Get a training job metadata.
-  *
-  * @param id - The training job ID.
-  *
-  * @example
-  * ```ts
-  * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
-  * const job = await mlTraining.getTrainingJob('<training-job-id>');
-  * console.log(job);
-  * ```
-  */
+  /**
+   * Get a training job metadata.
+   *
+   * @example
+   *
+   * ```ts
+   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const job = await mlTraining.getTrainingJob('<training-job-id>');
+   * console.log(job);
+   * ```
+   *
+   * @param id - The training job ID.
+   */
   async getTrainingJob(id: string) {
     const resp = await this.client.getTrainingJob({ id });
     return resp.metadata;
   }
 
- /**
-  * List training jobs.
-  *
-  * @param organizationId - The organization ID.
-  * @param status - The training job status.
-  *
-  * @example
-  * ```ts
-  * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
-  * const jobs = await mlTraining.listTrainingJobs(
-  *   '<organization-id>',
-  *   TrainingStatus.RUNNING
-  * );
-  * console.log(jobs);
-  * ```
-  */
+  /**
+   * List training jobs.
+   *
+   * @example
+   *
+   * ```ts
+   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const jobs = await mlTraining.listTrainingJobs(
+   *   '<organization-id>',
+   *   TrainingStatus.RUNNING
+   * );
+   * console.log(jobs);
+   * ```
+   *
+   * @param organizationId - The organization ID.
+   * @param status - The training job status.
+   */
   async listTrainingJobs(organizationId: string, status: TrainingStatus) {
     const resp = await this.client.listTrainingJobs({ organizationId, status });
     return resp.jobs;
   }
 
- /**
-  * Cancel a training job.
-  *
-  * @param id - The training job ID.
-  *
-  * @example
-  * ```ts
-  * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
-  * await mlTraining.cancelTrainingJob('<training-job-id>');
-  * ```
-  */
+  /**
+   * Cancel a training job.
+   *
+   * @example
+   *
+   * ```ts
+   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * await mlTraining.cancelTrainingJob('<training-job-id>');
+   * ```
+   *
+   * @param id - The training job ID.
+   */
   async cancelTrainingJob(id: string) {
     await this.client.cancelTrainingJob({ id });
     return null;
@@ -158,13 +169,17 @@ export class MlTrainingClient {
   /**
    * Delete a completed training job.
    *
-   * @param id - The training job ID.
-   *
    * @example
+   *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(machine, 'my_ml_training');
+   * const mlTraining = new VIAM.MlTrainingClient(
+   *   machine,
+   *   'my_ml_training'
+   * );
    * await mlTraining.deleteCompletedTrainingJob('<training-job-id>');
    * ```
+   *
+   * @param id - The training job ID.
    */
   async deleteCompletedTrainingJob(id: string) {
     await this.client.deleteCompletedTrainingJob({ id });
