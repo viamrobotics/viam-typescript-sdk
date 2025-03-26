@@ -23,11 +23,7 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(
-   *   machine,
-   *   'my_ml_training'
-   * );
-   * await mlTraining.submitTrainingJob(
+   * await mlTrainingClient.submitTrainingJob(
    *   '<organization-id>',
    *   '<dataset-id>',
    *   '<your-model-name>',
@@ -69,11 +65,7 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(
-   *   machine,
-   *   'my_ml_training'
-   * );
-   * await mlTraining.submitCustomTrainingJob(
+   * await mlTrainingClient.submitCustomTrainingJob(
    *   '<organization-id>',
    *   '<dataset-id>',
    *   'viam:classification-tflite',
@@ -115,12 +107,7 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(
-   *   machine,
-   *   'my_ml_training'
-   * );
-   * const job = await mlTraining.getTrainingJob('<training-job-id>');
-   * console.log(job);
+   * const job = await mlTrainingClient.getTrainingJob('<training-job-id>');
    * ```
    *
    * @param id - The training job ID.
@@ -136,15 +123,10 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(
-   *   machine,
-   *   'my_ml_training'
-   * );
-   * const jobs = await mlTraining.listTrainingJobs(
+   * const jobs = await mlTrainingClient.listTrainingJobs(
    *   '<organization-id>',
    *   TrainingStatus.RUNNING
    * );
-   * console.log(jobs);
    * ```
    *
    * @param organizationId - The organization ID.
@@ -161,11 +143,7 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(
-   *   machine,
-   *   'my_ml_training'
-   * );
-   * await mlTraining.cancelTrainingJob('<training-job-id>');
+   * await mlTrainingClient.cancelTrainingJob('<training-job-id>');
    * ```
    *
    * @param id - The training job ID.
@@ -181,11 +159,7 @@ export class MlTrainingClient {
    * @example
    *
    * ```ts
-   * const mlTraining = new VIAM.MlTrainingClient(
-   *   machine,
-   *   'my_ml_training'
-   * );
-   * await mlTraining.deleteCompletedTrainingJob('<training-job-id>');
+   * await mlTrainingClient.deleteCompletedTrainingJob('<training-job-id>');
    * ```
    *
    * @param id - The training job ID.
