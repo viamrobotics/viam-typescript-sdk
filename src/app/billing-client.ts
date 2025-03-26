@@ -26,7 +26,6 @@ export class BillingClient {
    * @example
    *
    * ```ts
-   * const billing = new VIAM.BillingClient(machine, 'my_billing');
    * const usage = await billing.getCurrentMonthUsage('<organization-id>');
    * console.log(usage);
    * ```
@@ -50,7 +49,6 @@ export class BillingClient {
    * @example
    *
    * ```ts
-   * const billing = new VIAM.BillingClient(machine, 'my_billing');
    * const billingInfo = await billing.getOrgBillingInformation(
    *   '<organization-id>'
    * );
@@ -71,7 +69,6 @@ export class BillingClient {
    * @example
    *
    * ```ts
-   * const billing = new VIAM.BillingClient(machine, 'my_billing');
    * const invoicesSummary = await billing.getInvoicesSummary(
    *   '<organization-id>'
    * );
@@ -92,7 +89,6 @@ export class BillingClient {
    * @example
    *
    * ```ts
-   * const billing = new VIAM.BillingClient(machine, 'my_billing');
    * const invoicePdf = await billing.getInvoicePdf(
    *   '<invoice-id>',
    *   '<organization-id>'
