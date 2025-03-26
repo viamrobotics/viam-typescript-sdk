@@ -27,7 +27,6 @@ export class BillingClient {
    *
    * ```ts
    * const usage = await billing.getCurrentMonthUsage('<organization-id>');
-   * console.log(usage);
    * ```
    *
    * @param orgId - The organization ID.
@@ -52,7 +51,6 @@ export class BillingClient {
    * const billingInfo = await billing.getOrgBillingInformation(
    *   '<organization-id>'
    * );
-   * console.log(billingInfo);
    * ```
    *
    * @param orgId - The organization ID.
@@ -72,7 +70,6 @@ export class BillingClient {
    * const invoicesSummary = await billing.getInvoicesSummary(
    *   '<organization-id>'
    * );
-   * console.log(invoicesSummary);
    * ```
    *
    * @param orgId - The organization ID.
@@ -93,7 +90,6 @@ export class BillingClient {
    *   '<invoice-id>',
    *   '<organization-id>'
    * );
-   * console.log(invoicePdf);
    * ```
    *
    * @param id - The invoice ID.
