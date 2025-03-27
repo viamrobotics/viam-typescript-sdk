@@ -43,8 +43,8 @@ export interface Vision extends Resource {
    * const image = await camera.getImage(mimeType);
    * const detections = await vision.getDetections(
    *   image,
-   *   width,
-   *   height,
+   *   600,
+   *   600,
    *   mimeType
    * );
    * ```
