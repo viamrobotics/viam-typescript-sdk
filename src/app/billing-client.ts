@@ -19,6 +19,18 @@ export class BillingClient {
     this.client = createPromiseClient(BillingService, transport);
   }
 
+  /**
+   * Get the data usage information for the current month for a given
+   * organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const usage = await billing.getCurrentMonthUsage('<organization-id>');
+   * ```
+   *
+   * @param orgId - The organization ID.
+   */
   async getCurrentMonthUsage(orgId: string) {
     const result: GetCurrentMonthUsageResponse =
       await this.client.getCurrentMonthUsage({
@@ -29,17 +41,60 @@ export class BillingClient {
     return result;
   }
 
+  /**
+   * Get the billing information (payment method, billing tier, etc.) for a
+   * given org.
+   *
+   * @example
+   *
+   * ```ts
+   * const billingInfo = await billing.getOrgBillingInformation(
+   *   '<organization-id>'
+   * );
+   * ```
+   *
+   * @param orgId - The organization ID.
+   */
   async getOrgBillingInformation(orgId: string) {
     return this.client.getOrgBillingInformation({
       orgId,
     });
   }
 
+  /**
+   * Get total outstanding balance plus invoice summaries for a given org.
+   *
+   * @example
+   *
+   * ```ts
+   * const invoicesSummary = await billing.getInvoicesSummary(
+   *   '<organization-id>'
+   * );
+   * ```
+   *
+   * @param orgId - The organization ID.
+   */
   async getInvoicesSummary(orgId: string) {
     return this.client.getInvoicesSummary({
       orgId,
     });
   }
+
+  /**
+   * Get invoice PDF data.
+   *
+   * @example
+   *
+   * ```ts
+   * const invoicePdf = await billing.getInvoicePdf(
+   *   '<invoice-id>',
+   *   '<organization-id>'
+   * );
+   * ```
+   *
+   * @param id - The invoice ID.
+   * @param orgId - The organization ID.
+   */
 
   async getInvoicePdf(id: string, orgId: string) {
     const pdfParts = this.client.getInvoicePdf({
