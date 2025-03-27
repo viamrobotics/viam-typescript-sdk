@@ -83,6 +83,18 @@ export class DataClient {
    * @param endTime Optional end time (`Date` object) for requesting a specific
    *   range of data
    * @returns An array of unified tabular data and metadata.
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.exportTabularData(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-sensor',
+   *   'rdk:component:sensor',
+   *   'Readings',
+   *   new Date('2025-03-25'),
+   *   new Date('2024-03-27'),
+   * );
+   * ```
    */
   async exportTabularData(
     partId: string,
@@ -139,6 +151,14 @@ export class DataClient {
    * @param organizationId The ID of the organization that owns the data
    * @param query The SQL query to run
    * @returns An array of data objects
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.tabularDataBySQL(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'SELECT * FROM readings LIMIT 5',
+   * );
+   * ```
    */
   async tabularDataBySQL(organizationId: string, query: string) {
     const resp = await this.dataClient.tabularDataBySQL({
@@ -156,6 +176,26 @@ export class DataClient {
    * @param useRecentData Whether to query blob storage or your recent data
    *   store. Defaults to false
    * @returns An array of data objects
+   *
+   * @example
+   * ```ts
+   * type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+   * const mqlQuery: Record<string, JsonValue>[] = [
+   *   {
+   *     "$match": {
+   *       "component_name": "sensor-1"
+   *     }
+   *   },
+   *   {
+   *     "$limit": 5
+   *   }
+   * ];
+   *
+   * const data = await dataClient.tabularDataByMQL(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   mqlQuery
+   * );
+   * ```
    */
   async tabularDataByMQL(
     organizationId: string,
@@ -194,6 +234,17 @@ export class DataClient {
    *   `false`.
    * @returns An array of data objects, the count (number of entries), and the
    *   last-returned page ID.
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.tabularDataByFilter(
+   *   {
+   *     componentName: 'sensor-1',
+   *     componentType: 'rdk:component:sensor',
+   *   } as Filter,
+   *   5
+   * );
+   * ```
    */
   async tabularDataByFilter(
     filter?: Filter,
@@ -265,6 +316,17 @@ export class DataClient {
    *   `false`.
    * @returns An array of data objects, the count (number of entries), and the
    *   last-returned page ID.
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.binaryDataByFilter(
+   *   {
+   *     componentName: 'camera-1',
+   *     componentType: 'rdk:component:camera',
+   *   } as Filter,
+   *   1
+   * );
+   * ```
    */
   async binaryDataByFilter(
     filter?: Filter,
@@ -302,6 +364,17 @@ export class DataClient {
    *
    * @param ids The IDs of the requested binary data
    * @returns An array of data objects
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.binaryDataByIds([
+   *   {
+   *     fileId: 'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
+   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *     locationId: 'ab1cd34e5f'
+   *   } as VIAM.BinaryID
+   * ]);
+   * ```
    */
   async binaryDataByIds(ids: BinaryID[]) {
     const resp = await this.dataClient.binaryDataByIDs({
@@ -320,6 +393,14 @@ export class DataClient {
    *   any data that was captured more than 10 days ago. If it is 0, all
    *   existing data is deleted.
    * @returns The number of items deleted
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.deleteTabularData(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   10,
+   * );
+   * ```
    */
   async deleteTabularData(organizationId: string, deleteOlderThanDays: number) {
     const resp = await this.dataClient.deleteTabularData({
@@ -337,6 +418,19 @@ export class DataClient {
    * @param includeInternalData Whether or not to delete internal data. Default
    *   is true
    * @returns The number of items deleted
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.deleteBinaryDataByFilter(
+   *   {
+   *     componentName: 'camera-1',
+   *     componentType: 'rdk:component:camera',
+   *     organizationIds: ['123abc45-1234-5678-90ab-cdef12345678'],
+   *     startTime: new Date('2025-03-19'),
+   *     endTime: new Date('2025-03-20'),
+   *   } as Filter,
+   * );
+   * ```
    */
   async deleteBinaryDataByFilter(filter?: Filter, includeInternalData = true) {
     const resp = await this.dataClient.deleteBinaryDataByFilter({
@@ -351,6 +445,17 @@ export class DataClient {
    *
    * @param ids The IDs of the data to be deleted. Must be non-empty.
    * @returns The number of items deleted
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.deleteBinaryDataByIds([
+   *   {
+   *     fileId: 'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
+   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *     locationId: 'ab1cd34e5f'
+   *   } as VIAM.BinaryID
+   * ]);
+   * ```
    */
   async deleteBinaryDataByIds(ids: BinaryID[]) {
     const resp = await this.dataClient.deleteBinaryDataByIDs({
@@ -365,6 +470,21 @@ export class DataClient {
    * @param tags The list of tags to add to specified binary data. Must be
    *   non-empty.
    * @param ids The IDs of the data to be tagged. Must be non-empty.
+   *
+   * @example
+   * ```ts
+   *  // TODO(DOES NOT WORK)
+   * const data = await dataClient.addTagsToBinaryDataByIds(
+   *   ["tag1", "tag2"],
+   *   [
+   *     {
+    *      fileId: 'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
+    *      organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+    *      locationId: 'ab1cd34e5f'
+    *    } as VIAM.BinaryID
+   *   ],
+   * );
+   * ```
    */
   async addTagsToBinaryDataByIds(tags: string[], ids: BinaryID[]) {
     await this.dataClient.addTagsToBinaryDataByIDs({
@@ -379,6 +499,19 @@ export class DataClient {
    * @param tags The tags to add to the data
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
+   *
+   * @example
+   * ```ts
+   *  // TODO(DOES NOT WORK)
+   * const data = await dataClient.addTagsToBinaryDataByFilter(
+   *   ["tag1", "tag2"],
+   *   [
+   *     {
+   *       componentName: 'camera-1',
+   *     } as Filter
+   *   ],
+   * );
+   * ```
    */
   async addTagsToBinaryDataByFilter(tags: string[], filter?: Filter) {
     await this.dataClient.addTagsToBinaryDataByFilter({
@@ -394,6 +527,21 @@ export class DataClient {
    *   non-empty.
    * @param ids The IDs of the data to be edited. Must be non-empty.
    * @returns The number of items deleted
+   *
+   * @example
+   * ```ts
+   * // TODO(UNTESTED)
+   * const data = await dataClient.removeTagsFromBinaryDataByIds(
+   *   ["tag1", "tag2"],
+   *   [
+   *     {
+   *       fileId: 'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
+   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *       locationId: 'ab1cd34e5f'
+   *     } as VIAM.BinaryID
+   *   ],
+   * );
+   * ```
    */
   async removeTagsFromBinaryDataByIds(tags: string[], ids: BinaryID[]) {
     const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
@@ -411,6 +559,21 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
    * @returns The number of items deleted
+   *
+   * @example
+   * ```ts
+   *  // TODO(DOES NOT WORK)
+   * const data = await dataClient.removeTagsFromBinaryDataByFilter(
+   *   ["tag1", "tag2"],
+   *   {
+   *     componentName: 'camera-1',
+   *     componentType: 'rdk:component:camera',
+   *     organizationIds: ['123abc45-1234-5678-90ab-cdef12345678'],
+   *     startTime: new Date('2025-03-19'),
+   *     endTime: new Date('2025-03-20'),
+   *   } as Filter,
+   * );
+   * ```
    */
   async removeTagsFromBinaryDataByFilter(tags: string[], filter?: Filter) {
     const resp = await this.dataClient.removeTagsFromBinaryDataByFilter({
@@ -426,6 +589,15 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying what data to get tags from.
    *   No `filter` implies all data.
    * @returns The list of tags
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.tagsByFilter(
+   *   {
+   *     componentName: 'camera-1',
+   *   } as Filter
+   * );
+   * ```
    */
   async tagsByFilter(filter?: Filter) {
     const resp = await this.dataClient.tagsByFilter({ filter });
@@ -446,6 +618,23 @@ export class DataClient {
    * @param yMaxNormalized The max Y value of the bounding box normalized from 0
    *   to 1
    * @returns The bounding box ID
+   *
+   * @example
+   * ```ts
+   *  // TODO(DOES NOT WORK)
+   * const bboxId = await dataClient.addBoundingBoxToImageById(
+   *   {
+   *     fileId: 'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
+   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *     locationId: 'ab1cd34e5f'
+   *   } as VIAM.BinaryID,
+   *   "label1",
+   *   0.3,
+   *   0.3,
+   *   0.6,
+   *   0.6
+   * );
+   * ```
    */
   async addBoundingBoxToImageById(
     id: BinaryID,
@@ -471,6 +660,19 @@ export class DataClient {
    *
    * @param binId The ID of the image to remove the bounding box from
    * @param bboxId The ID of the bounding box to remove
+   *
+   * @example
+   * ```ts
+   *  // TODO(UNTESTED)
+   * await dataClient.removeBoundingBoxFromImageById(
+   *   {
+   *     fileId: 'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
+   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *     locationId: 'ab1cd34e5f'
+   *   } as VIAM.BinaryID,
+   *   "bbox1",
+   * );
+   * ```
    */
   async removeBoundingBoxFromImageById(binId: BinaryID, bboxId: string) {
     await this.dataClient.removeBoundingBoxFromImageByID({
@@ -485,6 +687,16 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying what data to get tags from.
    *   No `filter` implies all labels.
    * @returns The list of bounding box labels
+   *
+   * @example
+   * ```ts
+   * // TODO(DOES NOT WORK)
+   * const data = await dataClient.boundingBoxLabelsByFilter(
+   *   {
+   *     componentName: 'camera-1',
+   *   } as Filter
+   * );
+   * ```
    */
   async boundingBoxLabelsByFilter(filter?: Filter) {
     const resp = await this.dataClient.boundingBoxLabelsByFilter({
@@ -500,6 +712,14 @@ export class DataClient {
    *
    * @param organizationId The ID of the organization
    * @param password The password of the user
+   *
+   * @example
+   * ```ts
+   * await dataClient.configureDatabaseUser(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'Password01!',
+   * );
+   * ```
    */
   async configureDatabaseUser(organizationId: string, password: string) {
     await this.dataClient.configureDatabaseUser({ organizationId, password });
@@ -510,6 +730,13 @@ export class DataClient {
    *
    * @param organizationId Organization to retrieve connection for
    * @returns Hostname of the federated database
+   *
+   * @example
+   * ```ts
+   * const hostname = await dataClient.getDatabaseConnection(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   * );
+   * ```
    */
   async getDatabaseConnection(organizationId: string) {
     const resp = await this.dataClient.getDatabaseConnection({
@@ -523,6 +750,20 @@ export class DataClient {
    *
    * @param ids The IDs of binary data to add to dataset
    * @param datasetId The ID of the dataset to be added to
+   *
+   * @example
+   * ```ts
+   * await dataClient.addBinaryDataToDatasetByIds(
+   *   [
+   *     {
+   *       fileId: 'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
+   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *       locationId: 'ab1cd34e5f'
+   *     } as VIAM.BinaryID
+   *   ],
+   *   '12ab3de4f56a7bcd89ef0ab1'
+   * );
+   * ```
    */
   async addBinaryDataToDatasetByIds(ids: BinaryID[], datasetId: string) {
     await this.dataClient.addBinaryDataToDatasetByIDs({
@@ -536,6 +777,20 @@ export class DataClient {
    *
    * @param ids The IDs of the binary data to remove from dataset
    * @param datasetId The ID of the dataset to be removed from
+   *
+   * @example
+   * ```ts
+   * await dataClient.removeBinaryDataFromDatasetByIds(
+   *   [
+   *     {
+   *       fileId: 'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
+   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
+   *       locationId: 'ab1cd34e5f'
+   *     } as VIAM.BinaryID
+   *   ],
+   *   '12ab3de4f56a7bcd89ef0ab1',
+   * );
+   * ```
    */
   async removeBinaryDataFromDatasetByIds(ids: BinaryID[], datasetId: string) {
     await this.dataClient.removeBinaryDataFromDatasetByIDs({
@@ -551,6 +806,14 @@ export class DataClient {
    * @param organizationId The ID of the organization the dataset is being
    *   created in
    * @returns The ID of the dataset
+   *
+   * @example
+   * ```ts
+   * const datasetId = await dataClient.createDataset(
+   *   'my-new-dataset',
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   * );
+   * ```
    */
   async createDataset(name: string, organizationId: string) {
     const resp = await this.datasetClient.createDataset({
@@ -564,6 +827,11 @@ export class DataClient {
    * Delete a dataset.
    *
    * @param id The ID of the dataset.
+   *
+   * @example
+   * ```ts
+   * await dataClient.deleteDataset('12ab3de4f56a7bcd89ef0ab1');
+   * ```
    */
   async deleteDataset(id: string) {
     await this.datasetClient.deleteDataset({ id });
@@ -574,6 +842,11 @@ export class DataClient {
    *
    * @param id The ID of the dataset
    * @param name The new name of the dataset
+   *
+   * @example
+   * ```ts
+   * await dataClient.renameDataset('12ab3de4f56a7bcd89ef0ab1', 'my-new-dataset');
+   * ```
    */
   async renameDataset(id: string, name: string) {
     await this.datasetClient.renameDataset({ id, name });
@@ -584,6 +857,13 @@ export class DataClient {
    *
    * @param organizationId The ID of the organization
    * @returns The list of datasets in the organization
+   *
+   * @example
+   * ```ts
+   * const datasets = await dataClient.listDatasetsByOrganizationID(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   * );
+   * ```
    */
   async listDatasetsByOrganizationID(
     organizationId: string
@@ -604,6 +884,13 @@ export class DataClient {
    *
    * @param ids The list of IDs of the datasets
    * @returns The list of datasets
+   *
+   * @example
+   * ```ts
+   * const datasets = await dataClient.listDatasetsByIds([
+   *   '12ab3de4f56a7bcd89ef0ab1',
+   * ]);
+   * ```
    */
   async listDatasetsByIds(ids: string[]): Promise<Dataset[]> {
     const resp = await this.datasetClient.listDatasetsByIDs({
@@ -640,6 +927,25 @@ export class DataClient {
    *   and Timestamps with length n > 1 will result in n datapoints being
    *   uploaded, all tied to the same metadata.
    * @returns The file ID of the uploaded data
+   *
+   * @example
+   * ```ts
+   * const fileId = await dataClient.tabularDataCaptureUpload(
+   *   [
+   *     {
+   *       "timestamp": "2025-03-26T10:00:00Z",
+   *       "value": 10
+   *     }
+   *   ],
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'rdk:component:sensor',
+   *   'my-sensor',
+   *   'Readings',
+   *   [
+   *     [new Date('2025-03-26T10:00:00Z'), new Date('2025-03-26T10:00:00Z')],
+   *   ],
+   * );
+   * ```
    */
   async tabularDataCaptureUpload(
     tabularData: Record<string, JsonValue>[],
@@ -714,6 +1020,19 @@ export class DataClient {
    *   this data was requested[0] by the robot and received[1] from the
    *   appropriate sensor.
    * @returns The file ID of the uploaded data
+   *
+   * @example
+   * ```ts
+   * const fileId = await dataClient.binaryDataCaptureUpload(
+   *   binaryData,
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'rdk:component:camera',
+   *   'my-camera',
+   *   'ReadImage',
+   *   '.jpg',
+   *   [new Date('2025-03-19'), new Date('2025-03-19')],
+   * );
+   * ```
    */
   async binaryDataCaptureUpload(
     binaryData: Uint8Array,
@@ -792,6 +1111,16 @@ export class DataClient {
    * @returns A tuple containing [timeCaptured, timeSynced, payload] or null if
    *   no data has been synced for the specified resource OR the most recently
    *   captured data was over a year ago
+   *
+   * @example
+   * ```ts
+   * const data = await dataClient.getLatestTabularData(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-sensor',
+   *   'rdk:component:sensor',
+   *   'Readings',
+   * );
+   * ```
    */
   async getLatestTabularData(
     partId: string,
