@@ -473,7 +473,6 @@ export class DataClient {
    *
    * @example
    * ```ts
-   *  // TODO(DOES NOT WORK)
    * const data = await dataClient.addTagsToBinaryDataByIds(
    *   ["tag1", "tag2"],
    *   [
@@ -502,7 +501,6 @@ export class DataClient {
    *
    * @example
    * ```ts
-   *  // TODO(DOES NOT WORK)
    * const data = await dataClient.addTagsToBinaryDataByFilter(
    *   ["tag1", "tag2"],
    *   [
@@ -530,7 +528,6 @@ export class DataClient {
    *
    * @example
    * ```ts
-   * // TODO(UNTESTED)
    * const data = await dataClient.removeTagsFromBinaryDataByIds(
    *   ["tag1", "tag2"],
    *   [
@@ -562,7 +559,6 @@ export class DataClient {
    *
    * @example
    * ```ts
-   *  // TODO(DOES NOT WORK)
    * const data = await dataClient.removeTagsFromBinaryDataByFilter(
    *   ["tag1", "tag2"],
    *   {
@@ -621,7 +617,6 @@ export class DataClient {
    *
    * @example
    * ```ts
-   *  // TODO(DOES NOT WORK)
    * const bboxId = await dataClient.addBoundingBoxToImageById(
    *   {
    *     fileId: 'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
@@ -670,7 +665,7 @@ export class DataClient {
    *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
    *     locationId: 'ab1cd34e5f'
    *   } as VIAM.BinaryID,
-   *   "bbox1",
+   *   "5Z9ryhkW7ULaXROjJO6ghPYulNllnH20QImda1iZFroZpQbjahK6igQ1WbYigXED",
    * );
    * ```
    */
@@ -690,7 +685,6 @@ export class DataClient {
    *
    * @example
    * ```ts
-   * // TODO(DOES NOT WORK)
    * const data = await dataClient.boundingBoxLabelsByFilter(
    *   {
    *     componentName: 'camera-1',
