@@ -39,12 +39,13 @@ import type { LogEntry } from '../gen/common/v1/common_pb';
  * Creates an Authorization object from auth details.
  *
  * @param organizationId The ID of the organization to create the role under
- * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+ * @param entityId The ID of the entity the role belongs to (for example a user
+ *   ID)
  * @param role The role to add ("owner" or "operator")
  * @param resourceType The type of resource to create the role for ("robot",
  *   "location", or "organization")
- * @param identityType The type of identity that the identity ID is (e.g., an
- *   api-key)
+ * @param identityType The type of identity that the identity ID is (for example
+ *   an api-key)
  * @param resourceId The ID of the resource the role is being created for
  */
 export const createAuth = (
@@ -850,7 +851,8 @@ export class AppClient {
    * Add a role under an organization.
    *
    * @param organizationId The ID of the organization to create the role under
-   * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+   * @param entityId The ID of the entity the role belongs to (for example a
+   *   user ID)
    * @param role The role to add ("owner" or "operator")
    * @param resourceType The type of resource to create the role for ("robot",
    *   "location", or "organization")
@@ -879,7 +881,8 @@ export class AppClient {
    * Removes a role from an organization.
    *
    * @param organizationId The ID of the organization to remove the role from
-   * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+   * @param entityId The ID of the entity the role belongs to (for example a
+   *   user ID)
    * @param role The role to remove ("owner" or "operator")
    * @param resourceType The type of resource to remove the role from ("robot",
    *   "location", or "organization")
