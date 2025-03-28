@@ -12,6 +12,7 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
+  GetAppContentResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   ListOrganizationMembersResponse,
@@ -1175,6 +1176,20 @@ export class AppClient {
     id: string
   ): Promise<CreateKeyFromExistingKeyAuthorizationsResponse> {
     return this.client.createKeyFromExistingKeyAuthorizations({ id });
+  }
+
+  /**
+   * Retrieves the app content for an organization.
+   *
+   * @param publicNamespace The public namespace of the organization
+   * @param name The name of the app
+   * @returns The blob path and entrypoint of the app content
+   */
+  async getAppContent(
+    publicNamespace: string,
+    name: string
+  ): Promise<GetAppContentResponse> {
+    return this.client.getAppContent({ publicNamespace, name });
   }
 
   /**
