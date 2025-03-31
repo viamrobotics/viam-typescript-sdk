@@ -1,9 +1,8 @@
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
-import type { MLModel } from './ml-model';
+import type { FlatTensors, MLModel } from './ml-model';
 import { Struct, type Options } from '../../types';
 import type { RobotClient } from '../../robot';
 import {
-  FlatTensors,
   InferRequest,
   MetadataRequest,
 } from '../../gen/service/mlmodel/v1/mlmodel_pb';
