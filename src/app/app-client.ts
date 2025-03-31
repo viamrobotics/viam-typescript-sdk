@@ -694,10 +694,10 @@ export class AppClient {
   }
 
   /**
-   * Updates an existing robot's name and/or location.
+   * Change the name of an existing machine. You can only change the name of the machine, not the location.
    *
    * @param robotId The ID of the robot to update
-   * @param locId The ID of the location to move the robot to
+   * @param locId The location where the robot is
    * @param name The name to update the robot to
    * @returns The newly-modified robot object
    */
