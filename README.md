@@ -29,11 +29,11 @@ npm install @viamrobotics/sdk
 
 ## Node
 
-To use this SDK with node, read the [documentation](/Node.md) or view the [example](/examples/node/)
+To use this SDK with node, read the [documentation](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/Node.md) or view the [example](https://github.com/viamrobotics/viam-typescript-sdk/tree/main/examples/node)
 
 ## React Native
 
-To use this SDK with React Native, read the [documentation](/ReactNative.md) or view the [example](/examples/react-native/)
+To use this SDK with React Native, read the [documentation](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/ReactNative.md) or view the [example](https://github.com/viamrobotics/viam-typescript-sdk/tree/main/examples/react-native/)
 
 ## License
 

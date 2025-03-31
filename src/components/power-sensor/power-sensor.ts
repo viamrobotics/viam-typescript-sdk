@@ -3,12 +3,62 @@ import type { Sensor } from '../sensor';
 
 /** Represents any sensor that reports voltage, current, and/or power */
 export interface PowerSensor extends Sensor {
-  /** Get Voltage in volts and a boolean that returns true if AC */
+  /**
+   * Get voltage in volts and a boolean indicating whether the voltage is AC
+   * (true) or DC (false).
+   *
+   * @example
+   *
+   * ```ts
+   * const powerSensor = new VIAM.PowerSensorClient(
+   *   machine,
+   *   'my_power_sensor'
+   * );
+   * const [voltage, isAc] = await powerSensor.getVoltage();
+   * ```
+   */
   getVoltage(extra?: Struct): Promise<readonly [number, boolean]>;
-  /** Get Current in amps and a boolean that returns true if AC */
+  /**
+   * Get Current in amps and a boolean indicating whether the voltage is AC
+   * (true) or DC (false).
+   *
+   * @example
+   *
+   * ```ts
+   * const powerSensor = new VIAM.PowerSensorClient(
+   *   machine,
+   *   'my_power_sensor'
+   * );
+   * const [current, isAc] = await powerSensor.getCurrent();
+   * ```
+   */
   getCurrent(extra?: Struct): Promise<readonly [number, boolean]>;
-  /** Get Power in watts */
+  /**
+   * Get power in watts.
+   *
+   * @example
+   *
+   * ```ts
+   * const powerSensor = new VIAM.PowerSensorClient(
+   *   machine,
+   *   'my_power_sensor'
+   * );
+   * const power = await powerSensor.getPower();
+   * ```
+   */
   getPower(extra?: Struct): Promise<number>;
-  /** Return the readings of a sensor. */
+  /**
+   * Return the readings of a sensor.
+   *
+   * @example
+   *
+   * ```ts
+   * const powerSensor = new VIAM.PowerSensorClient(
+   *   machine,
+   *   'my_power_sensor'
+   * );
+   * const readings = await powerSensor.getReadings();
+   * ```
+   */
   getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
 }

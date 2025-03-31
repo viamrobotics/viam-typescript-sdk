@@ -18,7 +18,7 @@ import type { Switch } from './switch';
  */
 export class SwitchClient implements Switch {
   private client: PromiseClient<typeof SwitchService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

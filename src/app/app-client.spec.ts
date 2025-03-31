@@ -1733,4 +1733,282 @@ describe('AppClient tests', () => {
       expect(response.id).toEqual('id');
     });
   });
+
+  describe('getAppContent tests', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getAppContent: () =>
+            new pb.GetAppContentResponse({
+              blobPath: '/path/to/blob',
+              entrypoint: 'index.html',
+            }),
+        });
+      });
+    });
+
+    it('getAppContent', async () => {
+      const response = await subject().getAppContent(
+        'publicNamespace',
+        'machineName'
+      );
+      expect(response.blobPath).toEqual('/path/to/blob');
+      expect(response.entrypoint).toEqual('index.html');
+    });
+  });
+
+  describe('getOrganizationMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getOrganizationMetadata: () =>
+            new pb.GetOrganizationMetadataResponse(),
+        });
+      });
+    });
+
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getOrganizationMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('preserves the map key when a Struct is found', async () => {
+      const testResponse = new pb.GetOrganizationMetadataResponse({
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getOrganizationMetadata: () => testResponse,
+        });
+      });
+
+      const response = await subject().getOrganizationMetadata('orgId');
+      expect(response).toEqual({ key1: 'value1' });
+    });
+  });
+
+  describe('updateOrganizationMetadata', () => {
+    let capturedRequest: pb.UpdateOrganizationMetadataRequest;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateOrganizationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateOrganizationMetadataResponse();
+          },
+        });
+      });
+    });
+
+    it('should handle empty metadata correctly', async () => {
+      await subject().updateOrganizationMetadata('orgId', {});
+
+      expect(capturedRequest).toEqual({
+        organizationId: 'orgId',
+        data: Struct.fromJson({}),
+      });
+    });
+
+    it('should successfully update metadata with valid data', async () => {
+      await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
+
+      expect(capturedRequest).toEqual({
+        organizationId: 'orgId',
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+    });
+  });
+
+  describe('getLocationMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getLocationMetadata: () => new pb.GetLocationMetadataResponse(),
+        });
+      });
+    });
+
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getLocationMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('preserves the map key when a Struct is found', async () => {
+      const testResponse = new pb.GetLocationMetadataResponse({
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getLocationMetadata: () => testResponse,
+        });
+      });
+
+      const response = await subject().getLocationMetadata('orgId');
+      expect(response).toEqual({ key1: 'value1' });
+    });
+  });
+
+  describe('updateLocationMetadata', () => {
+    let capturedRequest: pb.UpdateLocationMetadataResponse;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateLocationMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateLocationMetadataResponse();
+          },
+        });
+      });
+    });
+
+    it('should handle empty metadata correctly', async () => {
+      await subject().updateLocationMetadata('locId', {});
+
+      expect(capturedRequest).toEqual({
+        locationId: 'locId',
+        data: Struct.fromJson({}),
+      });
+    });
+
+    it('should successfully update metadata with valid data', async () => {
+      await subject().updateLocationMetadata('locId', { key1: 'value1' });
+
+      expect(capturedRequest).toEqual({
+        locationId: 'locId',
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+    });
+  });
+
+  describe('getRobotMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotMetadata: () => new pb.GetRobotMetadataResponse(),
+        });
+      });
+    });
+
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getRobotMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('preserves the map key when a Struct is found', async () => {
+      const testResponse = new pb.GetRobotMetadataResponse({
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotMetadata: () => testResponse,
+        });
+      });
+
+      const response = await subject().getRobotMetadata('orgId');
+      expect(response).toEqual({ key1: 'value1' });
+    });
+  });
+
+  describe('updateRobotMetadata', () => {
+    let capturedRequest: pb.UpdateRobotMetadataResponse;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateRobotMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateLocationMetadataResponse();
+          },
+        });
+      });
+    });
+
+    it('should handle empty metadata correctly', async () => {
+      await subject().updateRobotMetadata('robotId', {});
+
+      expect(capturedRequest).toEqual({
+        id: 'robotId',
+        data: Struct.fromJson({}),
+      });
+    });
+
+    it('should successfully update metadata with valid data', async () => {
+      await subject().updateRobotMetadata('robotId', { key1: 'value1' });
+
+      expect(capturedRequest).toEqual({
+        id: 'robotId',
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+    });
+  });
+
+  describe('getRobotPartMetadata', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotPartMetadata: () => new pb.GetRobotPartMetadataResponse(),
+        });
+      });
+    });
+
+    it('returns an empty object if there is no Struct', async () => {
+      const response = await subject().getRobotPartMetadata('orgId');
+      expect(response).toEqual({});
+    });
+
+    it('preserves the map key when a Struct is found', async () => {
+      const testResponse = new pb.GetRobotPartMetadataResponse({
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotPartMetadata: () => testResponse,
+        });
+      });
+
+      const response = await subject().getRobotPartMetadata('orgId');
+      expect(response).toEqual({ key1: 'value1' });
+    });
+  });
+
+  describe('updateRobotPartMetadata', () => {
+    let capturedRequest: pb.UpdateRobotPartMetadataResponse;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          updateRobotPartMetadata: (req) => {
+            capturedRequest = req;
+            return new pb.UpdateRobotPartMetadataResponse();
+          },
+        });
+      });
+    });
+
+    it('should handle empty metadata correctly', async () => {
+      await subject().updateRobotPartMetadata('robotPartId', {});
+
+      expect(capturedRequest).toEqual({
+        id: 'robotPartId',
+        data: Struct.fromJson({}),
+      });
+    });
+
+    it('should successfully update metadata with valid data', async () => {
+      await subject().updateRobotPartMetadata('robotPartId', {
+        key1: 'value1',
+      });
+
+      expect(capturedRequest).toEqual({
+        id: 'robotPartId',
+        data: Struct.fromJson({ key1: 'value1' }),
+      });
+    });
+  });
 });

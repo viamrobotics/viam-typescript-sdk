@@ -19,7 +19,7 @@ import type { Servo } from './servo';
  */
 export class ServoClient implements Servo {
   private client: PromiseClient<typeof ServoService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

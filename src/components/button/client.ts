@@ -14,7 +14,7 @@ import type { Button } from './button';
  */
 export class ButtonClient implements Button {
   private client: PromiseClient<typeof ButtonService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

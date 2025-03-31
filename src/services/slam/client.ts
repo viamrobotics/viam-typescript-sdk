@@ -19,7 +19,7 @@ import type { Slam } from './slam';
  */
 export class SlamClient implements Slam {
   private client: PromiseClient<typeof SLAMService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

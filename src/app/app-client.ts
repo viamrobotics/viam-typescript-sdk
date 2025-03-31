@@ -1,4 +1,5 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonValue } from '@bufbuild/protobuf';
+import { Struct } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -11,6 +12,7 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
+  GetAppContentResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   ListOrganizationMembersResponse,
@@ -1174,5 +1176,140 @@ export class AppClient {
     id: string
   ): Promise<CreateKeyFromExistingKeyAuthorizationsResponse> {
     return this.client.createKeyFromExistingKeyAuthorizations({ id });
+  }
+
+  /**
+   * Retrieves the app content for an organization.
+   *
+   * @param publicNamespace The public namespace of the organization
+   * @param name The name of the app
+   * @returns The blob path and entrypoint of the app content
+   */
+  async getAppContent(
+    publicNamespace: string,
+    name: string
+  ): Promise<GetAppContentResponse> {
+    return this.client.getAppContent({ publicNamespace, name });
+  }
+
+  /**
+   * Retrieves user-defined metadata for an organization.
+   *
+   * @param id The ID of the organization
+   * @returns The metadata associated with the organization
+   */
+  async getOrganizationMetadata(
+    id: string
+  ): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getOrganizationMetadata({
+      organizationId: id,
+    });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for an organization.
+   *
+   * @param id The ID of the organization
+   * @param data The metadata to update
+   */
+  async updateOrganizationMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateOrganizationMetadata({
+      organizationId: id,
+      data: Struct.fromJson(data),
+    });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a location.
+   *
+   * @param id The ID of the location
+   * @returns The metadata associated with the location
+   */
+  async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getLocationMetadata({ locationId: id });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for a location.
+   *
+   * @param id The ID of the location
+   * @param data The metadata to update
+   */
+  async updateLocationMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateLocationMetadata({
+      locationId: id,
+      data: Struct.fromJson(data),
+    });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a robot.
+   *
+   * @param id The ID of the robot
+   * @returns The metadata associated with the robot
+   */
+  async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getRobotMetadata({ id });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for a robot.
+   *
+   * @param id The ID of the robot
+   * @param data The metadata to update
+   */
+  async updateRobotMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateRobotMetadata({ id, data: Struct.fromJson(data) });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a robot part.
+   *
+   * @param id The ID of the robot part
+   * @returns The metadata associated with the robot part
+   */
+  async getRobotPartMetadata(id: string): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getRobotPartMetadata({ id });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for a robot part.
+   *
+   * @param id The ID of the robot part
+   * @param data The metadata to update
+   */
+  async updateRobotPartMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateRobotPartMetadata({
+      id,
+      data: Struct.fromJson(data),
+    });
   }
 }

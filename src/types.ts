@@ -8,8 +8,20 @@ export interface Options {
 }
 
 export interface Resource {
+  /** The name of the resource. */
+  readonly name: string;
+
   /**
    * Send/Receive arbitrary commands to the resource.
+   *
+   * @example
+   *
+   * ```ts
+   * const result = await resource.doCommand({
+   *   name: 'myCommand',
+   *   args: { key: 'value' },
+   * });
+   * ```
    *
    * @param command - The command to execute.
    */

@@ -58,6 +58,13 @@ export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
 
+const logDeprecationWarning = () => {
+  // eslint-disable-next-line no-console
+  console.warn(
+    'The BinaryID type is deprecated and will be removed in a future release. Please migrate to the BinaryDataId field instead.'
+  );
+};
+
 export class DataClient {
   private dataClient: PromiseClient<typeof DataService>;
   private datasetClient: PromiseClient<typeof DatasetService>;
@@ -153,11 +160,14 @@ export class DataClient {
    *
    * @param organizationId The ID of the organization that owns the data
    * @param query The MQL query to run as a list of BSON documents
+   * @param useRecentData Whether to query blob storage or your recent data
+   *   store. Defaults to false
    * @returns An array of data objects
    */
   async tabularDataByMQL(
     organizationId: string,
-    query: Uint8Array[] | Record<string, Date | JsonValue>[]
+    query: Uint8Array[] | Record<string, Date | JsonValue>[],
+    useRecentData?: boolean
   ) {
     const binary: Uint8Array[] =
       query[0] instanceof Uint8Array
@@ -166,6 +176,7 @@ export class DataClient {
     const resp = await this.dataClient.tabularDataByMQL({
       organizationId,
       mqlBinary: binary,
+      useRecentData,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
@@ -294,14 +305,22 @@ export class DataClient {
   }
 
   /**
-   * Get binary data using the BinaryID.
+   * Get binary data using the binary data ID.
    *
    * @param ids The IDs of the requested binary data
    * @returns An array of data objects
    */
-  async binaryDataByIds(ids: BinaryID[]) {
+  async binaryDataByIds(ids: string[] | BinaryID[]) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      const resp = await this.dataClient.binaryDataByIDs({
+        binaryDataIds: ids as string[],
+        includeBinary: true,
+      });
+      return resp.data;
+    }
+    logDeprecationWarning();
     const resp = await this.dataClient.binaryDataByIDs({
-      binaryIds: ids,
+      binaryIds: ids as BinaryID[],
       includeBinary: true,
     });
     return resp.data;
@@ -348,9 +367,16 @@ export class DataClient {
    * @param ids The IDs of the data to be deleted. Must be non-empty.
    * @returns The number of items deleted
    */
-  async deleteBinaryDataByIds(ids: BinaryID[]) {
+  async deleteBinaryDataByIds(ids: string[] | BinaryID[]) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      const resp = await this.dataClient.deleteBinaryDataByIDs({
+        binaryDataIds: ids as string[],
+      });
+      return resp.deletedCount;
+    }
+    logDeprecationWarning();
     const resp = await this.dataClient.deleteBinaryDataByIDs({
-      binaryIds: ids,
+      binaryIds: ids as BinaryID[],
     });
     return resp.deletedCount;
   }
@@ -362,10 +388,18 @@ export class DataClient {
    *   non-empty.
    * @param ids The IDs of the data to be tagged. Must be non-empty.
    */
-  async addTagsToBinaryDataByIds(tags: string[], ids: BinaryID[]) {
+  async addTagsToBinaryDataByIds(tags: string[], ids: string[] | BinaryID[]) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      await this.dataClient.addTagsToBinaryDataByIDs({
+        tags,
+        binaryDataIds: ids as string[],
+      });
+      return;
+    }
+    logDeprecationWarning();
     await this.dataClient.addTagsToBinaryDataByIDs({
       tags,
-      binaryIds: ids,
+      binaryIds: ids as BinaryID[],
     });
   }
 
@@ -391,10 +425,21 @@ export class DataClient {
    * @param ids The IDs of the data to be edited. Must be non-empty.
    * @returns The number of items deleted
    */
-  async removeTagsFromBinaryDataByIds(tags: string[], ids: BinaryID[]) {
+  async removeTagsFromBinaryDataByIds(
+    tags: string[],
+    ids: string[] | BinaryID[]
+  ) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
+        tags,
+        binaryDataIds: ids as string[],
+      });
+      return resp.deletedCount;
+    }
+    logDeprecationWarning();
     const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
       tags,
-      binaryIds: ids,
+      binaryIds: ids as BinaryID[],
     });
     return resp.deletedCount;
   }
@@ -444,15 +489,27 @@ export class DataClient {
    * @returns The bounding box ID
    */
   async addBoundingBoxToImageById(
-    id: BinaryID,
+    binaryId: string | BinaryID,
     label: string,
     xMinNormalized: number,
     yMinNormalized: number,
     xMaxNormalized: number,
     yMaxNormalized: number
   ) {
+    if (typeof binaryId === 'string') {
+      const resp = await this.dataClient.addBoundingBoxToImageByID({
+        binaryDataId: binaryId,
+        label,
+        xMinNormalized,
+        yMinNormalized,
+        xMaxNormalized,
+        yMaxNormalized,
+      });
+      return resp.bboxId;
+    }
+    logDeprecationWarning();
     const resp = await this.dataClient.addBoundingBoxToImageByID({
-      binaryId: id,
+      binaryId,
       label,
       xMinNormalized,
       yMinNormalized,
@@ -468,7 +525,18 @@ export class DataClient {
    * @param binId The ID of the image to remove the bounding box from
    * @param bboxId The ID of the bounding box to remove
    */
-  async removeBoundingBoxFromImageById(binId: BinaryID, bboxId: string) {
+  async removeBoundingBoxFromImageById(
+    binId: string | BinaryID,
+    bboxId: string
+  ) {
+    if (typeof binId === 'string') {
+      await this.dataClient.removeBoundingBoxFromImageByID({
+        binaryDataId: binId,
+        bboxId,
+      });
+      return;
+    }
+    logDeprecationWarning();
     await this.dataClient.removeBoundingBoxFromImageByID({
       binaryId: binId,
       bboxId,
@@ -520,9 +588,20 @@ export class DataClient {
    * @param ids The IDs of binary data to add to dataset
    * @param datasetId The ID of the dataset to be added to
    */
-  async addBinaryDataToDatasetByIds(ids: BinaryID[], datasetId: string) {
+  async addBinaryDataToDatasetByIds(
+    ids: string[] | BinaryID[],
+    datasetId: string
+  ) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      await this.dataClient.addBinaryDataToDatasetByIDs({
+        binaryDataIds: ids as string[],
+        datasetId,
+      });
+      return;
+    }
+    logDeprecationWarning();
     await this.dataClient.addBinaryDataToDatasetByIDs({
-      binaryIds: ids,
+      binaryIds: ids as BinaryID[],
       datasetId,
     });
   }
@@ -533,9 +612,20 @@ export class DataClient {
    * @param ids The IDs of the binary data to remove from dataset
    * @param datasetId The ID of the dataset to be removed from
    */
-  async removeBinaryDataFromDatasetByIds(ids: BinaryID[], datasetId: string) {
+  async removeBinaryDataFromDatasetByIds(
+    ids: string[] | BinaryID[],
+    datasetId: string
+  ) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
+      await this.dataClient.removeBinaryDataFromDatasetByIDs({
+        binaryDataIds: ids as string[],
+        datasetId,
+      });
+      return;
+    }
+    logDeprecationWarning();
     await this.dataClient.removeBinaryDataFromDatasetByIDs({
-      binaryIds: ids,
+      binaryIds: ids as BinaryID[],
       datasetId,
     });
   }
@@ -709,7 +799,7 @@ export class DataClient {
    * @param dataRequestTimes Tuple containing `Date` objects denoting the times
    *   this data was requested[0] by the robot and received[1] from the
    *   appropriate sensor.
-   * @returns The file ID of the uploaded data
+   * @returns The binary data ID of the uploaded data
    */
   async binaryDataCaptureUpload(
     binaryData: Uint8Array,
@@ -748,7 +838,7 @@ export class DataClient {
     });
 
     const resp = await this.dataSyncClient.dataCaptureUpload(req);
-    return resp.fileId;
+    return resp.binaryDataId;
   }
 
   // eslint-disable-next-line class-methods-use-this

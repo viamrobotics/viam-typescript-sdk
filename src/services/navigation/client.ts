@@ -26,7 +26,7 @@ import type { Mode } from './types';
  */
 export class NavigationClient implements Navigation {
   private client: PromiseClient<typeof NavigationService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

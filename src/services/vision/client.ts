@@ -24,7 +24,7 @@ import type { Vision } from './vision';
  */
 export class VisionClient implements Vision {
   private client: PromiseClient<typeof VisionService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
@@ -190,6 +190,7 @@ export class VisionClient implements Vision {
       classifications: response.classifications,
       detections: response.detections,
       objectPointClouds: response.objects,
+      extra: response.extra,
     };
   }
 
