@@ -15,8 +15,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Generate docs
-        run: make build-docs
+      - name: Build + Pack
+        run: |
+          sudo chown -R testbot .
+          sudo -u testbot bash -lc 'make build pack'
 
       - name: Test HTML
         # https://github.com/wjdp/htmltest-action/
