@@ -17,7 +17,6 @@ export interface Base extends Resource {
    * ```ts
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * const geometries = await base.getGeometries();
-   * console.log(geometries);
    * ```
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
@@ -145,7 +144,6 @@ export interface Base extends Resource {
    * ```ts
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * const moving = await base.isMoving();
-   * console.log('Base is moving:', moving);
    * ```
    */
   isMoving(): Promise<boolean>;
@@ -157,7 +155,6 @@ export interface Base extends Resource {
    * ```ts
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * const properties = await base.getProperties();
-   * console.log('Base properties:', properties);
    * ```
    */
   getProperties(extra?: Struct): Promise<BaseProperties>;

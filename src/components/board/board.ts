@@ -28,7 +28,6 @@ export interface Board extends Resource {
    *
    * // Get if it is true or false that the state of the pin is high.
    * const high = await board.getGPIO('15');
-   * console.log('Pin is high:', high);
    * ```
    *
    * @param pin - The pin number.
@@ -61,7 +60,6 @@ export interface Board extends Resource {
    *
    * // Get the duty cycle of this pin.
    * const dutyCycle = await board.getPWM('15');
-   * console.log('Duty cycle:', dutyCycle);
    * ```
    *
    * @param pin - The pin number.
@@ -95,7 +93,6 @@ export interface Board extends Resource {
    *
    * // Get the PWM frequency of this pin.
    * const freq = await board.getPWMFrequency('15');
-   * console.log('PWM frequency:', freq);
    * ```
    *
    * @param pin - The pin.
@@ -133,7 +130,6 @@ export interface Board extends Resource {
    * // Get the value of the analog signal "my_example_analog_reader" has most
    * // recently measured.
    * const reading = await board.readAnalogReader('my_example_analog_reader');
-   * console.log('Analog reading:', reading);
    * ```
    *
    * @param analogReader - The name of the analog reader.
@@ -166,7 +162,6 @@ export interface Board extends Resource {
    *
    * // Get the number of times this DigitalInterrupt has been interrupted with a tick.
    * const count = await board.getDigitalInterruptValue('my_example_digital_interrupt');
-   * console.log('Interrupt count:', count);
    * ```
    *
    * @param digitalInterruptName - The name of the digital interrupt.

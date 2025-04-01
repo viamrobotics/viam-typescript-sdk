@@ -17,7 +17,6 @@ export interface Arm extends Resource {
    * ```ts
    * const arm = new VIAM.ArmClient(machine, 'my_arm');
    * const pose = await arm.getEndPosition();
-   * console.log(pose);
    * ```
    */
   getEndPosition: (extra?: Struct) => Promise<Pose>;
@@ -79,7 +78,6 @@ export interface Arm extends Resource {
    * ```ts
    * const arm = new VIAM.ArmClient(machine, 'my_arm');
    * const jointPositions = await arm.getJointPositions();
-   * console.log(jointPositions);
    * ```
    */
   getJointPositions: (extra?: Struct) => Promise<ArmJointPositions>;
