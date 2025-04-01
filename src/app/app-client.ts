@@ -698,7 +698,7 @@ export class AppClient {
    * machine, not the location.
    *
    * @param robotId The ID of the robot to update
-   * @param locId The location where the robot is
+   * @param locId The ID of the location where the robot is
    * @param name The name to update the robot to
    * @returns The newly-modified robot object
    */
