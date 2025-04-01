@@ -19,7 +19,8 @@ export interface Tick {
  * components such as analog readers, and digital interrupts.
  */
 export interface Board extends Resource {
-  /** Get the high/low state of the given pin.
+  /**
+   * Get the high/low state of the given pin.
    *
    * @example
    *
@@ -129,7 +130,9 @@ export interface Board extends Resource {
    *
    * // Get the value of the analog signal "my_example_analog_reader" has most
    * // recently measured.
-   * const reading = await board.readAnalogReader('my_example_analog_reader');
+   * const reading = await board.readAnalogReader(
+   *   'my_example_analog_reader'
+   * );
    * ```
    *
    * @param analogReader - The name of the analog reader.
@@ -161,7 +164,9 @@ export interface Board extends Resource {
    * const board = new VIAM.BoardClient(machine, 'my_board');
    *
    * // Get the number of times this DigitalInterrupt has been interrupted with a tick.
-   * const count = await board.getDigitalInterruptValue('my_example_digital_interrupt');
+   * const count = await board.getDigitalInterruptValue(
+   *   'my_example_digital_interrupt'
+   * );
    * ```
    *
    * @param digitalInterruptName - The name of the digital interrupt.
@@ -182,7 +187,9 @@ export interface Board extends Resource {
    * const ticks = await board.streamTicks(['8', '11']);
    *
    * for await (const tick of ticks) {
-   *   console.log(`Pin ${tick.pinName} changed to ${tick.high ? 'high' : 'low'} at ${tick.time}`);
+   *   console.log(
+   *     `Pin ${tick.pinName} changed to ${tick.high ? 'high' : 'low'} at ${tick.time}`
+   *   );
    * }
    * ```
    *

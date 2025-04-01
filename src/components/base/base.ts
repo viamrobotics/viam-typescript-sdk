@@ -10,7 +10,8 @@ export const { GetPropertiesResponse: BaseProperties } = baseApi;
 /** Represents a physical base of a robot. */
 
 export interface Base extends Resource {
-  /** Get the geometries of the component in their current configuration
+  /**
+   * Get the geometries of the component in their current configuration
    *
    * @example
    *
@@ -79,25 +80,25 @@ export interface Base extends Resource {
    * // Move forward at 75% power
    * await base.setPower(
    *   { x: 0, y: 0.75, z: 0 }, // linear power
-   *   { x: 0, y: 0, z: 0 }     // no rotation
+   *   { x: 0, y: 0, z: 0 } // no rotation
    * );
    *
    * // Move straight back at 100% power
    * await base.setPower(
    *   { x: 0, y: -1, z: 0 }, // linear power
-   *   { x: 0, y: 0, z: 0 }   // no rotation
+   *   { x: 0, y: 0, z: 0 } // no rotation
    * );
    *
    * // Turn counter-clockwise at 50% power
    * await base.setPower(
-   *   { x: 0, y: 0, z: 0 },    // no linear movement
-   *   { x: 0, y: 0, z: 0.5 }   // rotate around z-axis
+   *   { x: 0, y: 0, z: 0 }, // no linear movement
+   *   { x: 0, y: 0, z: 0.5 } // rotate around z-axis
    * );
    *
    * // Turn clockwise at 60% power
    * await base.setPower(
-   *   { x: 0, y: 0, z: 0 },    // no linear movement
-   *   { x: 0, y: 0, z: -0.6 }   // rotate around z-axis
+   *   { x: 0, y: 0, z: 0 }, // no linear movement
+   *   { x: 0, y: 0, z: -0.6 } // rotate around z-axis
    * );
    * ```
    *
@@ -116,8 +117,8 @@ export interface Base extends Resource {
    *
    * // Move forward at 50mm/s while spinning 15 degrees per second to the left
    * await base.setVelocity(
-   *   { x: 0, y: 50, z: 0 },  // linear velocity in mm/s
-   *   { x: 0, y: 0, z: 15 }   // 15 degrees per second counter-clockwise
+   *   { x: 0, y: 50, z: 0 }, // linear velocity in mm/s
+   *   { x: 0, y: 0, z: 15 } // 15 degrees per second counter-clockwise
    * );
    * ```
    *
@@ -126,7 +127,8 @@ export interface Base extends Resource {
    */
   setVelocity(linear: Vector3, angular: Vector3, extra?: Struct): Promise<void>;
 
-  /** Stop a base
+  /**
+   * Stop a base
    *
    * @example
    *
@@ -137,7 +139,8 @@ export interface Base extends Resource {
    */
   stop(extra?: Struct): Promise<void>;
 
-  /** Return true if the base is in motion.
+  /**
+   * Return true if the base is in motion.
    *
    * @example
    *
@@ -148,7 +151,8 @@ export interface Base extends Resource {
    */
   isMoving(): Promise<boolean>;
 
-  /** Return the base's properties.
+  /**
+   * Return the base's properties.
    *
    * @example
    *

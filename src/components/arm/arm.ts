@@ -10,7 +10,8 @@ export const { JointPositions: ArmJointPositions } = armApi;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
-  /** Get the position of the end of the arm expressed as a pose
+  /**
+   * Get the position of the end of the arm expressed as a pose
    *
    * @example
    *
@@ -21,7 +22,8 @@ export interface Arm extends Resource {
    */
   getEndPosition: (extra?: Struct) => Promise<Pose>;
 
-  /** Get the geometries of the component in their current configuration
+  /**
+   * Get the geometries of the component in their current configuration
    *
    * @example
    *
@@ -42,7 +44,15 @@ export interface Arm extends Resource {
    * const arm = new VIAM.ArmClient(machine, 'my_arm');
    *
    * // Create a pose for the arm to move to
-   * const pose: Pose = { x: -500, y: -200, z: 62, oX: 1, oY: 0, oZ: 1, theta: 90 };
+   * const pose: Pose = {
+   *   x: -500,
+   *   y: -200,
+   *   z: 62,
+   *   oX: 1,
+   *   oY: 0,
+   *   oZ: 1,
+   *   theta: 90,
+   * };
    *
    * // Move the arm to the pose
    * await arm.moveToPosition(pose);
@@ -71,7 +81,8 @@ export interface Arm extends Resource {
     extra?: Struct
   ) => Promise<void>;
 
-  /** Gets the current position of each joint.
+  /**
+   * Gets the current position of each joint.
    *
    * @example
    *
@@ -82,7 +93,8 @@ export interface Arm extends Resource {
    */
   getJointPositions: (extra?: Struct) => Promise<ArmJointPositions>;
 
-  /** Stop the motion of the arm.
+  /**
+   * Stop the motion of the arm.
    *
    * @example
    *
@@ -93,7 +105,8 @@ export interface Arm extends Resource {
    */
   stop: (extra?: Struct) => Promise<void>;
 
-  /** Get if the arm is currently moving.
+  /**
+   * Get if the arm is currently moving.
    *
    * @example
    *
