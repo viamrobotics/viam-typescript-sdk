@@ -5,7 +5,6 @@ IgnoreInternalEmptyHash: true
 IgnoreDirectoryMissingTrailingSlash: false
 IgnoreURLs:
   - "app.viam.com"
-  - "http://joda-time.sourceforge.net"
 IgnoreDirs:
   - "lib"
 CacheExpires: "6h"

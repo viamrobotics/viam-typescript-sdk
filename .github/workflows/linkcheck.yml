@@ -6,9 +6,8 @@
 #
 name: run-htmltest-external
 on:
-  schedule:
-    # 10am UTC on Mondays
-    - cron: "0 10 * * 1"
+  pull_request:
+    types: [opened, synchronize]
 jobs:
   htmltest:
     if: github.repository_owner == 'viamrobotics'
