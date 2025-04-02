@@ -51,7 +51,9 @@ export interface Encoder extends Resource {
    * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
    *
    * // Get the position of the encoder in ticks
-   * const [position, posType] = await encoder.getPosition(EncoderPositionType.POSITION_TYPE_TICKS_COUNT);
+   * const [position, posType] = await encoder.getPosition(
+   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT
+   * );
    * console.log('The encoder position is currently', position, posType);
    * ```
    *
