@@ -179,7 +179,7 @@ export class AppClient {
    * ```
    *
    * @param locationId The ID of the location to query
-   * @returns The list of locations with access to the requested Location
+   * @returns The list of locations with access to the requested location
    */
   async getOrganizationsWithAccessToLocation(
     locationId: string
@@ -1360,23 +1360,17 @@ export class AppClient {
    * });
    * await appClient.changeRole(oldAuth, newAuth);
    * ```
+   */
+  async changeRole(
+    oldAuthorization: Authorization,
+    newAuthorization: Authorization
+  ) {
+    await this.client.changeRole({ oldAuthorization, newAuthorization });
+  }
+
+  /**
+   * List all authorizations for an organization.
    *
-   * Async changeRole( oldAuthorization: Authorization, newAuthorization:
-   * Authorization ) { await this.client.changeRole({ oldAuthorization,
-   * newAuthorization }); }
-   *
-   * /** List all authorizations for an organization.
-   *
-   * @example
-   *
-   * ```ts
-   * const authorizations = await appClient.listAuthorizations(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
-   * ```
-   *
-   * @param oldAuth The existing authorization
-   * @param newAuth The new authorization
    * @param organizationId The ID of the organization to list authorizations for
    * @param resourceIds Optional list of IDs of resources to list authorizations
    *   for. If not provided, all resources will be included
