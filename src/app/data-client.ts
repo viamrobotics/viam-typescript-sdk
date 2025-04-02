@@ -383,14 +383,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const data = await dataClient.binaryDataByIds([
-   *   {
-   *     fileId:
-   *       'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
-   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *     locationId: 'ab1cd34e5f',
-   *   } as VIAM.BinaryID,
-   * ]);
+   * const data = await dataClient.binaryDataByIds(["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]);
    * ```
    *
    * @param ids The IDs of the requested binary data
@@ -474,14 +467,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const data = await dataClient.deleteBinaryDataByIds([
-   *   {
-   *     fileId:
-   *       'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
-   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *     locationId: 'ab1cd34e5f',
-   *   } as VIAM.BinaryID,
-   * ]);
+   * const data = await dataClient.deleteBinaryDataByIds(["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]);
    * ```
    *
    * @param ids The IDs of the data to be deleted. Must be non-empty.
@@ -509,14 +495,7 @@ export class DataClient {
    * ```ts
    * const data = await dataClient.addTagsToBinaryDataByIds(
    *   ['tag1', 'tag2'],
-   *   [
-   *     {
-   *       fileId:
-   *         'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
-   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *       locationId: 'ab1cd34e5f',
-   *     } as VIAM.BinaryID,
-   *   ]
+   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]
    * );
    * ```
    *
@@ -574,14 +553,7 @@ export class DataClient {
    * ```ts
    * const data = await dataClient.removeTagsFromBinaryDataByIds(
    *   ['tag1', 'tag2'],
-   *   [
-   *     {
-   *       fileId:
-   *         'LamP5bBmGoknTw0RnsEMI7V3Hx0gXREqlVlTM0jXxN7wdBWjbUZxlNmHtbKydNCA',
-   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *       locationId: 'ab1cd34e5f',
-   *     } as VIAM.BinaryID,
-   *   ]
+   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]
    * );
    * ```
    *
@@ -668,12 +640,7 @@ export class DataClient {
    *
    * ```ts
    * const bboxId = await dataClient.addBoundingBoxToImageById(
-   *   {
-   *     fileId:
-   *       'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
-   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *     locationId: 'ab1cd34e5f',
-   *   } as VIAM.BinaryID,
+   *   "ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh",
    *   'label1',
    *   0.3,
    *   0.3,
@@ -733,12 +700,7 @@ export class DataClient {
    * ```ts
    * // TODO(UNTESTED)
    * await dataClient.removeBoundingBoxFromImageById(
-   *   {
-   *     fileId:
-   *       'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
-   *     organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *     locationId: 'ab1cd34e5f',
-   *   } as VIAM.BinaryID,
+   *   "ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh",
    *   '5Z9ryhkW7ULaXROjJO6ghPYulNllnH20QImda1iZFroZpQbjahK6igQ1WbYigXED'
    * );
    * ```
@@ -835,14 +797,7 @@ export class DataClient {
    *
    * ```ts
    * await dataClient.addBinaryDataToDatasetByIds(
-   *   [
-   *     {
-   *       fileId:
-   *         'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
-   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *       locationId: 'ab1cd34e5f',
-   *     } as VIAM.BinaryID,
-   *   ],
+   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"],
    *   '12ab3de4f56a7bcd89ef0ab1'
    * );
    * ```
@@ -875,14 +830,7 @@ export class DataClient {
    *
    * ```ts
    * await dataClient.removeBinaryDataFromDatasetByIds(
-   *   [
-   *     {
-   *       fileId:
-   *         'Mg2UEhFXzCdzs7iRDP9Ta8lRI9yZCtHqks1ucxMrfs6nIhtaGpcBqn9zJKXRFr6c',
-   *       organizationId: '123abc45-1234-5678-90ab-cdef12345678',
-   *       locationId: 'ab1cd34e5f',
-   *     } as VIAM.BinaryID,
-   *   ],
+   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"],
    *   '12ab3de4f56a7bcd89ef0ab1'
    * );
    * ```
@@ -1128,7 +1076,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const fileId = await dataClient.binaryDataCaptureUpload(
+   * const binaryDataId = await dataClient.binaryDataCaptureUpload(
    *   binaryData,
    *   '123abc45-1234-5678-90ab-cdef12345678',
    *   'rdk:component:camera',
