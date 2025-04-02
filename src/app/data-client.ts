@@ -383,7 +383,9 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const data = await dataClient.binaryDataByIds(["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]);
+   * const data = await dataClient.binaryDataByIds([
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   * ]);
    * ```
    *
    * @param ids The IDs of the requested binary data
@@ -467,7 +469,9 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const data = await dataClient.deleteBinaryDataByIds(["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]);
+   * const data = await dataClient.deleteBinaryDataByIds([
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   * ]);
    * ```
    *
    * @param ids The IDs of the data to be deleted. Must be non-empty.
@@ -495,7 +499,9 @@ export class DataClient {
    * ```ts
    * const data = await dataClient.addTagsToBinaryDataByIds(
    *   ['tag1', 'tag2'],
-   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]
+   *   [
+   *     'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   *   ]
    * );
    * ```
    *
@@ -553,7 +559,9 @@ export class DataClient {
    * ```ts
    * const data = await dataClient.removeTagsFromBinaryDataByIds(
    *   ['tag1', 'tag2'],
-   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"]
+   *   [
+   *     'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   *   ]
    * );
    * ```
    *
@@ -640,7 +648,7 @@ export class DataClient {
    *
    * ```ts
    * const bboxId = await dataClient.addBoundingBoxToImageById(
-   *   "ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh",
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
    *   'label1',
    *   0.3,
    *   0.3,
@@ -700,7 +708,7 @@ export class DataClient {
    * ```ts
    * // TODO(UNTESTED)
    * await dataClient.removeBoundingBoxFromImageById(
-   *   "ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh",
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
    *   '5Z9ryhkW7ULaXROjJO6ghPYulNllnH20QImda1iZFroZpQbjahK6igQ1WbYigXED'
    * );
    * ```
@@ -797,7 +805,9 @@ export class DataClient {
    *
    * ```ts
    * await dataClient.addBinaryDataToDatasetByIds(
-   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"],
+   *   [
+   *     'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   *   ],
    *   '12ab3de4f56a7bcd89ef0ab1'
    * );
    * ```
@@ -830,7 +840,9 @@ export class DataClient {
    *
    * ```ts
    * await dataClient.removeBinaryDataFromDatasetByIds(
-   *   ["ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh"],
+   *   [
+   *     'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   *   ],
    *   '12ab3de4f56a7bcd89ef0ab1'
    * );
    * ```
