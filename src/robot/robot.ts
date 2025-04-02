@@ -11,7 +11,13 @@ type Callback = (args: unknown) => void;
 
 export interface Robot {
   /**
-   * Get the list of sessions currently connected to the robot.
+   * Get the list of sessions currently connected to the machine.
+   *
+   * @example
+   *
+   * ```ts
+   * const sessions = await machine.getSessions();
+   * ```
    *
    * @group Sessions
    * @alpha
@@ -19,7 +25,13 @@ export interface Robot {
   getSessions(): Promise<proto.Session[]>;
 
   /**
-   * Get the list of operations currently running on the robot.
+   * Get the list of operations currently running on the machine.
+   *
+   * @example
+   *
+   * ```ts
+   * const operations = await machine.getOperations();
+   * ```
    *
    * @group Operations
    * @alpha
@@ -27,7 +39,13 @@ export interface Robot {
   getOperations(): Promise<proto.Operation[]>;
 
   /**
-   * Cancels the specified operation on the robot.
+   * Cancels the specified operation on the machine.
+   *
+   * @example
+   *
+   * ```ts
+   * await machine.cancelOperation('INSERT OPERATION ID');
+   * ```
    *
    * @param id - ID of operation to kill.
    * @group Operations
@@ -36,8 +54,14 @@ export interface Robot {
   cancelOperation(id: string): Promise<void>;
 
   /**
-   * Blocks on the specified operation on the robot. This function will only
+   * Blocks on the specified operation on the machine. This function will only
    * return when the specific operation has finished or has been cancelled.
+   *
+   * @example
+   *
+   * ```ts
+   * await machine.blockForOperation('INSERT OPERATION ID');
+   * ```
    *
    * @param id - ID of operation to block on.
    * @group Operations
@@ -49,6 +73,12 @@ export interface Robot {
    * Cancel all current and outstanding operations for the robot and stop all
    * actuators and movement.
    *
+   * @example
+   *
+   * ```ts
+   * await machine.stopAll();
+   * ```
+   *
    * @param extra - Any extra parameters to pass to the components' `stop`
    *   methods, keyed on the component's resource name.
    * @group Operations
@@ -57,7 +87,13 @@ export interface Robot {
   stopAll(extra?: Map<string, Struct>): Promise<void>;
 
   /**
-   * Get the configuration of the frame system of a given robot.
+   * Get the configuration of the frame system of a given machine.
+   *
+   * @example
+   *
+   * ```ts
+   * const frameSystemConfig = await machine.frameSystemConfig();
+   * ```
    *
    * @group Frame System
    * @alpha
@@ -106,13 +142,25 @@ export interface Robot {
   /**
    * Get the list of models provided by modules on the machine.
    *
+   * @example
+   *
+   * ```ts
+   * const models = await machine.getModelsFromModules();
+   * ```
+   *
    * @group Resources
    * @alpha
    */
   getModelsFromModules(): Promise<ModuleModel[]>;
 
   /**
-   * Get a list of all resources on the robot.
+   * Get a list of all resources on the machine.
+   *
+   * @example
+   *
+   * ```ts
+   * const resourceNames = await machine.resourceNames();
+   * ```
    *
    * @group Resources
    * @alpha
@@ -121,6 +169,12 @@ export interface Robot {
 
   /**
    * Get a list of all resource types.
+   *
+   * @example
+   *
+   * ```ts
+   * const resourceRPCSubtypes = await machine.resourceRPCSubtypes();
+   * ```
    *
    * @group Resources
    * @alpha
@@ -146,7 +200,13 @@ export interface Robot {
   ) => void;
 
   /**
-   * Get app-related information about the robot.
+   * Get app-related information about the machine.
+   *
+   * @example
+   *
+   * ```ts
+   * const cloudMetadata = await machine.getCloudMetadata();
+   * ```
    *
    * @group App/Cloud
    * @alpha
@@ -154,7 +214,13 @@ export interface Robot {
   getCloudMetadata(): Promise<CloudMetadata>;
 
   /**
-   * Get the current status of the robot.
+   * Get the current status of the machine.
+   *
+   * @example
+   *
+   * ```ts
+   * const machineStatus = await machine.getMachineStatus();
+   * ```
    *
    * @alpha
    */
@@ -162,6 +228,12 @@ export interface Robot {
 
   /**
    * Restarts a module running on the machine with the given id or name.
+   *
+   * @example
+   *
+   * ```ts
+   * await machine.restartModule('namespace:module:model', 'my_model_name');
+   * ```
    *
    * @param moduleId - The id matching the module_id field of the registry
    *   module in your part configuration
