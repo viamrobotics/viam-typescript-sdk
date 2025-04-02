@@ -120,7 +120,16 @@ export class AppClient {
   }
 
   /**
-   * Obain a user's ID from their email address.
+   * Obtain a user's ID from their email address. Internal use only.
+   *
+   * @example
+   *
+   * ```ts
+   * // This method is used internally only. To obtain a user's ID, use the listOrganizationsByUser method.
+   * const members = await appClient.listOrganizationMembers(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
    *
    * @param email The email address of the user
    * @returns The user's ID
@@ -144,6 +153,12 @@ export class AppClient {
   /**
    * List all organizations.
    *
+   * @example
+   *
+   * ```ts
+   * const organizations = await appClient.listOrganizations();
+   * ```
+   *
    * @returns The organization list
    */
   async listOrganizations(): Promise<Organization[]> {
@@ -154,8 +169,17 @@ export class AppClient {
   /**
    * List all organizations with access to a particular location.
    *
+   * @example
+   *
+   * ```ts
+   * const organizations =
+   *   await appClient.getOrganizationsWithAccessToLocation(
+   *     '<YOUR-LOCATION-ID>'
+   *   );
+   * ```
+   *
    * @param locationId The ID of the location to query
-   * @returns The list of locations with access to the requested location
+   * @returns The list of locations with access to the requested Location
    */
   async getOrganizationsWithAccessToLocation(
     locationId: string
@@ -167,7 +191,7 @@ export class AppClient {
   }
 
   /**
-   * List all organizations associated with a user.
+   * List all organizations associated with a user. Internal use only.
    *
    * @param userId The ID of the user to query
    * @returns The list of locations the requested user has access to
@@ -179,6 +203,14 @@ export class AppClient {
 
   /**
    * Get details about an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const organization = await appClient.getOrganization(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization
    * @returns Details about the organization, if it exists
@@ -192,6 +224,13 @@ export class AppClient {
 
   /**
    * Find out if an organization namespace is available.
+   *
+   * @example
+   *
+   * ```ts
+   * const isAvailable =
+   *   await appClient.getOrganizationNamespaceAvailability('name');
+   * ```
    *
    * @param namespace The namespace to query for availability
    * @returns A boolean indicating whether or not the namespace is available
@@ -207,6 +246,15 @@ export class AppClient {
 
   /**
    * Updates organization details.
+   *
+   * @example
+   *
+   * ```ts
+   * const organization = await appClient.updateOrganization(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newName'
+   * );
+   * ```
    *
    * @param organizationId The id of the organization to update
    * @param name Optional name to update the organization with
@@ -235,6 +283,12 @@ export class AppClient {
   /**
    * Deletes an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteOrganization('<YOUR-ORGANIZATION-ID>');
+   * ```
+   *
    * @param organizationId The id of the organization to delete
    */
   async deleteOrganization(organizationId: string) {
@@ -243,6 +297,14 @@ export class AppClient {
 
   /**
    * Lists organization memebers and outstanding invites.
+   *
+   * @example
+   *
+   * ```ts
+   * const members = await appClient.listOrganizationMembers(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
    *
    * @param organizationId The id of the organization to query
    * @returns An object containing organization members, pending invites, and
@@ -256,6 +318,27 @@ export class AppClient {
 
   /**
    * Creates a new invitation to join an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const auth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_operator',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access to
+   *   identityId: '<YOUR-USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'owner', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   *
+   * const invite = await appClient.createOrganizationInvite(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com',
+   *   [auth]
+   * );
+   * ```
    *
    * @param organizationId The id of the organization to create the invite for
    * @param email The email address of the user to generate an invite for
@@ -282,6 +365,27 @@ export class AppClient {
   /**
    * Updates authorizations for an existing org invite.
    *
+   * @example
+   *
+   * ```ts
+   * const auth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_operator',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access to
+   *   identityId: '<YOUR-USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'owner', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   * const invite = await appClient.updateOrganizationInviteAuthorizations(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com',
+   *   [auth],
+   *   []
+   * );
+   * ```
+   *
    * @param organizationId The id of the organization
    * @param email The email address associated with the invite
    * @param addAuthsList List of authorizations to add to the invite
@@ -306,6 +410,15 @@ export class AppClient {
   /**
    * Removes a member from an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteOrganizationMember(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-USER-ID>'
+   * );
+   * ```
+   *
    * @param organizationId The ID of the organization
    * @param userId The ID of the user
    */
@@ -316,6 +429,15 @@ export class AppClient {
   /**
    * Deletes a pending organization invite.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteOrganizationInvite(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com'
+   * );
+   * ```
+   *
    * @param organizationId The ID of the organization
    * @param email The email associated with the invite to delete
    */
@@ -325,6 +447,15 @@ export class AppClient {
 
   /**
    * Resends a pending organization invite.
+   *
+   * @example
+   *
+   * ```ts
+   * const invite = await appClient.resendOrganizationInvite(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization
    * @param email The email associated with the invite to resend
@@ -343,6 +474,15 @@ export class AppClient {
 
   /**
    * Creates a new location.
+   *
+   * @example
+   *
+   * ```ts
+   * const location = await appClient.createLocation(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'name'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to create the location
    *   under
@@ -367,6 +507,12 @@ export class AppClient {
   /**
    * Looks up a location.
    *
+   * @example
+   *
+   * ```ts
+   * const location = await appClient.getLocation('<YOUR-LOCATION-ID>');
+   * ```
+   *
    * @param locId The ID of the location to query.
    * @returns The location object
    */
@@ -379,6 +525,15 @@ export class AppClient {
 
   /**
    * Updates location details.
+   *
+   * @example
+   *
+   * ```ts
+   * const location = await appClient.updateLocation(
+   *   '<YOUR-LOCATION-ID>',
+   *   'newName'
+   * );
+   * ```
    *
    * @param locId The ID of the location to update
    * @param name Optional string to update the location's name to
@@ -405,6 +560,12 @@ export class AppClient {
   /**
    * Deletes a location
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteLocation('<YOUR-LOCATION-ID>');
+   * ```
+   *
    * @param locId The ID of the location to delete
    */
   async deleteLocation(locId: string) {
@@ -413,6 +574,14 @@ export class AppClient {
 
   /**
    * Lists all locations under an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const locations = await appClient.listLocations(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to query
    * @returns A list of locations under the organization
@@ -425,6 +594,15 @@ export class AppClient {
   /**
    * Shares a location with another organization
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.shareLocation(
+   *   '<OTHER-ORGANIZATION-ID>',
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
    * @param organizationId The ID of the organization to share with
    * @param locId The ID of the location to share
    */
@@ -435,6 +613,15 @@ export class AppClient {
   /**
    * Unshares a location with an organization
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.unshareLocation(
+   *   '<OTHER-ORGANIZATION-ID>',
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
    * @param organizationId The ID of the organization to unshare with
    * @param locId The ID of the location to unshare
    */
@@ -444,6 +631,14 @@ export class AppClient {
 
   /**
    * Get a location's `LocationAuth` (location secret(s)).
+   *
+   * @example
+   *
+   * ```ts
+   * const locationAuth = await appClient.locationAuth(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
    *
    * @param locId The ID of the location to retrieve `LocationAuth` from.
    * @returns The `LocationAuth` for the requested location.
@@ -456,6 +651,14 @@ export class AppClient {
   /**
    * Create a location secret (`LocationAuth`).
    *
+   * @example
+   *
+   * ```ts
+   * const locationAuth = await appClient.createLocationSecret(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
    * @param locId The ID of the location to create a `LocationAuth` for
    * @returns The newly created `LocationAuth`
    */
@@ -467,6 +670,15 @@ export class AppClient {
   /**
    * Deletes a location secret (`LocationAuth`).
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteLocationSecret(
+   *   '<YOUR-LOCATION-ID>',
+   *   '<YOUR-SECRET-ID>'
+   * );
+   * ```
+   *
    * @param locId The ID of the location to delete the `LocationAuth` from
    * @param secretId The ID of the location secret to delete
    */
@@ -476,6 +688,12 @@ export class AppClient {
 
   /**
    * Queries a robot by its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * const robot = await appClient.getRobot('<YOUR-ROBOT-ID>');
+   * ```
    *
    * @param id The ID of the robot
    * @returns The `Robot` object
@@ -488,6 +706,14 @@ export class AppClient {
   /**
    * Returns a list of rover rental robots for an organization.
    *
+   * @example
+   *
+   * ```ts
+   * const roverRentalRobots = await appClient.getRoverRentalRobots(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
    * @param orgId The ID of the organization to query
    * @returns The list of `RoverRentalRobot` objects
    */
@@ -498,6 +724,12 @@ export class AppClient {
 
   /**
    * Returns a list of parts for a given robot
+   *
+   * @example
+   *
+   * ```ts
+   * const robotParts = await appClient.getRobotParts('<YOUR-ROBOT-ID>');
+   * ```
    *
    * @param robotId The ID of the robot to query
    * @returns The list of `RobotPart` objects associated with the robot
@@ -510,6 +742,12 @@ export class AppClient {
   /**
    * Queries a specific robot part by ID.
    *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.getRobotPart('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
    * @param id The ID of the requested robot part
    * @returns The robot part and a its json config
    */
@@ -520,6 +758,14 @@ export class AppClient {
   /**
    * Get a page of log entries for a specific robot part. Logs are sorted by
    * descending time (newest first).
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPartLogs = await appClient.getRobotPartLogs(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
    *
    * @param id The ID of the requested robot part
    * @param filter Optional string to filter logs on
@@ -548,6 +794,14 @@ export class AppClient {
    * Get a stream of log entries for a specific robot part. Logs are sorted by
    * descending time (newest first).
    *
+   * @example
+   *
+   * ```ts
+   * const robotPartLogs = await appClient.tailRobotPartLogs(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
    * @param id The ID of the requested robot part
    * @param queue A queue to put the log entries into
    * @param filter Optional string to filter logs on
@@ -575,6 +829,14 @@ export class AppClient {
   /**
    * Get a list containing the history of a robot part.
    *
+   * @example
+   *
+   * ```ts
+   * const robotPartHistory = await appClient.getRobotPartHistory(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
    * @param id The ID of the requested robot part
    * @returns The list of the robot part's history
    */
@@ -585,6 +847,15 @@ export class AppClient {
 
   /**
    * Updates a robot part based on its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.updateRobotPart(
+   *   '<YOUR-ROBOT-PART-ID>',
+   *   'newName'
+   * );
+   * ```
    *
    * @param id The ID of the requested robot part
    * @param name The new name of the robot part
@@ -603,6 +874,15 @@ export class AppClient {
   /**
    * Creates a new robot part.
    *
+   * @example
+   *
+   * ```ts
+   * const robotPartId = await appClient.newRobotPart(
+   *   '<YOUR-ROBOT-ID>',
+   *   'newPart'
+   * );
+   * ```
+   *
    * @param robotId The ID of the robot to create a part for
    * @param partName The name for the new robot part
    * @returns The ID of the newly-created robot part
@@ -615,6 +895,12 @@ export class AppClient {
   /**
    * Deletes a robot part.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRobotPart('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
    * @param partId The ID of the part to delete
    */
   async deleteRobotPart(partId: string) {
@@ -623,6 +909,13 @@ export class AppClient {
 
   /**
    * Gets a list of a robot's API keys.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotAPIKeys =
+   *   await appClient.getRobotAPIKeys('<YOUR-ROBOT-ID>');
+   * ```
    *
    * @param robotId The ID of the robot to get API keys for
    * @returns A list of the robot's API keys
@@ -635,6 +928,12 @@ export class AppClient {
   /**
    * Marks a robot part as the main part.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.markPartAsMain('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
    * @param partId The ID of the part to mark as main
    */
   async markPartAsMain(partId: string) {
@@ -644,6 +943,12 @@ export class AppClient {
   /**
    * Marks a robot part for restart.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.markPartForRestart('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
    * @param partId The ID of the part to mark for restart
    */
   async markPartForRestart(partId: string) {
@@ -652,6 +957,14 @@ export class AppClient {
 
   /**
    * Creates a new secret for a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.createRobotPartSecret(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
    *
    * @param partId The ID of the part to create a secret for
    * @returns The robot part object
@@ -664,6 +977,15 @@ export class AppClient {
   /**
    * Deletes a robot secret from a robot part.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRobotPartSecret(
+   *   '<YOUR-ROBOT-PART-ID>',
+   *   '<YOUR-SECRET-ID>'
+   * );
+   * ```
+   *
    * @param partId The ID of the part to delete a secret from
    * @param secretId The ID of the secret to delete
    */
@@ -673,6 +995,12 @@ export class AppClient {
 
   /**
    * Lists all robots in a location.
+   *
+   * @example
+   *
+   * ```ts
+   * const robots = await appClient.listRobots('<YOUR-LOCATION-ID>');
+   * ```
    *
    * @param locId The ID of the location to list robots for
    * @returns The list of robot objects
@@ -685,6 +1013,15 @@ export class AppClient {
   /**
    * Creates a new robot.
    *
+   * @example
+   *
+   * ```ts
+   * const robotId = await appClient.newRobot(
+   *   '<YOUR-LOCATION-ID>',
+   *   'newRobot'
+   * );
+   * ```
+   *
    * @param locId The ID of the location to create the robot in
    * @param name The name of the new robot
    * @returns The new robot's ID
@@ -696,6 +1033,16 @@ export class AppClient {
 
   /**
    * Updates an existing robot's name and/or location.
+   *
+   * @example
+   *
+   * ```ts
+   * const robot = await appClient.updateRobot(
+   *   '<YOUR-ROBOT-ID>',
+   *   '<YOUR-LOCATION-ID>',
+   *   'newName'
+   * );
+   * ```
    *
    * @param robotId The ID of the robot to update
    * @param locId The ID of the location to move the robot to
@@ -718,6 +1065,12 @@ export class AppClient {
   /**
    * Deletes a robot.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRobot('<YOUR-ROBOT-ID>');
+   * ```
+   *
    * @param id The ID of the robot to delete
    */
   async deleteRobot(id: string) {
@@ -726,6 +1079,14 @@ export class AppClient {
 
   /**
    * Lists all fragments within an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const fragments = await appClient.listFragments(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to list fragments for
    * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities
@@ -754,6 +1115,14 @@ export class AppClient {
   /**
    * Looks up a fragment by ID.
    *
+   * @example
+   *
+   * ```ts
+   * const fragment = await appClient.getFragment(
+   *   '12a12ab1-1234-5678-abcd-abcd01234567'
+   * );
+   * ```
+   *
    * @param id The ID of the fragment to look up
    * @returns The requested fragment
    */
@@ -764,6 +1133,15 @@ export class AppClient {
 
   /**
    * Creates a new fragment.
+   *
+   * @example
+   *
+   * ```ts
+   * const fragment = await appClient.createFragment(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newFragment'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to create the fragment
    *   under
@@ -786,6 +1164,15 @@ export class AppClient {
 
   /**
    * Updates an existing fragment.
+   *
+   * @example
+   *
+   * ```ts
+   * const fragment = await appClient.updateFragment(
+   *   '12a12ab1-1234-5678-abcd-abcd01234567',
+   *   'better_name'
+   * );
+   * ```
    *
    * @param id The ID of the fragment to update
    * @param name The name to update the fragment to
@@ -820,6 +1207,12 @@ export class AppClient {
   /**
    * Deletes a fragment.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteFragment('12a12ab1-1234-5678-abcd-abcd01234567');
+   * ```
+   *
    * @param id The ID of the fragment to delete
    */
   async deleteFragment(id: string) {
@@ -827,6 +1220,14 @@ export class AppClient {
   }
 
   /**
+   * @example
+   *
+   * ```ts
+   * const fragments = await appClient.listMachineFragments(
+   *   '<YOUR-MACHINE-ID>'
+   * );
+   * ```
+   *
    * @param machineId The machine ID used to filter fragments defined in a
    *   machine's parts. Also returns any fragments nested within the fragments
    *   defined in parts.
@@ -849,6 +1250,18 @@ export class AppClient {
 
   /**
    * Add a role under an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.addRole(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-USER-ID>',
+   *   'owner',
+   *   'robot',
+   *   '<YOUR-ROBOT-ID>'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to create the role under
    * @param entityId The ID of the entity the role belongs to (for example a
@@ -880,6 +1293,18 @@ export class AppClient {
   /**
    * Removes a role from an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.removeRole(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-USER-ID>',
+   *   'owner',
+   *   'robot',
+   *   '<YOUR-ROBOT-ID>'
+   * );
+   * ```
+   *
    * @param organizationId The ID of the organization to remove the role from
    * @param entityId The ID of the entity the role belongs to (for example a
    *   user ID)
@@ -910,19 +1335,48 @@ export class AppClient {
   /**
    * Changes an existing role.
    *
+   * @example
+   *
+   * ```ts
+   * const oldAuth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_owner',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access to
+   *   identityId: '<USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'owner', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   * const newAuth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_operator',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access To
+   *   identityId: '<USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'operator', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   * await appClient.changeRole(oldAuth, newAuth);
+   * ```
+   *
+   * Async changeRole( oldAuthorization: Authorization, newAuthorization:
+   * Authorization ) { await this.client.changeRole({ oldAuthorization,
+   * newAuthorization }); }
+   *
+   * /** List all authorizations for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const authorizations = await appClient.listAuthorizations(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
    * @param oldAuth The existing authorization
    * @param newAuth The new authorization
-   */
-  async changeRole(
-    oldAuthorization: Authorization,
-    newAuthorization: Authorization
-  ) {
-    await this.client.changeRole({ oldAuthorization, newAuthorization });
-  }
-
-  /**
-   * List all authorizations for an organization.
-   *
    * @param organizationId The ID of the organization to list authorizations for
    * @param resourceIds Optional list of IDs of resources to list authorizations
    *   for. If not provided, all resources will be included
@@ -955,6 +1409,14 @@ export class AppClient {
   /**
    * Get an item from the registry.
    *
+   * @example
+   *
+   * ```ts
+   * const registryItem = await appClient.getRegistryItem(
+   *   '<YOUR-REGISTRY-ITEM-ID>'
+   * );
+   * ```
+   *
    * @param itemId The ID of the item to get
    * @returns The requested item
    */
@@ -965,6 +1427,16 @@ export class AppClient {
 
   /**
    * Create a new registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.createRegistryItem(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newRegistryItemName',
+   *   5
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to create the registry
    *   item under
@@ -985,6 +1457,17 @@ export class AppClient {
 
   /**
    * Update an existing registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateRegistryItem(
+   *   '<YOUR-REGISTRY-ITEM-ID>',
+   *   5, // Package: ML Model
+   *   'new description',
+   *   1 // Private
+   * );
+   * ```
    *
    * @param itemId The ID of the registry item to update
    * @param type The PackageType to update the item to
@@ -1007,6 +1490,18 @@ export class AppClient {
 
   /**
    * List all registry items for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const registryItems = await appClient.listRegistryItems(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   [], // All package types
+   *   [1], // Private packages
+   *   [],
+   *   [1] // Active packages
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to query registry items
    *   for
@@ -1047,6 +1542,12 @@ export class AppClient {
   /**
    * Deletes a registry item.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRegistryItem('<YOUR-REGISTRY-ITEM-ID>');
+   * ```
+   *
    * @param itemId The ID of the item to delete
    */
   async deleteRegistryItem(itemId: string) {
@@ -1057,6 +1558,15 @@ export class AppClient {
 
   /**
    * Creates a new module.
+   *
+   * @example
+   *
+   * ```ts
+   * const module = await appClient.createModule(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newModule'
+   * );
+   * ```
    *
    * @param organizationId The ID of the organization to create the module under
    * @param name The name of the module
@@ -1074,6 +1584,19 @@ export class AppClient {
 
   /**
    * Updates an existing module.
+   *
+   * @example
+   *
+   * ```ts
+   * const module = await appClient.updateModule(
+   *   '<YOUR-MODULE-ID>',
+   *   1,
+   *   'https://example.com',
+   *   'new description',
+   *   [{ model: 'namespace:group:model1', api: 'rdk:component:generic' }],
+   *   'entrypoint'
+   * );
+   * ```
    *
    * @param moduleId The ID of the module to update
    * @param visibility The visibility to set for the module
@@ -1105,6 +1628,12 @@ export class AppClient {
   /**
    * Looks up a particular module.
    *
+   * @example
+   *
+   * ```ts
+   * const module = await appClient.getModule('<YOUR-MODULE-ID>');
+   * ```
+   *
    * @param moduleId The ID of the module
    * @returns The requested module
    */
@@ -1115,6 +1644,12 @@ export class AppClient {
 
   /**
    * Lists all modules for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const modules = await appClient.listModules('<YOUR-ORGANIZATION-ID>');
+   * ```
    *
    * @param organizationId The ID of the organization to query
    * @returns The organization's modules
@@ -1142,6 +1677,12 @@ export class AppClient {
   /**
    * Deletes an existing API key.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteKey('<YOUR-KEY-ID>');
+   * ```
+   *
    * @param id The ID of the key to delete
    */
   async deleteKey(id: string) {
@@ -1150,6 +1691,12 @@ export class AppClient {
 
   /**
    * List all API keys for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const keys = await appClient.listKeys('<YOUR-ORGANIZATION-ID>');
+   * ```
    *
    * @param orgId The ID of the organization to query
    * @returns The list of API keys
@@ -1162,6 +1709,12 @@ export class AppClient {
   /**
    * Rotates an existing API key.
    *
+   * @example
+   *
+   * ```ts
+   * const key = await appClient.rotateKey('<YOUR-KEY-ID>');
+   * ```
+   *
    * @param id The ID of the key to rotate
    * @returns The updated key and ID
    */
@@ -1171,6 +1724,15 @@ export class AppClient {
 
   /**
    * Creates a new key with an existing key's authorizations
+   *
+   * @example
+   *
+   * ```ts
+   * const key =
+   *   await appClient.createKeyFromExistingKeyAuthorizations(
+   *     '<YOUR-KEY-ID>'
+   *   );
+   * ```
    *
    * @param id The ID of the key to duplicate
    * @returns The new key and ID
@@ -1183,6 +1745,15 @@ export class AppClient {
 
   /**
    * Retrieves the app content for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const appContent = await appClient.getAppContent(
+   *   '<YOUR-PUBLIC-NAMESPACE>',
+   *   '<YOUR-APP-NAME>'
+   * );
+   * ```
    *
    * @param publicNamespace The public namespace of the organization
    * @param name The name of the app
@@ -1197,6 +1768,14 @@ export class AppClient {
 
   /**
    * Retrieves user-defined metadata for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getOrganizationMetadata(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
    *
    * @param id The ID of the organization
    * @returns The metadata associated with the organization
@@ -1216,6 +1795,14 @@ export class AppClient {
   /**
    * Updates user-defined metadata for an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateOrganizationMetadata('<YOUR-ORGANIZATION-ID>', {
+   *   key: 'value',
+   * });
+   * ```
+   *
    * @param id The ID of the organization
    * @param data The metadata to update
    */
@@ -1232,6 +1819,14 @@ export class AppClient {
   /**
    * Retrieves user-defined metadata for a location.
    *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getLocationMetadata(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
    * @param id The ID of the location
    * @returns The metadata associated with the location
    */
@@ -1245,6 +1840,14 @@ export class AppClient {
 
   /**
    * Updates user-defined metadata for a location.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateLocationMetadata('<YOUR-LOCATION-ID>', {
+   *   key: 'value',
+   * });
+   * ```
    *
    * @param id The ID of the location
    * @param data The metadata to update
@@ -1262,6 +1865,12 @@ export class AppClient {
   /**
    * Retrieves user-defined metadata for a robot.
    *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getRobotMetadata('<YOUR-ROBOT-ID>');
+   * ```
+   *
    * @param id The ID of the robot
    * @returns The metadata associated with the robot
    */
@@ -1276,6 +1885,14 @@ export class AppClient {
   /**
    * Updates user-defined metadata for a robot.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateRobotMetadata('<YOUR-ROBOT-ID>', {
+   *   key: 'value',
+   * });
+   * ```
+   *
    * @param id The ID of the robot
    * @param data The metadata to update
    */
@@ -1288,6 +1905,14 @@ export class AppClient {
 
   /**
    * Retrieves user-defined metadata for a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getRobotPartMetadata(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
    *
    * @param id The ID of the robot part
    * @returns The metadata associated with the robot part
@@ -1302,6 +1927,14 @@ export class AppClient {
 
   /**
    * Updates user-defined metadata for a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateRobotPartMetadata('<YOUR-ROBOT-PART-ID>', {
+   *   key: 'value',
+   * });
+   * ```
    *
    * @param id The ID of the robot part
    * @param data The metadata to update
