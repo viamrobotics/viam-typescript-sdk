@@ -3,7 +3,8 @@ import type { Struct, Resource } from '../../types';
 
 /** Represents a generic component. */
 export interface Generic extends Resource {
-  /** Get the geometries of the component in their current configuration.
+  /**
+   * Get the geometries of the component in their current configuration.
    *
    * @example
    *

@@ -4,7 +4,8 @@ import type { Geometry } from '../../gen/common/v1/common_pb';
 
 /** Represents a physical robotic gripper. */
 export interface Gripper extends Resource {
-  /** Get the geometries of the component in their current configuration.
+  /**
+   * Get the geometries of the component in their current configuration.
    *
    * @example
    *
@@ -18,7 +19,8 @@ export interface Gripper extends Resource {
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
-  /** Open a gripper of the underlying robot.
+  /**
+   * Open a gripper of the underlying robot.
    *
    * @example
    *
@@ -31,7 +33,8 @@ export interface Gripper extends Resource {
    */
   open: (extra?: Struct) => Promise<void>;
 
-  /** Request a gripper of the underlying robot to grab.
+  /**
+   * Request a gripper of the underlying robot to grab.
    *
    * @example
    *
@@ -44,7 +47,8 @@ export interface Gripper extends Resource {
    */
   grab: (extra?: Struct) => Promise<void>;
 
-  /** Stop a robot's gripper.
+  /**
+   * Stop a robot's gripper.
    *
    * @example
    *
@@ -57,7 +61,8 @@ export interface Gripper extends Resource {
    */
   stop: (extra?: Struct) => Promise<void>;
 
-  /** Report if the gripper is in motion.
+  /**
+   * Report if the gripper is in motion.
    *
    * @example
    *
