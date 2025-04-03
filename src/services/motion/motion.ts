@@ -32,20 +32,29 @@ export interface Motion extends Resource {
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
    * // Assumes a gripper configured with name "my_gripper"
-   * const gripperName = new VIAM.ResourceName({ name: 'my_gripper', namespace: 'rdk', type: 'component', subtype: 'gripper' });
+   * const gripperName = new VIAM.ResourceName({
+   *   name: 'my_gripper',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'gripper',
+   * });
    *
    * const goalPose: VIAM.Pose = {
-   *   x: -817, y: -230, z: 62,
-   *   oX: -1, oY: 0, oZ: 0,
-   *   theta: 90
+   *   x: -817,
+   *   y: -230,
+   *   z: 62,
+   *   oX: -1,
+   *   oY: 0,
+   *   oZ: 0,
+   *   theta: 90,
    * };
-   * const goalPoseInFrame = new VIAM.PoseInFrame({ referenceFrame: 'world', pose: goalPose });
+   * const goalPoseInFrame = new VIAM.PoseInFrame({
+   *   referenceFrame: 'world',
+   *   pose: goalPose,
+   * });
    *
    * // Move the gripper
-   * const moved = await motion.move(
-   *   goalPoseInFrame,
-   *   gripperName
-   * );
+   * const moved = await motion.move(goalPoseInFrame, gripperName);
    * ```
    *
    * @param destination - Destination to move to, which can a pose in the
@@ -81,13 +90,27 @@ export interface Motion extends Resource {
    *
    * // Define destination pose with respect to map origin
    * const myPose: VIAM.Pose = {
-   *   x: 0, y: 10, z: 0,
-   *   oX: 0, oY: 0, oZ: 0,
-   *   theta: 0
+   *   x: 0,
+   *   y: 10,
+   *   z: 0,
+   *   oX: 0,
+   *   oY: 0,
+   *   oZ: 0,
+   *   theta: 0,
    * };
    *
-   * const baseName = new VIAM.ResourceName({ name: 'my_base', namespace: 'rdk', type: 'component', subtype: 'base' });
-   * const slamServiceName = new VIAM.ResourceName({ name: 'my_slam_service', namespace: 'rdk', type: 'service', subtype: 'slam' });
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
+   * const slamServiceName = new VIAM.ResourceName({
+   *   name: 'my_slam_service',
+   *   namespace: 'rdk',
+   *   type: 'service',
+   *   subtype: 'slam',
+   * });
    *
    * // Move the base to Y=10 (location of 0,10,0) relative to map origin
    * const executionId = await motion.moveOnMap(
@@ -130,10 +153,23 @@ export interface Motion extends Resource {
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
    * // Define destination at GPS coordinates [0,0]
-   * const destination: VIAM.GeoPoint = { latitude: 40.7, longitude: -73.98 };
+   * const destination: VIAM.GeoPoint = {
+   *   latitude: 40.7,
+   *   longitude: -73.98,
+   * };
    *
-   * const baseName = new VIAM.ResourceName({ name: 'my_base', namespace: 'rdk', type: 'component', subtype: 'base' });
-   * const movementSensorName = new VIAM.ResourceName({ name: 'my_movement_sensor', namespace: 'rdk', type: 'component', subtype: 'movement_sensor' });
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
+   * const movementSensorName = new VIAM.ResourceName({
+   *   name: 'my_movement_sensor',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'movement_sensor',
+   * });
    *
    * // Move the base to the geographic location
    * const globeExecutionId = await motion.moveOnGlobe(
@@ -174,7 +210,12 @@ export interface Motion extends Resource {
    *
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
-   * const baseName = new VIAM.ResourceName({ name: 'my_base', namespace: 'rdk', type: 'component', subtype: 'base' });
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
    *
    * // Stop the base component which was instructed to move
    * await motion.stopPlan(baseName);
@@ -202,7 +243,12 @@ export interface Motion extends Resource {
    *
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
-   * const baseName = new VIAM.ResourceName({ name: 'my_base', namespace: 'rdk', type: 'component', subtype: 'base' });
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
    *
    * // Get the plan(s) of the base component
    * const response = await motion.getPlan(baseName);
@@ -257,7 +303,12 @@ export interface Motion extends Resource {
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
-   * const gripperName = new VIAM.ResourceName({ name: 'my_gripper', namespace: 'rdk', type: 'component', subtype: 'gripper' });
+   * const gripperName = new VIAM.ResourceName({
+   *   name: 'my_gripper',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'gripper',
+   * });
    *
    * // Get the gripper's pose in world coordinates
    * const gripperPoseInWorld = await motion.getPose(
