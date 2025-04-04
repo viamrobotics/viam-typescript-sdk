@@ -1,0 +1,16 @@
+DirectoryPath: "docs/dist"
+EnforceHTTPS: true
+IgnoreEmptyHref: true
+IgnoreInternalEmptyHash: true
+IgnoreDirectoryMissingTrailingSlash: false
+IgnoreURLs:
+  - "app.viam.com"
+  - "http://joda-time.sourceforge.net"
+IgnoreDirs:
+  - "lib"
+CacheExpires: "6h"
+# IgnoreDirs: - if we need to ever ignore files
+CheckInternal: false
+CheckDoctype: false
+CheckScripts: false
+FileExtension: ".html"
