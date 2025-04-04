@@ -55,7 +55,7 @@ export interface Slam extends Resource {
   getInternalState: () => Promise<Uint8Array>;
 
   /**
-   * Gets information on the properties of the current SLAM service.
+   * Get information on the properties of the current SLAM service.
    *
    * @example
    *
