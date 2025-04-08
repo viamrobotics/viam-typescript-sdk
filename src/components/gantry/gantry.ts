@@ -56,6 +56,8 @@ export interface Gantry extends Resource {
    * // Get the current positions of the axes in millimeters
    * const positions = await gantry.getPosition();
    * ```
+   *
+   * @returns A list of the current position of each axis in millimeters.
    */
   getPosition: (extra?: Struct) => Promise<number[]>;
 
@@ -88,6 +90,8 @@ export interface Gantry extends Resource {
    * // Get the lengths of the axes in millimeters
    * const lengths = await gantry.getLengths();
    * ```
+   *
+   * @returns A list of the length of each axis in millimeters.
    */
   getLengths: (extra?: Struct) => Promise<number[]>;
 
