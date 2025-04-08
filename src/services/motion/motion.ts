@@ -26,6 +26,37 @@ export interface Motion extends Resource {
    * Move any component on the robot to a specified destination which can be
    * from the reference frame of any other component on the robot.
    *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   *
+   * // Assumes a gripper configured with name "my_gripper"
+   * const gripperName = new VIAM.ResourceName({
+   *   name: 'my_gripper',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'gripper',
+   * });
+   *
+   * const goalPose: VIAM.Pose = {
+   *   x: -817,
+   *   y: -230,
+   *   z: 62,
+   *   oX: -1,
+   *   oY: 0,
+   *   oZ: 0,
+   *   theta: 90,
+   * };
+   * const goalPoseInFrame = new VIAM.PoseInFrame({
+   *   referenceFrame: 'world',
+   *   pose: goalPose,
+   * });
+   *
+   * // Move the gripper
+   * const moved = await motion.move(goalPoseInFrame, gripperName);
+   * ```
+   *
    * @param destination - Destination to move to, which can a pose in the
    *   reference frame of any frame in the robot's frame system.
    * @param componentName - Component on the robot to move to the specified
@@ -51,6 +82,43 @@ export interface Motion extends Resource {
    * ExectionID which you can use to identify all plans generated durring
    * the`moveOnMap()`call. You can monitor the progress of the`moveOnMap()`call
    * by querying`getPlan()`and`listPlanStatuses()`.
+   *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   *
+   * // Define destination pose with respect to map origin
+   * const myPose: VIAM.Pose = {
+   *   x: 0,
+   *   y: 10,
+   *   z: 0,
+   *   oX: 0,
+   *   oY: 0,
+   *   oZ: 0,
+   *   theta: 0,
+   * };
+   *
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
+   * const slamServiceName = new VIAM.ResourceName({
+   *   name: 'my_slam_service',
+   *   namespace: 'rdk',
+   *   type: 'service',
+   *   subtype: 'slam',
+   * });
+   *
+   * // Move the base to Y=10 (location of 0,10,0) relative to map origin
+   * const executionId = await motion.moveOnMap(
+   *   myPose,
+   *   baseName,
+   *   slamServiceName
+   * );
+   * ```
    *
    * @param destination - Specify a destination to, which can be any `Pose` with
    *   respect to the SLAM map's origin.
@@ -79,6 +147,38 @@ export interface Motion extends Resource {
    * generated durring the `moveOnGlobe()` call. You can monitor the progress of
    * the `moveOnGlobe()` call by querying `getPlan()` and `listPlanStatuses()`.
    *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   *
+   * // Define destination at GPS coordinates [0,0]
+   * const destination: VIAM.GeoPoint = {
+   *   latitude: 40.7,
+   *   longitude: -73.98,
+   * };
+   *
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
+   * const movementSensorName = new VIAM.ResourceName({
+   *   name: 'my_movement_sensor',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'movement_sensor',
+   * });
+   *
+   * // Move the base to the geographic location
+   * const globeExecutionId = await motion.moveOnGlobe(
+   *   destination,
+   *   baseName,
+   *   movementSensorName
+   * );
+   * ```
+   *
    * @param destination - Destination for the component to move to, represented
    *   as a `GeoPoint`.
    * @param componentName - The name of the component to move.
@@ -106,6 +206,21 @@ export interface Motion extends Resource {
    * Stop a component being moved by an in progress `moveOnGlobe()` or
    * `moveOnMap()` call.
    *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
+   *
+   * // Stop the base component which was instructed to move
+   * await motion.stopPlan(baseName);
+   * ```
+   *
    * @param componentName - The component to stop
    */
   stopPlan: (componentName: ResourceName, extra?: Struct) => Promise<null>;
@@ -123,6 +238,21 @@ export interface Motion extends Resource {
    * Plans never change. Replans always create new plans. Replans share the
    * ExecutionID of the previously executing plan. All repeated fields are in
    * chronological order.
+   *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   * const baseName = new VIAM.ResourceName({
+   *   name: 'my_base',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'base',
+   * });
+   *
+   * // Get the plan(s) of the base component
+   * const response = await motion.getPlan(baseName);
+   * ```
    *
    * @param componentName - The component to query
    * @param destinationFrame - The reference frame in which the component's
@@ -143,10 +273,19 @@ export interface Motion extends Resource {
    * least one of the following conditions since the motion service
    * initialized:
    *
-   * - The plan’s status is in progress
-   * - The plan’s status changed state within the last 24 hours
+   * - The plan's status is in progress
+   * - The plan's status changed state within the last 24 hours
    *
    * All repeated fields are in chronological order.
+   *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   *
+   * // List plan statuses within the TTL
+   * const response = await motion.listPlanStatuses();
+   * ```
    *
    * @param onlyActivePlans - If true, the response will only return plans which
    *   are executing.
@@ -158,6 +297,26 @@ export interface Motion extends Resource {
 
   /**
    * Get the current location and orientation of a component.
+   *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   *
+   * const gripperName = new VIAM.ResourceName({
+   *   name: 'my_gripper',
+   *   namespace: 'rdk',
+   *   type: 'component',
+   *   subtype: 'gripper',
+   * });
+   *
+   * // Get the gripper's pose in world coordinates
+   * const gripperPoseInWorld = await motion.getPose(
+   *   gripperName,
+   *   'world',
+   *   []
+   * );
+   * ```
    *
    * @param componentName - The component whose `Pose` is being requested.
    * @param destinationFrame - The reference frame in which the component's
