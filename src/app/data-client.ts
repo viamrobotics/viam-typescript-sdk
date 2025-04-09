@@ -706,7 +706,6 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * // TODO(UNTESTED)
    * await dataClient.removeBoundingBoxFromImageById(
    *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
    *   '5Z9ryhkW7ULaXROjJO6ghPYulNllnH20QImda1iZFroZpQbjahK6igQ1WbYigXED'
