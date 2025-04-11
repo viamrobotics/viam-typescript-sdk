@@ -19,7 +19,8 @@ export interface Generic extends Resource {
    * console.log('Geometries:', geometries);
    * ```
    *
-   * For more information, see [Generic API](https://docs.viam.com/dev/reference/apis/components/generic/#getgeometries).
+   * For more information, see [Generic
+   * API](https://docs.viam.com/dev/reference/apis/components/generic/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 }
