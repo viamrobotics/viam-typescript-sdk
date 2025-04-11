@@ -56,6 +56,8 @@ export interface Camera extends Resource {
    * }
    * ```
    *
+   * For more information, see [Camera API](https://docs.viam.com/dev/reference/apis/components/camera/#getimage).
+   *
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
    */
@@ -72,6 +74,8 @@ export interface Camera extends Resource {
    * const image = await camera.renderFrame(mimeType);
    * ```
    *
+   * For more information, see [Camera API](https://docs.viam.com/dev/reference/apis/components/camera/#renderframe).
+   *
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
    */
@@ -86,6 +90,8 @@ export interface Camera extends Resource {
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const pointCloud = await camera.getPointCloud();
    * ```
+   *
+   * For more information, see [Camera API](https://docs.viam.com/dev/reference/apis/components/camera/#getpointcloud).
    */
   getPointCloud: (extra?: Struct) => Promise<Uint8Array>;
 
@@ -98,6 +104,8 @@ export interface Camera extends Resource {
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const properties = await camera.getProperties();
    * ```
+   *
+   * For more information, see [Camera API](https://docs.viam.com/dev/reference/apis/components/camera/#getproperties).
    */
   getProperties: () => Promise<Properties>;
 }

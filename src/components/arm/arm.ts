@@ -19,6 +19,8 @@ export interface Arm extends Resource {
    * const arm = new VIAM.ArmClient(machine, 'my_arm');
    * const pose = await arm.getEndPosition();
    * ```
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#getendposition).
    */
   getEndPosition: (extra?: Struct) => Promise<Pose>;
 
@@ -32,6 +34,8 @@ export interface Arm extends Resource {
    * const geometries = await arm.getGeometries();
    * console.log(geometries);
    * ```
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -59,6 +63,8 @@ export interface Arm extends Resource {
    * ```
    *
    * @param pose - The destination pose for the arm.
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#movetoposition).
    */
   moveToPosition: (pose: Pose, extra?: Struct) => Promise<void>;
 
@@ -75,6 +81,8 @@ export interface Arm extends Resource {
    * ```
    *
    * @param jointPositionsList - List of angles (0-360) to move each joint to.
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#movetojointpositions).
    */
   moveToJointPositions: (
     jointPositionsList: number[],
@@ -90,6 +98,8 @@ export interface Arm extends Resource {
    * const arm = new VIAM.ArmClient(machine, 'my_arm');
    * const jointPositions = await arm.getJointPositions();
    * ```
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#getjointpositions).
    */
   getJointPositions: (extra?: Struct) => Promise<ArmJointPositions>;
 
@@ -102,6 +112,8 @@ export interface Arm extends Resource {
    * const arm = new VIAM.ArmClient(machine, 'my_arm');
    * await arm.stop();
    * ```
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#stop).
    */
   stop: (extra?: Struct) => Promise<void>;
 
@@ -115,6 +127,8 @@ export interface Arm extends Resource {
    * const isMoving = await arm.isMoving();
    * console.log(isMoving);
    * ```
+   *
+   * For more information, see [Arm API](https://docs.viam.com/dev/reference/apis/components/arm/#ismoving).
    */
   isMoving: () => Promise<boolean>;
 }

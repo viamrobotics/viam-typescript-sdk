@@ -24,6 +24,8 @@ export interface Encoder extends Resource {
    * // Reset the zero position of the encoder
    * await encoder.resetPosition();
    * ```
+   *
+   * For more information, see [Encoder API](https://docs.viam.com/dev/reference/apis/components/encoder/#resetposition).
    */
   resetPosition(extra?: Struct): Promise<void>;
 
@@ -38,6 +40,8 @@ export interface Encoder extends Resource {
    * // Get whether the encoder returns position in ticks or degrees
    * const properties = await encoder.getProperties();
    * ```
+   *
+   * For more information, see [Encoder API](https://docs.viam.com/dev/reference/apis/components/encoder/#getproperties).
    */
   getProperties(extra?: Struct): Promise<EncoderProperties>;
 
@@ -56,6 +60,8 @@ export interface Encoder extends Resource {
    * );
    * console.log('The encoder position is currently', position, posType);
    * ```
+   *
+   * For more information, see [Encoder API](https://docs.viam.com/dev/reference/apis/components/encoder/#getposition).
    *
    * @param positionType - The type of position the encoder returns (ticks or
    *   degrees)
