@@ -19,6 +19,9 @@ export interface Base extends Resource {
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * const geometries = await base.getGeometries();
    * ```
+   *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -37,6 +40,9 @@ export interface Base extends Resource {
    * // Move backward 40mm at -90mm/s (backwards)
    * await base.moveStraight(40, -90);
    * ```
+   *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#movestraight).
    *
    * @param distanceMm - Distance to move, in millimeters.
    * @param mmPerSec - Movement speed, in millimeters per second.
@@ -62,6 +68,9 @@ export interface Base extends Resource {
    * // Spin 180 degrees counter-clockwise at 20 degrees per second
    * await base.spin(-180, 20);
    * ```
+   *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#spin).
    *
    * @param angleDeg - Degrees to spin.
    * @param degsPerSec - Angular speed, in degrees per second.
@@ -102,6 +111,9 @@ export interface Base extends Resource {
    * );
    * ```
    *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#setpower).
+   *
    * @param linear - Desired linear power percentage from -1 to 1.
    * @param angular - Desired angular power percentage from -1 to 1.
    */
@@ -122,6 +134,9 @@ export interface Base extends Resource {
    * );
    * ```
    *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#setvelocity).
+   *
    * @param linear - Desired linear velocity in millimeters per second.
    * @param angular - Desired angular velocity in degrees per second.
    */
@@ -136,6 +151,9 @@ export interface Base extends Resource {
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * await base.stop();
    * ```
+   *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#stop).
    */
   stop(extra?: Struct): Promise<void>;
 
@@ -148,6 +166,9 @@ export interface Base extends Resource {
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * const moving = await base.isMoving();
    * ```
+   *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#ismoving).
    */
   isMoving(): Promise<boolean>;
 
@@ -160,6 +181,9 @@ export interface Base extends Resource {
    * const base = new VIAM.BaseClient(machine, 'my_base');
    * const properties = await base.getProperties();
    * ```
+   *
+   * For more information, see [Base
+   * API](https://docs.viam.com/dev/reference/apis/components/base/#getproperties).
    */
   getProperties(extra?: Struct): Promise<BaseProperties>;
 }
