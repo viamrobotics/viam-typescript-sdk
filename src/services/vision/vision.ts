@@ -22,6 +22,9 @@ export interface Vision extends Resource {
    * const detections = await vision.getDetectionsFromCamera('my_camera');
    * ```
    *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetectionsfromcamera).
+   *
    * @param cameraName - The name of the camera to use for detection.
    * @returns - The list of Detections.
    */
@@ -49,6 +52,9 @@ export interface Vision extends Resource {
    * );
    * ```
    *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetections).
+   *
    * @param image - The image from which to get detections.
    * @param width - The width of the image.
    * @param height - The height of the image.
@@ -75,6 +81,9 @@ export interface Vision extends Resource {
    *   10
    * );
    * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getclassificationsfromcamera).
    *
    * @param cameraName - The name of the camera to use for classification.
    * @param count - The number of Classifications requested.
@@ -106,6 +115,9 @@ export interface Vision extends Resource {
    * );
    * ```
    *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getclassifications).
+   *
    * @param image - The image from which to get classifications.
    * @param width - The width of the image.
    * @param height - The height of the image.
@@ -134,6 +146,9 @@ export interface Vision extends Resource {
    *   await vision.getObjectPointClouds('my_camera');
    * ```
    *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getobjectpointclouds).
+   *
    * @param cameraName - The name of the camera.
    * @returns - The list of PointCloudObjects
    */
@@ -154,6 +169,9 @@ export interface Vision extends Resource {
    * const properties = await vision.getProperties();
    * ```
    *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getproperties).
+   *
    * @returns - The properties of the vision service
    */
   getProperties: (extra?: Struct) => Promise<Properties>;
@@ -173,6 +191,9 @@ export interface Vision extends Resource {
    *   returnObjectPointClouds: true,
    * });
    * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#captureallfromcamera).
    *
    * @param cameraName - The name of the camera to use for classification,
    *   detection, and segmentation.
