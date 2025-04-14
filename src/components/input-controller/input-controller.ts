@@ -26,8 +26,8 @@ export interface InputController extends Resource {
    * console.log('Recent events:', recentEvents);
    * ```
    *
-   * For more information, see [InputController
-   * API](https://docs.viam.com/dev/reference/apis/components/inputcontroller/#getevents).
+   * For more information, see [Input Controller
+   * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#getevents).
    */
   getEvents(extra?: Struct): Promise<InputControllerEvent[]>;
 
@@ -55,8 +55,8 @@ export interface InputController extends Resource {
    * await controller.triggerEvent(buttonPressEvent);
    * ```
    *
-   * For more information, see [InputController
-   * API](https://docs.viam.com/dev/reference/apis/components/inputcontroller/#triggerevent).
+   * For more information, see [Input Controller
+   * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#triggerevent).
    */
   triggerEvent(event: InputControllerEvent, extra?: Struct): Promise<void>;
 }
