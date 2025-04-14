@@ -20,11 +20,11 @@ export interface Motor extends Resource {
    * await motor.setPower(0.4);
    * ```
    *
+   * For more information, see [Motor
+   * API](https://docs.viam.com/dev/reference/apis/components/motor/#setpower).
+   *
    * @param power - A value between -1 and 1 where negative values indicate a
    *   backwards direction and positive values a forward direction.
-   *
-   *   For more information, see [Motor
-   *   API](https://docs.viam.com/dev/reference/apis/components/motor/#setpower).
    */
   setPower(power: number, extra?: Struct): Promise<void>;
 
@@ -42,14 +42,14 @@ export interface Motor extends Resource {
    * await motor.goFor(60, 7.2);
    * ```
    *
+   * For more information, see [Motor
+   * API](https://docs.viam.com/dev/reference/apis/components/motor/#gofor).
+   *
    * @param rpm - Speed in revolutions per minute.
    * @param revolutions - Number of revolutions relative to the motor's starting
    *   position. If this value is 0, this will run the motor at the given rpm
    *   indefinitely. If this value is nonzero, this will block until the number
    *   of revolutions has been completed or another operation comes in.
-   *
-   *   For more information, see [Motor
-   *   API](https://docs.viam.com/dev/reference/apis/components/motor/#gofor).
    */
   goFor(rpm: number, revolutions: number, extra?: Struct): Promise<void>;
 
@@ -66,12 +66,12 @@ export interface Motor extends Resource {
    * await motor.goTo(75, 8.3);
    * ```
    *
+   * For more information, see [Motor
+   * API](https://docs.viam.com/dev/reference/apis/components/motor/#goto).
+   *
    * @param rpm - Speed in revolutions per minute.
    * @param positionRevolutions - Number of revolutions relative to the motor's
    *   home position.
-   *
-   *   For more information, see [Motor
-   *   API](https://docs.viam.com/dev/reference/apis/components/motor/#goto).
    */
   goTo(rpm: number, positionRevolutions: number, extra?: Struct): Promise<void>;
 
@@ -88,10 +88,10 @@ export interface Motor extends Resource {
    * await motor.setRPM(75);
    * ```
    *
-   * @param rpm - Speed in revolutions per minute.
+   * For more information, see [Motor
+   * API](https://docs.viam.com/dev/reference/apis/components/motor/#setrpm).
    *
-   *   For more information, see [Motor
-   *   API](https://docs.viam.com/dev/reference/apis/components/motor/#setrpm).
+   * @param rpm - Speed in revolutions per minute.
    */
   setRPM(rpm: number, extra?: Struct): Promise<void>;
 
@@ -108,10 +108,10 @@ export interface Motor extends Resource {
    * await motor.resetZeroPosition(0.0);
    * ```
    *
-   * @param offset - Position from which to offset the current position.
+   * For more information, see [Motor
+   * API](https://docs.viam.com/dev/reference/apis/components/motor/#resetzeroposition).
    *
-   *   For more information, see [Motor
-   *   API](https://docs.viam.com/dev/reference/apis/components/motor/#resetzeroposition).
+   * @param offset - Position from which to offset the current position.
    */
   resetZeroPosition(offset: number, extra?: Struct): Promise<void>;
 
