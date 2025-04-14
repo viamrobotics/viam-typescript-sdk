@@ -18,7 +18,8 @@ export interface Servo extends Resource {
    * await servo.move(90);
    * ```
    *
-   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#move).
+   * For more information, see [Servo
+   * API](https://docs.viam.com/dev/reference/apis/components/servo/#move).
    */
   move(angleDeg: number, extra?: Struct): Promise<void>;
 
@@ -34,7 +35,8 @@ export interface Servo extends Resource {
    * const pos = await servo.getPosition();
    * ```
    *
-   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#getposition).
+   * For more information, see [Servo
+   * API](https://docs.viam.com/dev/reference/apis/components/servo/#getposition).
    */
   getPosition(extra?: Struct): Promise<number>;
 
@@ -53,7 +55,8 @@ export interface Servo extends Resource {
    * await servo.stop();
    * ```
    *
-   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#stop).
+   * For more information, see [Servo
+   * API](https://docs.viam.com/dev/reference/apis/components/servo/#stop).
    */
   stop(extra?: Struct): Promise<void>;
 
@@ -69,7 +72,8 @@ export interface Servo extends Resource {
    * console.log('Moving:', moving);
    * ```
    *
-   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#ismoving).
+   * For more information, see [Servo
+   * API](https://docs.viam.com/dev/reference/apis/components/servo/#ismoving).
    */
   isMoving(): Promise<boolean>;
 }

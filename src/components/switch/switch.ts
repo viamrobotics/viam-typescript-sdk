@@ -18,7 +18,8 @@ export interface Switch extends Resource {
    * await mySwitch.setPosition(0);
    * ```
    *
-   * For more information, see [Switch API](https://docs.viam.com/dev/reference/apis/components/switch/#setposition).
+   * For more information, see [Switch
+   * API](https://docs.viam.com/dev/reference/apis/components/switch/#setposition).
    */
   setPosition: (position: number, extra?: Struct) => Promise<void>;
 
@@ -43,7 +44,8 @@ export interface Switch extends Resource {
    * const pos2 = await mySwitch.getPosition();
    * ```
    *
-   * For more information, see [Switch API](https://docs.viam.com/dev/reference/apis/components/switch/#getposition).
+   * For more information, see [Switch
+   * API](https://docs.viam.com/dev/reference/apis/components/switch/#getposition).
    */
   getPosition: (extra?: Struct) => Promise<number>;
 
@@ -60,7 +62,8 @@ export interface Switch extends Resource {
    * console.log('Number of positions:', numPositions);
    * ```
    *
-   * For more information, see [Switch API](https://docs.viam.com/dev/reference/apis/components/switch/#getnumberofpositions).
+   * For more information, see [Switch
+   * API](https://docs.viam.com/dev/reference/apis/components/switch/#getnumberofpositions).
    */
   getNumberOfPositions: (extra?: Struct) => Promise<number>;
 }
