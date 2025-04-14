@@ -30,6 +30,8 @@ export interface MovementSensor extends Resource {
    * );
    * const linearVelocity = await movementSensor.getLinearVelocity();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getlinearvelocity).
    */
   getLinearVelocity(extra?: Struct): Promise<Vector3>;
 
@@ -45,6 +47,8 @@ export interface MovementSensor extends Resource {
    * );
    * const angularVelocity = await movementSensor.getAngularVelocity();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getangularvelocity).
    */
   getAngularVelocity(extra?: Struct): Promise<Vector3>;
 
@@ -61,6 +65,8 @@ export interface MovementSensor extends Resource {
    * );
    * const compassHeading = await movementSensor.getCompassHeading();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getcompassheading).
    */
   getCompassHeading(extra?: Struct): Promise<number>;
 
@@ -76,6 +82,8 @@ export interface MovementSensor extends Resource {
    * );
    * const orientation = await movementSensor.getOrientation();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getorientation).
    */
   getOrientation(extra?: Struct): Promise<Orientation>;
 
@@ -91,6 +99,8 @@ export interface MovementSensor extends Resource {
    * );
    * const position = await movementSensor.getPosition();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getposition).
    */
   getPosition(extra?: Struct): Promise<MovementSensorPosition>;
 
@@ -106,6 +116,8 @@ export interface MovementSensor extends Resource {
    * );
    * const properties = await movementSensor.getProperties();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getproperties).
    */
   getProperties(extra?: Struct): Promise<MovementSensorProperties>;
 
@@ -121,6 +133,8 @@ export interface MovementSensor extends Resource {
    * );
    * const accuracy = await movementSensor.getAccuracy();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getaccuracy).
    */
   getAccuracy(extra?: Struct): Promise<MovementSensorAccuracy>;
 
@@ -137,6 +151,8 @@ export interface MovementSensor extends Resource {
    * const linearAcceleration =
    *   await movementSensor.getLinearAcceleration();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getlinearacceleration).
    */
   getLinearAcceleration(extra?: Struct): Promise<Vector3>;
 
@@ -152,6 +168,8 @@ export interface MovementSensor extends Resource {
    * );
    * const readings = await movementSensor.getReadings();
    * ```
+   *
+   * For more information, see [Movement Sensor API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getreadings).
    */
   getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
 }

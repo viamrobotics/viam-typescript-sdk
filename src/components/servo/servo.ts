@@ -17,6 +17,8 @@ export interface Servo extends Resource {
    * // Move the servo from its origin to the desired angle of 90 degrees
    * await servo.move(90);
    * ```
+   *
+   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#move).
    */
   move(angleDeg: number, extra?: Struct): Promise<void>;
 
@@ -31,6 +33,8 @@ export interface Servo extends Resource {
    * // Get the current set angle of the servo
    * const pos = await servo.getPosition();
    * ```
+   *
+   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#getposition).
    */
   getPosition(extra?: Struct): Promise<number>;
 
@@ -48,6 +52,8 @@ export interface Servo extends Resource {
    * // Stop the servo. It is assumed that the servo stops moving immediately
    * await servo.stop();
    * ```
+   *
+   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#stop).
    */
   stop(extra?: Struct): Promise<void>;
 
@@ -62,6 +68,8 @@ export interface Servo extends Resource {
    * const moving = await servo.isMoving();
    * console.log('Moving:', moving);
    * ```
+   *
+   * For more information, see [Servo API](https://docs.viam.com/dev/reference/apis/components/servo/#ismoving).
    */
   isMoving(): Promise<boolean>;
 }

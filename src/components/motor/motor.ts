@@ -22,6 +22,8 @@ export interface Motor extends Resource {
    *
    * @param power - A value between -1 and 1 where negative values indicate a
    *   backwards direction and positive values a forward direction.
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#setpower).
    */
   setPower(power: number, extra?: Struct): Promise<void>;
 
@@ -44,6 +46,8 @@ export interface Motor extends Resource {
    *   position. If this value is 0, this will run the motor at the given rpm
    *   indefinitely. If this value is nonzero, this will block until the number
    *   of revolutions has been completed or another operation comes in.
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#gofor).
    */
   goFor(rpm: number, revolutions: number, extra?: Struct): Promise<void>;
 
@@ -63,6 +67,8 @@ export interface Motor extends Resource {
    * @param rpm - Speed in revolutions per minute.
    * @param positionRevolutions - Number of revolutions relative to the motor's
    *   home position.
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#goto).
    */
   goTo(rpm: number, positionRevolutions: number, extra?: Struct): Promise<void>;
 
@@ -80,6 +86,8 @@ export interface Motor extends Resource {
    * ```
    *
    * @param rpm - Speed in revolutions per minute.
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#setrpm).
    */
   setRPM(rpm: number, extra?: Struct): Promise<void>;
 
@@ -97,6 +105,8 @@ export interface Motor extends Resource {
    * ```
    *
    * @param offset - Position from which to offset the current position.
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#resetzeroposition).
    */
   resetZeroPosition(offset: number, extra?: Struct): Promise<void>;
 
@@ -111,6 +121,8 @@ export interface Motor extends Resource {
    * // Stop the motor
    * await motor.stop();
    * ```
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#stop).
    */
   stop(extra?: Struct): Promise<void>;
 
@@ -127,6 +139,8 @@ export interface Motor extends Resource {
    * const properties = await motor.getProperties();
    * console.log('Properties:', properties);
    * ```
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#getproperties).
    */
   getProperties(extra?: Struct): Promise<Properties>;
 
@@ -143,6 +157,8 @@ export interface Motor extends Resource {
    * const position = await motor.getPosition();
    * console.log('Position:', position);
    * ```
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#getposition).
    */
   getPosition(extra?: Struct): Promise<number>;
 
@@ -159,6 +175,8 @@ export interface Motor extends Resource {
    * console.log('Powered:', isPowered);
    * console.log('Power percentage:', powerPct);
    * ```
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#ispowered).
    */
   isPowered(extra?: Struct): Promise<readonly [boolean, number]>;
 
@@ -174,6 +192,8 @@ export interface Motor extends Resource {
    * const moving = await motor.isMoving();
    * console.log('Moving:', moving);
    * ```
+   *
+   * For more information, see [Motor API](https://docs.viam.com/dev/reference/apis/components/motor/#ismoving).
    */
   isMoving(): Promise<boolean>;
 }

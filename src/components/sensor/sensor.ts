@@ -14,6 +14,8 @@ export interface Sensor extends Resource {
    * // Get the readings of a sensor.
    * const readings = await sensor.getReadings();
    * ```
+   *
+   * For more information, see [Sensor API](https://docs.viam.com/dev/reference/apis/components/sensor/#getreadings).
    */
   getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
 }
