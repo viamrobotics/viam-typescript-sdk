@@ -64,10 +64,10 @@ export interface Arm extends Resource {
    * await arm.moveToPosition(pose);
    * ```
    *
-   * @param pose - The destination pose for the arm.
+   * For more information, see [Arm
+   * API](https://docs.viam.com/dev/reference/apis/components/arm/#movetoposition).
    *
-   *   For more information, see [Arm
-   *   API](https://docs.viam.com/dev/reference/apis/components/arm/#movetoposition).
+   * @param pose - The destination pose for the arm.
    */
   moveToPosition: (pose: Pose, extra?: Struct) => Promise<void>;
 
@@ -83,10 +83,10 @@ export interface Arm extends Resource {
    * await arm.moveToJointPositions([90, 0, 0, 0, 15, 0]);
    * ```
    *
-   * @param jointPositionsList - List of angles (0-360) to move each joint to.
+   * For more information, see [Arm
+   * API](https://docs.viam.com/dev/reference/apis/components/arm/#movetojointpositions).
    *
-   *   For more information, see [Arm
-   *   API](https://docs.viam.com/dev/reference/apis/components/arm/#movetojointpositions).
+   * @param jointPositionsList - List of angles (0-360) to move each joint to.
    */
   moveToJointPositions: (
     jointPositionsList: number[],
