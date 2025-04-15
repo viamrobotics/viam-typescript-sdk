@@ -16,6 +16,9 @@ export interface Gripper extends Resource {
    * const geometries = await gripper.getGeometries();
    * console.log('Geometries:', geometries);
    * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -30,6 +33,9 @@ export interface Gripper extends Resource {
    * // Open the gripper
    * await gripper.open();
    * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#open).
    */
   open: (extra?: Struct) => Promise<void>;
 
@@ -44,6 +50,9 @@ export interface Gripper extends Resource {
    * // Close the gripper to grab
    * await gripper.grab();
    * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#grab).
    */
   grab: (extra?: Struct) => Promise<void>;
 
@@ -58,6 +67,9 @@ export interface Gripper extends Resource {
    * // Stop the gripper's current motion
    * await gripper.stop();
    * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#stop).
    */
   stop: (extra?: Struct) => Promise<void>;
 
@@ -73,6 +85,9 @@ export interface Gripper extends Resource {
    * const moving = await gripper.isMoving();
    * console.log('Gripper is moving:', moving);
    * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#ismoving).
    */
   isMoving: () => Promise<boolean>;
 }
