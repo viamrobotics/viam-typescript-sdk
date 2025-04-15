@@ -10,8 +10,9 @@ import { MLModelService } from '../../gen/service/mlmodel/v1/mlmodel_connect';
 
 export class MLModelClient implements MLModel {
   private client: PromiseClient<typeof MLModelService>;
-  private readonly name: string;
   private readonly options: Options;
+
+  public readonly name: string;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {

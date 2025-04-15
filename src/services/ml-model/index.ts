@@ -1,2 +1,2 @@
-export type { MLModel, FlatTensors } from './ml-model';
+export type { MLModel, Metadata, FlatTensors, TensorInfo } from './ml-model';
 export { MLModelClient } from './client';
