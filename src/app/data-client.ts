@@ -642,7 +642,7 @@ export class DataClient {
    *   } as Filter
    * );
    * ```
-  *
+   *
    * For more information, see [Data
    * API](https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyfilter).
    *
