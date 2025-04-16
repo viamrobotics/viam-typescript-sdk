@@ -33,6 +33,9 @@ export class MlTrainingClient {
    * );
    * ```
    *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#submittrainingjob).
+   *
    * @param organizationId - The organization ID.
    * @param datasetId - The dataset ID.
    * @param modelName - The model name.
@@ -75,6 +78,9 @@ export class MlTrainingClient {
    * );
    * ```
    *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#submitcustomtrainingjob).
+   *
    * @param organizationId - The organization ID.
    * @param datasetId - The dataset ID.
    * @param registryItemId - The registry item ID.
@@ -110,6 +116,9 @@ export class MlTrainingClient {
    * const job = await mlTrainingClient.getTrainingJob('<training-job-id>');
    * ```
    *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#gettrainingjob).
+   *
    * @param id - The training job ID.
    */
   async getTrainingJob(id: string) {
@@ -129,6 +138,9 @@ export class MlTrainingClient {
    * );
    * ```
    *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#listtrainingjobs).
+   *
    * @param organizationId - The organization ID.
    * @param status - The training job status.
    */
@@ -146,6 +158,9 @@ export class MlTrainingClient {
    * await mlTrainingClient.cancelTrainingJob('<training-job-id>');
    * ```
    *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#canceltrainingjob).
+   *
    * @param id - The training job ID.
    */
   async cancelTrainingJob(id: string) {
@@ -161,6 +176,9 @@ export class MlTrainingClient {
    * ```ts
    * await mlTrainingClient.deleteCompletedTrainingJob('<training-job-id>');
    * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#deletecompletedtrainingjob).
    *
    * @param id - The training job ID.
    */

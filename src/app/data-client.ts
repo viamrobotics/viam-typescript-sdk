@@ -92,6 +92,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#exporttabulardata).
+   *
    * @param partId The ID of the part that owns the data
    * @param resourceName The name of the requested resource that captured the
    *   data
@@ -165,6 +168,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#exporttabulardata).
+   *
    * @param organizationId The ID of the organization that owns the data
    * @param query The SQL query to run
    * @returns An array of data objects
@@ -207,6 +213,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabymql).
+   *
    * @param organizationId The ID of the organization that owns the data
    * @param query The MQL query to run as a list of BSON documents
    * @param useRecentData Whether to query blob storage or your recent data
@@ -247,6 +256,9 @@ export class DataClient {
    *   5
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabyfilter).
    *
    * @param filter Optional `pb.Filter` specifying tabular data to retrieve. No
    *   `filter` implies all tabular data.
@@ -329,6 +341,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyfilter).
+   *
    * @param filter Optional `pb.Filter` specifying binary data to retrieve. No
    *   `filter` implies all binary data.
    * @param limit The maximum number of entries to include in a page. Defaults
@@ -388,6 +403,9 @@ export class DataClient {
    * ]);
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyids).
+   *
    * @param ids The IDs of the requested binary data
    * @returns An array of data objects
    */
@@ -419,6 +437,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletetabulardata).
+   *
    * @param organizationId The ID of organization to delete data from
    * @param deleteOlderThanDays Delete data that was captured more than this
    *   many days ago. For example if `deleteOlderThanDays` is 10, this deletes
@@ -449,6 +470,9 @@ export class DataClient {
    * } as Filter);
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletebinarydatabyfilter).
+   *
    * @param filter Optional `pb.Filter` specifying binary data to delete. No
    *   `filter` implies all binary data.
    * @param includeInternalData Whether or not to delete internal data. Default
@@ -473,6 +497,9 @@ export class DataClient {
    *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
    * ]);
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletebinarydatabyids).
    *
    * @param ids The IDs of the data to be deleted. Must be non-empty.
    * @returns The number of items deleted
@@ -504,6 +531,9 @@ export class DataClient {
    *   ]
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyids).
    *
    * @param tags The list of tags to add to specified binary data. Must be
    *   non-empty.
@@ -540,6 +570,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyfilter).
+   *
    * @param tags The tags to add to the data
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
@@ -564,6 +597,9 @@ export class DataClient {
    *   ]
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyids).
    *
    * @param tags List of tags to remove from specified binary data. Must be
    *   non-empty.
@@ -606,6 +642,9 @@ export class DataClient {
    *   } as Filter
    * );
    * ```
+  *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyfilter).
    *
    * @param tags List of tags to remove from specified binary data. Must be
    *   non-empty.
@@ -632,6 +671,9 @@ export class DataClient {
    * } as Filter);
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#tagsbyfilter).
+   *
    * @param filter Optional `pb.Filter` specifying what data to get tags from.
    *   No `filter` implies all data.
    * @returns The list of tags
@@ -656,6 +698,9 @@ export class DataClient {
    *   0.6
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#addboundingboxtoimagebyid).
    *
    * @param binaryId The ID of the image to add the bounding box to
    * @param label A label for the bounding box
@@ -712,6 +757,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#removeboundingboxfromimagebyid).
+   *
    * @param binId The ID of the image to remove the bounding box from
    * @param bboxId The ID of the bounding box to remove
    */
@@ -744,6 +792,9 @@ export class DataClient {
    * } as Filter);
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#boundingboxlabelsbyfilter).
+   *
    * @param filter Optional `pb.Filter` specifying what data to get tags from.
    *   No `filter` implies all labels.
    * @returns The list of bounding box labels
@@ -769,6 +820,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#configuredatabaseuser).
+   *
    * @param organizationId The ID of the organization
    * @param password The password of the user
    */
@@ -786,6 +840,9 @@ export class DataClient {
    *   '123abc45-1234-5678-90ab-cdef12345678'
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#getdatabaseconnection).
    *
    * @param organizationId Organization to retrieve connection for
    * @returns Hostname of the federated database
@@ -810,6 +867,9 @@ export class DataClient {
    *   '12ab3de4f56a7bcd89ef0ab1'
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#addbinarydatatodatasetbyids).
    *
    * @param ids The IDs of binary data to add to dataset
    * @param datasetId The ID of the dataset to be added to
@@ -846,6 +906,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#removebinarydatafromdatasetbyids).
+   *
    * @param ids The IDs of the binary data to remove from dataset
    * @param datasetId The ID of the dataset to be removed from
    */
@@ -879,6 +942,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#createdataset).
+   *
    * @param name The name of the new dataset
    * @param organizationId The ID of the organization the dataset is being
    *   created in
@@ -901,6 +967,9 @@ export class DataClient {
    * await dataClient.deleteDataset('12ab3de4f56a7bcd89ef0ab1');
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletedataset).
+   *
    * @param id The ID of the dataset.
    */
   async deleteDataset(id: string) {
@@ -919,6 +988,9 @@ export class DataClient {
    * );
    * ```
    *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#renamedataset).
+   *
    * @param id The ID of the dataset
    * @param name The new name of the dataset
    */
@@ -936,6 +1008,9 @@ export class DataClient {
    *   '123abc45-1234-5678-90ab-cdef12345678'
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyorganizationid).
    *
    * @param organizationId The ID of the organization
    * @returns The list of datasets in the organization
@@ -964,6 +1039,9 @@ export class DataClient {
    *   '12ab3de4f56a7bcd89ef0ab1',
    * ]);
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyids).
    *
    * @param ids The list of IDs of the datasets
    * @returns The list of datasets
@@ -1010,6 +1088,9 @@ export class DataClient {
    *   ]
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatacaptureupload).
    *
    * @param tabularData The list of data to be uploaded, represented tabularly
    *   as an array.
@@ -1097,6 +1178,9 @@ export class DataClient {
    *   [new Date('2025-03-19'), new Date('2025-03-19')]
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatacaptureupload).
    *
    * @param binaryData The data to be uploaded, represented in bytes
    * @param partId The part ID of the component used to capture the data
@@ -1193,6 +1277,9 @@ export class DataClient {
    *   'Readings'
    * );
    * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#getlatesttabulardata).
    *
    * @param partId The ID of the part that owns the data
    * @param resourceName The name of the requested resource that captured the
