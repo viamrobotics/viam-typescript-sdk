@@ -57,9 +57,7 @@ export class SlamClient implements Slam {
     return concatArrayU8(chunks);
   }
 
-  async getInternalState(
-    callOptions = this.callOptions
-  ): Promise<Uint8Array> {
+  async getInternalState(callOptions = this.callOptions): Promise<Uint8Array> {
     const request = new GetInternalStateRequest({
       name: this.name,
     });
