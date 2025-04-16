@@ -1061,8 +1061,8 @@ export class DataClient {
   /**
    * Uploads the content and metadata for tabular data.
    *
-   * Upload tabular data collected on a robot through a specific component
-   * (e.g., a motor) along with the relevant metadata to app.viam.com. Tabular
+   * Upload tabular data collected on a robot through a specific component (for
+   * example, a motor) along with the relevant metadata to app.viam.com. Tabular
    * data can be found under the "Sensors" subtab of the Data tab on
    * app.viam.com.
    *
@@ -1096,7 +1096,7 @@ export class DataClient {
    *   as an array.
    * @param partId The part ID of the component used to capture the data
    * @param componentType The type of the component used to capture the data
-   *   (e.g., "movementSensor")
+   *   (for example, "movementSensor")
    * @param componentName The name of the component used to capture the data
    * @param methodName The name of the method used to capture the data.
    * @param tags The list of tags to allow for tag-based filtering when
@@ -1161,9 +1161,10 @@ export class DataClient {
   /**
    * Uploads the content and metadata for binary data.
    *
-   * Upload binary data collected on a robot through a specific component (e.g.,
-   * a motor) along with the relevant metadata to app.viam.com. binary data can
-   * be found under the "Sensors" subtab of the Data tab on app.viam.com.
+   * Upload binary data collected on a robot through a specific component (for
+   * example, a motor) along with the relevant metadata to app.viam.com. binary
+   * data can be found under the "Sensors" subtab of the Data tab on
+   * app.viam.com.
    *
    * @example
    *
@@ -1185,13 +1186,13 @@ export class DataClient {
    * @param binaryData The data to be uploaded, represented in bytes
    * @param partId The part ID of the component used to capture the data
    * @param componentType The type of the component used to capture the data
-   *   (e.g., "movementSensor")
+   *   (for example, "movementSensor")
    * @param componentName The name of the component used to capture the data
    * @param methodName The name of the method used to capture the data.
    * @param fileExtension The file extension of binary data including the
-   *   period, e.g. .jpg, .png, .pcd. The backend will route the binary to its
-   *   corresponding mime type based on this extension. Files with a .jpeg,
-   *   .jpg, or .png extension will be saved to the images tab.
+   *   period, for example .jpg, .png, or .pcd. The backend will route the
+   *   binary to its corresponding mime type based on this extension. Files with
+   *   a .jpeg, .jpg, or .png extension will be saved to the images tab.
    * @param tags The list of tags to allow for tag-based filtering when
    *   retrieving data
    * @param dataRequestTimes Tuple containing `Date` objects denoting the times
