@@ -39,10 +39,10 @@ export class SlamClient implements Slam {
     return this.client.getPosition(request, callOptions);
   }
 
-  getPointCloudMap = async (
+  async getPointCloudMap(
     returnEditedMap?: boolean,
     callOptions = this.callOptions
-  ): Promise<Uint8Array> => {
+  ): Promise<Uint8Array> {
     const request = new GetPointCloudMapRequest({
       name: this.name,
       returnEditedMap,
@@ -55,11 +55,11 @@ export class SlamClient implements Slam {
       chunks.push(chunk.pointCloudPcdChunk);
     }
     return concatArrayU8(chunks);
-  };
+  }
 
-  getInternalState = async (
+  async getInternalState(
     callOptions = this.callOptions
-  ): Promise<Uint8Array> => {
+  ): Promise<Uint8Array> {
     const request = new GetInternalStateRequest({
       name: this.name,
     });
@@ -71,7 +71,7 @@ export class SlamClient implements Slam {
       chunks.push(chunk.internalStateChunk);
     }
     return concatArrayU8(chunks);
-  };
+  }
 
   async getProperties(callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
