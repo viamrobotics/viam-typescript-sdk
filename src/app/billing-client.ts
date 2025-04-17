@@ -29,6 +29,9 @@ export class BillingClient {
    * const usage = await billing.getCurrentMonthUsage('<organization-id>');
    * ```
    *
+   * For more information, see [Billing
+   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getcurrentmonthusage).
+   *
    * @param orgId - The organization ID.
    */
   async getCurrentMonthUsage(orgId: string) {
@@ -53,6 +56,9 @@ export class BillingClient {
    * );
    * ```
    *
+   * For more information, see [Billing
+   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getorgbillinginformation).
+   *
    * @param orgId - The organization ID.
    */
   async getOrgBillingInformation(orgId: string) {
@@ -71,6 +77,9 @@ export class BillingClient {
    *   '<organization-id>'
    * );
    * ```
+   *
+   * For more information, see [Billing
+   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getinvoicesummary).
    *
    * @param orgId - The organization ID.
    */
@@ -91,6 +100,9 @@ export class BillingClient {
    *   '<organization-id>'
    * );
    * ```
+   *
+   * For more information, see [Billing
+   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getinvoicepdf).
    *
    * @param id - The invoice ID.
    * @param orgId - The organization ID.
