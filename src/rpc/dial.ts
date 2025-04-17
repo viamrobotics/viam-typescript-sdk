@@ -448,8 +448,15 @@ const processWebRTCOpts = async (
   );
   const additionalIceServers: RTCIceServer[] = config.additionalIceServers.map(
     (ice) => {
+      const iceUrls = [];
+      for(const iUrl of ice.urls){
+        if (iUrl.endsWith("udp")){
+          iceUrls.push(`${iUrl.slice(0, -3)}tcp`);
+        }
+        iceUrls.push(iUrl);
+      }
       return {
-        urls: ice.urls,
+        urls: iceUrls,
         credential: ice.credential,
         username: ice.username,
       };
