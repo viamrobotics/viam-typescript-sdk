@@ -57,6 +57,9 @@ export interface Motion extends Resource {
    * const moved = await motion.move(goalPoseInFrame, gripperName);
    * ```
    *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#move).
+   *
    * @param destination - Destination to move to, which can a pose in the
    *   reference frame of any frame in the robot's frame system.
    * @param componentName - Component on the robot to move to the specified
@@ -120,6 +123,9 @@ export interface Motion extends Resource {
    * );
    * ```
    *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#moveonmap).
+   *
    * @param destination - Specify a destination to, which can be any `Pose` with
    *   respect to the SLAM map's origin.
    * @param componentName - Component on the robot to move to the specified
@@ -179,6 +185,9 @@ export interface Motion extends Resource {
    * );
    * ```
    *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#moveonglobe).
+   *
    * @param destination - Destination for the component to move to, represented
    *   as a `GeoPoint`.
    * @param componentName - The name of the component to move.
@@ -221,6 +230,9 @@ export interface Motion extends Resource {
    * await motion.stopPlan(baseName);
    * ```
    *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#stopplan).
+   *
    * @param componentName - The component to stop
    */
   stopPlan: (componentName: ResourceName, extra?: Struct) => Promise<null>;
@@ -253,6 +265,9 @@ export interface Motion extends Resource {
    * // Get the plan(s) of the base component
    * const response = await motion.getPlan(baseName);
    * ```
+   *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#getplan).
    *
    * @param componentName - The component to query
    * @param destinationFrame - The reference frame in which the component's
@@ -287,6 +302,9 @@ export interface Motion extends Resource {
    * const response = await motion.listPlanStatuses();
    * ```
    *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#listplanstatuses).
+   *
    * @param onlyActivePlans - If true, the response will only return plans which
    *   are executing.
    */
@@ -317,6 +335,9 @@ export interface Motion extends Resource {
    *   []
    * );
    * ```
+   *
+   * For more information, see [Motion
+   * API](https://docs.viam.com/dev/reference/apis/services/motion/#getpose).
    *
    * @param componentName - The component whose `Pose` is being requested.
    * @param destinationFrame - The reference frame in which the component's

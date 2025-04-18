@@ -19,6 +19,9 @@ export interface Slam extends Resource {
    * const position = await slam.getPosition();
    * console.log('Current position:', position);
    * ```
+   *
+   * For more information, see [SLAM
+   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getposition).
    */
   getPosition: () => Promise<SlamPosition>;
 
@@ -36,6 +39,9 @@ export interface Slam extends Resource {
    * // Get the edited point cloud map
    * const editedMap = await slam.getPointCloudMap(true);
    * ```
+   *
+   * For more information, see [SLAM
+   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getpointcloudmap).
    */
   getPointCloudMap: (returnEditedMap?: boolean) => Promise<Uint8Array>;
 
@@ -51,6 +57,9 @@ export interface Slam extends Resource {
    * // Get the internal state of the SLAM algorithm
    * const internalState = await slam.getInternalState();
    * ```
+   *
+   * For more information, see [SLAM
+   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getinternalstate).
    */
   getInternalState: () => Promise<Uint8Array>;
 
@@ -66,6 +75,9 @@ export interface Slam extends Resource {
    * const properties = await slam.getProperties();
    * console.log('SLAM properties:', properties);
    * ```
+   *
+   * For more information, see [SLAM
+   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getproperties).
    */
   getProperties: () => Promise<SlamProperties>;
 }
