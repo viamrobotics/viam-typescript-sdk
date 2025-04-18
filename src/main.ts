@@ -199,7 +199,13 @@ export { GantryClient, type Gantry } from './components/gantry';
  */
 export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
 
-export { MLModelClient, type MLModel } from './services/ml-model';
+export {
+  MLModelClient,
+  type MLModel,
+  type Metadata,
+  type TensorInfo,
+  type FlatTensors,
+} from './services/ml-model';
 
 export { MotorClient, type Motor } from './components/motor';
 /**

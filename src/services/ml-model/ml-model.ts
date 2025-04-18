@@ -1,6 +1,8 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type * as mlModelAPI from '../../gen/service/mlmodel/v1/mlmodel_pb';
 
+export type Metadata = mlModelAPI.Metadata;
+export type TensorInfo = mlModelAPI.TensorInfo;
 export type FlatTensors = mlModelAPI.FlatTensors;
 
 export interface MLModel {
