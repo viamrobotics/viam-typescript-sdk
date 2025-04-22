@@ -24,7 +24,8 @@ import type {
  * API](https://docs.viam.com/dev/reference/apis/services/navigation/#getmode).
  */
 export interface Navigation extends Resource {
-  /** Get the mode the robot is operating in.
+  /**
+   * Get the mode the robot is operating in.
    *
    * @example
    *
@@ -55,6 +56,7 @@ export interface Navigation extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#setmode).
    *
    * @param mode - The mode for the service to operate in.
+   *
    *   - 0: MODE_UNSPECIFIED
    *   - 1: MODE_MANUAL
    *   - 2: MODE_WAYPOINT
@@ -62,7 +64,8 @@ export interface Navigation extends Resource {
    */
   setMode: (mode: Mode, extra?: Struct) => Promise<void>;
 
-  /** Get the current location of the robot.
+  /**
+   * Get the current location of the robot.
    *
    * @example
    *
@@ -77,7 +80,8 @@ export interface Navigation extends Resource {
    */
   getLocation: (extra?: Struct) => Promise<NavigationPosition>;
 
-  /** Get an array of waypoints currently in the service's data storage.
+  /**
+   * Get an array of waypoints currently in the service's data storage.
    *
    * @example
    *
@@ -108,7 +112,7 @@ export interface Navigation extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#addwaypoint).
    *
    * @param location - A waypoint described by latitude and longitude values.
-   * */
+   */
   addWayPoint: (location: GeoPoint, extra?: Struct) => Promise<void>;
 
   /**
