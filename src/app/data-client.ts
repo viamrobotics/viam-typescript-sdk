@@ -1444,62 +1444,6 @@ export class DataClient {
   }
 
   /**
-   * Updates a data pipeline configuration by its ID.
-   *
-   * @example
-   *
-   * ```ts
-   * type JsonValue =
-   *   | string
-   *   | number
-   *   | boolean
-   *   | null
-   *   | JsonValue[]
-   *   | { [key: string]: JsonValue };
-   * const mqlQuery: Record<string, JsonValue>[] = [
-   *   {
-   *     $match: {
-   *       component_name: 'sensor-1',
-   *     },
-   *   },
-   *   {
-   *     $limit: 5,
-   *   },
-   * ];
-   *
-   * await dataClient.updateDataPipeline(
-   *   '123abc45-1234-5678-90ab-cdef12345678',
-   *   'my-pipeline',
-   *   mqlQuery,
-   *   '0 0 * * *'
-   * );
-   * ```
-   *
-   * @param pipelineId The ID of the data pipeline
-   * @param name The name of the data pipeline
-   * @param query The MQL query to run as a list of BSON documents
-   * @param schedule The schedule to run the query on (cron expression)
-   */
-  async updateDataPipeline(
-    pipelineId: string,
-    name: string,
-    query: Uint8Array[] | Record<string, Date | JsonValue>[],
-    schedule: string
-  ): Promise<void> {
-    const mqlBinary: Uint8Array[] =
-      query[0] instanceof Uint8Array
-        ? (query as Uint8Array[])
-        : query.map((value) => BSON.serialize(value));
-
-    await this.dataPipelinesClient.updateDataPipeline({
-      id: pipelineId,
-      name,
-      mqlBinary,
-      schedule,
-    });
-  }
-
-  /**
    * Deletes a data pipeline by its ID.
    *
    * @example
@@ -1514,44 +1458,6 @@ export class DataClient {
    */
   async deleteDataPipeline(pipelineId: string): Promise<void> {
     await this.dataPipelinesClient.deleteDataPipeline({
-      id: pipelineId,
-    });
-  }
-
-  /**
-   * Enables a data pipeline by its ID.
-   *
-   * @example
-   *
-   * ```ts
-   * await dataClient.enableDataPipeline(
-   *   '123abc45-1234-5678-90ab-cdef12345678'
-   * );
-   * ```
-   *
-   * @param pipelineId The ID of the data pipeline
-   */
-  async enableDataPipeline(pipelineId: string): Promise<void> {
-    await this.dataPipelinesClient.enableDataPipeline({
-      id: pipelineId,
-    });
-  }
-
-  /**
-   * Disables a data pipeline by its ID.
-   *
-   * @example
-   *
-   * ```ts
-   * await dataClient.disableDataPipeline(
-   *   '123abc45-1234-5678-90ab-cdef12345678'
-   * );
-   * ```
-   *
-   * @param pipelineId The ID of the data pipeline
-   */
-  async disableDataPipeline(pipelineId: string): Promise<void> {
-    await this.dataPipelinesClient.disableDataPipeline({
       id: pipelineId,
     });
   }

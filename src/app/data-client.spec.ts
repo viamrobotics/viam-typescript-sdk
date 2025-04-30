@@ -1551,37 +1551,6 @@ describe('DataPipelineClient tests', () => {
     });
   });
 
-  describe('updateDataPipeline tests', () => {
-    let capReq: UpdateDataPipelineRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataPipelinesService, {
-          updateDataPipeline: (req: UpdateDataPipelineRequest) => {
-            capReq = req;
-            return new UpdateDataPipelineResponse();
-          },
-        });
-      });
-    });
-
-    it('update data pipeline', async () => {
-      const expectedRequest = new UpdateDataPipelineRequest({
-        id: pipelineId,
-        name: pipelineName,
-        mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
-        schedule,
-      });
-
-      await subject().updateDataPipeline(
-        pipelineId,
-        pipelineName,
-        mqlQuery,
-        schedule
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-  });
-
   describe('deleteDataPipeline tests', () => {
     let capReq: DeleteDataPipelineRequest;
     beforeEach(() => {
@@ -1601,52 +1570,6 @@ describe('DataPipelineClient tests', () => {
       });
 
       await subject().deleteDataPipeline(pipelineId);
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-  });
-
-  describe('enableDataPipeline tests', () => {
-    let capReq: EnableDataPipelineRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataPipelinesService, {
-          enableDataPipeline: (req: EnableDataPipelineRequest) => {
-            capReq = req;
-            return new EnableDataPipelineResponse();
-          },
-        });
-      });
-    });
-
-    it('enable data pipeline', async () => {
-      const expectedRequest = new EnableDataPipelineRequest({
-        id: pipelineId,
-      });
-
-      await subject().enableDataPipeline(pipelineId);
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-  });
-
-  describe('disableDataPipeline tests', () => {
-    let capReq: DisableDataPipelineRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataPipelinesService, {
-          disableDataPipeline: (req: DisableDataPipelineRequest) => {
-            capReq = req;
-            return new DisableDataPipelineResponse();
-          },
-        });
-      });
-    });
-
-    it('disable data pipeline', async () => {
-      const expectedRequest = new DisableDataPipelineRequest({
-        id: pipelineId,
-      });
-
-      await subject().disableDataPipeline(pipelineId);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
