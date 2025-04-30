@@ -1602,7 +1602,7 @@ export class ListDataPipelineRunsPage {
       return new ListDataPipelineRunsPage(
         this.dataPipelinesClient,
         this.pipelineId,
-        this.runs,
+        [],
         this.pageSize,
         "",
       );
