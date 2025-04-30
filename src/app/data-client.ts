@@ -1365,7 +1365,7 @@ export class DataClient {
    * @param pipelineId The ID of the data pipeline
    * @returns The data pipeline configuration or null if it does not exist
    */
-  async getPipeline(pipelineId: string): Promise<DataPipeline | null> {
+  async getDataPipeline(pipelineId: string): Promise<DataPipeline | null> {
     const resp = await this.dataPipelinesClient.getDataPipeline({
       id: pipelineId,
     });
@@ -1575,7 +1575,7 @@ export class DataClient {
   }
 }
 
-class ListDataPipelineRunsPage {
+export class ListDataPipelineRunsPage {
   constructor(
     private readonly dataPipelinesClient: PromiseClient<typeof DataPipelinesService>,
     private readonly pipelineId: string,

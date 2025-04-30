@@ -1498,7 +1498,7 @@ describe('DataPipelineClient tests', () => {
         id: pipelineId,
       });
 
-      const response = await subject().getPipeline(pipelineId);
+      const response = await subject().getDataPipeline(pipelineId);
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipeline);
     });
@@ -1512,7 +1512,7 @@ describe('DataPipelineClient tests', () => {
         });
       });
 
-      const response = await subject().getPipeline(pipelineId);
+      const response = await subject().getDataPipeline(pipelineId);
       expect(response).toBeNull();
     });
   });
