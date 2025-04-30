@@ -827,6 +827,12 @@ export class AppClient {
    *
    * ```ts
    * const robotPart = await appClient.getRobotPart('<YOUR-ROBOT-PART-ID>');
+   * // Get the part's address
+   * const address = robotPart.part.fqdn;
+   * // Check if machine is live (last access time less than 10 sec ago)
+   * if (Date.now() - Number(robotPart.part.lastAccess.seconds) * 1000 <= 10000) {
+   *   console.log("Machine is live");
+   * }
    * ```
    *
    * For more information, see [App
