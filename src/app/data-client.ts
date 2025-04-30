@@ -27,7 +27,10 @@ import {
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import { DataPipeline, DataPipelineRun } from '../gen/app/datapipelines/v1/data_pipelines_pb';
+import {
+  DataPipeline,
+  DataPipelineRun,
+} from '../gen/app/datapipelines/v1/data_pipelines_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -79,7 +82,10 @@ export class DataClient {
     this.dataClient = createPromiseClient(DataService, transport);
     this.datasetClient = createPromiseClient(DatasetService, transport);
     this.dataSyncClient = createPromiseClient(DataSyncService, transport);
-    this.dataPipelinesClient = createPromiseClient(DataPipelinesService, transport);
+    this.dataPipelinesClient = createPromiseClient(
+      DataPipelinesService,
+      transport
+    );
   }
 
   /**
@@ -243,9 +249,12 @@ export class DataClient {
 
     // Legacy support for useRecentData, which is now deprecated.
     let dataSource = tabularDataSource;
-    if (useRecentData && (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)) {
+    if (
+      useRecentData &&
+      (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)
+    ) {
       dataSource = new TabularDataSource({
-        type: TabularDataSourceType.HOT_STORAGE
+        type: TabularDataSourceType.HOT_STORAGE,
       });
     }
 
@@ -1340,7 +1349,9 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const pipelines = await dataClient.listDataPipelines('123abc45-1234-5678-90ab-cdef12345678');
+   * const pipelines = await dataClient.listDataPipelines(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * ```
    *
    * @param organizationId The ID of the organization
@@ -1359,9 +1370,11 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const pipeline = await dataClient.getPipeline('123abc45-1234-5678-90ab-cdef12345678');
+   * const pipeline = await dataClient.getPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * ```
-   * 
+   *
    * @param pipelineId The ID of the data pipeline
    * @returns The data pipeline configuration or null if it does not exist
    */
@@ -1371,7 +1384,7 @@ export class DataClient {
     });
     return resp.dataPipeline ?? null;
   }
-  
+
   /**
    * Creates a new data pipeline using the given query and schedule.
    *
@@ -1395,7 +1408,7 @@ export class DataClient {
    *     $limit: 5,
    *   },
    * ];
-   * 
+   *
    * const pipelineId = await dataClient.createDataPipeline(
    *   '123abc45-1234-5678-90ab-cdef12345678',
    *   'my-pipeline',
@@ -1414,7 +1427,7 @@ export class DataClient {
     organizationId: string,
     name: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
-    schedule: string,
+    schedule: string
   ): Promise<string> {
     const mqlBinary: Uint8Array[] =
       query[0] instanceof Uint8Array
@@ -1432,7 +1445,7 @@ export class DataClient {
 
   /**
    * Updates a data pipeline configuration by its ID.
-   * 
+   *
    * @example
    *
    * ```ts
@@ -1453,7 +1466,7 @@ export class DataClient {
    *     $limit: 5,
    *   },
    * ];
-   * 
+   *
    * await dataClient.updateDataPipeline(
    *   '123abc45-1234-5678-90ab-cdef12345678',
    *   'my-pipeline',
@@ -1471,13 +1484,13 @@ export class DataClient {
     pipelineId: string,
     name: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
-    schedule: string,
+    schedule: string
   ): Promise<void> {
     const mqlBinary: Uint8Array[] =
       query[0] instanceof Uint8Array
         ? (query as Uint8Array[])
         : query.map((value) => BSON.serialize(value));
-        
+
     await this.dataPipelinesClient.updateDataPipeline({
       id: pipelineId,
       name,
@@ -1492,9 +1505,11 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * await dataClient.deleteDataPipeline('123abc45-1234-5678-90ab-cdef12345678');
+   * await dataClient.deleteDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * ```
-   * 
+   *
    * @param pipelineId The ID of the data pipeline
    */
   async deleteDataPipeline(pipelineId: string): Promise<void> {
@@ -1509,9 +1524,11 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * await dataClient.enableDataPipeline('123abc45-1234-5678-90ab-cdef12345678');
+   * await dataClient.enableDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * ```
-   * 
+   *
    * @param pipelineId The ID of the data pipeline
    */
   async enableDataPipeline(pipelineId: string): Promise<void> {
@@ -1526,9 +1543,11 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * await dataClient.disableDataPipeline('123abc45-1234-5678-90ab-cdef12345678');
+   * await dataClient.disableDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * ```
-   * 
+   *
    * @param pipelineId The ID of the data pipeline
    */
   async disableDataPipeline(pipelineId: string): Promise<void> {
@@ -1536,14 +1555,16 @@ export class DataClient {
       id: pipelineId,
     });
   }
-  
+
   /**
    * List all runs of a data pipeline.
-   * 
+   *
    * @example
-   * 
+   *
    * ```ts
-   * const page = await dataClient.listDataPipelineRuns('123abc45-1234-5678-90ab-cdef12345678');
+   * const page = await dataClient.listDataPipelineRuns(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * page.runs.forEach((run) => {
    *   console.log(run);
    * });
@@ -1552,14 +1573,14 @@ export class DataClient {
    *   console.log(run);
    * });
    * ```
-   * 
+   *
    * @param pipelineId The ID of the data pipeline
    * @param pageSize The number of runs to return per page
    * @returns A page of data pipeline runs
    */
   async listDataPipelineRuns(
     pipelineId: string,
-    pageSize?: number,
+    pageSize?: number
   ): Promise<ListDataPipelineRunsPage> {
     const resp = await this.dataPipelinesClient.listDataPipelineRuns({
       id: pipelineId,
@@ -1570,30 +1591,34 @@ export class DataClient {
       pipelineId,
       resp.runs,
       pageSize,
-      resp.nextPageToken,
+      resp.nextPageToken
     );
   }
 }
 
 export class ListDataPipelineRunsPage {
   constructor(
-    private readonly dataPipelinesClient: PromiseClient<typeof DataPipelinesService>,
+    private readonly dataPipelinesClient: PromiseClient<
+      typeof DataPipelinesService
+    >,
     private readonly pipelineId: string,
     public readonly runs: DataPipelineRun[] = [],
     private readonly pageSize?: number,
-    private readonly nextPageToken?: string,
+    private readonly nextPageToken?: string
   ) {}
 
   /**
    * Retrieves the next page of data pipeline runs.
-   * 
+   *
    * @example
-   * 
+   *
    * ```ts
-   * const page = await dataClient.listDataPipelineRuns('123abc45-1234-5678-90ab-cdef12345678');
+   * const page = await dataClient.listDataPipelineRuns(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
    * const nextPage = await page.nextPage();
    * ```
-   * 
+   *
    * @returns A page of data pipeline runs
    */
   async nextPage(): Promise<ListDataPipelineRunsPage> {
@@ -1604,7 +1629,7 @@ export class ListDataPipelineRunsPage {
         this.pipelineId,
         [],
         this.pageSize,
-        "",
+        ''
       );
     }
 
@@ -1618,7 +1643,7 @@ export class ListDataPipelineRunsPage {
       this.pipelineId,
       resp.runs,
       this.pageSize,
-      resp.nextPageToken,
+      resp.nextPageToken
     );
   }
 }
