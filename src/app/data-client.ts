@@ -27,7 +27,7 @@ import {
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import { DataPipeline } from '../gen/app/datapipelines/v1/data_pipelines_pb';
+import { DataPipeline, DataPipelineRun } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -1537,6 +1537,90 @@ export class DataClient {
     });
   }
   
+  /**
+   * List all runs of a data pipeline.
+   * 
+   * @example
+   * 
+   * ```ts
+   * const page = await dataClient.listDataPipelineRuns('123abc45-1234-5678-90ab-cdef12345678');
+   * page.runs.forEach((run) => {
+   *   console.log(run);
+   * });
+   * page = await page.nextPage();
+   * page.runs.forEach((run) => {
+   *   console.log(run);
+   * });
+   * ```
+   * 
+   * @param pipelineId The ID of the data pipeline
+   * @param pageSize The number of runs to return per page
+   * @returns A page of data pipeline runs
+   */
+  async listDataPipelineRuns(
+    pipelineId: string,
+    pageSize?: number,
+  ): Promise<ListDataPipelineRunsPage> {
+    const resp = await this.dataPipelinesClient.listDataPipelineRuns({
+      id: pipelineId,
+      pageSize,
+    });
+    return new ListDataPipelineRunsPage(
+      this.dataPipelinesClient,
+      pipelineId,
+      resp.runs,
+      pageSize,
+      resp.nextPageToken,
+    );
+  }
+}
+
+class ListDataPipelineRunsPage {
+  constructor(
+    private readonly dataPipelinesClient: PromiseClient<typeof DataPipelinesService>,
+    private readonly pipelineId: string,
+    public readonly runs: DataPipelineRun[] = [],
+    private readonly pageSize?: number,
+    private readonly nextPageToken?: string,
+  ) {}
+
+  /**
+   * Retrieves the next page of data pipeline runs.
+   * 
+   * @example
+   * 
+   * ```ts
+   * const page = await dataClient.listDataPipelineRuns('123abc45-1234-5678-90ab-cdef12345678');
+   * const nextPage = await page.nextPage();
+   * ```
+   * 
+   * @returns A page of data pipeline runs
+   */
+  async nextPage(): Promise<ListDataPipelineRunsPage> {
+    if (this.nextPageToken === undefined || this.nextPageToken === '') {
+      // empty token means no more runs to list.
+      return new ListDataPipelineRunsPage(
+        this.dataPipelinesClient,
+        this.pipelineId,
+        this.runs,
+        this.pageSize,
+        "",
+      );
+    }
+
+    const resp = await this.dataPipelinesClient.listDataPipelineRuns({
+      id: this.pipelineId,
+      pageSize: this.pageSize,
+      pageToken: this.nextPageToken,
+    });
+    return new ListDataPipelineRunsPage(
+      this.dataPipelinesClient,
+      this.pipelineId,
+      resp.runs,
+      this.pageSize,
+      resp.nextPageToken,
+    );
+  }
 }
 
 export { type BinaryID, type Order } from '../gen/app/data/v1/data_pb';
