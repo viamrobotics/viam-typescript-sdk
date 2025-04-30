@@ -1700,7 +1700,7 @@ describe('DataPipelineClient tests', () => {
             capReq = req;
             return new ListDataPipelineRunsResponse({
               runs: nextPageRuns,
-              nextPageToken: '',
+              nextPageToken: 'some-token',
             });
           },
         });
@@ -1709,6 +1709,25 @@ describe('DataPipelineClient tests', () => {
       const page = await subject().listDataPipelineRuns(pipelineId, pageSize);
       const nextPage = await page.nextPage();
       expect(nextPage.runs).toEqual(nextPageRuns);
+    });
+
+    it('returns empty page when no more runs', async () => {
+      const someRuns = [run1];
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataPipelinesService, {
+          listDataPipelineRuns: (req: ListDataPipelineRunsRequest) => {
+            capReq = req;
+            return new ListDataPipelineRunsResponse({
+              runs: someRuns,
+              nextPageToken: '',
+            });
+          },
+        });
+      });
+
+      const page = await subject().listDataPipelineRuns(pipelineId, pageSize);
+      const nextPage = await page.nextPage();
+      expect(nextPage.runs).toEqual([]);
     });
   });
 });
