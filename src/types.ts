@@ -17,10 +17,11 @@ export interface Resource {
    * @example
    *
    * ```ts
-   * const result = await resource.doCommand({
-   *   name: 'myCommand',
-   *   args: { key: 'value' },
-   * });
+   * import { Struct } from '@viamrobotics/sdk';
+   *
+   * const result = await resource.doCommand(Struct.fromJson({
+   *   myCommand: { key: 'value' },
+   * }));
    * ```
    *
    * @param command - The command to execute.
