@@ -19,9 +19,11 @@ export interface Resource {
    * ```ts
    * import { Struct } from '@viamrobotics/sdk';
    *
-   * const result = await resource.doCommand(Struct.fromJson({
-   *   myCommand: { key: 'value' },
-   * }));
+   * const result = await resource.doCommand(
+   *   Struct.fromJson({
+   *     myCommand: { key: 'value' },
+   *   })
+   * );
    * ```
    *
    * @param command - The command to execute.
