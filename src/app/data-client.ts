@@ -201,13 +201,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * type JsonValue =
-   *   | string
-   *   | number
-   *   | boolean
-   *   | null
-   *   | JsonValue[]
-   *   | { [key: string]: JsonValue };
+   * // {@link JsonValue} is imported from @bufbuild/protobuf
    * const mqlQuery: Record<string, JsonValue>[] = [
    *   {
    *     $match: {
@@ -1391,13 +1385,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * type JsonValue =
-   *   | string
-   *   | number
-   *   | boolean
-   *   | null
-   *   | JsonValue[]
-   *   | { [key: string]: JsonValue };
+   * // {@link JsonValue} is imported from @bufbuild/protobuf
    * const mqlQuery: Record<string, JsonValue>[] = [
    *   {
    *     $match: {
