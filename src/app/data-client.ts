@@ -13,10 +13,13 @@ import {
   Filter,
   Order,
   TagsFilter,
+  TabularDataSource,
+  TabularDataSourceType,
 } from '../gen/app/data/v1/data_pb';
 import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
 import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
 import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
   DataCaptureUploadRequest,
   DataType,
@@ -24,6 +27,10 @@ import {
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
+import {
+  DataPipeline,
+  DataPipelineRun,
+} from '../gen/app/datapipelines/v1/data_pipelines_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -69,11 +76,16 @@ export class DataClient {
   private dataClient: PromiseClient<typeof DataService>;
   private datasetClient: PromiseClient<typeof DatasetService>;
   private dataSyncClient: PromiseClient<typeof DataSyncService>;
+  private dataPipelinesClient: PromiseClient<typeof DataPipelinesService>;
 
   constructor(transport: Transport) {
     this.dataClient = createPromiseClient(DataService, transport);
     this.datasetClient = createPromiseClient(DatasetService, transport);
     this.dataSyncClient = createPromiseClient(DataSyncService, transport);
+    this.dataPipelinesClient = createPromiseClient(
+      DataPipelinesService,
+      transport
+    );
   }
 
   /**
@@ -189,13 +201,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * type JsonValue =
-   *   | string
-   *   | number
-   *   | boolean
-   *   | null
-   *   | JsonValue[]
-   *   | { [key: string]: JsonValue };
+   * // {@link JsonValue} is imported from @bufbuild/protobuf
    * const mqlQuery: Record<string, JsonValue>[] = [
    *   {
    *     $match: {
@@ -219,22 +225,37 @@ export class DataClient {
    * @param organizationId The ID of the organization that owns the data
    * @param query The MQL query to run as a list of BSON documents
    * @param useRecentData Whether to query blob storage or your recent data
-   *   store. Defaults to false
+   *   store. Defaults to false. Deprecated - use dataSource instead.
+   * @param dataSource The data source to query. Defaults to the standard data
+   *   source.
    * @returns An array of data objects
    */
   async tabularDataByMQL(
     organizationId: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
-    useRecentData?: boolean
+    useRecentData?: boolean,
+    tabularDataSource?: TabularDataSource
   ) {
     const binary: Uint8Array[] =
       query[0] instanceof Uint8Array
         ? (query as Uint8Array[])
         : query.map((value) => BSON.serialize(value));
+
+    // Legacy support for useRecentData, which is now deprecated.
+    let dataSource = tabularDataSource;
+    if (
+      useRecentData &&
+      (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)
+    ) {
+      dataSource = new TabularDataSource({
+        type: TabularDataSourceType.HOT_STORAGE,
+      });
+    }
+
     const resp = await this.dataClient.tabularDataByMQL({
       organizationId,
       mqlBinary: binary,
-      useRecentData,
+      dataSource,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
@@ -1314,6 +1335,210 @@ export class DataClient {
       resp.timeSynced.toDate(),
       resp.payload.toJson() as Record<string, JsonValue>,
     ];
+  }
+
+  /**
+   * List all data pipelines for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const pipelines = await dataClient.listDataPipelines(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @returns The list of data pipelines
+   */
+  async listDataPipelines(organizationId: string): Promise<DataPipeline[]> {
+    const resp = await this.dataPipelinesClient.listDataPipelines({
+      organizationId,
+    });
+    return resp.dataPipelines;
+  }
+
+  /**
+   * Get a data pipeline configuration by its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * const pipeline = await dataClient.getPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param pipelineId The ID of the data pipeline
+   * @returns The data pipeline configuration or null if it does not exist
+   */
+  async getDataPipeline(pipelineId: string): Promise<DataPipeline | null> {
+    const resp = await this.dataPipelinesClient.getDataPipeline({
+      id: pipelineId,
+    });
+    return resp.dataPipeline ?? null;
+  }
+
+  /**
+   * Creates a new data pipeline using the given query and schedule.
+   *
+   * @example
+   *
+   * ```ts
+   * // {@link JsonValue} is imported from @bufbuild/protobuf
+   * const mqlQuery: Record<string, JsonValue>[] = [
+   *   {
+   *     $match: {
+   *       component_name: 'sensor-1',
+   *     },
+   *   },
+   *   {
+   *     $limit: 5,
+   *   },
+   * ];
+   *
+   * const pipelineId = await dataClient.createDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-pipeline',
+   *   mqlQuery,
+   *   '0 0 * * *'
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param name The name of the data pipeline
+   * @param query The MQL query to run as a list of BSON documents
+   * @param schedule The schedule to run the query on (cron expression)
+   * @returns The ID of the created data pipeline
+   */
+  async createDataPipeline(
+    organizationId: string,
+    name: string,
+    query: Uint8Array[] | Record<string, Date | JsonValue>[],
+    schedule: string
+  ): Promise<string> {
+    const mqlBinary: Uint8Array[] =
+      query[0] instanceof Uint8Array
+        ? (query as Uint8Array[])
+        : query.map((value) => BSON.serialize(value));
+
+    const resp = await this.dataPipelinesClient.createDataPipeline({
+      organizationId,
+      name,
+      mqlBinary,
+      schedule,
+    });
+    return resp.id;
+  }
+
+  /**
+   * Deletes a data pipeline by its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.deleteDataPipeline(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param pipelineId The ID of the data pipeline
+   */
+  async deleteDataPipeline(pipelineId: string): Promise<void> {
+    await this.dataPipelinesClient.deleteDataPipeline({
+      id: pipelineId,
+    });
+  }
+
+  /**
+   * List all runs of a data pipeline.
+   *
+   * @example
+   *
+   * ```ts
+   * const page = await dataClient.listDataPipelineRuns(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * page.runs.forEach((run) => {
+   *   console.log(run);
+   * });
+   * page = await page.nextPage();
+   * page.runs.forEach((run) => {
+   *   console.log(run);
+   * });
+   * ```
+   *
+   * @param pipelineId The ID of the data pipeline
+   * @param pageSize The number of runs to return per page
+   * @returns A page of data pipeline runs
+   */
+  async listDataPipelineRuns(
+    pipelineId: string,
+    pageSize?: number
+  ): Promise<ListDataPipelineRunsPage> {
+    const resp = await this.dataPipelinesClient.listDataPipelineRuns({
+      id: pipelineId,
+      pageSize,
+    });
+    return new ListDataPipelineRunsPage(
+      this.dataPipelinesClient,
+      pipelineId,
+      resp.runs,
+      pageSize,
+      resp.nextPageToken
+    );
+  }
+}
+
+export class ListDataPipelineRunsPage {
+  constructor(
+    private readonly dataPipelinesClient: PromiseClient<
+      typeof DataPipelinesService
+    >,
+    private readonly pipelineId: string,
+    public readonly runs: DataPipelineRun[] = [],
+    private readonly pageSize?: number,
+    private readonly nextPageToken?: string
+  ) {}
+
+  /**
+   * Retrieves the next page of data pipeline runs.
+   *
+   * @example
+   *
+   * ```ts
+   * const page = await dataClient.listDataPipelineRuns(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * const nextPage = await page.nextPage();
+   * ```
+   *
+   * @returns A page of data pipeline runs
+   */
+  async nextPage(): Promise<ListDataPipelineRunsPage> {
+    if (this.nextPageToken === undefined || this.nextPageToken === '') {
+      // empty token means no more runs to list.
+      return new ListDataPipelineRunsPage(
+        this.dataPipelinesClient,
+        this.pipelineId,
+        [],
+        this.pageSize,
+        ''
+      );
+    }
+
+    const resp = await this.dataPipelinesClient.listDataPipelineRuns({
+      id: this.pipelineId,
+      pageSize: this.pageSize,
+      pageToken: this.nextPageToken,
+    });
+    return new ListDataPipelineRunsPage(
+      this.dataPipelinesClient,
+      this.pipelineId,
+      resp.runs,
+      this.pageSize,
+      resp.nextPageToken
+    );
   }
 }
 
