@@ -30,6 +30,8 @@ import { newPeerConnectionForClient } from './peer';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { SignalingExchange } from './signaling-exchange';
+import type { RobotClient } from '../robot';
+import { MachineConnectionEvent } from '../events';
 
 export interface DialOptions {
   credentials?: Credentials | undefined;
@@ -337,6 +339,7 @@ const getOptionalWebRTCConfig = async (
  * to handle reconnect on connection termination
  */
 export const dialWebRTC = async (
+  client: RobotClient,
   signalingAddress: string,
   host: string,
   dialOpts?: DialOptions
@@ -397,6 +400,12 @@ export const dialWebRTC = async (
     dc,
     webrtcOpts
   );
+
+  exchange.on<{ message: string; error?: Error }>(
+    MachineConnectionEvent.DIAL_EVENT,
+    (event) => client.emit(MachineConnectionEvent.DIAL_EVENT, event)
+  );
+
   try {
     // set timeout for dial attempt if a timeout is specified
     if (dialOpts?.dialTimeout !== undefined) {
@@ -426,7 +435,10 @@ export const dialWebRTC = async (
       dataChannel: dc,
     };
   } catch (error) {
-    console.error('error dialing', error); // eslint-disable-line no-console
+    client.emit(MachineConnectionEvent.DIAL_EVENT, {
+      message: 'Error dialing.',
+      error,
+    });
     throw error;
   } finally {
     if (!successful) {

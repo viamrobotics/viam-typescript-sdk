@@ -1,4 +1,4 @@
-import { backOff, type IBackOffOptions } from 'exponential-backoff';
+import { backOff } from 'exponential-backoff';
 import { isCredential } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
 import {
@@ -180,7 +180,7 @@ export const createRobotClient = async (
               // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
               client.emit(MachineConnectionEvent.DIAL_EVENT, {
-                message: `Failed to connect, attempt ${attemptNumber} with backoff`,
+                message: `Failed to connect via WebRTC, attempt ${attemptNumber} with backoff`,
                 error,
               });
 
@@ -207,7 +207,7 @@ export const createRobotClient = async (
               // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
               client.emit(MachineConnectionEvent.DIAL_EVENT, {
-                message: `Failed to connect, attempt ${attemptNumber} with backoff`,
+                message: `Failed to connect via gRPC, attempt ${attemptNumber} with backoff`,
                 error,
               });
 

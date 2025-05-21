@@ -505,6 +505,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         }
 
         const webRTCConn = await dialWebRTC(
+          this,
           this.webrtcOptions.signalingAddress || this.serviceHost,
           this.webrtcOptions.host,
           opts
