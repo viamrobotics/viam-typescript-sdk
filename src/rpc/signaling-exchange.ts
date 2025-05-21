@@ -15,10 +15,11 @@ import { ConnectionClosedError } from './connection-closed-error';
 import type { DialWebRTCOptions } from './dial';
 import { addSdpFields } from './peer';
 import { atob, btoa } from './polyfills';
+import { EventDispatcher, MachineConnectionEvent } from '../events';
 
 const callUUIDUnset = 'invariant: call uuid unset';
 
-export class SignalingExchange {
+export class SignalingExchange extends EventDispatcher {
   private readonly clientChannel: ClientChannel;
   private callUuid?: string;
   // only send once since exchange may end or ICE may end
@@ -45,6 +46,7 @@ export class SignalingExchange {
     private readonly dc: RTCDataChannel,
     private readonly dialOpts?: DialWebRTCOptions
   ) {
+    super();
     this.clientChannel = new ClientChannel(this.pc, this.dc);
   }
 
@@ -117,8 +119,11 @@ export class SignalingExchange {
       this.pc.addEventListener(
         'icecandidate',
         (event: { candidate: RTCIceCandidateInit | null }) => {
-          this.onLocalICECandidate(event).catch((error) => {
-            console.error(`error processing local ICE candidate ${error}`); // eslint-disable-line no-console
+          this.onLocalICECandidate(event).catch((error: Error) => {
+            this.emit(MachineConnectionEvent.DIAL_EVENT, {
+              message: 'Error processing local ICE candidate.',
+              error,
+            });
           });
         }
       );
@@ -182,7 +187,10 @@ export class SignalingExchange {
       if (this.clientChannel.isClosed()) {
         throw new ConnectionClosedError('client channel is closed');
       }
-      console.error(error.message); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: error.message,
+        error,
+      });
     }
     throw error;
   }
@@ -237,12 +245,17 @@ export class SignalingExchange {
     }
     const cand = iceCandidateFromProto(response.candidate);
     if (cand.candidate !== undefined) {
-      console.debug(`received remote ICE ${cand.candidate}`); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: `received remote ICE ${cand.candidate}.`,
+      });
     }
     try {
       await this.pc.addIceCandidate(cand);
     } catch (error) {
-      console.log('error adding ice candidate', error); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: 'Error adding ice candidate.',
+        error,
+      });
       await this.sendError(JSON.stringify(error));
       throw error;
     }
@@ -269,7 +282,9 @@ export class SignalingExchange {
     }
 
     if (event.candidate.candidate !== undefined) {
-      console.debug(`gathered local ICE ${event.candidate.candidate}`); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: `Gathered local ICE ${event.candidate.candidate}.`,
+      });
     }
     const iProto = iceCandidateToProto(event.candidate);
     const callRequestUpdate = new CallUpdateRequest({
@@ -300,7 +315,10 @@ export class SignalingExchange {
       ) {
         return;
       }
-      console.error(error); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: 'Error sending info to a Call.',
+        error,
+      });
     }
   }
 
@@ -330,7 +348,10 @@ export class SignalingExchange {
        * with another ICE candidate(s) will make the connection work. In the
        * future it may be better to figure out if this error is fatal or not.
        */
-      console.error('failed to send call update; continuing', error); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: 'Failed to send call update, continuing.',
+        error,
+      });
     }
   }
 
@@ -357,7 +378,10 @@ export class SignalingExchange {
        * with another ICE candidate(s) will make the connection work. In the
        * future it may be better to figure out if this error is fatal or not.
        */
-      console.error(error); // eslint-disable-line no-console
+      this.emit(MachineConnectionEvent.DIAL_EVENT, {
+        message: 'Failed to send call update, continuing.',
+        error,
+      });
     }
   }
 }
