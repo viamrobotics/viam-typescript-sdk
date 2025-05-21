@@ -119,7 +119,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
   client.emit(MachineConnectionEvent.DIAL_EVENT, {
-    message: 'dialing via WebRTC',
+    message: 'Dialing via WebRTC.',
   });
 
   await client.connect({
@@ -129,7 +129,7 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   });
 
   client.emit(MachineConnectionEvent.DIAL_EVENT, {
-    message: 'connected via WebRTC',
+    message: 'Connected via WebRTC.',
   });
 
   return client;
@@ -180,7 +180,7 @@ export const createRobotClient = async (
               // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
               client.emit(MachineConnectionEvent.DIAL_EVENT, {
-                message: `Failed to connect via WebRTC, attempt ${attemptNumber} with backoff`,
+                message: `Failed to connect via WebRTC, attempt ${attemptNumber} with backoff.`,
                 error,
               });
 
@@ -207,7 +207,7 @@ export const createRobotClient = async (
               // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
               client.emit(MachineConnectionEvent.DIAL_EVENT, {
-                message: `Failed to connect via gRPC, attempt ${attemptNumber} with backoff`,
+                message: `Failed to connect via gRPC, attempt ${attemptNumber} with backoff.`,
                 error,
               });
 
