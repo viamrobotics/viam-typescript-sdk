@@ -1,7 +1,11 @@
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { isCredential } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
-import type { AccessToken, Credential } from '../main';
+import {
+  MachineConnectionEvent,
+  type AccessToken,
+  type Credential,
+} from '../main';
 import { RobotClient } from './client';
 
 /** Options required to dial a robot via gRPC. */
@@ -27,9 +31,6 @@ const isPosInt = (x: number): boolean => {
 const isLocalConnection = (url: string) => url.includes('local');
 
 const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
-  // eslint-disable-next-line no-console
-  console.debug('dialing via gRPC...');
-
   if (!isLocalConnection(conf.host)) {
     throw new Error(
       `cannot dial "${conf.host}" directly, please use a local url instead.`
@@ -48,6 +49,13 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   }
   const client = new RobotClient(conf.host, undefined, sessOpts, clientConf);
 
+  // eslint-disable-next-line no-console
+  console.debug('dialing via gRPC...');
+
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'dialing via gRPC',
+  });
+
   await client.connect({
     creds: conf.credentials,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
@@ -55,6 +63,10 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
 
   // eslint-disable-next-line no-console
   console.debug('connected via gRPC');
+
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'connected via gRPC',
+  });
 
   return client;
 };
@@ -92,9 +104,6 @@ export interface DialWebRTCConf {
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
-  // eslint-disable-next-line no-console
-  console.debug('dialing via WebRTC...');
-
   const impliedURL = conf.serviceHost ?? conf.host;
   const { signalingAddress } = conf;
   const iceServers = conf.iceServers ?? [];
@@ -115,6 +124,13 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   }
   const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
+  // eslint-disable-next-line no-console
+  console.debug('dialing via WebRTC...');
+
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'dialing via WebRTC',
+  });
+
   await client.connect({
     priority: conf.priority,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
@@ -123,6 +139,10 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
 
   // eslint-disable-next-line no-console
   console.debug('connected via WebRTC');
+
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'connected via WebRTC',
+  });
 
   return client;
 };

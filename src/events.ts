@@ -1,4 +1,4 @@
-type Callback = (args: unknown) => void;
+type Callback<T = unknown> = (args: T) => void;
 
 /**
  * MachineConnectionEvent events are emitted by a Client's EventDispatcher when
@@ -9,12 +9,13 @@ export enum MachineConnectionEvent {
   CONNECTED = 'connected',
   DISCONNECTING = 'disconnecting',
   DISCONNECTED = 'disconnected',
+  DIAL_EVENT = 'dialing',
 }
 
 export class EventDispatcher {
   listeners: Partial<Record<string, Set<Callback>>> = {};
 
-  on(type: string, listener: Callback) {
+  on<T>(type: string, listener: Callback<T>) {
     const { listeners } = this;
     listeners[type] ??= new Set();
     listeners[type]?.add(listener);
@@ -36,7 +37,7 @@ export class EventDispatcher {
     this.listeners[type]?.delete(listener);
   }
 
-  emit(type: string, args: unknown) {
+  emit<T>(type: string, args: T) {
     for (const callback of this.listeners[type] ?? []) {
       callback(args);
     }

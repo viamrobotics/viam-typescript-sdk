@@ -204,11 +204,20 @@ export class RobotClient extends EventDispatcher implements Robot {
       return;
     }
 
+    this.emit(MachineConnectionEvent.DIAL_EVENT, {
+      message: 'Connection closed, attempting to reconnect',
+    });
+
     // eslint-disable-next-line no-console
-    console.debug('Connection closed, will try to reconnect');
+    console.debug('Connection closed, attempting to reconnect');
     const backOffOpts: Partial<IBackOffOptions> = {
-      retry: (error, attemptNumber) => {
+      retry: (error: Error, attemptNumber) => {
         // TODO: This ought to check exceptional errors so as to not keep failing forever.
+
+        this.emit(MachineConnectionEvent.DIAL_EVENT, {
+          message: `Failed to connect, attempt ${attemptNumber} with backoff`,
+          error,
+        });
 
         // eslint-disable-next-line no-console
         console.debug(
@@ -228,10 +237,18 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
     void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
+        this.emit(MachineConnectionEvent.DIAL_EVENT, {
+          message: 'Reconnected successfully',
+        });
+
         // eslint-disable-next-line no-console
-        console.debug('Reconnected successfully!');
+        console.debug('Reconnected successfully');
       })
       .catch(() => {
+        this.emit(MachineConnectionEvent.DIAL_EVENT, {
+          message: `Reached max attempts: ${this.reconnectMaxAttempts}`,
+        });
+
         // eslint-disable-next-line no-console
         console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
       });
