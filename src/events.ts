@@ -18,7 +18,7 @@ export class EventDispatcher {
   on<T>(type: string, listener: Callback<T>) {
     const { listeners } = this;
     listeners[type] ??= new Set();
-    listeners[type]?.add(listener);
+    listeners[type]?.add(listener as Callback);
   }
 
   once(type: string, listener: Callback) {
@@ -37,7 +37,7 @@ export class EventDispatcher {
     this.listeners[type]?.delete(listener);
   }
 
-  emit<T>(type: string, args: T) {
+  emit<T = unknown>(type: string, args: T) {
     for (const callback of this.listeners[type] ?? []) {
       callback(args);
     }
