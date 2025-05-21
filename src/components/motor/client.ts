@@ -25,7 +25,7 @@ import type { Motor } from './motor';
  */
 export class MotorClient implements Motor {
   private client: PromiseClient<typeof MotorService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 

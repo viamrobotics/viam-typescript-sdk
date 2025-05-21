@@ -8,8 +8,23 @@ export interface Options {
 }
 
 export interface Resource {
+  /** The name of the resource. */
+  readonly name: string;
+
   /**
    * Send/Receive arbitrary commands to the resource.
+   *
+   * @example
+   *
+   * ```ts
+   * import { Struct } from '@viamrobotics/sdk';
+   *
+   * const result = await resource.doCommand(
+   *   Struct.fromJson({
+   *     myCommand: { key: 'value' },
+   *   })
+   * );
+   * ```
    *
    * @param command - The command to execute.
    */

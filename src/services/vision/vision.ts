@@ -15,6 +15,16 @@ export interface Vision extends Resource {
   /**
    * Get a list of detections in the next image given a camera.
    *
+   * @example
+   *
+   * ```ts
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   * const detections = await vision.getDetectionsFromCamera('my_camera');
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetectionsfromcamera).
+   *
    * @param cameraName - The name of the camera to use for detection.
    * @returns - The list of Detections.
    */
@@ -25,6 +35,25 @@ export interface Vision extends Resource {
 
   /**
    * Get a list of detections in the given image.
+   *
+   * @example
+   *
+   * ```ts
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   *
+   * const mimeType = 'image/jpeg';
+   * const image = await camera.getImage(mimeType);
+   * const detections = await vision.getDetections(
+   *   image,
+   *   600,
+   *   600,
+   *   mimeType
+   * );
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetections).
    *
    * @param image - The image from which to get detections.
    * @param width - The width of the image.
@@ -43,6 +72,19 @@ export interface Vision extends Resource {
   /**
    * Get a list of classifications in the next image given a camera.
    *
+   * @example
+   *
+   * ```ts
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   * const classifications = await vision.getClassificationsFromCamera(
+   *   'my_camera',
+   *   10
+   * );
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getclassificationsfromcamera).
+   *
    * @param cameraName - The name of the camera to use for classification.
    * @param count - The number of Classifications requested.
    * @returns - The list of Classifications.
@@ -55,6 +97,26 @@ export interface Vision extends Resource {
 
   /**
    * Get a list of classifications in the given image.
+   *
+   * @example
+   *
+   * ```ts
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   *
+   * const mimeType = 'image/jpeg';
+   * const image = await camera.getImage(mimeType);
+   * const classifications = await vision.getClassifications(
+   *   image,
+   *   600,
+   *   600,
+   *   mimeType,
+   *   10
+   * );
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getclassifications).
    *
    * @param image - The image from which to get classifications.
    * @param width - The width of the image.
@@ -76,6 +138,17 @@ export interface Vision extends Resource {
    * Returns a list of the 3D point cloud objects and associated metadata in the
    * latest picture obtained from the specified 3D camera.
    *
+   * @example
+   *
+   * ```ts
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   * const pointCloudObjects =
+   *   await vision.getObjectPointClouds('my_camera');
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getobjectpointclouds).
+   *
    * @param cameraName - The name of the camera.
    * @returns - The list of PointCloudObjects
    */
@@ -89,6 +162,16 @@ export interface Vision extends Resource {
    * booleans indicating whether classifications, detections, and 3d
    * segmentation are supported.
    *
+   * @example
+   *
+   * ```ts
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   * const properties = await vision.getProperties();
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getproperties).
+   *
    * @returns - The properties of the vision service
    */
   getProperties: (extra?: Struct) => Promise<Properties>;
@@ -96,6 +179,21 @@ export interface Vision extends Resource {
   /**
    * Returns the requested image, classifications, detections, and 3d point
    * cloud objects in the next image given a camera.
+   *
+   * @example
+   *
+   * ```ts
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   * const captureAll = await vision.captureAllFromCamera('my_camera', {
+   *   returnImage: true,
+   *   returnClassifications: true,
+   *   returnDetections: true,
+   *   returnObjectPointClouds: true,
+   * });
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#captureallfromcamera).
    *
    * @param cameraName - The name of the camera to use for classification,
    *   detection, and segmentation.

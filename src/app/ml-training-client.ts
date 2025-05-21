@@ -17,6 +17,32 @@ export class MlTrainingClient {
     this.client = createPromiseClient(MLTrainingService, transport);
   }
 
+  /**
+   * Submit a training job.
+   *
+   * @example
+   *
+   * ```ts
+   * await mlTrainingClient.submitTrainingJob(
+   *   '<organization-id>',
+   *   '<dataset-id>',
+   *   '<your-model-name>',
+   *   '1.0.0',
+   *   ModelType.SINGLE_LABEL_CLASSIFICATION,
+   *   ['tag1', 'tag2']
+   * );
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#submittrainingjob).
+   *
+   * @param organizationId - The organization ID.
+   * @param datasetId - The dataset ID.
+   * @param modelName - The model name.
+   * @param modelVersion - The model version.
+   * @param modelType - The model type.
+   * @param tags - The tags.
+   */
   async submitTrainingJob(
     organizationId: string,
     datasetId: string,
@@ -36,6 +62,32 @@ export class MlTrainingClient {
     return resp.id;
   }
 
+  /**
+   * Submit a training job from a custom training script.
+   *
+   * @example
+   *
+   * ```ts
+   * await mlTrainingClient.submitCustomTrainingJob(
+   *   '<organization-id>',
+   *   '<dataset-id>',
+   *   'viam:classification-tflite',
+   *   '1.0.0',
+   *   '<your-model-name>',
+   *   '1.0.0'
+   * );
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#submitcustomtrainingjob).
+   *
+   * @param organizationId - The organization ID.
+   * @param datasetId - The dataset ID.
+   * @param registryItemId - The registry item ID.
+   * @param registryItemVersion - The registry item version.
+   * @param modelName - The model name.
+   * @param modelVersion - The model version.
+   */
   async submitCustomTrainingJob(
     organizationId: string,
     datasetId: string,
@@ -55,21 +107,81 @@ export class MlTrainingClient {
     return resp.id;
   }
 
+  /**
+   * Get a training job metadata.
+   *
+   * @example
+   *
+   * ```ts
+   * const job = await mlTrainingClient.getTrainingJob('<training-job-id>');
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#gettrainingjob).
+   *
+   * @param id - The training job ID.
+   */
   async getTrainingJob(id: string) {
     const resp = await this.client.getTrainingJob({ id });
     return resp.metadata;
   }
 
+  /**
+   * List training jobs.
+   *
+   * @example
+   *
+   * ```ts
+   * const jobs = await mlTrainingClient.listTrainingJobs(
+   *   '<organization-id>',
+   *   TrainingStatus.RUNNING
+   * );
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#listtrainingjobs).
+   *
+   * @param organizationId - The organization ID.
+   * @param status - The training job status.
+   */
   async listTrainingJobs(organizationId: string, status: TrainingStatus) {
     const resp = await this.client.listTrainingJobs({ organizationId, status });
     return resp.jobs;
   }
 
+  /**
+   * Cancel a training job.
+   *
+   * @example
+   *
+   * ```ts
+   * await mlTrainingClient.cancelTrainingJob('<training-job-id>');
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#canceltrainingjob).
+   *
+   * @param id - The training job ID.
+   */
   async cancelTrainingJob(id: string) {
     await this.client.cancelTrainingJob({ id });
     return null;
   }
 
+  /**
+   * Delete a completed training job.
+   *
+   * @example
+   *
+   * ```ts
+   * await mlTrainingClient.deleteCompletedTrainingJob('<training-job-id>');
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#deletecompletedtrainingjob).
+   *
+   * @param id - The training job ID.
+   */
   async deleteCompletedTrainingJob(id: string) {
     await this.client.deleteCompletedTrainingJob({ id });
     return null;

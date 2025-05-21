@@ -29,14 +29,25 @@ npm install @viamrobotics/sdk
 
 ## Node
 
-To use this SDK with node, read the [documentation](/Node.md) or view the [example](/examples/node/)
+To use this SDK with node, read the [documentation](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/Node.md) or view the [example](https://github.com/viamrobotics/viam-typescript-sdk/tree/main/examples/node)
 
 ## React Native
 
-To use this SDK with React Native, read the [documentation](/ReactNative.md) or view the [example](/examples/react-native/)
+To use this SDK with React Native, read the [documentation](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/ReactNative.md) or view the [example](https://github.com/viamrobotics/viam-typescript-sdk/tree/main/examples/react-native/)
+
+## Offline Mode
+
+> [!WARNING]
+> Using the typescript SDK in offline mode necessitates disabling TLS verification and so should be done with caution.
+
+To use the browser on a local network with limited-or-no internet, follow these instructions:
+```
+1. start viam-server with the `-no-tls` flag
+2. set the signaling server in typescript to `http://{HOST}.local:8080`
+```
 
 ## License
 
-Copyright 2022-2024 Viam Inc.
+Copyright 2022-2025 Viam Inc.
 
 Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/viam-typescript-sdk/blob/main/LICENSE) file

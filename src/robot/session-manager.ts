@@ -1,9 +1,23 @@
+/* eslint-disable max-depth */
+import {
+  BinaryReader,
+  FileDescriptorProto,
+  MethodOptions,
+} from '@bufbuild/protobuf';
 import {
   Code,
   ConnectError,
   createClient,
   type Transport,
 } from '@connectrpc/connect';
+import { createAsyncIterable } from '@connectrpc/connect/protocol';
+import { safety_heartbeat_monitored as safteyHeartbeatMonitored } from '../gen/common/v1/common_pb';
+import { ServerReflection } from '../gen/grpc/reflection/v1/reflection_connect';
+import {
+  FileDescriptorResponse,
+  ListServiceResponse,
+  ServerReflectionRequest,
+} from '../gen/grpc/reflection/v1/reflection_pb';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
   SendSessionHeartbeatRequest,
@@ -22,11 +36,14 @@ const timeoutBlob = new Blob(
 );
 
 export default class SessionManager {
+  public static heartbeatMonitoredMethods: Record<string, boolean> = {};
+
   public readonly transport: Transport;
 
   private currentSessionID = '';
   private sessionsSupported: boolean | undefined;
   private heartbeatIntervalMs: number | undefined;
+  private host = '';
 
   private starting: Promise<void> | undefined;
 
@@ -35,7 +52,11 @@ export default class SessionManager {
     return createClient(RobotService, transport);
   }
 
-  constructor(private deferredTransport: () => Transport) {
+  constructor(
+    host: string,
+    private deferredTransport: () => Transport
+  ) {
+    this.host = host;
     this.transport = new SessionTransport(this.deferredTransport, this);
   }
 
@@ -167,6 +188,7 @@ export default class SessionManager {
           (Number(heartbeatWindow.seconds) * 1e3 +
             heartbeatWindow.nanos / 1e6) /
           5;
+        await this.applyHeartbeatMonitoredMethods();
         resolve();
         this.heartbeat().catch(console.error); // eslint-disable-line no-console
       })()
@@ -179,5 +201,84 @@ export default class SessionManager {
     await this.starting;
 
     return this.getSessionMetadataInner();
+  }
+
+  private async applyHeartbeatMonitoredMethods(): Promise<void> {
+    try {
+      const client = createClient(ServerReflection, this.transport);
+      const request = new ServerReflectionRequest({
+        host: this.host,
+        messageRequest: { case: 'listServices', value: '' },
+      });
+      const responseStream = client.serverReflectionInfo(
+        createAsyncIterable([request]),
+        { timeoutMs: 10_000 }
+      );
+      for await (const serviceResponse of responseStream) {
+        const fdpRequests = (
+          serviceResponse.messageResponse.value as ListServiceResponse
+        ).service.map((service) => {
+          return new ServerReflectionRequest({
+            messageRequest: {
+              case: 'fileContainingSymbol',
+              value: service.name,
+            },
+          });
+        });
+        const fdpResponseStream = client.serverReflectionInfo(
+          createAsyncIterable(fdpRequests),
+          { timeoutMs: 10_000 }
+        );
+        for await (const fdpResponse of fdpResponseStream) {
+          for (const fdp of (
+            fdpResponse.messageResponse.value as FileDescriptorResponse
+          ).fileDescriptorProto) {
+            const protoFile = FileDescriptorProto.fromBinary(fdp);
+            for (const service of protoFile.service) {
+              for (const method of service.method) {
+                SessionManager.heartbeatMonitoredMethods[
+                  `/${protoFile.package}.${service.name}/${method.name}`
+                ] = SessionManager.hasHeartbeatOption(method.options);
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // If can't get heartbeat monitored methods via reflection, use defaults.
+      SessionManager.heartbeatMonitoredMethods = {
+        '/viam.component.arm.v1.ArmService/MoveToPosition': true,
+        '/viam.component.arm.v1.ArmService/MoveToJointPositions': true,
+        '/viam.component.arm.v1.ArmService/MoveThroughJointPositions': true,
+        '/viam.component.base.v1.BaseService/MoveStraight': true,
+        '/viam.component.base.v1.BaseService/Spin': true,
+        '/viam.component.base.v1.BaseService/SetPower': true,
+        '/viam.component.base.v1.BaseService/SetVelocity': true,
+        '/viam.component.gantry.v1.GantryService/MoveToPosition': true,
+        '/viam.component.gripper.v1.GripperService/Open': true,
+        '/viam.component.gripper.v1.GripperService/Grab': true,
+        '/viam.component.motor.v1.MotorService/SetPower': true,
+        '/viam.component.motor.v1.MotorService/GoFor': true,
+        '/viam.component.motor.v1.MotorService/GoTo': true,
+        '/viam.component.motor.v1.MotorService/SetRPM': true,
+        '/viam.component.servo.v1.ServoService/Move': true,
+      };
+    }
+  }
+
+  private static hasHeartbeatOption(options?: MethodOptions): boolean {
+    if (!options) {
+      return false;
+    }
+    const reader = new BinaryReader(options.toBinary());
+    while (reader.pos < reader.len) {
+      const tag = reader.tag();
+      const [fieldNumber] = tag;
+      if (fieldNumber === safteyHeartbeatMonitored.field.no) {
+        return true;
+      }
+      reader.string();
+    }
+    return false;
   }
 }

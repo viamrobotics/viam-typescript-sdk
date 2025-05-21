@@ -24,8 +24,6 @@ import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_
 import { ServoService } from '../gen/component/servo/v1/servo_connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
-  // DiscoveryQuery deprecated, remove on march 10th
-  DiscoveryQuery,
   GetModelsFromModulesRequest,
   RestartModuleRequest,
   TransformPCDRequest,
@@ -41,6 +39,7 @@ import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
 import SessionManager from './session-manager';
+import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 
 interface WebRTCOptions {
   enabled: boolean;
@@ -118,6 +117,10 @@ export class RobotClient extends EventDispatcher implements Robot {
     | PromiseClient<typeof GripperService>
     | undefined;
 
+  private mlModelServiceClient:
+    | PromiseClient<typeof MLModelService>
+    | undefined;
+
   private movementSensorServiceClient:
     | PromiseClient<typeof MovementSensorService>
     | undefined;
@@ -170,12 +173,15 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.onDisconnect();
       }
     );
-    this.sessionManager = new SessionManager((): Transport => {
-      if (!this.transport) {
-        throw new Error(RobotClient.notConnectedYetStr);
+    this.sessionManager = new SessionManager(
+      this.serviceHost,
+      (): Transport => {
+        if (!this.transport) {
+          throw new Error(RobotClient.notConnectedYetStr);
+        }
+        return this.transport;
       }
-      return this.transport;
-    });
+    );
 
     // For each connection event type, add a listener to capture that
     // event and re-emit it with the 'connectionstatechange' event
@@ -332,6 +338,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.gripperServiceClient;
+  }
+
+  get mlModelService() {
+    if (!this.mlModelServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.mlModelServiceClient;
   }
 
   get movementSensorService() {
@@ -598,6 +611,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         GripperService,
         clientTransport
       );
+      this.mlModelServiceClient = createPromiseClient(
+        MLModelService,
+        clientTransport
+      );
       this.movementSensorServiceClient = createPromiseClient(
         MovementSensorService,
         clientTransport
@@ -725,19 +742,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     });
     const resp = await this.robotService.transformPCD(request);
     return resp.pointCloudPcd;
-  }
-
-  // DISCOVERY - deprecated, remove on march 10th
-
-  async discoverComponents(queries: DiscoveryQuery[]) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      'RobotClient.discoverComponents is deprecated. It will be removed on March 10 2025. Use the DiscoveryService APIs instead.'
-    );
-    const resp = await this.robotService.discoverComponents({
-      queries,
-    });
-    return resp.discovery;
   }
 
   // GET MODELS FROM MODULES

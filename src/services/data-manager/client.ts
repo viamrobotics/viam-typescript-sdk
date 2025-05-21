@@ -9,7 +9,7 @@ import type { DataManager } from './data-manager';
 
 export class DataManagerClient implements DataManager {
   private client: PromiseClient<typeof DataManagerService>;
-  private readonly name: string;
+  public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
 
@@ -19,6 +19,25 @@ export class DataManagerClient implements DataManager {
     this.options = options;
   }
 
+  /**
+   * Sync data stored on the machine to the cloud.
+   *
+   * @example
+   *
+   * ```ts
+   * const dataManager = new VIAM.DataManagerClient(
+   *   machine,
+   *   'my_data_manager'
+   * );
+   * await dataManager.sync();
+   * ```
+   *
+   * For more information, see [Data Manager
+   * API](https://docs.viam.com/dev/reference/apis/services/data/#sync).
+   *
+   * @param extra - Extra arguments to pass to the sync request.
+   * @param callOptions - Call options for the sync request.
+   */
   async sync(extra = {}, callOptions = this.callOptions) {
     const request = new SyncRequest({
       name: this.name,
@@ -30,6 +49,25 @@ export class DataManagerClient implements DataManager {
     await this.client.sync(request, callOptions);
   }
 
+  /**
+   * Do a command on the data manager.
+   *
+   * @example
+   *
+   * ```ts
+   * const dataManager = new VIAM.DataManagerClient(
+   *   machine,
+   *   'my_data_manager'
+   * );
+   * await dataManager.doCommand(new Struct({ cmd: 'test', data1: 500 }));
+   * ```
+   *
+   * For more information, see [Data Manager
+   * API](https://docs.viam.com/dev/reference/apis/services/data/#docommand).
+   *
+   * @param command - The command to do.
+   * @param callOptions - Call options for the command.
+   */
   async doCommand(
     command: Struct,
     callOptions = this.callOptions

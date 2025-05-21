@@ -1,4 +1,5 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonValue } from '@bufbuild/protobuf';
+import { Struct } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -11,6 +12,7 @@ import {
   CreateModuleResponse,
   Fragment,
   FragmentVisibility,
+  GetAppContentResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   ListOrganizationMembersResponse,
@@ -37,12 +39,13 @@ import type { LogEntry } from '../gen/common/v1/common_pb';
  * Creates an Authorization object from auth details.
  *
  * @param organizationId The ID of the organization to create the role under
- * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+ * @param entityId The ID of the entity the role belongs to (for example a user
+ *   ID)
  * @param role The role to add ("owner" or "operator")
  * @param resourceType The type of resource to create the role for ("robot",
  *   "location", or "organization")
- * @param identityType The type of identity that the identity ID is (e.g., an
- *   api-key)
+ * @param identityType The type of identity that the identity ID is (for example
+ *   an api-key)
  * @param resourceId The ID of the resource the role is being created for
  */
 export const createAuth = (
@@ -117,7 +120,19 @@ export class AppClient {
   }
 
   /**
-   * Obain a user's ID from their email address.
+   * Obtain a user's ID from their email address. Internal use only.
+   *
+   * @example
+   *
+   * ```ts
+   * // This method is used internally only. To obtain a user's ID, use the listOrganizationsByUser method.
+   * const members = await appClient.listOrganizationMembers(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getuseridbyemail).
    *
    * @param email The email address of the user
    * @returns The user's ID
@@ -130,6 +145,9 @@ export class AppClient {
   /**
    * Create a new organization.
    *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createorganization).
+   *
    * @param name The name of the new organization
    * @returns The new organization
    */
@@ -141,6 +159,15 @@ export class AppClient {
   /**
    * List all organizations.
    *
+   * @example
+   *
+   * ```ts
+   * const organizations = await appClient.listOrganizations();
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listorganizations).
+   *
    * @returns The organization list
    */
   async listOrganizations(): Promise<Organization[]> {
@@ -150,6 +177,18 @@ export class AppClient {
 
   /**
    * List all organizations with access to a particular location.
+   *
+   * @example
+   *
+   * ```ts
+   * const organizations =
+   *   await appClient.getOrganizationsWithAccessToLocation(
+   *     '<YOUR-LOCATION-ID>'
+   *   );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getorganizationswithaccesstolocation).
    *
    * @param locationId The ID of the location to query
    * @returns The list of locations with access to the requested location
@@ -164,7 +203,7 @@ export class AppClient {
   }
 
   /**
-   * List all organizations associated with a user.
+   * List all organizations associated with a user. Internal use only.
    *
    * @param userId The ID of the user to query
    * @returns The list of locations the requested user has access to
@@ -176,6 +215,17 @@ export class AppClient {
 
   /**
    * Get details about an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const organization = await appClient.getOrganization(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getorganization).
    *
    * @param organizationId The ID of the organization
    * @returns Details about the organization, if it exists
@@ -189,6 +239,16 @@ export class AppClient {
 
   /**
    * Find out if an organization namespace is available.
+   *
+   * @example
+   *
+   * ```ts
+   * const isAvailable =
+   *   await appClient.getOrganizationNamespaceAvailability('name');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getorganizationnamespaceavailability).
    *
    * @param namespace The namespace to query for availability
    * @returns A boolean indicating whether or not the namespace is available
@@ -204,6 +264,18 @@ export class AppClient {
 
   /**
    * Updates organization details.
+   *
+   * @example
+   *
+   * ```ts
+   * const organization = await appClient.updateOrganization(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newName'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updateorganization).
    *
    * @param organizationId The id of the organization to update
    * @param name Optional name to update the organization with
@@ -232,6 +304,15 @@ export class AppClient {
   /**
    * Deletes an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteOrganization('<YOUR-ORGANIZATION-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleteorganization).
+   *
    * @param organizationId The id of the organization to delete
    */
   async deleteOrganization(organizationId: string) {
@@ -240,6 +321,17 @@ export class AppClient {
 
   /**
    * Lists organization memebers and outstanding invites.
+   *
+   * @example
+   *
+   * ```ts
+   * const members = await appClient.listOrganizationMembers(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listorganizationmembers).
    *
    * @param organizationId The id of the organization to query
    * @returns An object containing organization members, pending invites, and
@@ -253,6 +345,30 @@ export class AppClient {
 
   /**
    * Creates a new invitation to join an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const auth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_operator',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access to
+   *   identityId: '<YOUR-USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'owner', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   *
+   * const invite = await appClient.createOrganizationInvite(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com',
+   *   [auth]
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createorganizationinvite).
    *
    * @param organizationId The id of the organization to create the invite for
    * @param email The email address of the user to generate an invite for
@@ -279,6 +395,30 @@ export class AppClient {
   /**
    * Updates authorizations for an existing org invite.
    *
+   * @example
+   *
+   * ```ts
+   * const auth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_operator',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access to
+   *   identityId: '<YOUR-USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'owner', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   * const invite = await appClient.updateOrganizationInviteAuthorizations(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com',
+   *   [auth],
+   *   []
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updateorganizationinviteauthorizations).
+   *
    * @param organizationId The id of the organization
    * @param email The email address associated with the invite
    * @param addAuthsList List of authorizations to add to the invite
@@ -303,6 +443,18 @@ export class AppClient {
   /**
    * Removes a member from an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteOrganizationMember(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-USER-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleteorganizationmember).
+   *
    * @param organizationId The ID of the organization
    * @param userId The ID of the user
    */
@@ -313,6 +465,18 @@ export class AppClient {
   /**
    * Deletes a pending organization invite.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteOrganizationInvite(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleteorganizationinvite).
+   *
    * @param organizationId The ID of the organization
    * @param email The email associated with the invite to delete
    */
@@ -322,6 +486,18 @@ export class AppClient {
 
   /**
    * Resends a pending organization invite.
+   *
+   * @example
+   *
+   * ```ts
+   * const invite = await appClient.resendOrganizationInvite(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'youremail@email.com'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#resendorganizationinvite).
    *
    * @param organizationId The ID of the organization
    * @param email The email associated with the invite to resend
@@ -340,6 +516,18 @@ export class AppClient {
 
   /**
    * Creates a new location.
+   *
+   * @example
+   *
+   * ```ts
+   * const location = await appClient.createLocation(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'name'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createlocation).
    *
    * @param organizationId The ID of the organization to create the location
    *   under
@@ -364,6 +552,15 @@ export class AppClient {
   /**
    * Looks up a location.
    *
+   * @example
+   *
+   * ```ts
+   * const location = await appClient.getLocation('<YOUR-LOCATION-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getlocation).
+   *
    * @param locId The ID of the location to query.
    * @returns The location object
    */
@@ -376,6 +573,18 @@ export class AppClient {
 
   /**
    * Updates location details.
+   *
+   * @example
+   *
+   * ```ts
+   * const location = await appClient.updateLocation(
+   *   '<YOUR-LOCATION-ID>',
+   *   'newName'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updatelocation).
    *
    * @param locId The ID of the location to update
    * @param name Optional string to update the location's name to
@@ -402,6 +611,15 @@ export class AppClient {
   /**
    * Deletes a location
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteLocation('<YOUR-LOCATION-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deletelocation).
+   *
    * @param locId The ID of the location to delete
    */
   async deleteLocation(locId: string) {
@@ -410,6 +628,17 @@ export class AppClient {
 
   /**
    * Lists all locations under an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const locations = await appClient.listLocations(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listlocations).
    *
    * @param organizationId The ID of the organization to query
    * @returns A list of locations under the organization
@@ -422,6 +651,18 @@ export class AppClient {
   /**
    * Shares a location with another organization
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.shareLocation(
+   *   '<OTHER-ORGANIZATION-ID>',
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#sharelocation).
+   *
    * @param organizationId The ID of the organization to share with
    * @param locId The ID of the location to share
    */
@@ -432,6 +673,18 @@ export class AppClient {
   /**
    * Unshares a location with an organization
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.unshareLocation(
+   *   '<OTHER-ORGANIZATION-ID>',
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#unsharelocation).
+   *
    * @param organizationId The ID of the organization to unshare with
    * @param locId The ID of the location to unshare
    */
@@ -441,6 +694,17 @@ export class AppClient {
 
   /**
    * Get a location's `LocationAuth` (location secret(s)).
+   *
+   * @example
+   *
+   * ```ts
+   * const locationAuth = await appClient.locationAuth(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#locationauth).
    *
    * @param locId The ID of the location to retrieve `LocationAuth` from.
    * @returns The `LocationAuth` for the requested location.
@@ -453,6 +717,17 @@ export class AppClient {
   /**
    * Create a location secret (`LocationAuth`).
    *
+   * @example
+   *
+   * ```ts
+   * const locationAuth = await appClient.createLocationSecret(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createlocationsecret).
+   *
    * @param locId The ID of the location to create a `LocationAuth` for
    * @returns The newly created `LocationAuth`
    */
@@ -464,6 +739,18 @@ export class AppClient {
   /**
    * Deletes a location secret (`LocationAuth`).
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteLocationSecret(
+   *   '<YOUR-LOCATION-ID>',
+   *   '<YOUR-SECRET-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deletelocationsecret).
+   *
    * @param locId The ID of the location to delete the `LocationAuth` from
    * @param secretId The ID of the location secret to delete
    */
@@ -473,6 +760,15 @@ export class AppClient {
 
   /**
    * Queries a robot by its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * const robot = await appClient.getRobot('<YOUR-ROBOT-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobot).
    *
    * @param id The ID of the robot
    * @returns The `Robot` object
@@ -485,6 +781,17 @@ export class AppClient {
   /**
    * Returns a list of rover rental robots for an organization.
    *
+   * @example
+   *
+   * ```ts
+   * const roverRentalRobots = await appClient.getRoverRentalRobots(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getroverrentalrobots).
+   *
    * @param orgId The ID of the organization to query
    * @returns The list of `RoverRentalRobot` objects
    */
@@ -495,6 +802,15 @@ export class AppClient {
 
   /**
    * Returns a list of parts for a given robot
+   *
+   * @example
+   *
+   * ```ts
+   * const robotParts = await appClient.getRobotParts('<YOUR-ROBOT-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotparts).
    *
    * @param robotId The ID of the robot to query
    * @returns The list of `RobotPart` objects associated with the robot
@@ -507,6 +823,24 @@ export class AppClient {
   /**
    * Queries a specific robot part by ID.
    *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.getRobotPart('<YOUR-ROBOT-PART-ID>');
+   * // Get the part's address
+   * const address = robotPart.part.fqdn;
+   * // Check if machine is live (last access time less than 10 sec ago)
+   * if (
+   *   Date.now() - Number(robotPart.part.lastAccess.seconds) * 1000 <=
+   *   10000
+   * ) {
+   *   console.log('Machine is live');
+   * }
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotpart).
+   *
    * @param id The ID of the requested robot part
    * @returns The robot part and a its json config
    */
@@ -517,6 +851,17 @@ export class AppClient {
   /**
    * Get a page of log entries for a specific robot part. Logs are sorted by
    * descending time (newest first).
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPartLogs = await appClient.getRobotPartLogs(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotpartlogs).
    *
    * @param id The ID of the requested robot part
    * @param filter Optional string to filter logs on
@@ -545,6 +890,17 @@ export class AppClient {
    * Get a stream of log entries for a specific robot part. Logs are sorted by
    * descending time (newest first).
    *
+   * @example
+   *
+   * ```ts
+   * const robotPartLogs = await appClient.tailRobotPartLogs(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#tailrobotpartlogs).
+   *
    * @param id The ID of the requested robot part
    * @param queue A queue to put the log entries into
    * @param filter Optional string to filter logs on
@@ -572,6 +928,17 @@ export class AppClient {
   /**
    * Get a list containing the history of a robot part.
    *
+   * @example
+   *
+   * ```ts
+   * const robotPartHistory = await appClient.getRobotPartHistory(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotparthistory).
+   *
    * @param id The ID of the requested robot part
    * @returns The list of the robot part's history
    */
@@ -582,6 +949,18 @@ export class AppClient {
 
   /**
    * Updates a robot part based on its ID.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.updateRobotPart(
+   *   '<YOUR-ROBOT-PART-ID>',
+   *   'newName'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updaterobotpart).
    *
    * @param id The ID of the requested robot part
    * @param name The new name of the robot part
@@ -600,6 +979,18 @@ export class AppClient {
   /**
    * Creates a new robot part.
    *
+   * @example
+   *
+   * ```ts
+   * const robotPartId = await appClient.newRobotPart(
+   *   '<YOUR-ROBOT-ID>',
+   *   'newPart'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#newrobotpart).
+   *
    * @param robotId The ID of the robot to create a part for
    * @param partName The name for the new robot part
    * @returns The ID of the newly-created robot part
@@ -612,6 +1003,15 @@ export class AppClient {
   /**
    * Deletes a robot part.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRobotPart('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleterobotpart).
+   *
    * @param partId The ID of the part to delete
    */
   async deleteRobotPart(partId: string) {
@@ -620,6 +1020,16 @@ export class AppClient {
 
   /**
    * Gets a list of a robot's API keys.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotAPIKeys =
+   *   await appClient.getRobotAPIKeys('<YOUR-ROBOT-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotapikeys).
    *
    * @param robotId The ID of the robot to get API keys for
    * @returns A list of the robot's API keys
@@ -632,6 +1042,15 @@ export class AppClient {
   /**
    * Marks a robot part as the main part.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.markPartAsMain('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#markpartasmain).
+   *
    * @param partId The ID of the part to mark as main
    */
   async markPartAsMain(partId: string) {
@@ -641,6 +1060,15 @@ export class AppClient {
   /**
    * Marks a robot part for restart.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.markPartForRestart('<YOUR-ROBOT-PART-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#markpartforrestart).
+   *
    * @param partId The ID of the part to mark for restart
    */
   async markPartForRestart(partId: string) {
@@ -649,6 +1077,17 @@ export class AppClient {
 
   /**
    * Creates a new secret for a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.createRobotPartSecret(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createrobotpartsecret).
    *
    * @param partId The ID of the part to create a secret for
    * @returns The robot part object
@@ -661,6 +1100,18 @@ export class AppClient {
   /**
    * Deletes a robot secret from a robot part.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRobotPartSecret(
+   *   '<YOUR-ROBOT-PART-ID>',
+   *   '<YOUR-SECRET-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleterobotpartsecret).
+   *
    * @param partId The ID of the part to delete a secret from
    * @param secretId The ID of the secret to delete
    */
@@ -670,6 +1121,15 @@ export class AppClient {
 
   /**
    * Lists all robots in a location.
+   *
+   * @example
+   *
+   * ```ts
+   * const robots = await appClient.listRobots('<YOUR-LOCATION-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listrobots).
    *
    * @param locId The ID of the location to list robots for
    * @returns The list of robot objects
@@ -682,6 +1142,18 @@ export class AppClient {
   /**
    * Creates a new robot.
    *
+   * @example
+   *
+   * ```ts
+   * const robotId = await appClient.newRobot(
+   *   '<YOUR-LOCATION-ID>',
+   *   'newRobot'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#newrobot).
+   *
    * @param locId The ID of the location to create the robot in
    * @param name The name of the new robot
    * @returns The new robot's ID
@@ -692,10 +1164,24 @@ export class AppClient {
   }
 
   /**
-   * Updates an existing robot's name and/or location.
+   * Change the name of an existing machine. You can only change the name of the
+   * machine, not the location.
+   *
+   * @example
+   *
+   * ```ts
+   * const robot = await appClient.updateRobot(
+   *   '<YOUR-ROBOT-ID>',
+   *   '<YOUR-LOCATION-ID>',
+   *   'newName'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updaterobot).
    *
    * @param robotId The ID of the robot to update
-   * @param locId The ID of the location to move the robot to
+   * @param locId The ID of the location where the robot is
    * @param name The name to update the robot to
    * @returns The newly-modified robot object
    */
@@ -715,6 +1201,15 @@ export class AppClient {
   /**
    * Deletes a robot.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRobot('<YOUR-ROBOT-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleterobot).
+   *
    * @param id The ID of the robot to delete
    */
   async deleteRobot(id: string) {
@@ -723,6 +1218,17 @@ export class AppClient {
 
   /**
    * Lists all fragments within an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const fragments = await appClient.listFragments(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listfragments).
    *
    * @param organizationId The ID of the organization to list fragments for
    * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities
@@ -751,6 +1257,17 @@ export class AppClient {
   /**
    * Looks up a fragment by ID.
    *
+   * @example
+   *
+   * ```ts
+   * const fragment = await appClient.getFragment(
+   *   '12a12ab1-1234-5678-abcd-abcd01234567'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getfragment).
+   *
    * @param id The ID of the fragment to look up
    * @returns The requested fragment
    */
@@ -761,6 +1278,18 @@ export class AppClient {
 
   /**
    * Creates a new fragment.
+   *
+   * @example
+   *
+   * ```ts
+   * const fragment = await appClient.createFragment(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newFragment'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createfragment).
    *
    * @param organizationId The ID of the organization to create the fragment
    *   under
@@ -783,6 +1312,18 @@ export class AppClient {
 
   /**
    * Updates an existing fragment.
+   *
+   * @example
+   *
+   * ```ts
+   * const fragment = await appClient.updateFragment(
+   *   '12a12ab1-1234-5678-abcd-abcd01234567',
+   *   'better_name'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updatefragment).
    *
    * @param id The ID of the fragment to update
    * @param name The name to update the fragment to
@@ -817,6 +1358,15 @@ export class AppClient {
   /**
    * Deletes a fragment.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteFragment('12a12ab1-1234-5678-abcd-abcd01234567');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deletefragment).
+   *
    * @param id The ID of the fragment to delete
    */
   async deleteFragment(id: string) {
@@ -824,6 +1374,17 @@ export class AppClient {
   }
 
   /**
+   * @example
+   *
+   * ```ts
+   * const fragments = await appClient.listMachineFragments(
+   *   '<YOUR-MACHINE-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listmachinefragments).
+   *
    * @param machineId The machine ID used to filter fragments defined in a
    *   machine's parts. Also returns any fragments nested within the fragments
    *   defined in parts.
@@ -847,8 +1408,24 @@ export class AppClient {
   /**
    * Add a role under an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.addRole(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-USER-ID>',
+   *   'owner',
+   *   'robot',
+   *   '<YOUR-ROBOT-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#addrole).
+   *
    * @param organizationId The ID of the organization to create the role under
-   * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+   * @param entityId The ID of the entity the role belongs to (for example a
+   *   user ID)
    * @param role The role to add ("owner" or "operator")
    * @param resourceType The type of resource to create the role for ("robot",
    *   "location", or "organization")
@@ -876,8 +1453,24 @@ export class AppClient {
   /**
    * Removes a role from an organization.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.removeRole(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-USER-ID>',
+   *   'owner',
+   *   'robot',
+   *   '<YOUR-ROBOT-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#removerole).
+   *
    * @param organizationId The ID of the organization to remove the role from
-   * @param entityId The ID of the entity the role belongs to (e.g., a user ID)
+   * @param entityId The ID of the entity the role belongs to (for example a
+   *   user ID)
    * @param role The role to remove ("owner" or "operator")
    * @param resourceType The type of resource to remove the role from ("robot",
    *   "location", or "organization")
@@ -905,8 +1498,37 @@ export class AppClient {
   /**
    * Changes an existing role.
    *
-   * @param oldAuth The existing authorization
-   * @param newAuth The new authorization
+   * @example
+   *
+   * ```ts
+   * const oldAuth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_owner',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access to
+   *   identityId: '<USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'owner', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   * const newAuth = new VIAM.appApi.Authorization({
+   *   authorizationType: 'role',
+   *   authorizationId: 'organization_operator',
+   *   organizationId: '<YOUR-ORGANIZATION-ID>',
+   *   resourceId: '<YOUR-RESOURCE-ID>', // The resource to grant access to
+   *   resourceType: 'organization', // The type of resource to grant access To
+   *   identityId: '<USER-ID>', // The user id of the user to grant access to (optional)
+   *   roleId: 'operator', // The role to grant access to
+   *   identityType: 'user',
+   * });
+   * await appClient.changeRole(oldAuth, newAuth);
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#changerole).
+   *
+   * @param oldAuthorization The existing authorization
+   * @param newAuthorization The new authorization to change to
    */
   async changeRole(
     oldAuthorization: Authorization,
@@ -917,6 +1539,9 @@ export class AppClient {
 
   /**
    * List all authorizations for an organization.
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listauthorizations).
    *
    * @param organizationId The ID of the organization to list authorizations for
    * @param resourceIds Optional list of IDs of resources to list authorizations
@@ -937,6 +1562,9 @@ export class AppClient {
   /**
    * Checks whether requested permissions exist.
    *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#checkpermissions).
+   *
    * @param permissions A list of permissions to check
    * @returns A filtered list of the authorized permissions
    */
@@ -950,6 +1578,17 @@ export class AppClient {
   /**
    * Get an item from the registry.
    *
+   * @example
+   *
+   * ```ts
+   * const registryItem = await appClient.getRegistryItem(
+   *   '<YOUR-REGISTRY-ITEM-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getregistryitem).
+   *
    * @param itemId The ID of the item to get
    * @returns The requested item
    */
@@ -960,6 +1599,19 @@ export class AppClient {
 
   /**
    * Create a new registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.createRegistryItem(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newRegistryItemName',
+   *   5
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createregistryitem).
    *
    * @param organizationId The ID of the organization to create the registry
    *   item under
@@ -980,6 +1632,20 @@ export class AppClient {
 
   /**
    * Update an existing registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateRegistryItem(
+   *   '<YOUR-REGISTRY-ITEM-ID>',
+   *   5, // Package: ML Model
+   *   'new description',
+   *   1 // Private
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updateregistryitem).
    *
    * @param itemId The ID of the registry item to update
    * @param type The PackageType to update the item to
@@ -1002,6 +1668,21 @@ export class AppClient {
 
   /**
    * List all registry items for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const registryItems = await appClient.listRegistryItems(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   [], // All package types
+   *   [1], // Private packages
+   *   [],
+   *   [1] // Active packages
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listregistryitems).
    *
    * @param organizationId The ID of the organization to query registry items
    *   for
@@ -1042,6 +1723,15 @@ export class AppClient {
   /**
    * Deletes a registry item.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteRegistryItem('<YOUR-REGISTRY-ITEM-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deleteregistryitem).
+   *
    * @param itemId The ID of the item to delete
    */
   async deleteRegistryItem(itemId: string) {
@@ -1052,6 +1742,18 @@ export class AppClient {
 
   /**
    * Creates a new module.
+   *
+   * @example
+   *
+   * ```ts
+   * const module = await appClient.createModule(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   'newModule'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createmodule).
    *
    * @param organizationId The ID of the organization to create the module under
    * @param name The name of the module
@@ -1069,6 +1771,22 @@ export class AppClient {
 
   /**
    * Updates an existing module.
+   *
+   * @example
+   *
+   * ```ts
+   * const module = await appClient.updateModule(
+   *   '<YOUR-MODULE-ID>',
+   *   1,
+   *   'https://example.com',
+   *   'new description',
+   *   [{ model: 'namespace:group:model1', api: 'rdk:component:generic' }],
+   *   'entrypoint'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updatemodule).
    *
    * @param moduleId The ID of the module to update
    * @param visibility The visibility to set for the module
@@ -1100,6 +1818,15 @@ export class AppClient {
   /**
    * Looks up a particular module.
    *
+   * @example
+   *
+   * ```ts
+   * const module = await appClient.getModule('<YOUR-MODULE-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getmodule).
+   *
    * @param moduleId The ID of the module
    * @returns The requested module
    */
@@ -1111,6 +1838,15 @@ export class AppClient {
   /**
    * Lists all modules for an organization.
    *
+   * @example
+   *
+   * ```ts
+   * const modules = await appClient.listModules('<YOUR-ORGANIZATION-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listmodules).
+   *
    * @param organizationId The ID of the organization to query
    * @returns The organization's modules
    */
@@ -1121,6 +1857,9 @@ export class AppClient {
 
   /**
    * Creates a new API key.
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createkey).
    *
    * @param authorizations The list of authorizations to provide for the API key
    * @param name An optional name for the key. If none is passed, defaults to
@@ -1137,6 +1876,15 @@ export class AppClient {
   /**
    * Deletes an existing API key.
    *
+   * @example
+   *
+   * ```ts
+   * await appClient.deleteKey('<YOUR-KEY-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#deletekey).
+   *
    * @param id The ID of the key to delete
    */
   async deleteKey(id: string) {
@@ -1145,6 +1893,15 @@ export class AppClient {
 
   /**
    * List all API keys for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const keys = await appClient.listKeys('<YOUR-ORGANIZATION-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listkeys).
    *
    * @param orgId The ID of the organization to query
    * @returns The list of API keys
@@ -1157,6 +1914,15 @@ export class AppClient {
   /**
    * Rotates an existing API key.
    *
+   * @example
+   *
+   * ```ts
+   * const key = await appClient.rotateKey('<YOUR-KEY-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#rotatekey).
+   *
    * @param id The ID of the key to rotate
    * @returns The updated key and ID
    */
@@ -1167,6 +1933,18 @@ export class AppClient {
   /**
    * Creates a new key with an existing key's authorizations
    *
+   * @example
+   *
+   * ```ts
+   * const key =
+   *   await appClient.createKeyFromExistingKeyAuthorizations(
+   *     '<YOUR-KEY-ID>'
+   *   );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createkeyfromexistingkeyauthorizations).
+   *
    * @param id The ID of the key to duplicate
    * @returns The new key and ID
    */
@@ -1174,5 +1952,238 @@ export class AppClient {
     id: string
   ): Promise<CreateKeyFromExistingKeyAuthorizationsResponse> {
     return this.client.createKeyFromExistingKeyAuthorizations({ id });
+  }
+
+  /**
+   * Retrieves the app content for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const appContent = await appClient.getAppContent(
+   *   '<YOUR-PUBLIC-NAMESPACE>',
+   *   '<YOUR-APP-NAME>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getappcontent).
+   *
+   * @param publicNamespace The public namespace of the organization
+   * @param name The name of the app
+   * @returns The blob path and entrypoint of the app content
+   */
+  async getAppContent(
+    publicNamespace: string,
+    name: string
+  ): Promise<GetAppContentResponse> {
+    return this.client.getAppContent({ publicNamespace, name });
+  }
+
+  /**
+   * Retrieves user-defined metadata for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getOrganizationMetadata(
+   *   '<YOUR-ORGANIZATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getorganizationmetadata).
+   *
+   * @param id The ID of the organization
+   * @returns The metadata associated with the organization
+   */
+  async getOrganizationMetadata(
+    id: string
+  ): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getOrganizationMetadata({
+      organizationId: id,
+    });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for an organization.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateOrganizationMetadata('<YOUR-ORGANIZATION-ID>', {
+   *   key: 'value',
+   * });
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updateorganizationmetadata).
+   *
+   * @param id The ID of the organization
+   * @param data The metadata to update
+   */
+  async updateOrganizationMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateOrganizationMetadata({
+      organizationId: id,
+      data: Struct.fromJson(data),
+    });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a location.
+   *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getLocationMetadata(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getlocationmetadata).
+   *
+   * @param id The ID of the location
+   * @returns The metadata associated with the location
+   */
+  async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getLocationMetadata({ locationId: id });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for a location.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateLocationMetadata('<YOUR-LOCATION-ID>', {
+   *   key: 'value',
+   * });
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updatelocationmetadata).
+   *
+   * @param id The ID of the location
+   * @param data The metadata to update
+   */
+  async updateLocationMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateLocationMetadata({
+      locationId: id,
+      data: Struct.fromJson(data),
+    });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a robot.
+   *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getRobotMetadata('<YOUR-ROBOT-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotmetadata).
+   *
+   * @param id The ID of the robot
+   * @returns The metadata associated with the robot
+   */
+  async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getRobotMetadata({ id });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for a robot.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateRobotMetadata('<YOUR-ROBOT-ID>', {
+   *   key: 'value',
+   * });
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updaterobotmetadata).
+   *
+   * @param id The ID of the robot
+   * @param data The metadata to update
+   */
+  async updateRobotMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateRobotMetadata({ id, data: Struct.fromJson(data) });
+  }
+
+  /**
+   * Retrieves user-defined metadata for a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * const metadata = await appClient.getRobotPartMetadata(
+   *   '<YOUR-ROBOT-PART-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotpartmetadata).
+   *
+   * @param id The ID of the robot part
+   * @returns The metadata associated with the robot part
+   */
+  async getRobotPartMetadata(id: string): Promise<Record<string, JsonValue>> {
+    const response = await this.client.getRobotPartMetadata({ id });
+    const jsonResponse = response.toJson() as {
+      data?: Record<string, JsonValue>;
+    };
+    return jsonResponse.data ?? {};
+  }
+
+  /**
+   * Updates user-defined metadata for a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.updateRobotPartMetadata('<YOUR-ROBOT-PART-ID>', {
+   *   key: 'value',
+   * });
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#updaterobotpartmetadata).
+   *
+   * @param id The ID of the robot part
+   * @param data The metadata to update
+   */
+  async updateRobotPartMetadata(
+    id: string,
+    data: Record<string, JsonValue>
+  ): Promise<void> {
+    await this.client.updateRobotPartMetadata({
+      id,
+      data: Struct.fromJson(data),
+    });
   }
 }
