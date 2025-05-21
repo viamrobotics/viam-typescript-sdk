@@ -21,10 +21,10 @@ export class EventDispatcher {
     listeners[type]?.add(listener as Callback);
   }
 
-  once(type: string, listener: Callback) {
-    const fn = (args: unknown) => {
+  once<T>(type: string, listener: Callback<T>) {
+    const fn = (args: T) => {
       listener(args);
-      this.off(type, listener);
+      this.off(type, listener as Callback);
     };
     this.on(type, fn);
   }
