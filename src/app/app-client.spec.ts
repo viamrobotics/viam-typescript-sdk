@@ -794,13 +794,14 @@ describe('AppClient tests', () => {
   });
 
   describe('getRobotPartByNameAndLocation tests', () => {
+    const expectedResponse = new pb.GetRobotPartByNameAndLocationResponse({
+      part: robotPart,
+    });
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobotPartByNameAndLocation: () => {
-            return new pb.GetRobotPartByNameAndLocationResponse({
-              part: robotPart,
-            });
+            return expectedResponse;
           },
         });
       });
@@ -811,7 +812,7 @@ describe('AppClient tests', () => {
         'name',
         'locationId'
       );
-      expect(response).toEqual(robotPart);
+      expect(response).toEqual(expectedResponse);
     });
   });
 
