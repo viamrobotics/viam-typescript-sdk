@@ -849,7 +849,6 @@ export class AppClient {
     return this.client.getRobotPart({ id });
   }
 
-
   /**
    * Queries a specific robot part by name and location id.
    *

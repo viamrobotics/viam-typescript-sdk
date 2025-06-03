@@ -807,7 +807,10 @@ describe('AppClient tests', () => {
     });
 
     it('getRobotPartByNameAndLocation', async () => {
-      const response = await subject().getRobotPartByNameAndLocation('name', 'locationId');
+      const response = await subject().getRobotPartByNameAndLocation(
+        'name',
+        'locationId'
+      );
       expect(response).toEqual(robotPart);
     });
   });
