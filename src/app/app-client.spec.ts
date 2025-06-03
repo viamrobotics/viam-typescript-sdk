@@ -793,6 +793,25 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('getRobotPartByNameAndLocation tests', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getRobotPartByNameAndLocation: () => {
+            return new pb.GetRobotPartByNameAndLocationResponse({
+              part: robotPart,
+            });
+          },
+        });
+      });
+    });
+
+    it('getRobotPartByNameAndLocation', async () => {
+      const response = await subject().getRobotPartByNameAndLocation('name', 'locationId');
+      expect(response).toEqual(robotPart);
+    });
+  });
+
   describe('getRobotPartLogs tests', () => {
     const expectedResponse = new pb.GetRobotPartLogsResponse({
       logs: [logEntry],

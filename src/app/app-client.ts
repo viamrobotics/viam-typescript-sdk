@@ -15,6 +15,7 @@ import {
   GetAppContentResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
+  GetRobotPartByNameAndLocationResponse,
   ListOrganizationMembersResponse,
   Location,
   LocationAuth,
@@ -846,6 +847,33 @@ export class AppClient {
    */
   async getRobotPart(id: string): Promise<GetRobotPartResponse> {
     return this.client.getRobotPart({ id });
+  }
+
+
+  /**
+   * Queries a specific robot part by name and location id.
+   *
+   * @example
+   *
+   * ```ts
+   * const robotPart = await appClient.getRobotPartByNameAndLocation(
+   *   '<YOUR-ROBOT-PART-NAME>',
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotpartbynameandlocation).
+   *
+   * @param name The name of the requested robot part
+   * @param locationId The ID of the location of the requested robot part
+   * @returns The robot part
+   */
+  async getRobotPartByNameAndLocation(
+    name: string,
+    locationId: string
+  ): Promise<GetRobotPartByNameAndLocationResponse> {
+    return this.client.getRobotPartByNameAndLocation({ name, locationId });
   }
 
   /**
