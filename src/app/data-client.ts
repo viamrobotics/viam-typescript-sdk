@@ -1428,14 +1428,17 @@ export class DataClient {
     let dataSource: TabularDataSourceType;
 
     switch (inputDataSourceType) {
-      case 'standard':
-        dataSource = TabularDataSourceType.STANDARD
+      case 'standard': {
+        dataSource = TabularDataSourceType.STANDARD;
         break;
-      case 'hot_storage':
-        dataSource = TabularDataSourceType.HOT_STORAGE
+      }
+      case 'hot_storage': {
+        dataSource = TabularDataSourceType.HOT_STORAGE;
         break;
-      default:
+      }
+      default: {
         throw new Error(`Invalid data source type: ${dataSourceType}`);
+      }
     }
 
     const resp = await this.dataPipelinesClient.createDataPipeline({
