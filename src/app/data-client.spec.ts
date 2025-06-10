@@ -1428,8 +1428,8 @@ describe('DataPipelineClient tests', () => {
   const pipelineName = 'testPipeline';
   const mqlQuery = [{ $match: { component_name: 'sensor-1' } }];
   const schedule = '0 0 * * *';
-  const dataSourceTypeStandard = TabularDataSourceType.STANDARD
-  const dataSourceTypeHotStorage = TabularDataSourceType.HOT_STORAGE
+  const dataSourceTypeStandard = TabularDataSourceType.STANDARD;
+  const dataSourceTypeHotStorage = TabularDataSourceType.HOT_STORAGE;
 
   describe('listDataPipelines tests', () => {
     const pipeline1 = new DataPipeline({
@@ -1546,7 +1546,7 @@ describe('DataPipelineClient tests', () => {
         pipelineName,
         mqlQuery,
         schedule,
-        "standard",
+        'standard'
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
@@ -1565,7 +1565,7 @@ describe('DataPipelineClient tests', () => {
         organizationId,
         pipelineName,
         mqlQuery,
-        schedule,
+        schedule
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
