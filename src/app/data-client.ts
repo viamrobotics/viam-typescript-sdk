@@ -1409,24 +1409,41 @@ export class DataClient {
    * @param name The name of the data pipeline
    * @param query The MQL query to run as a list of BSON documents
    * @param schedule The schedule to run the query on (cron expression)
+   * @param dataSourceType The type of data source to use for the data pipeline
    * @returns The ID of the created data pipeline
    */
   async createDataPipeline(
     organizationId: string,
     name: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
-    schedule: string
+    schedule: string,
+    dataSourceType?: string
   ): Promise<string> {
     const mqlBinary: Uint8Array[] =
       query[0] instanceof Uint8Array
         ? (query as Uint8Array[])
         : query.map((value) => BSON.serialize(value));
 
+    const inputDataSourceType = dataSourceType ?? 'standard';
+    let dataSource: TabularDataSourceType;
+
+    switch (inputDataSourceType) {
+      case 'standard':
+        dataSource = TabularDataSourceType.STANDARD
+        break;
+      case 'hot_storage':
+        dataSource = TabularDataSourceType.HOT_STORAGE
+        break;
+      default:
+        throw new Error(`Invalid data source type: ${dataSourceType}`);
+    }
+
     const resp = await this.dataPipelinesClient.createDataPipeline({
       organizationId,
       name,
       mqlBinary,
       schedule,
+      dataSourceType: dataSource,
     });
     return resp.id;
   }

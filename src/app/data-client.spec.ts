@@ -46,6 +46,7 @@ import {
   TabularDataByFilterResponse,
   TabularDataByMQLResponse,
   TabularDataBySQLResponse,
+  TabularDataSourceType,
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
@@ -1427,17 +1428,21 @@ describe('DataPipelineClient tests', () => {
   const pipelineName = 'testPipeline';
   const mqlQuery = [{ $match: { component_name: 'sensor-1' } }];
   const schedule = '0 0 * * *';
+  const dataSourceTypeStandard = TabularDataSourceType.STANDARD
+  const dataSourceTypeHotStorage = TabularDataSourceType.HOT_STORAGE
 
   describe('listDataPipelines tests', () => {
     const pipeline1 = new DataPipeline({
       id: 'pipeline1',
       name: 'pipeline1',
       organizationId: 'org1',
+      dataSourceType: dataSourceTypeStandard,
     });
     const pipeline2 = new DataPipeline({
       id: 'pipeline2',
       name: 'pipeline2',
       organizationId: 'org2',
+      dataSourceType: dataSourceTypeHotStorage,
     });
     const pipelines = [pipeline1, pipeline2];
 
@@ -1471,6 +1476,7 @@ describe('DataPipelineClient tests', () => {
       id: pipelineId,
       name: pipelineName,
       organizationId,
+      dataSourceType: dataSourceTypeStandard,
     });
 
     let capReq: GetDataPipelineRequest;
@@ -1532,13 +1538,34 @@ describe('DataPipelineClient tests', () => {
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
         schedule,
+        dataSourceType: dataSourceTypeStandard,
       });
 
       const response = await subject().createDataPipeline(
         organizationId,
         pipelineName,
         mqlQuery,
-        schedule
+        schedule,
+        "standard",
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(response).toEqual(pipelineId);
+    });
+
+    it('create data pipeline with optional dataSourceType', async () => {
+      const expectedRequest = new CreateDataPipelineRequest({
+        organizationId,
+        name: pipelineName,
+        mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
+        schedule,
+        dataSourceType: dataSourceTypeStandard,
+      });
+
+      const response = await subject().createDataPipeline(
+        organizationId,
+        pipelineName,
+        mqlQuery,
+        schedule,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
