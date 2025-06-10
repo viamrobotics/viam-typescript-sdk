@@ -30,23 +30,24 @@
     "func": "push",
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM",
-	"commented": true
+    "hasReturn": false,
+    "commented": true
   },
   "genericservice": {
     "importName": "GenericServiceClient",
     "func": "doCommand",
-	"args": ["{}"],
+    "args": ["{}"],
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM",
-	"commented": true
+    "commented": true
   },
   "genericcomponent": {
     "importName": "GenericComponentClient",
     "func": "doCommand",
-	"args": ["{}"],
+    "args": ["{}"],
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM",
-	"commented": true
+    "commented": true
   },
   "camera": {
     "importName": "CameraClient",
