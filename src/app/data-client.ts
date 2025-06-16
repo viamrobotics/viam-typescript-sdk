@@ -1427,13 +1427,6 @@ export class DataClient {
     const inputDataSourceType =
       dataSourceType ?? TabularDataSourceType.STANDARD;
 
-    if (
-      inputDataSourceType !== TabularDataSourceType.STANDARD &&
-      inputDataSourceType !== TabularDataSourceType.HOT_STORAGE
-    ) {
-      throw new Error('Invalid data source type');
-    }
-
     const resp = await this.dataPipelinesClient.createDataPipeline({
       organizationId,
       name,
