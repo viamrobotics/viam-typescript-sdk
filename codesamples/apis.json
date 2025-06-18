@@ -25,6 +25,30 @@
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM"
   },
+  "button": {
+    "importName": "ButtonClient",
+    "func": "push",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM",
+    "hasReturn": false,
+    "commented": true
+  },
+  "genericservice": {
+    "importName": "GenericServiceClient",
+    "func": "doCommand",
+    "args": ["{}"],
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM",
+    "commented": true
+  },
+  "genericcomponent": {
+    "importName": "GenericComponentClient",
+    "func": "doCommand",
+    "args": ["{}"],
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM",
+    "commented": true
+  },
   "camera": {
     "importName": "CameraClient",
     "func": "getImage",
