@@ -55,6 +55,7 @@
     "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.6.0",
     "@connectrpc/connect-web": "^1.6.0",
+    "@viamrobotics/sdk": "^0.44.0",
     "bsonfy": "^1.0.2",
     "exponential-backoff": "^3.1.2"
   },

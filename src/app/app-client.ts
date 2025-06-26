@@ -13,6 +13,7 @@ import {
   Fragment,
   FragmentVisibility,
   GetAppContentResponse,
+  GetAppBrandingResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   GetRobotPartByNameAndLocationResponse,
@@ -2212,5 +2213,31 @@ export class AppClient {
       id,
       data: Struct.fromJson(data),
     });
+  }
+
+  /**
+   * Retrieves the app branding for an organization/app.
+   *
+   * @example
+   *
+   * ```ts
+   * const branding = await appClient.getAppBranding(
+   *   '<YOUR-PUBLIC-NAMESPACE>',
+   *   '<YOUR-APP-NAME>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getappbranding).
+   *
+   * @param publicNamespace The public namespace of the organization
+   * @param name The name of the app
+   * @returns The branding information for the app
+   */
+  async getAppBranding(
+    publicNamespace: string,
+    name: string
+  ): Promise<GetAppBrandingResponse> {
+    return this.client.getAppBranding({ publicNamespace, name });
   }
 }
