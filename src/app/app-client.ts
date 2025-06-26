@@ -33,6 +33,8 @@ import {
   RotateKeyResponse,
   RoverRentalRobot,
   Visibility,
+  ListMachineSummariesRequest,
+  LocationSummary,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -2212,5 +2214,42 @@ export class AppClient {
       id,
       data: Struct.fromJson(data),
     });
+  }
+
+  /**
+   * Lists machine summaries for an organization, optionally filtered by
+   * fragment IDs, location IDs, and limit.
+   *
+   * @example
+   *
+   * ```ts
+   * const summaries = await appClient.listMachineSummaries(
+   *   'orgId',
+   *   ['frag1'],
+   *   ['loc1'],
+   *   10
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param fragmentIds Optional list of fragment IDs to filter machines
+   * @param locationIds Optional list of location IDs to filter machines
+   * @param limit Optional max number of machines to return
+   * @returns The list of location summaries
+   */
+  async listMachineSummaries(
+    organizationId: string,
+    fragmentIds?: string[],
+    locationIds?: string[],
+    limit?: number
+  ): Promise<LocationSummary[]> {
+    const req: ListMachineSummariesRequest = new ListMachineSummariesRequest({
+      organizationId,
+      fragmentIds,
+      locationIds,
+      limit,
+    });
+    const resp = await this.client.listMachineSummaries(req);
+    return resp.locationSummaries;
   }
 }
