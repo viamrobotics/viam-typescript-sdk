@@ -1106,9 +1106,9 @@ describe('AppClient tests', () => {
   });
 
   describe('listMachineSummaries tests', () => {
-    const summary1 = new pb.MachineSummary({ id: 'm1', name: 'Machine 1' });
-    const summary2 = new pb.MachineSummary({ id: 'm2', name: 'Machine 2' });
-    const summaries = [summary1, summary2];
+    const locSummary1 = new pb.LocationSummary({});
+    const locSummary2 = new pb.LocationSummary({});
+    const locationSummaries = [locSummary1, locSummary2];
     let capturedReq: pb.ListMachineSummariesRequest | undefined;
 
     beforeEach(() => {
@@ -1116,24 +1116,29 @@ describe('AppClient tests', () => {
         service(AppService, {
           listMachineSummaries: (req: pb.ListMachineSummariesRequest) => {
             capturedReq = req;
-            return new pb.ListMachineSummariesResponse({ summaries });
+            return new pb.ListMachineSummariesResponse({ locationSummaries });
           },
         });
       });
     });
 
-    it('returns machine summaries with only organizationId', async () => {
+    it('returns location summaries with only organizationId', async () => {
       const response = await subject().listMachineSummaries('orgId');
-      expect(response).toEqual(summaries);
+      expect(response).toEqual(locationSummaries);
       expect(capturedReq?.organizationId).toEqual('orgId');
       expect(capturedReq?.fragmentIds).toBeUndefined();
       expect(capturedReq?.locationIds).toBeUndefined();
       expect(capturedReq?.limit).toBeUndefined();
     });
 
-    it('returns machine summaries with all filters', async () => {
-      const response = await subject().listMachineSummaries('orgId', ['frag1', 'frag2'], ['loc1'], 5);
-      expect(response).toEqual(summaries);
+    it('returns location summaries with all filters', async () => {
+      const response = await subject().listMachineSummaries(
+        'orgId',
+        ['frag1', 'frag2'],
+        ['loc1'],
+        5
+      );
+      expect(response).toEqual(locationSummaries);
       expect(capturedReq?.organizationId).toEqual('orgId');
       expect(capturedReq?.fragmentIds).toEqual(['frag1', 'frag2']);
       expect(capturedReq?.locationIds).toEqual(['loc1']);
