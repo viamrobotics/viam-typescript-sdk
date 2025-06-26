@@ -1126,8 +1126,8 @@ describe('AppClient tests', () => {
       const response = await subject().listMachineSummaries('orgId');
       expect(response).toEqual(locationSummaries);
       expect(capturedReq?.organizationId).toEqual('orgId');
-      expect(capturedReq?.fragmentIds).toBeUndefined();
-      expect(capturedReq?.locationIds).toBeUndefined();
+      expect(capturedReq?.fragmentIds).toEqual([]);
+      expect(capturedReq?.locationIds).toEqual([]);
       expect(capturedReq?.limit).toBeUndefined();
     });
 
