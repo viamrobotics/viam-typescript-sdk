@@ -1105,6 +1105,42 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('listMachineSummaries tests', () => {
+    const summary1 = new pb.MachineSummary({ id: 'm1', name: 'Machine 1' });
+    const summary2 = new pb.MachineSummary({ id: 'm2', name: 'Machine 2' });
+    const summaries = [summary1, summary2];
+    let capturedReq: pb.ListMachineSummariesRequest | undefined;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          listMachineSummaries: (req: pb.ListMachineSummariesRequest) => {
+            capturedReq = req;
+            return new pb.ListMachineSummariesResponse({ summaries });
+          },
+        });
+      });
+    });
+
+    it('returns machine summaries with only organizationId', async () => {
+      const response = await subject().listMachineSummaries('orgId');
+      expect(response).toEqual(summaries);
+      expect(capturedReq?.organizationId).toEqual('orgId');
+      expect(capturedReq?.fragmentIds).toBeUndefined();
+      expect(capturedReq?.locationIds).toBeUndefined();
+      expect(capturedReq?.limit).toBeUndefined();
+    });
+
+    it('returns machine summaries with all filters', async () => {
+      const response = await subject().listMachineSummaries('orgId', ['frag1', 'frag2'], ['loc1'], 5);
+      expect(response).toEqual(summaries);
+      expect(capturedReq?.organizationId).toEqual('orgId');
+      expect(capturedReq?.fragmentIds).toEqual(['frag1', 'frag2']);
+      expect(capturedReq?.locationIds).toEqual(['loc1']);
+      expect(capturedReq?.limit).toEqual(5);
+    });
+  });
+
   describe('newRobot tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
