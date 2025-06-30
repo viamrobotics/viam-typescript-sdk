@@ -2034,4 +2034,39 @@ describe('AppClient tests', () => {
       });
     });
   });
+
+  describe('getAppBranding tests', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getAppBranding: () =>
+            new pb.GetAppBrandingResponse({
+              logoPath: '/branding/logo.png',
+              textCustomizations: {
+                machinePicker: new pb.TextOverrides({
+                  fields: {
+                    heading: 'Welcome',
+                    subheading: 'Select your machine.',
+                  },
+                }),
+              },
+            }),
+        });
+      });
+    });
+
+    it('getAppBranding', async () => {
+      const response = await subject().getAppBranding(
+        'publicNamespace',
+        'appName'
+      );
+      expect(response.logoPath).toEqual('/branding/logo.png');
+      expect(response.textCustomizations.machinePicker!.fields.heading).toEqual(
+        'Welcome'
+      );
+      expect(
+        response.textCustomizations.machinePicker!.fields.subheading
+      ).toEqual('Select your machine.');
+    });
+  });
 });
