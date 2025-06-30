@@ -55,7 +55,7 @@ jobs:
           project: DOCS
           issuetype: Bug
           summary: Broken link detected in TS docs
-          description: "For more info see https://github.com/viamrobotics/viam-typsescript-sdk/actions/runs/${{ env.GITHUB_RUN_ID }}."
+          description: "For more info see https://github.com/viamrobotics/viam-typescript-sdk/actions/runs/${{ env.GITHUB_RUN_ID }}."
       - name: Log created Jira issue
         if: failure()
         run: echo "Issue ${{ steps.create.outputs.issue }} was created"
