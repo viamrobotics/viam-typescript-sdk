@@ -2242,7 +2242,7 @@ export class AppClient {
   ): Promise<GetAppBrandingResponse> {
     return this.client.getAppBranding({ publicNamespace, name });
   }
-  
+
   /**
    * Lists machine summaries for an organization, optionally filtered by
    * fragment IDs, location IDs, and limit.
