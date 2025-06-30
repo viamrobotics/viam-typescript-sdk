@@ -6,6 +6,7 @@ IgnoreDirectoryMissingTrailingSlash: false
 IgnoreURLs:
   - "app.viam.com"
   - "http://joda-time.sourceforge.net"
+  - "https://typedoc.org/"
 IgnoreDirs:
   - "lib"
 CacheExpires: "6h"
