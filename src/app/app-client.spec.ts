@@ -2091,6 +2091,7 @@ describe('AppClient tests', () => {
                   },
                 }),
               },
+              fragmentIds: ['frag1', 'frag2'],
             }),
         });
       });
@@ -2108,6 +2109,7 @@ describe('AppClient tests', () => {
       expect(
         response.textCustomizations.machinePicker!.fields.subheading
       ).toEqual('Select your machine.');
+      expect(response.fragmentIds).toEqual(['frag1', 'frag2']);
     });
   });
 });
