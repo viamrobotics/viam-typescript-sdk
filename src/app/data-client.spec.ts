@@ -1561,6 +1561,7 @@ describe('DataPipelineClient tests', () => {
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
         schedule,
+        enableBackfill,
         dataSourceType: dataSourceTypeStandard,
       });
 
@@ -1568,7 +1569,8 @@ describe('DataPipelineClient tests', () => {
         organizationId,
         pipelineName,
         mqlQuery,
-        schedule
+        schedule,
+        enableBackfill
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
