@@ -1417,6 +1417,7 @@ export class DataClient {
     name: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
     schedule: string,
+    enableBackfill: boolean,
     dataSourceType?: TabularDataSourceType
   ): Promise<string> {
     const mqlBinary: Uint8Array[] =
@@ -1432,6 +1433,7 @@ export class DataClient {
       name,
       mqlBinary,
       schedule,
+      enableBackfill,
       dataSourceType: inputDataSourceType,
     });
     return resp.id;
