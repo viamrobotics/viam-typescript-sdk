@@ -1418,8 +1418,7 @@ export class DataClient {
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
     schedule: string,
     enableBackfill: boolean,
-    dataSourceType?: TabularDataSourceType,
-
+    dataSourceType?: TabularDataSourceType
   ): Promise<string> {
     const mqlBinary: Uint8Array[] =
       query[0] instanceof Uint8Array
