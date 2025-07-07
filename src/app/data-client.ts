@@ -1,5 +1,5 @@
 import { BSON } from 'bsonfy';
-import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+import { Any, Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import {
   createPromiseClient,
   type PromiseClient,
@@ -136,7 +136,11 @@ export class DataClient {
       interval.end = Timestamp.fromDate(endTime);
     }
 
-    const additionalParameters = Struct.fromJson(additionalParams);
+    let additionalParameters: Struct | undefined;
+    if (additionalParams) {
+      additionalParameters = Struct.fromJson(additionalParams);
+    }
+
     const req = {
       partId,
       resourceName,
@@ -1323,7 +1327,11 @@ export class DataClient {
     methodName: string,
     additionalParams?: Record<string, JsonValue>
   ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
-    const additionalParameters = Struct.fromJson(additionalParams);
+    let additionalParameters: Struct | undefined;
+    if (additionalParams) {
+      additionalParameters = Struct.fromJson(additionalParams);
+    }
+
     const resp = await this.dataClient.getLatestTabularData({
       partId,
       resourceName,
