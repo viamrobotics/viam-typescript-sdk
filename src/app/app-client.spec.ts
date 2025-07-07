@@ -1105,6 +1105,47 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('listMachineSummaries tests', () => {
+    const locSummary1 = new pb.LocationSummary({});
+    const locSummary2 = new pb.LocationSummary({});
+    const locationSummaries = [locSummary1, locSummary2];
+    let capturedReq: pb.ListMachineSummariesRequest | undefined;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          listMachineSummaries: (req: pb.ListMachineSummariesRequest) => {
+            capturedReq = req;
+            return new pb.ListMachineSummariesResponse({ locationSummaries });
+          },
+        });
+      });
+    });
+
+    it('returns location summaries with only organizationId', async () => {
+      const response = await subject().listMachineSummaries('orgId');
+      expect(response).toEqual(locationSummaries);
+      expect(capturedReq?.organizationId).toEqual('orgId');
+      expect(capturedReq?.fragmentIds).toEqual([]);
+      expect(capturedReq?.locationIds).toEqual([]);
+      expect(capturedReq?.limit).toBeUndefined();
+    });
+
+    it('returns location summaries with all filters', async () => {
+      const response = await subject().listMachineSummaries(
+        'orgId',
+        ['frag1', 'frag2'],
+        ['loc1'],
+        5
+      );
+      expect(response).toEqual(locationSummaries);
+      expect(capturedReq?.organizationId).toEqual('orgId');
+      expect(capturedReq?.fragmentIds).toEqual(['frag1', 'frag2']);
+      expect(capturedReq?.locationIds).toEqual(['loc1']);
+      expect(capturedReq?.limit).toEqual(5);
+    });
+  });
+
   describe('newRobot tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
@@ -2032,6 +2073,43 @@ describe('AppClient tests', () => {
         id: 'robotPartId',
         data: Struct.fromJson({ key1: 'value1' }),
       });
+    });
+  });
+
+  describe('getAppBranding tests', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          getAppBranding: () =>
+            new pb.GetAppBrandingResponse({
+              logoPath: '/branding/logo.png',
+              textCustomizations: {
+                machinePicker: new pb.TextOverrides({
+                  fields: {
+                    heading: 'Welcome',
+                    subheading: 'Select your machine.',
+                  },
+                }),
+              },
+              fragmentIds: ['frag1', 'frag2'],
+            }),
+        });
+      });
+    });
+
+    it('getAppBranding', async () => {
+      const response = await subject().getAppBranding(
+        'publicNamespace',
+        'appName'
+      );
+      expect(response.logoPath).toEqual('/branding/logo.png');
+      expect(response.textCustomizations.machinePicker!.fields.heading).toEqual(
+        'Welcome'
+      );
+      expect(
+        response.textCustomizations.machinePicker!.fields.subheading
+      ).toEqual('Select your machine.');
+      expect(response.fragmentIds).toEqual(['frag1', 'frag2']);
     });
   });
 });

@@ -1571,27 +1571,6 @@ describe('DataPipelineClient tests', () => {
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
         schedule,
-        dataSourceType: dataSourceTypeStandard,
-      });
-
-      const response = await subject().createDataPipeline(
-        organizationId,
-        pipelineName,
-        mqlQuery,
-        schedule,
-        'standard'
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(response).toEqual(pipelineId);
-    });
-
-    it('create data pipeline with optional dataSourceType', async () => {
-      const expectedRequest = new CreateDataPipelineRequest({
-        organizationId,
-        name: pipelineName,
-        mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
-        schedule,
-        dataSourceType: dataSourceTypeStandard,
       });
 
       const response = await subject().createDataPipeline(

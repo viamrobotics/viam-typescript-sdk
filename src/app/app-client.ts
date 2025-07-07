@@ -13,6 +13,7 @@ import {
   Fragment,
   FragmentVisibility,
   GetAppContentResponse,
+  GetAppBrandingResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   GetRobotPartByNameAndLocationResponse,
@@ -33,6 +34,8 @@ import {
   RotateKeyResponse,
   RoverRentalRobot,
   Visibility,
+  ListMachineSummariesRequest,
+  LocationSummary,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -2212,5 +2215,68 @@ export class AppClient {
       id,
       data: Struct.fromJson(data),
     });
+  }
+
+  /**
+   * Retrieves the app branding for an organization/app.
+   *
+   * @example
+   *
+   * ```ts
+   * const branding = await appClient.getAppBranding(
+   *   '<YOUR-PUBLIC-NAMESPACE>',
+   *   '<YOUR-APP-NAME>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#getappbranding).
+   *
+   * @param publicNamespace The public namespace of the organization
+   * @param name The name of the app
+   * @returns The branding information for the app
+   */
+  async getAppBranding(
+    publicNamespace: string,
+    name: string
+  ): Promise<GetAppBrandingResponse> {
+    return this.client.getAppBranding({ publicNamespace, name });
+  }
+
+  /**
+   * Lists machine summaries for an organization, optionally filtered by
+   * fragment IDs, location IDs, and limit.
+   *
+   * @example
+   *
+   * ```ts
+   * const summaries = await appClient.listMachineSummaries(
+   *   'orgId',
+   *   ['frag1'],
+   *   ['loc1'],
+   *   10
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param fragmentIds Optional list of fragment IDs to filter machines
+   * @param locationIds Optional list of location IDs to filter machines
+   * @param limit Optional max number of machines to return
+   * @returns The list of location summaries
+   */
+  async listMachineSummaries(
+    organizationId: string,
+    fragmentIds?: string[],
+    locationIds?: string[],
+    limit?: number
+  ): Promise<LocationSummary[]> {
+    const req: ListMachineSummariesRequest = new ListMachineSummariesRequest({
+      organizationId,
+      fragmentIds,
+      locationIds,
+      limit,
+    });
+    const resp = await this.client.listMachineSummaries(req);
+    return resp.locationSummaries;
   }
 }

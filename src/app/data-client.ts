@@ -1423,36 +1423,22 @@ export class DataClient {
     name: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
     schedule: string,
-    dataSourceType?: string
+    dataSourceType?: TabularDataSourceType
   ): Promise<string> {
     const mqlBinary: Uint8Array[] =
       query[0] instanceof Uint8Array
         ? (query as Uint8Array[])
         : query.map((value) => BSON.serialize(value));
 
-    const inputDataSourceType = dataSourceType ?? 'standard';
-    let dataSource: TabularDataSourceType;
-
-    switch (inputDataSourceType) {
-      case 'standard': {
-        dataSource = TabularDataSourceType.STANDARD;
-        break;
-      }
-      case 'hot_storage': {
-        dataSource = TabularDataSourceType.HOT_STORAGE;
-        break;
-      }
-      default: {
-        throw new Error(`Invalid data source type: ${dataSourceType}`);
-      }
-    }
+    const inputDataSourceType =
+      dataSourceType ?? TabularDataSourceType.STANDARD;
 
     const resp = await this.dataPipelinesClient.createDataPipeline({
       organizationId,
       name,
       mqlBinary,
       schedule,
-      dataSourceType: dataSource,
+      dataSourceType: inputDataSourceType,
     });
     return resp.id;
   }

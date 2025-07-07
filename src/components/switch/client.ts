@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { SwitchService } from '../../gen/component/switch/v1/switch_connect';
 import {
   SetPositionRequest,
@@ -17,7 +17,7 @@ import type { Switch } from './switch';
  * @group Clients
  */
 export class SwitchClient implements Switch {
-  private client: PromiseClient<typeof SwitchService>;
+  private client: Client<typeof SwitchService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
@@ -65,7 +65,15 @@ export class SwitchClient implements Switch {
     this.options.requestLogger?.(request);
 
     const resp = await this.client.getNumberOfPositions(request, callOptions);
-    return resp.numberOfPositions;
+    if (
+      resp.labels.length > 0 &&
+      resp.labels.length !== resp.numberOfPositions
+    ) {
+      throw new Error(
+        'the number of labels does not match the number of positions'
+      );
+    }
+    return [resp.numberOfPositions, resp.labels] as [number, string[]];
   }
 
   async doCommand(
