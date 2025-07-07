@@ -217,6 +217,39 @@ describe('DataClient tests', () => {
 
       expect(capReq).toStrictEqual(expectedRequest);
     });
+
+    // Test for additional params
+    const additionalParams = {
+      key: 'value1',
+    };
+
+    it('gets tabular data for an interval with additional params', async () => {
+      await subject().exportTabularData(
+        'partId1',
+        'resource1',
+        'resource1:subtype',
+        'Readings',
+        timeCaptured1,
+        timeCaptured2,
+        additionalParams
+      );
+
+      const expectedRequest = new ExportTabularDataRequest({
+        partId: 'partId1',
+        resourceName: 'resource1',
+        resourceSubtype: 'resource1:subtype',
+        methodName: 'Readings',
+        interval: {
+          start: Timestamp.fromDate(timeCaptured1),
+          end: Timestamp.fromDate(timeCaptured2),
+        },
+        additionalParameters: Struct.fromJson({
+          key: 'value1',
+        }),
+      });
+
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
   });
 
   describe('tabularDataBySQL tests', () => {
