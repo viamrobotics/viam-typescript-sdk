@@ -1579,7 +1579,7 @@ describe('DataPipelineClient tests', () => {
         pipelineName,
         mqlQuery,
         schedule,
-        'standard'
+        dataSourceTypeStandard
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);

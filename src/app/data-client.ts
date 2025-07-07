@@ -1,5 +1,5 @@
 import { BSON } from 'bsonfy';
-import { Any, Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import {
   createPromiseClient,
   type PromiseClient,
