@@ -125,7 +125,8 @@ export class DataClient {
     resourceSubtype: string,
     methodName: string,
     startTime?: Date,
-    endTime?: Date
+    endTime?: Date,
+    additionalParams?: Record<string, JsonValue>
   ) {
     const interval = new CaptureInterval();
     if (startTime) {
@@ -135,12 +136,14 @@ export class DataClient {
       interval.end = Timestamp.fromDate(endTime);
     }
 
+    const additionalParameters = Struct.fromJson(additionalParams);
     const req = {
       partId,
       resourceName,
       resourceSubtype,
       methodName,
       interval,
+      additionalParameters,
     };
 
     const responses = this.dataClient.exportTabularData(req);
@@ -1317,13 +1320,16 @@ export class DataClient {
     partId: string,
     resourceName: string,
     resourceSubtype: string,
-    methodName: string
+    methodName: string,
+    additionalParams?: Record<string, JsonValue>
   ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
+    const additionalParameters = Struct.fromJson(additionalParams);
     const resp = await this.dataClient.getLatestTabularData({
       partId,
       resourceName,
       resourceSubtype,
       methodName,
+      additionalParameters,
     });
 
     if (!resp.payload || !resp.timeCaptured || !resp.timeSynced) {
