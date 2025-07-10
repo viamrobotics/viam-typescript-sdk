@@ -1463,6 +1463,7 @@ describe('DataPipelineClient tests', () => {
   const schedule = '0 0 * * *';
   const dataSourceTypeStandard = TabularDataSourceType.STANDARD;
   const dataSourceTypeHotStorage = TabularDataSourceType.HOT_STORAGE;
+  const enableBackfill = true;
 
   describe('listDataPipelines tests', () => {
     const pipeline1 = new DataPipeline({
@@ -1571,6 +1572,7 @@ describe('DataPipelineClient tests', () => {
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
         schedule,
+        enableBackfill,
         dataSourceType: dataSourceTypeStandard,
       });
 
@@ -1579,6 +1581,7 @@ describe('DataPipelineClient tests', () => {
         pipelineName,
         mqlQuery,
         schedule,
+        enableBackfill,
         dataSourceTypeStandard
       );
       expect(capReq).toStrictEqual(expectedRequest);
@@ -1591,6 +1594,7 @@ describe('DataPipelineClient tests', () => {
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
         schedule,
+        enableBackfill,
         dataSourceType: dataSourceTypeStandard,
       });
 
@@ -1598,7 +1602,8 @@ describe('DataPipelineClient tests', () => {
         organizationId,
         pipelineName,
         mqlQuery,
-        schedule
+        schedule,
+        enableBackfill
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
