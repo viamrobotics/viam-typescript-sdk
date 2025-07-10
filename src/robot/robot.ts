@@ -1,9 +1,8 @@
 import type { Struct } from '@bufbuild/protobuf';
 import { MachineConnectionEvent } from '../events';
 import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
-import type proto from '../gen/robot/v1/robot_pb';
+import * as proto from '../gen/robot/v1/robot_pb';
 import type { ResourceName } from '../types';
-import type { ModuleModel } from '../gen/robot/v1/robot_pb';
 
 export type CloudMetadata = proto.GetCloudMetadataResponse;
 
@@ -151,7 +150,7 @@ export interface Robot {
    * @group Resources
    * @alpha
    */
-  getModelsFromModules(): Promise<ModuleModel[]>;
+  getModelsFromModules(): Promise<proto.ModuleModel[]>;
 
   /**
    * Get a list of all resources on the machine.
