@@ -37,14 +37,7 @@ To use this SDK with React Native, read the [documentation](https://github.com/v
 
 ## Offline Mode
 
-> [!WARNING]
-> Using the typescript SDK in offline mode necessitates disabling TLS verification and so should be done with caution.
-
-To use the browser on a local network with limited-or-no internet, follow these instructions:
-```
-1. start viam-server with the `-no-tls` flag
-2. set the signaling server in typescript to `http://{HOST}.local:8080`
-```
+To run the TypeScript SDK in offline mode, see [Connect over local network or offline](https://docs.viam.com/dev/reference/sdks/connectivity/#connect-over-local-network-or-offline).
 
 ## License
 
