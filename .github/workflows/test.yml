@@ -16,5 +16,6 @@ jobs:
 
       - name: Build, lint, and test
         run: |
+          apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build lint test test-e2e'
