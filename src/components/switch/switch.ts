@@ -50,7 +50,9 @@ export interface Switch extends Resource {
   getPosition: (extra?: Struct) => Promise<number>;
 
   /**
-   * Get the total number of positions available on the switch.
+   * Get the total number of positions available on the switch, along with their
+   * labels. Labels should either be null, undefined, empty, or the same length
+   * has the number of positions.
    *
    * @example
    *
@@ -65,5 +67,5 @@ export interface Switch extends Resource {
    * For more information, see [Switch
    * API](https://docs.viam.com/dev/reference/apis/components/switch/#getnumberofpositions).
    */
-  getNumberOfPositions: (extra?: Struct) => Promise<number>;
+  getNumberOfPositions: (extra?: Struct) => Promise<[number, string[]]>;
 }

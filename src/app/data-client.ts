@@ -125,7 +125,8 @@ export class DataClient {
     resourceSubtype: string,
     methodName: string,
     startTime?: Date,
-    endTime?: Date
+    endTime?: Date,
+    additionalParams?: Record<string, JsonValue>
   ) {
     const interval = new CaptureInterval();
     if (startTime) {
@@ -135,12 +136,18 @@ export class DataClient {
       interval.end = Timestamp.fromDate(endTime);
     }
 
+    let additionalParameters: Struct | undefined;
+    if (additionalParams) {
+      additionalParameters = Struct.fromJson(additionalParams);
+    }
+
     const req = {
       partId,
       resourceName,
       resourceSubtype,
       methodName,
       interval,
+      additionalParameters,
     };
 
     const responses = this.dataClient.exportTabularData(req);
@@ -1317,13 +1324,20 @@ export class DataClient {
     partId: string,
     resourceName: string,
     resourceSubtype: string,
-    methodName: string
+    methodName: string,
+    additionalParams?: Record<string, JsonValue>
   ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
+    let additionalParameters: Struct | undefined;
+    if (additionalParams) {
+      additionalParameters = Struct.fromJson(additionalParams);
+    }
+
     const resp = await this.dataClient.getLatestTabularData({
       partId,
       resourceName,
       resourceSubtype,
       methodName,
+      additionalParameters,
     });
 
     if (!resp.payload || !resp.timeCaptured || !resp.timeSynced) {
@@ -1409,24 +1423,32 @@ export class DataClient {
    * @param name The name of the data pipeline
    * @param query The MQL query to run as a list of BSON documents
    * @param schedule The schedule to run the query on (cron expression)
+   * @param dataSourceType The type of data source to use for the data pipeline
    * @returns The ID of the created data pipeline
    */
   async createDataPipeline(
     organizationId: string,
     name: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
-    schedule: string
+    schedule: string,
+    enableBackfill: boolean,
+    dataSourceType?: TabularDataSourceType
   ): Promise<string> {
     const mqlBinary: Uint8Array[] =
       query[0] instanceof Uint8Array
         ? (query as Uint8Array[])
         : query.map((value) => BSON.serialize(value));
 
+    const inputDataSourceType =
+      dataSourceType ?? TabularDataSourceType.STANDARD;
+
     const resp = await this.dataPipelinesClient.createDataPipeline({
       organizationId,
       name,
       mqlBinary,
       schedule,
+      enableBackfill,
+      dataSourceType: inputDataSourceType,
     });
     return resp.id;
   }
