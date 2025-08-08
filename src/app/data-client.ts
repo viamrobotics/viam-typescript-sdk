@@ -1100,8 +1100,10 @@ export class DataClient {
    * const fileId = await dataClient.tabularDataCaptureUpload(
    *   [
    *     {
-   *       timestamp: '2025-03-26T10:00:00Z',
-   *       value: 10,
+   *       readings: {
+   *         timestamp: '2025-03-26T10:00:00Z',
+   *         value: 10,
+   *       },
    *     },
    *   ],
    *   '123abc45-1234-5678-90ab-cdef12345678',
