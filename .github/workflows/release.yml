@@ -22,7 +22,7 @@ jobs:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/viamrobotics/canon:amd64
+      image: ghcr.io/viamrobotics/rdk-devenv:amd64
     outputs:
       version: ${{ steps.which_version.outputs.version }}
     steps:
@@ -31,6 +31,8 @@ jobs:
 
       - name: Build + Lint + Test
         run: |
+          sudo apt-get install -y software-properties-common
+          apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
           sudo chown -R testbot .
           sudo -u testbot bash -lc 'make build lint test'
 
