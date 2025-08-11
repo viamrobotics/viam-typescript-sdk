@@ -210,17 +210,18 @@ export class RobotClient extends EventDispatcher implements Robot {
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.debug('Connection closed, will try to reconnect');
+    this.emit(MachineConnectionEvent.DIAL_EVENT, {
+      message: 'Connection closed, attempting to reconnect',
+    });
+
     const backOffOpts: Partial<IBackOffOptions> = {
-      retry: (error, attemptNumber) => {
+      retry: (error: Error, attemptNumber) => {
         // TODO: This ought to check exceptional errors so as to not keep failing forever.
 
-        // eslint-disable-next-line no-console
-        console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff`,
-          error
-        );
+        this.emit(MachineConnectionEvent.DIAL_EVENT, {
+          message: `Failed to connect, attempt ${attemptNumber} with backoff`,
+          error,
+        });
 
         // Always retry the next attempt
         return true;
@@ -234,12 +235,14 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
     void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
-        // eslint-disable-next-line no-console
-        console.debug('Reconnected successfully!');
+        this.emit(MachineConnectionEvent.DIAL_EVENT, {
+          message: 'Reconnected successfully',
+        });
       })
       .catch(() => {
-        // eslint-disable-next-line no-console
-        console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
+        this.emit(MachineConnectionEvent.DIAL_EVENT, {
+          message: `Reached max attempts: ${this.reconnectMaxAttempts}`,
+        });
       });
   }
 
@@ -502,6 +505,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         }
 
         const webRTCConn = await dialWebRTC(
+          this,
           this.webrtcOptions.signalingAddress || this.serviceHost,
           this.webrtcOptions.host,
           opts

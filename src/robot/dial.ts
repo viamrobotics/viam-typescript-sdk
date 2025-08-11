@@ -1,7 +1,11 @@
-import { backOff, type IBackOffOptions } from 'exponential-backoff';
+import { backOff } from 'exponential-backoff';
 import { isCredential } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
-import type { AccessToken, Credential } from '../main';
+import {
+  MachineConnectionEvent,
+  type AccessToken,
+  type Credential,
+} from '../main';
 import { RobotClient } from './client';
 
 /** Options required to dial a robot via gRPC. */
@@ -27,9 +31,6 @@ const isPosInt = (x: number): boolean => {
 const isLocalConnection = (url: string) => url.includes('local');
 
 const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
-  // eslint-disable-next-line no-console
-  console.debug('dialing via gRPC...');
-
   if (!isLocalConnection(conf.host)) {
     throw new Error(
       `cannot dial "${conf.host}" directly, please use a local url instead.`
@@ -48,13 +49,18 @@ const dialDirect = async (conf: DialDirectConf): Promise<RobotClient> => {
   }
   const client = new RobotClient(conf.host, undefined, sessOpts, clientConf);
 
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'dialing via gRPC',
+  });
+
   await client.connect({
     creds: conf.credentials,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
   });
 
-  // eslint-disable-next-line no-console
-  console.debug('connected via gRPC');
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'connected via gRPC',
+  });
 
   return client;
 };
@@ -92,9 +98,6 @@ export interface DialWebRTCConf {
 }
 
 const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
-  // eslint-disable-next-line no-console
-  console.debug('dialing via WebRTC...');
-
   const impliedURL = conf.serviceHost ?? conf.host;
   const { signalingAddress } = conf;
   const iceServers = conf.iceServers ?? [];
@@ -115,14 +118,19 @@ const dialWebRTC = async (conf: DialWebRTCConf): Promise<RobotClient> => {
   }
   const client = new RobotClient(impliedURL, clientConf, sessOpts);
 
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'Dialing via WebRTC.',
+  });
+
   await client.connect({
     priority: conf.priority,
     dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
     creds: conf.credentials,
   });
 
-  // eslint-disable-next-line no-console
-  console.debug('connected via WebRTC');
+  client.emit(MachineConnectionEvent.DIAL_EVENT, {
+    message: 'Connected via WebRTC.',
+  });
 
   return client;
 };
@@ -160,33 +168,28 @@ export const createRobotClient = async (
 ): Promise<RobotClient> => {
   validateDialConf(conf);
 
-  const backOffOpts: Partial<IBackOffOptions> = {
-    retry: (error, attemptNumber) => {
-      // TODO: This ought to check exceptional errors so as to not keep failing forever.
-
-      // eslint-disable-next-line no-console
-      console.debug(
-        `Failed to connect, attempt ${attemptNumber} with backoff`,
-        error
-      );
-
-      // Abort reconnects if the the caller specifies, otherwise retry
-      return !conf.reconnectAbortSignal?.abort;
-    },
-  };
-  if (conf.reconnectMaxWait !== undefined) {
-    backOffOpts.maxDelay = conf.reconnectMaxWait;
-  }
-  if (conf.reconnectMaxAttempts !== undefined) {
-    backOffOpts.numOfAttempts = conf.reconnectMaxAttempts;
-  }
-
   // Try to dial via WebRTC first.
   if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
     try {
-      return conf.noReconnect
+      const client = conf.noReconnect
         ? await dialWebRTC(conf)
-        : await backOff(async () => dialWebRTC(conf), backOffOpts);
+        : await backOff(async () => dialWebRTC(conf), {
+            maxDelay: conf.reconnectMaxWait,
+            numOfAttempts: conf.reconnectMaxAttempts,
+            retry: (error: Error, attemptNumber) => {
+              // TODO: This ought to check exceptional errors so as to not keep failing forever.
+
+              client.emit(MachineConnectionEvent.DIAL_EVENT, {
+                message: `Failed to connect via WebRTC, attempt ${attemptNumber} with backoff.`,
+                error,
+              });
+
+              // Abort reconnects if the the caller specifies, otherwise retry
+              return !conf.reconnectAbortSignal?.abort;
+            },
+          });
+
+      return client;
     } catch {
       // eslint-disable-next-line no-console
       console.debug('Failed to connect via WebRTC');
@@ -195,9 +198,25 @@ export const createRobotClient = async (
 
   if (!conf.reconnectAbortSignal?.abort) {
     try {
-      return conf.noReconnect
+      const client = conf.noReconnect
         ? await dialDirect(conf)
-        : await backOff(async () => dialDirect(conf), backOffOpts);
+        : await backOff(async () => dialDirect(conf), {
+            maxDelay: conf.reconnectMaxWait,
+            numOfAttempts: conf.reconnectMaxAttempts,
+            retry: (error: Error, attemptNumber) => {
+              // TODO: This ought to check exceptional errors so as to not keep failing forever.
+
+              client.emit(MachineConnectionEvent.DIAL_EVENT, {
+                message: `Failed to connect via gRPC, attempt ${attemptNumber} with backoff.`,
+                error,
+              });
+
+              // Abort reconnects if the the caller specifies, otherwise retry
+              return !conf.reconnectAbortSignal?.abort;
+            },
+          });
+
+      return client;
     } catch {
       // eslint-disable-next-line no-console
       console.debug('Failed to connect via gRPC');
