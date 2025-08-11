@@ -36,7 +36,7 @@
   "genericservice": {
     "importName": "GenericServiceClient",
     "func": "doCommand",
-    "args": ["{}"],
+    "args": ["VIAM.Struct.fromJson({})"],
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM",
     "commented": true
@@ -44,7 +44,7 @@
   "genericcomponent": {
     "importName": "GenericComponentClient",
     "func": "doCommand",
-    "args": ["{}"],
+    "args": ["VIAM.Struct.fromJson({})"],
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM",
     "commented": true
