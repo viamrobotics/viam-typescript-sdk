@@ -1087,6 +1087,37 @@ export class DataClient {
   }
 
   /**
+   * Merge multiple datasets into a new dataset.
+   *
+   * @example
+   *
+   * ```ts
+   * const newDatasetId = await dataClient.mergeDatasets(
+   *   ['datasetId1', 'datasetId2'],
+   *   'merged-dataset',
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param datasetIds The IDs of the datasets to merge
+   * @param name The name of the new merged dataset
+   * @param organizationId The ID of the organization the new dataset is being created in
+   * @returns The ID of the newly created merged dataset
+   */
+  async mergeDatasets(
+    datasetIds: string[],
+    name: string,
+    organizationId: string
+  ) {
+    const resp = await this.datasetClient.mergeDatasets({
+      datasetIds,
+      name,
+      organizationId,
+    });
+    return resp.datasetId;
+  }
+
+  /**
    * Uploads the content and metadata for tabular data.
    *
    * Upload tabular data collected on a robot through a specific component (for
