@@ -64,6 +64,8 @@ import {
   ListDatasetsByIDsResponse,
   ListDatasetsByOrganizationIDRequest,
   ListDatasetsByOrganizationIDResponse,
+  MergeDatasetsRequest,
+  MergeDatasetsResponse,
   RenameDatasetRequest,
   RenameDatasetResponse,
 } from '../gen/app/dataset/v1/dataset_pb';
@@ -408,7 +410,10 @@ describe('DataClient tests', () => {
             capReq = req;
             if (!once) {
               once = true;
-              return binDataResponse;
+              const response = new BinaryDataByFilterResponse();
+              response.deletedCount =
+                req.includeInternalData ? BigInt(20) : BigInt(10);
+              return response;
             }
             return new BinaryDataByFilterResponse();
           },
@@ -1333,6 +1338,38 @@ describe('DatasetClient tests', () => {
       expect(set2?.name).toEqual('name2');
       expect(set2?.organizationId).toEqual('orgId2');
       expect(set2?.created).toEqual(dataset2.timeCreated?.toDate());
+    });
+  });
+
+  describe('mergeDatasets tests', () => {
+    let capReq: MergeDatasetsRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DatasetService, {
+          mergeDatasets: (req) => {
+            capReq = req;
+            return new MergeDatasetsResponse({
+              datasetId: 'newDatasetId',
+            });
+          },
+        });
+      });
+    });
+
+    it('merges datasets', async () => {
+      const expectedRequest = new MergeDatasetsRequest({
+        datasetIds: ['datasetId1', 'datasetId2'],
+        name: 'merged-dataset',
+        organizationId: 'orgId',
+      });
+
+      const promise = await subject().mergeDatasets(
+        ['datasetId1', 'datasetId2'],
+        'merged-dataset',
+        'orgId'
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(promise).toEqual('newDatasetId');
     });
   });
 });

@@ -2,6 +2,7 @@ import type { Struct } from '@bufbuild/protobuf';
 import type {
   DistortionParameters,
   IntrinsicParameters,
+  Image,
 } from '../../gen/component/camera/v1/camera_pb';
 import type { Resource } from '../../types';
 import type { Geometry } from '../../gen/common/v1/common_pb';
@@ -61,8 +62,12 @@ export interface Camera extends Resource {
    *
    * @param mimeType - A specific MIME type to request. This is not necessarily
    *   the same type that will be returned.
+   * @returns An object containing the image data as a Uint8Array and its MIME type.
    */
-  getImage: (mimeType?: MimeType, extra?: Struct) => Promise<Uint8Array>;
+  getImage: (
+    mimeType?: MimeType,
+    extra?: Struct
+  ) => Promise<{ image: Uint8Array; mimeType: string }>;
 
   /**
    * Render a frame from a camera to an HTTP response.
@@ -112,4 +117,25 @@ export interface Camera extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/camera/#getproperties).
    */
   getProperties: () => Promise<Properties>;
+
+  /**
+   * Return frames from a camera.
+   *
+   * @example
+   *
+   * ```ts
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const images = await camera.getImages(['sensor1', 'sensor2']);
+   *
+   * for (const img of images) {
+   *   console.log(`Image from ${img.sourceName} with MIME type ${img.mimeType}`);
+   *   // Process img.image (Uint8Array)
+   * }
+   * ```
+   *
+   * @param filterSourceNames - The names of the sensors to retrieve images from. If this is not provided, all images from all sensors will be returned.
+   * @param extra - Additional arguments to the method
+   * @returns An array of images, each containing the image data, MIME type, and source name.
+   */
+  getImages: (filterSourceNames?: string[], extra?: Struct) => Promise<Image[]>;
 }

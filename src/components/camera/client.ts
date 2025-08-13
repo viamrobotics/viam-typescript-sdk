@@ -4,13 +4,15 @@ import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
 import {
   GetImageRequest,
+  GetImagesRequest,
+  GetImagesResponse,
   GetPointCloudRequest,
   RenderFrameRequest,
 } from '../../gen/component/camera/v1/camera_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
-import type { Camera, MimeType } from './camera';
+import type { Camera, Image, MimeType } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
@@ -46,7 +48,7 @@ export class CameraClient implements Camera {
     mimeType: MimeType = '',
     extra = {},
     callOptions = this.callOptions
-  ) {
+  ): Promise<{ image: Uint8Array, mimeType: string }> {
     const request = new GetImageRequest({
       name: this.name,
       mimeType,
@@ -56,7 +58,7 @@ export class CameraClient implements Camera {
     this.options.requestLogger?.(request);
 
     const resp = await this.client.getImage(request, callOptions);
-    return resp.image;
+    return { image: resp.image, mimeType: resp.mimeType };
   }
 
   async renderFrame(
@@ -110,5 +112,41 @@ export class CameraClient implements Camera {
       this.options,
       callOptions
     );
+  }
+
+  /**
+   * Return frames from a camera.
+   *
+   * @example
+   *
+   * ```ts
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const images = await camera.getImages(['sensor1', 'sensor2']);
+   *
+   * for (const img of images) {
+   *   console.log(`Image from ${img.sourceName} with MIME type ${img.mimeType}`);
+   *   // Process img.image (Uint8Array)
+   * }
+   * ```
+   *
+   * @param filterSourceNames - The names of the sensors to retrieve images from. If this is not provided, all images from all sensors will be returned.
+   * @param extra - Additional arguments to the method
+   * @returns An array of images, each containing the image data, MIME type, and source name.
+   */
+  async getImages(
+    filterSourceNames: string[] = [],
+    extra = {},
+    callOptions = this.callOptions
+  ): Promise<Image[]> {
+    const request = new GetImagesRequest({
+      name: this.name,
+      filterSourceNames,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getImages(request, callOptions);
+    return resp.images;
   }
 }
