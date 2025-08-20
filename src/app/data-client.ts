@@ -1238,7 +1238,8 @@ export class DataClient {
     methodName: string,
     fileExtension: string,
     dataRequestTimes: [Date, Date],
-    tags?: string[]
+    tags?: string[],
+    datasetIds?: string[]
   ) {
     const metadata = new UploadMetadata({
       partId,
@@ -1248,6 +1249,7 @@ export class DataClient {
       type: DataType.BINARY_SENSOR,
       tags,
       fileExtension,
+      datasetIds
     });
 
     const sensorData = new SensorData({
