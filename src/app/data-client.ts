@@ -1249,7 +1249,7 @@ export class DataClient {
       type: DataType.BINARY_SENSOR,
       tags,
       fileExtension,
-      datasetIds
+      datasetIds,
     });
 
     const sensorData = new SensorData({
