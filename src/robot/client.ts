@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { type ServiceType } from '@bufbuild/protobuf';
 import {
   createPromiseClient,
@@ -40,12 +39,61 @@ import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
 import SessionManager from './session-manager';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
+import type { AccessToken, Credential } from '../main';
+
+interface ICEServer {
+  urls: string;
+  username?: string;
+  credential?: string;
+}
+
+/** Options required to dial a robot via WebRTC. */
+export interface DialWebRTCConf {
+  host: string;
+  credentials?: Credential | AccessToken;
+  disableSessions?: boolean;
+  noReconnect?: boolean;
+  /** @default 10. */
+  reconnectMaxAttempts?: number;
+
+  /** @default Number.POSITIVE_INFINITY */
+  reconnectMaxWait?: number;
+  reconnectAbortSignal?: { abort: boolean };
+  // WebRTC
+  serviceHost?: string;
+  signalingAddress: string;
+  iceServers?: ICEServer[];
+  priority?: number;
+
+  /**
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   */
+  dialTimeout?: number;
+}
+
+/** Options required to dial a robot via gRPC. */
+export interface DialDirectConf {
+  host: string;
+  credentials?: Credential | AccessToken;
+  disableSessions?: boolean;
+  noReconnect?: boolean;
+  reconnectMaxAttempts?: number;
+  reconnectMaxWait?: number;
+  reconnectAbortSignal?: { abort: boolean };
+  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
+  // and a value of 0 would disable the timeout.
+  dialTimeout?: number;
+}
+
+/** Options required to dial a robot. */
+export type DialConf = DialDirectConf | DialWebRTCConf;
 
 interface WebRTCOptions {
   enabled: boolean;
   host: string;
   signalingAddress: string;
-  rtcConfig: RTCConfiguration | undefined;
+  rtcConfig: RTCConfiguration;
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
@@ -70,16 +118,70 @@ export interface ConnectOptions {
   dialTimeout?: number;
 }
 
+export const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
+  const conf = value as DialWebRTCConf;
+
+  if (typeof conf.signalingAddress !== 'string') {
+    return false;
+  }
+
+  return !conf.iceServers || Array.isArray(conf.iceServers);
+};
+
+const isPosInt = (x: number): boolean => {
+  return x > 0 && Number.isInteger(x);
+};
+
+/**
+ * Validates a DialConf passed to createRobotClient. Throws an error for invalid
+ * configs.
+ */
+export const validateDialConf = (conf: DialConf) => {
+  if (conf.credentials && isCredential(conf.credentials)) {
+    try {
+      conf.credentials.authEntity = new URL(conf.credentials.authEntity).host;
+    } catch (error) {
+      if (!(error instanceof TypeError)) {
+        throw error;
+      }
+    }
+  }
+
+  if (
+    conf.reconnectMaxAttempts !== undefined &&
+    !isPosInt(conf.reconnectMaxAttempts)
+  ) {
+    throw new Error(
+      `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
+    );
+  }
+
+  if (conf.reconnectMaxWait !== undefined && !isPosInt(conf.reconnectMaxWait)) {
+    throw new Error(
+      `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
+    );
+  }
+};
+
 /**
  * A gRPC-web client for a Robot.
  *
  * @group Clients
  */
 export class RobotClient extends EventDispatcher implements Robot {
-  private readonly serviceHost: string;
-  private readonly webrtcOptions: WebRTCOptions | undefined;
-  private readonly directOptions: DirectOptions | undefined;
-  private readonly sessionOptions: SessionOptions | undefined;
+  private serviceHost = '';
+
+  private readonly webrtcOptions: WebRTCOptions = {
+    enabled: false,
+    host: '',
+    signalingAddress: '',
+    rtcConfig: {},
+  };
+
+  private readonly directOptions: DirectOptions = {};
+
+  private readonly sessionOptions: SessionOptions = { disabled: false };
+
   private gRPCConnectionManager: GRPCConnectionManager;
   private sessionManager: SessionManager;
 
@@ -152,16 +254,29 @@ export class RobotClient extends EventDispatcher implements Robot {
   private slamServiceClient: PromiseClient<typeof SLAMService> | undefined;
 
   constructor(
-    serviceHost: string,
+    serviceHost?: string,
     webrtcOptions?: WebRTCOptions,
     sessionOptions?: SessionOptions,
     directOptions?: DirectOptions
   ) {
     super();
-    this.serviceHost = serviceHost;
-    this.webrtcOptions = webrtcOptions;
-    this.directOptions = directOptions;
-    this.sessionOptions = sessionOptions;
+
+    if (serviceHost !== undefined) {
+      this.serviceHost = serviceHost;
+    }
+
+    if (webrtcOptions) {
+      this.webrtcOptions = webrtcOptions;
+    }
+
+    if (directOptions) {
+      this.directOptions = directOptions;
+    }
+
+    if (sessionOptions) {
+      this.sessionOptions = sessionOptions;
+    }
+
     this.gRPCConnectionManager = new GRPCConnectionManager(
       (): Transport => {
         if (!this.transport) {
@@ -226,12 +341,15 @@ export class RobotClient extends EventDispatcher implements Robot {
         return true;
       },
     };
+
     if (this.reconnectMaxWait !== undefined) {
       backOffOpts.maxDelay = this.reconnectMaxWait;
     }
+
     if (this.reconnectMaxAttempts !== undefined) {
       backOffOpts.numOfAttempts = this.reconnectMaxAttempts;
     }
+
     void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
         // eslint-disable-next-line no-console
@@ -244,20 +362,19 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private get noReconnect() {
-    return this.webrtcOptions?.noReconnect ?? this.directOptions?.noReconnect;
+    return this.webrtcOptions.noReconnect ?? this.directOptions.noReconnect;
   }
 
   private get reconnectMaxAttempts() {
     return (
-      this.webrtcOptions?.reconnectMaxAttempts ??
-      this.directOptions?.reconnectMaxAttempts
+      this.webrtcOptions.reconnectMaxAttempts ??
+      this.directOptions.reconnectMaxAttempts
     );
   }
 
   private get reconnectMaxWait() {
     return (
-      this.webrtcOptions?.reconnectMaxWait ??
-      this.directOptions?.reconnectMaxWait
+      this.webrtcOptions.reconnectMaxWait ?? this.directOptions.reconnectMaxWait
     );
   }
 
@@ -401,7 +518,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   createServiceClient<T extends ServiceType>(svcType: T): PromiseClient<T> {
-    const clientTransport = this.sessionOptions?.disabled
+    const clientTransport = this.sessionOptions.disabled
       ? this.transport
       : this.sessionManager.transport;
 
@@ -417,6 +534,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   public async disconnect() {
     this.emit(MachineConnectionEvent.DISCONNECTING, {});
+
     while (this.connecting) {
       // eslint-disable-next-line no-await-in-loop
       await this.connecting;
@@ -433,6 +551,110 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   public isConnected(): boolean {
     return this.peerConn?.iceConnectionState === 'connected';
+  }
+
+  public async dialWebRTC(conf: DialWebRTCConf) {
+    this.emit('dialing', { method: 'webrtc' });
+
+    this.serviceHost = conf.serviceHost ?? conf.host;
+
+    this.webrtcOptions.enabled = true;
+    this.webrtcOptions.host = conf.host;
+    this.webrtcOptions.signalingAddress = conf.signalingAddress;
+    this.webrtcOptions.rtcConfig.iceServers = conf.iceServers ?? [];
+    this.webrtcOptions.noReconnect = conf.noReconnect;
+    this.webrtcOptions.reconnectMaxWait = conf.reconnectMaxWait;
+    this.webrtcOptions.reconnectMaxAttempts = conf.reconnectMaxAttempts;
+
+    this.sessionOptions.disabled = conf.disableSessions ?? false;
+
+    await this.connect({
+      priority: conf.priority,
+      dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
+      creds: conf.credentials,
+    });
+
+    return this;
+  }
+
+  public async dialDirect(conf: DialDirectConf) {
+    this.emit('dialing', { method: 'grpc' });
+
+    /** Check if a url corresponds to a local connection via heuristic */
+    if (!conf.host.includes('local')) {
+      throw new Error(
+        `cannot dial "${conf.host}" directly, please use a local url instead.`
+      );
+    }
+
+    this.serviceHost = conf.host;
+
+    this.webrtcOptions.enabled = false;
+
+    this.directOptions.noReconnect = conf.noReconnect;
+    this.directOptions.reconnectMaxWait = conf.reconnectMaxWait;
+    this.directOptions.reconnectMaxAttempts = conf.reconnectMaxAttempts;
+
+    this.sessionOptions.disabled = conf.disableSessions ?? false;
+
+    await this.connect({
+      creds: conf.credentials,
+      dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
+    });
+
+    return this;
+  }
+
+  public async dial(conf: DialConf) {
+    validateDialConf(conf);
+
+    const backOffOpts: Partial<IBackOffOptions> = {
+      retry: (error, attemptNumber) => {
+        // TODO: This ought to check exceptional errors so as to not keep failing forever.
+
+        // eslint-disable-next-line no-console
+        console.debug(
+          `Failed to connect, attempt ${attemptNumber} with backoff`,
+          error
+        );
+
+        // Abort reconnects if the the caller specifies, otherwise retry
+        return !conf.reconnectAbortSignal?.abort;
+      },
+    };
+
+    if (conf.reconnectMaxWait !== undefined) {
+      backOffOpts.maxDelay = conf.reconnectMaxWait;
+    }
+
+    if (conf.reconnectMaxAttempts !== undefined) {
+      backOffOpts.numOfAttempts = conf.reconnectMaxAttempts;
+    }
+
+    // Try to dial via WebRTC first.
+    if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
+      try {
+        return conf.noReconnect
+          ? await this.dialWebRTC(conf)
+          : await backOff(async () => this.dialWebRTC(conf), backOffOpts);
+      } catch {
+        // eslint-disable-next-line no-console
+        console.debug('Failed to connect via WebRTC');
+      }
+    }
+
+    if (!conf.reconnectAbortSignal?.abort) {
+      try {
+        return conf.noReconnect
+          ? await this.dialDirect(conf)
+          : await backOff(async () => this.dialDirect(conf), backOffOpts);
+      } catch {
+        // eslint-disable-next-line no-console
+        console.debug('Failed to connect via gRPC');
+      }
+    }
+
+    return this;
   }
 
   // TODO(RSDK-7672): refactor due to cognitive complexity
@@ -473,7 +695,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       const opts: DialOptions = {
         webrtcOptions: {
           disableTrickleICE: false,
-          rtcConfig: this.webrtcOptions?.rtcConfig,
+          rtcConfig: this.webrtcOptions.rtcConfig,
         },
         dialTimeout: dialTimeout ?? DIAL_TIMEOUT,
         extraHeaders: clientHeaders,
@@ -559,7 +781,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         await this.gRPCConnectionManager.start();
       }
 
-      const clientTransport = this.sessionOptions?.disabled
+      const clientTransport = this.sessionOptions.disabled
         ? this.transport
         : this.sessionManager.transport;
 

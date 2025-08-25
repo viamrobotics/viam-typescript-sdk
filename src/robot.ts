@@ -1,8 +1,8 @@
-export { RobotClient } from './robot/client';
 export {
-  createRobotClient,
+  RobotClient,
   type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
-} from './robot/dial';
+} from './robot/client';
+export { createRobotClient } from './robot/dial';
 export type { CloudMetadata, Robot } from './robot/robot';

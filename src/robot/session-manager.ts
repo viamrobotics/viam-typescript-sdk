@@ -53,10 +53,10 @@ export default class SessionManager {
   }
 
   constructor(
-    host: string,
+    host: string | undefined,
     private deferredTransport: () => Transport
   ) {
-    this.host = host;
+    this.host = host ?? '';
     this.transport = new SessionTransport(this.deferredTransport, this);
   }
 
