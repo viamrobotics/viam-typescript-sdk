@@ -604,6 +604,7 @@ export class DataClient {
    * @param tags The tags to add to the data
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
+   * @deprecated
    */
   async addTagsToBinaryDataByFilter(tags: string[], filter?: Filter) {
     await this.dataClient.addTagsToBinaryDataByFilter({
@@ -679,6 +680,7 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying binary data to add tags to.
    *   No `filter` implies all binary data.
    * @returns The number of items deleted
+   * @deprecated
    */
   async removeTagsFromBinaryDataByFilter(tags: string[], filter?: Filter) {
     const resp = await this.dataClient.removeTagsFromBinaryDataByFilter({
@@ -705,6 +707,7 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying what data to get tags from.
    *   No `filter` implies all data.
    * @returns The list of tags
+   * @deprecated
    */
   async tagsByFilter(filter?: Filter) {
     const resp = await this.dataClient.tagsByFilter({ filter });
@@ -826,6 +829,7 @@ export class DataClient {
    * @param filter Optional `pb.Filter` specifying what data to get tags from.
    *   No `filter` implies all labels.
    * @returns The list of bounding box labels
+   * @deprecated
    */
   async boundingBoxLabelsByFilter(filter?: Filter) {
     const resp = await this.dataClient.boundingBoxLabelsByFilter({

@@ -1,11 +1,15 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { DataManagerService } from '../../gen/service/datamanager/v1/data_manager_connect.js';
-import { SyncRequest } from '../../gen/service/datamanager/v1/data_manager_pb.js';
+import {
+  SyncRequest,
+  UploadBinaryDataToDatasetsRequest,
+} from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { DataManager } from './data-manager';
+import { MimeType } from '../../app/datasync/v1/data_sync_pb.js';
 
 export class DataManagerClient implements DataManager {
   private client: PromiseClient<typeof DataManagerService>;
@@ -79,5 +83,56 @@ export class DataManagerClient implements DataManager {
       this.options,
       callOptions
     );
+  }
+
+  /**
+   * Uploads binary data to specified datasets.
+   *
+   * @example
+   *
+   * ```ts
+   * const dataManager = new VIAM.DataManagerClient(
+   *   machine,
+   *   'my_data_manager'
+   * );
+   * const binaryData = new Uint8Array([1, 2, 3]);
+   * const tags = ['tag1', 'tag2'];
+   * const datasetIds = ['dataset1', 'dataset2'];
+   * const mimeType = MimeType.MIME_TYPE_JPEG;
+   * await dataManager.uploadBinaryDataToDatasets(
+   *   binaryData,
+   *   tags,
+   *   datasetIds,
+   *   mimeType
+   * );
+   * ```
+   *
+   * @param binaryData - The binary data to upload.
+   * @param tags - Tags to associate with the binary data.
+   * @param datasetIds - IDs of the datasets to upload the data to.
+   * @param mimeType - The MIME type of the binary data.
+   * @param extra - Additional arguments to pass to the method.
+   * @param callOptions - Call options for the request.
+   */
+  async uploadBinaryDataToDatasets(
+    binaryData: Uint8Array,
+    tags: string[],
+    datasetIds: string[],
+    mimeType: MimeType,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
+    const request = new UploadBinaryDataToDatasetsRequest({
+      name: this.name,
+      binaryData,
+      tags,
+      datasetIds,
+      mimeType,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    await this.client.uploadBinaryDataToDatasets(request, callOptions);
   }
 }

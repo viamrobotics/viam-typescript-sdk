@@ -72,6 +72,7 @@ import {
   DataCaptureUploadRequest,
   DataCaptureUploadResponse,
   DataType,
+  MimeType,
   SensorData,
   SensorMetadata,
   UploadMetadata,
@@ -93,10 +94,19 @@ import {
   ListDataPipelineRunsResponse,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+import { DataManagerService } from '../gen/service/datamanager/v1/data_manager_connect';
+import {
+  UploadBinaryDataToDatasetsRequest,
+  UploadBinaryDataToDatasetsResponse,
+} from '../gen/service/datamanager/v1/data_manager_pb';
+import { DataManagerClient } from '../services/data-manager/client';
+
 vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
 const subject = () => new DataClient(mockTransport);
+const dataManagerSubject = () =>
+  new DataManagerClient({} as any, 'data_manager', {}); // Mock RobotClient
 
 describe('DataClient tests', () => {
   const filter = subject().createFilter({
@@ -1713,6 +1723,49 @@ describe('DataPipelineClient tests', () => {
       const page = await subject().listDataPipelineRuns(pipelineId, pageSize);
       const nextPage = await page.nextPage();
       expect(nextPage.runs).toEqual([]);
+    });
+  });
+});
+
+describe('DataManagerClient tests', () => {
+  const name = 'data_manager';
+  const binaryData = new Uint8Array([1, 2, 3]);
+  const tags = ['tag1', 'tag2'];
+  const datasetIds = ['dataset1', 'dataset2'];
+  const mimeType = MimeType.MIME_TYPE_JPEG;
+  const extra = { key: 'value' };
+
+  describe('uploadBinaryDataToDatasets', () => {
+    let capReq: UploadBinaryDataToDatasetsRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataManagerService, {
+          uploadBinaryDataToDatasets: (req) => {
+            capReq = req;
+            return new UploadBinaryDataToDatasetsResponse();
+          },
+        });
+      });
+    });
+
+    it('uploads binary data to datasets', async () => {
+      const expectedRequest = new UploadBinaryDataToDatasetsRequest({
+        name,
+        binaryData,
+        tags,
+        datasetIds,
+        mimeType,
+        extra: Struct.fromJson(extra),
+      });
+
+      await dataManagerSubject().uploadBinaryDataToDatasets(
+        binaryData,
+        tags,
+        datasetIds,
+        mimeType,
+        extra
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
     });
   });
 });
