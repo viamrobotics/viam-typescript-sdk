@@ -253,6 +253,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private slamServiceClient: PromiseClient<typeof SLAMService> | undefined;
 
+  private currentRetryAttempt = 0;
+
   constructor(
     serviceHost?: string,
     webrtcOptions?: WebRTCOptions,
@@ -337,6 +339,8 @@ export class RobotClient extends EventDispatcher implements Robot {
           error
         );
 
+        this.currentRetryAttempt = attemptNumber;
+
         // Always retry the next attempt
         return true;
       },
@@ -349,6 +353,8 @@ export class RobotClient extends EventDispatcher implements Robot {
     if (this.reconnectMaxAttempts !== undefined) {
       backOffOpts.numOfAttempts = this.reconnectMaxAttempts;
     }
+
+    this.currentRetryAttempt = 0;
 
     void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
@@ -554,7 +560,10 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async dialWebRTC(conf: DialWebRTCConf) {
-    this.emit('dialing', { method: 'webrtc' });
+    this.emit('dialing', {
+      method: 'webrtc',
+      attempt: this.currentRetryAttempt,
+    });
 
     this.serviceHost = conf.serviceHost ?? conf.host;
 
@@ -578,7 +587,10 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async dialDirect(conf: DialDirectConf) {
-    this.emit('dialing', { method: 'grpc' });
+    this.emit('dialing', {
+      method: 'grpc',
+      attempt: this.currentRetryAttempt,
+    });
 
     /** Check if a url corresponds to a local connection via heuristic */
     if (!conf.host.includes('local')) {
@@ -618,6 +630,8 @@ export class RobotClient extends EventDispatcher implements Robot {
           error
         );
 
+        this.currentRetryAttempt = attemptNumber;
+
         // Abort reconnects if the the caller specifies, otherwise retry
         return !conf.reconnectAbortSignal?.abort;
       },
@@ -627,27 +641,27 @@ export class RobotClient extends EventDispatcher implements Robot {
       backOffOpts.maxDelay = conf.reconnectMaxWait;
     }
 
-    if (conf.reconnectMaxAttempts !== undefined) {
-      backOffOpts.numOfAttempts = conf.reconnectMaxAttempts;
-    }
+    backOffOpts.numOfAttempts = conf.noReconnect
+      ? 1
+      : conf.reconnectMaxAttempts;
+
+    this.currentRetryAttempt = 0;
 
     // Try to dial via WebRTC first.
     if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
       try {
-        return conf.noReconnect
-          ? await this.dialWebRTC(conf)
-          : await backOff(async () => this.dialWebRTC(conf), backOffOpts);
+        return await backOff(async () => this.dialWebRTC(conf), backOffOpts);
       } catch {
         // eslint-disable-next-line no-console
         console.debug('Failed to connect via WebRTC');
       }
     }
 
+    this.currentRetryAttempt = 0;
+
     if (!conf.reconnectAbortSignal?.abort) {
       try {
-        return conf.noReconnect
-          ? await this.dialDirect(conf)
-          : await backOff(async () => this.dialDirect(conf), backOffOpts);
+        return await backOff(async () => this.dialDirect(conf), backOffOpts);
       } catch {
         // eslint-disable-next-line no-console
         console.debug('Failed to connect via gRPC');
@@ -717,7 +731,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       // Save creds
       this.savedCreds = creds;
 
-      if (this.webrtcOptions?.enabled) {
+      if (this.webrtcOptions.enabled) {
         // This should not have to be checked but tsc can't tell the difference...
         if (opts.webrtcOptions) {
           opts.webrtcOptions.signalingCredentials = opts.credentials;
