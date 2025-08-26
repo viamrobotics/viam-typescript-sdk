@@ -566,6 +566,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     });
 
     this.serviceHost = conf.serviceHost ?? conf.host;
+    this.sessionManager.setHost(this.serviceHost);
 
     this.webrtcOptions.enabled = true;
     this.webrtcOptions.host = conf.host;
@@ -600,6 +601,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     this.serviceHost = conf.host;
+    this.sessionManager.setHost(this.serviceHost);
 
     this.webrtcOptions.enabled = false;
 

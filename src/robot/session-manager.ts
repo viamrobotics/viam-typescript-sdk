@@ -64,6 +64,10 @@ export default class SessionManager {
     return this.currentSessionID;
   }
 
+  public setHost(host: string) {
+    this.host = host;
+  }
+
   private getSessionMetadataInner(): Headers {
     const md = new Headers();
     if (this.sessionsSupported && this.currentSessionID !== '') {
