@@ -6,6 +6,7 @@ export type CollisionSpecification =
 export type Constraints = PlainMessage<motionApi.Constraints>;
 export type GetPlanResponse = motionApi.GetPlanResponse;
 export type LinearConstraint = PlainMessage<motionApi.LinearConstraint>;
+export type PseudolinearConstraint = PlainMessage<motionApi.PseudolinearConstraint>;
 export type ListPlanStatusesResponse = motionApi.ListPlanStatusesResponse;
 export type MotionConfiguration = PlainMessage<motionApi.MotionConfiguration>;
 export type ObstacleDetector = PlainMessage<motionApi.ObstacleDetector>;
@@ -18,6 +19,7 @@ export const {
   Constraints,
   GetPlanResponse,
   LinearConstraint,
+  PseudolinearConstraint,
   ListPlanStatusesResponse,
   MotionConfiguration,
   ObstacleDetector,

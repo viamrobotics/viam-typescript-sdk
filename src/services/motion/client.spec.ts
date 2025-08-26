@@ -18,9 +18,10 @@ import {
   ListPlanStatusesRequest,
   MoveOnGlobeRequest,
   MoveOnGlobeResponse,
+  MoveRequest,
   StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
-import { GeoGeometry, GeoPoint, ResourceName } from '../../types';
+import { GeoGeometry, GeoPoint, Pose, PoseInFrame, ResourceName } from '../../types';
 import { MotionClient } from './client';
 import {
   GetPlanResponse,
@@ -29,6 +30,7 @@ import {
   ObstacleDetector,
   PlanState,
 } from './types';
+import { Constraints, PseudolinearConstraint } from './types';
 
 const motionClientName = 'test-motion';
 const date = new Date(1970, 1, 1, 1, 1, 1);
@@ -260,6 +262,66 @@ describe('moveOnGlobe', () => {
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
 
     expect(executionId).toHaveBeenCalledOnce();
+  });
+});
+
+describe('move', () => {
+  it('sends a move request with pseudolinear constraints', async () => {
+    const expectedComponentName = new ResourceName({
+      namespace: 'viam',
+      type: 'component',
+      subtype: 'base',
+      name: 'myBase',
+    });
+    const expectedDestination: PoseInFrame = {
+      referenceFrame: 'world',
+      pose: {
+        x: 1,
+        y: 2,
+        z: 3,
+        oX: 0,
+        oY: 0,
+        oZ: 1,
+        theta: 90,
+      },
+    };
+    const expectedPseudolinearConstraint = new PseudolinearConstraint({
+      lineToleranceFactor: 0.5,
+      orientationToleranceFactor: 0.1,
+    });
+    const expectedConstraints: Constraints = {
+      pseudolinearConstraint: [expectedPseudolinearConstraint],
+    };
+    const expectedExtra = { some: 'extra' };
+    let capturedReq: MoveRequest | undefined;
+    const mockTransport = createRouterTransport(({ service }) => {
+      service(MotionService, {
+        move: (req) => {
+          capturedReq = req;
+          return { success: true };
+        },
+      });
+    });
+    RobotClient.prototype.createServiceClient = vi
+      .fn()
+      .mockImplementation(() =>
+        createPromiseClient(MotionService, mockTransport)
+      );
+    motion = new MotionClient(new RobotClient('host'), motionClientName);
+    await expect(
+      motion.move(
+        expectedDestination,
+        expectedComponentName,
+        undefined, // worldState
+        expectedConstraints,
+        expectedExtra
+      )
+    ).resolves.toStrictEqual(true);
+    expect(capturedReq?.name).toStrictEqual(motionClientName);
+    expect(capturedReq?.destination).toStrictEqual(expectedDestination);
+    expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
+    expect(capturedReq?.constraints).toStrictEqual(expectedConstraints);
+    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
   });
 });
 
