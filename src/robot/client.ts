@@ -559,7 +559,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.peerConn?.iceConnectionState === 'connected';
   }
 
-  public async dialWebRTC(conf: DialWebRTCConf) {
+  private async dialWebRTC(conf: DialWebRTCConf) {
     this.emit('dialing', {
       method: 'webrtc',
       attempt: this.currentRetryAttempt,
@@ -586,7 +586,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this;
   }
 
-  public async dialDirect(conf: DialDirectConf) {
+  private async dialDirect(conf: DialDirectConf) {
     this.emit('dialing', {
       method: 'grpc',
       attempt: this.currentRetryAttempt,
