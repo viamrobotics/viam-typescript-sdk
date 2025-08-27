@@ -121,8 +121,7 @@ export interface Robot {
    * specified destination which is a reference frame.
    *
    * @param pointCloudPCD - The point clouds to transform. This should be in the
-   *   PCD format encoded into bytes:
-   *   https://pointclouds.org/documentation/tutorials/pcd_file_format.html
+   *   {@link https://pointclouds.org/documentation/tutorials/pcd_file_format.html PCD format encoded into bytes}
    * @param source - The reference frame of the point cloud.
    * @param destination - The reference frame into which the source data should
    *   be transformed, if unset this defaults to the "world" reference frame. Do
