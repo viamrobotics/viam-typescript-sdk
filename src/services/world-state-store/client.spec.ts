@@ -13,6 +13,7 @@ import { RobotClient } from '../../robot';
 import { WorldStateStoreClient } from './client';
 import { TransformChangeType } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import { Transform, PoseInFrame, Pose } from '../../gen/common/v1/common_pb';
+import { transformWithUUID, uuidToString } from './world-state-store';
 
 vi.mock('../../robot');
 
@@ -75,7 +76,7 @@ describe('WorldStateStoreClient Tests', () => {
 
   describe('listUUIDs', () => {
     it('returns all transform UUIDs', async () => {
-      const expected = mockUuids;
+      const expected = mockUuids.map((uuid) => uuidToString(uuid));
 
       await expect(worldStateStore.listUUIDs()).resolves.toStrictEqual(
         expected
@@ -106,12 +107,12 @@ describe('WorldStateStoreClient Tests', () => {
       expect(results).toHaveLength(2);
       expect(results[0]).toEqual({
         changeType: TransformChangeType.ADDED,
-        transform: mockTransform,
+        transform: transformWithUUID(mockTransform),
         updatedFields: undefined,
       });
       expect(results[1]).toEqual({
         changeType: TransformChangeType.UPDATED,
-        transform: mockTransform,
+        transform: transformWithUUID(mockTransform),
         updatedFields: { paths: ['pose_in_observer_frame'] },
       });
     });
