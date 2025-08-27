@@ -1,9 +1,5 @@
 import { type ServiceType } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  type PromiseClient,
-  type Transport,
-} from '@connectrpc/connect';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
@@ -40,6 +36,7 @@ import type { Robot } from './robot';
 import SessionManager from './session-manager';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
+import { assertExists } from '../assert';
 
 interface ICEServer {
   urls: string;
@@ -197,61 +194,49 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private closed: boolean;
 
-  private robotServiceClient: PromiseClient<typeof RobotService> | undefined;
+  private robotServiceClient: Client<typeof RobotService> | undefined;
 
-  private armServiceClient: PromiseClient<typeof ArmService> | undefined;
+  private armServiceClient: Client<typeof ArmService> | undefined;
 
-  private baseServiceClient: PromiseClient<typeof BaseService> | undefined;
+  private baseServiceClient: Client<typeof BaseService> | undefined;
 
-  private boardServiceClient: PromiseClient<typeof BoardService> | undefined;
+  private boardServiceClient: Client<typeof BoardService> | undefined;
 
-  private encoderServiceClient:
-    | PromiseClient<typeof EncoderService>
-    | undefined;
+  private encoderServiceClient: Client<typeof EncoderService> | undefined;
 
-  private gantryServiceClient: PromiseClient<typeof GantryService> | undefined;
+  private gantryServiceClient: Client<typeof GantryService> | undefined;
 
-  private genericServiceClient:
-    | PromiseClient<typeof GenericService>
-    | undefined;
+  private genericServiceClient: Client<typeof GenericService> | undefined;
 
-  private gripperServiceClient:
-    | PromiseClient<typeof GripperService>
-    | undefined;
+  private gripperServiceClient: Client<typeof GripperService> | undefined;
 
-  private mlModelServiceClient:
-    | PromiseClient<typeof MLModelService>
-    | undefined;
+  private mlModelServiceClient: Client<typeof MLModelService> | undefined;
 
   private movementSensorServiceClient:
-    | PromiseClient<typeof MovementSensorService>
+    | Client<typeof MovementSensorService>
     | undefined;
 
   private powerSensorServiceClient:
-    | PromiseClient<typeof PowerSensorService>
+    | Client<typeof PowerSensorService>
     | undefined;
 
   private inputControllerServiceClient:
-    | PromiseClient<typeof InputControllerService>
+    | Client<typeof InputControllerService>
     | undefined;
 
-  private motorServiceClient: PromiseClient<typeof MotorService> | undefined;
+  private motorServiceClient: Client<typeof MotorService> | undefined;
 
-  private navigationServiceClient:
-    | PromiseClient<typeof NavigationService>
-    | undefined;
+  private navigationServiceClient: Client<typeof NavigationService> | undefined;
 
-  private discoveryServiceClient:
-    | PromiseClient<typeof DiscoveryService>
-    | undefined;
+  private discoveryServiceClient: Client<typeof DiscoveryService> | undefined;
 
-  private motionServiceClient: PromiseClient<typeof MotionService> | undefined;
+  private motionServiceClient: Client<typeof MotionService> | undefined;
 
-  private visionServiceClient: PromiseClient<typeof VisionService> | undefined;
+  private visionServiceClient: Client<typeof VisionService> | undefined;
 
-  private servoServiceClient: PromiseClient<typeof ServoService> | undefined;
+  private servoServiceClient: Client<typeof ServoService> | undefined;
 
-  private slamServiceClient: PromiseClient<typeof SLAMService> | undefined;
+  private slamServiceClient: Client<typeof SLAMService> | undefined;
 
   private currentRetryAttempt = 0;
 
@@ -398,165 +383,171 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   get armService() {
-    if (!this.armServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.armServiceClient ??= createClient(ArmService, this.clientTransport);
     return this.armServiceClient;
   }
 
   get baseService() {
-    if (!this.baseServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.baseServiceClient ??= createClient(BaseService, this.clientTransport);
     return this.baseServiceClient;
   }
 
   get boardService() {
-    if (!this.boardServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.boardServiceClient ??= createClient(
+      BoardService,
+      this.clientTransport
+    );
     return this.boardServiceClient;
   }
 
   get encoderService() {
-    if (!this.encoderServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.encoderServiceClient ??= createClient(
+      EncoderService,
+      this.clientTransport
+    );
     return this.encoderServiceClient;
   }
 
   get gantryService() {
-    if (!this.gantryServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.gantryServiceClient ??= createClient(
+      GantryService,
+      this.clientTransport
+    );
     return this.gantryServiceClient;
   }
 
   get genericService() {
-    if (!this.genericServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.genericServiceClient ??= createClient(
+      GenericService,
+      this.clientTransport
+    );
     return this.genericServiceClient;
   }
 
   get gripperService() {
-    if (!this.gripperServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.gripperServiceClient ??= createClient(
+      GripperService,
+      this.clientTransport
+    );
     return this.gripperServiceClient;
   }
 
   get mlModelService() {
-    if (!this.mlModelServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.mlModelServiceClient ??= createClient(
+      MLModelService,
+      this.clientTransport
+    );
     return this.mlModelServiceClient;
   }
 
   get movementSensorService() {
-    if (!this.movementSensorServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.movementSensorServiceClient ??= createClient(
+      MovementSensorService,
+      this.clientTransport
+    );
     return this.movementSensorServiceClient;
   }
 
   get powerSensorService() {
-    if (!this.powerSensorServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.powerSensorServiceClient ??= createClient(
+      PowerSensorService,
+      this.clientTransport
+    );
     return this.powerSensorServiceClient;
   }
 
   get inputControllerService() {
-    if (!this.inputControllerServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.inputControllerServiceClient ??= createClient(
+      InputControllerService,
+      this.clientTransport
+    );
     return this.inputControllerServiceClient;
   }
 
   get motorService() {
-    if (!this.motorServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.motorServiceClient ??= createClient(
+      MotorService,
+      this.clientTransport
+    );
     return this.motorServiceClient;
   }
 
   get navigationService() {
-    if (!this.navigationServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.navigationServiceClient ??= createClient(
+      NavigationService,
+      this.clientTransport
+    );
     return this.navigationServiceClient;
   }
 
   get discoveryService() {
-    if (!this.discoveryServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.discoveryServiceClient ??= createClient(
+      DiscoveryService,
+      this.clientTransport
+    );
     return this.discoveryServiceClient;
   }
 
   get motionService() {
-    if (!this.motionServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.motionServiceClient ??= createClient(
+      MotionService,
+      this.clientTransport
+    );
     return this.motionServiceClient;
   }
 
   get visionService() {
-    if (!this.visionServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.visionServiceClient ??= createClient(
+      VisionService,
+      this.clientTransport
+    );
     return this.visionServiceClient;
   }
 
   get servoService() {
-    if (!this.servoServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.servoServiceClient ??= createClient(
+      ServoService,
+      this.clientTransport
+    );
     return this.servoServiceClient;
   }
 
   get slamService() {
-    if (!this.slamServiceClient) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    this.slamServiceClient ??= createClient(SLAMService, this.clientTransport);
     return this.slamServiceClient;
   }
 
-  createServiceClient<T extends ServiceType>(svcType: T): PromiseClient<T> {
-    const clientTransport = this.sessionOptions.disabled
-      ? this.transport
-      : this.sessionManager.transport;
-
-    if (!clientTransport) {
-      throw new Error(RobotClient.notConnectedYetStr);
-    }
-    return createPromiseClient(svcType, clientTransport);
+  createServiceClient<T extends ServiceType>(svcType: T): Client<T> {
+    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
+    return createClient(svcType, this.clientTransport);
   }
 
   get peerConnection() {
     return this.peerConn;
   }
 
-  public async disconnect() {
-    this.emit(MachineConnectionEvent.DISCONNECTING, {});
-
-    while (this.connecting) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.connecting;
-    }
-
-    if (this.peerConn) {
-      this.peerConn.close();
-      this.peerConn = undefined;
-    }
-    this.sessionManager.reset();
-    this.closed = true;
-    this.emit(MachineConnectionEvent.DISCONNECTED, {});
-  }
-
-  public isConnected(): boolean {
-    return this.peerConn?.iceConnectionState === 'connected';
+  private get clientTransport() {
+    return this.sessionOptions.disabled
+      ? this.transport
+      : this.sessionManager.transport;
   }
 
   private async dialWebRTC(conf: DialWebRTCConf) {
@@ -673,6 +664,27 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this;
   }
 
+  public async disconnect() {
+    this.emit(MachineConnectionEvent.DISCONNECTING, {});
+
+    while (this.connecting) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.connecting;
+    }
+
+    if (this.peerConn) {
+      this.peerConn.close();
+      this.peerConn = undefined;
+    }
+    this.sessionManager.reset();
+    this.closed = true;
+    this.emit(MachineConnectionEvent.DISCONNECTED, {});
+  }
+
+  public isConnected(): boolean {
+    return this.peerConn?.iceConnectionState === 'connected';
+  }
+
   // TODO(RSDK-7672): refactor due to cognitive complexity
   // eslint-disable-next-line sonarjs/cognitive-complexity
   public async connect({
@@ -692,6 +704,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       }
       return;
     }
+
     this.connecting = new Promise<void>((resolve) => {
       this.connectResolve = resolve;
     });
@@ -801,81 +814,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         ? this.transport
         : this.sessionManager.transport;
 
-      this.robotServiceClient = createPromiseClient(
-        RobotService,
-        clientTransport
-      );
-      // eslint-disable-next-line no-warning-comments
-      // TODO(RSDK-144): these should be created as needed
-      this.armServiceClient = createPromiseClient(ArmService, clientTransport);
-      this.baseServiceClient = createPromiseClient(
-        BaseService,
-        clientTransport
-      );
-      this.boardServiceClient = createPromiseClient(
-        BoardService,
-        clientTransport
-      );
-      this.encoderServiceClient = createPromiseClient(
-        EncoderService,
-        clientTransport
-      );
-      this.gantryServiceClient = createPromiseClient(
-        GantryService,
-        clientTransport
-      );
-      this.genericServiceClient = createPromiseClient(
-        GenericService,
-        clientTransport
-      );
-      this.gripperServiceClient = createPromiseClient(
-        GripperService,
-        clientTransport
-      );
-      this.mlModelServiceClient = createPromiseClient(
-        MLModelService,
-        clientTransport
-      );
-      this.movementSensorServiceClient = createPromiseClient(
-        MovementSensorService,
-        clientTransport
-      );
-      this.powerSensorServiceClient = createPromiseClient(
-        PowerSensorService,
-        clientTransport
-      );
-      this.inputControllerServiceClient = createPromiseClient(
-        InputControllerService,
-        clientTransport
-      );
-      this.motorServiceClient = createPromiseClient(
-        MotorService,
-        clientTransport
-      );
-      this.navigationServiceClient = createPromiseClient(
-        NavigationService,
-        clientTransport
-      );
-      this.motionServiceClient = createPromiseClient(
-        MotionService,
-        clientTransport
-      );
-      this.visionServiceClient = createPromiseClient(
-        VisionService,
-        clientTransport
-      );
-      this.servoServiceClient = createPromiseClient(
-        ServoService,
-        clientTransport
-      );
-      this.slamServiceClient = createPromiseClient(
-        SLAMService,
-        clientTransport
-      );
-      this.discoveryServiceClient = createPromiseClient(
-        DiscoveryService,
-        clientTransport
-      );
+      this.robotServiceClient = createClient(RobotService, clientTransport);
 
       this.emit(MachineConnectionEvent.CONNECTED, {});
     } catch (error) {
