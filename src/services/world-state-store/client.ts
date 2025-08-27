@@ -10,6 +10,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { WorldStateStore } from './world-state-store';
+import { transformWithUUID } from './world-state-store';
 
 /**
  * A gRPC-web client for a WorldStateStore service.
@@ -74,7 +75,7 @@ export class WorldStateStoreClient implements WorldStateStore {
     for await (const response of stream) {
       yield {
         changeType: response.changeType,
-        transform: response.transform,
+        transform: transformWithUUID(response.transform),
         updatedFields: response.updatedFields,
       };
     }
