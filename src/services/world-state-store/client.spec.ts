@@ -85,7 +85,7 @@ describe('WorldStateStoreClient Tests', () => {
 
   describe('getTransform', () => {
     it('returns a transform by UUID', async () => {
-      const uuid = new Uint8Array([1, 2, 3, 4]);
+      const uuid = '123e4567-e89b-12d3-a456-426614174000';
       const expected = mockTransform;
 
       await expect(worldStateStore.getTransform(uuid)).resolves.toStrictEqual(

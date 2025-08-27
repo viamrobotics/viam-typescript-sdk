@@ -10,7 +10,11 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { WorldStateStore } from './world-state-store';
-import { transformWithUUID, uuidToString } from './world-state-store';
+import {
+  transformWithUUID,
+  uuidFromString,
+  uuidToString,
+} from './world-state-store';
 
 /**
  * A gRPC-web client for a WorldStateStore service.
@@ -41,14 +45,10 @@ export class WorldStateStoreClient implements WorldStateStore {
     return response.uuids.map((uuid) => uuidToString(uuid));
   }
 
-  async getTransform(
-    uuid: Uint8Array,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async getTransform(uuid: string, extra = {}, callOptions = this.callOptions) {
     const request = new GetTransformRequest({
       name: this.name,
-      uuid,
+      uuid: uuidFromString(uuid),
       extra: Struct.fromJson(extra),
     });
 

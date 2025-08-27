@@ -46,7 +46,7 @@ export interface WorldStateStore extends Resource {
    * @param uuid - The UUID of the transform to retrieve
    * @param extra - Additional arguments to the method
    */
-  getTransform: (uuid: Uint8Array, extra?: Struct) => Promise<Transform>;
+  getTransform: (uuid: string, extra?: Struct) => Promise<Transform>;
 
   /**
    * StreamTransformChanges streams changes to world state transforms.
@@ -80,6 +80,9 @@ export interface WorldStateStore extends Resource {
 }
 
 export const uuidToString = (uuid: Uint8Array) => UuidTool.toString([...uuid]);
+export const uuidFromString = (uuid: string): Uint8Array =>
+  new Uint8Array(UuidTool.toBytes(uuid));
+
 export const transformWithUUID = (
   transform: Transform | undefined
 ): TransformWithUUID | undefined => {
