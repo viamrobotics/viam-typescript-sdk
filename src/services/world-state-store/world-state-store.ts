@@ -26,7 +26,7 @@ export interface WorldStateStore extends Resource {
    *
    * @param extra - Additional arguments to the method
    */
-  listUUIDs: (extra?: Struct) => Promise<Uint8Array[]>;
+  listUUIDs: (extra?: Struct) => Promise<string[]>;
 
   /**
    * GetTransform returns a world state transform by UUID.
