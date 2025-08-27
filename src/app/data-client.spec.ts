@@ -1344,6 +1344,7 @@ describe('DataSyncClient tests', () => {
   const methodName = 'testMethodName';
   const fileExtension = '.png';
   const tags = ['testTag1', 'testTag2'];
+  const datasetIds = ['dataset1', 'dataset2'];
   const timeRequested1 = new Date(1970, 1, 1, 1, 1, 1);
   const timeReceived1 = new Date(1971, 2, 2, 2, 2, 2);
   const dataRequestTimes1: [Date, Date] = [timeRequested1, timeReceived1];
@@ -1430,6 +1431,7 @@ describe('DataSyncClient tests', () => {
       metadata.type = DataType.BINARY_SENSOR;
       metadata.fileExtension = fileExtension;
       expectedRequest.metadata = metadata;
+      expectedRequest.metadata.datasetIds = datasetIds;
       const sensorData = new SensorData();
       const sensorMetadata = new SensorMetadata();
       sensorMetadata.timeRequested = Timestamp.fromDate(timeRequested1);
@@ -1447,7 +1449,8 @@ describe('DataSyncClient tests', () => {
         methodName,
         fileExtension,
         dataRequestTimes1,
-        tags
+        tags,
+        datasetIds
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toStrictEqual('fileId');

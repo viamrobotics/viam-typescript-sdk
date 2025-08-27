@@ -282,6 +282,9 @@ export {
   GenericClient as GenericComponentClient,
   type Generic as GenericComponent,
 } from './components/generic';
+
+export { PoseTrackerClient, type PoseTracker } from './components/posetracker';
+
 /**
  * Raw Protobuf interfaces for a Generic component.
  *

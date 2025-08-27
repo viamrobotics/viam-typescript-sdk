@@ -1100,8 +1100,10 @@ export class DataClient {
    * const fileId = await dataClient.tabularDataCaptureUpload(
    *   [
    *     {
-   *       timestamp: '2025-03-26T10:00:00Z',
-   *       value: 10,
+   *       readings: {
+   *         timestamp: '2025-03-26T10:00:00Z',
+   *         value: 10,
+   *       },
    *     },
    *   ],
    *   '123abc45-1234-5678-90ab-cdef12345678',
@@ -1236,7 +1238,8 @@ export class DataClient {
     methodName: string,
     fileExtension: string,
     dataRequestTimes: [Date, Date],
-    tags?: string[]
+    tags?: string[],
+    datasetIds?: string[]
   ) {
     const metadata = new UploadMetadata({
       partId,
@@ -1246,6 +1249,7 @@ export class DataClient {
       type: DataType.BINARY_SENSOR,
       tags,
       fileExtension,
+      datasetIds,
     });
 
     const sensorData = new SensorData({
@@ -1416,6 +1420,7 @@ export class DataClient {
    *   'my-pipeline',
    *   mqlQuery,
    *   '0 0 * * *'
+   *   false
    * );
    * ```
    *
