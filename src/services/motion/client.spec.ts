@@ -8,26 +8,32 @@ vi.mock('../../gen/service/motion/v1/motion_pb_service');
 vi.mock('../../robot');
 
 import { Struct, Timestamp } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
   ListPlanStatusesRequest,
   MoveOnGlobeRequest,
   MoveOnGlobeResponse,
+  MoveRequest,
   StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
-import { GeoGeometry, GeoPoint, ResourceName } from '../../types';
+import {
+  GeoGeometry,
+  GeoPoint,
+  Pose,
+  PoseInFrame,
+  ResourceName,
+} from '../../types';
 import { MotionClient } from './client';
 import {
+  Constraints,
   GetPlanResponse,
   ListPlanStatusesResponse,
   MotionConfiguration,
   ObstacleDetector,
   PlanState,
+  PseudolinearConstraint,
 } from './types';
 
 const motionClientName = 'test-motion';
@@ -76,9 +82,7 @@ describe('moveOnGlobe', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -226,9 +230,7 @@ describe('moveOnGlobe', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -263,6 +265,64 @@ describe('moveOnGlobe', () => {
   });
 });
 
+describe('move', () => {
+  it('sends a move request with pseudolinear constraints', async () => {
+    const expectedComponentName = new ResourceName({
+      namespace: 'viam',
+      type: 'component',
+      subtype: 'base',
+      name: 'myBase',
+    });
+    const expectedDestination = new PoseInFrame({
+      referenceFrame: 'world',
+      pose: new Pose({
+        x: 1,
+        y: 2,
+        z: 3,
+        oX: 0,
+        oY: 0,
+        oZ: 1,
+        theta: 90,
+      }),
+    });
+    const expectedPseudolinearConstraint = new PseudolinearConstraint({
+      lineToleranceFactor: 5,
+      orientationToleranceFactor: 10,
+    });
+    const expectedConstraints = new Constraints({
+      pseudolinearConstraint: [expectedPseudolinearConstraint],
+    });
+    const expectedExtra = { some: 'extra' };
+    let capturedReq: MoveRequest | undefined;
+    const mockTransport = createRouterTransport(({ service }) => {
+      service(MotionService, {
+        move: (req) => {
+          capturedReq = req;
+          return { success: true };
+        },
+      });
+    });
+    RobotClient.prototype.createServiceClient = vi
+      .fn()
+      .mockImplementation(() => createClient(MotionService, mockTransport));
+    motion = new MotionClient(new RobotClient('host'), motionClientName);
+    await expect(
+      motion.move(
+        expectedDestination,
+        expectedComponentName,
+        undefined,
+        expectedConstraints,
+        expectedExtra
+      )
+    ).resolves.toStrictEqual(true);
+    expect(capturedReq?.name).toStrictEqual(motionClientName);
+    expect(capturedReq?.destination).toStrictEqual(expectedDestination);
+    expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
+    expect(capturedReq?.constraints).toStrictEqual(expectedConstraints);
+    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+  });
+});
+
 describe('stopPlan', () => {
   it('return null', async () => {
     const expectedComponentName = new ResourceName({
@@ -285,9 +345,7 @@ describe('stopPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -318,9 +376,7 @@ describe('stopPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -393,9 +449,7 @@ describe('getPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -430,9 +484,7 @@ describe('getPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -485,9 +537,7 @@ describe('listPlanStatuses', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -513,9 +563,7 @@ describe('listPlanStatuses', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
