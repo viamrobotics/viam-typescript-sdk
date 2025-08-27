@@ -17,9 +17,16 @@ export interface Properties {
   frameRate?: number;
 }
 
+export interface NamedImage {
+  sourceName: string;
+  image: Uint8Array;
+  mimeType: string;
+}
+
 export type MimeType =
   | ''
   | 'image/vnd.viam.rgba'
+  | 'image/vnd.viam.depth'
   | 'image/jpeg'
   | 'image/png'
   | 'pointcloud/pcd'
@@ -63,6 +70,27 @@ export interface Camera extends Resource {
    *   the same type that will be returned.
    */
   getImage: (mimeType?: MimeType, extra?: Struct) => Promise<Uint8Array>;
+
+  /**
+   * Return a frame from a camera.
+   *
+   * @example
+   *
+   * ```ts
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const images = await camera.getImages();
+   * ```
+   *
+   * TODO(docs): include docs link for get images TS example
+   *
+   * @param filterSourceNames - A list of source names to filter the images by.
+   *   If empty or undefined, all images will be returned.
+   * @param extra - Extra parameters to pass to the camera.
+   */
+  getImages: (
+    filterSourceNames?: string[],
+    extra?: Struct
+  ) => Promise<NamedImage[]>;
 
   /**
    * Render a frame from a camera to an HTTP response.

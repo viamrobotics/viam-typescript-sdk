@@ -3,7 +3,9 @@ import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
 import {
+  Format,
   GetImageRequest,
+  GetImagesRequest,
   GetPointCloudRequest,
   RenderFrameRequest,
 } from '../../gen/component/camera/v1/camera_pb';
@@ -14,6 +16,27 @@ import type { Camera, MimeType } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
+
+// TODO(RSDK-11729): remove helper and format field once removed from proto
+const formatToMimeType = (format: Format): MimeType => {
+  switch (format) {
+    case Format.RAW_RGBA: {
+      return 'image/vnd.viam.rgba';
+    }
+    case Format.JPEG: {
+      return 'image/jpeg';
+    }
+    case Format.PNG: {
+      return 'image/png';
+    }
+    case Format.RAW_DEPTH: {
+      return 'image/vnd.viam.depth';
+    }
+    case Format.UNSPECIFIED: {
+      return '';
+    }
+  }
+};
 
 /**
  * A gRPC-web client for the Camera component.
@@ -57,6 +80,28 @@ export class CameraClient implements Camera {
 
     const resp = await this.client.getImage(request, callOptions);
     return resp.image;
+  }
+
+  async getImages(
+    filterSourceNames: string[] = [],
+    extra = {},
+    callOptions = this.callOptions
+  ) {
+    const request = new GetImagesRequest({
+      name: this.name,
+      filterSourceNames,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getImages(request, callOptions);
+
+    return resp.images.map((image) => ({
+      sourceName: image.sourceName,
+      image: image.image,
+      mimeType: image.mimeType || formatToMimeType(image.format),
+    }));
   }
 
   async renderFrame(
