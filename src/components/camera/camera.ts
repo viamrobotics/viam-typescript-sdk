@@ -1,4 +1,5 @@
 import type { Struct } from '@bufbuild/protobuf';
+import type { Timestamp } from '@bufbuild/protobuf';
 import type {
   DistortionParameters,
   IntrinsicParameters,
@@ -21,6 +22,10 @@ export interface NamedImage {
   sourceName: string;
   image: Uint8Array;
   mimeType: string;
+}
+
+export interface ResponseMetadata {
+  capturedAt: Timestamp;
 }
 
 export type MimeType =
@@ -90,7 +95,7 @@ export interface Camera extends Resource {
   getImages: (
     filterSourceNames?: string[],
     extra?: Struct
-  ) => Promise<NamedImage[]>;
+  ) => Promise<[NamedImage[], ResponseMetadata]>;
 
   /**
    * Render a frame from a camera to an HTTP response.

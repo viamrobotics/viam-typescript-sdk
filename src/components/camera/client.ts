@@ -1,4 +1,4 @@
-import { type JsonValue, Struct } from '@bufbuild/protobuf';
+import { type JsonValue, Struct, Timestamp } from '@bufbuild/protobuf';
 import type { CallOptions, PromiseClient } from '@connectrpc/connect';
 import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
@@ -12,7 +12,7 @@ import {
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
-import type { Camera, MimeType } from './camera';
+import type { Camera, NamedImage, MimeType, ResponseMetadata } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
@@ -96,12 +96,16 @@ export class CameraClient implements Camera {
     this.options.requestLogger?.(request);
 
     const resp = await this.client.getImages(request, callOptions);
-
-    return resp.images.map((image) => ({
+    const images = resp.images.map((image) => ({
       sourceName: image.sourceName,
       image: image.image,
       mimeType: image.mimeType || formatToMimeType(image.format),
     }));
+    const metadata: ResponseMetadata = {
+      capturedAt: resp.responseMetadata?.capturedAt ?? new Timestamp(),
+    };
+
+    return [images, metadata] as [NamedImage[], ResponseMetadata];
   }
 
   async renderFrame(
