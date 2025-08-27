@@ -8,10 +8,7 @@ vi.mock('../../gen/service/motion/v1/motion_pb_service');
 vi.mock('../../robot');
 
 import { Struct, Timestamp } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
@@ -21,16 +18,23 @@ import {
   MoveRequest,
   StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
-import { GeoGeometry, GeoPoint, Pose, PoseInFrame, ResourceName } from '../../types';
+import {
+  GeoGeometry,
+  GeoPoint,
+  Pose,
+  PoseInFrame,
+  ResourceName,
+} from '../../types';
 import { MotionClient } from './client';
 import {
+  Constraints,
   GetPlanResponse,
   ListPlanStatusesResponse,
   MotionConfiguration,
   ObstacleDetector,
   PlanState,
+  PseudolinearConstraint,
 } from './types';
-import { Constraints, PseudolinearConstraint } from './types';
 
 const motionClientName = 'test-motion';
 const date = new Date(1970, 1, 1, 1, 1, 1);
@@ -78,9 +82,7 @@ describe('moveOnGlobe', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -228,9 +230,7 @@ describe('moveOnGlobe', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -273,9 +273,9 @@ describe('move', () => {
       subtype: 'base',
       name: 'myBase',
     });
-    const expectedDestination: PoseInFrame = {
+    const expectedDestination = new PoseInFrame({
       referenceFrame: 'world',
-      pose: {
+      pose: new Pose({
         x: 1,
         y: 2,
         z: 3,
@@ -283,15 +283,15 @@ describe('move', () => {
         oY: 0,
         oZ: 1,
         theta: 90,
-      },
-    };
-    const expectedPseudolinearConstraint = new PseudolinearConstraint({
-      lineToleranceFactor: 0.5,
-      orientationToleranceFactor: 0.1,
+      }),
     });
-    const expectedConstraints: Constraints = {
+    const expectedPseudolinearConstraint = new PseudolinearConstraint({
+      lineToleranceFactor: 5,
+      orientationToleranceFactor: 10,
+    });
+    const expectedConstraints = new Constraints({
       pseudolinearConstraint: [expectedPseudolinearConstraint],
-    };
+    });
     const expectedExtra = { some: 'extra' };
     let capturedReq: MoveRequest | undefined;
     const mockTransport = createRouterTransport(({ service }) => {
@@ -304,15 +304,13 @@ describe('move', () => {
     });
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
     motion = new MotionClient(new RobotClient('host'), motionClientName);
     await expect(
       motion.move(
         expectedDestination,
         expectedComponentName,
-        undefined, // worldState
+        undefined,
         expectedConstraints,
         expectedExtra
       )
@@ -347,9 +345,7 @@ describe('stopPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -380,9 +376,7 @@ describe('stopPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -455,9 +449,7 @@ describe('getPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -492,9 +484,7 @@ describe('getPlan', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -547,9 +537,7 @@ describe('listPlanStatuses', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
@@ -575,9 +563,7 @@ describe('listPlanStatuses', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(MotionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MotionService, mockTransport));
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 

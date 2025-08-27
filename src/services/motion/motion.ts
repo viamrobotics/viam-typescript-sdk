@@ -15,7 +15,6 @@ import type {
   GetPlanResponse,
   ListPlanStatusesResponse,
   MotionConfiguration,
-  PseudolinearConstraint,
 } from './types';
 
 /**

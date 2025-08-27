@@ -1,6 +1,6 @@
 import type { Struct } from '@bufbuild/protobuf';
+import { MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
 import type { Resource } from '../../types';
-import type { MimeType } from '../../app/datasync/v1/data_sync_pb.js';
 
 export interface DataManager extends Resource {
   sync: (extra?: Struct) => Promise<void>;

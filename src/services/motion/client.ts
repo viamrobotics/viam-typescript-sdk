@@ -9,7 +9,6 @@ import {
   MoveOnMapRequest,
   MoveRequest,
   StopPlanRequest,
-  PseudolinearConstraint,
 } from '../../gen/service/motion/v1/motion_pb';
 import type { RobotClient } from '../../robot';
 import type {
