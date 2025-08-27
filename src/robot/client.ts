@@ -36,10 +36,7 @@ import type { Robot } from './robot';
 import SessionManager from './session-manager';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
-<<<<<<< HEAD
 import { assertExists } from '../assert';
-=======
->>>>>>> 99a230edf3eaf9499343c1780f4050d52b2390b1
 
 interface ICEServer {
   urls: string;
