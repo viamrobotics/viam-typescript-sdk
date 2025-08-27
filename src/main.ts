@@ -407,6 +407,8 @@ export {
  */
 export * as visionApi from './gen/service/vision/v1/vision_pb';
 
+export { WorldStateStoreClient } from './services/world-state-store';
+
 export {
   GenericClient as GenericServiceClient,
   type Generic as GenericService,
