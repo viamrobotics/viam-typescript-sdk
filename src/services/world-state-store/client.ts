@@ -55,11 +55,12 @@ export class WorldStateStoreClient implements WorldStateStore {
     this.options.requestLogger?.(request);
 
     const response = await this.client.getTransform(request, callOptions);
-    if (!response.transform) {
+    const transform = transformWithUUID(response.transform);
+    if (!transform) {
       throw new Error('No transform returned from server');
     }
 
-    return response.transform;
+    return transform;
   }
 
   async *streamTransformChanges(extra = {}, callOptions = this.callOptions) {
