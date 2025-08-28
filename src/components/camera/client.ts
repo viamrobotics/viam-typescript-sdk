@@ -12,7 +12,7 @@ import {
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
-import type { Camera, NamedImage, MimeType, ResponseMetadata } from './camera';
+import type { Camera, MimeType, ResponseMetadata } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
@@ -105,7 +105,7 @@ export class CameraClient implements Camera {
       capturedAt: resp.responseMetadata?.capturedAt ?? new Timestamp(),
     };
 
-    return [images, metadata] as [NamedImage[], ResponseMetadata];
+    return { images, metadata };
   }
 
   async renderFrame(

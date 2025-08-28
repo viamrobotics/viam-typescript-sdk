@@ -95,7 +95,7 @@ export interface Camera extends Resource {
   getImages: (
     filterSourceNames?: string[],
     extra?: Struct
-  ) => Promise<[NamedImage[], ResponseMetadata]>;
+  ) => Promise<{ images: NamedImage[]; metadata: ResponseMetadata }>;
 
   /**
    * Render a frame from a camera to an HTTP response.
