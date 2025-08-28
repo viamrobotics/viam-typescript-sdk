@@ -1,4 +1,4 @@
-import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { Geometry, PoseInFrame } from '../../gen/common/v1/common_pb';
 import type { Struct, Resource } from '../../types';
 
 /** Represents a generic component. */
@@ -23,4 +23,9 @@ export interface PoseTracker extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/generic/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
+  getPoses: (
+    bodyNames?: string[],
+    extra?: Struct
+  ) => Promise<Record<string, PoseInFrame>>;
 }
