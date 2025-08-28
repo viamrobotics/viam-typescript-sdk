@@ -341,8 +341,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
-        // Always retry the next attempt
-        return true;
+        // Always retry the next attempt if not closed
+        return !this.closed;
       },
     };
 
@@ -634,8 +634,10 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
-        // Abort reconnects if the the caller specifies, otherwise retry
-        return !conf.reconnectAbortSignal?.abort;
+        const aborted = conf.reconnectAbortSignal?.abort ?? false;
+
+        // Retry if not closed or aborted
+        return !aborted && !this.closed;
       },
     };
 
