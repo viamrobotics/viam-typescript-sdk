@@ -383,155 +383,98 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   get armService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.armServiceClient ??= createClient(ArmService, this.clientTransport);
+    this.armServiceClient ??= this.createServiceClient(ArmService);
     return this.armServiceClient;
   }
 
   get baseService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.baseServiceClient ??= createClient(BaseService, this.clientTransport);
+    this.baseServiceClient ??= this.createServiceClient(BaseService);
     return this.baseServiceClient;
   }
 
   get boardService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.boardServiceClient ??= createClient(
-      BoardService,
-      this.clientTransport
-    );
+    this.boardServiceClient ??= this.createServiceClient(BoardService);
     return this.boardServiceClient;
   }
 
   get encoderService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.encoderServiceClient ??= createClient(
-      EncoderService,
-      this.clientTransport
-    );
+    this.encoderServiceClient ??= this.createServiceClient(EncoderService);
     return this.encoderServiceClient;
   }
 
   get gantryService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.gantryServiceClient ??= createClient(
-      GantryService,
-      this.clientTransport
-    );
+    this.gantryServiceClient ??= this.createServiceClient(GantryService);
     return this.gantryServiceClient;
   }
 
   get genericService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.genericServiceClient ??= createClient(
-      GenericService,
-      this.clientTransport
-    );
+    this.genericServiceClient ??= this.createServiceClient(GenericService);
     return this.genericServiceClient;
   }
 
   get gripperService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.gripperServiceClient ??= createClient(
-      GripperService,
-      this.clientTransport
-    );
+    this.gripperServiceClient ??= this.createServiceClient(GripperService);
     return this.gripperServiceClient;
   }
 
   get mlModelService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.mlModelServiceClient ??= createClient(
-      MLModelService,
-      this.clientTransport
-    );
+    this.mlModelServiceClient ??= this.createServiceClient(MLModelService);
     return this.mlModelServiceClient;
   }
 
   get movementSensorService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.movementSensorServiceClient ??= createClient(
-      MovementSensorService,
-      this.clientTransport
+    this.movementSensorServiceClient ??= this.createServiceClient(
+      MovementSensorService
     );
     return this.movementSensorServiceClient;
   }
 
   get powerSensorService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.powerSensorServiceClient ??= createClient(
-      PowerSensorService,
-      this.clientTransport
-    );
+    this.powerSensorServiceClient ??=
+      this.createServiceClient(PowerSensorService);
     return this.powerSensorServiceClient;
   }
 
   get inputControllerService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.inputControllerServiceClient ??= createClient(
-      InputControllerService,
-      this.clientTransport
+    this.inputControllerServiceClient ??= this.createServiceClient(
+      InputControllerService
     );
     return this.inputControllerServiceClient;
   }
 
   get motorService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.motorServiceClient ??= createClient(
-      MotorService,
-      this.clientTransport
-    );
+    this.motorServiceClient ??= this.createServiceClient(MotorService);
     return this.motorServiceClient;
   }
 
   get navigationService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.navigationServiceClient ??= createClient(
-      NavigationService,
-      this.clientTransport
-    );
+    this.navigationServiceClient ??=
+      this.createServiceClient(NavigationService);
     return this.navigationServiceClient;
   }
 
   get discoveryService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.discoveryServiceClient ??= createClient(
-      DiscoveryService,
-      this.clientTransport
-    );
+    this.discoveryServiceClient ??= this.createServiceClient(DiscoveryService);
     return this.discoveryServiceClient;
   }
 
   get motionService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.motionServiceClient ??= createClient(
-      MotionService,
-      this.clientTransport
-    );
+    this.motionServiceClient ??= this.createServiceClient(MotionService);
     return this.motionServiceClient;
   }
 
   get visionService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.visionServiceClient ??= createClient(
-      VisionService,
-      this.clientTransport
-    );
+    this.visionServiceClient ??= this.createServiceClient(VisionService);
     return this.visionServiceClient;
   }
 
   get servoService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.servoServiceClient ??= createClient(
-      ServoService,
-      this.clientTransport
-    );
+    this.servoServiceClient ??= this.createServiceClient(ServoService);
     return this.servoServiceClient;
   }
 
   get slamService() {
-    assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
-    this.slamServiceClient ??= createClient(SLAMService, this.clientTransport);
+    this.slamServiceClient ??= this.createServiceClient(SLAMService);
     return this.slamServiceClient;
   }
 
