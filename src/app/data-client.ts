@@ -1,10 +1,6 @@
 import { BSON } from 'bsonfy';
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  type PromiseClient,
-  type Transport,
-} from '@connectrpc/connect';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
   BinaryID,
@@ -73,19 +69,16 @@ const logDeprecationWarning = () => {
 };
 
 export class DataClient {
-  private dataClient: PromiseClient<typeof DataService>;
-  private datasetClient: PromiseClient<typeof DatasetService>;
-  private dataSyncClient: PromiseClient<typeof DataSyncService>;
-  private dataPipelinesClient: PromiseClient<typeof DataPipelinesService>;
+  private dataClient: Client<typeof DataService>;
+  private datasetClient: Client<typeof DatasetService>;
+  private dataSyncClient: Client<typeof DataSyncService>;
+  private dataPipelinesClient: Client<typeof DataPipelinesService>;
 
   constructor(transport: Transport) {
-    this.dataClient = createPromiseClient(DataService, transport);
-    this.datasetClient = createPromiseClient(DatasetService, transport);
-    this.dataSyncClient = createPromiseClient(DataSyncService, transport);
-    this.dataPipelinesClient = createPromiseClient(
-      DataPipelinesService,
-      transport
-    );
+    this.dataClient = createClient(DataService, transport);
+    this.datasetClient = createClient(DatasetService, transport);
+    this.dataSyncClient = createClient(DataSyncService, transport);
+    this.dataPipelinesClient = createClient(DataPipelinesService, transport);
   }
 
   /**
@@ -1519,9 +1512,7 @@ export class DataClient {
 
 export class ListDataPipelineRunsPage {
   constructor(
-    private readonly dataPipelinesClient: PromiseClient<
-      typeof DataPipelinesService
-    >,
+    private readonly dataPipelinesClient: Client<typeof DataPipelinesService>,
     private readonly pipelineId: string,
     public readonly runs: DataPipelineRun[] = [],
     private readonly pageSize?: number,

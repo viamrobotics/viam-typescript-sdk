@@ -1,4 +1,4 @@
-import { createPromiseClient, type Transport } from '@connectrpc/connect';
+import { createClient, type Transport } from '@connectrpc/connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 
 const timeoutBlob = new Blob(
@@ -21,7 +21,7 @@ export default class GRPCConnectionManager {
 
   private get client() {
     const transport = this.deferredTransport();
-    return createPromiseClient(RobotService, transport);
+    return createClient(RobotService, transport);
   }
 
   public heartbeat() {

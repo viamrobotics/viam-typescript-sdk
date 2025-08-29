@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
 import {
   AddWaypointRequest,
@@ -25,7 +25,7 @@ import type { Mode } from './types';
  * @group Clients
  */
 export class NavigationClient implements Navigation {
-  private client: PromiseClient<typeof NavigationService>;
+  private client: Client<typeof NavigationService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

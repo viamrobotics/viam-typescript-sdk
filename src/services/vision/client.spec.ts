@@ -1,9 +1,6 @@
 // @vitest-environment happy-dom
 
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { Struct } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { VisionService } from '../../gen/service/vision/v1/vision_connect';
@@ -81,9 +78,7 @@ describe('VisionClient Tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(VisionService, mockTransport)
-      );
+      .mockImplementation(() => createClient(VisionService, mockTransport));
     vision = new VisionClient(new RobotClient('host'), visionClientName);
   });
 

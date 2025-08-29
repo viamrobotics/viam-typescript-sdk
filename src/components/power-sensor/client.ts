@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
 import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_connect';
 import {
@@ -19,7 +19,7 @@ import type { PowerSensor } from './power-sensor';
  */
 
 export class PowerSensorClient implements PowerSensor {
-  private client: PromiseClient<typeof PowerSensorService>;
+  private client: Client<typeof PowerSensorService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { GantryService } from '../../gen/component/gantry/v1/gantry_connect';
 import {
   GetLengthsRequest,
@@ -21,7 +21,7 @@ import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
  * @group Clients
  */
 export class GantryClient implements Gantry {
-  private client: PromiseClient<typeof GantryService>;
+  private client: Client<typeof GantryService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

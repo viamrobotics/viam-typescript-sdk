@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { MotorService } from '../../gen/component/motor/v1/motor_connect';
 import {
   GetPositionRequest,
@@ -24,7 +24,7 @@ import type { Motor } from './motor';
  * @group Clients
  */
 export class MotorClient implements Motor {
-  private client: PromiseClient<typeof MotorService>;
+  private client: Client<typeof MotorService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
