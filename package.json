@@ -80,6 +80,7 @@
     "prettier-plugin-jsdoc": "^1.1.1",
     "typedoc": "^0.27.9",
     "typescript": "^5.3.3",
+    "uuid-tool": "^2.0.3",
     "vite": "^5.0.10",
     "vitest": "^1.1.0",
     "yaml": "^2.3.3"

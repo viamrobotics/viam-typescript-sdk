@@ -1,6 +1,8 @@
 import { type ServiceType } from '@bufbuild/protobuf';
 import {
+  createClient,
   createPromiseClient,
+  type Client,
   type PromiseClient,
   type Transport,
 } from '@connectrpc/connect';
@@ -40,6 +42,7 @@ import type { Robot } from './robot';
 import SessionManager from './session-manager';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
+import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 
 interface ICEServer {
   urls: string;
@@ -252,6 +255,10 @@ export class RobotClient extends EventDispatcher implements Robot {
   private servoServiceClient: PromiseClient<typeof ServoService> | undefined;
 
   private slamServiceClient: PromiseClient<typeof SLAMService> | undefined;
+
+  private worldStateStoreServiceClient:
+    | Client<typeof WorldStateStoreService>
+    | undefined;
 
   private currentRetryAttempt = 0;
 
@@ -521,6 +528,13 @@ export class RobotClient extends EventDispatcher implements Robot {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.slamServiceClient;
+  }
+
+  get worldStateStoreService() {
+    if (!this.worldStateStoreServiceClient) {
+      throw new Error(RobotClient.notConnectedYetStr);
+    }
+    return this.worldStateStoreServiceClient;
   }
 
   createServiceClient<T extends ServiceType>(svcType: T): PromiseClient<T> {
@@ -874,6 +888,10 @@ export class RobotClient extends EventDispatcher implements Robot {
       );
       this.discoveryServiceClient = createPromiseClient(
         DiscoveryService,
+        clientTransport
+      );
+      this.worldStateStoreServiceClient = createClient(
+        WorldStateStoreService,
         clientTransport
       );
 
