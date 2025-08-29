@@ -1,5 +1,5 @@
 import { type JsonValue, Struct } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
 import {
@@ -21,7 +21,7 @@ const PointCloudPCD: MimeType = 'pointcloud/pcd';
  * @group Clients
  */
 export class CameraClient implements Camera {
-  private client: PromiseClient<typeof CameraService>;
+  private client: Client<typeof CameraService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

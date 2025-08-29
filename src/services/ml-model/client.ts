@@ -1,4 +1,4 @@
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import type { FlatTensors, MLModel } from './ml-model';
 import { Struct, type Options } from '../../types';
 import type { RobotClient } from '../../robot';
@@ -9,7 +9,7 @@ import {
 import { MLModelService } from '../../gen/service/mlmodel/v1/mlmodel_connect';
 
 export class MLModelClient implements MLModel {
-  private client: PromiseClient<typeof MLModelService>;
+  private client: Client<typeof MLModelService>;
   private readonly options: Options;
 
   public readonly name: string;

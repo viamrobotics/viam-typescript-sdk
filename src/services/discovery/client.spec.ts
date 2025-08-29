@@ -1,9 +1,6 @@
 // @vitest-environment happy-dom
 
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
 import { DiscoverResourcesResponse } from '../../gen/service/discovery/v1/discovery_pb';
@@ -30,9 +27,7 @@ describe('DiscoveryClient Tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(DiscoveryService, mockTransport)
-      );
+      .mockImplementation(() => createClient(DiscoveryService, mockTransport));
     discovery = new DiscoveryClient(
       new RobotClient('host'),
       discoveryClientName

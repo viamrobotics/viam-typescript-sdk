@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { EncoderService } from '../../gen/component/encoder/v1/encoder_connect';
 import {
   GetPositionRequest,
@@ -17,7 +17,7 @@ import { EncoderPositionType, type Encoder } from './encoder';
  * @group Clients
  */
 export class EncoderClient implements Encoder {
-  private client: PromiseClient<typeof EncoderService>;
+  private client: Client<typeof EncoderService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

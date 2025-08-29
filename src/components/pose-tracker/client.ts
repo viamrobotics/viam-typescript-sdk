@@ -1,5 +1,5 @@
 import { type JsonValue, Struct } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { PoseTrackerService } from '../../gen/component/posetracker/v1/pose_tracker_connect';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
@@ -13,7 +13,7 @@ import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
  * @group Clients
  */
 export class PoseTrackerClient implements PoseTracker {
-  private client: PromiseClient<typeof PoseTrackerService>;
+  private client: Client<typeof PoseTrackerService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

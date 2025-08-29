@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { ServoService } from '../../gen/component/servo/v1/servo_connect';
 import {
   GetPositionRequest,
@@ -18,7 +18,7 @@ import type { Servo } from './servo';
  * @group Clients
  */
 export class ServoClient implements Servo {
-  private client: PromiseClient<typeof ServoService>;
+  private client: Client<typeof ServoService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

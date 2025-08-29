@@ -2,7 +2,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
 import { Duration, Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { BoardService } from '../../gen/component/board/v1/board_connect';
 import {
   GetDigitalInterruptValueRequest,
@@ -26,7 +26,7 @@ import { type Board, type PowerMode, type Tick } from './board';
  * @group Clients
  */
 export class BoardClient implements Board {
-  private client: PromiseClient<typeof BoardService>;
+  private client: Client<typeof BoardService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

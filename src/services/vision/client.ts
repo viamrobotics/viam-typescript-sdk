@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { VisionService } from '../../gen/service/vision/v1/vision_connect';
 import {
   CaptureAllFromCameraRequest,
@@ -23,7 +23,7 @@ import type { Vision } from './vision';
  * @group Clients
  */
 export class VisionClient implements Vision {
-  private client: PromiseClient<typeof VisionService>;
+  private client: Client<typeof VisionService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

@@ -3,10 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Value } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { GetReadingsResponse } from '../../gen/common/v1/common_pb';
 import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_connect';
 import { RobotClient } from '../../robot';
@@ -31,7 +28,7 @@ describe('MovementSensorClient tests', () => {
     RobotClient.prototype.createServiceClient = vi
       .fn()
       .mockImplementation(() =>
-        createPromiseClient(MovementSensorService, mockTransport)
+        createClient(MovementSensorService, mockTransport)
       );
 
     sensor = new MovementSensorClient(new RobotClient('host'), 'test-sensor');

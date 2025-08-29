@@ -8,7 +8,7 @@ vi.mock('../../gen/stream/v1/stream_pb_service');
 
 import {
   ConnectError,
-  createPromiseClient,
+  createClient,
   createRouterTransport,
   type Transport,
 } from '@connectrpc/connect';
@@ -33,9 +33,7 @@ describe('StreamClient', () => {
     robotClient = new EventDispatcher() as RobotClient;
     robotClient.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(StreamService, mockTransport)
-      );
+      .mockImplementation(() => createClient(StreamService, mockTransport));
     streamClient = new StreamClient(robotClient);
   });
 

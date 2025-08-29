@@ -1,4 +1,4 @@
-import type { PromiseClient } from '@connectrpc/connect';
+import type { Client } from '@connectrpc/connect';
 import { EventDispatcher, MachineConnectionEvent } from '../../events';
 import { StreamService } from '../../gen/stream/v1/stream_connect';
 import {
@@ -26,7 +26,7 @@ const getValidSDPTrackName = (name: string) => {
  * @group Clients
  */
 export class StreamClient extends EventDispatcher implements Stream {
-  private client: PromiseClient<typeof StreamService>;
+  private client: Client<typeof StreamService>;
   private readonly options: Options;
   private streams: Set<string>;
 

@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { BaseService } from '../../gen/component/base/v1/base_connect';
 import {
   GetPropertiesRequest,
@@ -22,7 +22,7 @@ import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
  * @group Clients
  */
 export class BaseClient implements Base {
-  private client: PromiseClient<typeof BaseService>;
+  private client: Client<typeof BaseService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

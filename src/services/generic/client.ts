@@ -1,5 +1,5 @@
 import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { GenericService } from '../../gen/service/generic/v1/generic_connect';
 import { RobotClient } from '../../robot';
 import type { Options } from '../../types';
@@ -12,7 +12,7 @@ import type { Generic } from './generic';
  * @group Clients
  */
 export class GenericClient implements Generic {
-  private client: PromiseClient<typeof GenericService>;
+  private client: Client<typeof GenericService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

@@ -1,9 +1,6 @@
 // @vitest-environment happy-dom
 
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
@@ -43,9 +40,7 @@ describe('SlamClient tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(SLAMService, mockTransport)
-      );
+      .mockImplementation(() => createClient(SLAMService, mockTransport));
 
     slam = new SlamClient(new RobotClient('host'), 'test-slam');
   });
