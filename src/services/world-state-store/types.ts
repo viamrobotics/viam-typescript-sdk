@@ -6,9 +6,9 @@ export interface TransformWithUUID extends PlainMessage<Transform> {
   uuidString: string;
 }
 
-export type TransformChangeStream = AsyncGenerator<
-  Omit<PlainMessage<StreamTransformChangesResponse>, 'transform'> & {
-    transform: TransformWithUUID | undefined;
-  },
-  void
->;
+export type TransformChangeEvent = Omit<
+  PlainMessage<StreamTransformChangesResponse>,
+  'transform'
+> & {
+  transform: TransformWithUUID | undefined;
+};

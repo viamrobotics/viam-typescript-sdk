@@ -1,6 +1,6 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Transform, Resource } from '../../types';
-import type { TransformChangeStream, TransformWithUUID } from './types';
+import type { TransformChangeEvent, TransformWithUUID } from './types';
 import { UuidTool } from 'uuid-tool';
 
 /**
@@ -50,6 +50,8 @@ export interface WorldStateStore extends Resource {
   /**
    * StreamTransformChanges streams changes to world state transforms.
    *
+   * The returned transform will only contain the fields that have changed.
+   *
    * @example
    *
    * ```ts
@@ -71,20 +73,16 @@ export interface WorldStateStore extends Resource {
    *
    * @param extra - Additional arguments to the method
    */
-  streamTransformChanges: (extra?: Struct) => TransformChangeStream;
+  streamTransformChanges: (
+    extra?: Struct
+  ) => AsyncGenerator<TransformChangeEvent, void>;
 }
 
 export const uuidToString = (uuid: Uint8Array) => UuidTool.toString([...uuid]);
 export const uuidFromString = (uuid: string): Uint8Array =>
   new Uint8Array(UuidTool.toBytes(uuid));
 
-export const transformWithUUID = (
-  transform: Transform | undefined
-): TransformWithUUID | undefined => {
-  if (!transform) {
-    return undefined;
-  }
-
+export const transformWithUUID = (transform: Transform): TransformWithUUID => {
   return {
     ...transform,
     uuidString: uuidToString(transform.uuid),

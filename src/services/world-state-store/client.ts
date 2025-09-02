@@ -15,6 +15,7 @@ import {
   uuidFromString,
   uuidToString,
 } from './world-state-store';
+import type { TransformChangeEvent } from './types';
 
 /**
  * A gRPC-web client for a WorldStateStore service.
@@ -55,15 +56,17 @@ export class WorldStateStoreClient implements WorldStateStore {
     this.options.requestLogger?.(request);
 
     const response = await this.client.getTransform(request, callOptions);
-    const transform = transformWithUUID(response.transform);
-    if (!transform) {
+    if (!response.transform) {
       throw new Error('No transform returned from server');
     }
 
-    return transform;
+    return transformWithUUID(response.transform);
   }
 
-  async *streamTransformChanges(extra = {}, callOptions = this.callOptions) {
+  async *streamTransformChanges(
+    extra = {},
+    callOptions = this.callOptions
+  ): AsyncGenerator<TransformChangeEvent, void> {
     const request = new StreamTransformChangesRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -74,10 +77,13 @@ export class WorldStateStoreClient implements WorldStateStore {
     const stream = this.client.streamTransformChanges(request, callOptions);
 
     for await (const response of stream) {
+      if (!response.transform) {
+        continue;
+      }
+
       yield {
-        changeType: response.changeType,
+        ...response,
         transform: transformWithUUID(response.transform),
-        updatedFields: response.updatedFields,
       };
     }
   }
