@@ -104,7 +104,7 @@ interface TransportInitOptions {
 export const dialDirect = async (
   address: string,
   opts?: DialOptions,
-  transportCredentialsInclude: boolean = false,
+  transportCredentialsInclude = false
 ): Promise<Transport> => {
   validateDialOptions(opts);
   const createTransport =
@@ -313,10 +313,14 @@ const getOptionalWebRTCConfig = async (
   signalingAddress: string,
   callOpts: CallOptions,
   dialOpts?: DialOptions,
-  transportCredentialsInclude: boolean = false
+  transportCredentialsInclude = false
 ): Promise<WebRTCConfig> => {
   const optsCopy = { ...dialOpts } as DialOptions;
-  const directTransport = await dialDirect(signalingAddress, optsCopy, transportCredentialsInclude);
+  const directTransport = await dialDirect(
+    signalingAddress,
+    optsCopy,
+    transportCredentialsInclude
+  );
 
   const signalingClient = createClient(SignalingService, directTransport);
   try {
@@ -342,7 +346,7 @@ export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
   dialOpts?: DialOptions,
-  transportCredentialsInclude: boolean = false
+  transportCredentialsInclude = false
 ): Promise<WebRTCConnection> => {
   const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   validateDialOptions(dialOpts);
@@ -383,7 +387,11 @@ export const dialWebRTC = async (
 
   let directTransport: Transport;
   try {
-    directTransport = await dialDirect(usableSignalingAddress, exchangeOpts, transportCredentialsInclude);
+    directTransport = await dialDirect(
+      usableSignalingAddress,
+      exchangeOpts,
+      transportCredentialsInclude
+    );
   } catch (error) {
     pc.close();
     throw error;
@@ -440,7 +448,7 @@ const processWebRTCOpts = async (
   signalingAddress: string,
   callOpts: CallOptions,
   dialOpts?: DialOptions,
-  transportCredentialsInclude: boolean = false
+  transportCredentialsInclude = false
 ): Promise<DialWebRTCOptions> => {
   // Get TURN servers, if any.
   const config = await getOptionalWebRTCConfig(

@@ -697,12 +697,13 @@ export class RobotClient extends EventDispatcher implements Robot {
           opts.webrtcOptions.signalingCredentials = opts.credentials;
         }
 
-        const signalingAddress = this.webrtcOptions.signalingAddress || this.serviceHost;
+        const signalingAddress =
+          this.webrtcOptions.signalingAddress || this.serviceHost;
         const webRTCConn = await dialWebRTC(
           signalingAddress,
           this.webrtcOptions.host,
           opts,
-          this.serviceHost !== '' && (signalingAddress !== this.serviceHost)
+          this.serviceHost !== '' && signalingAddress !== this.serviceHost
         );
 
         /*
