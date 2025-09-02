@@ -2,7 +2,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
 import { SensorService } from '../../gen/component/sensor/v1/sensor_connect';
 import { doCommandFromClient } from '../../utils';
@@ -14,7 +14,7 @@ import type { Sensor } from './sensor';
  * @group Clients
  */
 export class SensorClient implements Sensor {
-  private client: PromiseClient<typeof SensorService>;
+  private client: Client<typeof SensorService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

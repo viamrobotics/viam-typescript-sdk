@@ -8,10 +8,7 @@ import { BoardClient } from './client';
 vi.mock('../../robot');
 
 import type { PartialMessage } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import {
   createWritableIterable,
   type WritableIterable,
@@ -49,9 +46,7 @@ describe('BoardClient tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(BoardService, mockTransport)
-      );
+      .mockImplementation(() => createClient(BoardService, mockTransport));
 
     board = new BoardClient(new RobotClient('host'), 'test-board');
   });

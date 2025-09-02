@@ -2,7 +2,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_connect';
 import {
   GetEventsRequest,
@@ -17,7 +17,7 @@ import type { InputController, InputControllerEvent } from './input-controller';
  * @group Clients
  */
 export class InputControllerClient implements InputController {
-  private client: PromiseClient<typeof InputControllerService>;
+  private client: Client<typeof InputControllerService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
