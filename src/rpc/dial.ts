@@ -111,6 +111,9 @@ export const dialDirect = async (
 
   const transportOpts = {
     baseUrl: address,
+    // Default is "same-origin", which does not include localhost:*.
+    // Services running on other ports that expect cookies from App would otherwise not receive them.
+    credentials: "include" as RequestCredentials,
   };
 
   // Client already has access token with no external auth, skip Authenticate process.
