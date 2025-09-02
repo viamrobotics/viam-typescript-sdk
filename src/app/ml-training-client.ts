@@ -1,8 +1,4 @@
-import {
-  createPromiseClient,
-  type PromiseClient,
-  type Transport,
-} from '@connectrpc/connect';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { MLTrainingService } from '../gen/app/mltraining/v1/ml_training_connect';
 
 import {
@@ -11,10 +7,10 @@ import {
 } from '../gen/app/mltraining/v1/ml_training_pb';
 
 export class MlTrainingClient {
-  private client: PromiseClient<typeof MLTrainingService>;
+  private client: Client<typeof MLTrainingService>;
 
   constructor(transport: Transport) {
-    this.client = createPromiseClient(MLTrainingService, transport);
+    this.client = createClient(MLTrainingService, transport);
   }
 
   /**

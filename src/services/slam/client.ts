@@ -1,5 +1,5 @@
 import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
 import {
   GetInternalStateRequest,
@@ -18,7 +18,7 @@ import type { Slam } from './slam';
  * @group Clients
  */
 export class SlamClient implements Slam {
-  private client: PromiseClient<typeof SLAMService>;
+  private client: Client<typeof SLAMService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

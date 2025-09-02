@@ -14,7 +14,7 @@ import type {
   Transport,
   UnaryResponse,
 } from '@connectrpc/connect';
-import { Code, ConnectError, createPromiseClient } from '@connectrpc/connect';
+import { Code, ConnectError, createClient } from '@connectrpc/connect';
 import {
   AuthService,
   ExternalAuthService,
@@ -174,7 +174,7 @@ const makeAuthenticatedTransport = async (
 
     const resolvedAddress = opts.externalAuthAddress ?? address;
     const transport = defaultFactory({ baseUrl: resolvedAddress });
-    const authClient = createPromiseClient(AuthService, transport);
+    const authClient = createClient(AuthService, transport);
     const resp = await authClient.authenticate(request);
     accessToken = resp.accessToken;
   } else {
@@ -198,10 +198,7 @@ const makeAuthenticatedTransport = async (
     const transport = defaultFactory({
       baseUrl: opts.externalAuthAddress,
     });
-    const externalAuthClient = createPromiseClient(
-      ExternalAuthService,
-      transport
-    );
+    const externalAuthClient = createClient(ExternalAuthService, transport);
     const resp = await externalAuthClient.authenticateTo(request, {
       headers: extAuthHeaders,
     });
@@ -316,10 +313,7 @@ const getOptionalWebRTCConfig = async (
   const optsCopy = { ...dialOpts } as DialOptions;
   const directTransport = await dialDirect(signalingAddress, optsCopy);
 
-  const signalingClient = createPromiseClient(
-    SignalingService,
-    directTransport
-  );
+  const signalingClient = createClient(SignalingService, directTransport);
   try {
     const resp = await signalingClient.optionalWebRTCConfig({}, callOpts);
     return resp.config ?? new WebRTCConfig();
@@ -388,10 +382,7 @@ export const dialWebRTC = async (
     throw error;
   }
 
-  const signalingClient = createPromiseClient(
-    SignalingService,
-    directTransport
-  );
+  const signalingClient = createClient(SignalingService, directTransport);
 
   const exchange = new SignalingExchange(
     signalingClient,

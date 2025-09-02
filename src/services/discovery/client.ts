@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
 import { DiscoverResourcesRequest } from '../../gen/service/discovery/v1/discovery_pb';
 import type { RobotClient } from '../../robot';
@@ -13,7 +13,7 @@ import type { Discovery } from './discovery';
  * @group Clients
  */
 export class DiscoveryClient implements Discovery {
-  private client: PromiseClient<typeof DiscoveryService>;
+  private client: Client<typeof DiscoveryService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };

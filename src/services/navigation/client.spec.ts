@@ -5,10 +5,7 @@ import { RobotClient } from '../../robot';
 vi.mock('../../gen/service/navigation/v1/navigation_pb_service');
 vi.mock('../../robot');
 
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
 import { GetLocationResponse } from '../../gen/service/navigation/v1/navigation_pb';
 import { NavigationClient } from './client';
@@ -44,9 +41,7 @@ describe('getLocation', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createPromiseClient(NavigationService, mockTransport)
-      );
+      .mockImplementation(() => createClient(NavigationService, mockTransport));
 
     navigation = new NavigationClient(
       new RobotClient('host'),
