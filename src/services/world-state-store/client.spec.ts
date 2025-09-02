@@ -86,12 +86,13 @@ describe('WorldStateStoreClient Tests', () => {
 
   describe('getTransform', () => {
     it('returns a transform by UUID', async () => {
-      const uuid = '123e4567-e89b-12d3-a456-426614174000';
+      const uuid = '01020304';
       const expected = mockTransform;
 
-      await expect(worldStateStore.getTransform(uuid)).resolves.toStrictEqual(
-        expected
-      );
+      await expect(worldStateStore.getTransform(uuid)).resolves.toStrictEqual({
+        ...expected,
+        uuidString: uuid,
+      });
     });
   });
 
