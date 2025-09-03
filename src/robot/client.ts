@@ -36,6 +36,7 @@ import type { Robot } from './robot';
 import SessionManager from './session-manager';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
+import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { assertExists } from '../assert';
 
 interface ICEServer {
@@ -237,6 +238,10 @@ export class RobotClient extends EventDispatcher implements Robot {
   private servoServiceClient: Client<typeof ServoService> | undefined;
 
   private slamServiceClient: Client<typeof SLAMService> | undefined;
+
+  private worldStateStoreServiceClient:
+    | Client<typeof WorldStateStoreService>
+    | undefined;
 
   private currentRetryAttempt = 0;
 
@@ -476,6 +481,13 @@ export class RobotClient extends EventDispatcher implements Robot {
   get slamService() {
     this.slamServiceClient ??= this.createServiceClient(SLAMService);
     return this.slamServiceClient;
+  }
+
+  get worldStateStoreService() {
+    this.worldStateStoreServiceClient ??= this.createServiceClient(
+      WorldStateStoreService
+    );
+    return this.worldStateStoreServiceClient;
   }
 
   createServiceClient<T extends ServiceType>(svcType: T): Client<T> {
