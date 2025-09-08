@@ -103,7 +103,8 @@ interface TransportInitOptions {
 
 export const dialDirect = async (
   address: string,
-  opts?: DialOptions
+  opts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<Transport> => {
   validateDialOptions(opts);
   const createTransport =
@@ -111,6 +112,8 @@ export const dialDirect = async (
 
   const transportOpts = {
     baseUrl: address,
+    // Default is "same-origin", which does not include localhost:*.
+    credentials: 'same-origin' as RequestCredentials,
   };
 
   // Client already has access token with no external auth, skip Authenticate process.
@@ -133,6 +136,10 @@ export const dialDirect = async (
     opts === undefined ||
     (opts.credentials === undefined && opts.accessToken === undefined)
   ) {
+    // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
+    if (transportCredentialsInclude) {
+      transportOpts.credentials = 'include';
+    }
     return createTransport(transportOpts);
   }
 
@@ -305,10 +312,15 @@ export interface WebRTCConnection {
 const getOptionalWebRTCConfig = async (
   signalingAddress: string,
   callOpts: CallOptions,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<WebRTCConfig> => {
   const optsCopy = { ...dialOpts } as DialOptions;
-  const directTransport = await dialDirect(signalingAddress, optsCopy);
+  const directTransport = await dialDirect(
+    signalingAddress,
+    optsCopy,
+    transportCredentialsInclude
+  );
 
   const signalingClient = createClient(SignalingService, directTransport);
   try {
@@ -333,7 +345,8 @@ const getOptionalWebRTCConfig = async (
 export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<WebRTCConnection> => {
   const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   validateDialOptions(dialOpts);
@@ -356,7 +369,8 @@ export const dialWebRTC = async (
   const webrtcOpts = await processWebRTCOpts(
     usableSignalingAddress,
     callOpts,
-    dialOpts
+    dialOpts,
+    transportCredentialsInclude
   );
   // then derive options specifically for signaling against our target.
   const exchangeOpts = processSignalingExchangeOpts(
@@ -373,7 +387,11 @@ export const dialWebRTC = async (
 
   let directTransport: Transport;
   try {
-    directTransport = await dialDirect(usableSignalingAddress, exchangeOpts);
+    directTransport = await dialDirect(
+      usableSignalingAddress,
+      exchangeOpts,
+      transportCredentialsInclude
+    );
   } catch (error) {
     pc.close();
     throw error;
@@ -429,13 +447,15 @@ export const dialWebRTC = async (
 const processWebRTCOpts = async (
   signalingAddress: string,
   callOpts: CallOptions,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<DialWebRTCOptions> => {
   // Get TURN servers, if any.
   const config = await getOptionalWebRTCConfig(
     signalingAddress,
     callOpts,
-    dialOpts
+    dialOpts,
+    transportCredentialsInclude
   );
   const additionalIceServers: RTCIceServer[] = config.additionalIceServers.map(
     (ice) => {
