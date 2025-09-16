@@ -23,7 +23,6 @@ import {
   GeoPoint,
   Pose,
   PoseInFrame,
-  ResourceName,
 } from '../../types';
 import { MotionClient } from './client';
 import {
@@ -53,18 +52,8 @@ describe('moveOnGlobe', () => {
     const expectedDestination = new GeoPoint({ latitude: 1, longitude: 2 });
     const expectedObstaclesList: ObstacleDetector[] = [];
     const expectedHeading = undefined;
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
-    const expectedMovementSensorName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'movementsensor',
-      name: 'myMovementsensor',
-    });
+    const expectedComponentName = "myBase";
+    const expectedMovementSensorName = "myMovementsensor";
     const expectedMotionConfiguration = undefined;
     const expectedExtra = {};
 
@@ -89,22 +78,8 @@ describe('moveOnGlobe', () => {
     await expect(
       motion.moveOnGlobe(
         { latitude: 1, longitude: 2 },
-        {
-          namespace: 'viam',
-          type: 'component',
-          subtype: 'base',
-          name: 'myBase',
-          remotePath: [],
-          localName: '',
-        },
-        {
-          namespace: 'viam',
-          type: 'component',
-          subtype: 'movementsensor',
-          name: 'myMovementsensor',
-          remotePath: [],
-          localName: '',
-        }
+        "myBase",
+        "myMovementsensor"
       )
     ).resolves.toStrictEqual(testExecutionId);
 
@@ -179,33 +154,13 @@ describe('moveOnGlobe', () => {
       }),
     ];
     const expectedHeading = 60;
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
-    const expectedMovementSensorName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'movementsensor',
-      name: 'myMovementsensor',
-    });
+    const expectedComponentName = "myBase";
+    const expectedMovementSensorName = "myMovementsensor";
     const expectedMotionConfiguration = new MotionConfiguration({
       obstacleDetectors: [
         {
-          visionService: {
-            namespace: 'viam',
-            type: 'service',
-            subtype: 'vision',
-            name: 'myVisionService',
-          },
-          camera: {
-            namespace: 'viam',
-            type: 'component',
-            subtype: 'camera',
-            name: 'myCamera',
-          },
+          visionService: "myVisionService",
+          camera: "myCamera",
         },
       ],
       positionPollingFrequencyHz: 20,
@@ -267,12 +222,7 @@ describe('moveOnGlobe', () => {
 
 describe('move', () => {
   it('sends a move request with pseudolinear constraints', async () => {
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
+    const expectedComponentName = "myBase";
     const expectedDestination = new PoseInFrame({
       referenceFrame: 'world',
       pose: new Pose({
@@ -325,12 +275,7 @@ describe('move', () => {
 
 describe('stopPlan', () => {
   it('return null', async () => {
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
+    const expectedComponentName = "myBase";
     const expectedExtra = {};
 
     let capturedReq: StopPlanRequest | undefined;
@@ -357,12 +302,7 @@ describe('stopPlan', () => {
   });
 
   it('allows optionally specifying extra', async () => {
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
+    const expectedComponentName = "myBase";
     const expectedExtra = { some: 'extra' };
     let capturedReq: StopPlanRequest | undefined;
     const mockTransport = createRouterTransport(({ service }) => {
@@ -393,12 +333,7 @@ describe('getPlan', () => {
     currentPlanWithStatus: {
       plan: {
         id: 'planId',
-        componentName: {
-          namespace: 'viam',
-          type: 'component',
-          subtype: 'base',
-          name: 'myBase',
-        },
+        componentName: "myBase",
         executionId: 'executionId',
         steps: [
           {
@@ -428,12 +363,7 @@ describe('getPlan', () => {
   });
 
   it('return GetPlanResponse', async () => {
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
+    const expectedComponentName = "myBase";
     const expectedLastPlanOnly = false;
     const expectedExecutionID = undefined;
     const expectedExtra = {};
@@ -463,12 +393,7 @@ describe('getPlan', () => {
   });
 
   it('allows optionally specifying lastPlanOnly, executionID, and extra', async () => {
-    const expectedComponentName = new ResourceName({
-      namespace: 'viam',
-      type: 'component',
-      subtype: 'base',
-      name: 'myBase',
-    });
+    const expectedComponentName = "myBase";
     const expectedLastPlanOnly = true;
     const expectedExecutionID = 'some specific executionID';
     const expectedExtra = { some: 'extra' };
@@ -508,12 +433,7 @@ describe('listPlanStatuses', () => {
     planStatusesWithIds: [
       {
         planId: 'some plan id',
-        componentName: {
-          namespace: 'viam',
-          type: 'component',
-          subtype: 'base',
-          name: 'myBase',
-        },
+        componentName: "myBase",
         executionId: 'some execution id',
         status: {
           state: PlanState.STOPPED,
