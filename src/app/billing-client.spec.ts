@@ -15,6 +15,9 @@ import {
   SourceType,
   UsageCost,
   UsageCostType,
+  GetOrgBillingInformationResponse,
+  PaymentMethodUSBankAccount,
+  VerificationInfo,
 } from '../gen/app/v1/billing_pb';
 import {
   BillingClient,
@@ -68,11 +71,32 @@ const testInvoiceSummary = new GetInvoicesSummaryResponse({
     },
   ],
 });
-const testBillingInfo = {
+
+const testVerificationInfo = new VerificationInfo({
+  arrivalDate: BigInt(1678886400000), // Example timestamp
+  hostedVerificationPageUrl: 'https://example.com/verify',
+});
+
+const testPaymentMethodUSBankAccount = new PaymentMethodUSBankAccount({
+  bankName: 'Example Bank',
+  lastFourDigitsAccountNumber: '1234',
+  routingNumber: '567890123',
+  accountType: 'checking',
+  verificationInfo: testVerificationInfo,
+});
+
+const testBillingInfo = new GetOrgBillingInformationResponse({
   type: PaymentMethodType.UNSPECIFIED,
   billingEmail: 'email@email.com',
   billingTier: 'platinum',
-};
+});
+
+const testBillingInfoUSBankAccount = new GetOrgBillingInformationResponse({
+  type: PaymentMethodType.USBANKACCOUNT,
+  billingEmail: 'email@email.com',
+  billingTier: 'platinum',
+  methodUsBankAccount: testPaymentMethodUSBankAccount,
+});
 
 let testGetInvoicePdfStream: WritableIterable<GetInvoicePdfResponse>;
 
@@ -115,7 +139,6 @@ describe('BillingClient tests', () => {
             endDate: testEndDate,
           } as GetCurrentMonthUsageResponse;
         },
-        getOrgBillingInformation: () => testBillingInfo,
         getInvoicesSummary: () => testInvoiceSummary,
         getInvoicePdf: () => testGetInvoicePdfStream,
       });
@@ -131,9 +154,28 @@ describe('BillingClient tests', () => {
     expect(response).toEqual(testMonthUsage);
   });
 
-  it('getOrgBillingInformation', async () => {
-    const response = await subject().getOrgBillingInformation('orgId');
-    expect(response).toEqual(testBillingInfo);
+  describe('getOrgBillingInformation', () => {
+    it('should return billing info with unspecified payment method', async () => {
+      const localMockTransport = createRouterTransport(({ service }) => {
+        service(BillingService, {
+          getOrgBillingInformation: () => testBillingInfo,
+        });
+      });
+      const localSubject = () => new BillingClient(localMockTransport);
+      const response = await localSubject().getOrgBillingInformation('orgId');
+      expect(response).toEqual(testBillingInfo);
+    });
+
+    it('should return billing info with US bank account payment method', async () => {
+      const localMockTransport = createRouterTransport(({ service }) => {
+        service(BillingService, {
+          getOrgBillingInformation: () => testBillingInfoUSBankAccount,
+        });
+      });
+      const localSubject = () => new BillingClient(localMockTransport);
+      const response = await localSubject().getOrgBillingInformation('orgId');
+      expect(response).toEqual(testBillingInfoUSBankAccount);
+    });
   });
 
   it('getInvoicesSummary', async () => {
