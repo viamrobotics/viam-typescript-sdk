@@ -30,7 +30,7 @@ export interface Motion extends Resource {
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
-   * cconst gripperName = "my_gripper";
+   * const gripperName = "my_gripper";
    *
    * const goalPose: VIAM.Pose = {
    *   x: -817,
