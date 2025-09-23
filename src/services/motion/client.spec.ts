@@ -18,12 +18,7 @@ import {
   MoveRequest,
   StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
-import {
-  GeoGeometry,
-  GeoPoint,
-  Pose,
-  PoseInFrame,
-} from '../../types';
+import { GeoGeometry, GeoPoint, Pose, PoseInFrame } from '../../types';
 import { MotionClient } from './client';
 import {
   Constraints,
@@ -52,8 +47,8 @@ describe('moveOnGlobe', () => {
     const expectedDestination = new GeoPoint({ latitude: 1, longitude: 2 });
     const expectedObstaclesList: ObstacleDetector[] = [];
     const expectedHeading = undefined;
-    const expectedComponentName = "myBase";
-    const expectedMovementSensorName = "myMovementsensor";
+    const expectedComponentName = 'myBase';
+    const expectedMovementSensorName = 'myMovementsensor';
     const expectedMotionConfiguration = undefined;
     const expectedExtra = {};
 
@@ -78,8 +73,8 @@ describe('moveOnGlobe', () => {
     await expect(
       motion.moveOnGlobe(
         { latitude: 1, longitude: 2 },
-        "myBase",
-        "myMovementsensor"
+        'myBase',
+        'myMovementsensor'
       )
     ).resolves.toStrictEqual(testExecutionId);
 
@@ -154,13 +149,13 @@ describe('moveOnGlobe', () => {
       }),
     ];
     const expectedHeading = 60;
-    const expectedComponentName = "myBase";
-    const expectedMovementSensorName = "myMovementsensor";
+    const expectedComponentName = 'myBase';
+    const expectedMovementSensorName = 'myMovementsensor';
     const expectedMotionConfiguration = new MotionConfiguration({
       obstacleDetectors: [
         {
-          visionService: "myVisionService",
-          camera: "myCamera",
+          visionService: 'myVisionService',
+          camera: 'myCamera',
         },
       ],
       positionPollingFrequencyHz: 20,
@@ -222,7 +217,7 @@ describe('moveOnGlobe', () => {
 
 describe('move', () => {
   it('sends a move request with pseudolinear constraints', async () => {
-    const expectedComponentName = "myBase";
+    const expectedComponentName = 'myBase';
     const expectedDestination = new PoseInFrame({
       referenceFrame: 'world',
       pose: new Pose({
@@ -275,7 +270,7 @@ describe('move', () => {
 
 describe('stopPlan', () => {
   it('return null', async () => {
-    const expectedComponentName = "myBase";
+    const expectedComponentName = 'myBase';
     const expectedExtra = {};
 
     let capturedReq: StopPlanRequest | undefined;
@@ -302,7 +297,7 @@ describe('stopPlan', () => {
   });
 
   it('allows optionally specifying extra', async () => {
-    const expectedComponentName = "myBase";
+    const expectedComponentName = 'myBase';
     const expectedExtra = { some: 'extra' };
     let capturedReq: StopPlanRequest | undefined;
     const mockTransport = createRouterTransport(({ service }) => {
@@ -333,7 +328,7 @@ describe('getPlan', () => {
     currentPlanWithStatus: {
       plan: {
         id: 'planId',
-        componentName: "myBase",
+        componentName: 'myBase',
         executionId: 'executionId',
         steps: [
           {
@@ -363,7 +358,7 @@ describe('getPlan', () => {
   });
 
   it('return GetPlanResponse', async () => {
-    const expectedComponentName = "myBase";
+    const expectedComponentName = 'myBase';
     const expectedLastPlanOnly = false;
     const expectedExecutionID = undefined;
     const expectedExtra = {};
@@ -393,7 +388,7 @@ describe('getPlan', () => {
   });
 
   it('allows optionally specifying lastPlanOnly, executionID, and extra', async () => {
-    const expectedComponentName = "myBase";
+    const expectedComponentName = 'myBase';
     const expectedLastPlanOnly = true;
     const expectedExecutionID = 'some specific executionID';
     const expectedExtra = { some: 'extra' };
@@ -433,7 +428,7 @@ describe('listPlanStatuses', () => {
     planStatusesWithIds: [
       {
         planId: 'some plan id',
-        componentName: "myBase",
+        componentName: 'myBase',
         executionId: 'some execution id',
         status: {
           state: PlanState.STOPPED,
