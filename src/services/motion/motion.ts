@@ -96,8 +96,8 @@ export interface Motion extends Resource {
    *   theta: 0,
    * };
    *
-   * const baseName = "my_base";
-   * const slamServiceName = "my_slam_service";
+   * const baseName = 'my_base';
+   * const slamServiceName = 'my_slam_service';
    *
    * // Move the base to Y=10 (location of 0,10,0) relative to map origin
    * const executionId = await motion.moveOnMap(
@@ -148,8 +148,8 @@ export interface Motion extends Resource {
    *   longitude: -73.98,
    * };
    *
-   * const baseName = "my_base";
-   * const movementSensorName = "my_movement_sensor";
+   * const baseName = 'my_base';
+   * const movementSensorName = 'my_movement_sensor';
    *
    * // Move the base to the geographic location
    * const globeExecutionId = await motion.moveOnGlobe(
@@ -193,7 +193,7 @@ export interface Motion extends Resource {
    *
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
-   * const baseName = "my_base";
+   * const baseName = 'my_base';
    *
    * // Stop the base component which was instructed to move
    * await motion.stopPlan(baseName);
@@ -224,7 +224,7 @@ export interface Motion extends Resource {
    *
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
-   * const baseName = "my_base";
+   * const baseName = 'my_base';
    *
    * // Get the plan(s) of the base component
    * const response = await motion.getPlan(baseName);
@@ -285,7 +285,7 @@ export interface Motion extends Resource {
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
-   * const gripperName = "my_gripper";
+   * const gripperName = 'my_gripper';
    *
    * // Get the gripper's pose in world coordinates
    * const gripperPoseInWorld = await motion.getPose(
