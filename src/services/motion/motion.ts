@@ -6,7 +6,6 @@ import type {
   Pose,
   PoseInFrame,
   Resource,
-  ResourceName,
   Transform,
   WorldState,
 } from '../../types';
@@ -32,12 +31,7 @@ export interface Motion extends Resource {
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
    * // Assumes a gripper configured with name "my_gripper"
-   * const gripperName = new VIAM.ResourceName({
-   *   name: 'my_gripper',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'gripper',
-   * });
+   * cconst gripperName = "my_gripper";
    *
    * const goalPose: VIAM.Pose = {
    *   x: -817,
@@ -71,7 +65,7 @@ export interface Motion extends Resource {
    */
   move: (
     destination: PoseInFrame,
-    componentName: ResourceName,
+    componentName: string,
     worldState?: WorldState,
     constraints?: Constraints,
     extra?: Struct
@@ -102,18 +96,8 @@ export interface Motion extends Resource {
    *   theta: 0,
    * };
    *
-   * const baseName = new VIAM.ResourceName({
-   *   name: 'my_base',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'base',
-   * });
-   * const slamServiceName = new VIAM.ResourceName({
-   *   name: 'my_slam_service',
-   *   namespace: 'rdk',
-   *   type: 'service',
-   *   subtype: 'slam',
-   * });
+   * const baseName = 'my_base';
+   * const slamServiceName = 'my_slam_service';
    *
    * // Move the base to Y=10 (location of 0,10,0) relative to map origin
    * const executionId = await motion.moveOnMap(
@@ -137,8 +121,8 @@ export interface Motion extends Resource {
    */
   moveOnMap: (
     destination: Pose,
-    componentName: ResourceName,
-    slamServiceName: ResourceName,
+    componentName: string,
+    slamServiceName: string,
     motionConfiguration?: MotionConfiguration,
     obstacles?: Geometry[],
     extra?: Struct
@@ -164,18 +148,8 @@ export interface Motion extends Resource {
    *   longitude: -73.98,
    * };
    *
-   * const baseName = new VIAM.ResourceName({
-   *   name: 'my_base',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'base',
-   * });
-   * const movementSensorName = new VIAM.ResourceName({
-   *   name: 'my_movement_sensor',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'movement_sensor',
-   * });
+   * const baseName = 'my_base';
+   * const movementSensorName = 'my_movement_sensor';
    *
    * // Move the base to the geographic location
    * const globeExecutionId = await motion.moveOnGlobe(
@@ -202,8 +176,8 @@ export interface Motion extends Resource {
    */
   moveOnGlobe: (
     destination: GeoPoint,
-    componentName: ResourceName,
-    movementSensorName: ResourceName,
+    componentName: string,
+    movementSensorName: string,
     heading?: number,
     obstaclesList?: GeoGeometry[],
     motionConfiguration?: MotionConfiguration,
@@ -219,12 +193,7 @@ export interface Motion extends Resource {
    *
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
-   * const baseName = new VIAM.ResourceName({
-   *   name: 'my_base',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'base',
-   * });
+   * const baseName = 'my_base';
    *
    * // Stop the base component which was instructed to move
    * await motion.stopPlan(baseName);
@@ -235,7 +204,7 @@ export interface Motion extends Resource {
    *
    * @param componentName - The component to stop
    */
-  stopPlan: (componentName: ResourceName, extra?: Struct) => Promise<null>;
+  stopPlan: (componentName: string, extra?: Struct) => Promise<null>;
 
   /**
    * By default: returns the plan history of the most recent `moveOnGlobe()` or
@@ -255,12 +224,7 @@ export interface Motion extends Resource {
    *
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
-   * const baseName = new VIAM.ResourceName({
-   *   name: 'my_base',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'base',
-   * });
+   * const baseName = 'my_base';
    *
    * // Get the plan(s) of the base component
    * const response = await motion.getPlan(baseName);
@@ -277,7 +241,7 @@ export interface Motion extends Resource {
    *   reference frames that are needed to compute the component's `Pose`.
    */
   getPlan: (
-    componentName: ResourceName,
+    componentName: string,
     lastPlanOnly?: boolean,
     executionId?: string,
     extra?: Struct
@@ -321,12 +285,7 @@ export interface Motion extends Resource {
    * ```ts
    * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
-   * const gripperName = new VIAM.ResourceName({
-   *   name: 'my_gripper',
-   *   namespace: 'rdk',
-   *   type: 'component',
-   *   subtype: 'gripper',
-   * });
+   * const gripperName = 'my_gripper';
    *
    * // Get the gripper's pose in world coordinates
    * const gripperPoseInWorld = await motion.getPose(
@@ -347,7 +306,7 @@ export interface Motion extends Resource {
    *   reference frames that are needed to compute the component's `Pose`.
    */
   getPose: (
-    componentName: ResourceName,
+    componentName: string,
     destinationFrame: string,
     supplementalTransforms: Transform[],
     extra?: Struct
