@@ -72,6 +72,8 @@ import {
   DataCaptureUploadRequest,
   DataCaptureUploadResponse,
   DataType,
+  FileUploadRequest,
+  FileUploadResponse,
   SensorData,
   SensorMetadata,
   UploadMetadata,
@@ -1714,5 +1716,94 @@ describe('DataPipelineClient tests', () => {
       const nextPage = await page.nextPage();
       expect(nextPage.runs).toEqual([]);
     });
+  });
+});
+
+describe('fileUpload tests', () => {
+  const partId = 'testPartId';
+  const fileExtension = '.png';
+  const tags = ['testTag1', 'testTag2'];
+  const datasetIds = ['dataset1', 'dataset2'];
+  const binaryData = new Uint8Array([1, 2, 3, 4, 5]);
+  const dataRequestTimes: [Date, Date] = [
+    new Date('2025-03-19T10:00:00Z'),
+    new Date('2025-03-19T10:00:01Z'),
+  ];
+
+  let capturedRequests: FileUploadRequest[];
+
+  beforeEach(() => {
+    capturedRequests = [];
+    mockTransport = createRouterTransport(({ service }) => {
+      service(DataSyncService, {
+        fileUpload: async (requests: AsyncIterable<FileUploadRequest>) => {
+          for await (const request of requests) {
+            capturedRequests.push(request);
+          }
+          return new FileUploadResponse({
+            fileId: 'testFileId',
+            binaryDataId: 'testBinaryDataId',
+          });
+        },
+      });
+    });
+  });
+
+  it('uploads file with metadata and file contents', async () => {
+    const result = await subject().fileUpload(
+      binaryData,
+      partId,
+      fileExtension,
+      dataRequestTimes,
+      tags,
+      datasetIds
+    );
+
+    expect(result).toBe('testBinaryDataId');
+    expect(capturedRequests).toHaveLength(2);
+
+    // Check metadata request
+    const metadataRequest = capturedRequests[0]!;
+    expect(metadataRequest.uploadPacket.case).toBe('metadata');
+    if (metadataRequest.uploadPacket.case === 'metadata') {
+      const metadata = metadataRequest.uploadPacket.value;
+      expect(metadata.partId).toBe(partId);
+      expect(metadata.type).toBe(DataType.BINARY_SENSOR);
+      expect(metadata.tags).toEqual(tags);
+      expect(metadata.fileExtension).toBe(fileExtension);
+      expect(metadata.datasetIds).toEqual(datasetIds);
+    }
+
+    // Check file contents request
+    const fileContentsRequest = capturedRequests[1]!;
+    expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
+    if (fileContentsRequest.uploadPacket.case === 'fileContents') {
+      const fileData = fileContentsRequest.uploadPacket.value;
+      expect(fileData.data).toEqual(binaryData);
+    }
+  });
+
+  it('uploads file without optional parameters', async () => {
+    const result = await subject().fileUpload(
+      binaryData,
+      partId,
+      fileExtension,
+      dataRequestTimes
+    );
+
+    expect(result).toBe('testBinaryDataId');
+    expect(capturedRequests).toHaveLength(2);
+
+    // Check metadata request
+    const metadataRequest = capturedRequests[0]!;
+    expect(metadataRequest.uploadPacket.case).toBe('metadata');
+    if (metadataRequest.uploadPacket.case === 'metadata') {
+      const metadata = metadataRequest.uploadPacket.value;
+      expect(metadata.partId).toBe(partId);
+      expect(metadata.type).toBe(DataType.BINARY_SENSOR);
+      expect(metadata.tags).toEqual([]);
+      expect(metadata.fileExtension).toBe(fileExtension);
+      expect(metadata.datasetIds).toEqual([]);
+    }
   });
 });

@@ -1,5 +1,5 @@
 import { BSON } from 'bsonfy';
-import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+import { Struct, Timestamp, type JsonValue, type PartialMessage } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
@@ -19,6 +19,8 @@ import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines
 import {
   DataCaptureUploadRequest,
   DataType,
+  FileData,
+  FileUploadRequest,
   SensorData,
   SensorMetadata,
   UploadMetadata,
@@ -1212,7 +1214,7 @@ export class DataClient {
    *   (for example, "movementSensor")
    * @param componentName The name of the component used to capture the data
    * @param methodName The name of the method used to capture the data.
-   * @param fileExtension The file extension of binary data including the
+   * @param filename The file extension of binary data including the
    *   period, for example .jpg, .png, or .pcd. The backend will route the
    *   binary to its corresponding mime type based on this extension. Files with
    *   a .jpeg, .jpg, or .png extension will be saved to the images tab.
@@ -1229,7 +1231,7 @@ export class DataClient {
     componentType: string,
     componentName: string,
     methodName: string,
-    fileExtension: string,
+    filename: string,
     dataRequestTimes: [Date, Date],
     tags?: string[],
     datasetIds?: string[]
@@ -1241,7 +1243,7 @@ export class DataClient {
       methodName,
       type: DataType.BINARY_SENSOR,
       tags,
-      fileExtension,
+      filename,
       datasetIds,
     });
 
@@ -1263,6 +1265,87 @@ export class DataClient {
 
     const resp = await this.dataSyncClient.dataCaptureUpload(req);
     return resp.binaryDataId;
+  }
+
+  /**
+   * Uploads the contents and metadata for binary (image + file) data using streaming.
+   *
+   * Upload binary data collected on a robot along with the relevant metadata to app.viam.com. This
+   * method uses client streaming to upload the data in chunks, which is more
+   * efficient for large files.
+   *
+   * @example
+   *
+   * ```ts
+   * const binaryDataId = await dataClient.fileUpload(
+   *   binaryData,
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   '.jpg',
+   *   [new Date('2025-03-19'), new Date('2025-03-19')]
+   * );
+   * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#fileupload).
+   *
+   * @param binaryData The data to be uploaded, represented in bytes
+   * @param partId The part ID of the component used to capture the data
+   * @param fileName The filename of binary data including the
+   *   period, for example image.jpg, image.png, or image.pcd. The backend will route the
+   *   binary to its corresponding mime type based on this extension. Files with
+   *   a .jpeg, .jpg, or .png extension will be saved to the images tab.
+   * @param dataRequestTimes Tuple containing `Date` objects denoting the times
+   *   this data was requested[0] by the robot and received[1] from the
+   *   appropriate sensor.
+   * @param tags The list of tags to allow for tag-based filtering when
+   *   retrieving data
+   * @param datasetIds The list of dataset IDs to associate with the uploaded data
+   * @returns The binary data ID of the uploaded data
+   */
+  async fileUpload(
+    binaryData: Uint8Array,
+    partId: string,
+    fileName: string,
+    _dataRequestTimes: [Date, Date],
+    tags?: string[],
+    datasetIds?: string[]
+  ) {
+    const fileExtension = fileName.includes('.') ? fileName.split('.')[1] : '';
+    const metadata = new UploadMetadata({
+      partId,
+      type: DataType.BINARY_SENSOR,
+      tags,
+      fileName,
+      fileExtension,
+      datasetIds,
+    });
+
+    const fileData = new FileData({
+      data: binaryData,
+    });
+
+    // Create async generator for streaming upload
+    async function* uploadGenerator(): AsyncIterable<PartialMessage<FileUploadRequest>> {
+      // Send metadata first
+      yield new FileUploadRequest({
+        uploadPacket: {
+          case: 'metadata',
+          value: metadata,
+        },
+      });
+
+      // Send file contents
+      yield new FileUploadRequest({
+        uploadPacket: {
+          case: 'fileContents',
+          value: fileData,
+        },
+      });
+    }
+
+    // Call the streaming method
+    const response = await this.dataSyncClient.fileUpload(uploadGenerator());
+    return response.binaryDataId;
   }
 
   // eslint-disable-next-line class-methods-use-this
