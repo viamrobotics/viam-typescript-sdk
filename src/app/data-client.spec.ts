@@ -1,6 +1,6 @@
-import { BSON } from 'bsonfy';
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
+import { BSON } from 'bsonfy';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
@@ -33,6 +33,8 @@ import {
   Filter,
   GetDatabaseConnectionRequest,
   GetDatabaseConnectionResponse,
+  GetLatestTabularDataRequest,
+  GetLatestTabularDataResponse,
   RemoveBinaryDataFromDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsResponse,
   RemoveBoundingBoxFromImageByIDRequest,
@@ -50,9 +52,23 @@ import {
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
-  GetLatestTabularDataRequest,
-  GetLatestTabularDataResponse,
 } from '../gen/app/data/v1/data_pb';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+import {
+  CreateDataPipelineRequest,
+  CreateDataPipelineResponse,
+  DataPipeline,
+  DataPipelineRun,
+  DataPipelineRunStatus,
+  DeleteDataPipelineRequest,
+  DeleteDataPipelineResponse,
+  GetDataPipelineRequest,
+  GetDataPipelineResponse,
+  ListDataPipelineRunsRequest,
+  ListDataPipelineRunsResponse,
+  ListDataPipelinesRequest,
+  ListDataPipelinesResponse,
+} from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
 import {
   CreateDatasetRequest,
@@ -72,36 +88,25 @@ import {
   DataCaptureUploadRequest,
   DataCaptureUploadResponse,
   DataType,
+  FileData,
   FileUploadRequest,
   FileUploadResponse,
   SensorData,
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import { DataClient, type FilterOptions } from './data-client';
 import {
-  DataPipeline,
-  ListDataPipelinesRequest,
-  ListDataPipelinesResponse,
-  GetDataPipelineRequest,
-  GetDataPipelineResponse,
-  CreateDataPipelineRequest,
-  CreateDataPipelineResponse,
-  DeleteDataPipelineRequest,
-  DeleteDataPipelineResponse,
-  DataPipelineRun,
-  DataPipelineRunStatus,
-  ListDataPipelineRunsRequest,
-  ListDataPipelineRunsResponse,
-} from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+  DataClient,
+  type FileUploadOptions,
+  type FilterOptions,
+} from './data-client';
 vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
 const subject = () => new DataClient(mockTransport);
 
 describe('DataClient tests', () => {
-  const filter = subject().createFilter({
+  const filter = DataClient.createFilter({
     componentName: 'testComponentName',
     componentType: 'testComponentType',
   });
@@ -1037,13 +1042,13 @@ describe('DataClient tests', () => {
 
   describe('createFilter tests', () => {
     it('create empty filter', () => {
-      const testFilter = subject().createFilter({});
+      const testFilter = DataClient.createFilter({});
       expect(testFilter).toEqual(new Filter());
     });
 
     it('create filter', () => {
       const opts = { componentName: 'camera' };
-      const testFilter = subject().createFilter(opts);
+      const testFilter = DataClient.createFilter(opts);
 
       const expectedFilter = new Filter({
         componentName: 'camera',
@@ -1091,7 +1096,7 @@ describe('DataClient tests', () => {
         endTime,
         tags: tagsList,
       };
-      const testFilter = subject().createFilter(opts);
+      const testFilter = DataClient.createFilter(opts);
       expect(testFilter.componentType).toEqual('testComponentType');
 
       const expectedFilter = new Filter({
@@ -1721,14 +1726,19 @@ describe('DataPipelineClient tests', () => {
 
 describe('fileUpload tests', () => {
   const partId = 'testPartId';
-  const fileExtension = '.png';
-  const tags = ['testTag1', 'testTag2'];
-  const datasetIds = ['dataset1', 'dataset2'];
   const binaryData = new Uint8Array([1, 2, 3, 4, 5]);
-  const dataRequestTimes: [Date, Date] = [
-    new Date('2025-03-19T10:00:00Z'),
-    new Date('2025-03-19T10:00:01Z'),
-  ];
+  const options: FileUploadOptions = {
+    componentType: 'componentType',
+    componentName: 'componentName',
+    methodName: 'methodName',
+    fileName: 'fileName',
+    fileExtension: '.png',
+    tags: ['testTag1', 'testTag2'],
+    datasetIds: ['dataset1', 'dataset2'],
+  };
+
+  const expectedFileId = 'testFileId';
+  const expectedBinaryDataId = 'testBinaryDataId';
 
   let capturedRequests: FileUploadRequest[];
 
@@ -1741,8 +1751,8 @@ describe('fileUpload tests', () => {
             capturedRequests.push(request);
           }
           return new FileUploadResponse({
-            fileId: 'testFileId',
-            binaryDataId: 'testBinaryDataId',
+            fileId: expectedFileId,
+            binaryDataId: expectedBinaryDataId,
           });
         },
       });
@@ -1750,46 +1760,34 @@ describe('fileUpload tests', () => {
   });
 
   it('uploads file with metadata and file contents', async () => {
-    const result = await subject().fileUpload(
-      binaryData,
-      partId,
-      fileExtension,
-      dataRequestTimes,
-      tags,
-      datasetIds
-    );
+    const result = await subject().fileUpload(binaryData, partId, options);
 
-    expect(result).toBe('testBinaryDataId');
+    expect(result).toBe(expectedBinaryDataId);
     expect(capturedRequests).toHaveLength(2);
 
     // Check metadata request
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
-    if (metadataRequest.uploadPacket.case === 'metadata') {
-      const metadata = metadataRequest.uploadPacket.value;
-      expect(metadata.partId).toBe(partId);
-      expect(metadata.type).toBe(DataType.BINARY_SENSOR);
-      expect(metadata.tags).toEqual(tags);
-      expect(metadata.fileExtension).toBe(fileExtension);
-      expect(metadata.datasetIds).toEqual(datasetIds);
-    }
+    const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
+    expect(metadata.partId).toBe(partId);
+    expect(metadata.type).toBe(DataType.FILE);
+    expect(metadata.componentType).toBe(options.componentType);
+    expect(metadata.componentName).toBe(options.componentName);
+    expect(metadata.methodName).toBe(options.methodName);
+    expect(metadata.fileName).toBe(options.fileName);
+    expect(metadata.fileExtension).toBe(options.fileExtension);
+    expect(metadata.tags).toStrictEqual(options.tags);
+    expect(metadata.datasetIds).toStrictEqual(options.datasetIds);
 
     // Check file contents request
     const fileContentsRequest = capturedRequests[1]!;
     expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
-    if (fileContentsRequest.uploadPacket.case === 'fileContents') {
-      const fileData = fileContentsRequest.uploadPacket.value;
-      expect(fileData.data).toEqual(binaryData);
-    }
+    const fileContents = fileContentsRequest.uploadPacket.value as FileData;
+    expect(fileContents.data).toEqual(binaryData);
   });
 
   it('uploads file without optional parameters', async () => {
-    const result = await subject().fileUpload(
-      binaryData,
-      partId,
-      fileExtension,
-      dataRequestTimes
-    );
+    const result = await subject().fileUpload(binaryData, partId);
 
     expect(result).toBe('testBinaryDataId');
     expect(capturedRequests).toHaveLength(2);
@@ -1797,13 +1795,21 @@ describe('fileUpload tests', () => {
     // Check metadata request
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
-    if (metadataRequest.uploadPacket.case === 'metadata') {
-      const metadata = metadataRequest.uploadPacket.value;
-      expect(metadata.partId).toBe(partId);
-      expect(metadata.type).toBe(DataType.BINARY_SENSOR);
-      expect(metadata.tags).toEqual([]);
-      expect(metadata.fileExtension).toBe(fileExtension);
-      expect(metadata.datasetIds).toEqual([]);
-    }
+    const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
+    expect(metadata.partId).toBe(partId);
+    expect(metadata.type).toBe(DataType.FILE);
+    expect(metadata.componentType).toBe('');
+    expect(metadata.componentName).toBe('');
+    expect(metadata.methodName).toBe('');
+    expect(metadata.fileName).toBe('');
+    expect(metadata.fileExtension).toBe('');
+    expect(metadata.tags).toStrictEqual([]);
+    expect(metadata.datasetIds).toStrictEqual([]);
+
+    // Check file contents request
+    const fileContentsRequest = capturedRequests[1]!;
+    expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
+    const fileContents = fileContentsRequest.uploadPacket.value as FileData;
+    expect(fileContents.data).toEqual(binaryData);
   });
 });

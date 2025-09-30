@@ -1,6 +1,11 @@
-import { BSON } from 'bsonfy';
-import { Struct, Timestamp, type JsonValue, type PartialMessage } from '@bufbuild/protobuf';
+import {
+  Struct,
+  Timestamp,
+  type JsonValue,
+  type PartialMessage,
+} from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import { BSON } from 'bsonfy';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
   BinaryID,
@@ -8,14 +13,18 @@ import {
   CaptureMetadata,
   Filter,
   Order,
-  TagsFilter,
   TabularDataSource,
   TabularDataSourceType,
+  TagsFilter,
 } from '../gen/app/data/v1/data_pb';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+import {
+  DataPipeline,
+  DataPipelineRun,
+} from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
 import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
 import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
   DataCaptureUploadRequest,
   DataType,
@@ -25,10 +34,6 @@ import {
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import {
-  DataPipeline,
-  DataPipelineRun,
-} from '../gen/app/datapipelines/v1/data_pipelines_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -57,6 +62,43 @@ interface TabularDataPoint {
   methodParameters: JsonValue;
   tags: string[];
   payload: JsonValue;
+}
+
+/** Optional parameters for uploading files */
+export interface FileUploadOptions {
+  /**
+   * Optional type of the component associated with the file (for example,
+   * "movement_sensor").
+   */
+  componentType?: string;
+
+  /** Optional name of the component associated with the file. */
+  componentName?: string;
+
+  /** Optional name of the method associated with the file. */
+  methodName?: string;
+
+  /**
+   * Optional name of the file. The empty string `""` will be assigned as the
+   * file name if one isn't provided.
+   */
+  fileName?: string;
+
+  /**
+   * Optional file extension. The empty string `""` will be assigned as the file
+   * extension if one isn't provided. Files with a `.jpeg`, `.jpg`, or `.png`
+   * extension will be saved to the **Images** tab.
+   */
+  fileExtension?: string;
+
+  /**
+   * Optional list of tags to allow for tag-based filtering when retrieving
+   * data.
+   */
+  tags?: string[];
+
+  /** Optional list of datasets to add the data to. */
+  datasetIds?: string[];
 }
 
 export type Dataset = Partial<PBDataset> & {
@@ -1214,7 +1256,7 @@ export class DataClient {
    *   (for example, "movementSensor")
    * @param componentName The name of the component used to capture the data
    * @param methodName The name of the method used to capture the data.
-   * @param filename The file extension of binary data including the
+   * @param fileExtension The file extension of binary data including the
    *   period, for example .jpg, .png, or .pcd. The backend will route the
    *   binary to its corresponding mime type based on this extension. Files with
    *   a .jpeg, .jpg, or .png extension will be saved to the images tab.
@@ -1231,7 +1273,7 @@ export class DataClient {
     componentType: string,
     componentName: string,
     methodName: string,
-    filename: string,
+    fileExtension: string,
     dataRequestTimes: [Date, Date],
     tags?: string[],
     datasetIds?: string[]
@@ -1243,7 +1285,7 @@ export class DataClient {
       methodName,
       type: DataType.BINARY_SENSOR,
       tags,
-      filename,
+      fileExtension,
       datasetIds,
     });
 
@@ -1268,20 +1310,22 @@ export class DataClient {
   }
 
   /**
-   * Uploads the contents and metadata for binary (image + file) data using streaming.
+   * Upload arbitrary file data.
    *
-   * Upload binary data collected on a robot along with the relevant metadata to app.viam.com. This
-   * method uses client streaming to upload the data in chunks, which is more
-   * efficient for large files.
+   * Upload file data that may be stored on a robot along with the relevant
+   * metadata. File data can be found in the **Files** tab of the **DATA**
+   * page.
    *
    * @example
    *
    * ```ts
    * const binaryDataId = await dataClient.fileUpload(
-   *   binaryData,
-   *   '123abc45-1234-5678-90ab-cdef12345678',
-   *   '.jpg',
-   *   [new Date('2025-03-19'), new Date('2025-03-19')]
+   *  'INSERT YOUR PART ID'
+   *  binaryData,
+   *  {
+   *    fileExtension: ".jpeg",
+   *    tags: ["tag_1", "tag_2"],
+   *  }
    * );
    * ```
    *
@@ -1290,66 +1334,60 @@ export class DataClient {
    *
    * @param binaryData The data to be uploaded, represented in bytes
    * @param partId The part ID of the component used to capture the data
-   * @param fileName The filename of binary data including the
-   *   period, for example image.jpg, image.png, or image.pcd. The backend will route the
-   *   binary to its corresponding mime type based on this extension. Files with
-   *   a .jpeg, .jpg, or .png extension will be saved to the images tab.
-   * @param dataRequestTimes Tuple containing `Date` objects denoting the times
-   *   this data was requested[0] by the robot and received[1] from the
-   *   appropriate sensor.
-   * @param tags The list of tags to allow for tag-based filtering when
-   *   retrieving data
-   * @param datasetIds The list of dataset IDs to associate with the uploaded data
+   * @param options Options for the file upload
    * @returns The binary data ID of the uploaded data
    */
   async fileUpload(
     binaryData: Uint8Array,
     partId: string,
-    fileName: string,
-    _dataRequestTimes: [Date, Date],
-    tags?: string[],
-    datasetIds?: string[]
+    options?: FileUploadOptions
   ) {
-    const fileExtension = fileName.includes('.') ? fileName.split('.')[1] : '';
-    const metadata = new UploadMetadata({
+    const md = new UploadMetadata({
       partId,
-      type: DataType.BINARY_SENSOR,
-      tags,
-      fileName,
-      fileExtension,
-      datasetIds,
+      type: DataType.FILE,
+      ...options,
     });
 
-    const fileData = new FileData({
-      data: binaryData,
-    });
-
-    // Create async generator for streaming upload
-    async function* uploadGenerator(): AsyncIterable<PartialMessage<FileUploadRequest>> {
-      // Send metadata first
-      yield new FileUploadRequest({
-        uploadPacket: {
-          case: 'metadata',
-          value: metadata,
-        },
-      });
-
-      // Send file contents
-      yield new FileUploadRequest({
-        uploadPacket: {
-          case: 'fileContents',
-          value: fileData,
-        },
-      });
-    }
-
-    // Call the streaming method
-    const response = await this.dataSyncClient.fileUpload(uploadGenerator());
+    const response = await this.dataSyncClient.fileUpload(
+      DataClient.fileUploadRequests(md, binaryData)
+    );
     return response.binaryDataId;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  createFilter(options: FilterOptions): Filter {
+  /**
+   * Create an async generator of FileUploadRequests to use with FileUpload
+   * methods.
+   *
+   * @param metadata The file's metadata
+   * @param data The binary data of the file
+   */
+  private static async *fileUploadRequests(
+    metadata: UploadMetadata,
+    data: Uint8Array
+  ): AsyncGenerator<PartialMessage<FileUploadRequest>> {
+    yield new FileUploadRequest({
+      uploadPacket: {
+        case: 'metadata',
+        value: metadata,
+      },
+    });
+    // Awaiting because linter gets mad if not awaiting nor yielding promises
+    const uploadChunkSize = await Promise.resolve(64 * 1024);
+    for (let i = 0; i < data.length; i += uploadChunkSize) {
+      let end = i + uploadChunkSize;
+      if (end > data.length) {
+        end = data.length;
+      }
+      yield new FileUploadRequest({
+        uploadPacket: {
+          case: 'fileContents',
+          value: new FileData({ data: data.slice(i, end) }),
+        },
+      });
+    }
+  }
+
+  static createFilter(options: FilterOptions): Filter {
     const filter = new Filter(options);
 
     if (options.startTime ?? options.endTime) {
