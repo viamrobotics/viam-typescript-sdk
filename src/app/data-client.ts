@@ -12,6 +12,8 @@ import {
   CaptureInterval,
   CaptureMetadata,
   Filter,
+  Index,
+  IndexableCollection,
   Order,
   TabularDataSource,
   TabularDataSourceType,
@@ -273,13 +275,15 @@ export class DataClient {
    *   store. Defaults to false. Deprecated - use dataSource instead.
    * @param dataSource The data source to query. Defaults to the standard data
    *   source.
+   * @param queryPrefixName Optional name of the query prefix.
    * @returns An array of data objects
    */
   async tabularDataByMQL(
     organizationId: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
     useRecentData?: boolean,
-    tabularDataSource?: TabularDataSource
+    tabularDataSource?: TabularDataSource,
+    queryPrefixName?: string
   ) {
     const binary: Uint8Array[] =
       query[0] instanceof Uint8Array
@@ -301,6 +305,7 @@ export class DataClient {
       organizationId,
       mqlBinary: binary,
       dataSource,
+      queryPrefixName,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
@@ -1544,6 +1549,7 @@ export class DataClient {
    * @param query The MQL query to run as a list of BSON documents
    * @param schedule The schedule to run the query on (cron expression)
    * @param dataSourceType The type of data source to use for the data pipeline
+   * @param enableBackfill Whether to enable backfill for the data pipeline
    * @returns The ID of the created data pipeline
    */
   async createDataPipeline(
@@ -1630,6 +1636,104 @@ export class DataClient {
       resp.nextPageToken
     );
   }
+
+  /**
+   * CreateIndex starts a custom index build
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.createIndex(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   IndexableCollection.HOT_STORE,
+   *   [new TextEncoder().encode(JSON.stringify({ field: 1 }))]
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param collectionType The type of collection to create the index on
+   * @param indexSpec The MongoDB index specification in JSON format, as a
+   *   Uint8Array
+   * @param pipelineName Optional name of the pipeline if collectionType is
+   *   PIPELINE_SINK
+   */
+  async createIndex(
+    organizationId: string,
+    collectionType: IndexableCollection,
+    indexSpec: Uint8Array[],
+    pipelineName?: string
+  ) {
+    await this.dataClient.createIndex({
+      organizationId,
+      collectionType,
+      indexSpec,
+      pipelineName,
+    });
+  }
+
+  /**
+   * ListIndexes returns all the indexes for a given collection
+   *
+   * @example
+   *
+   * ```ts
+   * const indexes = await dataClient.listIndexes(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   IndexableCollection.HOT_STORE
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param collectionType The type of collection to list indexes for
+   * @param pipelineName Optional name of the pipeline if collectionType is
+   *   PIPELINE_SINK
+   * @returns An array of indexes
+   */
+  async listIndexes(
+    organizationId: string,
+    collectionType: IndexableCollection,
+    pipelineName?: string
+  ): Promise<Index[]> {
+    const resp = await this.dataClient.listIndexes({
+      organizationId,
+      collectionType,
+      pipelineName,
+    });
+    return resp.indexes;
+  }
+
+  /**
+   * DeleteIndex drops the specified custom index from a collection
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.deleteIndex(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   IndexableCollection.HOT_STORE,
+   *   'my_index'
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param collectionType The type of collection to delete the index from
+   * @param indexName The name of the index to delete
+   * @param pipelineName Optional name of the pipeline if collectionType is
+   *   PIPELINE_SINK
+   */
+  async deleteIndex(
+    organizationId: string,
+    collectionType: IndexableCollection,
+    indexName: string,
+    pipelineName?: string
+  ) {
+    await this.dataClient.deleteIndex({
+      organizationId,
+      collectionType,
+      indexName,
+      pipelineName,
+    });
+  }
 }
 
 export class ListDataPipelineRunsPage {
@@ -1682,5 +1786,11 @@ export class ListDataPipelineRunsPage {
   }
 }
 
-export { type BinaryID, type Order } from '../gen/app/data/v1/data_pb';
+export {
+  type BinaryID,
+  type Index,
+  type IndexableCollection,
+  type IndexCreator,
+  type Order,
+} from '../gen/app/data/v1/data_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';

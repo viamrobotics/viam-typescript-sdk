@@ -37,6 +37,9 @@ export {
   type BinaryID,
   type DataClient,
   type FilterOptions,
+  type IndexableCollection,
+  type IndexCreator,
+  type Index,
 } from './app/data-client';
 /**
  * Raw Protobuf interfaces for Data.
