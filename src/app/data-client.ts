@@ -119,7 +119,7 @@ export class DataClient {
   private datasetClient: Client<typeof DatasetService>;
   private dataSyncClient: Client<typeof DataSyncService>;
   private dataPipelinesClient: Client<typeof DataPipelinesService>;
-  static readonly UPLOAD_CHUNK_SIZE = 8;
+  static readonly UPLOAD_CHUNK_SIZE = 1024 * 64;
 
   constructor(transport: Transport) {
     this.dataClient = createClient(DataService, transport);

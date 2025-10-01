@@ -526,7 +526,7 @@ describe('DataClient tests', () => {
       expect(promise[1]?.binary).toEqual(bin2);
     });
 
-    it('get binary data by id', async () => {
+    it('get binary data by ids', async () => {
       const promise = await subject().binaryDataByIds([binaryId1, binaryId2]);
       expect(promise.length).toEqual(2);
       expect(promise[0]?.binary).toEqual(bin1);
