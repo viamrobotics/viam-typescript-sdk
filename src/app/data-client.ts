@@ -1,6 +1,11 @@
-import { BSON } from 'bsonfy';
-import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+import {
+  Struct,
+  Timestamp,
+  type JsonValue,
+  type PartialMessage,
+} from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import { BSON } from 'bsonfy';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
   BinaryID,
@@ -8,25 +13,27 @@ import {
   CaptureMetadata,
   Filter,
   Order,
-  TagsFilter,
   TabularDataSource,
   TabularDataSourceType,
+  TagsFilter,
 } from '../gen/app/data/v1/data_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
-import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
-import {
-  DataCaptureUploadRequest,
-  DataType,
-  SensorData,
-  SensorMetadata,
-  UploadMetadata,
-} from '../gen/app/datasync/v1/data_sync_pb';
 import {
   DataPipeline,
   DataPipelineRun,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
+import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
+import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+import {
+  DataCaptureUploadRequest,
+  DataType,
+  FileData,
+  FileUploadRequest,
+  SensorData,
+  SensorMetadata,
+  UploadMetadata,
+} from '../gen/app/datasync/v1/data_sync_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -57,6 +64,43 @@ interface TabularDataPoint {
   payload: JsonValue;
 }
 
+/** Optional parameters for uploading files */
+export interface FileUploadOptions {
+  /**
+   * Optional type of the component associated with the file (for example,
+   * "movement_sensor").
+   */
+  componentType?: string;
+
+  /** Optional name of the component associated with the file. */
+  componentName?: string;
+
+  /** Optional name of the method associated with the file. */
+  methodName?: string;
+
+  /**
+   * Optional name of the file. The empty string `""` will be assigned as the
+   * file name if one isn't provided.
+   */
+  fileName?: string;
+
+  /**
+   * Optional file extension. The empty string `""` will be assigned as the file
+   * extension if one isn't provided. Files with a `.jpeg`, `.jpg`, or `.png`
+   * extension will be saved to the **Images** tab.
+   */
+  fileExtension?: string;
+
+  /**
+   * Optional list of tags to allow for tag-based filtering when retrieving
+   * data.
+   */
+  tags?: string[];
+
+  /** Optional list of datasets to add the data to. */
+  datasetIds?: string[];
+}
+
 export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
@@ -73,6 +117,7 @@ export class DataClient {
   private datasetClient: Client<typeof DatasetService>;
   private dataSyncClient: Client<typeof DataSyncService>;
   private dataPipelinesClient: Client<typeof DataPipelinesService>;
+  static readonly UPLOAD_CHUNK_SIZE = 8;
 
   constructor(transport: Transport) {
     this.dataClient = createClient(DataService, transport);
@@ -1265,8 +1310,84 @@ export class DataClient {
     return resp.binaryDataId;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  createFilter(options: FilterOptions): Filter {
+  /**
+   * Upload arbitrary file data.
+   *
+   * Upload file data that may be stored on a robot along with the relevant
+   * metadata. File data can be found in the **Files** tab of the **DATA**
+   * page.
+   *
+   * @example
+   *
+   * ```ts
+   * const binaryDataId = await dataClient.fileUpload(
+   *   binaryData,
+   *   'INSERT YOUR PART ID',
+   *   {
+   *     fileExtension: '.jpeg',
+   *     tags: ['tag_1', 'tag_2'],
+   *   }
+   * );
+   * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#fileupload).
+   *
+   * @param binaryData The data to be uploaded
+   * @param partId The part ID of the machine that captured the data
+   * @param options Options for the file upload
+   * @returns The binary data ID of the uploaded data
+   */
+  async fileUpload(
+    binaryData: Uint8Array,
+    partId: string,
+    options?: FileUploadOptions
+  ) {
+    const md = new UploadMetadata({
+      partId,
+      type: DataType.FILE,
+      ...options,
+    });
+
+    const response = await this.dataSyncClient.fileUpload(
+      DataClient.fileUploadRequests(md, binaryData)
+    );
+    return response.binaryDataId;
+  }
+
+  /**
+   * Create an async generator of FileUploadRequests to use with FileUpload
+   * methods.
+   *
+   * @param metadata The file's metadata
+   * @param data The binary data of the file
+   */
+  // eslint-disable-next-line @typescript-eslint/require-await
+  private static async *fileUploadRequests(
+    metadata: UploadMetadata,
+    data: Uint8Array
+  ): AsyncGenerator<PartialMessage<FileUploadRequest>> {
+    yield new FileUploadRequest({
+      uploadPacket: {
+        case: 'metadata',
+        value: metadata,
+      },
+    });
+    for (let i = 0; i < data.length; i += DataClient.UPLOAD_CHUNK_SIZE) {
+      let end = i + DataClient.UPLOAD_CHUNK_SIZE;
+      if (end > data.length) {
+        end = data.length;
+      }
+      yield new FileUploadRequest({
+        uploadPacket: {
+          case: 'fileContents',
+          value: new FileData({ data: data.slice(i, end) }),
+        },
+      });
+    }
+  }
+
+  static createFilter(options: FilterOptions): Filter {
     const filter = new Filter(options);
 
     if (options.startTime ?? options.endTime) {
