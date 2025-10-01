@@ -1788,9 +1788,7 @@ export class ListDataPipelineRunsPage {
 
 export {
   type BinaryID,
-  type Index,
   type IndexableCollection,
-  type IndexCreator,
   type Order,
 } from '../gen/app/data/v1/data_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
