@@ -70,8 +70,9 @@ export class SignalingExchange {
      * should be done nor should any errors be emitted.
      */
     this.clientChannel.ready
-      .then(() => {
+      .then(async () => {
         this.exchangeDone = true;
+        await this.sendDone();
       })
       .catch(console.error); // eslint-disable-line no-console
 
