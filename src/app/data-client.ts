@@ -1320,20 +1320,20 @@ export class DataClient {
    *
    * ```ts
    * const binaryDataId = await dataClient.fileUpload(
-   *  'INSERT YOUR PART ID'
-   *  binaryData,
-   *  {
-   *    fileExtension: ".jpeg",
-   *    tags: ["tag_1", "tag_2"],
-   *  }
+   *   binaryData,
+   *   'INSERT YOUR PART ID',
+   *   {
+   *     fileExtension: '.jpeg',
+   *     tags: ['tag_1', 'tag_2'],
+   *   }
    * );
    * ```
    *
    * For more information, see [Data
    * API](https://docs.viam.com/dev/reference/apis/data-client/#fileupload).
    *
-   * @param binaryData The data to be uploaded, represented in bytes
-   * @param partId The part ID of the component used to capture the data
+   * @param binaryData The data to be uploaded
+   * @param partId The part ID of the machine that captured the data
    * @param options Options for the file upload
    * @returns The binary data ID of the uploaded data
    */
@@ -1361,6 +1361,7 @@ export class DataClient {
    * @param metadata The file's metadata
    * @param data The binary data of the file
    */
+  // eslint-disable-next-line @typescript-eslint/require-await
   private static async *fileUploadRequests(
     metadata: UploadMetadata,
     data: Uint8Array
@@ -1371,8 +1372,7 @@ export class DataClient {
         value: metadata,
       },
     });
-    // Awaiting because linter gets mad if not awaiting nor yielding promises
-    const uploadChunkSize = await Promise.resolve(64 * 1024);
+    const uploadChunkSize = 64 * 1024;
     for (let i = 0; i < data.length; i += uploadChunkSize) {
       let end = i + uploadChunkSize;
       if (end > data.length) {
