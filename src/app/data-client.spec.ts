@@ -1789,7 +1789,7 @@ describe('fileUpload tests', () => {
   it('uploads file without optional parameters', async () => {
     const result = await subject().fileUpload(binaryData, partId);
 
-    expect(result).toBe('testBinaryDataId');
+    expect(result).toBe(expectedBinaryDataId);
     expect(capturedRequests).toHaveLength(2);
 
     // Check metadata request
@@ -1811,5 +1811,41 @@ describe('fileUpload tests', () => {
     expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
     const fileContents = fileContentsRequest.uploadPacket.value as FileData;
     expect(fileContents.data).toEqual(binaryData);
+  });
+
+  it('chunks file data', async () => {
+    const numChunks = 3;
+    const data = Uint8Array.from(
+      { length: DataClient.UPLOAD_CHUNK_SIZE * numChunks },
+      () => Math.floor(Math.random() * 256)
+    );
+
+    const result = await subject().fileUpload(data, partId);
+    expect(result).toBe(expectedBinaryDataId);
+    expect(capturedRequests).toHaveLength(1 + numChunks);
+
+    const metadataRequest = capturedRequests[0]!;
+    expect(metadataRequest.uploadPacket.case).toBe('metadata');
+
+    const contentRequests = capturedRequests.slice(1);
+    expect(contentRequests).toHaveLength(numChunks);
+
+    const receivedLength = contentRequests.reduce(
+      (acc, val) => acc + (val.uploadPacket.value as FileData).data.length,
+      0
+    );
+    expect(receivedLength).toEqual(numChunks * DataClient.UPLOAD_CHUNK_SIZE);
+
+    const receivedData = new Uint8Array(receivedLength);
+    let offset = 0;
+    for (const req of contentRequests) {
+      expect(req.uploadPacket.case).toBe('fileContents');
+      const fileData = req.uploadPacket.value as FileData;
+      expect(fileData.data).toHaveLength(DataClient.UPLOAD_CHUNK_SIZE);
+      receivedData.set(fileData.data, offset);
+      offset += fileData.data.length;
+    }
+
+    expect(receivedData).toStrictEqual(data);
   });
 });

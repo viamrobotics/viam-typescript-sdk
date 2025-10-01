@@ -117,6 +117,7 @@ export class DataClient {
   private datasetClient: Client<typeof DatasetService>;
   private dataSyncClient: Client<typeof DataSyncService>;
   private dataPipelinesClient: Client<typeof DataPipelinesService>;
+  static readonly UPLOAD_CHUNK_SIZE = 8;
 
   constructor(transport: Transport) {
     this.dataClient = createClient(DataService, transport);
@@ -1372,9 +1373,8 @@ export class DataClient {
         value: metadata,
       },
     });
-    const uploadChunkSize = 64 * 1024;
-    for (let i = 0; i < data.length; i += uploadChunkSize) {
-      let end = i + uploadChunkSize;
+    for (let i = 0; i < data.length; i += DataClient.UPLOAD_CHUNK_SIZE) {
+      let end = i + DataClient.UPLOAD_CHUNK_SIZE;
       if (end > data.length) {
         end = data.length;
       }
