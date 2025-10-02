@@ -7,6 +7,7 @@ IgnoreURLs:
   - "app.viam.com"
   - "http://joda-time.sourceforge.net"
   - "https://typedoc.org/"
+  - "https://www.npmjs.com/package/@viamrobotics/sdk"
 IgnoreDirs:
   - "lib"
 CacheExpires: "6h"
