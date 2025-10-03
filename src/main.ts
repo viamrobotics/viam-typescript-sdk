@@ -1,9 +1,9 @@
 export const version = __VERSION__;
 
 export {
-  RobotClient,
   RobotClient as Client,
   createRobotClient,
+  RobotClient,
   type CloudMetadata,
   type DialConf,
   type DialDirectConf,
@@ -29,14 +29,15 @@ export {
 export {
   type AccessToken,
   type Credential,
-  type CredentialType,
   type Credentials,
+  type CredentialType,
 } from './app/viam-transport';
 
 export {
   type BinaryID,
   type DataClient,
   type FilterOptions,
+  type IndexableCollection,
 } from './app/data-client';
 /**
  * Raw Protobuf interfaces for Data.
@@ -201,10 +202,10 @@ export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
 
 export {
   MLModelClient,
-  type MLModel,
-  type Metadata,
-  type TensorInfo,
   type FlatTensors,
+  type Metadata,
+  type MLModel,
+  type TensorInfo,
 } from './services/ml-model';
 
 export { MotorClient, type Motor } from './components/motor';

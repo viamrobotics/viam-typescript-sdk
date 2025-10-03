@@ -23,10 +23,14 @@ import {
   CaptureInterval,
   ConfigureDatabaseUserRequest,
   ConfigureDatabaseUserResponse,
+  CreateIndexRequest,
+  CreateIndexResponse,
   DataRequest,
   DeleteBinaryDataByFilterRequest,
   DeleteBinaryDataByFilterResponse,
   DeleteBinaryDataByIDsResponse,
+  DeleteIndexRequest,
+  DeleteIndexResponse,
   DeleteTabularDataResponse,
   ExportTabularDataRequest,
   ExportTabularDataResponse,
@@ -35,6 +39,11 @@ import {
   GetDatabaseConnectionResponse,
   GetLatestTabularDataRequest,
   GetLatestTabularDataResponse,
+  Index,
+  IndexableCollection,
+  IndexCreator,
+  ListIndexesRequest,
+  ListIndexesResponse,
   RemoveBinaryDataFromDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsResponse,
   RemoveBoundingBoxFromImageByIDRequest,
@@ -46,6 +55,7 @@ import {
   TabularData,
   TabularDataByFilterRequest,
   TabularDataByFilterResponse,
+  TabularDataByMQLRequest,
   TabularDataByMQLResponse,
   TabularDataBySQLResponse,
   TabularDataSourceType,
@@ -321,6 +331,36 @@ describe('DataClient tests', () => {
         [{ query: 'some_mql_query' }],
         true
       );
+      const result = promise as typeof data;
+      expect(result[0]?.key1).toBeInstanceOf(Date);
+      expect(promise).toEqual(data);
+    });
+
+    it('get tabular data from MQL with queryPrefixName', async () => {
+      const expectedRequest = new TabularDataByMQLRequest({
+        organizationId: 'some_org_id',
+        mqlBinary: [BSON.serialize({ query: 'some_mql_query' })],
+        queryPrefixName: 'my_prefix',
+      });
+      let capReq: TabularDataByMQLRequest | undefined = undefined;
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          tabularDataByMQL: (req) => {
+            capReq = req;
+            return new TabularDataByMQLResponse({
+              rawData: data.map((x) => BSON.serialize(x)),
+            });
+          },
+        });
+      });
+      const promise = await subject().tabularDataByMQL(
+        'some_org_id',
+        [{ query: 'some_mql_query' }],
+        false,
+        undefined,
+        'my_prefix'
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
       const result = promise as typeof data;
       expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
@@ -1036,6 +1076,155 @@ describe('DataClient tests', () => {
         [binaryId1, binaryId2],
         'datasetId'
       );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('createIndex tests', () => {
+    let capReq: CreateIndexRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createIndex: (req) => {
+            capReq = req;
+            return new CreateIndexResponse();
+          },
+        });
+      });
+    });
+    it('creates an index', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.PIPELINE_SINK;
+      const indexSpec = { keys: { field: 1 }, options: { priority: 1 } };
+      const pipelineName = 'pipeline1';
+      await subject().createIndex(
+        organizationId,
+        collectionType,
+        indexSpec,
+        pipelineName
+      );
+      expect(capReq.organizationId).toBe(organizationId);
+      expect(capReq.collectionType).toBe(collectionType);
+      expect(
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
+      ).toStrictEqual(indexSpec);
+      expect(capReq.pipelineName).toBe(pipelineName);
+    });
+    it('creates an index without pipeline name', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const indexSpec = { keys: { field: 2 }, options: { priority: 2 } };
+      await subject().createIndex(organizationId, collectionType, indexSpec);
+      expect(capReq.organizationId).toBe(organizationId);
+      expect(capReq.collectionType).toBe(collectionType);
+      expect(
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
+      ).toStrictEqual(indexSpec);
+    });
+  });
+  describe('listIndexes tests', () => {
+    let capReq: ListIndexesRequest;
+    const index1 = new Index({
+      collectionType: IndexableCollection.HOT_STORE,
+      indexName: 'index1',
+      indexSpec: [new TextEncoder().encode(JSON.stringify({ field: 1 }))],
+      createdBy: IndexCreator.CUSTOMER,
+    });
+    const index2 = new Index({
+      collectionType: IndexableCollection.PIPELINE_SINK,
+      pipelineName: 'pipeline1',
+      indexName: 'index2',
+      indexSpec: [
+        new TextEncoder().encode(JSON.stringify({ another_field: -1 })),
+      ],
+      createdBy: IndexCreator.VIAM,
+    });
+    const indexes = [index1, index2];
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          listIndexes: (req) => {
+            capReq = req;
+            return new ListIndexesResponse({
+              indexes,
+            });
+          },
+        });
+      });
+    });
+    it('lists indexes', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const pipelineName = 'pipeline1';
+      const expectedRequest = new ListIndexesRequest({
+        organizationId,
+        collectionType,
+        pipelineName,
+      });
+      const result = await subject().listIndexes(
+        organizationId,
+        collectionType,
+        pipelineName
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(indexes);
+    });
+    it('lists indexes without pipeline name', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const expectedRequest = new ListIndexesRequest({
+        organizationId,
+        collectionType,
+      });
+      const result = await subject().listIndexes(
+        organizationId,
+        collectionType
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(indexes);
+    });
+  });
+  describe('deleteIndex tests', () => {
+    let capReq: DeleteIndexRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          deleteIndex: (req) => {
+            capReq = req;
+            return new DeleteIndexResponse();
+          },
+        });
+      });
+    });
+    it('deletes an index', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const indexName = 'my_index';
+      const pipelineName = 'pipeline1';
+      const expectedRequest = new DeleteIndexRequest({
+        organizationId,
+        collectionType,
+        indexName,
+        pipelineName,
+      });
+      await subject().deleteIndex(
+        organizationId,
+        collectionType,
+        indexName,
+        pipelineName
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+    it('deletes an index without pipeline name', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const indexName = 'my_index';
+      const expectedRequest = new DeleteIndexRequest({
+        organizationId,
+        collectionType,
+        indexName,
+      });
+      await subject().deleteIndex(organizationId, collectionType, indexName);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
