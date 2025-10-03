@@ -1095,37 +1095,31 @@ describe('DataClient tests', () => {
     it('creates an index', async () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
-      const indexSpec = [
-        new TextEncoder().encode(JSON.stringify({ field: 1 })),
-      ];
+      const indexSpec = [{ field: 1 }, { priority: 2 }];
       const pipelineName = 'pipeline1';
-      const expectedRequest = new CreateIndexRequest({
-        organizationId,
-        collectionType,
-        indexSpec,
-        pipelineName,
-      });
       await subject().createIndex(
         organizationId,
         collectionType,
         indexSpec,
         pipelineName
       );
-      expect(capReq).toStrictEqual(expectedRequest);
+      expect(capReq.organizationId).toBe(organizationId);
+      expect(capReq.collectionType).toBe(collectionType);
+      expect(
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))
+      ).toStrictEqual(indexSpec);
+      expect(capReq.pipelineName).toBe(pipelineName);
     });
     it('creates an index without pipeline name', async () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
-      const indexSpec = [
-        new TextEncoder().encode(JSON.stringify({ field: 1 })),
-      ];
-      const expectedRequest = new CreateIndexRequest({
-        organizationId,
-        collectionType,
-        indexSpec,
-      });
+      const indexSpec = [{ field: 3 }, { priority: 4 }];
       await subject().createIndex(organizationId, collectionType, indexSpec);
-      expect(capReq).toStrictEqual(expectedRequest);
+      expect(capReq.organizationId).toBe(organizationId);
+      expect(capReq.collectionType).toBe(collectionType);
+      expect(
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))
+      ).toStrictEqual(indexSpec);
     });
   });
   describe('listIndexes tests', () => {
