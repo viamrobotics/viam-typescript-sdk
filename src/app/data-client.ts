@@ -1660,13 +1660,13 @@ export class DataClient {
   async createIndex(
     organizationId: string,
     collectionType: IndexableCollection,
-    indexSpec: Uint8Array[],
+    indexSpec: Map<string, unknown>[],
     pipelineName?: string
   ) {
     await this.dataClient.createIndex({
       organizationId,
       collectionType,
-      indexSpec,
+      indexSpec: indexSpec.map((spec) => BSON.serialize(spec)),
       pipelineName,
     });
   }
