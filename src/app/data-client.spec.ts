@@ -1094,7 +1094,7 @@ describe('DataClient tests', () => {
     });
     it('creates an index', async () => {
       const organizationId = 'orgId';
-      const collectionType = IndexableCollection.HOT_STORE;
+      const collectionType = IndexableCollection.PIPELINE_SINK;
       const indexSpec = { keys: { field: 1 }, options: { priority: 1 } };
       const pipelineName = 'pipeline1';
       await subject().createIndex(
