@@ -1095,7 +1095,7 @@ describe('DataClient tests', () => {
     it('creates an index', async () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
-      const indexSpec = [{ field: 1 }, { priority: 2 }];
+      const indexSpec = { keys: { field: 1 }, options: { priority: 1 } };
       const pipelineName = 'pipeline1';
       await subject().createIndex(
         organizationId,
@@ -1106,19 +1106,19 @@ describe('DataClient tests', () => {
       expect(capReq.organizationId).toBe(organizationId);
       expect(capReq.collectionType).toBe(collectionType);
       expect(
-        capReq.indexSpec.map((spec) => BSON.deserialize(spec))
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
       ).toStrictEqual(indexSpec);
       expect(capReq.pipelineName).toBe(pipelineName);
     });
     it('creates an index without pipeline name', async () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
-      const indexSpec = [{ field: 3 }, { priority: 4 }];
+      const indexSpec = { keys: { field: 2 }, options: { priority: 2 } };
       await subject().createIndex(organizationId, collectionType, indexSpec);
       expect(capReq.organizationId).toBe(organizationId);
       expect(capReq.collectionType).toBe(collectionType);
       expect(
-        capReq.indexSpec.map((spec) => BSON.deserialize(spec))
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
       ).toStrictEqual(indexSpec);
     });
   });
