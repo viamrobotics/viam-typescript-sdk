@@ -1666,10 +1666,16 @@ export class DataClient {
     },
     pipelineName?: string
   ) {
+    const serializedIndexSpec = [BSON.serialize(indexSpec.keys)];
+
+    if (indexSpec.options) {
+      serializedIndexSpec.push(BSON.serialize(indexSpec.options));
+    }
+
     await this.dataClient.createIndex({
       organizationId,
       collectionType,
-      indexSpec: [BSON.serialize(indexSpec)],
+      indexSpec: serializedIndexSpec,
       pipelineName,
     });
   }
