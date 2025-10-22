@@ -48,6 +48,9 @@ export type Sphere = PlainMessage<commonApi.Sphere>;
 export type Transform = PlainMessage<commonApi.Transform>;
 export type Vector3 = PlainMessage<commonApi.Vector3>;
 export type WorldState = PlainMessage<commonApi.WorldState>;
+export type AudioInfo = PlainMessage<commonApi.AudioInfo>;
+export type GetPropertiesRequest = PlainMessage<commonApi.GetPropertiesRequest>;
+export type GetPropertiesResponse = PlainMessage<commonApi.GetPropertiesResponse>;
 
 export const {
   Capsule,
@@ -65,6 +68,9 @@ export const {
   Transform,
   Vector3,
   WorldState,
+  AudioInfo,
+  GetPropertiesRequest,
+  GetPropertiesResponse,
 } = commonApi;
 
 export const isValidGeoPoint = (value: GeoPoint) => {
