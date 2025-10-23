@@ -9,7 +9,6 @@ import { GetPropertiesRequest } from '../../gen/common/v1/common_pb';
 import { type AudioIn } from './audio-in';
 import { doCommandFromClient } from '../../utils';
 
-
 /*
  * A gRPC-web client for the AudioIn component.
  *
@@ -27,42 +26,40 @@ export class AudioInClient implements AudioIn {
     this.options = options;
   }
 
-
-    async *getAudio(
+  async *getAudio(
     codec: string,
     durationSeconds: number,
     previousTimestamp: bigint,
     extra = {},
-    callOptions = this.callOptions) {
+    callOptions = this.callOptions
+  ) {
+    const request = new GetAudioRequest({
+      name: this.name,
+      codec: codec,
+      durationSeconds: durationSeconds,
+      previousTimestampNanoseconds: previousTimestamp,
+      extra: Struct.fromJson(extra),
+    });
 
-        const request = new GetAudioRequest({
-            name: this.name,
-            codec: codec,
-            durationSeconds: durationSeconds,
-            previousTimestampNanoseconds: previousTimestamp,
-            extra: Struct.fromJson(extra),
-        });
+    this.options.requestLogger?.(request);
 
-        this.options.requestLogger?.(request);
+    const stream = this.client.getAudio(request, callOptions);
 
-        const stream = this.client.getAudio(request, callOptions);
-
-          // Yield chunks as they arrive
-        for await (const resp of stream) {
-            if (!resp.audio) {
-                continue;
-            }
-            yield {
-            audioData: resp.audio.audioData,
-            audioInfo: resp.audio.audioInfo!,
-            startTimeNs: resp.audio.startTimestampNanoseconds,
-            endTimeNs: resp.audio.endTimestampNanoseconds,
-            sequence: resp.audio.sequence,
-            requestID: resp.requestId
-            }
+    // Yield chunks as they arrive
+    for await (const resp of stream) {
+      if (!resp.audio) {
+        continue;
       }
-
+      yield {
+        audioData: resp.audio.audioData,
+        audioInfo: resp.audio.audioInfo!,
+        startTimeNs: resp.audio.startTimestampNanoseconds,
+        endTimeNs: resp.audio.endTimestampNanoseconds,
+        sequence: resp.audio.sequence,
+        requestID: resp.requestId,
+      };
     }
+  }
 
   async getProperties(callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
@@ -93,5 +90,3 @@ export class AudioInClient implements AudioIn {
     );
   }
 }
-
-

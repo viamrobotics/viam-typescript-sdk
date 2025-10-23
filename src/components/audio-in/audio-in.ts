@@ -14,27 +14,25 @@ export interface AudioChunk {
 /** Represents a device that takes audio input. */
 
 export interface AudioIn extends Resource {
-
-
-
-/**
- * Stream audio from the device.
- *
- * @example
- *
- * ```ts
- * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
- *
- * // Stream
- * const  = await audioIn.GetAudio(['8', '11']);
- // TODO finish this docs thing
- */
-getAudio(
+  /**
+   * Stream audio from the device.
+   *
+   * @example
+   *
+   * ```ts
+   * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
+   *
+   * // Stream
+   * const  = await audioIn.GetAudio(['8', '11']);
+   *  // TODO finish this docs thing
+   * ```
+   */
+  getAudio(
     codec: string,
     durationSeconds: number,
     previousTimestamp: bigint,
-    extra?: Struct):
- AsyncIterable<AudioChunk>;
+    extra?: Struct
+  ): AsyncIterable<AudioChunk>;
 
   /**
    * Return the audio input properties.
@@ -47,6 +45,4 @@ getAudio(
    * ```
    */
   getProperties: () => Promise<AudioProperties>;
-
 }
-

@@ -19,4 +19,4 @@ export const AudioCodec = {
   WAV: 'wav',
 } as const;
 
-export type AudioCodecType = typeof AudioCodec[keyof typeof AudioCodec];
+export type AudioCodecType = (typeof AudioCodec)[keyof typeof AudioCodec];

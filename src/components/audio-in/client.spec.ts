@@ -116,7 +116,11 @@ describe('AudioInClient tests', () => {
     it('getProperties returns audio properties', async () => {
       const properties = await audioin.getProperties();
 
-      expect(properties.supportedCodecs).toEqual([AudioCodec.PCM16, AudioCodec.MP3, AudioCodec.PCM32_FLOAT]);
+      expect(properties.supportedCodecs).toEqual([
+        AudioCodec.PCM16,
+        AudioCodec.MP3,
+        AudioCodec.PCM32_FLOAT,
+      ]);
       expect(properties.sampleRateHz).toEqual(48_000);
       expect(properties.numChannels).toEqual(2);
     });

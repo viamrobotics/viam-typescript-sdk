@@ -5,7 +5,10 @@ import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
 import { PlayRequest } from '../../gen/component/audioout/v1/audioout_pb';
-import { GetPropertiesRequest, type AudioInfo } from '../../gen/common/v1/common_pb';
+import {
+  GetPropertiesRequest,
+  type AudioInfo,
+} from '../../gen/common/v1/common_pb';
 import { type AudioOut } from './audio-out';
 import { doCommandFromClient } from '../../utils';
 

@@ -1,7 +1,10 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetPropertiesResponse, AudioInfo } from '../../gen/common/v1/common_pb';
+import {
+  GetPropertiesResponse,
+  AudioInfo,
+} from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { AudioOutClient } from './client';
 import { AudioCodec } from '../../audio-common';
@@ -55,7 +58,11 @@ describe('AudioOutClient tests', () => {
     it('getProperties returns audio properties', async () => {
       const properties = await audioOut.getProperties();
 
-      expect(properties.supportedCodecs).toEqual([AudioCodec.PCM16, AudioCodec.MP3, AudioCodec.PCM32_FLOAT]);
+      expect(properties.supportedCodecs).toEqual([
+        AudioCodec.PCM16,
+        AudioCodec.MP3,
+        AudioCodec.PCM32_FLOAT,
+      ]);
       expect(properties.sampleRateHz).toEqual(48_000);
       expect(properties.numChannels).toEqual(2);
     });
