@@ -49,12 +49,15 @@ export class AudioInClient implements AudioIn {
 
           // Yield chunks as they arrive
         for await (const resp of stream) {
+            if (!resp.audio) {
+                continue;
+            }
             yield {
-            audioData: resp.audio?.audioData,
-            audioInfo: resp.audio?.audioInfo,
-            startTimeNs: resp.audio?.startTimestampNanoseconds,
-            endTimeNs: resp.audio?.endTimestampNanoseconds,
-            sequence: resp.audio?.sequence,
+            audioData: resp.audio.audioData,
+            audioInfo: resp.audio.audioInfo!,
+            startTimeNs: resp.audio.startTimestampNanoseconds,
+            endTimeNs: resp.audio.endTimestampNanoseconds,
+            sequence: resp.audio.sequence,
             requestID: resp.requestId
             }
       }

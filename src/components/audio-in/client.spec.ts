@@ -70,7 +70,11 @@ describe('AudioInClient tests', () => {
       await testAudioStream.write({
         audio: {
           audioData: new Uint8Array([4, 5, 6]),
-          audioInfo: {},
+          audioInfo: {
+            codec: AudioCodec.PCM16,
+            sampleRateHz: 48_000,
+            numChannels: 2,
+          },
           startTimestampNanoseconds: BigInt(1000),
           endTimestampNanoseconds: BigInt(2000),
           sequence: 1,
@@ -81,7 +85,11 @@ describe('AudioInClient tests', () => {
       await testAudioStream.write({
         audio: {
           audioData: new Uint8Array([7, 8, 9]),
-          audioInfo: {},
+          audioInfo: {
+            codec: AudioCodec.PCM16,
+            sampleRateHz: 48_000,
+            numChannels: 2,
+          },
           startTimestampNanoseconds: BigInt(2000),
           endTimestampNanoseconds: BigInt(3000),
           sequence: 2,
