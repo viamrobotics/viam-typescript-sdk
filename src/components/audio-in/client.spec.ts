@@ -29,6 +29,9 @@ const testProperties = new GetPropertiesResponse({
 
 describe('AudioInClient tests', () => {
   beforeEach(() => {
+    testAudioStream =
+      createWritableIterable<PartialMessage<GetAudioResponse>>();
+
     const mockTransport = createRouterTransport(({ service }) => {
       service(AudioInService, {
         getAudio: () => {
@@ -49,8 +52,6 @@ describe('AudioInClient tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    testAudioStream =
-      createWritableIterable<PartialMessage<GetAudioResponse>>();
   });
 
   describe('getAudio tests', () => {
