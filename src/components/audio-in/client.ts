@@ -1,12 +1,12 @@
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import { Duration, Struct, type JsonValue } from '@bufbuild/protobuf';
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
 import { GetAudioRequest } from '../../gen/component/audioin/v1/audioin_pb';
 import { GetPropertiesRequest } from '../../gen/common/v1/common_pb';
-import { type AudioIn, type AudioChunk } from './audio-in';
+import { type AudioIn } from './audio-in';
 import { doCommandFromClient } from '../../utils';
 
 
@@ -28,14 +28,14 @@ export class AudioInClient implements AudioIn {
   }
 
 
-    async *getAudio(audioData: Uint8Array,
+    async *getAudio(
     codec: string,
     durationSeconds: number,
     previousTimestamp: bigint,
-    extra?: Struct,
+    extra = {},
     callOptions = this.callOptions) {
 
-        const request = GetAudioRequest({
+        const request = new GetAudioRequest({
             name: this.name,
             codec: codec,
             durationSeconds: durationSeconds,
@@ -45,7 +45,7 @@ export class AudioInClient implements AudioIn {
 
         this.options.requestLogger?.(request);
 
-        const stream = this.client.GetAudio(request, callOptions);
+        const stream = this.client.getAudio(request, callOptions);
 
           // Yield chunks as they arrive
         for await (const chunk of stream) {
