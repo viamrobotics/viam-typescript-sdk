@@ -4,7 +4,7 @@ import type { AudioProperties } from '../../audio-common';
 
 export interface AudioChunk {
   audioData: Uint8Array;
-  audioInfo: AudioInfo;
+  audioInfo?: AudioInfo;
   startTimeNs: bigint;
   endTimeNs: bigint;
   sequence: number;

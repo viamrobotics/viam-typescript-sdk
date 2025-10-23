@@ -6,7 +6,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
 import { GetAudioRequest } from '../../gen/component/audioin/v1/audioin_pb';
 import { GetPropertiesRequest } from '../../gen/common/v1/common_pb';
-import { type AudioIn } from './audio-in';
+import { type AudioIn, type AudioChunk } from './audio-in';
 import { doCommandFromClient } from '../../utils';
 
 /*
@@ -32,7 +32,7 @@ export class AudioInClient implements AudioIn {
     previousTimestamp: bigint,
     extra = {},
     callOptions = this.callOptions
-  ) {
+  ): AsyncIterable<AudioChunk> {
     const request = new GetAudioRequest({
       name: this.name,
       codec,
