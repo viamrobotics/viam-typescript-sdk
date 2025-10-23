@@ -35,8 +35,8 @@ export class AudioInClient implements AudioIn {
   ) {
     const request = new GetAudioRequest({
       name: this.name,
-      codec: codec,
-      durationSeconds: durationSeconds,
+      codec,
+      durationSeconds,
       previousTimestampNanoseconds: previousTimestamp,
       extra: Struct.fromJson(extra),
     });
@@ -47,12 +47,12 @@ export class AudioInClient implements AudioIn {
 
     // Yield chunks as they arrive
     for await (const resp of stream) {
-      if (!resp.audio) {
+      if (!resp.audio?.audioInfo) {
         continue;
       }
       yield {
         audioData: resp.audio.audioData,
-        audioInfo: resp.audio.audioInfo!,
+        audioInfo: resp.audio.audioInfo,
         startTimeNs: resp.audio.startTimestampNanoseconds,
         endTimeNs: resp.audio.endTimestampNanoseconds,
         sequence: resp.audio.sequence,
