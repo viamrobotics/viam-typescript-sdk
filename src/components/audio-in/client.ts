@@ -29,7 +29,7 @@ export class AudioInClient implements AudioIn {
   async *getAudio(
     codec: string,
     durationSeconds: number,
-    previousTimestamp: bigint,
+    previousTimestamp = 0n,
     extra = {},
     callOptions = this.callOptions
   ): AsyncIterable<AudioChunk> {

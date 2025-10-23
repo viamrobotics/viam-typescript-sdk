@@ -21,16 +21,12 @@ export interface AudioIn extends Resource {
    *
    * ```ts
    * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
-   *
-   * // Stream
-   * const  = await audioIn.GetAudio(['8', '11']);
-   *  // TODO finish this docs thing
-   * ```
+   * const stream = audioIn.getAudio(VIAM.AudioCodec.PCM16,3,0n,{});
    */
   getAudio(
     codec: string,
     durationSeconds: number,
-    previousTimestamp: bigint,
+    previousTimestamp?: bigint,
     extra?: Struct
   ): AsyncIterable<AudioChunk>;
 
@@ -38,6 +34,7 @@ export interface AudioIn extends Resource {
    * Return the audio input properties.
    *
    * @example
+   *
    *
    * ```ts
    * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
