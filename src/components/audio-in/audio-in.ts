@@ -21,7 +21,8 @@ export interface AudioIn extends Resource {
    *
    * ```ts
    * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
-   * const stream = audioIn.getAudio(VIAM.AudioCodec.PCM16,3,0n,{});
+   * const stream = audioIn.getAudio(VIAM.AudioCodec.PCM16, 3, 0n, {});
+   * ```
    */
   getAudio(
     codec: string,
@@ -34,7 +35,6 @@ export interface AudioIn extends Resource {
    * Return the audio input properties.
    *
    * @example
-   *
    *
    * ```ts
    * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
