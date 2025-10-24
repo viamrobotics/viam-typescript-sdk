@@ -62,7 +62,7 @@ export class StreamClientStream<
             success: resolve,
             failure: reject,
           };
-          this.startRequest();
+          this.startRequest(signal);
           this.sendMessages(streamReq.message).catch((error) => {
             console.error('error sending streaming message', error); // eslint-disable-line no-console
             this.closeWithRecvError();

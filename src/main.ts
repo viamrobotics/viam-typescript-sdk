@@ -102,6 +102,17 @@ export { type BillingClient } from './app/billing-client';
 export * as billingApi from './gen/app/v1/billing_pb';
 
 export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
+export {
+  AudioInClient,
+  type AudioIn,
+  type AudioChunk,
+} from './components/audioin';
+export { AudioOutClient, type AudioOut } from './components/audioout';
+export {
+  AudioCodec,
+  type AudioCodecType,
+  type AudioProperties,
+} from './audio-common';
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
