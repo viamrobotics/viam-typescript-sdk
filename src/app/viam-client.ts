@@ -1,5 +1,5 @@
 import type { Transport } from '@connectrpc/connect';
-import { SharedSecret_State } from '../gen/app/v1/app_pb';
+import { SharedSecret_State, SharedSecret } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -62,7 +62,7 @@ export class ViamClient {
       throw new Error('Either a machine address or ID must be provided');
     }
     let address = host;
-    let locationId: string | undefined = undefined;
+    let robotSecret : SharedSecret | undefined = undefined;
 
     // Get address if only ID was provided
     if (id !== undefined && host === undefined) {
@@ -74,8 +74,10 @@ export class ViamClient {
         );
       }
       address = mainPart.fqdn;
-      locationId = mainPart.locationId;
-    }
+      robotSecret =  mainPart.secrets.find(
+        (sec) => sec.state == SharedSecret_State.ENABLED
+      )
+    };
 
     if (address === undefined || address === '') {
       throw new Error(
@@ -83,32 +85,16 @@ export class ViamClient {
       );
     }
 
-    // If credentials is AccessToken, then attempt to get the robot location secret
+    // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
-    if (!isCredential(creds)) {
-      if (locationId === undefined) {
-        // If we don't have a location, try to get it from the address
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const firstHalf = address.split('.viam.');
-        const locationSplit = firstHalf[0]?.split('.');
-        if (locationSplit !== undefined) {
-          locationId = locationSplit.at(-1);
-        }
-      }
-      if (locationId !== undefined) {
-        // If we found the location, then attempt to get its secret
-        const location = await this.appClient.getLocation(locationId);
-        const secret = location?.auth?.secrets.find(
-          // eslint-disable-next-line camelcase
-          (sec) => sec.state === SharedSecret_State.ENABLED
-        );
+    if (!isCredential(creds) && robotSecret !== undefined) {
         creds = {
-          type: 'robot-location-secret',
-          payload: secret?.secret,
+          type: 'robot-secret',
+          payload: robotSecret.secret,
           authEntity: address,
         } as Credential;
       }
-    }
+
 
     return createRobotClient({
       host: address,

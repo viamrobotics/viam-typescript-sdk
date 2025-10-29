@@ -17,7 +17,6 @@ export interface Credential {
 }
 
 export type CredentialType =
-  | 'robot-location-secret'
   | 'api-key'
   | 'robot-secret';
 
