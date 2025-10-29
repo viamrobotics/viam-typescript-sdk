@@ -14,7 +14,7 @@ import type { RobotClient } from '../../robot';
 import type { Options, Pose } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Arm } from './arm';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
+import { Get3DModelsRequest, GetGeometriesRequest, type Mesh } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -57,6 +57,19 @@ export class ArmClient implements Arm {
 
     const response = await this.client.getGeometries(request, callOptions);
     return response.geometries;
+  }
+
+  async get3DModels(extra = {}, callOptions = this.callOptions): Promise<Record<string, Mesh>> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const request = new Get3DModelsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const response = await this.client.get3DModels(request, callOptions);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+    return response.models;
   }
 
   async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
