@@ -2,7 +2,7 @@ import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
-import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 
 export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
@@ -40,6 +40,20 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
+  /**
+   * 
+   * Get the 3D models of the component
+   *
+   * @example
+   *
+   * ```ts
+   * const arm = new VIAM.ArmClient(machine, 'my_arm');
+   * const models = await arm.get3DModels();
+   * console.log(models);
+   * ```
+   */
+  get3DModels: (extra?: Struct) => Promise<Record<string, Mesh>>;
 
   /**
    * Move the end of the arm to the pose.

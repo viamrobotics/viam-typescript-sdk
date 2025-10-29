@@ -55,7 +55,13 @@ update-buf: $(node_modules)
 .PHONY: build-buf
 build-buf: $(node_modules) clean-buf
 	$(buf) generate buf.build/googleapis/googleapis
-	$(buf) generate buf.build/viamrobotics/api:$$(cat api_version.lock) --path common,component,robot,service,app,provisioning,tagger,stream
+	@if [ -z "$(LOCAL_API_PATH)" ]; then \
+		echo "using production API"; \
+		$(buf) generate buf.build/viamrobotics/api:$$(cat api_version.lock) --path common,component,robot,service,app,provisioning,tagger,stream; \
+	else \
+		echo "using local API from $(LOCAL_API_PATH)"; \
+		$(buf) generate $(LOCAL_API_PATH); \
+	fi
 	$(buf) generate buf.build/viamrobotics/goutils
 	$(buf) generate buf.build/grpc/grpc --path grpc/reflection/v1/reflection.proto
 
