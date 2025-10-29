@@ -62,7 +62,7 @@ export class ViamClient {
       throw new Error('Either a machine address or ID must be provided');
     }
     let address = host;
-    let robotSecret : SharedSecret | undefined = undefined;
+    let robotSecret: SharedSecret | undefined = undefined;
 
     // Get address if only ID was provided
     if (id !== undefined && host === undefined) {
@@ -74,10 +74,11 @@ export class ViamClient {
         );
       }
       address = mainPart.fqdn;
-      robotSecret =  mainPart.secrets.find(
-        (sec) => sec.state == SharedSecret_State.ENABLED
-      )
-    };
+      robotSecret = mainPart.secrets.find(
+        // eslint-disable-next-line camelcase
+        (sec) => sec.state === SharedSecret_State.ENABLED
+      );
+    }
 
     if (address === undefined || address === '') {
       throw new Error(
@@ -88,13 +89,12 @@ export class ViamClient {
     // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
     if (!isCredential(creds) && robotSecret !== undefined) {
-        creds = {
-          type: 'robot-secret',
-          payload: robotSecret.secret,
-          authEntity: address,
-        } as Credential;
-      }
-
+      creds = {
+        type: 'robot-secret',
+        payload: robotSecret.secret,
+        authEntity: address,
+      } as Credential;
+    }
 
     return createRobotClient({
       host: address,
