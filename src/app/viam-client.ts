@@ -63,7 +63,10 @@ export class ViamClient {
         return undefined;
       }
       const name = host.split('.')[0]!;
-      const resp = await this.appClient.getRobotPartByNameAndLocation(name, locationId);
+      const resp = await this.appClient.getRobotPartByNameAndLocation(
+        name,
+        locationId
+      );
       return resp.part?.secret;
     }
     return undefined;
@@ -107,15 +110,14 @@ export class ViamClient {
       if (robotSecret === undefined) {
         robotSecret = await this.getRobotSecretFromHost(address);
       }
-      creds = robotSecret ? {
-        type: 'robot-secret',
-        payload: robotSecret,
-        authEntity: address,
-      } as Credential 
-      : creds;
+      creds = robotSecret
+        ? ({
+            type: 'robot-secret',
+            payload: robotSecret,
+            authEntity: address,
+          } as Credential)
+        : creds;
     }
-
-    console.log(creds)
 
     return createRobotClient({
       host: address,
