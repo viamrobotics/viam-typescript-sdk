@@ -62,12 +62,14 @@ export class ViamClient {
       if (locationId === undefined) {
         return undefined;
       }
-      const name = host.split('.')[0]!;
-      const resp = await this.appClient.getRobotPartByNameAndLocation(
-        name,
-        locationId
-      );
-      return resp.part?.secret;
+      const name = host.split('.').at(0);
+      if (name !== undefined) {
+        const resp = await this.appClient.getRobotPartByNameAndLocation(
+          name,
+          locationId
+        );
+        return resp.part?.secret;
+      }
     }
     return undefined;
   }
@@ -110,13 +112,14 @@ export class ViamClient {
       if (robotSecret === undefined) {
         robotSecret = await this.getRobotSecretFromHost(address);
       }
-      creds = robotSecret
-        ? ({
-            type: 'robot-secret',
-            payload: robotSecret,
-            authEntity: address,
-          } as Credential)
-        : creds;
+      creds =
+        robotSecret === undefined
+          ? creds
+          : ({
+              type: 'robot-secret',
+              payload: robotSecret,
+              authEntity: address,
+            } as Credential);
     }
 
     return createRobotClient({
