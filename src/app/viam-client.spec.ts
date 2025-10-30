@@ -1,7 +1,10 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Location, RobotPart, SharedSecret_State } from '../gen/app/v1/app_pb';
+import {
+  GetRobotPartByNameAndLocationResponse,
+  RobotPart,
+} from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -156,98 +159,64 @@ describe('ViamClient', () => {
       ).rejects.toThrowError('not provided and could not be obtained');
     });
 
-    it('gets location secret if credential is access token -- host', async () => {
-      options = { credentials: testAccessToken };
-      const client = await subject();
-
-      const location = new Location({
-        auth: {
-          secrets: [
-            {
-              id: '0',
-              state: SharedSecret_State.DISABLED, // eslint-disable-line camelcase
-              secret: 'disabled secret',
-            },
-            {
-              id: '1',
-              state: SharedSecret_State.UNSPECIFIED, // eslint-disable-line camelcase
-              secret: 'unspecified secret',
-            },
-            {
-              id: '2',
-              state: SharedSecret_State.ENABLED, // eslint-disable-line camelcase
-              secret: 'enabled secret',
-            },
-          ],
-          locationId: 'location',
-          secret: 'secret',
-        },
-      });
-      const getLocationMock = vi.fn().mockImplementation(() => location);
-      AppClient.prototype.getLocation = getLocationMock;
-
-      await client.connectToMachine({
-        host: 'main-part.location.viam.cloud',
-      });
-      expect(getLocationMock).toHaveBeenCalledWith('location');
-      expect(createRobotClient).toHaveBeenCalledWith(
-        expect.objectContaining({
-          credentials: expect.objectContaining({
-            type: 'robot-location-secret',
-            payload: 'enabled secret',
-          }),
-        })
-      );
-    });
-
-    it('gets location secret if credential is access token -- id', async () => {
+    it('gets robot secret if credential is access token -- host', async () => {
       options = { credentials: testAccessToken };
       const client = await subject();
 
       const MAIN_PART = new RobotPart({
         mainPart: true,
-        locationId: 'location-id',
+        name: 'main-part',
+        secret: 'fake-robot-secret',
+      });
+      const partByNameAndLocationResponse =
+        new GetRobotPartByNameAndLocationResponse({
+          part: MAIN_PART,
+        });
+      const getRobotPartByNameAndLocationMock = vi
+        .fn()
+        .mockImplementation(() => partByNameAndLocationResponse);
+      AppClient.prototype.getRobotPartByNameAndLocation =
+        getRobotPartByNameAndLocationMock;
+
+      await client.connectToMachine({
+        host: 'main-part.location.viam.cloud',
+      });
+      expect(getRobotPartByNameAndLocationMock).toHaveBeenCalledWith(
+        'main-part',
+        'location'
+      );
+      expect(createRobotClient).toHaveBeenCalledWith(
+        expect.objectContaining({
+          credentials: expect.objectContaining({
+            type: 'robot-secret',
+            payload: 'fake-robot-secret',
+          }),
+        })
+      );
+    });
+
+    it('gets robot secret if credential is access token -- id', async () => {
+      options = { credentials: testAccessToken };
+      const client = await subject();
+
+      const MAIN_PART = new RobotPart({
+        mainPart: true,
         fqdn: 'main-part.fqdn',
+        secret: 'fake-robot-secret',
       });
       const robotParts = [MAIN_PART];
       const getRobotPartsMock = vi.fn().mockImplementation(() => robotParts);
       AppClient.prototype.getRobotParts = getRobotPartsMock;
 
-      const location = new Location({
-        auth: {
-          secrets: [
-            {
-              id: '0',
-              state: SharedSecret_State.DISABLED, // eslint-disable-line camelcase
-              secret: 'disabled secret',
-            },
-            {
-              id: '1',
-              state: SharedSecret_State.UNSPECIFIED, // eslint-disable-line camelcase
-              secret: 'unspecified secret',
-            },
-            {
-              id: '2',
-              state: SharedSecret_State.ENABLED, // eslint-disable-line camelcase
-              secret: 'enabled secret',
-            },
-          ],
-          locationId: 'location',
-          secret: 'secret',
-        },
-      });
-      const getLocationMock = vi.fn().mockImplementation(() => location);
-      AppClient.prototype.getLocation = getLocationMock;
-
       await client.connectToMachine({
         id: 'machine-uuid',
       });
-      expect(getLocationMock).toHaveBeenCalledWith('location-id');
+      expect(getRobotPartsMock).toHaveBeenCalledWith('machine-uuid');
       expect(createRobotClient).toHaveBeenCalledWith(
         expect.objectContaining({
           credentials: expect.objectContaining({
-            type: 'robot-location-secret',
-            payload: 'enabled secret',
+            type: 'robot-secret',
+            payload: 'fake-robot-secret',
           }),
         })
       );

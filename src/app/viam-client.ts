@@ -1,5 +1,4 @@
 import type { Transport } from '@connectrpc/connect';
-import { SharedSecret_State } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -54,6 +53,26 @@ export class ViamClient {
     this.billingClient = new BillingClient(this.transport);
   }
 
+  async getRobotSecretFromHost(host: string): Promise<string | undefined> {
+    const firstHalf = host.split('.viam.');
+    const locationSplit = firstHalf[0]?.split('.');
+    if (locationSplit !== undefined) {
+      const locationId = locationSplit.at(-1);
+      if (locationId === undefined) {
+        return undefined;
+      }
+      const name = host.split('.').at(0);
+      if (name !== undefined) {
+        const resp = await this.appClient.getRobotPartByNameAndLocation(
+          name,
+          locationId
+        );
+        return resp.part?.secret;
+      }
+    }
+    return undefined;
+  }
+
   public async connectToMachine({
     host = undefined,
     id = undefined,
@@ -62,7 +81,7 @@ export class ViamClient {
       throw new Error('Either a machine address or ID must be provided');
     }
     let address = host;
-    let locationId: string | undefined = undefined;
+    let robotSecret: string | undefined = undefined;
 
     // Get address if only ID was provided
     if (id !== undefined && host === undefined) {
@@ -74,7 +93,7 @@ export class ViamClient {
         );
       }
       address = mainPart.fqdn;
-      locationId = mainPart.locationId;
+      robotSecret = mainPart.secret;
     }
 
     if (address === undefined || address === '') {
@@ -83,31 +102,20 @@ export class ViamClient {
       );
     }
 
-    // If credentials is AccessToken, then attempt to get the robot location secret
+    // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
     if (!isCredential(creds)) {
-      if (locationId === undefined) {
-        // If we don't have a location, try to get it from the address
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const firstHalf = address.split('.viam.');
-        const locationSplit = firstHalf[0]?.split('.');
-        if (locationSplit !== undefined) {
-          locationId = locationSplit.at(-1);
-        }
+      if (robotSecret === undefined) {
+        robotSecret = await this.getRobotSecretFromHost(address);
       }
-      if (locationId !== undefined) {
-        // If we found the location, then attempt to get its secret
-        const location = await this.appClient.getLocation(locationId);
-        const secret = location?.auth?.secrets.find(
-          // eslint-disable-next-line camelcase
-          (sec) => sec.state === SharedSecret_State.ENABLED
-        );
-        creds = {
-          type: 'robot-location-secret',
-          payload: secret?.secret,
-          authEntity: address,
-        } as Credential;
-      }
+      creds =
+        robotSecret === undefined
+          ? creds
+          : ({
+              type: 'robot-secret',
+              payload: robotSecret,
+              authEntity: address,
+            } as Credential);
     }
 
     return createRobotClient({
