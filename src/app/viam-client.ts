@@ -1,5 +1,5 @@
 import type { Transport } from '@connectrpc/connect';
-import { SharedSecret_State, SharedSecret } from '../gen/app/v1/app_pb';
+import { SharedSecret_State } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -54,6 +54,21 @@ export class ViamClient {
     this.billingClient = new BillingClient(this.transport);
   }
 
+  async getRobotSecretFromHost(host: string): Promise<string | undefined> {
+    const firstHalf = host.split('.viam.');
+    const locationSplit = firstHalf[0]?.split('.');
+    if (locationSplit !== undefined) {
+      const locationId = locationSplit.at(-1);
+      if (locationId === undefined) {
+        return undefined;
+      }
+      const name = host.split('.')[0]!;
+      const resp = await this.appClient.getRobotPartByNameAndLocation(name, locationId);
+      return resp.part?.secret;
+    }
+    return undefined;
+  }
+
   public async connectToMachine({
     host = undefined,
     id = undefined,
@@ -62,7 +77,7 @@ export class ViamClient {
       throw new Error('Either a machine address or ID must be provided');
     }
     let address = host;
-    let robotSecret: SharedSecret | undefined = undefined;
+    let robotSecret: string | undefined = undefined;
 
     // Get address if only ID was provided
     if (id !== undefined && host === undefined) {
@@ -77,7 +92,7 @@ export class ViamClient {
       robotSecret = mainPart.secrets.find(
         // eslint-disable-next-line camelcase
         (sec) => sec.state === SharedSecret_State.ENABLED
-      );
+      )?.secret;
     }
 
     if (address === undefined || address === '') {
@@ -88,13 +103,19 @@ export class ViamClient {
 
     // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
-    if (!isCredential(creds) && robotSecret !== undefined) {
-      creds = {
+    if (!isCredential(creds)) {
+      if (robotSecret === undefined) {
+        robotSecret = await this.getRobotSecretFromHost(address);
+      }
+      creds = robotSecret ? {
         type: 'robot-secret',
-        payload: robotSecret.secret,
+        payload: robotSecret,
         authEntity: address,
-      } as Credential;
+      } as Credential 
+      : creds;
     }
+
+    console.log(creds)
 
     return createRobotClient({
       host: address,
