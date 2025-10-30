@@ -94,10 +94,7 @@ export class ViamClient {
         );
       }
       address = mainPart.fqdn;
-      robotSecret = mainPart.secrets.find(
-        // eslint-disable-next-line camelcase
-        (sec) => sec.state === SharedSecret_State.ENABLED
-      )?.secret;
+      robotSecret = mainPart.secret;
     }
 
     if (address === undefined || address === '') {
