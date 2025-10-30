@@ -1,5 +1,4 @@
 import type { Transport } from '@connectrpc/connect';
-import { SharedSecret_State } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';

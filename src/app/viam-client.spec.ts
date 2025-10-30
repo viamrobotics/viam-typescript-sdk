@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetRobotPartByNameAndLocationResponse, Location, RobotPart, SharedSecret_State } from '../gen/app/v1/app_pb';
+import { GetRobotPartByNameAndLocationResponse, RobotPart } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
