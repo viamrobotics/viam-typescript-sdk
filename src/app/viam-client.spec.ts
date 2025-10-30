@@ -1,7 +1,10 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetRobotPartByNameAndLocationResponse, RobotPart } from '../gen/app/v1/app_pb';
+import {
+  GetRobotPartByNameAndLocationResponse,
+  RobotPart,
+} from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -165,16 +168,23 @@ describe('ViamClient', () => {
         name: 'main-part',
         secret: 'fake-robot-secret',
       });
-      const partByNameAndLocationResponse = new GetRobotPartByNameAndLocationResponse({
-        part: MAIN_PART
-      });
-      const getRobotPartByNameAndLocationMock = vi.fn().mockImplementation(() => partByNameAndLocationResponse);
-      AppClient.prototype.getRobotPartByNameAndLocation = getRobotPartByNameAndLocationMock;
+      const partByNameAndLocationResponse =
+        new GetRobotPartByNameAndLocationResponse({
+          part: MAIN_PART,
+        });
+      const getRobotPartByNameAndLocationMock = vi
+        .fn()
+        .mockImplementation(() => partByNameAndLocationResponse);
+      AppClient.prototype.getRobotPartByNameAndLocation =
+        getRobotPartByNameAndLocationMock;
 
       await client.connectToMachine({
         host: 'main-part.location.viam.cloud',
       });
-      expect(getRobotPartByNameAndLocationMock).toHaveBeenCalledWith('main-part', 'location');
+      expect(getRobotPartByNameAndLocationMock).toHaveBeenCalledWith(
+        'main-part',
+        'location'
+      );
       expect(createRobotClient).toHaveBeenCalledWith(
         expect.objectContaining({
           credentials: expect.objectContaining({
