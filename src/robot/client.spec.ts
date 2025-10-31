@@ -1,6 +1,14 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  beforeEach,
+  afterEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockInstance,
+} from 'vitest';
 import type { Transport } from '@connectrpc/connect';
 import { createRouterTransport } from '@connectrpc/connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
@@ -17,18 +25,51 @@ vi.mock('../rpc', async () => {
 });
 
 describe('RobotClient', () => {
-  describe('event listeners', () => {
-    let mockTransport: Transport;
+  let mockTransport: Transport;
+  let mockPeerConnection: RTCPeerConnection;
+  let mockDataChannel: RTCDataChannel;
+  let client: RobotClient;
 
-    let mockPeerConnection: RTCPeerConnection;
+  beforeEach(() => {
+    mockTransport = createRouterTransport(({ service }) => {
+      service(RobotService, {
+        resourceNames: () => ({ resources: [] }),
+        getOperations: () => ({ operations: [] }),
+      });
+    });
+
+    mockPeerConnection = {
+      close: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      iceConnectionState: 'connected',
+    } as unknown as RTCPeerConnection;
+
+    mockDataChannel = {
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      readyState: 'open',
+    } as unknown as RTCDataChannel;
+
+    vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
+      transport: mockTransport,
+      peerConnection: mockPeerConnection,
+      dataChannel: mockDataChannel,
+    });
+
+    client = new RobotClient();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('event listeners', () => {
     let pcAddEventListenerSpy: ReturnType<typeof vi.fn>;
     let pcRemoveEventListenerSpy: ReturnType<typeof vi.fn>;
 
-    let mockDataChannel: RTCDataChannel;
     let dcAddEventListenerSpy: ReturnType<typeof vi.fn>;
     let dcRemoveEventListenerSpy: ReturnType<typeof vi.fn>;
-
-    let client: RobotClient;
 
     beforeEach(() => {
       pcAddEventListenerSpy = vi.fn();
@@ -49,24 +90,11 @@ describe('RobotClient', () => {
         readyState: 'open',
       } as unknown as RTCDataChannel;
 
-      mockTransport = createRouterTransport(({ service }) => {
-        service(RobotService, {
-          resourceNames: () => ({ resources: [] }),
-          getOperations: () => ({ operations: [] }),
-        });
-      });
-
       vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
         transport: mockTransport,
         peerConnection: mockPeerConnection,
         dataChannel: mockDataChannel,
       });
-
-      client = new RobotClient();
-    });
-
-    afterEach(() => {
-      vi.clearAllMocks();
     });
 
     it.each([
@@ -228,6 +256,136 @@ describe('RobotClient', () => {
       expect(iceRemoveCalls.length).toBeGreaterThanOrEqual(1);
       expect(trackRemoveCalls.length).toBeGreaterThanOrEqual(1);
       expect(dcRemoveCalls.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('session management on reconnection', () => {
+    let mockResetFn: MockInstance<[], void>;
+
+    const testCredential = {
+      authEntity: 'test-entity',
+      type: 'api-key' as const,
+      payload: 'test-payload',
+    };
+
+    const differentCredential = {
+      authEntity: 'different-entity',
+      type: 'api-key' as const,
+      payload: 'different-payload',
+    };
+
+    const accessToken = {
+      type: 'access-token' as const,
+      payload: 'test-access-token',
+    };
+
+    const differentAccessToken = {
+      type: 'access-token' as const,
+      payload: 'different-access-token',
+    };
+
+    beforeEach(() => {
+      // Spy on the SessionManager's reset method to verify conditional reset behavior
+      // eslint-disable-next-line vitest/no-restricted-vi-methods, @typescript-eslint/dot-notation
+      mockResetFn = vi.spyOn(client['sessionManager'], 'reset');
+    });
+
+    afterEach(() => {
+      mockResetFn.mockRestore();
+    });
+
+    it('should reset session when connecting for the first time', async () => {
+      await client.dial({
+        host: 'test-host',
+        signalingAddress: 'https://test.local',
+        credentials: testCredential,
+        disableSessions: false,
+        noReconnect: true,
+      });
+
+      expect(mockResetFn).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([
+      {
+        description:
+          'should reset session when credentials change during reconnection',
+        initialCreds: testCredential,
+        disableSessions: false,
+        reconnectCreds: differentCredential,
+      },
+      {
+        description: 'should reset session when sessions are disabled',
+        initialCreds: testCredential,
+        disableSessions: true,
+        reconnectCreds: testCredential,
+      },
+      {
+        description:
+          'should reset session when reconnecting with no saved credentials',
+        initialCreds: undefined,
+        disableSessions: false,
+        reconnectCreds: undefined,
+      },
+      {
+        description:
+          'should reset session when access token changes during reconnection',
+        initialCreds: accessToken,
+        disableSessions: false,
+        reconnectCreds: differentAccessToken,
+      },
+    ])(
+      '$description',
+      async ({ initialCreds, disableSessions, reconnectCreds }) => {
+        await client.dial({
+          host: 'test-host',
+          signalingAddress: 'https://test.local',
+          credentials: initialCreds,
+          disableSessions,
+          noReconnect: true,
+        });
+
+        mockResetFn.mockClear();
+
+        await client.connect({ creds: reconnectCreds });
+
+        expect(mockResetFn).toHaveBeenCalledTimes(1);
+      }
+    );
+
+    it.each([
+      {
+        description:
+          'should NOT reset session when reconnecting with same credentials',
+        initialCreds: testCredential,
+        reconnectCreds: testCredential,
+      },
+      {
+        description:
+          'should NOT reset session when reconnecting without explicitly passing creds (uses savedCreds)',
+        initialCreds: testCredential,
+        reconnectCreds: undefined,
+      },
+      {
+        description:
+          'should NOT reset session when using access token and reconnecting with same token',
+        initialCreds: accessToken,
+        reconnectCreds: accessToken,
+      },
+    ])('$description', async ({ initialCreds, reconnectCreds }) => {
+      await client.dial({
+        host: 'test-host',
+        signalingAddress: 'https://test.local',
+        credentials: initialCreds,
+        disableSessions: false,
+        noReconnect: true,
+      });
+
+      mockResetFn.mockClear();
+
+      await client.connect({ creds: reconnectCreds });
+
+      expect(mockResetFn).not.toHaveBeenCalled();
     });
   });
 });
