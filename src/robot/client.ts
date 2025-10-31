@@ -760,12 +760,8 @@ export class RobotClient extends EventDispatcher implements Robot {
           this.serviceHost !== '' && signalingAddress !== this.serviceHost
         );
 
-        /*
-         * Lint disabled because we know that we are the only code to
-         * read and then write to 'peerConn', even after we have awaited/paused.
-         */
-        this.peerConn = webRTCConn.peerConnection; // eslint-disable-line require-atomic-updates
-        this.dataChannel = webRTCConn.dataChannel; // eslint-disable-line require-atomic-updates
+        this.peerConn = webRTCConn.peerConnection;
+        this.dataChannel = webRTCConn.dataChannel;
 
         this.cleanupEventListeners();
 
@@ -839,12 +835,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     } finally {
       this.connectResolve?.();
       this.connectResolve = undefined;
-
-      /*
-       * Lint disabled because we know that we are the only code to
-       * read and then write to 'connecting', even after we have awaited/paused.
-       */
-      this.connecting = undefined; // eslint-disable-line require-atomic-updates
+      this.connecting = undefined;
     }
   }
 
