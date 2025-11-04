@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { ArmService } from '../../gen/component/arm/v1/arm_connect';
 import {
   GetEndPositionRequest,
@@ -14,7 +14,10 @@ import type { RobotClient } from '../../robot';
 import type { Options, Pose } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Arm } from './arm';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
+import {
+  GetGeometriesRequest,
+  GetKinematicsRequest,
+} from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -22,7 +25,7 @@ import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
  * @group Clients
  */
 export class ArmClient implements Arm {
-  private client: PromiseClient<typeof ArmService>;
+  private client: Client<typeof ArmService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
@@ -57,6 +60,20 @@ export class ArmClient implements Arm {
 
     const response = await this.client.getGeometries(request, callOptions);
     return response.geometries;
+  }
+
+  async getKinematics(extra = {}, callOptions = this.callOptions) {
+    const request = new GetKinematicsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    const response = await this.client.getKinematics(request, callOptions);
+
+    const decoder = new TextDecoder('utf8');
+    const jsonString = decoder.decode(response.kinematicsData);
+
+    return JSON.parse(jsonString) as Record<string, unknown>;
   }
 
   async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
