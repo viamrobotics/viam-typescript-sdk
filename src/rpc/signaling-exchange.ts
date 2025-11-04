@@ -1,4 +1,4 @@
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { Code, ConnectError } from '@connectrpc/connect';
 import { Status } from '../gen/google/rpc/status_pb';
 import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
@@ -39,7 +39,7 @@ export class SignalingExchange {
   private totalCallUpdateDuration = 0;
 
   constructor(
-    private readonly signalingClient: PromiseClient<typeof SignalingService>,
+    private readonly signalingClient: Client<typeof SignalingService>,
     private readonly callOpts: CallOptions,
     private readonly pc: RTCPeerConnection,
     private readonly dc: RTCDataChannel,
@@ -70,8 +70,9 @@ export class SignalingExchange {
      * should be done nor should any errors be emitted.
      */
     this.clientChannel.ready
-      .then(() => {
+      .then(async () => {
         this.exchangeDone = true;
+        await this.sendDone();
       })
       .catch(console.error); // eslint-disable-line no-console
 

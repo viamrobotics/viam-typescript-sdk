@@ -1,6 +1,6 @@
-import { BSON } from 'bsonfy';
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
+import { BSON } from 'bsonfy';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
@@ -23,16 +23,27 @@ import {
   CaptureInterval,
   ConfigureDatabaseUserRequest,
   ConfigureDatabaseUserResponse,
+  CreateIndexRequest,
+  CreateIndexResponse,
   DataRequest,
   DeleteBinaryDataByFilterRequest,
   DeleteBinaryDataByFilterResponse,
   DeleteBinaryDataByIDsResponse,
+  DeleteIndexRequest,
+  DeleteIndexResponse,
   DeleteTabularDataResponse,
   ExportTabularDataRequest,
   ExportTabularDataResponse,
   Filter,
   GetDatabaseConnectionRequest,
   GetDatabaseConnectionResponse,
+  GetLatestTabularDataRequest,
+  GetLatestTabularDataResponse,
+  Index,
+  IndexableCollection,
+  IndexCreator,
+  ListIndexesRequest,
+  ListIndexesResponse,
   RemoveBinaryDataFromDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsResponse,
   RemoveBoundingBoxFromImageByIDRequest,
@@ -44,15 +55,30 @@ import {
   TabularData,
   TabularDataByFilterRequest,
   TabularDataByFilterResponse,
+  TabularDataByMQLRequest,
   TabularDataByMQLResponse,
   TabularDataBySQLResponse,
   TabularDataSourceType,
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
-  GetLatestTabularDataRequest,
-  GetLatestTabularDataResponse,
 } from '../gen/app/data/v1/data_pb';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+import {
+  CreateDataPipelineRequest,
+  CreateDataPipelineResponse,
+  DataPipeline,
+  DataPipelineRun,
+  DataPipelineRunStatus,
+  DeleteDataPipelineRequest,
+  DeleteDataPipelineResponse,
+  GetDataPipelineRequest,
+  GetDataPipelineResponse,
+  ListDataPipelineRunsRequest,
+  ListDataPipelineRunsResponse,
+  ListDataPipelinesRequest,
+  ListDataPipelinesResponse,
+} from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
 import {
   CreateDatasetRequest,
@@ -72,34 +98,25 @@ import {
   DataCaptureUploadRequest,
   DataCaptureUploadResponse,
   DataType,
+  FileData,
+  FileUploadRequest,
+  FileUploadResponse,
   SensorData,
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import { DataClient, type FilterOptions } from './data-client';
 import {
-  DataPipeline,
-  ListDataPipelinesRequest,
-  ListDataPipelinesResponse,
-  GetDataPipelineRequest,
-  GetDataPipelineResponse,
-  CreateDataPipelineRequest,
-  CreateDataPipelineResponse,
-  DeleteDataPipelineRequest,
-  DeleteDataPipelineResponse,
-  DataPipelineRun,
-  DataPipelineRunStatus,
-  ListDataPipelineRunsRequest,
-  ListDataPipelineRunsResponse,
-} from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+  DataClient,
+  type FileUploadOptions,
+  type FilterOptions,
+} from './data-client';
 vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
 const subject = () => new DataClient(mockTransport);
 
 describe('DataClient tests', () => {
-  const filter = subject().createFilter({
+  const filter = DataClient.createFilter({
     componentName: 'testComponentName',
     componentType: 'testComponentType',
   });
@@ -314,6 +331,36 @@ describe('DataClient tests', () => {
         [{ query: 'some_mql_query' }],
         true
       );
+      const result = promise as typeof data;
+      expect(result[0]?.key1).toBeInstanceOf(Date);
+      expect(promise).toEqual(data);
+    });
+
+    it('get tabular data from MQL with queryPrefixName', async () => {
+      const expectedRequest = new TabularDataByMQLRequest({
+        organizationId: 'some_org_id',
+        mqlBinary: [BSON.serialize({ query: 'some_mql_query' })],
+        queryPrefixName: 'my_prefix',
+      });
+      let capReq: TabularDataByMQLRequest | undefined = undefined;
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          tabularDataByMQL: (req) => {
+            capReq = req;
+            return new TabularDataByMQLResponse({
+              rawData: data.map((x) => BSON.serialize(x)),
+            });
+          },
+        });
+      });
+      const promise = await subject().tabularDataByMQL(
+        'some_org_id',
+        [{ query: 'some_mql_query' }],
+        false,
+        undefined,
+        'my_prefix'
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
       const result = promise as typeof data;
       expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
@@ -1033,15 +1080,164 @@ describe('DataClient tests', () => {
     });
   });
 
+  describe('createIndex tests', () => {
+    let capReq: CreateIndexRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createIndex: (req) => {
+            capReq = req;
+            return new CreateIndexResponse();
+          },
+        });
+      });
+    });
+    it('creates an index', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.PIPELINE_SINK;
+      const indexSpec = { keys: { field: 1 }, options: { priority: 1 } };
+      const pipelineName = 'pipeline1';
+      await subject().createIndex(
+        organizationId,
+        collectionType,
+        indexSpec,
+        pipelineName
+      );
+      expect(capReq.organizationId).toBe(organizationId);
+      expect(capReq.collectionType).toBe(collectionType);
+      expect(
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
+      ).toStrictEqual(indexSpec);
+      expect(capReq.pipelineName).toBe(pipelineName);
+    });
+    it('creates an index without pipeline name', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const indexSpec = { keys: { field: 2 }, options: { priority: 2 } };
+      await subject().createIndex(organizationId, collectionType, indexSpec);
+      expect(capReq.organizationId).toBe(organizationId);
+      expect(capReq.collectionType).toBe(collectionType);
+      expect(
+        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
+      ).toStrictEqual(indexSpec);
+    });
+  });
+  describe('listIndexes tests', () => {
+    let capReq: ListIndexesRequest;
+    const index1 = new Index({
+      collectionType: IndexableCollection.HOT_STORE,
+      indexName: 'index1',
+      indexSpec: [new TextEncoder().encode(JSON.stringify({ field: 1 }))],
+      createdBy: IndexCreator.CUSTOMER,
+    });
+    const index2 = new Index({
+      collectionType: IndexableCollection.PIPELINE_SINK,
+      pipelineName: 'pipeline1',
+      indexName: 'index2',
+      indexSpec: [
+        new TextEncoder().encode(JSON.stringify({ another_field: -1 })),
+      ],
+      createdBy: IndexCreator.VIAM,
+    });
+    const indexes = [index1, index2];
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          listIndexes: (req) => {
+            capReq = req;
+            return new ListIndexesResponse({
+              indexes,
+            });
+          },
+        });
+      });
+    });
+    it('lists indexes', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const pipelineName = 'pipeline1';
+      const expectedRequest = new ListIndexesRequest({
+        organizationId,
+        collectionType,
+        pipelineName,
+      });
+      const result = await subject().listIndexes(
+        organizationId,
+        collectionType,
+        pipelineName
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(indexes);
+    });
+    it('lists indexes without pipeline name', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const expectedRequest = new ListIndexesRequest({
+        organizationId,
+        collectionType,
+      });
+      const result = await subject().listIndexes(
+        organizationId,
+        collectionType
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(indexes);
+    });
+  });
+  describe('deleteIndex tests', () => {
+    let capReq: DeleteIndexRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          deleteIndex: (req) => {
+            capReq = req;
+            return new DeleteIndexResponse();
+          },
+        });
+      });
+    });
+    it('deletes an index', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const indexName = 'my_index';
+      const pipelineName = 'pipeline1';
+      const expectedRequest = new DeleteIndexRequest({
+        organizationId,
+        collectionType,
+        indexName,
+        pipelineName,
+      });
+      await subject().deleteIndex(
+        organizationId,
+        collectionType,
+        indexName,
+        pipelineName
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+    it('deletes an index without pipeline name', async () => {
+      const organizationId = 'orgId';
+      const collectionType = IndexableCollection.HOT_STORE;
+      const indexName = 'my_index';
+      const expectedRequest = new DeleteIndexRequest({
+        organizationId,
+        collectionType,
+        indexName,
+      });
+      await subject().deleteIndex(organizationId, collectionType, indexName);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
   describe('createFilter tests', () => {
     it('create empty filter', () => {
-      const testFilter = subject().createFilter({});
+      const testFilter = DataClient.createFilter({});
       expect(testFilter).toEqual(new Filter());
     });
 
     it('create filter', () => {
       const opts = { componentName: 'camera' };
-      const testFilter = subject().createFilter(opts);
+      const testFilter = DataClient.createFilter(opts);
 
       const expectedFilter = new Filter({
         componentName: 'camera',
@@ -1089,7 +1285,7 @@ describe('DataClient tests', () => {
         endTime,
         tags: tagsList,
       };
-      const testFilter = subject().createFilter(opts);
+      const testFilter = DataClient.createFilter(opts);
       expect(testFilter.componentType).toEqual('testComponentType');
 
       const expectedFilter = new Filter({
@@ -1714,5 +1910,131 @@ describe('DataPipelineClient tests', () => {
       const nextPage = await page.nextPage();
       expect(nextPage.runs).toEqual([]);
     });
+  });
+});
+
+describe('fileUpload tests', () => {
+  const partId = 'testPartId';
+  const binaryData = new Uint8Array([1, 2, 3, 4, 5]);
+  const options: FileUploadOptions = {
+    componentType: 'componentType',
+    componentName: 'componentName',
+    methodName: 'methodName',
+    fileName: 'fileName',
+    fileExtension: '.png',
+    tags: ['testTag1', 'testTag2'],
+    datasetIds: ['dataset1', 'dataset2'],
+  };
+
+  const expectedFileId = 'testFileId';
+  const expectedBinaryDataId = 'testBinaryDataId';
+
+  let capturedRequests: FileUploadRequest[];
+
+  beforeEach(() => {
+    capturedRequests = [];
+    mockTransport = createRouterTransport(({ service }) => {
+      service(DataSyncService, {
+        fileUpload: async (requests: AsyncIterable<FileUploadRequest>) => {
+          for await (const request of requests) {
+            capturedRequests.push(request);
+          }
+          return new FileUploadResponse({
+            fileId: expectedFileId,
+            binaryDataId: expectedBinaryDataId,
+          });
+        },
+      });
+    });
+  });
+
+  it('uploads file with metadata and file contents', async () => {
+    const result = await subject().fileUpload(binaryData, partId, options);
+
+    expect(result).toBe(expectedBinaryDataId);
+    expect(capturedRequests).toHaveLength(2);
+
+    // Check metadata request
+    const metadataRequest = capturedRequests[0]!;
+    expect(metadataRequest.uploadPacket.case).toBe('metadata');
+    const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
+    expect(metadata.partId).toBe(partId);
+    expect(metadata.type).toBe(DataType.FILE);
+    expect(metadata.componentType).toBe(options.componentType);
+    expect(metadata.componentName).toBe(options.componentName);
+    expect(metadata.methodName).toBe(options.methodName);
+    expect(metadata.fileName).toBe(options.fileName);
+    expect(metadata.fileExtension).toBe(options.fileExtension);
+    expect(metadata.tags).toStrictEqual(options.tags);
+    expect(metadata.datasetIds).toStrictEqual(options.datasetIds);
+
+    // Check file contents request
+    const fileContentsRequest = capturedRequests[1]!;
+    expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
+    const fileContents = fileContentsRequest.uploadPacket.value as FileData;
+    expect(fileContents.data).toEqual(binaryData);
+  });
+
+  it('uploads file without optional parameters', async () => {
+    const result = await subject().fileUpload(binaryData, partId);
+
+    expect(result).toBe(expectedBinaryDataId);
+    expect(capturedRequests).toHaveLength(2);
+
+    // Check metadata request
+    const metadataRequest = capturedRequests[0]!;
+    expect(metadataRequest.uploadPacket.case).toBe('metadata');
+    const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
+    expect(metadata.partId).toBe(partId);
+    expect(metadata.type).toBe(DataType.FILE);
+    expect(metadata.componentType).toBe('');
+    expect(metadata.componentName).toBe('');
+    expect(metadata.methodName).toBe('');
+    expect(metadata.fileName).toBe('');
+    expect(metadata.fileExtension).toBe('');
+    expect(metadata.tags).toStrictEqual([]);
+    expect(metadata.datasetIds).toStrictEqual([]);
+
+    // Check file contents request
+    const fileContentsRequest = capturedRequests[1]!;
+    expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
+    const fileContents = fileContentsRequest.uploadPacket.value as FileData;
+    expect(fileContents.data).toEqual(binaryData);
+  });
+
+  it('chunks file data', async () => {
+    const numChunks = 3;
+    const data = Uint8Array.from(
+      { length: DataClient.UPLOAD_CHUNK_SIZE * numChunks },
+      () => Math.floor(Math.random() * 256)
+    );
+
+    const result = await subject().fileUpload(data, partId);
+    expect(result).toBe(expectedBinaryDataId);
+    expect(capturedRequests).toHaveLength(1 + numChunks);
+
+    const metadataRequest = capturedRequests[0]!;
+    expect(metadataRequest.uploadPacket.case).toBe('metadata');
+
+    const contentRequests = capturedRequests.slice(1);
+    expect(contentRequests).toHaveLength(numChunks);
+
+    const receivedLength = contentRequests.reduce(
+      (acc, val) => acc + (val.uploadPacket.value as FileData).data.length,
+      0
+    );
+    expect(receivedLength).toEqual(numChunks * DataClient.UPLOAD_CHUNK_SIZE);
+
+    const receivedData = new Uint8Array(receivedLength);
+    let offset = 0;
+    for (const req of contentRequests) {
+      expect(req.uploadPacket.case).toBe('fileContents');
+      const fileData = req.uploadPacket.value as FileData;
+      expect(fileData.data).toHaveLength(DataClient.UPLOAD_CHUNK_SIZE);
+      receivedData.set(fileData.data, offset);
+      offset += fileData.data.length;
+    }
+
+    expect(receivedData).toStrictEqual(data);
   });
 });

@@ -1,36 +1,41 @@
-import { BSON } from 'bsonfy';
-import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import {
-  createPromiseClient,
-  type PromiseClient,
-  type Transport,
-} from '@connectrpc/connect';
+  Struct,
+  Timestamp,
+  type JsonValue,
+  type PartialMessage,
+} from '@bufbuild/protobuf';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import { BSON } from 'bsonfy';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
   BinaryID,
   CaptureInterval,
   CaptureMetadata,
   Filter,
+  Index,
+  IndexableCollection,
   Order,
-  TagsFilter,
   TabularDataSource,
   TabularDataSourceType,
+  TagsFilter,
 } from '../gen/app/data/v1/data_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
-import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
-import {
-  DataCaptureUploadRequest,
-  DataType,
-  SensorData,
-  SensorMetadata,
-  UploadMetadata,
-} from '../gen/app/datasync/v1/data_sync_pb';
 import {
   DataPipeline,
   DataPipelineRun,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
+import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
+import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+import {
+  DataCaptureUploadRequest,
+  DataType,
+  FileData,
+  FileUploadRequest,
+  SensorData,
+  SensorMetadata,
+  UploadMetadata,
+} from '../gen/app/datasync/v1/data_sync_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -61,6 +66,43 @@ interface TabularDataPoint {
   payload: JsonValue;
 }
 
+/** Optional parameters for uploading files */
+export interface FileUploadOptions {
+  /**
+   * Optional type of the component associated with the file (for example,
+   * "movement_sensor").
+   */
+  componentType?: string;
+
+  /** Optional name of the component associated with the file. */
+  componentName?: string;
+
+  /** Optional name of the method associated with the file. */
+  methodName?: string;
+
+  /**
+   * Optional name of the file. The empty string `""` will be assigned as the
+   * file name if one isn't provided.
+   */
+  fileName?: string;
+
+  /**
+   * Optional file extension. The empty string `""` will be assigned as the file
+   * extension if one isn't provided. Files with a `.jpeg`, `.jpg`, or `.png`
+   * extension will be saved to the **Images** tab.
+   */
+  fileExtension?: string;
+
+  /**
+   * Optional list of tags to allow for tag-based filtering when retrieving
+   * data.
+   */
+  tags?: string[];
+
+  /** Optional list of datasets to add the data to. */
+  datasetIds?: string[];
+}
+
 export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
@@ -73,19 +115,17 @@ const logDeprecationWarning = () => {
 };
 
 export class DataClient {
-  private dataClient: PromiseClient<typeof DataService>;
-  private datasetClient: PromiseClient<typeof DatasetService>;
-  private dataSyncClient: PromiseClient<typeof DataSyncService>;
-  private dataPipelinesClient: PromiseClient<typeof DataPipelinesService>;
+  private dataClient: Client<typeof DataService>;
+  private datasetClient: Client<typeof DatasetService>;
+  private dataSyncClient: Client<typeof DataSyncService>;
+  private dataPipelinesClient: Client<typeof DataPipelinesService>;
+  static readonly UPLOAD_CHUNK_SIZE = 1024 * 64;
 
   constructor(transport: Transport) {
-    this.dataClient = createPromiseClient(DataService, transport);
-    this.datasetClient = createPromiseClient(DatasetService, transport);
-    this.dataSyncClient = createPromiseClient(DataSyncService, transport);
-    this.dataPipelinesClient = createPromiseClient(
-      DataPipelinesService,
-      transport
-    );
+    this.dataClient = createClient(DataService, transport);
+    this.datasetClient = createClient(DatasetService, transport);
+    this.dataSyncClient = createClient(DataSyncService, transport);
+    this.dataPipelinesClient = createClient(DataPipelinesService, transport);
   }
 
   /**
@@ -235,13 +275,15 @@ export class DataClient {
    *   store. Defaults to false. Deprecated - use dataSource instead.
    * @param dataSource The data source to query. Defaults to the standard data
    *   source.
+   * @param queryPrefixName Optional name of the query prefix.
    * @returns An array of data objects
    */
   async tabularDataByMQL(
     organizationId: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
     useRecentData?: boolean,
-    tabularDataSource?: TabularDataSource
+    tabularDataSource?: TabularDataSource,
+    queryPrefixName?: string
   ) {
     const binary: Uint8Array[] =
       query[0] instanceof Uint8Array
@@ -263,6 +305,7 @@ export class DataClient {
       organizationId,
       mqlBinary: binary,
       dataSource,
+      queryPrefixName,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
   }
@@ -1272,8 +1315,84 @@ export class DataClient {
     return resp.binaryDataId;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  createFilter(options: FilterOptions): Filter {
+  /**
+   * Upload arbitrary file data.
+   *
+   * Upload file data that may be stored on a robot along with the relevant
+   * metadata. File data can be found in the **Files** tab of the **DATA**
+   * page.
+   *
+   * @example
+   *
+   * ```ts
+   * const binaryDataId = await dataClient.fileUpload(
+   *   binaryData,
+   *   'INSERT YOUR PART ID',
+   *   {
+   *     fileExtension: '.jpeg',
+   *     tags: ['tag_1', 'tag_2'],
+   *   }
+   * );
+   * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#fileupload).
+   *
+   * @param binaryData The data to be uploaded
+   * @param partId The part ID of the machine that captured the data
+   * @param options Options for the file upload
+   * @returns The binary data ID of the uploaded data
+   */
+  async fileUpload(
+    binaryData: Uint8Array,
+    partId: string,
+    options?: FileUploadOptions
+  ) {
+    const md = new UploadMetadata({
+      partId,
+      type: DataType.FILE,
+      ...options,
+    });
+
+    const response = await this.dataSyncClient.fileUpload(
+      DataClient.fileUploadRequests(md, binaryData)
+    );
+    return response.binaryDataId;
+  }
+
+  /**
+   * Create an async generator of FileUploadRequests to use with FileUpload
+   * methods.
+   *
+   * @param metadata The file's metadata
+   * @param data The binary data of the file
+   */
+  // eslint-disable-next-line @typescript-eslint/require-await
+  private static async *fileUploadRequests(
+    metadata: UploadMetadata,
+    data: Uint8Array
+  ): AsyncGenerator<PartialMessage<FileUploadRequest>> {
+    yield new FileUploadRequest({
+      uploadPacket: {
+        case: 'metadata',
+        value: metadata,
+      },
+    });
+    for (let i = 0; i < data.length; i += DataClient.UPLOAD_CHUNK_SIZE) {
+      let end = i + DataClient.UPLOAD_CHUNK_SIZE;
+      if (end > data.length) {
+        end = data.length;
+      }
+      yield new FileUploadRequest({
+        uploadPacket: {
+          case: 'fileContents',
+          value: new FileData({ data: data.slice(i, end) }),
+        },
+      });
+    }
+  }
+
+  static createFilter(options: FilterOptions): Filter {
     const filter = new Filter(options);
 
     if (options.startTime ?? options.endTime) {
@@ -1420,7 +1539,8 @@ export class DataClient {
    *   'my-pipeline',
    *   mqlQuery,
    *   '0 0 * * *'
-   *   false
+   *   false,
+   *   0
    * );
    * ```
    *
@@ -1429,6 +1549,7 @@ export class DataClient {
    * @param query The MQL query to run as a list of BSON documents
    * @param schedule The schedule to run the query on (cron expression)
    * @param dataSourceType The type of data source to use for the data pipeline
+   * @param enableBackfill Whether to enable backfill for the data pipeline
    * @returns The ID of the created data pipeline
    */
   async createDataPipeline(
@@ -1515,13 +1636,112 @@ export class DataClient {
       resp.nextPageToken
     );
   }
+
+  /**
+   * CreateIndex starts a custom index build
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.createIndex(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   IndexableCollection.HOT_STORE,
+   *   [new TextEncoder().encode(JSON.stringify({ field: 1 }))]
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param collectionType The type of collection to create the index on
+   * @param indexSpec The MongoDB index specification in JSON format, as a
+   *   Uint8Array
+   * @param pipelineName Optional name of the pipeline if collectionType is
+   *   PIPELINE_SINK
+   */
+  async createIndex(
+    organizationId: string,
+    collectionType: IndexableCollection,
+    indexSpec: {
+      keys: Record<string, number>;
+      options?: Record<string, unknown>;
+    },
+    pipelineName?: string
+  ) {
+    await this.dataClient.createIndex({
+      organizationId,
+      collectionType,
+      indexSpec: [BSON.serialize(indexSpec)],
+      pipelineName,
+    });
+  }
+
+  /**
+   * ListIndexes returns all the indexes for a given collection
+   *
+   * @example
+   *
+   * ```ts
+   * const indexes = await dataClient.listIndexes(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   IndexableCollection.HOT_STORE
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param collectionType The type of collection to list indexes for
+   * @param pipelineName Optional name of the pipeline if collectionType is
+   *   PIPELINE_SINK
+   * @returns An array of indexes
+   */
+  async listIndexes(
+    organizationId: string,
+    collectionType: IndexableCollection,
+    pipelineName?: string
+  ): Promise<Index[]> {
+    const resp = await this.dataClient.listIndexes({
+      organizationId,
+      collectionType,
+      pipelineName,
+    });
+    return resp.indexes;
+  }
+
+  /**
+   * DeleteIndex drops the specified custom index from a collection
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.deleteIndex(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   IndexableCollection.HOT_STORE,
+   *   'my_index'
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param collectionType The type of collection to delete the index from
+   * @param indexName The name of the index to delete
+   * @param pipelineName Optional name of the pipeline if collectionType is
+   *   PIPELINE_SINK
+   */
+  async deleteIndex(
+    organizationId: string,
+    collectionType: IndexableCollection,
+    indexName: string,
+    pipelineName?: string
+  ) {
+    await this.dataClient.deleteIndex({
+      organizationId,
+      collectionType,
+      indexName,
+      pipelineName,
+    });
+  }
 }
 
 export class ListDataPipelineRunsPage {
   constructor(
-    private readonly dataPipelinesClient: PromiseClient<
-      typeof DataPipelinesService
-    >,
+    private readonly dataPipelinesClient: Client<typeof DataPipelinesService>,
     private readonly pipelineId: string,
     public readonly runs: DataPipelineRun[] = [],
     private readonly pageSize?: number,
@@ -1569,5 +1789,9 @@ export class ListDataPipelineRunsPage {
   }
 }
 
-export { type BinaryID, type Order } from '../gen/app/data/v1/data_pb';
+export {
+  type BinaryID,
+  type IndexableCollection,
+  type Order,
+} from '../gen/app/data/v1/data_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';

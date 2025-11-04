@@ -31,6 +31,7 @@ jobs:
 
       - name: Build + Lint + Test
         run: |
+          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install -y software-properties-common
           apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
           sudo chown -R testbot .

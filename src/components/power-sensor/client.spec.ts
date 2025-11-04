@@ -3,10 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Value } from '@bufbuild/protobuf';
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { GetReadingsResponse } from '../../gen/common/v1/common_pb';
 import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_connect';
 import {
@@ -57,7 +54,7 @@ describe('PowerSensorClient tests', () => {
     RobotClient.prototype.createServiceClient = vi
       .fn()
       .mockImplementation(() =>
-        createPromiseClient(PowerSensorService, mockTransport)
+        createClient(PowerSensorService, mockTransport)
       );
 
     sensor = new PowerSensorClient(new RobotClient('host'), 'test-sensor');

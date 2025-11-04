@@ -36,6 +36,7 @@ import type { Robot } from './robot';
 import SessionManager from './session-manager';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
+import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { assertExists } from '../assert';
 
 interface ICEServer {
@@ -238,6 +239,10 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private slamServiceClient: Client<typeof SLAMService> | undefined;
 
+  private worldStateStoreServiceClient:
+    | Client<typeof WorldStateStoreService>
+    | undefined;
+
   private currentRetryAttempt = 0;
 
   constructor(
@@ -326,8 +331,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
-        // Always retry the next attempt
-        return true;
+        // Always retry the next attempt if not closed
+        return !this.closed;
       },
     };
 
@@ -346,9 +351,18 @@ export class RobotClient extends EventDispatcher implements Robot {
         // eslint-disable-next-line no-console
         console.debug('Reconnected successfully!');
       })
-      .catch(() => {
+      .catch((error) => {
+        if (
+          this.reconnectMaxAttempts !== undefined &&
+          this.currentRetryAttempt >= this.reconnectMaxAttempts
+        ) {
+          // eslint-disable-next-line no-console
+          console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
+          return;
+        }
+
         // eslint-disable-next-line no-console
-        console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
+        console.error(error);
       });
   }
 
@@ -478,6 +492,13 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.slamServiceClient;
   }
 
+  get worldStateStoreService() {
+    this.worldStateStoreServiceClient ??= this.createServiceClient(
+      WorldStateStoreService
+    );
+    return this.worldStateStoreServiceClient;
+  }
+
   createServiceClient<T extends ServiceType>(svcType: T): Client<T> {
     assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
     return createClient(svcType, this.clientTransport);
@@ -568,8 +589,10 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
-        // Abort reconnects if the the caller specifies, otherwise retry
-        return !conf.reconnectAbortSignal?.abort;
+        const aborted = conf.reconnectAbortSignal?.abort ?? false;
+
+        // Retry if not closed or aborted
+        return !aborted && !this.closed;
       },
     };
 
@@ -695,10 +718,13 @@ export class RobotClient extends EventDispatcher implements Robot {
           opts.webrtcOptions.signalingCredentials = opts.credentials;
         }
 
+        const signalingAddress =
+          this.webrtcOptions.signalingAddress || this.serviceHost;
         const webRTCConn = await dialWebRTC(
-          this.webrtcOptions.signalingAddress || this.serviceHost,
+          signalingAddress,
           this.webrtcOptions.host,
-          opts
+          opts,
+          this.serviceHost !== '' && signalingAddress !== this.serviceHost
         );
 
         /*

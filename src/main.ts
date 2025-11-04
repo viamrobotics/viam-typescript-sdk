@@ -1,9 +1,9 @@
 export const version = __VERSION__;
 
 export {
-  RobotClient,
   RobotClient as Client,
   createRobotClient,
+  RobotClient,
   type CloudMetadata,
   type DialConf,
   type DialDirectConf,
@@ -29,14 +29,15 @@ export {
 export {
   type AccessToken,
   type Credential,
-  type CredentialType,
   type Credentials,
+  type CredentialType,
 } from './app/viam-transport';
 
 export {
   type BinaryID,
   type DataClient,
   type FilterOptions,
+  type IndexableCollection,
 } from './app/data-client';
 /**
  * Raw Protobuf interfaces for Data.
@@ -101,6 +102,17 @@ export { type BillingClient } from './app/billing-client';
 export * as billingApi from './gen/app/v1/billing_pb';
 
 export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
+export {
+  AudioInClient,
+  type AudioIn,
+  type AudioChunk,
+} from './components/audioin';
+export { AudioOutClient, type AudioOut } from './components/audioout';
+export {
+  AudioCodec,
+  type AudioCodecType,
+  type AudioProperties,
+} from './audio-common';
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
@@ -201,10 +213,10 @@ export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
 
 export {
   MLModelClient,
-  type MLModel,
-  type Metadata,
-  type TensorInfo,
   type FlatTensors,
+  type Metadata,
+  type MLModel,
+  type TensorInfo,
 } from './services/ml-model';
 
 export { MotorClient, type Motor } from './components/motor';
@@ -406,6 +418,8 @@ export {
  * @group Raw Protobufs
  */
 export * as visionApi from './gen/service/vision/v1/vision_pb';
+
+export * from './services/world-state-store';
 
 export {
   GenericClient as GenericServiceClient,

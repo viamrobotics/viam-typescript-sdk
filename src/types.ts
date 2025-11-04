@@ -39,6 +39,7 @@ export type GeoPoint = PlainMessage<commonApi.GeoPoint>;
 export type GeometriesInFrame = PlainMessage<commonApi.GeometriesInFrame>;
 export type Geometry = PlainMessage<commonApi.Geometry>;
 export type Orientation = PlainMessage<commonApi.Orientation>;
+export type PointCloud = PlainMessage<commonApi.PointCloud>;
 export type Pose = PlainMessage<commonApi.Pose>;
 export type PoseInFrame = PlainMessage<commonApi.PoseInFrame>;
 export type RectangularPrism = PlainMessage<commonApi.RectangularPrism>;
@@ -55,6 +56,7 @@ export const {
   GeometriesInFrame,
   Geometry,
   Orientation,
+  PointCloud,
   Pose,
   PoseInFrame,
   RectangularPrism,

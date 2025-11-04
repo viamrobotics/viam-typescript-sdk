@@ -1,9 +1,6 @@
 // @vitest-environment happy-dom
 
-import {
-  createPromiseClient,
-  createRouterTransport,
-} from '@connectrpc/connect';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_connect';
 import {
@@ -47,7 +44,7 @@ describe('InputControllerClient Tests', () => {
     RobotClient.prototype.createServiceClient = vi
       .fn()
       .mockImplementation(() =>
-        createPromiseClient(InputControllerService, mockTransport)
+        createClient(InputControllerService, mockTransport)
       );
 
     inputController = new InputControllerClient(

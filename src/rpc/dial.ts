@@ -14,7 +14,7 @@ import type {
   Transport,
   UnaryResponse,
 } from '@connectrpc/connect';
-import { Code, ConnectError, createPromiseClient } from '@connectrpc/connect';
+import { Code, ConnectError, createClient } from '@connectrpc/connect';
 import {
   AuthService,
   ExternalAuthService,
@@ -103,7 +103,8 @@ interface TransportInitOptions {
 
 export const dialDirect = async (
   address: string,
-  opts?: DialOptions
+  opts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<Transport> => {
   validateDialOptions(opts);
   const createTransport =
@@ -111,6 +112,8 @@ export const dialDirect = async (
 
   const transportOpts = {
     baseUrl: address,
+    // Default is "same-origin", which does not include localhost:*.
+    credentials: 'same-origin' as RequestCredentials,
   };
 
   // Client already has access token with no external auth, skip Authenticate process.
@@ -133,6 +136,10 @@ export const dialDirect = async (
     opts === undefined ||
     (opts.credentials === undefined && opts.accessToken === undefined)
   ) {
+    // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
+    if (transportCredentialsInclude) {
+      transportOpts.credentials = 'include';
+    }
     return createTransport(transportOpts);
   }
 
@@ -171,7 +178,7 @@ const makeAuthenticatedTransport = async (
 
     const resolvedAddress = opts.externalAuthAddress ?? address;
     const transport = defaultFactory({ baseUrl: resolvedAddress });
-    const authClient = createPromiseClient(AuthService, transport);
+    const authClient = createClient(AuthService, transport);
     const resp = await authClient.authenticate(request);
     accessToken = resp.accessToken;
   } else {
@@ -195,10 +202,7 @@ const makeAuthenticatedTransport = async (
     const transport = defaultFactory({
       baseUrl: opts.externalAuthAddress,
     });
-    const externalAuthClient = createPromiseClient(
-      ExternalAuthService,
-      transport
-    );
+    const externalAuthClient = createClient(ExternalAuthService, transport);
     const resp = await externalAuthClient.authenticateTo(request, {
       headers: extAuthHeaders,
     });
@@ -308,15 +312,17 @@ export interface WebRTCConnection {
 const getOptionalWebRTCConfig = async (
   signalingAddress: string,
   callOpts: CallOptions,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<WebRTCConfig> => {
   const optsCopy = { ...dialOpts } as DialOptions;
-  const directTransport = await dialDirect(signalingAddress, optsCopy);
-
-  const signalingClient = createPromiseClient(
-    SignalingService,
-    directTransport
+  const directTransport = await dialDirect(
+    signalingAddress,
+    optsCopy,
+    transportCredentialsInclude
   );
+
+  const signalingClient = createClient(SignalingService, directTransport);
   try {
     const resp = await signalingClient.optionalWebRTCConfig({}, callOpts);
     return resp.config ?? new WebRTCConfig();
@@ -339,7 +345,8 @@ const getOptionalWebRTCConfig = async (
 export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<WebRTCConnection> => {
   const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   validateDialOptions(dialOpts);
@@ -362,7 +369,8 @@ export const dialWebRTC = async (
   const webrtcOpts = await processWebRTCOpts(
     usableSignalingAddress,
     callOpts,
-    dialOpts
+    dialOpts,
+    transportCredentialsInclude
   );
   // then derive options specifically for signaling against our target.
   const exchangeOpts = processSignalingExchangeOpts(
@@ -379,16 +387,17 @@ export const dialWebRTC = async (
 
   let directTransport: Transport;
   try {
-    directTransport = await dialDirect(usableSignalingAddress, exchangeOpts);
+    directTransport = await dialDirect(
+      usableSignalingAddress,
+      exchangeOpts,
+      transportCredentialsInclude
+    );
   } catch (error) {
     pc.close();
     throw error;
   }
 
-  const signalingClient = createPromiseClient(
-    SignalingService,
-    directTransport
-  );
+  const signalingClient = createClient(SignalingService, directTransport);
 
   const exchange = new SignalingExchange(
     signalingClient,
@@ -438,13 +447,15 @@ export const dialWebRTC = async (
 const processWebRTCOpts = async (
   signalingAddress: string,
   callOpts: CallOptions,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<DialWebRTCOptions> => {
   // Get TURN servers, if any.
   const config = await getOptionalWebRTCConfig(
     signalingAddress,
     callOpts,
-    dialOpts
+    dialOpts,
+    transportCredentialsInclude
   );
   const additionalIceServers: RTCIceServer[] = config.additionalIceServers.map(
     (ice) => {

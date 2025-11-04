@@ -1,5 +1,5 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, PromiseClient } from '@connectrpc/connect';
+import type { CallOptions, Client } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
@@ -18,7 +18,6 @@ import type {
   Options,
   Pose,
   PoseInFrame,
-  ResourceName,
   Transform,
   WorldState,
 } from '../../types';
@@ -32,7 +31,7 @@ import { type Constraints, type MotionConfiguration } from './types';
  * @group Clients
  */
 export class MotionClient implements Motion {
-  private client: PromiseClient<typeof MotionService>;
+  private client: Client<typeof MotionService>;
   public readonly name: string;
   private readonly options: Options;
   public callOptions: CallOptions = { headers: {} as Record<string, string> };
@@ -45,7 +44,7 @@ export class MotionClient implements Motion {
 
   async move(
     destination: PoseInFrame,
-    componentName: ResourceName,
+    componentName: string,
     worldState?: WorldState,
     constraints?: Constraints,
     extra = {},
@@ -68,8 +67,8 @@ export class MotionClient implements Motion {
 
   async moveOnMap(
     destination: Pose,
-    componentName: ResourceName,
-    slamServiceName: ResourceName,
+    componentName: string,
+    slamServiceName: string,
     motionConfig?: MotionConfiguration,
     obstacles?: Geometry[],
     extra = {},
@@ -93,8 +92,8 @@ export class MotionClient implements Motion {
 
   async moveOnGlobe(
     destination: GeoPoint,
-    componentName: ResourceName,
-    movementSensorName: ResourceName,
+    componentName: string,
+    movementSensorName: string,
     heading?: number,
     obstaclesList?: GeoGeometry[],
     motionConfig?: MotionConfiguration,
@@ -121,7 +120,7 @@ export class MotionClient implements Motion {
   }
 
   async stopPlan(
-    componentName: ResourceName,
+    componentName: string,
     extra = {},
     callOptions = this.callOptions
   ) {
@@ -138,7 +137,7 @@ export class MotionClient implements Motion {
   }
 
   async getPlan(
-    componentName: ResourceName,
+    componentName: string,
     lastPlanOnly?: boolean,
     executionId?: string,
     extra = {},
@@ -174,7 +173,7 @@ export class MotionClient implements Motion {
   }
 
   async getPose(
-    componentName: ResourceName,
+    componentName: string,
     destinationFrame: string,
     supplementalTransforms: Transform[],
     extra = {},

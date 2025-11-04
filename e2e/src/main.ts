@@ -3,6 +3,7 @@ import { createRobotClient } from '../../src/main';
 const main = async () => {
   const machine = await createRobotClient({
     host: 'e2e-ts-sdk',
+    serviceHost: 'http://localhost:9090',
     signalingAddress: 'http://localhost:9090',
     iceServers: [{ urls: 'stun:global.stun.twilio.com:3478' }],
   });

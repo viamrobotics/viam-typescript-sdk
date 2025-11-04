@@ -1,16 +1,12 @@
-import {
-  createPromiseClient,
-  type PromiseClient,
-  type Transport,
-} from '@connectrpc/connect';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
 import type { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
 
 export class ProvisioningClient {
-  private client: PromiseClient<typeof ProvisioningService>;
+  private client: Client<typeof ProvisioningService>;
 
   constructor(transport: Transport) {
-    this.client = createPromiseClient(ProvisioningService, transport);
+    this.client = createClient(ProvisioningService, transport);
   }
 
   /**
