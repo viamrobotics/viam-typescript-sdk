@@ -43,8 +43,7 @@ export interface Arm extends Resource {
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
   /**
-   * Get the kinematics information associated with the arm as the format and
-   * byte contents of the kinematics file.
+   * Get the kinematics information associated with the arm.
    *
    * @example
    *
