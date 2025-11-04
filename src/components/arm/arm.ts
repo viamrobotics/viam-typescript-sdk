@@ -2,10 +2,7 @@ import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { Pose, Resource, Vector3 } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
-import type {
-  Geometry,
-  KinematicsFileFormat,
-} from '../../gen/common/v1/common_pb';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 import type { Frame } from '../../gen/app/v1/robot_pb';
 
 export type ArmJointPositions = PlainMessage<armApi.JointPositions>;

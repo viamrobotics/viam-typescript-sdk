@@ -73,7 +73,7 @@ export class ArmClient implements Arm {
     const decoder = new TextDecoder('utf8');
     const jsonString = decoder.decode(response.kinematicsData);
 
-    return JSON.parse(jsonString) as Record<string, unknown>;
+    return JSON.parse(jsonString) as ReturnType<Arm['getKinematics']>;
   }
 
   async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
