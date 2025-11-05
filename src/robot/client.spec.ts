@@ -44,6 +44,7 @@ describe('RobotClient', () => {
       } as unknown as RTCPeerConnection;
 
       mockDataChannel = {
+        close: vi.fn(),
         addEventListener: dcAddEventListenerSpy,
         removeEventListener: dcRemoveEventListenerSpy,
         readyState: 'open',

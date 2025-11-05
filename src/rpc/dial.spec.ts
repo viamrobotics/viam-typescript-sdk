@@ -37,6 +37,7 @@ describe('dialWebRTC', () => {
   let mockCreateClient: ReturnType<typeof vi.fn>;
 
   let mockPeerConnectionClose: ReturnType<typeof vi.fn>;
+  let mockDataChannelClose: ReturnType<typeof vi.fn>;
   let mockExchangeDoExchange: ReturnType<typeof vi.fn>;
   let mockExchangeTerminate: ReturnType<typeof vi.fn>;
 
@@ -52,9 +53,11 @@ describe('dialWebRTC', () => {
       removeEventListener: removeEventListenerFn,
     } as unknown as RTCPeerConnection;
 
+    mockDataChannelClose = vi.fn();
     const dcAddEventListenerFn = vi.fn();
     const dcRemoveEventListenerFn = vi.fn();
     mockDataChannel = {
+      close: mockDataChannelClose,
       addEventListener: dcAddEventListenerFn,
       removeEventListener: dcRemoveEventListenerFn,
     } as unknown as RTCDataChannel;
