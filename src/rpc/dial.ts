@@ -441,6 +441,7 @@ export const dialWebRTC = async (
   } finally {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
+      timeoutId = undefined;
     }
 
     if (!successful) {
