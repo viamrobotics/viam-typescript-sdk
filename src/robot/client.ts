@@ -672,6 +672,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     if (this.dataChannel) {
+      this.dataChannel.close();
       this.dataChannel = undefined;
     }
 
@@ -711,6 +712,11 @@ export class RobotClient extends EventDispatcher implements Robot {
     if (this.peerConn) {
       this.peerConn.close();
       this.peerConn = undefined;
+    }
+
+    if (this.dataChannel) {
+      this.dataChannel.close();
+      this.dataChannel = undefined;
     }
 
     /*

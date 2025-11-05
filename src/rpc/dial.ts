@@ -394,6 +394,7 @@ export const dialWebRTC = async (
     );
   } catch (error) {
     pc.close();
+    dc.close();
     throw error;
   }
 
@@ -441,10 +442,12 @@ export const dialWebRTC = async (
   } finally {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
+      timeoutId = undefined;
     }
 
     if (!successful) {
       pc.close();
+      dc.close();
     }
   }
 };
