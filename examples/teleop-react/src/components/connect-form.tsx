@@ -52,7 +52,7 @@ export const ConnectForm = (props: ConnectFormProps): JSX.Element => {
     setApiKeyId(event.target.value);
   };
   const handleApiKey: ChangeEventHandler<HTMLInputElement> = (event) => {
-    setApiKeyId(event.target.value);
+    setApiKey(event.target.value);
   };
   const handleSubmit: FormEventHandler = (event) => {
     onSubmit({ hostname, apiKeyId, apiKey });
