@@ -1,3 +1,4 @@
 dist
 docs
 src/gen
+src/api-version.ts
