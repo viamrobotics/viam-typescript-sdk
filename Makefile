@@ -26,7 +26,8 @@ build-ci: _build
 clean: clean-js clean-buf clean-docs
 
 .PHONY: _test
-_test: npm run test
+_test: 
+	npm run test
 
 .PHONY: test
 test: $(node_modules) build-buf _test
