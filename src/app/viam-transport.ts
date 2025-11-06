@@ -16,10 +16,7 @@ export interface Credential {
   payload: string;
 }
 
-export type CredentialType =
-  | 'robot-location-secret'
-  | 'api-key'
-  | 'robot-secret';
+export type CredentialType = 'api-key' | 'robot-secret';
 
 /** An access token used to access protected resources. */
 export interface AccessToken {
