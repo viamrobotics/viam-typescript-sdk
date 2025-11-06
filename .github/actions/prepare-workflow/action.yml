@@ -16,6 +16,8 @@ runs:
         sudo chown -R testbot .
         sudo mkdir -p /home/testbot/.cache/buf
         sudo chown -R testbot:testbot /home/testbot/.cache
+        sudo mkdir -p /github/home/.npm
+        sudo chown -R testbot:testbot /github/home/.npm
 
     - name: Setup Node.js
       uses: actions/setup-node@v6
