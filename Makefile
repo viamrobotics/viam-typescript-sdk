@@ -13,25 +13,42 @@ setup:  $(node_modules)
 teardown:
 	rm -rf node_modules
 
+.PHONY: _build
+_build: build-js build-docs
+
 .PHONY: build
-build: build-buf build-js build-docs
+build: build-buf _build
+
+.PHONY: build-ci
+build-ci: _build
 
 .PHONY: clean
 clean: clean-js clean-buf clean-docs
 
+.PHONY: _test
+_test: npm run test
+
 .PHONY: test
-test: $(node_modules) build-buf
-	npm run test
+test: $(node_modules) build-buf _test
+
+.PHONY: test-ci
+test-ci: _test
 
 .PHONY: test-watch
 test-watch: $(node_modules) build-buf
 	npm run test:watch
 
-.PHONY: lint
-lint: $(node_modules) build-buf
+.PHONY: _lint
+_lint: 
 	npm run lint
 	npm run typecheck
 	npm run check -- --reject="@bufbuild/protobuf,@connectrpc/connect,@connectrpc/connect-web"
+
+.PHONY: lint
+lint: $(node_modules) build-buf _lint
+
+.PHONY: lint-ci
+lint-ci: _lint
 
 .PHONY: format
 format: $(node_modules)
@@ -105,8 +122,10 @@ e2e/bin/viam-server:
 run-e2e-server: e2e/bin/viam-server
 	e2e/bin/viam-server --config=./e2e/server_config.json
 
-test-e2e: e2e/bin/viam-server build install-playwright
+.PHONY: _test-e2e
+_test-e2e: e2e/bin/viam-server install-playwright
 	cd e2e && npm run e2e:playwright
 
-test-e2e-ci: e2e/bin/viam-server install-playwright
-	cd e2e && npm run e2e:playwright
+test-e2e: build _test-e2e
+
+test-e2e-ci: _test-e2e

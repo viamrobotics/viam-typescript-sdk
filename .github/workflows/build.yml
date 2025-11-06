@@ -37,7 +37,7 @@ jobs:
           path: .
 
       - name: Build
-        run: sudo -u testbot bash -lc 'make build'
+        run: sudo -u testbot bash -lc 'make build-ci'
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
