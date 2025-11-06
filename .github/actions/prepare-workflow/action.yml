@@ -27,31 +27,32 @@ runs:
         echo "Using Node.js version: $NODE_VERSION"
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ steps.node-version.outputs.version }}
+        cache: 'npm'
 
-    - name: Restore npm cache
+    - name: Restore node_modules cache
       uses: actions/cache/restore@v4
-      id: cache-npm
+      id: cache-node-modules
       with:
         path: node_modules
-        key: npm-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
         restore-keys: |
-          npm-${{ runner.os }}-${{ steps.node-version.outputs.version }}-
-          npm-${{ runner.os }}-
+          node-modules-${{ runner.os }}-${{ steps.node-version.outputs.version }}-
+          node-modules-${{ runner.os }}-
 
     - name: Install npm dependencies
-      if: steps.cache-npm.outputs.cache-hit != 'true'
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
       shell: bash
       run: sudo -u testbot bash -lc 'npm ci --audit=false'
 
-    - name: Save npm cache
-      if: steps.cache-npm.outputs.cache-hit != 'true'
+    - name: Save node_modules cache
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: node_modules
-        key: npm-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
 
     - name: Generate api-version.ts
       shell: bash
