@@ -31,7 +31,7 @@ jobs:
         run: sudo -u testbot bash -lc 'make setup'
 
       - name: Build protocol buffers
-        run: sudo -u testbot bash -lc 'make build-buf'
+        run: sudo -u testbot bash -lc 'make build-buf-ci'
 
       - name: Upload build-buf artifacts
         uses: actions/upload-artifact@v4

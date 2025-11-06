@@ -69,12 +69,18 @@ clean-buf:
 update-buf: $(node_modules)
 	$(buf) mod update
 
-.PHONY: build-buf
-build-buf: $(node_modules) clean-buf
+.PHONY: _build-buf
+_build-buf: 
 	$(buf) generate buf.build/googleapis/googleapis
 	$(buf) generate buf.build/viamrobotics/api:$$(cat api_version.lock) --path common,component,robot,service,app,provisioning,tagger,stream
 	$(buf) generate buf.build/viamrobotics/goutils
 	$(buf) generate buf.build/grpc/grpc --path grpc/reflection/v1/reflection.proto
+
+.PHONY: build-buf
+build-buf: $(node_modules) clean-buf _build-buf
+
+.PHONY: build-buf-ci
+build-buf-ci: _build-buf
 
 # js targets
 
