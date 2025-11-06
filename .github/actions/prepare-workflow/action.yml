@@ -1,11 +1,7 @@
-name: 'Prepare Job'
+name: 'Prepare Workflow'
 description: 'Setup environment, cache and install dependencies, and optionally download build artifacts'
 
 inputs:
-  node_version:
-    description: 'Node.js version to use'
-    required: false
-    default: '20'
   download_build_artifacts:
     description: 'Whether to download full build artifacts (for test-e2e only)'
     required: false
@@ -15,22 +11,35 @@ runs:
   using: 'composite'
   steps:
     - name: Setup environment
-      uses: viamrobotics/viam-typescript-sdk/.github/actions/setup-environment@test-breakup-workflows
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common jq
+        apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
+        sudo chown -R testbot .
+
+    - name: Read Node.js version from package.json
+      id: node-version
+      shell: bash
+      run: |
+        NODE_VERSION=$(jq -r '.engines.node' package.json | sed 's/[^0-9]//g')
+        echo "version=$NODE_VERSION" >> $GITHUB_OUTPUT
+        echo "Using Node.js version: $NODE_VERSION"
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ inputs.node_version }}
+        node-version: ${{ steps.node-version.outputs.version }}
 
     - name: Restore npm cache
       uses: actions/cache/restore@v4
       id: cache-npm
       with:
         path: node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
+        key: npm-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-node-${{ inputs.node_version }}-
-          ${{ runner.os }}-node-
+          npm-${{ runner.os }}-${{ steps.node-version.outputs.version }}-
+          npm-${{ runner.os }}-
 
     - name: Install npm dependencies
       if: steps.cache-npm.outputs.cache-hit != 'true'
@@ -42,7 +51,7 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
+        key: npm-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
 
     - name: Generate api-version.ts
       shell: bash

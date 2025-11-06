@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Prepare job
-        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@main
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@main
 
       - name: Build
         run: sudo -u testbot bash -lc 'make build-ci'
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Prepare job
-        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@main
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@main
 
       - name: Lint
         run: sudo -u testbot bash -lc 'make lint-ci'
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Prepare job
-        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@main
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@main
 
       - name: Test
         run: sudo -u testbot bash -lc 'make test-ci'
@@ -71,7 +71,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Prepare job
-        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@main
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@main
         with:
           download_build_artifacts: 'true'
 
