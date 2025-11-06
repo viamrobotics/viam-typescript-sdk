@@ -73,7 +73,7 @@ jobs:
       - name: Prepare workflow
         uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@main
         with:
-          download_build_artifacts: 'true'
+          e2e: 'true'
 
       - name: Test E2E
         run: sudo -u testbot bash -lc 'make test-e2e-ci'

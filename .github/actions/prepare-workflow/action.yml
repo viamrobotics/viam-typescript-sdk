@@ -2,8 +2,8 @@ name: 'Prepare Workflow'
 description: 'Setup environment, cache and install dependencies, and optionally download build artifacts'
 
 inputs:
-  download_build_artifacts:
-    description: 'Whether to download full build artifacts (for test-e2e only)'
+  e2e:
+    description: 'Whether to prepare for e2e tests'
     required: false
     default: 'false'
 
@@ -13,43 +13,22 @@ runs:
     - name: Setup environment
       shell: bash
       run: |
-        if ! command -v jq &> /dev/null; then
-          sudo apt-get update
-          sudo apt-get install -y software-properties-common jq
-          apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
-        fi
         sudo chown -R testbot .
         sudo mkdir -p /home/testbot/.cache/buf
         sudo chown -R testbot:testbot /home/testbot/.cache
 
-    - name: Read Node.js version from package.json
-      id: node-version
-      shell: bash
-      run: |
-        NODE_VERSION=$(jq -r '.engines.node' package.json | sed 's/[^0-9]//g')
-        echo "version=$NODE_VERSION" >> $GITHUB_OUTPUT
-        echo "Using Node.js version: $NODE_VERSION"
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
-        node-version: ${{ steps.node-version.outputs.version }}
         cache: 'npm'
-
-    - name: Verify Node.js version
-      shell: bash
-      run: |
-        echo "Node.js version: $(node --version)"
-        echo "Expected: >=22"
 
     - name: Restore node_modules cache
       uses: actions/cache/restore@v4
       id: cache-node-modules
       with:
         path: node_modules
-        key: node-modules-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
         restore-keys: |
-          node-modules-${{ runner.os }}-${{ steps.node-version.outputs.version }}-
           node-modules-${{ runner.os }}-
 
     - name: Install npm dependencies
@@ -62,21 +41,21 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: node_modules
-        key: node-modules-${{ runner.os }}-${{ steps.node-version.outputs.version }}-${{ hashFiles('package-lock.json') }}
+        key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
     - name: Generate api-version.ts
       shell: bash
       run: sudo -E -u testbot bash -lc 'node ./scripts/write-versions.js'
       
     - name: Download build artifacts
-      if: inputs.download_build_artifacts == 'true'
+      if: inputs.e2e == 'true'
       uses: actions/download-artifact@v4
       with:
         name: build-artifacts
         path: .
 
     - name: Restore build-buf cache
-      if: inputs.download_build_artifacts != 'true'
+      if: inputs.e2e != 'true'
       uses: actions/cache/restore@v4
       id: cache-build-buf
       with:
@@ -87,19 +66,19 @@ runs:
           build-buf-${{ runner.os }}-
 
     - name: Generate build-buf if not cached
-      if: inputs.download_build_artifacts != 'true' && steps.cache-build-buf.outputs.cache-hit != 'true'
+      if: inputs.e2e != 'true' && steps.cache-build-buf.outputs.cache-hit != 'true'
       shell: bash
       run: sudo -E -u testbot bash -lc 'make build-buf-ci'
 
     - name: Save build-buf cache
-      if: inputs.download_build_artifacts != 'true' && steps.cache-build-buf.outputs.cache-hit != 'true'
+      if: inputs.e2e != 'true' && steps.cache-build-buf.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: src/gen
         key: build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock', 'buf.gen.yaml') }}
 
     - name: Read Playwright version from package.json
-      if: inputs.download_build_artifacts == 'true'
+      if: inputs.e2e == 'true'
       id: playwright-version
       shell: bash
       run: |
@@ -108,7 +87,7 @@ runs:
         echo "Using Playwright version: $PLAYWRIGHT_VERSION"
 
     - name: Restore Playwright browsers cache
-      if: inputs.download_build_artifacts == 'true'
+      if: inputs.e2e == 'true'
       uses: actions/cache/restore@v4
       id: cache-playwright
       with:
@@ -118,12 +97,13 @@ runs:
           playwright-${{ runner.os }}-
 
     - name: Install Playwright browsers
-      if: inputs.download_build_artifacts == 'true' && steps.cache-playwright.outputs.cache-hit != 'true'
+      if: inputs.e2e == 'true' && steps.cache-playwright.outputs.cache-hit != 'true'
       shell: bash
-      run: sudo -E -u testbot bash -lc 'cd e2e && npx playwright install --with-deps'
+      run: |
+        sudo -E -u testbot bash -lc 'npx playwright install --with-deps'
 
     - name: Save Playwright browsers cache
-      if: inputs.download_build_artifacts == 'true' && steps.cache-playwright.outputs.cache-hit != 'true'
+      if: inputs.e2e == 'true' && steps.cache-playwright.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: /home/testbot/.cache/ms-playwright
