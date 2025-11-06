@@ -364,8 +364,8 @@ describe('validateDialOptions', () => {
           signalingAccessToken: 'sig-token',
           signalingCredentials: {
             authEntity: 'test-entity',
-            type: 'robot-location-secret' as const,
-            payload: 'payload',
+            type: 'api-key' as const,
+            payload: 'key',
           },
         },
       },
