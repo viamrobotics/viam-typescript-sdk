@@ -99,6 +99,7 @@ runs:
         key: build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock', 'buf.gen.yaml') }}
 
     - name: Read Playwright version from package.json
+      if: inputs.download_build_artifacts == 'true'
       id: playwright-version
       shell: bash
       run: |
@@ -107,6 +108,7 @@ runs:
         echo "Using Playwright version: $PLAYWRIGHT_VERSION"
 
     - name: Restore Playwright browsers cache
+      if: inputs.download_build_artifacts == 'true'
       uses: actions/cache/restore@v4
       id: cache-playwright
       with:
@@ -116,12 +118,12 @@ runs:
           playwright-${{ runner.os }}-
 
     - name: Install Playwright browsers
-      if: steps.cache-playwright.outputs.cache-hit != 'true'
+      if: inputs.download_build_artifacts == 'true' && steps.cache-playwright.outputs.cache-hit != 'true'
       shell: bash
       run: sudo -E -u testbot bash -lc 'cd e2e && npx playwright install --with-deps'
 
     - name: Save Playwright browsers cache
-      if: steps.cache-playwright.outputs.cache-hit != 'true'
+      if: inputs.download_build_artifacts == 'true' && steps.cache-playwright.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: /home/testbot/.cache/ms-playwright
