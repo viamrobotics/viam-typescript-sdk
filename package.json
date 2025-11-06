@@ -39,8 +39,8 @@
     "e2e:playwright-debug": "playwright test --debug",
     "e2e:playwright-install": "playwright install",
     "e2e:test-harness": "vite e2e",
-    "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}'",
-    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
+    "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}' --ignore-pattern 'src/gen/**' --ignore-pattern 'dist/**' --ignore-pattern 'docs/**'",
+    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}' --ignore-path .prettierignore"
   },
   "repository": {
     "type": "git",
