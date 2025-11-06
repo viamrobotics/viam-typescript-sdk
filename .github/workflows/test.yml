@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: viamrobotics/viam-typescript-sdk/.github/actions/setup-environment@breakup-workflows
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/setup-environment@test-breakup-workflows
 
       - name: Cache node_modules
         uses: actions/cache@v4

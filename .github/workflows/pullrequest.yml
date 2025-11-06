@@ -4,23 +4,23 @@ on: [workflow_dispatch, pull_request]
 
 jobs:
   setup:
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/setup.yml@breakup-workflows
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/setup.yml@test-breakup-workflows
 
   build:
     needs: setup
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/build.yml@breakup-workflows
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/build.yml@test-breakup-workflows
 
   lint:
     needs: setup
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/lint.yml@breakup-workflows
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/lint.yml@test-breakup-workflows
 
   test:
     needs: setup
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@breakup-workflows
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@test-breakup-workflows
 
   test-e2e:
     needs: build
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test-e2e.yml@breakup-workflows
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test-e2e.yml@test-breakup-workflows
 
   license_check:
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/license_finder.yml@breakup-workflows
