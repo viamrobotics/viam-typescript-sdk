@@ -17,15 +17,32 @@ runs:
     - name: Setup environment
       uses: viamrobotics/viam-typescript-sdk/.github/actions/setup-environment@main
 
-    - name: Setup Node.js with npm caching
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
-        cache: 'npm'
+
+    - name: Restore npm cache
+      uses: actions/cache/restore@v4
+      id: cache-npm
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ inputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ inputs.node_version }}-
+          ${{ runner.os }}-node-
 
     - name: Install npm dependencies
+      if: steps.cache-npm.outputs.cache-hit != 'true'
       shell: bash
       run: sudo -u testbot bash -lc 'npm ci --audit=false'
+
+    - name: Save npm cache
+      if: steps.cache-npm.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ inputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
 
     - name: Download build artifacts
       if: inputs.download_build_artifacts == 'true'
