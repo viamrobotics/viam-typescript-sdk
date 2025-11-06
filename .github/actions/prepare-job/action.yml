@@ -44,6 +44,10 @@ runs:
         path: node_modules
         key: ${{ runner.os }}-node-${{ inputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
 
+    - name: Generate api-version.ts
+      shell: bash
+      run: sudo -u testbot bash -lc 'node ./scripts/write-versions.js'
+      
     - name: Download build artifacts
       if: inputs.download_build_artifacts == 'true'
       uses: actions/download-artifact@v4
