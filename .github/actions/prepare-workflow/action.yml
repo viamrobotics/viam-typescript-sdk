@@ -18,6 +18,8 @@ runs:
         sudo chown -R testbot:testbot /home/testbot/.cache
         sudo mkdir -p /github/home/.npm
         sudo chown -R testbot:testbot /github/home/.npm
+        sudo mkdir -p /github/home/.cache
+        sudo chown -R testbot:testbot /github/home/.cache
 
     - name: Setup Node.js
       uses: actions/setup-node@v6
@@ -46,9 +48,9 @@ runs:
         path: node_modules
         key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-    - name: Generate api-version.ts
+    - name: Prebuild
       shell: bash
-      run: sudo -E -u testbot bash -lc 'node ./scripts/write-versions.js'
+      run: sudo -E -u testbot bash -lc 'npm run prebuild'
 
     - name: Download build artifacts
       if: inputs.e2e == 'true'
