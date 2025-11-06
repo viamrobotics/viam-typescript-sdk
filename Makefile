@@ -117,11 +117,6 @@ build-docs: clean-docs build-buf
 
 # e2e tests
 
-.PHONY: install-playwright
-install-playwright:
-	cd e2e && npm install
-	cd e2e && npx playwright install --with-deps
-
 e2e/bin/viam-server:
 	bash e2e/setup.sh
 
@@ -129,10 +124,10 @@ e2e/bin/viam-server:
 run-e2e-server: e2e/bin/viam-server
 	e2e/bin/viam-server --config=./e2e/server_config.json
 
-.PHONY: _test-e2e
-_test-e2e: e2e/bin/viam-server install-playwright
-	cd e2e && npm run e2e:playwright
+test-e2e: e2e/bin/viam-server build
+	npx playwright install --with-deps
+	npm run e2e:playwright
 
-test-e2e: build _test-e2e
-
-test-e2e-ci: _test-e2e
+test-e2e-ci: e2e/bin/viam-server
+	npx playwright install
+	npm run e2e:playwright
