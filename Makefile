@@ -129,5 +129,4 @@ test-e2e: e2e/bin/viam-server build
 	npm run e2e:playwright
 
 test-e2e-ci: e2e/bin/viam-server
-	npx playwright install
 	npm run e2e:playwright
