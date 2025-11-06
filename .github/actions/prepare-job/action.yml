@@ -1,0 +1,71 @@
+name: 'Prepare Job'
+description: 'Setup environment, cache and install dependencies, and optionally generate/download artifacts'
+
+inputs:
+  generate_build_buf:
+    description: 'Whether to generate build-buf artifacts (instead of downloading)'
+    required: false
+    default: 'false'
+  download_build_buf:
+    description: 'Whether to download build-buf artifacts'
+    required: false
+    default: 'true'
+  download_build_artifacts:
+    description: 'Whether to download full build artifacts'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup environment
+      uses: viamrobotics/viam-typescript-sdk/.github/actions/setup-environment@main
+
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      id: cache-node-modules
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('Makefile') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-
+          ${{ runner.os }}-node-
+
+    - name: Install npm dependencies
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      shell: bash
+      run: sudo -u testbot bash -lc 'make setup'
+
+    - name: Generate build-buf artifacts
+      if: inputs.generate_build_buf == 'true'
+      shell: bash
+      run: sudo -u testbot bash -lc 'make build-buf-ci'
+
+    - name: Cache build-buf artifacts
+      if: inputs.generate_build_buf == 'true'
+      uses: actions/cache@v4
+      with:
+        path: src/gen
+        key: build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock') }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock') }}-
+          build-buf-${{ runner.os }}-
+
+    - name: Restore build-buf artifacts from cache
+      if: inputs.download_build_buf == 'true' && inputs.generate_build_buf != 'true'
+      uses: actions/cache@v4
+      id: cache-build-buf-restore
+      with:
+        path: src/gen
+        key: build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock') }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock') }}-
+          build-buf-${{ runner.os }}-
+
+    - name: Download build artifacts
+      if: inputs.download_build_artifacts == 'true'
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: .
+
