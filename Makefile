@@ -13,27 +13,25 @@ setup:  $(node_modules)
 teardown:
 	rm -rf node_modules
 
-.PHONY: _build
-_build: build-js build-docs
-
 .PHONY: build
-build: build-buf _build
+build: build-buf build-js build-docs
 
 .PHONY: build-ci
-build-ci: _build
+build-ci:
+	npm run build
+	npm run doc
+
 
 .PHONY: clean
 clean: clean-js clean-buf clean-docs
 
-.PHONY: _test
-_test: 
+.PHONY: test
+test: $(node_modules) build-buf
 	npm run test
 
-.PHONY: test
-test: $(node_modules) build-buf _test
-
 .PHONY: test-ci
-test-ci: _test
+test-ci: 
+	npm run test
 
 .PHONY: test-watch
 test-watch: $(node_modules) build-buf
