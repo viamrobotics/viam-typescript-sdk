@@ -184,6 +184,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   private sessionManager: SessionManager;
 
   private peerConn: RTCPeerConnection | undefined;
+  private dataChannel: RTCDataChannel | undefined;
 
   private transport: Transport | undefined;
 
@@ -245,6 +246,10 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private currentRetryAttempt = 0;
 
+  private onICEConnectionStateChange?: () => void;
+  private onDataChannelClose?: (event: Event) => void;
+  private onTrack?: (event: RTCTrackEvent) => void;
+
   constructor(
     serviceHost?: string,
     webrtcOptions?: WebRTCOptions,
@@ -304,6 +309,27 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     this.closed = false;
+  }
+
+  private cleanupEventListeners() {
+    if (this.peerConn && this.onICEConnectionStateChange) {
+      this.peerConn.removeEventListener(
+        'iceconnectionstatechange',
+        this.onICEConnectionStateChange
+      );
+
+      this.onICEConnectionStateChange = undefined;
+    }
+
+    if (this.peerConn && this.onTrack) {
+      this.peerConn.removeEventListener('track', this.onTrack);
+      this.onTrack = undefined;
+    }
+
+    if (this.dataChannel && this.onDataChannelClose) {
+      this.dataChannel.removeEventListener('close', this.onDataChannelClose);
+      this.onDataChannelClose = undefined;
+    }
   }
 
   private onDisconnect(event?: Event) {
@@ -638,10 +664,18 @@ export class RobotClient extends EventDispatcher implements Robot {
       await this.connecting;
     }
 
+    this.cleanupEventListeners();
+
     if (this.peerConn) {
       this.peerConn.close();
       this.peerConn = undefined;
     }
+
+    if (this.dataChannel) {
+      this.dataChannel.close();
+      this.dataChannel = undefined;
+    }
+
     this.sessionManager.reset();
     this.closed = true;
     this.emit(MachineConnectionEvent.DISCONNECTED, {});
@@ -680,11 +714,18 @@ export class RobotClient extends EventDispatcher implements Robot {
       this.peerConn = undefined;
     }
 
+    if (this.dataChannel) {
+      this.dataChannel.close();
+      this.dataChannel = undefined;
+    }
+
     /*
-     * TODO(RSDK-887): no longer reset if we are reusing authentication material; otherwise our session
-     * and authentication context will no longer match.
+     * Only reset session if credentials have changed or if explicitly required;
+     * otherwise our session and authentication context will no longer match.
      */
-    this.sessionManager.reset();
+    if (!creds || creds !== this.savedCreds || this.sessionOptions.disabled) {
+      this.sessionManager.reset();
+    }
 
     try {
       const opts: DialOptions = {
@@ -727,12 +768,12 @@ export class RobotClient extends EventDispatcher implements Robot {
           this.serviceHost !== '' && signalingAddress !== this.serviceHost
         );
 
-        /*
-         * Lint disabled because we know that we are the only code to
-         * read and then write to 'peerConn', even after we have awaited/paused.
-         */
-        this.peerConn = webRTCConn.peerConnection; // eslint-disable-line require-atomic-updates
-        this.peerConn.addEventListener('iceconnectionstatechange', () => {
+        this.peerConn = webRTCConn.peerConnection;
+        this.dataChannel = webRTCConn.dataChannel;
+
+        this.cleanupEventListeners();
+
+        this.onICEConnectionStateChange = () => {
           /*
            * TODO: are there any disconnection scenarios where we can reuse the
            * same connection and restart ice?
@@ -746,17 +787,22 @@ export class RobotClient extends EventDispatcher implements Robot {
           } else if (this.peerConn?.iceConnectionState === 'closed') {
             this.onDisconnect();
           }
-        });
+        };
+
+        this.peerConn.addEventListener(
+          'iceconnectionstatechange',
+          this.onICEConnectionStateChange
+        );
+
         // There is not an iceconnectionstatechange nor connectionstatechange
         // event when the peerConn closes. Instead, listen to the data channel
         // closing and emit disconnect when that occurs.
-        webRTCConn.dataChannel.addEventListener('close', (event) => {
-          this.onDisconnect(event);
-        });
+        this.onDataChannelClose = (event: Event) => this.onDisconnect(event);
+        this.dataChannel.addEventListener('close', this.onDataChannelClose);
 
         this.transport = webRTCConn.transport;
 
-        webRTCConn.peerConnection.addEventListener('track', (event) => {
+        this.onTrack = (event: RTCTrackEvent) => {
           const [eventStream] = event.streams;
           if (!eventStream) {
             this.emit('track', event);
@@ -773,7 +819,9 @@ export class RobotClient extends EventDispatcher implements Robot {
             value: resName,
           });
           this.emit('track', event);
-        });
+        };
+
+        this.peerConn.addEventListener('track', this.onTrack);
       } else {
         this.transport = await dialDirect(this.serviceHost, opts);
         await this.gRPCConnectionManager.start();
@@ -795,12 +843,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     } finally {
       this.connectResolve?.();
       this.connectResolve = undefined;
-
-      /*
-       * Lint disabled because we know that we are the only code to
-       * read and then write to 'connecting', even after we have awaited/paused.
-       */
-      this.connecting = undefined; // eslint-disable-line require-atomic-updates
+      this.connecting = undefined;
     }
   }
 

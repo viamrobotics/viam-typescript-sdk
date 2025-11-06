@@ -212,7 +212,7 @@ const makeAuthenticatedTransport = async (
   return new AuthenticatedTransport(transportOpts, defaultFactory, authHeaders);
 };
 
-class AuthenticatedTransport implements Transport {
+export class AuthenticatedTransport implements Transport {
   protected readonly transport: Transport;
   protected readonly extraHeaders: Headers;
 
@@ -394,6 +394,7 @@ export const dialWebRTC = async (
     );
   } catch (error) {
     pc.close();
+    dc.close();
     throw error;
   }
 
@@ -406,16 +407,17 @@ export const dialWebRTC = async (
     dc,
     webrtcOpts
   );
-  try {
-    // set timeout for dial attempt if a timeout is specified
-    if (dialOpts?.dialTimeout !== undefined) {
-      setTimeout(() => {
-        if (!successful) {
-          exchange.terminate(new Error('timed out'));
-        }
-      }, dialOpts.dialTimeout);
-    }
 
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  if (dialOpts?.dialTimeout !== undefined && dialOpts.dialTimeout > 0) {
+    timeoutId = setTimeout(() => {
+      if (!successful) {
+        exchange.terminate(new Error('timed out'));
+      }
+    }, dialOpts.dialTimeout);
+  }
+
+  try {
     const cc = await exchange.doExchange();
 
     if (
@@ -438,8 +440,14 @@ export const dialWebRTC = async (
     console.error('error dialing', error); // eslint-disable-line no-console
     throw error;
   } finally {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+
     if (!successful) {
       pc.close();
+      dc.close();
     }
   }
 };
@@ -537,8 +545,7 @@ const processSignalingExchangeOpts = (
   return optsCopy;
 };
 
-// eslint-disable-next-line sonarjs/cognitive-complexity -- it is not complex
-const validateDialOptions = (opts?: DialOptions) => {
+export const validateDialOptions = (opts?: DialOptions) => {
   if (!opts) {
     return;
   }
@@ -548,17 +555,16 @@ const validateDialOptions = (opts?: DialOptions) => {
       throw new Error('cannot set credentials with accessToken');
     }
 
-    if (opts.webrtcOptions !== undefined) {
-      if (opts.webrtcOptions.signalingAccessToken !== undefined) {
-        throw new Error(
-          'cannot set webrtcOptions.signalingAccessToken with accessToken'
-        );
-      }
-      if (opts.webrtcOptions.signalingCredentials !== undefined) {
-        throw new Error(
-          'cannot set webrtcOptions.signalingCredentials with accessToken'
-        );
-      }
+    if (opts.webrtcOptions?.signalingAccessToken !== undefined) {
+      throw new Error(
+        'cannot set webrtcOptions.signalingAccessToken with accessToken'
+      );
+    }
+
+    if (opts.webrtcOptions?.signalingCredentials !== undefined) {
+      throw new Error(
+        'cannot set webrtcOptions.signalingCredentials with accessToken'
+      );
     }
   }
 
