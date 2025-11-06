@@ -16,7 +16,10 @@
       "default": "./dist/main.es.js"
     }
   },
-  "packageManager": "npm@10.9.0",
+  "packageManager": "npm@10.9.3",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "prebuild": "node ./scripts/write-versions.js",
     "build": "npm run build:bundle && npm run build:types && npm run build:copy-dts",
