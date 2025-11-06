@@ -14,27 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: viamrobotics/viam-typescript-sdk/.github/actions/setup-environment@test-breakup-workflows
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: cache-node-modules
+      - name: Prepare job
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@test-breakup-workflows
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install npm dependencies
-        if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: sudo -u testbot bash -lc 'npm ci --audit=false'
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: .
+          download_build_buf: 'false'
+          download_build_artifacts: 'true'
 
       - name: Test E2E
         run: sudo -u testbot bash -lc 'make test-e2e-ci'
