@@ -6,11 +6,27 @@ on:
       - main
 
 jobs:
+  setup:
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/setup.yml@main
+
+  build:
+    needs: setup
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/build.yml@main
+
+  lint:
+    needs: setup
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/lint.yml@main
+
   test:
+    needs: setup
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@main
 
+  test-e2e:
+    needs: build
+    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test-e2e.yml@main
+
   publish_next:
-    needs: test
+    needs: [build, lint, test, test-e2e]
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/publish_next.yml@main
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

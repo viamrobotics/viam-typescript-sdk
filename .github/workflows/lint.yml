@@ -1,11 +1,11 @@
-name: Test
+name: Lint
 
 on:
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  test:
+  lint:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
@@ -36,5 +36,5 @@ jobs:
           name: build-buf-artifacts
           path: .
 
-      - name: Test
-        run: sudo -u testbot bash -lc 'make test'
+      - name: Lint
+        run: sudo -u testbot bash -lc 'make lint'

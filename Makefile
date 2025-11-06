@@ -107,3 +107,6 @@ run-e2e-server: e2e/bin/viam-server
 
 test-e2e: e2e/bin/viam-server build install-playwright
 	cd e2e && npm run e2e:playwright
+
+test-e2e-ci: e2e/bin/viam-server install-playwright
+	cd e2e && npm run e2e:playwright

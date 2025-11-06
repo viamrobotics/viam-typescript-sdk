@@ -1,11 +1,11 @@
-name: Test
+name: Setup
 
 on:
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  test:
+  setup:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
@@ -30,11 +30,13 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: sudo -u testbot bash -lc 'npm ci --audit=false'
 
-      - name: Download build-buf artifacts
-        uses: actions/download-artifact@v4
+      - name: Build protocol buffers
+        run: sudo -u testbot bash -lc 'make build-buf'
+
+      - name: Upload build-buf artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: build-buf-artifacts
-          path: .
+          path: src/gen
+          retention-days: 1
 
-      - name: Test
-        run: sudo -u testbot bash -lc 'make test'

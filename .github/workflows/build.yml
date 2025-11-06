@@ -1,11 +1,11 @@
-name: Test
+name: Build
 
 on:
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  test:
+  build:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     container:
@@ -36,5 +36,14 @@ jobs:
           name: build-buf-artifacts
           path: .
 
-      - name: Test
-        run: sudo -u testbot bash -lc 'make test'
+      - name: Build
+        run: sudo -u testbot bash -lc 'make build'
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            src/gen
+            dist
+          retention-days: 1
