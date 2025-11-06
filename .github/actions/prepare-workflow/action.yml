@@ -17,6 +17,8 @@ runs:
         sudo apt-get install -y software-properties-common jq
         apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
         sudo chown -R testbot .
+        sudo mkdir -p /home/testbot/.cache/buf
+        sudo chown -R testbot:testbot /home/testbot/.cache
 
     - name: Read Node.js version from package.json
       id: node-version
@@ -32,6 +34,12 @@ runs:
         node-version: ${{ steps.node-version.outputs.version }}
         cache: 'npm'
 
+    - name: Verify Node.js version
+      shell: bash
+      run: |
+        echo "Node.js version: $(node --version)"
+        echo "Expected: >=22"
+
     - name: Restore node_modules cache
       uses: actions/cache/restore@v4
       id: cache-node-modules
@@ -45,7 +53,7 @@ runs:
     - name: Install npm dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true'
       shell: bash
-      run: sudo -u testbot bash -lc 'npm ci --audit=false'
+      run: sudo -E -u testbot bash -lc 'npm ci --audit=false'
 
     - name: Save node_modules cache
       if: steps.cache-node-modules.outputs.cache-hit != 'true'
@@ -56,7 +64,7 @@ runs:
 
     - name: Generate api-version.ts
       shell: bash
-      run: sudo -u testbot bash -lc 'node ./scripts/write-versions.js'
+      run: sudo -E -u testbot bash -lc 'node ./scripts/write-versions.js'
       
     - name: Download build artifacts
       if: inputs.download_build_artifacts == 'true'
@@ -79,7 +87,7 @@ runs:
     - name: Generate build-buf if not cached
       if: inputs.download_build_artifacts != 'true' && steps.cache-build-buf.outputs.cache-hit != 'true'
       shell: bash
-      run: sudo -u testbot bash -lc 'make build-buf-ci'
+      run: sudo -E -u testbot bash -lc 'make build-buf-ci'
 
     - name: Save build-buf cache
       if: inputs.download_build_artifacts != 'true' && steps.cache-build-buf.outputs.cache-hit != 'true'
@@ -108,7 +116,7 @@ runs:
     - name: Install Playwright browsers
       if: steps.cache-playwright.outputs.cache-hit != 'true'
       shell: bash
-      run: sudo -u testbot bash -lc 'cd e2e && npx playwright install --with-deps'
+      run: sudo -E -u testbot bash -lc 'cd e2e && npx playwright install --with-deps'
 
     - name: Save Playwright browsers cache
       if: steps.cache-playwright.outputs.cache-hit != 'true'
