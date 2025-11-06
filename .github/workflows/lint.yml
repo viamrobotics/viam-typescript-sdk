@@ -37,4 +37,4 @@ jobs:
           path: .
 
       - name: Lint
-        run: sudo -u testbot bash -lc 'make lint'
+        run: sudo -u testbot bash -lc 'make lint-ci'

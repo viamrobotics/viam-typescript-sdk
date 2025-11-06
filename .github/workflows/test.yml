@@ -37,4 +37,4 @@ jobs:
           path: .
 
       - name: Test
-        run: sudo -u testbot bash -lc 'make test'
+        run: sudo -u testbot bash -lc 'make test-ci'
