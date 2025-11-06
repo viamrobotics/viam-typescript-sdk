@@ -456,5 +456,3 @@ export {
 } from './utils';
 
 export { MachineConnectionEvent } from './events';
-
-// delete this comment
