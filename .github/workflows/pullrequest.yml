@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare job
+      - name: Prepare workflow
         uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@test-breakup-workflows
 
       - name: Build
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare job
+      - name: Prepare workflow
         uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@test-breakup-workflows
 
       - name: Lint
@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare job
+      - name: Prepare jobw
         uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@test-breakup-workflows
 
       - name: Test
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare job
+      - name: Prepare workflow
         uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-workflow@test-breakup-workflows
         with:
           download_build_artifacts: 'true'

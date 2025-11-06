@@ -88,3 +88,32 @@ runs:
         path: src/gen
         key: build-buf-${{ runner.os }}-${{ hashFiles('api_version.lock', 'buf.gen.yaml') }}
 
+    - name: Read Playwright version from package.json
+      id: playwright-version
+      shell: bash
+      run: |
+        PLAYWRIGHT_VERSION=$(jq -r '.devDependencies."@playwright/test"' package.json)
+        echo "version=$PLAYWRIGHT_VERSION" >> $GITHUB_OUTPUT
+        echo "Using Playwright version: $PLAYWRIGHT_VERSION"
+
+    - name: Restore Playwright browsers cache
+      uses: actions/cache/restore@v4
+      id: cache-playwright
+      with:
+        path: /home/testbot/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+        restore-keys: |
+          playwright-${{ runner.os }}-
+
+    - name: Install Playwright browsers
+      if: steps.cache-playwright.outputs.cache-hit != 'true'
+      shell: bash
+      run: sudo -u testbot bash -lc 'cd e2e && npx playwright install --with-deps'
+
+    - name: Save Playwright browsers cache
+      if: steps.cache-playwright.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: /home/testbot/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
