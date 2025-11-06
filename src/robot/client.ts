@@ -720,10 +720,12 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     /*
-     * TODO(RSDK-887): no longer reset if we are reusing authentication material; otherwise our session
-     * and authentication context will no longer match.
+     * Only reset session if credentials have changed or if explicitly required;
+     * otherwise our session and authentication context will no longer match.
      */
-    this.sessionManager.reset();
+    if (!creds || creds !== this.savedCreds || this.sessionOptions.disabled) {
+      this.sessionManager.reset();
+    }
 
     try {
       const opts: DialOptions = {
