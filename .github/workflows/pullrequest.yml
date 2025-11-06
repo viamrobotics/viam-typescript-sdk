@@ -3,24 +3,75 @@ name: Pull Request Update
 on: [workflow_dispatch, pull_request]
 
 jobs:
-  setup:
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/setup.yml@test-breakup-workflows
-
   build:
-    needs: setup
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/build.yml@test-breakup-workflows
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/viamrobotics/rdk-devenv:amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare job
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@test-breakup-workflows
+
+      - name: Build
+        run: sudo -u testbot bash -lc 'make build-ci'
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist
+          retention-days: 1
 
   lint:
-    needs: setup
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/lint.yml@test-breakup-workflows
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/viamrobotics/rdk-devenv:amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare job
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@test-breakup-workflows
+
+      - name: Lint
+        run: sudo -u testbot bash -lc 'make lint-ci'
 
   test:
-    needs: setup
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test.yml@test-breakup-workflows
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/viamrobotics/rdk-devenv:amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare job
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@test-breakup-workflows
+
+      - name: Test
+        run: sudo -u testbot bash -lc 'make test-ci'
 
   test-e2e:
+    if: github.repository_owner == 'viamrobotics'
     needs: build
-    uses: viamrobotics/viam-typescript-sdk/.github/workflows/test-e2e.yml@test-breakup-workflows
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/viamrobotics/rdk-devenv:amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare job
+        uses: viamrobotics/viam-typescript-sdk/.github/actions/prepare-job@test-breakup-workflows
+        with:
+          download_build_artifacts: 'true'
+
+      - name: Test E2E
+        run: sudo -u testbot bash -lc 'make test-e2e-ci'
 
   license_check:
     uses: viamrobotics/viam-typescript-sdk/.github/workflows/license_finder.yml@breakup-workflows
