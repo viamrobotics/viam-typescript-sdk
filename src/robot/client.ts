@@ -632,13 +632,21 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     this.currentRetryAttempt = 0;
 
+    let dialWebRTCError: Error | undefined;
+    let dialDirectError: Error | undefined;
+
     // Try to dial via WebRTC first.
     if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
       try {
         return await backOff(async () => this.dialWebRTC(conf), backOffOpts);
-      } catch {
+      } catch (error) {
+        dialWebRTCError =
+          error instanceof Error ? error : new Error(String(error));
         // eslint-disable-next-line no-console
-        console.debug('Failed to connect via WebRTC');
+        console.debug('Failed to connect via WebRTC', dialWebRTCError);
+        this.emit(MachineConnectionEvent.DISCONNECTED, {
+          error: dialWebRTCError,
+        });
       }
     }
 
@@ -647,10 +655,21 @@ export class RobotClient extends EventDispatcher implements Robot {
     if (!conf.reconnectAbortSignal?.abort) {
       try {
         return await backOff(async () => this.dialDirect(conf), backOffOpts);
-      } catch {
+      } catch (error) {
+        dialDirectError =
+          error instanceof Error ? error : new Error(String(error));
         // eslint-disable-next-line no-console
-        console.debug('Failed to connect via gRPC');
+        console.debug('Failed to connect via gRPC', dialDirectError);
+        this.emit(MachineConnectionEvent.DISCONNECTED, {
+          error: dialDirectError,
+        });
       }
+    }
+
+    if (dialWebRTCError && dialDirectError) {
+      throw new Error('Failed to connect via all methods', {
+        cause: [dialWebRTCError, dialDirectError],
+      });
     }
 
     return this;

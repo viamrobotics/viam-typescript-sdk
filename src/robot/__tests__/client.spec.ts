@@ -383,4 +383,239 @@ describe('RobotClient', () => {
       expect(mockResetFn).not.toHaveBeenCalled();
     });
   });
+
+  describe('dial error handling', () => {
+    interface DisconnectedEventCapture {
+      events: unknown[];
+      setupListener: (client: RobotClient) => void;
+    }
+
+    const captureDisconnectedEvents = (): DisconnectedEventCapture => {
+      const events: unknown[] = [];
+      const setupListener = (client: RobotClient) => {
+        client.on('disconnected', (event) => {
+          events.push(event);
+        });
+      };
+      return { events, setupListener };
+    };
+
+    const findEventWithError = (
+      events: unknown[],
+      errorMessage?: string
+    ): unknown => {
+      return events.find((event) => {
+        if (
+          typeof event !== 'object' ||
+          event === null ||
+          !('error' in event)
+        ) {
+          return false;
+        }
+        if (errorMessage === undefined || errorMessage === '') {
+          return true;
+        }
+        const { error } = event as { error: Error };
+        return error.message === errorMessage;
+      });
+    };
+
+    it('should throw an error when both WebRTC and gRPC connections fail', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const webrtcError = new Error('WebRTC connection failed');
+      const grpcError = new Error('gRPC connection failed');
+
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
+      vi.mocked(rpcModule.dialDirect).mockRejectedValue(grpcError);
+
+      // Act & Assert
+      await expect(
+        client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        })
+      ).rejects.toThrow('Failed to connect via all methods');
+    });
+
+    it('should emit DISCONNECTED event with error when WebRTC fails', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const webrtcError = new Error('WebRTC connection failed');
+      const { events, setupListener } = captureDisconnectedEvents();
+
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
+      setupListener(client);
+
+      // Act
+      try {
+        await client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        });
+      } catch {
+        // Expected to throw
+      }
+
+      // Assert
+      expect(events.length).toBeGreaterThanOrEqual(2);
+      const webrtcEvent = findEventWithError(
+        events,
+        'WebRTC connection failed'
+      );
+      expect(webrtcEvent).toBeDefined();
+      expect(webrtcEvent).toMatchObject({ error: webrtcError });
+    });
+
+    it('should emit DISCONNECTED event with error when gRPC fails', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const { events, setupListener } = captureDisconnectedEvents();
+
+      setupListener(client);
+
+      // Act
+      try {
+        await client.dial({
+          host: TEST_HOST,
+          noReconnect: true,
+        });
+      } catch {
+        // Expected to throw
+      }
+
+      // Assert
+      expect(events.length).toBeGreaterThanOrEqual(1);
+      const errorEvent = findEventWithError(events);
+      expect(errorEvent).toBeDefined();
+      expect((errorEvent as { error: Error }).error).toBeInstanceOf(Error);
+    });
+
+    it('should emit DISCONNECTED events even for non-Error objects', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const webrtcError = 'string error';
+      const { events, setupListener } = captureDisconnectedEvents();
+
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
+      setupListener(client);
+
+      // Act
+      try {
+        await client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        });
+      } catch {
+        // Expected to throw
+      }
+
+      // Assert
+      expect(events.length).toBeGreaterThanOrEqual(2);
+      const errorEvent = findEventWithError(events);
+      expect(errorEvent).toBeDefined();
+      expect((errorEvent as { error: Error }).error).toBeInstanceOf(Error);
+    });
+
+    it('should include both errors in the thrown error cause', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const webrtcError = new Error('WebRTC connection failed');
+
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
+
+      // Act
+      let caughtError: Error | undefined;
+      try {
+        await client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        });
+      } catch (error) {
+        caughtError = error as Error;
+      }
+
+      // Assert
+      expect(caughtError).toBeDefined();
+      expect(caughtError).toBeInstanceOf(Error);
+      expect(caughtError!.message).toBe('Failed to connect via all methods');
+      expect(caughtError!.cause).toBeDefined();
+      expect(Array.isArray(caughtError!.cause)).toBe(true);
+      const causes = caughtError!.cause as Error[];
+      expect(causes).toHaveLength(2);
+      expect(causes[0]).toBe(webrtcError);
+      expect(causes[1]).toBeInstanceOf(Error);
+    });
+
+    it('should handle non-Error objects thrown from dial methods', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const webrtcError = 'string error';
+      const grpcError = { message: 'object error' };
+
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
+      vi.mocked(rpcModule.dialDirect).mockRejectedValue(grpcError);
+
+      // Act & Assert
+      await expect(
+        client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        })
+      ).rejects.toThrow('Failed to connect via all methods');
+    });
+
+    it('should not throw when WebRTC succeeds', async () => {
+      // Arrange
+      const client = setupClientMocks();
+
+      // Act
+      const result = await client.dial({
+        ...baseDialConfig,
+        noReconnect: true,
+      });
+
+      // Assert
+      expect(result).toBe(client);
+    });
+
+    it('should not throw when gRPC succeeds after WebRTC fails', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const webrtcError = new Error('WebRTC connection failed');
+
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
+      vi.mocked(rpcModule.dialDirect).mockResolvedValue(
+        createMockRobotServiceTransport()
+      );
+
+      // Act
+      // Use a local host so dialDirect validation passes
+      const result = await client.dial({
+        host: 'localhost:8080',
+        noReconnect: true,
+      });
+
+      // Assert
+      expect(result).toBe(client);
+    });
+
+    it('should not throw when only gRPC dial is attempted (no WebRTC config)', async () => {
+      // Arrange
+      const client = new RobotClient();
+      vi.mocked(rpcModule.dialDirect).mockResolvedValue(
+        createMockRobotServiceTransport()
+      );
+
+      // Act
+      // Use a local host so dialDirect validation passes
+      const result = await client.dial({
+        host: 'localhost:8080',
+        noReconnect: true,
+      });
+
+      // Assert
+      expect(result).toBe(client);
+    });
+  });
 });
