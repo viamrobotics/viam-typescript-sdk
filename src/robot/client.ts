@@ -1,5 +1,11 @@
 import { type ServiceType } from '@bufbuild/protobuf';
-import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import {
+  Code,
+  ConnectError,
+  createClient,
+  type Client,
+  type Transport,
+} from '@connectrpc/connect';
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
@@ -128,6 +134,39 @@ export const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
 
 const isPosInt = (x: number): boolean => {
   return x > 0 && Number.isInteger(x);
+};
+
+const isRetryableError = (error: unknown): boolean => {
+  // Don't retry on auth failures, invalid arguments, or not found
+  if (
+    error instanceof ConnectError &&
+    [
+      Code.Unauthenticated,
+      Code.PermissionDenied,
+      Code.InvalidArgument,
+      Code.NotFound,
+      Code.FailedPrecondition,
+      Code.OutOfRange,
+      Code.Unimplemented,
+    ].includes(error.code)
+  ) {
+    return false;
+  }
+
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    // Don't retry on configuration errors
+    if (
+      message.includes('invalid') ||
+      message.includes('configuration') ||
+      message.includes('cannot dial')
+    ) {
+      return false;
+    }
+  }
+
+  // Retry on network errors, timeouts, and other transient issues
+  return true;
 };
 
 /**
@@ -347,8 +386,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     console.debug('Connection closed, will try to reconnect');
     const backOffOpts: Partial<IBackOffOptions> = {
       retry: (error, attemptNumber) => {
-        // TODO: This ought to check exceptional errors so as to not keep failing forever.
-
         // eslint-disable-next-line no-console
         console.debug(
           `Failed to connect, attempt ${attemptNumber} with backoff`,
@@ -356,9 +393,20 @@ export class RobotClient extends EventDispatcher implements Robot {
         );
 
         this.currentRetryAttempt = attemptNumber;
+        const isRetryable = isRetryableError(error);
+        if (!this.closed && isRetryable) {
+          return true;
+        }
 
-        // Always retry the next attempt if not closed
-        return !this.closed;
+        if (!isRetryable) {
+          // eslint-disable-next-line no-console
+          console.debug(
+            'Non-retryable error encountered, stopping reconnection attempts',
+            error
+          );
+        }
+
+        return false;
       },
     };
 
@@ -605,8 +653,6 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     const backOffOpts: Partial<IBackOffOptions> = {
       retry: (error, attemptNumber) => {
-        // TODO: This ought to check exceptional errors so as to not keep failing forever.
-
         // eslint-disable-next-line no-console
         console.debug(
           `Failed to connect, attempt ${attemptNumber} with backoff`,
@@ -616,9 +662,20 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.currentRetryAttempt = attemptNumber;
 
         const aborted = conf.reconnectAbortSignal?.abort ?? false;
+        const isRetryable = isRetryableError(error);
+        if (!aborted && !this.closed && isRetryable) {
+          return true;
+        }
 
-        // Retry if not closed or aborted
-        return !aborted && !this.closed;
+        if (!isRetryable) {
+          // eslint-disable-next-line no-console
+          console.debug(
+            'Non-retryable error encountered, stopping connection attempts',
+            error
+          );
+        }
+
+        return false;
       },
     };
 

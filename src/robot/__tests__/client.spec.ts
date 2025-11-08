@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../client';
 import * as rpcModule from '../../rpc';
 import { createMockRobotServiceTransport } from '../__mocks__/robot-service';
@@ -19,6 +19,24 @@ import {
   createMockDataChannel,
   createMockPeerConnection,
 } from '../../__mocks__/webrtc';
+import {
+  unauthenticatedError,
+  permissionDeniedError,
+  invalidArgumentError,
+  notFoundError,
+  failedPreconditionError,
+  outOfRangeError,
+  unimplementedError,
+  unavailableError,
+  deadlineExceededError,
+  abortedError,
+  internalError,
+  unknownError,
+  configurationError,
+  cannotDialError,
+  networkError,
+  timeoutError,
+} from '../../__fixtures__/errors';
 
 vi.mock('../../rpc', async () => {
   const actual = await vi.importActual('../../rpc');
@@ -75,6 +93,7 @@ const setupEventListenerMocks = () => {
     pcRemoveEventListener,
     dcAddEventListener,
     dcRemoveEventListener,
+    dataChannel,
   };
 };
 
@@ -124,7 +143,6 @@ describe('RobotClient', () => {
         const firstCallArgs = addSpy.mock.calls.find(
           (call) => call[0] === eventType
         );
-        expect(firstCallArgs).toBeDefined();
         const firstHandler = firstCallArgs?.[1];
 
         addSpy.mockClear();
@@ -134,6 +152,9 @@ describe('RobotClient', () => {
         await mocks.client.connect();
 
         // Assert
+        expect(firstCallArgs).toBeDefined();
+        expect(firstHandler).toBeDefined();
+
         const removeCallArgs = removeSpy.mock.calls.find(
           (call) => call[0] === eventType
         );
@@ -616,6 +637,528 @@ describe('RobotClient', () => {
 
       // Assert
       expect(result).toBe(client);
+    });
+  });
+
+  describe('retry logic on error', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    describe('dial() method - non-retryable errors', () => {
+      it.each([
+        { error: unauthenticatedError, description: 'Unauthenticated' },
+        { error: permissionDeniedError, description: 'PermissionDenied' },
+        { error: invalidArgumentError, description: 'InvalidArgument' },
+        { error: notFoundError, description: 'NotFound' },
+        { error: failedPreconditionError, description: 'FailedPrecondition' },
+        { error: outOfRangeError, description: 'OutOfRange' },
+        { error: unimplementedError, description: 'Unimplemented' },
+      ])('should not retry on $description error', async ({ error }) => {
+        // Arrange
+        const client = new RobotClient();
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(error);
+
+        // Mock dialDirect to also fail immediately to prevent fallback from starting heartbeat
+        vi.mocked(rpcModule.dialDirect).mockRejectedValue(error);
+
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        });
+
+        // Assert
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not retry on configuration error with "invalid" in message', async () => {
+        // Arrange
+        const client = new RobotClient();
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(configurationError);
+
+        // Mock dialDirect to also fail immediately to prevent fallback from starting heartbeat
+        vi.mocked(rpcModule.dialDirect).mockRejectedValue(configurationError);
+
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        });
+
+        // Assert
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not retry on "cannot dial" error', async () => {
+        // Arrange
+        const client = new RobotClient();
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(cannotDialError);
+
+        // Mock dialDirect to also fail immediately to prevent fallback from starting heartbeat
+        vi.mocked(rpcModule.dialDirect).mockRejectedValue(cannotDialError);
+
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: true,
+        });
+
+        // Assert
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('dial() method - retryable errors', () => {
+      it.each([
+        { error: unavailableError, description: 'Unavailable' },
+        { error: deadlineExceededError, description: 'DeadlineExceeded' },
+        { error: abortedError, description: 'Aborted' },
+        { error: internalError, description: 'Internal' },
+        { error: unknownError, description: 'Unknown' },
+      ])(
+        'should retry on $description error up to max attempts',
+        async ({ error }) => {
+          // Arrange
+          const client = new RobotClient();
+          const maxAttempts = 3;
+
+          const dialWebRTCMock = vi
+            .mocked(rpcModule.dialWebRTC)
+            .mockRejectedValue(error);
+
+          // Act
+          const dialPromise = client.dial({
+            ...baseDialConfig,
+            noReconnect: false,
+            reconnectMaxAttempts: maxAttempts,
+          });
+
+          // Ensure promise rejection is handled to prevent unhandled rejections
+          // The backOff library creates internal promises that reject asynchronously
+          dialPromise.catch(() => {
+            // Expected rejection - handled to prevent unhandled rejection warnings
+          });
+
+          // Run timers to allow backOff to complete
+          await vi.runAllTimersAsync();
+
+          // Assert - await the rejection to ensure it's handled
+          await expect(dialPromise).rejects.toThrow();
+          expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
+        }
+      );
+
+      it('should retry on network error', async () => {
+        // Arrange
+        const client = new RobotClient();
+        const maxAttempts = 3;
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(networkError);
+
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: maxAttempts,
+        });
+
+        // Ensure promise rejection is handled to prevent unhandled rejections
+        // The backOff library creates internal promises that reject asynchronously
+        dialPromise.catch(() => {
+          // Expected rejection - handled to prevent unhandled rejection warnings
+        });
+
+        // Run timers to allow backOff to complete
+        await vi.runAllTimersAsync();
+
+        // Assert - await the rejection to ensure it's handled
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
+      });
+
+      it('should retry on timeout error', async () => {
+        // Arrange
+        const client = new RobotClient();
+        const maxAttempts = 3;
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(timeoutError);
+
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: maxAttempts,
+        });
+
+        // Ensure promise rejection is handled to prevent unhandled rejections
+        // The backOff library creates internal promises that reject asynchronously
+        dialPromise.catch(() => {
+          // Expected rejection - handled to prevent unhandled rejection warnings
+        });
+
+        // Run timers to allow backOff to complete
+        await vi.runAllTimersAsync();
+
+        // Assert - await the rejection to ensure it's handled
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
+      });
+
+      it('should succeed on retry after transient error', async () => {
+        // Arrange
+        const client = new RobotClient();
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValueOnce(unavailableError)
+          .mockRejectedValueOnce(unavailableError)
+          .mockResolvedValueOnce({
+            transport: createMockRobotServiceTransport(),
+            peerConnection: createMockPeerConnection(),
+            dataChannel: createMockDataChannel(),
+          });
+
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: 5,
+        });
+
+        await vi.runAllTimersAsync();
+
+        // Assert
+        await expect(dialPromise).resolves.toBeDefined();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(3);
+      });
+    });
+
+    describe('reconnection on disconnect - non-retryable errors', () => {
+      it.each([
+        { error: unauthenticatedError, description: 'Unauthenticated' },
+        { error: permissionDeniedError, description: 'PermissionDenied' },
+        { error: invalidArgumentError, description: 'InvalidArgument' },
+        { error: notFoundError, description: 'NotFound' },
+        { error: failedPreconditionError, description: 'FailedPrecondition' },
+        { error: outOfRangeError, description: 'OutOfRange' },
+        { error: unimplementedError, description: 'Unimplemented' },
+      ])(
+        'should not retry reconnection on $description error',
+        async ({ error }) => {
+          // Arrange
+          let closeHandler: ((event: Event) => void) | undefined;
+
+          const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+            (event: string, handler: (event: unknown) => void) => {
+              if (event === 'close') {
+                closeHandler = handler as (event: Event) => void;
+              }
+            }
+          );
+
+          const dataChannel = createMockDataChannel(
+            vi.fn(),
+            dcAddEventListener,
+            vi.fn(),
+            'open'
+          );
+
+          const dialWebRTCMock = vi
+            .mocked(rpcModule.dialWebRTC)
+            .mockResolvedValueOnce({
+              transport: createMockRobotServiceTransport(),
+              peerConnection: createMockPeerConnection(),
+              dataChannel,
+            })
+            .mockRejectedValue(error);
+
+          const client = new RobotClient();
+
+          await client.dial({
+            ...baseDialConfig,
+            noReconnect: false,
+            reconnectMaxAttempts: 5,
+          });
+
+          // Reset mock call count after initial connection
+          dialWebRTCMock.mockClear();
+
+          // Act - trigger disconnect through data channel close event
+          expect(closeHandler).toBeDefined();
+          closeHandler!(new Event('close'));
+
+          // Wait for backoff attempts to complete
+          await vi.runAllTimersAsync();
+          await vi.runOnlyPendingTimersAsync();
+
+          // Assert
+          expect(dialWebRTCMock).toHaveBeenCalledTimes(1);
+        }
+      );
+
+      it('should not retry reconnection on configuration error', async () => {
+        // Arrange
+        let closeHandler: ((event: Event) => void) | undefined;
+
+        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+          (event: string, handler: (event: unknown) => void) => {
+            if (event === 'close') {
+              closeHandler = handler as (event: Event) => void;
+            }
+          }
+        );
+
+        const dataChannel = createMockDataChannel(
+          vi.fn(),
+          dcAddEventListener,
+          vi.fn(),
+          'open'
+        );
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockResolvedValueOnce({
+            transport: createMockRobotServiceTransport(),
+            peerConnection: createMockPeerConnection(),
+            dataChannel,
+          })
+          .mockRejectedValue(configurationError);
+
+        const client = new RobotClient();
+
+        await client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: 5,
+        });
+
+        // Reset mock call count after initial connection
+        dialWebRTCMock.mockClear();
+
+        // Act
+        expect(closeHandler).toBeDefined();
+        closeHandler!(new Event('close'));
+
+        await vi.runAllTimersAsync();
+        await vi.runOnlyPendingTimersAsync();
+
+        // Assert
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('reconnection on disconnect - retryable errors', () => {
+      it.each([
+        { error: unavailableError, description: 'Unavailable' },
+        { error: deadlineExceededError, description: 'DeadlineExceeded' },
+        { error: abortedError, description: 'Aborted' },
+        { error: internalError, description: 'Internal' },
+        { error: unknownError, description: 'Unknown' },
+      ])(
+        'should retry reconnection on $description error',
+        async ({ error }) => {
+          // Arrange
+          let closeHandler: ((event: Event) => void) | undefined;
+
+          const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+            (event: string, handler: (event: unknown) => void) => {
+              if (event === 'close') {
+                closeHandler = handler as (event: Event) => void;
+              }
+            }
+          );
+
+          const dataChannel = createMockDataChannel(
+            vi.fn(),
+            dcAddEventListener,
+            vi.fn(),
+            'open'
+          );
+
+          const dialWebRTCMock = vi
+            .mocked(rpcModule.dialWebRTC)
+            .mockResolvedValueOnce({
+              transport: createMockRobotServiceTransport(),
+              peerConnection: createMockPeerConnection(),
+              dataChannel,
+            })
+            .mockRejectedValue(error);
+
+          const client = new RobotClient();
+
+          await client.dial({
+            ...baseDialConfig,
+            noReconnect: false,
+            reconnectMaxAttempts: 3,
+          });
+
+          // Reset mock call count after initial connection
+          dialWebRTCMock.mockClear();
+
+          // Act
+          expect(closeHandler).toBeDefined();
+          closeHandler!(new Event('close'));
+
+          // Wait for backoff attempts to complete
+          await vi.runAllTimersAsync();
+          await vi.runOnlyPendingTimersAsync();
+
+          // Assert
+          expect(dialWebRTCMock).toHaveBeenCalledTimes(3);
+        }
+      );
+
+      it('should succeed on reconnection retry after transient error', async () => {
+        // Arrange
+        let closeHandler: ((event: Event) => void) | undefined;
+
+        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+          (event: string, handler: (event: unknown) => void) => {
+            if (event === 'close') {
+              closeHandler = handler as (event: Event) => void;
+            }
+          }
+        );
+
+        const dataChannel = createMockDataChannel(
+          vi.fn(),
+          dcAddEventListener,
+          vi.fn(),
+          'open'
+        );
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockResolvedValueOnce({
+            transport: createMockRobotServiceTransport(),
+            peerConnection: createMockPeerConnection(),
+            dataChannel,
+          })
+          .mockRejectedValueOnce(unavailableError)
+          .mockRejectedValueOnce(unavailableError)
+          .mockRejectedValueOnce(unavailableError)
+          .mockResolvedValueOnce({
+            transport: createMockRobotServiceTransport(),
+            peerConnection: createMockPeerConnection(),
+            dataChannel,
+          });
+
+        const client = new RobotClient();
+
+        await client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: 10,
+        });
+
+        // Reset mock call count after initial connection
+        dialWebRTCMock.mockClear();
+
+        // Act
+        expect(closeHandler).toBeDefined();
+        closeHandler!(new Event('close'));
+
+        // Wait for reconnection to succeed
+        await vi.runAllTimersAsync();
+        await vi.runOnlyPendingTimersAsync();
+
+        // Assert
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(4);
+      });
+    });
+
+    describe('fallback from WebRTC to gRPC', () => {
+      it('should not retry gRPC on non-retryable error after WebRTC fails', async () => {
+        // Arrange
+        const client = new RobotClient();
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(unavailableError);
+
+        const dialDirectMock = vi
+          .mocked(rpcModule.dialDirect)
+          .mockRejectedValue(permissionDeniedError);
+
+        // Act
+        const dialPromise = client.dial({
+          host: 'test.local',
+          signalingAddress: TEST_SIGNALING_ADDRESS,
+          noReconnect: false,
+          reconnectMaxAttempts: 5,
+        });
+
+        // Ensure promise rejection is handled to prevent unhandled rejections
+        // The backOff library creates internal promises that reject asynchronously
+        dialPromise.catch(() => {
+          // Expected rejection - handled to prevent unhandled rejection warnings
+        });
+
+        // Run timers to allow backOff to complete
+        await vi.runAllTimersAsync();
+
+        // Assert - await the rejection to ensure it's handled
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(5);
+        expect(dialDirectMock).toHaveBeenCalledTimes(1);
+      });
+
+      it('should retry both WebRTC and gRPC on retryable errors', async () => {
+        // Arrange
+        const client = new RobotClient();
+        const maxAttempts = 3;
+
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockRejectedValue(unavailableError);
+
+        const dialDirectMock = vi
+          .mocked(rpcModule.dialDirect)
+          .mockRejectedValue(unavailableError);
+
+        // Act
+        const dialPromise = client.dial({
+          host: 'test.local',
+          signalingAddress: TEST_SIGNALING_ADDRESS,
+          noReconnect: false,
+          reconnectMaxAttempts: maxAttempts,
+        });
+
+        // Ensure promise rejection is handled to prevent unhandled rejections
+        // The backOff library creates internal promises that reject asynchronously
+        dialPromise.catch(() => {
+          // Expected rejection - handled to prevent unhandled rejection warnings
+        });
+
+        // Run timers to allow backOff to complete
+        await vi.runAllTimersAsync();
+
+        // Assert - await the rejection to ensure it's handled
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
+        expect(dialDirectMock).toHaveBeenCalledTimes(maxAttempts);
+      });
     });
   });
 });
