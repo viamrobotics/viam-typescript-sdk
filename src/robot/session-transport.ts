@@ -29,7 +29,7 @@ export default class SessionTransport implements Transport {
       if (
         error instanceof ConnectError &&
         error.code === Code.InvalidArgument &&
-        error.message === 'SESSION_EXPIRED'
+        error.rawMessage === 'SESSION_EXPIRED'
       ) {
         this.sessionManager.reset();
       }

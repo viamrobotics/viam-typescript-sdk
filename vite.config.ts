@@ -29,6 +29,7 @@ export default defineConfig({
   },
   test: {
     mockReset: true,
+    silent: true,
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
