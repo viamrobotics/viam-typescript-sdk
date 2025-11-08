@@ -640,6 +640,113 @@ describe('RobotClient', () => {
     });
   });
 
+  describe('concurrent dial prevention', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('should abort previous dial attempt when a new dial is called', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC);
+
+      // First call simulates slow connection that would retry
+      dialWebRTCMock.mockImplementationOnce(async () => {
+        return new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(unavailableError);
+          }, 1000);
+        });
+      });
+
+      dialWebRTCMock.mockResolvedValueOnce({
+        transport: createMockRobotServiceTransport(),
+        peerConnection: createMockPeerConnection(),
+        dataChannel: createMockDataChannel(),
+      });
+
+      // Act - start first dial attempt (will be aborted by second dial)
+      void client.dial({
+        ...baseDialConfig,
+        noReconnect: false,
+        reconnectMaxAttempts: 5,
+      });
+
+      await vi.advanceTimersByTimeAsync(100);
+      const secondDialPromise = client.dial({
+        ...baseDialConfig,
+        noReconnect: false,
+        reconnectMaxAttempts: 5,
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+
+      // Assert - second dial should succeed
+      await expect(secondDialPromise).resolves.toBe(client);
+
+      // If both dials ran concurrently, we'd see many more calls due to retries
+      // With abort, the first dial stops retrying, so we see fewer calls
+      expect(dialWebRTCMock.mock.calls.length).toBeLessThan(10);
+    });
+
+    it('should allow sequential dial calls', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
+        transport: createMockRobotServiceTransport(),
+        peerConnection: createMockPeerConnection(),
+        dataChannel: createMockDataChannel(),
+      });
+
+      // Act
+      const firstResult = await client.dial({
+        ...baseDialConfig,
+        noReconnect: true,
+      });
+
+      const secondResult = await client.dial({
+        ...baseDialConfig,
+        noReconnect: true,
+      });
+
+      // Assert
+      expect(firstResult).toBe(client);
+      expect(secondResult).toBe(client);
+      expect(dialWebRTCMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('should abort in-progress dial when disconnect is called', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const dialWebRTCMock = vi
+        .mocked(rpcModule.dialWebRTC)
+        .mockImplementation(async () => {
+          return new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(unavailableError);
+            }, 1000);
+          });
+        });
+
+      // Act
+      void client.dial({
+        ...baseDialConfig,
+        noReconnect: false,
+        reconnectMaxAttempts: 5,
+      });
+
+      await client.disconnect();
+      await vi.runAllTimersAsync();
+
+      // Assert - verify that dialWebRTC wasn't called excessively
+      expect(dialWebRTCMock.mock.calls.length).toBeLessThan(5);
+    });
+  });
+
   describe('retry logic on error', () => {
     beforeEach(() => {
       vi.useFakeTimers();

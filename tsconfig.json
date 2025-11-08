@@ -7,7 +7,12 @@
     "outDir": "dist",
 
     // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
-    "exactOptionalPropertyTypes": false,
+    "exactOptionalPropertyTypes": false
   },
-  "include": ["src/**/*.ts", "e2e/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "e2e/**/*.ts",
+    "playwright.config.ts",
+    "vitest.workspace.ts"
+  ]
 }

@@ -7,8 +7,174 @@
       content="width=device-width, initial-scale=1.0"
     />
     <title>E2E Harness</title>
+    <style>
+      body {
+        font-family: system-ui;
+        padding: 16px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h2 {
+        margin-top: 24px;
+        color: #333;
+      }
+      .button-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 8px 0;
+      }
+      button {
+        padding: 4px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        background: rgb(244, 244, 244);
+        color: black;
+        border: 1px solid black;
+      }
+      button:hover {
+        background: rgb(234, 234, 234);
+      }
+      button:active {
+        background: rgb(224, 224, 224);
+        transform: translateY(1px);
+      }
+      [data-testid='connection-status'] {
+        padding: 8px;
+        font-weight: bold;
+        border-left: 4px solid black;
+        background: rgb(244, 244, 244);
+        height: 20px;
+      }
+      [data-testid='dialing-status'] {
+        padding: 8px;
+        border-left: 4px solid black;
+        background: rgb(244, 244, 244);
+        font-style: italic;
+        font-size: 12px;
+        height: 14px;
+      }
+      [data-testid='output'] {
+        background: rgb(244, 244, 244);
+        color: black;
+        padding: 8px;
+        border-radius: 4px;
+        overflow-x: auto;
+        min-height: 100px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+      }
+    </style>
   </head>
   <body>
+    <h1>E2E Test Harness</h1>
+    <div data-testid="connection-status"></div>
+    <div data-testid="dialing-status"></div>
+
+    <h2>Connection Controls</h2>
+    <div class="button-group">
+      <button
+        id="connect-btn"
+        data-testid="connect-btn"
+      >
+        Connect
+      </button>
+      <button
+        id="disconnect-btn"
+        data-testid="disconnect-btn"
+        disabled
+      >
+        Disconnect
+      </button>
+      <button
+        id="connect-invalid-btn"
+        data-testid="connect-invalid-btn"
+      >
+        Connect Invalid
+      </button>
+    </div>
+
+    <h2>RobotClient APIs</h2>
+    <div class="button-group">
+      <button
+        data-robot-api="resourceNames"
+        disabled
+      >
+        Get Resource Names
+      </button>
+      <button
+        data-robot-api="getMachineStatus"
+        disabled
+      >
+        Get Machine Status
+      </button>
+      <button
+        data-robot-api="getSessions"
+        disabled
+      >
+        Get Sessions
+      </button>
+      <button
+        data-robot-api="getOperations"
+        disabled
+      >
+        Get Operations
+      </button>
+      <button
+        data-robot-api="stopAll"
+        disabled
+      >
+        Stop All
+      </button>
+      <button
+        data-robot-api="getModelsFromModules"
+        disabled
+      >
+        Get Models From Modules
+      </button>
+      <button
+        data-robot-api="resourceRPCSubtypes"
+        disabled
+      >
+        Get Resource RPC Subtypes
+      </button>
+      <button
+        data-robot-api="getCloudMetadata"
+        disabled
+      >
+        Get Cloud Metadata
+      </button>
+      <button
+        data-robot-api="getVersion"
+        disabled
+      >
+        Get Version
+      </button>
+    </div>
+    <div class="input-group">
+      <input
+        type="text"
+        id="operation-id-input"
+        data-testid="operation-id-input"
+        placeholder="Operation ID"
+      />
+      <button
+        data-robot-api="cancelOperation"
+        disabled
+      >
+        Cancel Operation
+      </button>
+      <button
+        data-robot-api="blockForOperation"
+        disabled
+      >
+        Block For Operation
+      </button>
+    </div>
+
+    <h2>Output</h2>
+    <pre data-testid="output">No output yet</pre>
+
     <script
       type="module"
       src="/src/main.ts"
