@@ -21,4 +21,3 @@ export const differentAccessToken: AccessToken = {
   type: 'access-token',
   payload: 'different-access-token',
 };
-
