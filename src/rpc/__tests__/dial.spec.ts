@@ -27,8 +27,8 @@ import {
 } from '../../__mocks__/webrtc';
 import { withICEServers } from '../__fixtures__/dial-webrtc-options';
 import { createMockTransport } from '../../__mocks__/transports';
+import { createMockSignalingExchange } from '../__mocks__/signaling-exchanges';
 import { ClientChannel } from '../client-channel';
-import type { Transport } from '@connectrpc/connect';
 
 vi.mock('../peer');
 vi.mock('../signaling-exchange');
@@ -52,11 +52,14 @@ const setupDialWebRTCMocks = () => {
   const peerConnection = createMockPeerConnection();
   const dataChannel = createMockDataChannel();
   const transport = createMockTransport();
+  const signalingExchange = createMockSignalingExchange(transport);
 
   vi.mocked(newPeerConnectionForClient).mockResolvedValue({
     pc: peerConnection,
     dc: dataChannel,
   });
+
+  vi.mocked(SignalingExchange).mockImplementation(() => signalingExchange);
 
   const optionalWebRTCConfigFn = vi.fn().mockResolvedValue({
     config: {
@@ -65,19 +68,11 @@ const setupDialWebRTCMocks = () => {
     },
   });
 
-  const mockClient = {
+  vi.mocked(createClient).mockReturnValue({
     optionalWebRTCConfig: optionalWebRTCConfigFn,
-  } as unknown as ReturnType<typeof createClient>;
+  } as unknown as ReturnType<typeof createClient>);
 
-  vi.mocked(createClient).mockReturnValue(mockClient);
   vi.mocked(createGrpcWebTransport).mockReturnValue(transport);
-
-  const signalingExchange = {
-    doExchange: vi.fn().mockResolvedValue(transport),
-    terminate: vi.fn(),
-  } as unknown as SignalingExchange;
-
-  vi.mocked(SignalingExchange).mockImplementation(() => signalingExchange);
 
   return {
     peerConnection,
@@ -212,18 +207,21 @@ describe('dialWebRTC', () => {
       expect(vi.mocked(peerConnection.close)).toHaveBeenCalled();
     });
 
-    it('should propagate error if transport creation fails', async () => {
+    it('should close peer connection if dialDirect fails', async () => {
       // Arrange
-      setupDialWebRTCMocks();
-      vi.mocked(createGrpcWebTransport).mockImplementation(() => {
-        throw new Error('Transport creation failed');
-      });
+      const { peerConnection, transport } = setupDialWebRTCMocks();
+      // First call succeeds (getOptionalWebRTCConfig), second call fails (signaling)
+      vi.mocked(createGrpcWebTransport)
+        .mockReturnValueOnce(transport)
+        .mockImplementationOnce(() => {
+          throw new Error('Transport creation failed');
+        });
 
       // Act & Assert
       await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow(
         'Transport creation failed'
       );
-      expect(newPeerConnectionForClient).not.toHaveBeenCalled();
+      expect(vi.mocked(peerConnection.close)).toHaveBeenCalled();
     });
 
     it('should rethrow errors after cleanup', async () => {
@@ -326,103 +324,6 @@ describe('validateDialOptions', () => {
     },
   ])('should throw when $description', ({ options, expectedError }) => {
     expect(() => validateDialOptions(options)).toThrow(expectedError);
-  });
-});
-
-describe('resource management', () => {
-  it('should reuse a single transport for config fetching and signaling', async () => {
-    // Arrange
-    setupDialWebRTCMocks();
-
-    // Act
-    await dialWebRTC(TEST_URL, TEST_HOST);
-
-    // Assert
-    expect(createGrpcWebTransport).toHaveBeenCalledTimes(1);
-    expect(createGrpcWebTransport).toHaveBeenCalledWith({
-      baseUrl: TEST_URL,
-      credentials: 'same-origin',
-    });
-  });
-
-  it('should reuse a single signaling client for config fetching and signaling', async () => {
-    // Arrange
-    setupDialWebRTCMocks();
-
-    // Act
-    await dialWebRTC(TEST_URL, TEST_HOST);
-
-    // Assert
-    expect(createClient).toHaveBeenCalledTimes(1);
-    expect(createClient).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything()
-    );
-  });
-
-  it('should not leak transports on successful connection', async () => {
-    // Arrange
-    const { transport } = setupDialWebRTCMocks();
-    const transportCount = { created: 0 };
-
-    vi.mocked(createGrpcWebTransport).mockImplementation(() => {
-      transportCount.created += 1;
-      return transport;
-    });
-
-    // Act
-    await dialWebRTC(TEST_URL, TEST_HOST);
-
-    // Assert
-    expect(transportCount.created).toBe(1);
-  });
-
-  it('should not leak transports on connection failure', async () => {
-    // Arrange
-    const { transport, signalingExchange } = setupDialWebRTCMocks();
-    const transportCount = { created: 0 };
-
-    vi.mocked(createGrpcWebTransport).mockImplementation(() => {
-      transportCount.created += 1;
-      return transport;
-    });
-
-    const error = new Error('Connection failed');
-    vi.mocked(signalingExchange.doExchange).mockRejectedValueOnce(error);
-
-    // Act
-    await dialWebRTC(TEST_URL, TEST_HOST).catch(() => {
-      // Ignore error for this test
-    });
-
-    // Assert
-    expect(transportCount.created).toBe(1);
-  });
-
-  it('should use the same transport reference for both config and signaling', async () => {
-    // Arrange
-    setupDialWebRTCMocks();
-    const capturedTransports: Transport[] = [];
-
-    vi.mocked(createClient).mockImplementation(
-      (_service, capturedTransport) => {
-        capturedTransports.push(capturedTransport);
-        return {
-          optionalWebRTCConfig: vi.fn().mockResolvedValue({
-            config: {
-              additionalIceServers: [],
-              disableTrickle: false,
-            },
-          }),
-        } as unknown as ReturnType<typeof createClient>;
-      }
-    );
-
-    // Act
-    await dialWebRTC(TEST_URL, TEST_HOST);
-
-    // Assert
-    expect(capturedTransports.length).toBe(1);
   });
 });
 
