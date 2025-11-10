@@ -12,6 +12,7 @@ import {
 } from '../../__fixtures__/credentials';
 import {
   TEST_HOST,
+  TEST_LOCAL_HOST,
   TEST_SIGNALING_ADDRESS,
 } from '../../__fixtures__/test-constants';
 import { baseDialConfig } from '../__fixtures__/dial-configs';
@@ -613,7 +614,7 @@ describe('RobotClient', () => {
       // Act
       // Use a local host so dialDirect validation passes
       const result = await client.dial({
-        host: 'localhost:8080',
+        host: TEST_LOCAL_HOST,
         noReconnect: true,
       });
 
@@ -631,7 +632,7 @@ describe('RobotClient', () => {
       // Act
       // Use a local host so dialDirect validation passes
       const result = await client.dial({
-        host: 'localhost:8080',
+        host: TEST_LOCAL_HOST,
         noReconnect: true,
       });
 
