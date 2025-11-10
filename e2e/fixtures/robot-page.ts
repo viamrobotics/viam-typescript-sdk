@@ -113,6 +113,35 @@ export class RobotPage {
     await this.page.click(`[data-robot-api="${apiName}"]`);
   }
 
+  async getClientSessionId(): Promise<string> {
+    await this.page.click('[data-testid="get-session-id-btn"]');
+    // Wait for output to be updated
+    await this.page.waitForSelector(
+      `[data-testid="${this.outputID}"][data-has-output="true"]`,
+      { timeout: 30_000 }
+    );
+    const outputEl = this.page.getByTestId(this.outputID);
+    const text = await outputEl.textContent();
+    const parsed: unknown = JSON.parse(text ?? '""');
+    return typeof parsed === 'string' ? parsed : '';
+  }
+
+  async createSession(): Promise<{
+    sessionId: string;
+    metadata: Record<string, unknown>;
+  }> {
+    await this.page.click('[data-testid="create-session-btn"]');
+    const output = (await this.getOutput()) as {
+      sessionId?: string;
+      metadata?: Record<string, unknown>;
+    };
+    // The output will be an object with sessionId and hasSession
+    return {
+      sessionId: String(output.sessionId ?? ''),
+      metadata: output.metadata ?? {},
+    };
+  }
+
   getPage(): Page {
     return this.page;
   }

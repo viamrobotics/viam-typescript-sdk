@@ -29,7 +29,7 @@
     "lint": "concurrently -g npm:lint:*",
     "lint:prettier": "npm run _prettier -- --check",
     "lint:eslint": "npm run _eslint",
-    "test": "vitest run --project unit",
+    "test": "vitest run --project unit --silent",
     "test:watch": "vitest",
     "typecheck": "concurrently -g npm:typecheck:*",
     "typecheck:src": "tsc",

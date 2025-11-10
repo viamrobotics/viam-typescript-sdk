@@ -28,6 +28,9 @@ const dialingStatusEl = getElement<HTMLDivElement>('dialing-status');
 const connectBtn = getButton('connect-btn');
 const disconnectBtn = getButton('disconnect-btn');
 const connectInvalidBtn = getButton('connect-invalid-btn');
+const expireSessionBtn = getButton('expire-session-btn');
+const getSessionIdBtn = getButton('get-session-id-btn');
+const createSessionBtn = getButton('create-session-btn');
 
 const robotAPIButtons = getElements<HTMLButtonElement>('[data-robot-api]');
 
@@ -57,6 +60,10 @@ const setButtonsDisabled = (disabled: boolean) => {
   if (disconnectBtn) {
     disconnectBtn.disabled = disabled;
   }
+  if (createSessionBtn) {
+    createSessionBtn.disabled = disabled;
+  }
+  // Get Session ID button is always enabled - reading session ID doesn't require connection
   for (const button of robotAPIButtons) {
     button.disabled = disabled;
   }
@@ -168,6 +175,32 @@ connectInvalidBtn?.addEventListener('click', () => {
 
 disconnectBtn?.addEventListener('click', () => {
   void disconnect();
+});
+
+expireSessionBtn?.addEventListener('click', () => {
+  // eslint-disable-next-line @typescript-eslint/dot-notation
+  client['sessionManager'].reset();
+});
+
+getSessionIdBtn?.addEventListener('click', () => {
+  clearOutput();
+  setOutput(client.sessionId);
+});
+
+createSessionBtn?.addEventListener('click', () => {
+  clearOutput();
+  void (async () => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      const metadata = await client['sessionManager'].getSessionMetadata();
+      setOutput({
+        sessionId: client.sessionId,
+        metadata: Object.fromEntries(metadata.entries()),
+      });
+    } catch (error) {
+      setError(error as Error);
+    }
+  })();
 });
 
 for (const button of robotAPIButtons) {

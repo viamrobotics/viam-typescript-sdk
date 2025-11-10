@@ -81,6 +81,7 @@ export default class SessionManager {
       return;
     }
     this.sessionsSupported = undefined;
+    this.currentSessionID = '';
   }
 
   // Note: maybe support non-worker for foreground presence.
