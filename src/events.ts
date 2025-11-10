@@ -17,7 +17,7 @@ export class EventDispatcher {
   on(type: string, listener: Callback) {
     const { listeners } = this;
     listeners[type] ??= new Set();
-    listeners[type].add(listener);
+    listeners[type]?.add(listener);
   }
 
   once(type: string, listener: Callback) {
