@@ -11,6 +11,17 @@ import {
   BinaryID,
   CaptureInterval,
   CaptureMetadata,
+  CreateSavedQueryRequest,
+  CreateSavedQueryResponse,
+  Query,
+  DeleteSavedQueryRequest,
+  DeleteSavedQueryResponse,
+  GetSavedQueryRequest,
+  GetSavedQueryResponse,
+  ListSavedQueriesRequest,
+  ListSavedQueriesResponse,
+  UpdateSavedQueryRequest,
+  UpdateSavedQueryResponse,
   Filter,
   Index,
   IndexableCollection,
@@ -1737,6 +1748,166 @@ export class DataClient {
       pipelineName,
     });
   }
+
+  /**
+   * CreateSavedQuery saves a mql query.
+   *
+   * @example
+   *
+   * ```ts
+   * // {@link JsonValue} is imported from @bufbuild/protobuf
+   * const mqlQuery: Record<string, JsonValue>[] = [
+   *   {
+   *     $match: {
+   *       component_name: 'sensor-1',
+   *     },
+   *   },
+   *   {
+   *     $limit: 5,
+   *   },
+   * ];
+   *
+   * const queryId = await dataClient.createSavedQuery(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-saved-query',
+   *   mqlQuery
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param name The name of the saved query
+   * @param query The MQL query to save as a list of BSON documents
+   * @returns The ID of the created saved query
+   */
+  async createSavedQuery(
+    organizationId: string,
+    name: string,
+    query: Uint8Array[] | Record<string, Date | JsonValue>[]
+  ): Promise<string> {
+    const mqlBinary: Uint8Array[] =
+      query[0] instanceof Uint8Array
+        ? (query as Uint8Array[])
+        : query.map((value) => BSON.serialize(value));
+
+    const resp = await this.dataClient.createSavedQuery({
+      organizationId,
+      name,
+      mqlBinary,
+    });
+    return resp.id;
+  }
+
+  /**
+   * UpdateSavedQuery updates the saved query with the given id.
+   *
+   * @example
+   *
+   * ```ts
+   * // {@link JsonValue} is imported from @bufbuild/protobuf
+   * const mqlQuery: Record<string, JsonValue>[] = [
+   *   {
+   *     $match: {
+   *       component_name: 'sensor-2',
+   *     },
+   *   },
+   *   {
+   *     $limit: 10,
+   *   },
+   * ];
+   *
+   * await dataClient.updateSavedQuery(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'my-updated-query',
+   *   mqlQuery
+   * );
+   * ```
+   *
+   * @param id The ID of the saved query to update
+   * @param name The new name of the saved query
+   * @param query The new MQL query to save as a list of BSON documents
+   */
+  async updateSavedQuery(
+    id: string,
+    name: string,
+    query: Uint8Array[] | Record<string, Date | JsonValue>[]
+  ): Promise<void> {
+    const mqlBinary: Uint8Array[] =
+      query[0] instanceof Uint8Array
+        ? (query as Uint8Array[])
+        : query.map((value) => BSON.serialize(value));
+
+    await this.dataClient.updateSavedQuery({
+      id,
+      name,
+      mqlBinary,
+    });
+  }
+
+  /**
+   * GetSavedQuery retrieves a saved query by id.
+   *
+   * @example
+   *
+   * ```ts
+   * const savedQuery = await dataClient.getSavedQuery(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param id The ID of the saved query
+   * @returns The saved query configuration or null if it does not exist
+   */
+  async getSavedQuery(id: string): Promise<Query | null> {
+    const resp = await this.dataClient.getSavedQuery({
+      id,
+    });
+    return resp.savedQuery ?? null;
+  }
+
+  /**
+   * DeleteSavedQuery deletes a saved query based on the given id.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.deleteSavedQuery(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param id The ID of the saved query to delete
+   */
+  async deleteSavedQuery(id: string): Promise<void> {
+    await this.dataClient.deleteSavedQuery({
+      id,
+    });
+  }
+
+  /**
+   * ListSavedQueries lists saved queries for a given organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const savedQueries = await dataClient.listSavedQueries(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param limit Optional limit for the number of queries to return
+   * @returns An array of saved queries
+   */
+  async listSavedQueries(
+    organizationId: string,
+    limit?: number
+  ): Promise<Query[]> {
+    const resp = await this.dataClient.listSavedQueries({
+      organizationId,
+      limit: limit === undefined ? undefined : BigInt(limit),
+    });
+    return resp.queries;
+  }
 }
 
 export class ListDataPipelineRunsPage {
@@ -1793,5 +1964,16 @@ export {
   type BinaryID,
   type IndexableCollection,
   type Order,
+  CreateSavedQueryRequest,
+  CreateSavedQueryResponse,
+  Query,
+  DeleteSavedQueryRequest,
+  DeleteSavedQueryResponse,
+  GetSavedQueryRequest,
+  GetSavedQueryResponse,
+  ListSavedQueriesRequest,
+  ListSavedQueriesResponse,
+  UpdateSavedQueryRequest,
+  UpdateSavedQueryResponse,
 } from '../gen/app/data/v1/data_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';

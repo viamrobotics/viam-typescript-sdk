@@ -44,6 +44,17 @@ import {
   IndexCreator,
   ListIndexesRequest,
   ListIndexesResponse,
+  Query,
+  CreateSavedQueryRequest,
+  CreateSavedQueryResponse,
+  DeleteSavedQueryRequest,
+  DeleteSavedQueryResponse,
+  GetSavedQueryRequest,
+  GetSavedQueryResponse,
+  ListSavedQueriesRequest,
+  ListSavedQueriesResponse,
+  UpdateSavedQueryRequest,
+  UpdateSavedQueryResponse,
   RemoveBinaryDataFromDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsResponse,
   RemoveBoundingBoxFromImageByIDRequest,
@@ -1228,6 +1239,180 @@ describe('DataClient tests', () => {
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
+
+  // ADDED TESTS START
+  describe('createSavedQuery tests', () => {
+    let capReq: CreateSavedQueryRequest;
+    const mqlQuery = [{ $match: { component_name: 'sensor-1' } }];
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createSavedQuery: (req) => {
+            capReq = req;
+            return new CreateSavedQueryResponse({
+              id: 'queryId',
+            });
+          },
+        });
+      });
+    });
+    it('creates a saved query', async () => {
+      const organizationId = 'orgId';
+      const name = 'my-query';
+      const expectedRequest = new CreateSavedQueryRequest({
+        organizationId,
+        name,
+        mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
+      });
+      const result = await subject().createSavedQuery(
+        organizationId,
+        name,
+        mqlQuery
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toBe('queryId');
+    });
+  });
+
+  describe('updateSavedQuery tests', () => {
+    let capReq: UpdateSavedQueryRequest;
+    const mqlQuery = [{ $match: { component_name: 'sensor-2' } }];
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          updateSavedQuery: (req) => {
+            capReq = req;
+            return new UpdateSavedQueryResponse();
+          },
+        });
+      });
+    });
+    it('updates a saved query', async () => {
+      const id = 'queryId';
+      const name = 'my-updated-query';
+      const expectedRequest = new UpdateSavedQueryRequest({
+        id,
+        name,
+        mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
+      });
+      await subject().updateSavedQuery(id, name, mqlQuery);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('getSavedQuery tests', () => {
+    let capReq: GetSavedQueryRequest;
+    const savedQuery = new Query({
+      id: 'queryId',
+      organizationId: 'orgId',
+      name: 'my-query',
+      mqlBinary: [],
+    });
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getSavedQuery: (req) => {
+            capReq = req;
+            return new GetSavedQueryResponse({
+              savedQuery,
+            });
+          },
+        });
+      });
+    });
+    it('gets a saved query', async () => {
+      const id = 'queryId';
+      const expectedRequest = new GetSavedQueryRequest({
+        id,
+      });
+      const result = await subject().getSavedQuery(id);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toStrictEqual(savedQuery);
+    });
+    it('returns null when saved query does not exist', async () => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getSavedQuery: () => {
+            return new GetSavedQueryResponse({});
+          },
+        });
+      });
+      const result = await subject().getSavedQuery('nonExistentId');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('deleteSavedQuery tests', () => {
+    let capReq: DeleteSavedQueryRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          deleteSavedQuery: (req) => {
+            capReq = req;
+            return new DeleteSavedQueryResponse();
+          },
+        });
+      });
+    });
+    it('deletes a saved query', async () => {
+      const id = 'queryId';
+      const expectedRequest = new DeleteSavedQueryRequest({
+        id,
+      });
+      await subject().deleteSavedQuery(id);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('listSavedQueries tests', () => {
+    let capReq: ListSavedQueriesRequest;
+    const query1 = new Query({
+      id: 'query1',
+      organizationId: 'orgId',
+      name: 'query1',
+      mqlBinary: [],
+    });
+    const query2 = new Query({
+      id: 'query2',
+      organizationId: 'orgId',
+      name: 'query2',
+      mqlBinary: [],
+    });
+    const queries = [query1, query2];
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          listSavedQueries: (req) => {
+            capReq = req;
+            return new ListSavedQueriesResponse({
+              queries,
+            });
+          },
+        });
+      });
+    });
+    it('lists saved queries', async () => {
+      const organizationId = 'orgId';
+      const expectedRequest = new ListSavedQueriesRequest({
+        organizationId,
+      });
+      const result = await subject().listSavedQueries(organizationId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toStrictEqual(queries);
+    });
+    it('lists saved queries with limit', async () => {
+      const organizationId = 'orgId';
+      const limit = 10;
+      const expectedRequest = new ListSavedQueriesRequest({
+        organizationId,
+        limit: BigInt(limit),
+      });
+      const result = await subject().listSavedQueries(organizationId, limit);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toStrictEqual(queries);
+    });
+  });
+  // ADDED TESTS END
 
   describe('createFilter tests', () => {
     it('create empty filter', () => {
