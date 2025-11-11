@@ -38,7 +38,7 @@ const waitForServer = async (
 };
 
 /** Global setup function - starts viam-server before all tests */
-export const setup = async (): Promise<void> => {
+export const setup = async (): Promise<() => Promise<void>> => {
   console.log('Starting viam-server for E2E tests...');
 
   const binaryPath = path.resolve(dirname, '../bin/viam-server');
@@ -88,6 +88,9 @@ export const setup = async (): Promise<void> => {
   process.env.VIAM_SERVER_URL = `http://${VIAM_SERVER_HOST}:${VIAM_SERVER_PORT}`;
 
   console.log('✓ Global setup complete');
+
+  // Return teardown function for Vitest
+  return teardown;
 };
 
 /** Global teardown function - stops viam-server after all tests */
@@ -96,7 +99,21 @@ export const teardown = async (): Promise<void> => {
 
   if (serverProcess) {
     const exitPromise = new Promise<void>((resolve) => {
-      serverProcess?.on('exit', () => {
+      if (!serverProcess) {
+        resolve();
+        return;
+      }
+
+      const timeout = setTimeout(() => {
+        console.warn('viam-server did not exit gracefully, forcing kill...');
+        if (serverProcess) {
+          serverProcess.kill('SIGKILL');
+        }
+        resolve();
+      }, 5000);
+
+      serverProcess.on('exit', () => {
+        clearTimeout(timeout);
         serverProcess = undefined;
         resolve();
       });

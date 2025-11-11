@@ -18,5 +18,6 @@ export default defineConfig({
     globalSetup: ['./e2e/helpers/global-setup.ts'],
     setupFiles: ['./e2e/helpers/node-setup.ts'],
     environment: 'node',
+    teardownTimeout: 10_000,
   },
 });
