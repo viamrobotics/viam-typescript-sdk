@@ -255,23 +255,41 @@ export class SignalingExchange {
     candidate: RTCIceCandidateInit | null;
   }) {
     await this.remoteDescriptionSet;
+
     if (this.exchangeDone || this.pc.iceConnectionState === 'connected') {
+      if (event.candidate !== null) {
+        // eslint-disable-next-line no-console
+        console.info(
+          'Dropping ICE candidate - exchange done or already connected',
+          {
+            exchangeDone: this.exchangeDone,
+            iceConnectionState: this.pc.iceConnectionState,
+            candidate: event.candidate.candidate,
+          }
+        );
+      }
       return;
     }
 
     if (event.candidate === null) {
+      // eslint-disable-next-line no-console
+      console.info('ICE gathering complete');
       this.iceComplete = true;
       await this.sendDone();
       return;
     }
 
     if (this.callUuid === undefined || this.callUuid === '') {
+      // eslint-disable-next-line no-console
+      console.error(callUUIDUnset);
       throw new Error(callUUIDUnset);
     }
 
     if (event.candidate.candidate !== undefined) {
-      console.debug(`gathered local ICE ${event.candidate.candidate}`); // eslint-disable-line no-console
+      // eslint-disable-next-line no-console
+      console.info(`Gathered local ICE ${event.candidate.candidate}`);
     }
+
     const iProto = iceCandidateToProto(event.candidate);
     const callRequestUpdate = new CallUpdateRequest({
       uuid: this.callUuid,
@@ -280,6 +298,7 @@ export class SignalingExchange {
         value: iProto,
       },
     });
+
     const callUpdateStart = new Date();
     try {
       await this.signalingClient.callUpdate(callRequestUpdate, this.callOpts);
