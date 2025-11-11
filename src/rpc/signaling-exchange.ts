@@ -259,11 +259,14 @@ export class SignalingExchange {
     if (this.exchangeDone || this.pc.iceConnectionState === 'connected') {
       if (event.candidate !== null) {
         // eslint-disable-next-line no-console
-        console.info('Dropping ICE candidate - exchange done or already connected', { 
-          exchangeDone: this.exchangeDone,
-          iceConnectionState: this.pc.iceConnectionState,
-          candidate: event.candidate.candidate
-        });
+        console.info(
+          'Dropping ICE candidate - exchange done or already connected',
+          {
+            exchangeDone: this.exchangeDone,
+            iceConnectionState: this.pc.iceConnectionState,
+            candidate: event.candidate.candidate,
+          }
+        );
       }
       return;
     }
@@ -295,7 +298,7 @@ export class SignalingExchange {
         value: iProto,
       },
     });
-    
+
     const callUpdateStart = new Date();
     try {
       await this.signalingClient.callUpdate(callRequestUpdate, this.callOpts);
