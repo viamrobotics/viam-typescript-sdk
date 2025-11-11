@@ -17,6 +17,8 @@ import type { Arm } from './arm';
 import {
   GetGeometriesRequest,
   GetKinematicsRequest,
+  Get3DModelsRequest,
+  Mesh,
 } from '../../gen/common/v1/common_pb';
 
 /**
@@ -60,6 +62,19 @@ export class ArmClient implements Arm {
 
     const response = await this.client.getGeometries(request, callOptions);
     return response.geometries;
+  }
+
+  async get3DModels(
+    extra = {},
+    callOptions = this.callOptions
+  ): Promise<Record<string, Mesh>> {
+    const request = new Get3DModelsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    const response = await this.client.get3DModels(request, callOptions);
+    return response.models;
   }
 
   async getKinematics(extra = {}, callOptions = this.callOptions) {
