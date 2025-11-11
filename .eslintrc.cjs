@@ -10,6 +10,7 @@ module.exports = {
     'docs',
     'playwright-report',
     'vitest-report',
+    'vitest-e2e-report',
     /*
      * TODO(mc, 2023-04-06): something about nested node_modules in examples
      * is causing eslint to choke. Investigate workspaces as a solution
