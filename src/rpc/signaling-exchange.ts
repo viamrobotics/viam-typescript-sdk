@@ -284,7 +284,7 @@ export class SignalingExchange {
 
     if (event.candidate.candidate !== undefined) {
       // eslint-disable-next-line no-console
-      console.info(`gathered local ICE ${event.candidate.candidate}`);
+      console.info(`Gathered local ICE ${event.candidate.candidate}`);
     }
 
     const iProto = iceCandidateToProto(event.candidate);
