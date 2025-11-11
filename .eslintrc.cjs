@@ -8,6 +8,7 @@ module.exports = {
     'src/gen',
     'dist',
     'docs',
+    'playwright-report',
     /*
      * TODO(mc, 2023-04-06): something about nested node_modules in examples
      * is causing eslint to choke. Investigate workspaces as a solution
