@@ -393,19 +393,20 @@ export class RobotClient extends EventDispatcher implements Robot {
         );
 
         this.currentRetryAttempt = attemptNumber;
+        if (this.closed) {
+          return false;
+        }
+
         const isRetryable = isRetryableError(error);
-        if (!this.closed && isRetryable) {
+        if (isRetryable) {
           return true;
         }
 
-        if (!isRetryable) {
-          // eslint-disable-next-line no-console
-          console.debug(
-            'Non-retryable error encountered, stopping reconnection attempts',
-            error
-          );
-        }
-
+        // eslint-disable-next-line no-console
+        console.debug(
+          'Non-retryable error encountered, stopping reconnection attempts',
+          error
+        );
         return false;
       },
     };
@@ -661,20 +662,31 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
+        // Stop connection attempts if explicitly aborted
         const aborted = conf.reconnectAbortSignal?.abort ?? false;
+        if (aborted) {
+          return false;
+        }
+
+        // Stop connection attempts if client was explicitly closed by user
+        if (this.closed) {
+          return false;
+        }
+
+        // Check if error is retryable
         const isRetryable = isRetryableError(error);
-        if (!aborted && !this.closed && isRetryable) {
+
+        if (isRetryable) {
+          // Continue retrying on transient errors
           return true;
         }
 
-        if (!isRetryable) {
-          // eslint-disable-next-line no-console
-          console.debug(
-            'Non-retryable error encountered, stopping connection attempts',
-            error
-          );
-        }
-
+        // Stop connection attempts on non-retryable errors (auth failures, config errors, etc.)
+        // eslint-disable-next-line no-console
+        console.debug(
+          'Non-retryable error encountered, stopping connection attempts',
+          error
+        );
         return false;
       },
     };
