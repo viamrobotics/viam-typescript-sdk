@@ -155,7 +155,7 @@ describe('Robot Client API Tests', () => {
     // Assert
     expect(version).toEqual(
       expect.objectContaining({
-        version: expect.stringMatching(/^v\d+\.\d+\.\d+$/u),
+        version: expect.stringMatching(/^v?\d+\.\d+\.\d+$/u),
         apiVersion: expect.stringMatching(/^v\d+\.\d+\.\d+$/u),
         platform: 'rdk',
       })

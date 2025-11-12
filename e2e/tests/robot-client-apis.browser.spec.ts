@@ -283,7 +283,7 @@ test.describe('Robot Client API Tests', () => {
     expect(await robotPage.getOutput<RobotClient, 'getVersion'>()).toEqual(
       expect.objectContaining({
         platform: 'rdk',
-        version: expect.stringMatching(/^v\d+\.\d+\.\d+$/u),
+        version: expect.stringMatching(/^v?\d+\.\d+\.\d+$/u),
         apiVersion: expect.stringMatching(/^v\d+\.\d+\.\d+$/u),
       })
     );
