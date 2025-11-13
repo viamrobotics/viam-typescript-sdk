@@ -12,10 +12,6 @@ const VIAM_SERVER_PORT = 9090;
 const VIAM_SERVER_HOST = 'localhost';
 const VIAM_SERVER_FQDN = 'e2e-ts-sdk';
 
-/**
- * Wait for the viam-server to be ready by checking if the port is accepting
- * connections.
- */
 const waitForServer = async (
   host: string,
   port: number,
@@ -37,7 +33,6 @@ const waitForServer = async (
   throw new Error(`viam-server failed to start within ${maxAttempts} seconds`);
 };
 
-/** Global setup function - starts viam-server before all tests */
 export const setup = async (): Promise<() => Promise<void>> => {
   console.log('Starting viam-server for E2E tests...');
 
@@ -88,12 +83,9 @@ export const setup = async (): Promise<() => Promise<void>> => {
   process.env.VIAM_SERVER_URL = `http://${VIAM_SERVER_HOST}:${VIAM_SERVER_PORT}`;
 
   console.log('✓ Global setup complete');
-
-  // Return teardown function for Vitest
   return teardown;
 };
 
-/** Global teardown function - stops viam-server after all tests */
 export const teardown = async (): Promise<void> => {
   console.log('Stopping viam-server...');
 
@@ -126,5 +118,4 @@ export const teardown = async (): Promise<void> => {
   console.log('✓ Global teardown complete');
 };
 
-// For Playwright, which expects a default export
 export default setup;

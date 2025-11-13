@@ -1,10 +1,3 @@
-/**
- * E2E Test Harness
- *
- * This page loads the Viam SDK in a browser environment for end-to-end testing.
- * It attaches behavior to the buttons in index.html to trigger SDK operations.
- */
-
 import {
   RobotClient,
   type DialConf,
