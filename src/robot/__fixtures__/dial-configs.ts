@@ -18,3 +18,13 @@ export const withNoReconnect: DialConf = {
   ...baseDialConfig,
   noReconnect: true,
 } as const;
+
+export const withRetry: DialConf = {
+  ...baseDialConfig,
+  noReconnect: false,
+  reconnectMaxAttempts: 3,
+} as const;
+
+export const TEST_DIAL_TIMEOUT_MS = 1000;
+export const TEST_MAX_RETRY_ATTEMPTS = 5;
+export const TEST_TIMER_ADVANCE_MS = 100;
