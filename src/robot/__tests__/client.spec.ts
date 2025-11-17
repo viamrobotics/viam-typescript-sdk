@@ -425,6 +425,50 @@ describe('RobotClient', () => {
       // Assert
       expect(result).toBe(client);
     });
+
+    it('should throw error when only gRPC connection is attempted and fails', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const grpcError = new Error('gRPC connection failed');
+
+      vi.mocked(rpcModule.dialDirect).mockRejectedValue(grpcError);
+
+      // Act & Assert
+      await expect(
+        client.dial({
+          host: TEST_LOCAL_HOST,
+          noReconnect: true,
+        })
+      ).rejects.toThrow('Failed to connect via all methods');
+    });
+
+    it('should include only gRPC error when WebRTC is not configured', async () => {
+      // Arrange
+      const client = new RobotClient();
+      const grpcError = new Error('gRPC connection failed');
+
+      vi.mocked(rpcModule.dialDirect).mockRejectedValue(grpcError);
+
+      // Act
+      let caughtError: Error | undefined;
+      try {
+        await client.dial({
+          host: TEST_LOCAL_HOST,
+          noReconnect: true,
+        });
+      } catch (error) {
+        caughtError = error as Error;
+      }
+
+      // Assert
+      expect(caughtError).toBeDefined();
+      expect(caughtError!.message).toBe('Failed to connect via all methods');
+      expect(caughtError!.cause).toBeDefined();
+      expect(Array.isArray(caughtError!.cause)).toBe(true);
+      const causes = caughtError!.cause as Error[];
+      expect(causes).toHaveLength(1);
+      expect(causes[0]).toBe(grpcError);
+    });
   });
 
   describe('concurrent dial prevention', () => {

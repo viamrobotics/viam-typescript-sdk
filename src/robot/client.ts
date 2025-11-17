@@ -840,10 +840,12 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     this.currentRetryAttempt = 0;
     const errors: Error[] = [];
+    const isWebRTC = isDialWebRTCConf(conf);
+    const potentialErrors = isWebRTC ? 2 : 1;
 
     const aborted =
       internalAbortSignal.abort || userAbortSignal?.abort === true;
-    if (isDialWebRTCConf(conf) && !aborted) {
+    if (isWebRTC && !aborted) {
       const { dialer, error } = await this.tryWebRTCDial(
         conf,
         internalAbortSignal,
@@ -875,7 +877,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       errors.push(error);
     }
 
-    if (errors.length > 0) {
+    if (errors.length === potentialErrors) {
       throw new Error('Failed to connect via all methods', {
         cause: errors,
       });
