@@ -36,6 +36,16 @@ export const unimplementedError = new ConnectError(
   Code.Unimplemented
 );
 
+export const alreadyExistsError = new ConnectError(
+  'Resource already exists',
+  Code.AlreadyExists
+);
+
+export const canceledError = new ConnectError(
+  'Operation was canceled',
+  Code.Canceled
+);
+
 // Retryable ConnectError codes
 export const unavailableError = new ConnectError(
   'Service unavailable',

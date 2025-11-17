@@ -147,13 +147,15 @@ const isRetryableError = (error: unknown): boolean => {
   if (
     error instanceof ConnectError &&
     [
-      Code.Unauthenticated,
-      Code.PermissionDenied,
+      Code.Canceled,
       Code.InvalidArgument,
       Code.NotFound,
+      Code.AlreadyExists,
+      Code.PermissionDenied,
       Code.FailedPrecondition,
       Code.OutOfRange,
       Code.Unimplemented,
+      Code.Unauthenticated,
     ].includes(error.code)
   ) {
     return false;
