@@ -1,0 +1,23 @@
+{
+  "network": {
+    "fqdn": "e2e-ts-sdk",
+    "bind_address": ":9090"
+  },
+  "components": [
+    {
+      "name": "base1",
+      "type": "base",
+      "model": "fake"
+    },
+    {
+      "name": "servo1",
+      "type": "servo",
+      "model": "fake"
+    },
+    {
+      "name": "motor1",
+      "type": "motor",
+      "model": "fake"
+    }
+  ]
+}

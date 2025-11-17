@@ -45,6 +45,8 @@ import type { AccessToken, Credential } from '../main';
 import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { assertExists } from '../assert';
 
+const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';
+
 interface ICEServer {
   urls: string;
   username?: string;
@@ -120,6 +122,10 @@ export interface ConnectOptions {
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
+}
+
+interface DialAbortSignal {
+  abort: boolean;
 }
 
 export const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
@@ -202,6 +208,12 @@ export const validateDialConf = (conf: DialConf) => {
   }
 };
 
+const throwOnAbortError = (error: unknown) => {
+  if (error instanceof Error && error.message === DIAL_ABORTED_ERROR_MESSAGE) {
+    throw error;
+  }
+};
+
 /**
  * A gRPC-web client for a Robot.
  *
@@ -232,6 +244,10 @@ export class RobotClient extends EventDispatcher implements Robot {
   private connecting: Promise<void> | undefined;
 
   private connectResolve: (() => void) | undefined;
+
+  private dialing: Promise<RobotClient> | undefined;
+
+  private currentDialAbortSignal: DialAbortSignal | undefined;
 
   private savedCreds: Credentials | undefined;
 
@@ -591,8 +607,16 @@ export class RobotClient extends EventDispatcher implements Robot {
       : this.sessionManager.transport;
   }
 
-  private async dialWebRTC(conf: DialWebRTCConf) {
-    this.emit('dialing', {
+  private async dialWebRTC(
+    conf: DialWebRTCConf,
+    abortSignal?: DialAbortSignal
+  ) {
+    // Check if aborted before starting
+    if (abortSignal?.abort === true) {
+      throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
+    }
+
+    this.emit(MachineConnectionEvent.DIALING, {
       method: 'webrtc',
       attempt: this.currentRetryAttempt,
     });
@@ -619,8 +643,16 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this;
   }
 
-  private async dialDirect(conf: DialDirectConf) {
-    this.emit('dialing', {
+  private async dialDirect(
+    conf: DialDirectConf,
+    abortSignal?: DialAbortSignal
+  ) {
+    // Check if aborted before starting
+    if (abortSignal?.abort === true) {
+      throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
+    }
+
+    this.emit(MachineConnectionEvent.DIALING, {
       method: 'grpc',
       attempt: this.currentRetryAttempt,
     });
@@ -651,11 +683,63 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this;
   }
 
+  private resetDialing(dialPromise: Promise<RobotClient>) {
+    if (this.dialing === dialPromise) {
+      this.dialing = undefined;
+      this.currentDialAbortSignal = undefined;
+    }
+  }
+
   public async dial(conf: DialConf) {
     validateDialConf(conf);
 
-    const backOffOpts: Partial<IBackOffOptions> = {
+    if (this.dialing && this.currentDialAbortSignal) {
+      // eslint-disable-next-line no-console
+      console.debug('Aborting previous dial attempt due to new dial call');
+      this.currentDialAbortSignal.abort = true;
+      this.dialing.catch(() => {
+        // eslint-disable-next-line no-console
+        console.debug('Ignored abort error from previous dial');
+      });
+    }
+
+    this.currentDialAbortSignal = { abort: false };
+    const dialPromise = this.performDial(
+      conf,
+      this.currentDialAbortSignal,
+      conf.reconnectAbortSignal ?? { abort: false }
+    );
+
+    this.dialing = dialPromise;
+    try {
+      const result = await dialPromise;
+      this.resetDialing(dialPromise);
+      return result;
+    } catch (error) {
+      this.resetDialing(dialPromise);
+      if (
+        error instanceof Error &&
+        error.message === DIAL_ABORTED_ERROR_MESSAGE
+      ) {
+        // eslint-disable-next-line no-console
+        console.debug(DIAL_ABORTED_ERROR_MESSAGE);
+        return this;
+      }
+      throw error;
+    }
+  }
+
+  private createBackOffOpts(
+    { abort: internalAbort }: DialAbortSignal,
+    { abort: userAbort }: DialAbortSignal
+  ): Partial<IBackOffOptions> {
+    return {
       retry: (error, attemptNumber) => {
+        const aborted = internalAbort || userAbort;
+        if (aborted) {
+          throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
+        }
+
         // eslint-disable-next-line no-console
         console.debug(
           `Failed to connect, attempt ${attemptNumber} with backoff`,
@@ -664,26 +748,14 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
-        // Stop connection attempts if explicitly aborted
-        const aborted = conf.reconnectAbortSignal?.abort ?? false;
-        if (aborted) {
-          return false;
-        }
-
-        // Stop connection attempts if client was explicitly closed by user
         if (this.closed) {
           return false;
         }
 
-        // Check if error is retryable
-        const isRetryable = isRetryableError(error);
-
-        if (isRetryable) {
-          // Continue retrying on transient errors
+        if (isRetryableError(error)) {
           return true;
         }
 
-        // Stop connection attempts on non-retryable errors (auth failures, config errors, etc.)
         // eslint-disable-next-line no-console
         console.debug(
           'Non-retryable error encountered, stopping connection attempts',
@@ -692,6 +764,71 @@ export class RobotClient extends EventDispatcher implements Robot {
         return false;
       },
     };
+  }
+
+  private async tryWebRTCDial(
+    conf: DialWebRTCConf,
+    internalAbortSignal: DialAbortSignal,
+    backOffOpts: Partial<IBackOffOptions>
+  ): Promise<{ dialer: RobotClient; error?: Error }> {
+    try {
+      const dialer = await backOff(
+        async () => this.dialWebRTC(conf, internalAbortSignal),
+        backOffOpts
+      );
+      return { dialer };
+    } catch (error) {
+      throwOnAbortError(error);
+
+      const dialWebRTCError =
+        error instanceof Error ? error : new Error(String(error));
+
+      // eslint-disable-next-line no-console
+      console.debug('Failed to connect via WebRTC', dialWebRTCError);
+      this.emit(MachineConnectionEvent.DISCONNECTED, {
+        error: dialWebRTCError,
+      });
+
+      return { dialer: this, error: dialWebRTCError };
+    }
+  }
+
+  private async tryDirectDial(
+    conf: DialDirectConf,
+    internalAbortSignal: DialAbortSignal,
+    backOffOpts: Partial<IBackOffOptions>
+  ): Promise<{ dialer: RobotClient; error?: Error }> {
+    try {
+      const dialer = await backOff(
+        async () => this.dialDirect(conf, internalAbortSignal),
+        backOffOpts
+      );
+      return { dialer };
+    } catch (error) {
+      throwOnAbortError(error);
+
+      const dialDirectError =
+        error instanceof Error ? error : new Error(String(error));
+
+      // eslint-disable-next-line no-console
+      console.debug('Failed to connect via gRPC', dialDirectError);
+      this.emit(MachineConnectionEvent.DISCONNECTED, {
+        error: dialDirectError,
+      });
+
+      return { dialer: this, error: dialDirectError };
+    }
+  }
+
+  private async performDial(
+    conf: DialConf,
+    internalAbortSignal: DialAbortSignal,
+    userAbortSignal?: DialAbortSignal
+  ): Promise<RobotClient> {
+    const backOffOpts = this.createBackOffOpts(
+      internalAbortSignal,
+      userAbortSignal ?? { abort: false }
+    );
 
     if (conf.reconnectMaxWait !== undefined) {
       backOffOpts.maxDelay = conf.reconnectMaxWait;
@@ -702,41 +839,47 @@ export class RobotClient extends EventDispatcher implements Robot {
       : conf.reconnectMaxAttempts;
 
     this.currentRetryAttempt = 0;
-    let webRTCError: Error | undefined;
-    let directError: Error | undefined;
+    const errors: Error[] = [];
+    const isWebRTC = isDialWebRTCConf(conf);
+    const potentialErrors = isWebRTC ? 2 : 1;
 
-    // Try to dial via WebRTC first.
-    if (isDialWebRTCConf(conf) && !conf.reconnectAbortSignal?.abort) {
-      try {
-        return await backOff(async () => this.dialWebRTC(conf), backOffOpts);
-      } catch (error) {
-        webRTCError = error instanceof Error ? error : new Error(String(error));
-        // eslint-disable-next-line no-console
-        console.debug('Failed to connect via WebRTC', webRTCError);
-        this.emit(MachineConnectionEvent.DISCONNECTED, {
-          error: webRTCError,
-        });
+    const aborted =
+      internalAbortSignal.abort || userAbortSignal?.abort === true;
+    if (isWebRTC && !aborted) {
+      const { dialer, error } = await this.tryWebRTCDial(
+        conf,
+        internalAbortSignal,
+        backOffOpts
+      );
+      // If WebRTC succeeded, return the client
+      if (!error) {
+        return dialer;
       }
+
+      errors.push(error);
     }
 
     this.currentRetryAttempt = 0;
 
-    if (!conf.reconnectAbortSignal?.abort) {
-      try {
-        return await backOff(async () => this.dialDirect(conf), backOffOpts);
-      } catch (error) {
-        directError = error instanceof Error ? error : new Error(String(error));
-        // eslint-disable-next-line no-console
-        console.debug('Failed to connect via gRPC', directError);
-        this.emit(MachineConnectionEvent.DISCONNECTED, {
-          error: directError,
-        });
+    const abortedAfterWebRTC =
+      internalAbortSignal.abort || userAbortSignal?.abort === true;
+    if (!abortedAfterWebRTC) {
+      const { dialer, error } = await this.tryDirectDial(
+        conf,
+        internalAbortSignal,
+        backOffOpts
+      );
+      // If gRPC succeeded, return the client
+      if (!error) {
+        return dialer;
       }
+
+      errors.push(error);
     }
 
-    if (webRTCError && directError) {
+    if (errors.length === potentialErrors) {
       throw new Error('Failed to connect via all methods', {
-        cause: [webRTCError, directError],
+        cause: errors,
       });
     }
 
@@ -745,6 +888,15 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   public async disconnect() {
     this.emit(MachineConnectionEvent.DISCONNECTING, {});
+
+    if (this.currentDialAbortSignal && this.dialing) {
+      this.currentDialAbortSignal.abort = true;
+      this.dialing.catch(() => {
+        // eslint-disable-next-line no-console
+        console.debug('Ignored abort error from previous dial');
+      });
+      this.resetDialing(this.dialing);
+    }
 
     while (this.connecting) {
       // eslint-disable-next-line no-await-in-loop

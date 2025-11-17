@@ -118,3 +118,5 @@ src/api-version.ts
 *.DS_Store
 
 playwright-report/
+vitest-report/
+vitest-e2e-report/

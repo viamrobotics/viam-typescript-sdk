@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src"],
+  "exclude": [
+    "e2e",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "playwright.config.ts",
+    "vitest.workspace.ts"
+  ]
+}

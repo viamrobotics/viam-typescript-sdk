@@ -9,6 +9,7 @@ export enum MachineConnectionEvent {
   CONNECTED = 'connected',
   DISCONNECTING = 'disconnecting',
   DISCONNECTED = 'disconnected',
+  DIALING = 'dialing',
 }
 
 export class EventDispatcher {
