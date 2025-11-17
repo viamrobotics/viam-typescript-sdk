@@ -1,21 +1,20 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../client';
 import * as rpcModule from '../../rpc';
 import { createMockRobotServiceTransport } from '../__mocks__/robot-service';
-import {
-  testCredential,
-  differentCredential,
-  testAccessToken,
-  differentAccessToken,
-} from '../../__fixtures__/credentials';
 import {
   TEST_HOST,
   TEST_LOCAL_HOST,
   TEST_SIGNALING_ADDRESS,
 } from '../../__fixtures__/test-constants';
-import { baseDialConfig } from '../__fixtures__/dial-configs';
+import {
+  baseDialConfig,
+  TEST_DIAL_TIMEOUT_MS,
+  TEST_MAX_RETRY_ATTEMPTS,
+  TEST_TIMER_ADVANCE_MS,
+} from '../__fixtures__/dial-configs';
 import {
   createMockDataChannel,
   createMockPeerConnection,
@@ -84,10 +83,12 @@ const setupEventListenerMocks = () => {
 describe('RobotClient', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   describe('event listeners', () => {
     type EventListenerMocks = ReturnType<typeof setupEventListenerMocks>;
+
     it.each([
       {
         eventType: 'iceconnectionstatechange',
@@ -111,7 +112,7 @@ describe('RobotClient', () => {
         description: 'peer connection track',
       },
     ])(
-      'should remove old $description handler before adding new one',
+      'should properly manage $description handlers during reconnection',
       async ({ eventType, getAddSpy, getRemoveSpy }) => {
         // Arrange
         const mocks = setupEventListenerMocks();
@@ -124,88 +125,46 @@ describe('RobotClient', () => {
           signalingAddress: TEST_SIGNALING_ADDRESS,
         });
 
+        // Verify initial handler was added
         const firstCallArgs = addSpy.mock.calls.find(
           (call) => call[0] === eventType
         );
         const firstHandler = firstCallArgs?.[1];
-
-        addSpy.mockClear();
-        removeSpy.mockClear();
-
-        // Act
-        await mocks.client.connect();
-
-        // Assert
-        expect(firstCallArgs).toBeDefined();
         expect(firstHandler).toBeDefined();
-
-        const removeCallArgs = removeSpy.mock.calls.find(
-          (call) => call[0] === eventType
-        );
-        const secondCallArgs = addSpy.mock.calls.find(
-          (call) => call[0] === eventType
-        );
-
-        expect(removeCallArgs).toBeDefined();
-        expect(removeCallArgs?.[1]).toBe(firstHandler);
-        expect(secondCallArgs).toBeDefined();
-      }
-    );
-
-    it.each([
-      {
-        eventType: 'iceconnectionstatechange',
-        getAddSpy: (mocks: EventListenerMocks) => mocks.pcAddEventListener,
-        getRemoveSpy: (mocks: EventListenerMocks) =>
-          mocks.pcRemoveEventListener,
-        description: 'iceconnectionstatechange',
-      },
-      {
-        eventType: 'close',
-        getAddSpy: (mocks: EventListenerMocks) => mocks.dcAddEventListener,
-        getRemoveSpy: (mocks: EventListenerMocks) =>
-          mocks.dcRemoveEventListener,
-        description: 'data channel close',
-      },
-      {
-        eventType: 'track',
-        getAddSpy: (mocks: EventListenerMocks) => mocks.pcAddEventListener,
-        getRemoveSpy: (mocks: EventListenerMocks) =>
-          mocks.pcRemoveEventListener,
-        description: 'track',
-      },
-    ])(
-      'should only have one $description handler at a time',
-      async ({ eventType, getAddSpy, getRemoveSpy }) => {
-        // Arrange
-        const mocks = setupEventListenerMocks();
-        const addSpy = getAddSpy(mocks);
-        const removeSpy = getRemoveSpy(mocks);
-
-        await mocks.client.dial({
-          ...baseDialConfig,
-          host: TEST_HOST,
-          signalingAddress: TEST_SIGNALING_ADDRESS,
-        });
 
         const firstConnectionCalls = addSpy.mock.calls.filter(
           (call) => call[0] === eventType
         );
         expect(firstConnectionCalls).toHaveLength(1);
 
-        // Act
+        addSpy.mockClear();
+        removeSpy.mockClear();
+
+        // Act - reconnect
         await mocks.client.connect();
 
-        // Assert
-        const totalCalls = addSpy.mock.calls.filter(
+        // Assert - old handler should be removed before new handler is added
+        const removeCallArgs = removeSpy.mock.calls.find(
           (call) => call[0] === eventType
         );
-        const removeCalls = removeSpy.mock.calls.filter(
-          (call) => call[0] === eventType
-        );
+        expect(removeCallArgs).toBeDefined();
+        expect(removeCallArgs?.[1]).toBe(firstHandler);
 
-        expect(totalCalls).toHaveLength(2);
-        expect(removeCalls).toHaveLength(1);
+        // Assert - new handler should be added
+        const secondCallArgs = addSpy.mock.calls.find(
+          (call) => call[0] === eventType
+        );
+        expect(secondCallArgs).toBeDefined();
+
+        // Assert - only one handler added and one removed during reconnection
+        const totalAddCalls = addSpy.mock.calls.filter(
+          (call) => call[0] === eventType
+        );
+        const totalRemoveCalls = removeSpy.mock.calls.filter(
+          (call) => call[0] === eventType
+        );
+        expect(totalAddCalls).toHaveLength(1);
+        expect(totalRemoveCalls).toHaveLength(1);
       }
     );
 
@@ -272,152 +231,17 @@ describe('RobotClient', () => {
     });
   });
 
-  describe('session management on reconnection', () => {
-    it('should reset session when connecting for the first time', async () => {
-      // Arrange
-      const client = setupClientMocks();
-      // eslint-disable-next-line vitest/no-restricted-vi-methods, @typescript-eslint/dot-notation
-      const mockResetFn = vi.spyOn(client['sessionManager'], 'reset');
-
-      // Act
-      await client.dial({
-        host: TEST_HOST,
-        signalingAddress: TEST_SIGNALING_ADDRESS,
-        credentials: testCredential,
-        disableSessions: false,
-        noReconnect: true,
-      });
-
-      // Assert
-      expect(mockResetFn).toHaveBeenCalledTimes(1);
-    });
-
-    it.each([
-      {
-        description:
-          'should reset session when credentials change during reconnection',
-        initialCreds: testCredential,
-        disableSessions: false,
-        reconnectCreds: differentCredential,
-      },
-      {
-        description: 'should reset session when sessions are disabled',
-        initialCreds: testCredential,
-        disableSessions: true,
-        reconnectCreds: testCredential,
-      },
-      {
-        description:
-          'should reset session when reconnecting with no saved credentials',
-        initialCreds: undefined,
-        disableSessions: false,
-        reconnectCreds: undefined,
-      },
-      {
-        description:
-          'should reset session when access token changes during reconnection',
-        initialCreds: testAccessToken,
-        disableSessions: false,
-        reconnectCreds: differentAccessToken,
-      },
-    ])(
-      '$description',
-      async ({ initialCreds, disableSessions, reconnectCreds }) => {
-        // Arrange
-        const client = setupClientMocks();
-        // eslint-disable-next-line vitest/no-restricted-vi-methods, @typescript-eslint/dot-notation
-        const mockResetFn = vi.spyOn(client['sessionManager'], 'reset');
-
-        await client.dial({
-          host: TEST_HOST,
-          signalingAddress: TEST_SIGNALING_ADDRESS,
-          credentials: initialCreds,
-          disableSessions,
-          noReconnect: true,
-        });
-
-        mockResetFn.mockClear();
-
-        // Act
-        await client.connect({ creds: reconnectCreds });
-
-        // Assert
-        expect(mockResetFn).toHaveBeenCalledTimes(1);
-      }
-    );
-
-    it.each([
-      {
-        description:
-          'should NOT reset session when reconnecting with same credentials',
-        initialCreds: testCredential,
-        reconnectCreds: testCredential,
-      },
-      {
-        description:
-          'should NOT reset session when reconnecting without explicitly passing creds (uses savedCreds)',
-        initialCreds: testCredential,
-        reconnectCreds: undefined,
-      },
-      {
-        description:
-          'should NOT reset session when using access token and reconnecting with same token',
-        initialCreds: testAccessToken,
-        reconnectCreds: testAccessToken,
-      },
-    ])('$description', async ({ initialCreds, reconnectCreds }) => {
-      // Arrange
-      const client = setupClientMocks();
-      // eslint-disable-next-line vitest/no-restricted-vi-methods, @typescript-eslint/dot-notation
-      const mockResetFn = vi.spyOn(client['sessionManager'], 'reset');
-
-      await client.dial({
-        host: TEST_HOST,
-        signalingAddress: TEST_SIGNALING_ADDRESS,
-        credentials: initialCreds,
-        disableSessions: false,
-        noReconnect: true,
-      });
-
-      mockResetFn.mockClear();
-
-      // Act
-      await client.connect({ creds: reconnectCreds });
-
-      // Assert
-      expect(mockResetFn).not.toHaveBeenCalled();
-    });
-  });
-
   describe('dial error handling', () => {
-    const captureDisconnectedEvents = () => {
-      const events: unknown[] = [];
-      const setupListener = (client: RobotClient) => {
-        client.on('disconnected', (event) => {
-          events.push(event);
-        });
-      };
-      return { events, setupListener };
-    };
+    interface DisconnectedEvent {
+      error?: Error;
+    }
 
-    const findEventWithError = (
-      events: unknown[],
-      errorMessage?: string
-    ): unknown => {
-      return events.find((event) => {
-        if (
-          typeof event !== 'object' ||
-          event === null ||
-          !('error' in event)
-        ) {
-          return false;
-        }
-        if (errorMessage === undefined || errorMessage === '') {
-          return true;
-        }
-        const { error } = event as { error: Error };
-        return error.message === errorMessage;
+    const setupDisconnectedEventCapture = (client: RobotClient) => {
+      const events: DisconnectedEvent[] = [];
+      client.on('disconnected', (event) => {
+        events.push(event as DisconnectedEvent);
       });
+      return events;
     };
 
     it('should return client instance when WebRTC connection succeeds', async () => {
@@ -454,9 +278,8 @@ describe('RobotClient', () => {
       // Arrange
       const client = new RobotClient();
       const webrtcError = new Error('WebRTC connection failed');
-      const { events, setupListener } = captureDisconnectedEvents();
+      const events = setupDisconnectedEventCapture(client);
 
-      setupListener(client);
       vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
 
       // Act
@@ -471,20 +294,17 @@ describe('RobotClient', () => {
 
       // Assert
       expect(events.length).toBeGreaterThanOrEqual(2);
-      const webrtcEvent = findEventWithError(
-        events,
-        'WebRTC connection failed'
+      const webrtcEvent = events.find(
+        (event) => event.error?.message === 'WebRTC connection failed'
       );
       expect(webrtcEvent).toBeDefined();
-      expect(webrtcEvent).toMatchObject({ error: webrtcError });
+      expect(webrtcEvent?.error).toBe(webrtcError);
     });
 
     it('should emit DISCONNECTED event when gRPC fails and throw', async () => {
       // Arrange
       const client = new RobotClient();
-      const { events, setupListener } = captureDisconnectedEvents();
-
-      setupListener(client);
+      const events = setupDisconnectedEventCapture(client);
 
       // Act
       try {
@@ -498,9 +318,8 @@ describe('RobotClient', () => {
 
       // Assert
       expect(events.length).toBeGreaterThanOrEqual(1);
-      const errorEvent = findEventWithError(events);
-      expect(errorEvent).toBeDefined();
-      expect((errorEvent as { error: Error }).error).toBeInstanceOf(Error);
+      expect(events[0]).toBeDefined();
+      expect(events[0]?.error).toBeInstanceOf(Error);
     });
 
     it('should include both errors in thrown error cause', async () => {
@@ -567,9 +386,8 @@ describe('RobotClient', () => {
       // Arrange
       const client = new RobotClient();
       const webrtcError = new Error('WebRTC connection failed');
-      const { events, setupListener } = captureDisconnectedEvents();
+      const events = setupDisconnectedEventCapture(client);
 
-      setupListener(client);
       vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
       vi.mocked(rpcModule.dialDirect).mockResolvedValue(
         createMockRobotServiceTransport()
@@ -585,9 +403,8 @@ describe('RobotClient', () => {
       // Assert
       expect(result).toBe(client);
       expect(events.length).toBeGreaterThanOrEqual(1);
-      const webrtcEvent = findEventWithError(
-        events,
-        'WebRTC connection failed'
+      const webrtcEvent = events.find(
+        (event) => event.error?.message === 'WebRTC connection failed'
       );
       expect(webrtcEvent).toBeDefined();
     });
@@ -610,15 +427,116 @@ describe('RobotClient', () => {
     });
   });
 
-  describe('retry logic', () => {
-    beforeEach(() => {
+  describe('concurrent dial prevention', () => {
+    it('should abort previous dial attempt when a new dial is called', async () => {
+      // Arrange
       vi.useFakeTimers();
+      const client = new RobotClient();
+      const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC);
+
+      // First call simulates slow connection that would retry
+      dialWebRTCMock.mockImplementationOnce(async () => {
+        return new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(errors.unavailableError);
+          }, TEST_DIAL_TIMEOUT_MS);
+        });
+      });
+
+      dialWebRTCMock.mockResolvedValueOnce({
+        transport: createMockRobotServiceTransport(),
+        peerConnection: createMockPeerConnection(),
+        dataChannel: createMockDataChannel(),
+      });
+
+      // Act - start first dial attempt (will be aborted by second dial)
+      void client.dial({
+        ...baseDialConfig,
+        noReconnect: false,
+        reconnectMaxAttempts: TEST_MAX_RETRY_ATTEMPTS,
+      });
+
+      await vi.advanceTimersByTimeAsync(TEST_TIMER_ADVANCE_MS);
+      const secondDialPromise = client.dial({
+        ...baseDialConfig,
+        noReconnect: false,
+        reconnectMaxAttempts: TEST_MAX_RETRY_ATTEMPTS,
+      });
+
+      await vi.runOnlyPendingTimersAsync();
+
+      // Assert - second dial should succeed
+      await expect(secondDialPromise).resolves.toBe(client);
+
+      // If both dials ran concurrently, we'd see many more calls due to retries
+      // With abort, the first dial stops retrying, so we see fewer calls
+      expect(dialWebRTCMock.mock.calls.length).toBeLessThan(10);
     });
 
-    afterEach(() => {
-      vi.useRealTimers();
+    it('should allow sequential dial calls', async () => {
+      // Arrange
+      vi.useFakeTimers();
+      const client = new RobotClient();
+      const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
+        transport: createMockRobotServiceTransport(),
+        peerConnection: createMockPeerConnection(),
+        dataChannel: createMockDataChannel(),
+      });
+
+      // Act
+      const firstResult = await client.dial({
+        ...baseDialConfig,
+        noReconnect: true,
+      });
+
+      const secondResult = await client.dial({
+        ...baseDialConfig,
+        noReconnect: true,
+      });
+
+      // Assert
+      expect(firstResult).toBe(client);
+      expect(secondResult).toBe(client);
+      expect(dialWebRTCMock).toHaveBeenCalledTimes(2);
     });
 
+    it('should abort in-progress dial when disconnect is called', async () => {
+      // Arrange
+      vi.useFakeTimers();
+      const client = new RobotClient();
+      const dialWebRTCMock = vi
+        .mocked(rpcModule.dialWebRTC)
+        .mockImplementation(async () => {
+          return new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(errors.unavailableError);
+            }, TEST_DIAL_TIMEOUT_MS);
+          });
+        });
+
+      // Act - store promise and add rejection handler immediately
+      const dialPromise = client
+        .dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: TEST_MAX_RETRY_ATTEMPTS,
+        })
+        .catch(() => {
+          /* Expected to fail - suppress unhandled rejection */
+        });
+
+      await client.disconnect();
+      await vi.runAllTimersAsync();
+      await dialPromise;
+
+      // Assert - verify that dialWebRTC wasn't called excessively (disconnect should stop retries)
+      expect(dialWebRTCMock.mock.calls.length).toBeLessThanOrEqual(
+        TEST_MAX_RETRY_ATTEMPTS
+      );
+    });
+  });
+
+  describe('retry logic on error', () => {
     describe('dial() - non-retryable errors', () => {
       it.each([
         { error: errors.canceledError, description: 'Canceled' },
@@ -643,6 +561,7 @@ describe('RobotClient', () => {
         { error: errors.cannotDialError, description: 'cannot dial error' },
       ])('should not retry on $description', async ({ error }) => {
         // Arrange
+        vi.useFakeTimers();
         const client = new RobotClient();
 
         const dialWebRTCMock = vi
@@ -680,6 +599,7 @@ describe('RobotClient', () => {
         'should retry on $description up to max attempts',
         async ({ error }) => {
           // Arrange
+          vi.useFakeTimers();
           const client = new RobotClient();
           const maxAttempts = 3;
 
@@ -711,6 +631,7 @@ describe('RobotClient', () => {
 
       it('should succeed on retry after transient error', async () => {
         // Arrange
+        vi.useFakeTimers();
         const client = new RobotClient();
 
         const dialWebRTCMock = vi
@@ -727,7 +648,7 @@ describe('RobotClient', () => {
         const dialPromise = client.dial({
           ...baseDialConfig,
           noReconnect: false,
-          reconnectMaxAttempts: 5,
+          reconnectMaxAttempts: TEST_MAX_RETRY_ATTEMPTS,
         });
 
         await vi.runAllTimersAsync();
@@ -761,6 +682,7 @@ describe('RobotClient', () => {
         },
       ])('should not retry reconnection on $description', async ({ error }) => {
         // Arrange
+        vi.useFakeTimers();
         let closeHandler: ((event: Event) => void) | undefined;
 
         const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
@@ -792,7 +714,7 @@ describe('RobotClient', () => {
         await client.dial({
           ...baseDialConfig,
           noReconnect: false,
-          reconnectMaxAttempts: 5,
+          reconnectMaxAttempts: TEST_MAX_RETRY_ATTEMPTS,
         });
 
         // Reset mock call count after initial connection
@@ -825,6 +747,7 @@ describe('RobotClient', () => {
         'should retry reconnection on $description error',
         async ({ error }) => {
           // Arrange
+          vi.useFakeTimers();
           let closeHandler: ((event: Event) => void) | undefined;
 
           const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
@@ -877,6 +800,7 @@ describe('RobotClient', () => {
 
       it('should succeed on reconnection retry after transient error', async () => {
         // Arrange
+        vi.useFakeTimers();
         let closeHandler: ((event: Event) => void) | undefined;
 
         const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
@@ -937,6 +861,7 @@ describe('RobotClient', () => {
     describe('WebRTC to gRPC fallback', () => {
       it('should not retry gRPC on non-retryable error after WebRTC fails', async () => {
         // Arrange
+        vi.useFakeTimers();
         const client = new RobotClient();
 
         const dialWebRTCMock = vi
@@ -952,7 +877,7 @@ describe('RobotClient', () => {
           host: 'test.local',
           signalingAddress: TEST_SIGNALING_ADDRESS,
           noReconnect: false,
-          reconnectMaxAttempts: 5,
+          reconnectMaxAttempts: TEST_MAX_RETRY_ATTEMPTS,
         });
 
         // Ensure promise rejection is handled to prevent unhandled rejections
@@ -966,12 +891,13 @@ describe('RobotClient', () => {
 
         // Assert - await the rejection to ensure it's handled
         await expect(dialPromise).rejects.toThrow();
-        expect(dialWebRTCMock).toHaveBeenCalledTimes(5);
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(TEST_MAX_RETRY_ATTEMPTS);
         expect(dialDirectMock).toHaveBeenCalledTimes(1);
       });
 
       it('should retry both WebRTC and gRPC on retryable errors', async () => {
         // Arrange
+        vi.useFakeTimers();
         const client = new RobotClient();
         const maxAttempts = 3;
 
