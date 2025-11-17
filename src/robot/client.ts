@@ -748,20 +748,14 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.currentRetryAttempt = attemptNumber;
 
-        // Stop connection attempts if client was explicitly closed by user
         if (this.closed) {
           return false;
         }
 
-        // Check if error is retryable
-        const isRetryable = isRetryableError(error);
-
-        if (isRetryable) {
-          // Continue retrying on transient errors
+        if (isRetryableError(error)) {
           return true;
         }
 
-        // Stop connection attempts on non-retryable errors (auth failures, config errors, etc.)
         // eslint-disable-next-line no-console
         console.debug(
           'Non-retryable error encountered, stopping connection attempts',
@@ -845,10 +839,8 @@ export class RobotClient extends EventDispatcher implements Robot {
       : conf.reconnectMaxAttempts;
 
     this.currentRetryAttempt = 0;
-    let dialWebRTCError: Error | undefined;
-    let dialDirectError: Error | undefined;
+    const errors: Error[] = [];
 
-    // Try to dial via WebRTC first.
     const aborted =
       internalAbortSignal.abort || userAbortSignal?.abort === true;
     if (isDialWebRTCConf(conf) && !aborted) {
@@ -862,7 +854,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         return dialer;
       }
 
-      dialWebRTCError = error;
+      errors.push(error);
     }
 
     this.currentRetryAttempt = 0;
@@ -880,16 +872,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         return dialer;
       }
 
-      dialDirectError = error;
-    }
-
-    // Both attempts failed - collect errors
-    const errors: Error[] = [];
-    if (dialWebRTCError) {
-      errors.push(dialWebRTCError);
-    }
-    if (dialDirectError) {
-      errors.push(dialDirectError);
+      errors.push(error);
     }
 
     if (errors.length > 0) {
