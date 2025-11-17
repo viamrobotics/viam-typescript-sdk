@@ -28,7 +28,10 @@ export default defineConfig({
     },
   },
   test: {
-    reporters: [['html', { outputFile: './vitest-report/index.html' }]],
+    reporters: [
+      'verbose',
+      ['html', { outputFile: './vitest-report/index.html' }],
+    ],
     include: ['src/**/*.spec.ts'],
     environment: 'happy-dom',
     mockReset: true,

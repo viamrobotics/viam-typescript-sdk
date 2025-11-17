@@ -11,7 +11,7 @@ export default defineConfig({
   },
   test: {
     reporters: [
-      ['html', { outputFile: './vitest-e2e-report/index.html' }],
+      ['verbose', { outputFile: './vitest-e2e-report/index.html' }],
       'default',
     ],
     include: ['e2e/tests/**/*.node.spec.ts'],
