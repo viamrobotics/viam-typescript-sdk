@@ -30,7 +30,7 @@ test.describe('Robot Client API Tests', () => {
           type: 'component',
         },
         {
-          name: 'test-motor',
+          name: 'motor1',
           namespace: 'rdk',
           subtype: 'motor',
           type: 'component',
@@ -107,7 +107,7 @@ test.describe('Robot Client API Tests', () => {
               namespace: 'rdk',
               type: 'component',
               subtype: 'motor',
-              name: 'test-motor',
+              name: 'motor1',
             },
             state: 'STATE_READY',
             lastUpdated: expect.any(String),

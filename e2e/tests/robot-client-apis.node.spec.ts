@@ -41,7 +41,7 @@ describe('Robot Client API Tests', () => {
           type: 'component',
         },
         {
-          name: 'test-motor',
+          name: 'motor1',
           namespace: 'rdk',
           subtype: 'motor',
           type: 'component',

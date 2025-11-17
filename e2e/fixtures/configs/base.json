@@ -15,10 +15,9 @@
       "model": "fake"
     },
     {
-      "name": "test-motor",
+      "name": "motor1",
       "type": "motor",
       "model": "fake"
     }
   ]
 }
-
