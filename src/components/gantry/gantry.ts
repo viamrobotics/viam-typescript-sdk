@@ -1,6 +1,6 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
-import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { Geometry, KinematicsFileFormat } from '../../gen/common/v1/common_pb';
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {
@@ -144,4 +144,20 @@ export interface Gantry extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#ismoving).
    */
   isMoving: () => Promise<boolean>;
+
+  /**
+   * Get the kinematics of the gantry.
+   *
+   * @example
+   *
+   * ```ts
+   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   *
+   * // Get the kinematics of this component
+   * const kinematics = await gantry.getKinematics();
+   * ```
+   *
+   * @returns The {@link KinematicsFileFormat} of the gantry.
+   */
+  getKinematics: (extra?: Struct) => Promise<KinematicsFileFormat>;
 }
