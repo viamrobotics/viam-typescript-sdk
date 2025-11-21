@@ -9,11 +9,11 @@ import {
   MoveToPositionRequest,
   StopRequest,
 } from '../../gen/component/gantry/v1/gantry_pb';
+import { GetGeometriesRequest, GetGeometriesResponse, GetKinematicsRequest, GetKinematicsResponse, KinematicsFileFormat } from '../../gen/common/v1/common_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Gantry } from './gantry';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Gantry component.
@@ -129,5 +129,24 @@ export class GantryClient implements Gantry {
       this.options,
       callOptions
     );
+  }
+
+  /**
+   * Get the kinematics of the gantry.
+   *
+   * @param extra - Optional object for additional arguments
+   * @param callOptions - Optional {@link CallOptions} for custom gRPC headers
+   * @returns The {@link KinematicsFileFormat} of the gantry.
+   */
+  async getKinematics(extra = {}, callOptions = this.callOptions) {
+    const request = new GetKinematicsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const response = await this.client.getKinematics(request, callOptions);
+    return response.kinematicsData;
   }
 }
