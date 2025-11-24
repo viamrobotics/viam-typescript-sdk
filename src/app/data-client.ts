@@ -497,6 +497,31 @@ export class DataClient {
   }
 
   /**
+   * Create a signed URL for binary data.
+   *
+   * @example
+   *
+   * ```ts
+   * const signedUrl = await dataClient.createBinaryDataSignedURL(
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh'
+   * );
+   * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#createbinarydatasignedurl).
+   *
+   * @param binaryDataId The ID of the binary data
+   * @returns A signed URL string for accessing the binary data
+   */
+  async createBinaryDataSignedURL(binaryDataId: string, expirationMinutes?: number): Promise<string> {
+    const response = await this.dataClient.createBinaryDataSignedURL({
+      binaryDataId,
+      expirationMinutes,
+    });
+    return response.signedUrl;
+  }
+
+  /**
    * Delete tabular data older than a specified number of days.
    *
    * @example
