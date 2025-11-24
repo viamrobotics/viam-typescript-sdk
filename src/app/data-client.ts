@@ -513,7 +513,10 @@ export class DataClient {
    * @param binaryDataId The ID of the binary data
    * @returns A signed URL string for accessing the binary data
    */
-  async createBinaryDataSignedURL(binaryDataId: string, expirationMinutes?: number): Promise<string> {
+  async createBinaryDataSignedURL(
+    binaryDataId: string,
+    expirationMinutes?: number
+  ): Promise<string> {
     const response = await this.dataClient.createBinaryDataSignedURL({
       binaryDataId,
       expirationMinutes,
