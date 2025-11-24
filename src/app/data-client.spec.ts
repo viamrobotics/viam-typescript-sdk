@@ -25,6 +25,8 @@ import {
   ConfigureDatabaseUserResponse,
   CreateIndexRequest,
   CreateIndexResponse,
+  CreateBinaryDataSignedURLRequest,
+  CreateBinaryDataSignedURLResponse,
   DataRequest,
   DeleteBinaryDataByFilterRequest,
   DeleteBinaryDataByFilterResponse,
@@ -1226,6 +1228,52 @@ describe('DataClient tests', () => {
       });
       await subject().deleteIndex(organizationId, collectionType, indexName);
       expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('createBinaryDataSignedURL tests', () => {
+    const binaryDataId = 'testBinaryDataId';
+    const signedUrl = 'https://example.com/signed-url';
+    const expiresAt = new Date(2025, 0, 1, 12, 0, 0); // Jan 1, 2025 12:00:00
+    const expirationMinutes = 60;
+
+    let capReq: CreateBinaryDataSignedURLRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createBinaryDataSignedURL: (req) => {
+            capReq = req;
+            return new CreateBinaryDataSignedURLResponse({
+              signedUrl,
+              expiresAt: Timestamp.fromDate(expiresAt),
+            });
+          },
+        });
+      });
+    });
+
+    it('creates a binary data signed URL with default expiration', async () => {
+      const expectedRequest = new CreateBinaryDataSignedURLRequest({
+        binaryDataId,
+      });
+
+      const result = await subject().createBinaryDataSignedURL(binaryDataId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual({ signedUrl, expiresAt });
+    });
+
+    it('creates a binary data signed URL with specified expiration', async () => {
+      const expectedRequest = new CreateBinaryDataSignedURLRequest({
+        binaryDataId,
+        expirationMinutes,
+      });
+
+      const result = await subject().createBinaryDataSignedURL(
+        binaryDataId,
+        expirationMinutes
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual({ signedUrl, expiresAt });
     });
   });
 

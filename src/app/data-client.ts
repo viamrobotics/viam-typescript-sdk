@@ -18,6 +18,8 @@ import {
   TabularDataSource,
   TabularDataSourceType,
   TagsFilter,
+  CreateBinaryDataSignedURLRequest,
+  CreateBinaryDataSignedURLResponse,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
@@ -1737,6 +1739,43 @@ export class DataClient {
       pipelineName,
     });
   }
+
+  /**
+   * CreateBinaryDataSignedURL creates a temporary public URL for a binary data file.
+   *
+   * @example
+   *
+   * ```ts
+   * const { signedUrl, expiresAt } = await dataClient.createBinaryDataSignedURL(
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   *   60 // Expiration in minutes
+   * );
+   * console.log('Signed URL:', signedUrl);
+   * console.log('Expires At:', expiresAt);
+   * ```
+   *
+   * For more information, see [Data
+   * API](https://docs.viam.com/dev/reference/apis/data-client/#createbinarydatasignedurl).
+   *
+   * @param binaryDataId The binary data ID of the file to create a signed URL for.
+   * @param expirationMinutes Optional expiration time in minutes. Defaults to 15 minutes if not specified.
+   *   Maximum allowed is 10080 minutes (7 days).
+   * @returns An object containing the signed URL and its expiration time.
+   */
+  async createBinaryDataSignedURL(
+    binaryDataId: string,
+    expirationMinutes?: number
+  ): Promise<{ signedUrl: string; expiresAt: Date }> {
+    const req = new CreateBinaryDataSignedURLRequest({
+      binaryDataId,
+      expirationMinutes,
+    });
+    const resp = await this.dataClient.createBinaryDataSignedURL(req);
+    return {
+      signedUrl: resp.signedUrl,
+      expiresAt: resp.expiresAt!.toDate(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    };
+  }
 }
 
 export class ListDataPipelineRunsPage {
@@ -1793,5 +1832,7 @@ export {
   type BinaryID,
   type IndexableCollection,
   type Order,
+  CreateBinaryDataSignedURLRequest,
+  CreateBinaryDataSignedURLResponse,
 } from '../gen/app/data/v1/data_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
