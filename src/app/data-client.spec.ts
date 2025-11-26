@@ -23,6 +23,8 @@ import {
   CaptureInterval,
   ConfigureDatabaseUserRequest,
   ConfigureDatabaseUserResponse,
+  CreateBinaryDataSignedURLRequest,
+  CreateBinaryDataSignedURLResponse,
   CreateIndexRequest,
   CreateIndexResponse,
   DataRequest,
@@ -551,6 +553,50 @@ describe('DataClient tests', () => {
 
       await subject().binaryDataByIds([binaryId1]);
       expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('createBinaryDataSignedURL tests', () => {
+    let capReq: CreateBinaryDataSignedURLRequest;
+    const signedUrl = 'https://example.com/signed-url?token=abc123';
+    const binaryDataId = 'test-binary-data-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createBinaryDataSignedURL: (req) => {
+            capReq = req;
+            return new CreateBinaryDataSignedURLResponse({
+              signedUrl,
+            });
+          },
+        });
+      });
+    });
+
+    it('create signed URL for binary data', async () => {
+      const expectedRequest = new CreateBinaryDataSignedURLRequest({
+        binaryDataId,
+      });
+
+      const response = await subject().createBinaryDataSignedURL(binaryDataId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(response).toEqual(signedUrl);
+    });
+
+    it('create signed URL with expiration minutes', async () => {
+      const expirationMinutes = 30;
+      const expectedRequest = new CreateBinaryDataSignedURLRequest({
+        binaryDataId,
+        expirationMinutes,
+      });
+
+      const response = await subject().createBinaryDataSignedURL(
+        binaryDataId,
+        expirationMinutes
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(response).toEqual(signedUrl);
     });
   });
 
