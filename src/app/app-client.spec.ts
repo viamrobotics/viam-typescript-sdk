@@ -822,10 +822,13 @@ describe('AppClient tests', () => {
       nextPageToken: 'nextPage',
     });
 
+    let capturedRequest: pb.GetRobotPartLogsRequest | undefined;
+
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getRobotPartLogs: () => {
+          getRobotPartLogs: (req) => {
+            capturedRequest = req;
             return expectedResponse;
           },
         });
@@ -835,6 +838,17 @@ describe('AppClient tests', () => {
     it('getRobotPartLogs', async () => {
       const response = await subject().getRobotPartLogs('email');
       expect(response).toEqual(expectedResponse);
+      expect(capturedRequest?.id).toEqual('email');
+      expect(capturedRequest?.filter).toBeUndefined();
+      expect(capturedRequest?.levels).toEqual([]);
+      expect(capturedRequest?.pageToken).toEqual('');
+      expect(capturedRequest?.userFacingOnly).toBeUndefined();
+    });
+
+    it('getRobotPartLogs with userFacingOnly', async () => {
+      await subject().getRobotPartLogs('robotId', undefined, undefined, '', true);
+      expect(capturedRequest?.id).toEqual('robotId');
+      expect(capturedRequest?.userFacingOnly).toEqual(true);
     });
   });
 
