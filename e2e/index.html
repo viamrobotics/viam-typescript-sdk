@@ -109,66 +109,58 @@
         Get Machine Status
       </button>
       <button
-        data-robot-api="getSessions"
-        disabled
-      >
-        Get Sessions
-      </button>
-      <button
-        data-robot-api="getOperations"
-        disabled
-      >
-        Get Operations
-      </button>
-      <button
-        data-robot-api="stopAll"
-        disabled
-      >
-        Stop All
-      </button>
-      <button
-        data-robot-api="getModelsFromModules"
-        disabled
-      >
-        Get Models From Modules
-      </button>
-      <button
-        data-robot-api="resourceRPCSubtypes"
-        disabled
-      >
-        Get Resource RPC Subtypes
-      </button>
-      <button
-        data-robot-api="getCloudMetadata"
-        disabled
-      >
-        Get Cloud Metadata
-      </button>
-      <button
         data-robot-api="getVersion"
         disabled
       >
         Get Version
       </button>
     </div>
-    <div class="input-group">
-      <input
-        type="text"
-        id="operation-id-input"
-        data-testid="operation-id-input"
-        placeholder="Operation ID"
-      />
+
+    <h2>Arm APIs</h2>
+    <div class="button-group">
       <button
-        data-robot-api="cancelOperation"
+        data-arm-api="getEndPosition"
         disabled
       >
-        Cancel Operation
+        Get End Position
       </button>
       <button
-        data-robot-api="blockForOperation"
+        data-arm-api="getJointPositions"
         disabled
       >
-        Block For Operation
+        Get Joint Positions
+      </button>
+    </div>
+
+    <h2>Camera APIs</h2>
+    <div class="button-group">
+      <button
+        data-camera-api="getProperties"
+        disabled
+      >
+        Get Properties
+      </button>
+      <button
+        data-camera-api="getImages"
+        disabled
+      >
+        Get Images
+      </button>
+    </div>
+
+    <h2>Vision APIs</h2>
+    <div class="button-group">
+      <button
+        data-vision-api="getProperties"
+        disabled
+      >
+        Get Properties
+      </button>
+      <button
+        data-vision-api="getDetectionsFromCamera"
+        disabled
+      >
+        Get Detections From Camera
       </button>
     </div>
 

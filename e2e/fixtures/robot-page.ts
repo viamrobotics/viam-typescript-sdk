@@ -1,5 +1,8 @@
 import { test as base, type Page } from '@playwright/test';
-import type { Robot, RobotClient } from '../../src/robot';
+import type { RobotClient } from '../../src/robot';
+import type { ArmClient } from '../../src/components/arm';
+import type { CameraClient } from '../../src/components/camera';
+import type { VisionClient } from '../../src/services/vision';
 import type { ResolvedReturnType } from '../helpers/api-types';
 
 export class RobotPage {
@@ -92,9 +95,7 @@ export class RobotPage {
     return text ?? '';
   }
 
-  async getOutput<T extends Robot, K extends keyof T>(): Promise<
-    ResolvedReturnType<T[K]>
-  > {
+  async getOutput<T, K extends keyof T>(): Promise<ResolvedReturnType<T[K]>> {
     // Wait for the output to be updated by checking for the data-has-output attribute
     await this.page.waitForSelector(
       `[data-testid="${this.outputID}"][data-has-output="true"]`,
@@ -111,6 +112,18 @@ export class RobotPage {
 
   async clickRobotAPIButton(apiName: keyof RobotClient): Promise<void> {
     await this.page.click(`[data-robot-api="${apiName}"]`);
+  }
+
+  async clickArmAPIButton(apiName: keyof ArmClient): Promise<void> {
+    await this.page.click(`[data-arm-api="${apiName}"]`);
+  }
+
+  async clickCameraAPIButton(apiName: keyof CameraClient): Promise<void> {
+    await this.page.click(`[data-camera-api="${apiName}"]`);
+  }
+
+  async clickVisionAPIButton(apiName: keyof VisionClient): Promise<void> {
+    await this.page.click(`[data-vision-api="${apiName}"]`);
   }
 
   getPage(): Page {

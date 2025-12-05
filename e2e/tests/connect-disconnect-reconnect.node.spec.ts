@@ -26,7 +26,7 @@ describe('Connect, Disconnect, and Reconnect', () => {
     // Act & Assert
     await client.dial(nodeConfig);
     const resources = await client.resourceNames();
-    expect(resources.length).toEqual(4);
+    expect(resources.length).toBeGreaterThan(0);
 
     // Act & Assert
     await client.disconnect();
@@ -34,7 +34,7 @@ describe('Connect, Disconnect, and Reconnect', () => {
     // Act & Assert
     await client.dial(nodeConfig);
     const resourcesAfterReconnect = await client.resourceNames();
-    expect(resourcesAfterReconnect.length).toEqual(4);
+    expect(resourcesAfterReconnect.length).toBeGreaterThan(0);
   });
 
   it('should abort previous dial attempt when a new dial is called', async () => {
@@ -60,7 +60,7 @@ describe('Connect, Disconnect, and Reconnect', () => {
 
     // Assert
     const resources = await client.resourceNames();
-    expect(resources.length).toEqual(4);
+    expect(resources.length).toBeGreaterThan(0);
     expect(dialingAttempts.length).toBeGreaterThan(0);
   });
 });

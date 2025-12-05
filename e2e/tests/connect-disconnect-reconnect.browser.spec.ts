@@ -46,9 +46,14 @@ withRobot.describe('Connect, Disconnect, and Reconnect', () => {
 
       // Act
       await robotPage.clickButton('connect-btn');
-      await robotPage.getPage().waitForTimeout(500);
 
-      // Assert
+      // Assert - wait for connected state instead of using arbitrary timeout
+      await robotPage
+        .getPage()
+        .waitForSelector(
+          '[data-testid="connection-status"]:is(:text("Connected"))',
+          { timeout: 10_000 }
+        );
       const connectionStatus = await robotPage.getConnectionStatus();
       const dialingStatus = await robotPage.getDialingStatus();
 
