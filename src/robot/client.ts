@@ -29,6 +29,7 @@ import {
   RestartModuleRequest,
   TransformPCDRequest,
   TransformPoseRequest,
+  SendTracesRequest,
 } from '../gen/robot/v1/robot_pb';
 import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
 import { MotionService } from '../gen/service/motion/v1/motion_connect';
@@ -44,6 +45,7 @@ import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
 import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { assertExists } from '../assert';
+import type { ResourceSpans } from '../../opentelemetry/proto/trace/v1/trace_pb';
 
 const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';
 
@@ -1206,5 +1208,26 @@ export class RobotClient extends EventDispatcher implements Robot {
       request.idOrName.value = moduleName;
     }
     await this.robotService.restartModule(request);
+  }
+
+  /**
+   * Send traces to the robot.
+   *
+   * @example
+   *
+   * ```ts
+   * import { ResourceSpans } from '../../gen/opentelemetry/proto/trace/v1/trace_pb';
+   *
+   * const resourceSpans = [new ResourceSpans()]; // Populate with actual trace data
+   * await machine.sendTraces(resourceSpans);
+   * ```
+   *
+   * @param resourceSpans - A list of OpenTelemetry ResourceSpans to send.
+   * @group Traces
+   * @alpha
+   */
+  async sendTraces(resourceSpans: ResourceSpans[]) {
+    const request = new SendTracesRequest({ resourceSpans });
+    await this.robotService.sendTraces(request);
   }
 }

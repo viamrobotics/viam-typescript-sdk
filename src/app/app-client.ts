@@ -899,6 +899,8 @@ export class AppClient {
    *   all log levels
    * @param pageToken Optional string indicating which page of logs to query.
    *   Defaults to the most recent
+   * @param userFacingOnly Optional boolean to indicate whether or not only
+   *   user-facing logs should be returned. Defaults to false
    * @returns The robot requested logs and the page token for the next page of
    *   logs
    */
@@ -906,13 +908,15 @@ export class AppClient {
     id: string,
     filter?: string,
     levels?: string[],
-    pageToken = ''
+    pageToken = '',
+    userFacingOnly = false
   ): Promise<GetRobotPartLogsResponse> {
     return this.client.getRobotPartLogs({
       id,
       filter,
       levels,
       pageToken,
+      userFacingOnly,
     });
   }
 
