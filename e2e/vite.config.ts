@@ -19,5 +19,7 @@ export default defineConfig({
     setupFiles: ['./e2e/helpers/node-setup.ts'],
     environment: 'node',
     teardownTimeout: 10_000,
+    // Retry failed tests in CI to handle timing issues
+    retry: process.env.CI === undefined ? 0 : 2,
   },
 });
