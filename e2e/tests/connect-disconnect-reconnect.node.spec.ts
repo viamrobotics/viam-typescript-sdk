@@ -5,6 +5,19 @@ import {
   invalidNodeConfig,
 } from '../fixtures/configs/dial-configs';
 
+const waitForDialingEvent = async (
+  client: RobotClient
+): Promise<{ method: string; attempt: number }> => {
+  return new Promise((resolve) => {
+    const handler = (args: unknown) => {
+      const event = args as { method: string; attempt: number };
+      client.off(MachineConnectionEvent.DIALING, handler);
+      resolve(event);
+    };
+    client.on(MachineConnectionEvent.DIALING, handler);
+  });
+};
+
 describe('Connect, Disconnect, and Reconnect', () => {
   let client: RobotClient;
 
@@ -50,9 +63,8 @@ describe('Connect, Disconnect, and Reconnect', () => {
       // Expected to fail - ignore the error
     });
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100);
-    });
+    // Wait for the first dial attempt to start instead of arbitrary timeout
+    await waitForDialingEvent(client);
 
     // Act
     await client.dial(defaultNodeConfig);

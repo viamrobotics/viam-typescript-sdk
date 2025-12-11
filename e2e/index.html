@@ -7,64 +7,6 @@
       content="width=device-width, initial-scale=1.0"
     />
     <title>E2E Harness</title>
-    <style>
-      body {
-        font-family: system-ui;
-        padding: 16px;
-        max-width: 800px;
-        margin: 0 auto;
-      }
-      h2 {
-        margin-top: 24px;
-        color: #333;
-      }
-      .button-group {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin: 8px 0;
-      }
-      button {
-        padding: 4px 8px;
-        font-size: 12px;
-        cursor: pointer;
-        background: rgb(244, 244, 244);
-        color: black;
-        border: 1px solid black;
-      }
-      button:hover {
-        background: rgb(234, 234, 234);
-      }
-      button:active {
-        background: rgb(224, 224, 224);
-        transform: translateY(1px);
-      }
-      [data-testid='connection-status'] {
-        padding: 8px;
-        font-weight: bold;
-        border-left: 4px solid black;
-        background: rgb(244, 244, 244);
-        height: 20px;
-      }
-      [data-testid='dialing-status'] {
-        padding: 8px;
-        border-left: 4px solid black;
-        background: rgb(244, 244, 244);
-        font-style: italic;
-        font-size: 12px;
-        height: 14px;
-      }
-      [data-testid='output'] {
-        background: rgb(244, 244, 244);
-        color: black;
-        padding: 8px;
-        border-radius: 4px;
-        overflow-x: auto;
-        min-height: 100px;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-      }
-    </style>
   </head>
   <body>
     <h1>E2E Test Harness</h1>
@@ -169,7 +111,7 @@
 
     <script
       type="module"
-      src="/src/main.ts"
+      src="/index.ts"
     ></script>
   </body>
 </html>

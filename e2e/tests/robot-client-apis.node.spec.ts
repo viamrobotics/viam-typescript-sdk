@@ -21,9 +21,9 @@ describe('Robot Client API Tests', () => {
     // Assert - Verify we can discover the configured components
     expect(resources).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ name: 'base1', subtype: 'base' }),
-        expect.objectContaining({ name: 'servo1', subtype: 'servo' }),
-        expect.objectContaining({ name: 'motor1', subtype: 'motor' }),
+        expect.objectContaining({ name: 'fake_arm', subtype: 'arm' }),
+        expect.objectContaining({ name: 'fake_camera', subtype: 'camera' }),
+        expect.objectContaining({ name: 'fake_vision', subtype: 'vision' }),
       ])
     );
 

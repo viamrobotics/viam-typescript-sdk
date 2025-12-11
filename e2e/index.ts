@@ -5,9 +5,9 @@ import {
   VisionClient,
   type DialConf,
   MachineConnectionEvent,
-} from '../../src/main';
-import { defaultConfig, invalidConfig } from '../fixtures/configs/dial-configs';
-import type { ResolvedReturnType } from '../helpers/api-types';
+} from '../src/main';
+import { defaultConfig, invalidConfig } from './fixtures/configs/dial-configs';
+import type { ResolvedReturnType } from './helpers/api-types';
 
 const client = new RobotClient();
 const armClient = new ArmClient(client, 'fake_arm');
