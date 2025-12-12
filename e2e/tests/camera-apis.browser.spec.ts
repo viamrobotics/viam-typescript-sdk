@@ -10,7 +10,7 @@ withRobot.describe('Camera API Tests', () => {
       await robotPage.connect();
 
       // Act
-      await robotPage.clickCameraAPIButton('getProperties');
+      await robotPage.getCameraProperties();
       const properties = await robotPage.getOutput<Camera, 'getProperties'>();
 
       // Assert - Verify properties structure
@@ -27,7 +27,7 @@ withRobot.describe('Camera API Tests', () => {
     await robotPage.connect();
 
     // Act
-    await robotPage.clickCameraAPIButton('getImages');
+    await robotPage.getCameraImages();
     const imageResult = await robotPage.getOutput<CameraClient, 'getImages'>();
 
     // Assert - Verify we got images

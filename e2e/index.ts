@@ -1,3 +1,4 @@
+import type { ArgumentsType } from 'vitest';
 import {
   RobotClient,
   ArmClient,
@@ -15,23 +16,21 @@ const cameraClient = new CameraClient(client, 'fake_camera');
 const visionClient = new VisionClient(client, 'fake_vision');
 
 const getElement = <T extends HTMLElement>(id: string) =>
-  document.querySelector<T>(`[data-testid="${id}"]`);
+  document.querySelector<T>(`[data-${id}]`);
 
-const getElements = <T extends HTMLElement>(selector: string) =>
-  document.querySelectorAll<T>(selector);
-
-const getButton = (id: string) => getElement<HTMLButtonElement>(id);
+const getElements = <T extends HTMLElement>(id: string) =>
+  document.querySelectorAll<T>(`[data-${id}]`);
 
 const connectionStatusEl = getElement<HTMLDivElement>('connection-status');
 const dialingStatusEl = getElement<HTMLDivElement>('dialing-status');
-const connectBtn = getButton('connect-btn');
-const disconnectBtn = getButton('disconnect-btn');
-const connectInvalidBtn = getButton('connect-invalid-btn');
+const connectBtn = getElement<HTMLButtonElement>('connect');
+const disconnectBtn = getElement<HTMLButtonElement>('disconnect');
+const connectInvalidBtn = getElement<HTMLButtonElement>('connect-invalid');
 
-const robotAPIButtons = getElements<HTMLButtonElement>('[data-robot-api]');
-const armAPIButtons = getElements<HTMLButtonElement>('[data-arm-api]');
-const cameraAPIButtons = getElements<HTMLButtonElement>('[data-camera-api]');
-const visionAPIButtons = getElements<HTMLButtonElement>('[data-vision-api]');
+const robotAPIButtons = getElements<HTMLButtonElement>('robot-api');
+const armAPIButtons = getElements<HTMLButtonElement>('arm-api');
+const cameraAPIButtons = getElements<HTMLButtonElement>('camera-api');
+const visionAPIButtons = getElements<HTMLButtonElement>('vision-api');
 
 const outputEl = getElement<HTMLPreElement>('output');
 
@@ -59,16 +58,12 @@ const setButtonsDisabled = (disabled: boolean) => {
   if (disconnectBtn) {
     disconnectBtn.disabled = disabled;
   }
-  for (const button of robotAPIButtons) {
-    button.disabled = disabled;
-  }
-  for (const button of armAPIButtons) {
-    button.disabled = disabled;
-  }
-  for (const button of cameraAPIButtons) {
-    button.disabled = disabled;
-  }
-  for (const button of visionAPIButtons) {
+  for (const button of [
+    ...robotAPIButtons,
+    ...armAPIButtons,
+    ...cameraAPIButtons,
+    ...visionAPIButtons,
+  ]) {
     button.disabled = disabled;
   }
 };
@@ -106,8 +101,8 @@ client.on(MachineConnectionEvent.DISCONNECTED, () => {
 });
 
 client.on(MachineConnectionEvent.DIALING, (args: unknown) => {
-  const { method, attempt } = args as { method: string; attempt: number };
-  setDialingStatus(`Dialing ${method} (attempt ${attempt + 1})`);
+  const { attempt } = args as { attempt: number };
+  setDialingStatus(`Dial attempt ${attempt + 1}`);
 });
 
 client.on(MachineConnectionEvent.CONNECTING, () => {
@@ -136,7 +131,6 @@ const disconnect = async () => {
   }
 };
 
-// Attach Event Handlers
 connectBtn?.addEventListener('click', () => {
   void connect();
 });
@@ -149,8 +143,14 @@ disconnectBtn?.addEventListener('click', () => {
   void disconnect();
 });
 
-const callAPI = async <T, K extends keyof T>(apiClient: T, api: K) => {
-  const clientFunc = apiClient[api] as () => Promise<ResolvedReturnType<T[K]>>;
+const callAPI = async <T, K extends keyof T>(
+  apiClient: T,
+  api: K,
+  args: ArgumentsType<T[K]>
+) => {
+  const clientFunc = apiClient[api] as (
+    ...args: ArgumentsType<T[K]>
+  ) => Promise<ResolvedReturnType<T[K]>>;
 
   if (typeof clientFunc !== 'function') {
     throw new TypeError(
@@ -159,7 +159,7 @@ const callAPI = async <T, K extends keyof T>(apiClient: T, api: K) => {
   }
 
   try {
-    const result = await clientFunc.apply(apiClient);
+    const result = await clientFunc.apply(apiClient, args);
     setOutput(result);
   } catch (error) {
     setError(error as Error);
@@ -170,7 +170,7 @@ for (const button of robotAPIButtons) {
   button.addEventListener('click', () => {
     clearOutput();
     const api = button.dataset.robotApi as keyof RobotClient;
-    void callAPI(client, api);
+    void callAPI(client, api, []);
   });
 }
 
@@ -178,7 +178,10 @@ for (const button of armAPIButtons) {
   button.addEventListener('click', () => {
     clearOutput();
     const api = button.dataset.armApi as keyof ArmClient;
-    void callAPI(armClient, api);
+    const args = JSON.parse(button.dataset.armApiArgs ?? '[]') as ArgumentsType<
+      ArmClient[typeof api]
+    >;
+    void callAPI(armClient, api, args);
   });
 }
 
@@ -186,7 +189,7 @@ for (const button of cameraAPIButtons) {
   button.addEventListener('click', () => {
     clearOutput();
     const api = button.dataset.cameraApi as keyof CameraClient;
-    void callAPI(cameraClient, api);
+    void callAPI(cameraClient, api, []);
   });
 }
 
@@ -194,7 +197,10 @@ for (const button of visionAPIButtons) {
   button.addEventListener('click', () => {
     clearOutput();
     const api = button.dataset.visionApi as keyof VisionClient;
-    void callAPI(visionClient, api);
+    const args = JSON.parse(
+      button.dataset.visionApiArgs ?? '[]'
+    ) as ArgumentsType<VisionClient[typeof api]>;
+    void callAPI(visionClient, api, args);
   });
 }
 

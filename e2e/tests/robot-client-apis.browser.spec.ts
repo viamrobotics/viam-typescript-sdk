@@ -10,7 +10,7 @@ withRobot.describe('Robot Client API Tests', () => {
       await robotPage.connect();
 
       // Act - Get resource names
-      await robotPage.clickRobotAPIButton('resourceNames');
+      await robotPage.getResourceNames();
       const resources = await robotPage.getOutput<
         RobotClient,
         'resourceNames'
@@ -26,7 +26,7 @@ withRobot.describe('Robot Client API Tests', () => {
       );
 
       // Act - Get version info
-      await robotPage.clickRobotAPIButton('getVersion');
+      await robotPage.getVersion();
       const version = await robotPage.getOutput<RobotClient, 'getVersion'>();
 
       // Assert - Verify we get valid version information
@@ -45,7 +45,7 @@ withRobot.describe('Robot Client API Tests', () => {
     await robotPage.connect();
 
     // Act
-    await robotPage.clickRobotAPIButton('getMachineStatus');
+    await robotPage.getMachineStatus();
     const status = await robotPage.getOutput<RobotClient, 'getMachineStatus'>();
 
     // Assert - Verify basic machine status structure

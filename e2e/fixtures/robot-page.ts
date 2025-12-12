@@ -1,17 +1,7 @@
 import { test as base, type Page } from '@playwright/test';
-import type { RobotClient } from '../../src/robot';
-import type { ArmClient } from '../../src/components/arm';
-import type { CameraClient } from '../../src/components/camera';
-import type { VisionClient } from '../../src/services/vision';
 import type { ResolvedReturnType } from '../helpers/api-types';
 
 export class RobotPage {
-  private readonly connectionStatusID = 'connection-status';
-  private readonly dialingStatusID = 'dialing-status';
-  private readonly connectButtonID = 'connect-btn';
-  private readonly disconnectButtonID = 'disconnect-btn';
-  private readonly outputID = 'output';
-
   constructor(private readonly page: Page) {}
 
   async ensureReady(): Promise<void> {
@@ -23,107 +13,107 @@ export class RobotPage {
 
   async connect(): Promise<void> {
     await this.ensureReady();
-    await this.page.getByTestId(this.connectButtonID).click();
+    await this.page.click('[data-connect]');
     await this.page.waitForSelector(
-      `[data-testid="${this.connectionStatusID}"]:is(:text("Connected"))`
+      '[data-connection-status]:is(:text("Connected"))',
+      { timeout: 10_000 }
+    );
+  }
+
+  async connectInvalid(): Promise<void> {
+    await this.ensureReady();
+    await this.page.click('[data-connect-invalid]');
+    await this.page.waitForSelector(
+      '[data-connection-status]:is(:text("Disconnected"))'
     );
   }
 
   async disconnect(): Promise<void> {
-    await this.page.getByTestId(this.disconnectButtonID).click();
+    await this.page.click('[data-disconnect]');
     await this.page.waitForSelector(
-      `[data-testid="${this.connectionStatusID}"]:is(:text("Disconnected"))`
+      '[data-connection-status]:is(:text("Disconnected"))'
     );
   }
 
   async getConnectionStatus(): Promise<string> {
-    const connectionStatusEl = this.page.getByTestId(this.connectionStatusID);
+    const connectionStatusEl = this.page.locator('[data-connection-status]');
     const text = await connectionStatusEl.textContent();
     return text ?? 'Unknown';
   }
 
-  async waitForDialing(): Promise<void> {
-    await this.page.waitForSelector(
-      `[data-testid="${this.dialingStatusID}"]:not(:empty)`,
-      { timeout: 5000 }
-    );
-  }
-
-  async waitForFirstDialingAttempt(): Promise<void> {
-    await this.page.waitForFunction(
-      (testId: string) => {
-        const el = document.querySelector(`[data-testid="${testId}"]`);
-        const text = el?.textContent ?? '';
-        const match = text.match(/attempt (?<attemptNumber>\d+)/u);
-        if (!match?.groups) {
-          return false;
-        }
-        const attemptNumber = Number.parseInt(
-          match.groups.attemptNumber ?? '0',
-          10
-        );
-        return attemptNumber === 1;
-      },
-      this.dialingStatusID,
-      { timeout: 10_000 }
-    );
-  }
-
-  async waitForSubsequentDialingAttempts(): Promise<void> {
-    await this.page.waitForFunction(
-      (testId: string) => {
-        const el = document.querySelector(`[data-testid="${testId}"]`);
-        const text = el?.textContent ?? '';
-        const match = text.match(/attempt (?<attemptNumber>\d+)/u);
-        if (!match?.groups) {
-          return false;
-        }
-        const attemptNumber = Number.parseInt(
-          match.groups.attemptNumber ?? '0',
-          10
-        );
-        return attemptNumber > 1;
-      },
-      this.dialingStatusID,
-      { timeout: 10_000 }
-    );
-  }
-
   async getDialingStatus(): Promise<string> {
-    const dialingStatusEl = this.page.getByTestId(this.dialingStatusID);
+    const dialingStatusEl = this.page.locator('[data-dialing-status]');
     const text = await dialingStatusEl.textContent();
     return text ?? '';
   }
 
+  async waitForDialing(): Promise<void> {
+    await this.page.waitForSelector('[data-dialing-status]:not(:empty)', {
+      timeout: 10_000,
+    });
+  }
+
+  async waitForDialingAttempt(first: boolean): Promise<void> {
+    const locator = first
+      ? this.page.locator('[data-dialing-status]:is(:text("Dial attempt 1"))')
+      : this.page
+          .locator('[data-dialing-status]')
+          .filter({ hasText: /Dial attempt (?:[2-9]|[1-9]\d+)/u });
+    await locator.waitFor({ timeout: 10_000 });
+  }
+
   async getOutput<T, K extends keyof T>(): Promise<ResolvedReturnType<T[K]>> {
     // Wait for the output to be updated by checking for the data-has-output attribute
-    await this.page.waitForSelector(
-      `[data-testid="${this.outputID}"][data-has-output="true"]`,
-      { timeout: 30_000 }
-    );
-    const outputEl = this.page.getByTestId(this.outputID);
+    await this.page.waitForSelector('[data-output][data-has-output="true"]', {
+      timeout: 30_000,
+    });
+    const outputEl = this.page.locator('[data-output]');
     const text = await outputEl.textContent();
     return JSON.parse(text ?? '{}') as ResolvedReturnType<T[K]>;
   }
 
-  async clickButton(testId: string): Promise<void> {
-    await this.page.click(`[data-testid="${testId}"]`);
+  async getResourceNames() {
+    await this.page.click(`[data-robot-api="resourceNames"]`);
   }
 
-  async clickRobotAPIButton(apiName: keyof RobotClient): Promise<void> {
-    await this.page.click(`[data-robot-api="${apiName}"]`);
+  async getMachineStatus() {
+    await this.page.click(`[data-robot-api="getMachineStatus"]`);
   }
 
-  async clickArmAPIButton(apiName: keyof ArmClient): Promise<void> {
-    await this.page.click(`[data-arm-api="${apiName}"]`);
+  async getVersion() {
+    await this.page.click(`[data-robot-api="getVersion"]`);
   }
 
-  async clickCameraAPIButton(apiName: keyof CameraClient): Promise<void> {
-    await this.page.click(`[data-camera-api="${apiName}"]`);
+  async getEndPosition() {
+    await this.page.click(`[data-arm-api="getEndPosition"]`);
   }
 
-  async clickVisionAPIButton(apiName: keyof VisionClient): Promise<void> {
-    await this.page.click(`[data-vision-api="${apiName}"]`);
+  async getJointPositions() {
+    await this.page.click(`[data-arm-api="getJointPositions"]`);
+  }
+
+  async moveToPosition() {
+    await this.page.click(`[data-arm-api="moveToPosition"]`);
+  }
+
+  async getCameraProperties() {
+    await this.page.click(`[data-camera-api="getProperties"]`);
+  }
+
+  async getCameraImages() {
+    await this.page.click(`[data-camera-api="getImages"]`);
+  }
+
+  async getVisionProperties() {
+    await this.page.click(`[data-vision-api="getProperties"]`);
+  }
+
+  async getVisionDetectionsFromCamera() {
+    await this.page.click(`[data-vision-api="getDetectionsFromCamera"]`);
+  }
+
+  async captureAllFromCamera() {
+    await this.page.click(`[data-vision-api="captureAllFromCamera"]`);
   }
 
   getPage(): Page {

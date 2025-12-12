@@ -10,7 +10,7 @@ withRobot.describe('Arm API Tests', () => {
       await robotPage.connect();
 
       // Act - Get end position
-      await robotPage.clickArmAPIButton('getEndPosition');
+      await robotPage.getEndPosition();
       const endPosition = await robotPage.getOutput<
         ArmClient,
         'getEndPosition'
@@ -26,7 +26,7 @@ withRobot.describe('Arm API Tests', () => {
       );
 
       // Act - Get joint positions
-      await robotPage.clickArmAPIButton('getJointPositions');
+      await robotPage.getJointPositions();
       const jointPositions = await robotPage.getOutput<
         ArmClient,
         'getJointPositions'
@@ -38,6 +38,41 @@ withRobot.describe('Arm API Tests', () => {
           values: expect.any(Array),
         })
       );
+    }
+  );
+
+  withRobot(
+    'should move arm to joint positions and get new end position',
+    async ({ robotPage }) => {
+      // Arrange
+      await robotPage.connect();
+
+      // Act - Get end position
+      await robotPage.getEndPosition();
+      const endPosition = await robotPage.getOutput<
+        ArmClient,
+        'getEndPosition'
+      >();
+
+      // Assert - Verify pose structure
+      expect(endPosition).toEqual(
+        expect.objectContaining({
+          x: expect.any(Number),
+          y: expect.any(Number),
+          z: expect.any(Number),
+        })
+      );
+
+      // Act - Move to position
+      await robotPage.moveToPosition();
+      await robotPage.getEndPosition();
+      const movedEndPosition = await robotPage.getOutput<
+        ArmClient,
+        'getEndPosition'
+      >();
+
+      // Assert - Verify end position is different
+      expect(movedEndPosition).not.toEqual(endPosition);
     }
   );
 });

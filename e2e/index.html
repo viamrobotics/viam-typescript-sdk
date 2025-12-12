@@ -10,27 +10,27 @@
   </head>
   <body>
     <h1>E2E Test Harness</h1>
-    <div data-testid="connection-status"></div>
-    <div data-testid="dialing-status"></div>
+    <div data-connection-status></div>
+    <div data-dialing-status></div>
 
     <h2>Connection Controls</h2>
     <div class="button-group">
       <button
         id="connect-btn"
-        data-testid="connect-btn"
+        data-connect
       >
         Connect
       </button>
       <button
         id="disconnect-btn"
-        data-testid="disconnect-btn"
+        data-disconnect
         disabled
       >
         Disconnect
       </button>
       <button
         id="connect-invalid-btn"
-        data-testid="connect-invalid-btn"
+        data-connect-invalid
       >
         Connect Invalid
       </button>
@@ -72,6 +72,13 @@
       >
         Get Joint Positions
       </button>
+      <button
+        data-arm-api="moveToPosition"
+        data-arm-api-args='[{"x": -500, "y": -200, "z": 62, "oX": 1, "oY": 0, "oZ": 1, "theta": 90}]'
+        disabled
+      >
+        Move to Position
+      </button>
     </div>
 
     <h2>Camera APIs</h2>
@@ -104,10 +111,17 @@
       >
         Get Detections From Camera
       </button>
+      <button
+        data-vision-api="captureAllFromCamera"
+        data-vision-api-args='["fake_camera", {"returnImage": true, "returnClassifications": true, "returnDetections": true, "returnObjectPointClouds": true}]'
+        disabled
+      >
+        Capture All From Camera
+      </button>
     </div>
 
     <h2>Output</h2>
-    <pre data-testid="output">No output yet</pre>
+    <pre data-output>No output yet</pre>
 
     <script
       type="module"
