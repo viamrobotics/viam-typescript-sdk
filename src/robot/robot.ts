@@ -3,6 +3,7 @@ import { MachineConnectionEvent } from '../events';
 import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
 import * as proto from '../gen/robot/v1/robot_pb';
 import type { ResourceName } from '../types';
+import type { ResourceSpans } from '../gen/opentelemetry/proto/trace/v1/trace_pb';
 
 export type CloudMetadata = proto.GetCloudMetadataResponse;
 
@@ -241,4 +242,22 @@ export interface Robot {
    * @alpha
    */
   restartModule(moduleId?: string, moduleName?: string): Promise<void>;
+
+  /**
+   * Send traces to the robot.
+   *
+   * @example
+   *
+   * ```ts
+   * import { ResourceSpans } from '../../gen/opentelemetry/proto/trace/v1/trace_pb';
+   *
+   * const resourceSpans = [new ResourceSpans()]; // Populate with actual trace data
+   * await machine.sendTraces(resourceSpans);
+   * ```
+   *
+   * @param resourceSpans - A list of OpenTelemetry ResourceSpans to send.
+   * @group Traces
+   * @alpha
+   */
+  sendTraces(resourceSpans: ResourceSpans[]): Promise<void>;
 }
