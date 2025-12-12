@@ -1,15 +1,17 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { RobotClient, VisionClient } from '../../src/main';
+import { RobotClient, VisionClient, CameraClient } from '../../src/main';
 import { defaultNodeConfig } from '../fixtures/configs/dial-configs';
 
 describe('Vision API Tests', () => {
   let client: RobotClient;
   let vision: VisionClient;
+  let camera: CameraClient;
 
   beforeEach(async () => {
     client = new RobotClient();
     await client.dial(defaultNodeConfig);
     vision = new VisionClient(client, 'fake_vision');
+    camera = new CameraClient(client, 'fake_camera');
   });
 
   afterEach(async () => {
@@ -31,6 +33,9 @@ describe('Vision API Tests', () => {
   });
 
   it('should get detections from camera', async () => {
+    // Arrange - Should be initialized before vision service accesses it
+    await camera.getProperties();
+
     // Act
     const detections = await vision.getDetectionsFromCamera('fake_camera');
 
