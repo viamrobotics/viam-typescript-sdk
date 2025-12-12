@@ -3,8 +3,6 @@ import { defineConfig } from 'vite';
 
 import pkg from '../package.json';
 
-const isCI = process.env.CI !== undefined;
-
 // https://vitejs.dev/config/
 export default defineConfig({
   define: {
@@ -21,15 +19,6 @@ export default defineConfig({
     setupFiles: ['./e2e/helpers/node-setup.ts'],
     environment: 'node',
     teardownTimeout: 10_000,
-    // Retry failed tests in CI to handle timing issues
-    retry: isCI ? 2 : 0,
-    // Run tests sequentially in CI to avoid resource contention
-    sequence: {
-      concurrent: false,
-    },
-    // Increase test timeout in CI for slower environments
-    testTimeout: isCI ? 30_000 : 10_000,
-    // Enable more verbose output in CI for debugging
-    logHeapUsage: isCI,
+    fileParallelism: false,
   },
 });
