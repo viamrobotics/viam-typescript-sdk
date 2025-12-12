@@ -7,11 +7,10 @@
   },
   "exclude": [
     "**/*.test.ts",
+    "**/*.spec.ts",
     "e2e/**/*.ts",
     "playwright.config.ts",
     "vitest.workspace.ts",
-    "src/**/__fixtures__/**",
-    "src/**/__mocks__/**",
     "src/**/__tests__/**"
   ]
 }

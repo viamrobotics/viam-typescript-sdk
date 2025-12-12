@@ -3,23 +3,23 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../client';
 import * as rpcModule from '../../rpc';
-import { createMockRobotServiceTransport } from '../__mocks__/robot-service';
+import { createMockRobotServiceTransport } from './mocks/robot-service';
 import {
   TEST_HOST,
   TEST_LOCAL_HOST,
   TEST_SIGNALING_ADDRESS,
-} from '../../__fixtures__/test-constants';
+} from '../../__tests__/fixtures/test-constants';
 import {
   baseDialConfig,
   TEST_DIAL_TIMEOUT_MS,
   TEST_MAX_RETRY_ATTEMPTS,
   TEST_TIMER_ADVANCE_MS,
-} from '../__fixtures__/dial-configs';
+} from './fixtures/dial-configs';
 import {
   createMockDataChannel,
   createMockPeerConnection,
-} from '../../__mocks__/webrtc';
-import * as errors from '../../__fixtures__/errors';
+} from '../../__tests__/mocks/webrtc';
+import * as errors from '../../__tests__/fixtures/errors';
 
 vi.mock('../../rpc', async () => {
   const actual = await vi.importActual('../../rpc');
@@ -482,7 +482,7 @@ describe('RobotClient', () => {
       dialWebRTCMock.mockImplementationOnce(async () => {
         return new Promise((_, reject) => {
           setTimeout(() => {
-            reject(errors.unavailableError);
+            reject(errors.createUnavailableError());
           }, TEST_DIAL_TIMEOUT_MS);
         });
       });
@@ -553,7 +553,7 @@ describe('RobotClient', () => {
         .mockImplementation(async () => {
           return new Promise((_, reject) => {
             setTimeout(() => {
-              reject(errors.unavailableError);
+              reject(errors.createUnavailableError());
             }, TEST_DIAL_TIMEOUT_MS);
           });
         });
@@ -583,26 +583,41 @@ describe('RobotClient', () => {
   describe('retry logic on error', () => {
     describe('dial() - non-retryable errors', () => {
       it.each([
-        { error: errors.canceledError, description: 'Canceled' },
-        { error: errors.invalidArgumentError, description: 'InvalidArgument' },
-        { error: errors.notFoundError, description: 'NotFound' },
-        { error: errors.alreadyExistsError, description: 'AlreadyExists' },
+        { error: errors.createCanceledError(), description: 'Canceled' },
         {
-          error: errors.permissionDeniedError,
+          error: errors.createInvalidArgumentError(),
+          description: 'InvalidArgument',
+        },
+        { error: errors.createNotFoundError(), description: 'NotFound' },
+        {
+          error: errors.createAlreadyExistsError(),
+          description: 'AlreadyExists',
+        },
+        {
+          error: errors.createPermissionDeniedError(),
           description: 'PermissionDenied',
         },
         {
-          error: errors.failedPreconditionError,
+          error: errors.createFailedPreconditionError(),
           description: 'FailedPrecondition',
         },
-        { error: errors.outOfRangeError, description: 'OutOfRange' },
-        { error: errors.unimplementedError, description: 'Unimplemented' },
-        { error: errors.unauthenticatedError, description: 'Unauthenticated' },
+        { error: errors.createOutOfRangeError(), description: 'OutOfRange' },
         {
-          error: errors.configurationError,
+          error: errors.createUnimplementedError(),
+          description: 'Unimplemented',
+        },
+        {
+          error: errors.createUnauthenticatedError(),
+          description: 'Unauthenticated',
+        },
+        {
+          error: errors.createConfigurationError(),
           description: 'configuration error',
         },
-        { error: errors.cannotDialError, description: 'cannot dial error' },
+        {
+          error: errors.createCannotDialError(),
+          description: 'cannot dial error',
+        },
       ])('should not retry on $description', async ({ error }) => {
         // Arrange
         vi.useFakeTimers();
@@ -629,16 +644,16 @@ describe('RobotClient', () => {
 
     describe('dial() - retryable errors', () => {
       it.each([
-        { error: errors.unavailableError, description: 'Unavailable' },
+        { error: errors.createUnavailableError(), description: 'Unavailable' },
         {
-          error: errors.deadlineExceededError,
+          error: errors.createDeadlineExceededError(),
           description: 'DeadlineExceeded',
         },
-        { error: errors.abortedError, description: 'Aborted' },
-        { error: errors.internalError, description: 'Internal' },
-        { error: errors.unknownError, description: 'Unknown' },
-        { error: errors.networkError, description: 'network error' },
-        { error: errors.timeoutError, description: 'timeout error' },
+        { error: errors.createAbortedError(), description: 'Aborted' },
+        { error: errors.createInternalError(), description: 'Internal' },
+        { error: errors.createUnknownError(), description: 'Unknown' },
+        { error: errors.createNetworkError(), description: 'network error' },
+        { error: errors.createTimeoutError(), description: 'timeout error' },
       ])(
         'should retry on $description up to max attempts',
         async ({ error }) => {
@@ -680,8 +695,8 @@ describe('RobotClient', () => {
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
-          .mockRejectedValueOnce(errors.unavailableError)
-          .mockRejectedValueOnce(errors.unavailableError)
+          .mockRejectedValueOnce(errors.createUnavailableError())
+          .mockRejectedValueOnce(errors.createUnavailableError())
           .mockResolvedValueOnce({
             transport: createMockRobotServiceTransport(),
             peerConnection: createMockPeerConnection(),
@@ -705,23 +720,35 @@ describe('RobotClient', () => {
 
     describe('reconnection - non-retryable errors', () => {
       it.each([
-        { error: errors.canceledError, description: 'Canceled' },
-        { error: errors.invalidArgumentError, description: 'InvalidArgument' },
-        { error: errors.notFoundError, description: 'NotFound' },
-        { error: errors.alreadyExistsError, description: 'AlreadyExists' },
+        { error: errors.createCanceledError(), description: 'Canceled' },
         {
-          error: errors.permissionDeniedError,
+          error: errors.createInvalidArgumentError(),
+          description: 'InvalidArgument',
+        },
+        { error: errors.createNotFoundError(), description: 'NotFound' },
+        {
+          error: errors.createAlreadyExistsError(),
+          description: 'AlreadyExists',
+        },
+        {
+          error: errors.createPermissionDeniedError(),
           description: 'PermissionDenied',
         },
         {
-          error: errors.failedPreconditionError,
+          error: errors.createFailedPreconditionError(),
           description: 'FailedPrecondition',
         },
-        { error: errors.outOfRangeError, description: 'OutOfRange' },
-        { error: errors.unimplementedError, description: 'Unimplemented' },
-        { error: errors.unauthenticatedError, description: 'Unauthenticated' },
+        { error: errors.createOutOfRangeError(), description: 'OutOfRange' },
         {
-          error: errors.configurationError,
+          error: errors.createUnimplementedError(),
+          description: 'Unimplemented',
+        },
+        {
+          error: errors.createUnauthenticatedError(),
+          description: 'Unauthenticated',
+        },
+        {
+          error: errors.createConfigurationError(),
           description: 'configuration error',
         },
       ])('should not retry reconnection on $description', async ({ error }) => {
@@ -779,14 +806,14 @@ describe('RobotClient', () => {
 
     describe('reconnection - retryable errors', () => {
       it.each([
-        { error: errors.unavailableError, description: 'Unavailable' },
+        { error: errors.createUnavailableError(), description: 'Unavailable' },
         {
-          error: errors.deadlineExceededError,
+          error: errors.createDeadlineExceededError(),
           description: 'DeadlineExceeded',
         },
-        { error: errors.abortedError, description: 'Aborted' },
-        { error: errors.internalError, description: 'Internal' },
-        { error: errors.unknownError, description: 'Unknown' },
+        { error: errors.createAbortedError(), description: 'Aborted' },
+        { error: errors.createInternalError(), description: 'Internal' },
+        { error: errors.createUnknownError(), description: 'Unknown' },
       ])(
         'should retry reconnection on $description error',
         async ({ error }) => {
@@ -869,9 +896,9 @@ describe('RobotClient', () => {
             peerConnection: createMockPeerConnection(),
             dataChannel,
           })
-          .mockRejectedValueOnce(errors.unavailableError)
-          .mockRejectedValueOnce(errors.unavailableError)
-          .mockRejectedValueOnce(errors.unavailableError)
+          .mockRejectedValueOnce(errors.createUnavailableError())
+          .mockRejectedValueOnce(errors.createUnavailableError())
+          .mockRejectedValueOnce(errors.createUnavailableError())
           .mockResolvedValueOnce({
             transport: createMockRobotServiceTransport(),
             peerConnection: createMockPeerConnection(),
@@ -910,11 +937,11 @@ describe('RobotClient', () => {
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
-          .mockRejectedValue(errors.unavailableError);
+          .mockRejectedValue(errors.createUnavailableError());
 
         const dialDirectMock = vi
           .mocked(rpcModule.dialDirect)
-          .mockRejectedValue(errors.permissionDeniedError);
+          .mockRejectedValue(errors.createPermissionDeniedError());
 
         // Act
         const dialPromise = client.dial({
@@ -947,11 +974,11 @@ describe('RobotClient', () => {
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
-          .mockRejectedValue(errors.unavailableError);
+          .mockRejectedValue(errors.createUnavailableError());
 
         const dialDirectMock = vi
           .mocked(rpcModule.dialDirect)
-          .mockRejectedValue(errors.unavailableError);
+          .mockRejectedValue(errors.createUnavailableError());
 
         // Act
         const dialPromise = client.dial({

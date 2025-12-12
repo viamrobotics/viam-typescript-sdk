@@ -1,8 +1,8 @@
 import {
   TEST_HOST,
   TEST_SIGNALING_ADDRESS,
-} from '../../__fixtures__/test-constants';
-import type { DialConf } from '../../main';
+} from '../../../__tests__/fixtures/test-constants';
+import type { DialConf } from '../../../main';
 
 export const baseDialConfig: DialConf = {
   host: TEST_HOST,

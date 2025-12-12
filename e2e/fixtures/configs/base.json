@@ -5,18 +5,20 @@
   },
   "components": [
     {
-      "name": "base1",
-      "type": "base",
+      "name": "fake_arm",
+      "type": "arm",
       "model": "fake"
     },
     {
-      "name": "servo1",
-      "type": "servo",
+      "name": "fake_camera",
+      "type": "camera",
       "model": "fake"
-    },
+    }
+  ],
+  "services": [
     {
-      "name": "motor1",
-      "type": "motor",
+      "name": "fake_vision",
+      "type": "vision",
       "model": "fake"
     }
   ]
