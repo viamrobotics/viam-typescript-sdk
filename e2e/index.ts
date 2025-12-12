@@ -74,7 +74,6 @@ const setOutput = (data: unknown) => {
   }
 
   outputEl.textContent = JSON.stringify(data, null, 2);
-  outputEl.dataset.hasOutput = 'true';
 };
 
 const clearOutput = () => {
@@ -83,7 +82,6 @@ const clearOutput = () => {
   }
 
   outputEl.textContent = 'No output yet';
-  outputEl.dataset.hasOutput = 'false';
 };
 
 const setError = (error: Error) => {
@@ -160,7 +158,8 @@ const callAPI = async <T, K extends keyof T>(
 
   try {
     const result = await clientFunc.apply(apiClient, args);
-    setOutput(result);
+    // For void-returning methods, output success indicator
+    setOutput(result ?? { success: true });
   } catch (error) {
     setError(error as Error);
   }

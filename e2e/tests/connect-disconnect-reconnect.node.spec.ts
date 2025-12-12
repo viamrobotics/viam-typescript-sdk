@@ -63,10 +63,8 @@ describe('Connect, Disconnect, and Reconnect', () => {
       // Expected to fail - ignore the error
     });
 
-    // Wait for the first dial attempt to start instead of arbitrary timeout
-    await waitForDialingEvent(client);
-
     // Act
+    await waitForDialingEvent(client);
     await client.dial(defaultNodeConfig);
     await invalidDialPromise;
 

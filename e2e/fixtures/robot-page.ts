@@ -1,5 +1,5 @@
 import { test as base, type Page } from '@playwright/test';
-import type { ResolvedReturnType } from '../helpers/api-types';
+import type { OutputType, ResolvedReturnType } from '../helpers/api-types';
 
 export class RobotPage {
   constructor(private readonly page: Page) {}
@@ -62,14 +62,20 @@ export class RobotPage {
     await locator.waitFor({ timeout: 10_000 });
   }
 
-  async getOutput<T, K extends keyof T>(): Promise<ResolvedReturnType<T[K]>> {
-    // Wait for the output to be updated by checking for the data-has-output attribute
-    await this.page.waitForSelector('[data-output][data-has-output="true"]', {
+  async getOutput<T, K extends keyof T>(): Promise<
+    OutputType<ResolvedReturnType<T[K]>>
+  > {
+    // Wait for output to be updated (not the default "No output yet" text)
+    const outputEl = this.page.locator('[data-output]');
+    await outputEl.filter({ hasNotText: 'No output yet' }).waitFor({
       timeout: 30_000,
     });
-    const outputEl = this.page.locator('[data-output]');
     const text = await outputEl.textContent();
-    return JSON.parse(text ?? '{}') as ResolvedReturnType<T[K]>;
+    if (text === null || text === '') {
+      throw new Error('No output found');
+    }
+
+    return JSON.parse(text) as OutputType<ResolvedReturnType<T[K]>>;
   }
 
   async getResourceNames() {
@@ -92,8 +98,8 @@ export class RobotPage {
     await this.page.click(`[data-arm-api="getJointPositions"]`);
   }
 
-  async moveToPosition() {
-    await this.page.click(`[data-arm-api="moveToPosition"]`);
+  async moveToJointPositions() {
+    await this.page.click(`[data-arm-api="moveToJointPositions"]`);
   }
 
   async getCameraProperties() {
