@@ -19,7 +19,11 @@ export interface Video extends Resource {
    * );
    *
    * for await (const chunk of videoStream) {
-   *   console.log('Received video chunk:', chunk.videoData.length, 'bytes');
+   *   console.log(
+   *     'Received video chunk:',
+   *     chunk.videoData.length,
+   *     'bytes'
+   *   );
    * }
    * ```
    *
