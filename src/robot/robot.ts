@@ -1,10 +1,19 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import { MachineConnectionEvent } from '../events';
-import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
 import * as proto from '../gen/robot/v1/robot_pb';
-import type { ResourceName } from '../types';
+import type { PoseInFrame, ResourceName, Transform } from '../types';
 
-export type CloudMetadata = proto.GetCloudMetadataResponse;
+export type CloudMetadata = PlainMessage<proto.GetCloudMetadataResponse>;
+export type ConfigStatus = PlainMessage<proto.ConfigStatus>;
+export type FrameSystemConfig = PlainMessage<proto.FrameSystemConfig>;
+export type JobStatus = PlainMessage<proto.JobStatus>;
+export type MachineStatus = PlainMessage<proto.GetMachineStatusResponse>;
+export type MachineStatusState = proto.GetMachineStatusResponse_State;
+export type ModuleModel = PlainMessage<proto.ModuleModel>;
+export type ResourceRPCSubtype = PlainMessage<proto.ResourceRPCSubtype>;
+export type ResourceStatus = PlainMessage<proto.ResourceStatus>;
+export type Session = PlainMessage<proto.Session>;
+export type Operation = PlainMessage<proto.Operation>;
 
 type Callback = (args: unknown) => void;
 
@@ -21,7 +30,7 @@ export interface Robot {
    * @group Sessions
    * @alpha
    */
-  getSessions(): Promise<proto.Session[]>;
+  getSessions(): Promise<Session[]>;
 
   /**
    * Get the list of operations currently running on the machine.
@@ -35,7 +44,7 @@ export interface Robot {
    * @group Operations
    * @alpha
    */
-  getOperations(): Promise<proto.Operation[]>;
+  getOperations(): Promise<Operation[]>;
 
   /**
    * Cancels the specified operation on the machine.
@@ -97,7 +106,7 @@ export interface Robot {
    * @group Frame System
    * @alpha
    */
-  frameSystemConfig(transform: Transform[]): Promise<proto.FrameSystemConfig[]>;
+  frameSystemConfig(transform: Transform[]): Promise<FrameSystemConfig[]>;
 
   /**
    * Transform a given source Pose from the reference frame to a new specified
@@ -149,7 +158,7 @@ export interface Robot {
    * @group Resources
    * @alpha
    */
-  getModelsFromModules(): Promise<proto.ModuleModel[]>;
+  getModelsFromModules(): Promise<ModuleModel[]>;
 
   /**
    * Get a list of all resources on the machine.
@@ -177,7 +186,7 @@ export interface Robot {
    * @group Resources
    * @alpha
    */
-  resourceRPCSubtypes(): Promise<proto.ResourceRPCSubtype[]>;
+  resourceRPCSubtypes(): Promise<ResourceRPCSubtype[]>;
 
   /**
    * Call a function when a connection event occurs.
@@ -222,7 +231,7 @@ export interface Robot {
    *
    * @alpha
    */
-  getMachineStatus(): Promise<proto.GetMachineStatusResponse>;
+  getMachineStatus(): Promise<MachineStatus>;
 
   /**
    * Restarts a module running on the machine with the given id or name.
