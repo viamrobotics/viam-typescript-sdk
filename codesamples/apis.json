@@ -5,6 +5,18 @@
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM"
   },
+   "audioin": {
+    "importName": "AudioInClient",
+    "func": "getProperties",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
+  "audioout": {
+    "importName": "AudioOutClient",
+    "func": "getProperties",
+    "packagePath": "@viamrobotics/sdk",
+    "packageName": "VIAM"
+  },
   "base": {
     "importName": "BaseClient",
     "func": "isMoving",
