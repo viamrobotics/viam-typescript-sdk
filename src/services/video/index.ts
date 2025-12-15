@@ -1,3 +1,3 @@
 export { VideoClient } from './client';
 export type { Video } from './video';
-export type { GetVideoOptions, VideoChunk } from './types';
+export type { VideoChunk } from './types';

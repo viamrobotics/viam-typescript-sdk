@@ -5,7 +5,7 @@ import { GetVideoRequest } from '../../gen/service/video/v1/video_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
-import type { GetVideoOptions, VideoChunk } from './types';
+import type { VideoChunk } from './types';
 import type { Video } from './video';
 
 /** Convert a Date to a protobuf Timestamp. */
@@ -36,20 +36,21 @@ export class VideoClient implements Video {
   }
 
   async *getVideo(
-    videoOptions: GetVideoOptions,
+    startTimestamp?: Date,
+    endTimestamp?: Date,
+    videoCodec = '',
+    videoContainer = '',
     extra = {},
     callOptions = this.callOptions
   ): AsyncIterable<VideoChunk> {
     const request = new GetVideoRequest({
       name: this.name,
-      startTimestamp: videoOptions.startTimestamp
-        ? dateToTimestamp(videoOptions.startTimestamp)
+      startTimestamp: startTimestamp
+        ? dateToTimestamp(startTimestamp)
         : undefined,
-      endTimestamp: videoOptions.endTimestamp
-        ? dateToTimestamp(videoOptions.endTimestamp)
-        : undefined,
-      videoCodec: videoOptions.videoCodec ?? '',
-      videoContainer: videoOptions.videoContainer ?? '',
+      endTimestamp: endTimestamp ? dateToTimestamp(endTimestamp) : undefined,
+      videoCodec,
+      videoContainer,
       requestId: generateUUID(),
       extra: Struct.fromJson(extra),
     });

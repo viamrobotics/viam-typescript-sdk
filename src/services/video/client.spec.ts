@@ -45,12 +45,12 @@ describe('VideoClient Tests', () => {
 
       const streamPromise = (async () => {
         const chunks = [];
-        for await (const chunk of video.getVideo({
-          startTimestamp: new Date('2025-01-01T00:00:00Z'),
-          endTimestamp: new Date('2025-01-01T00:10:00Z'),
-          videoCodec: 'h264',
-          videoContainer: 'mp4',
-        })) {
+        for await (const chunk of video.getVideo(
+          new Date('2025-01-01T00:00:00Z'),
+          new Date('2025-01-01T00:10:00Z'),
+          'h264',
+          'mp4'
+        )) {
           chunks.push(chunk);
         }
         return chunks;
@@ -86,7 +86,7 @@ describe('VideoClient Tests', () => {
     it('handles empty stream', async () => {
       const streamPromise = (async () => {
         const chunks = [];
-        for await (const chunk of video.getVideo({})) {
+        for await (const chunk of video.getVideo()) {
           chunks.push(chunk);
         }
         return chunks;
