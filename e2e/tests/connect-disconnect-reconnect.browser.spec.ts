@@ -29,31 +29,27 @@ withRobot.describe('Connect, Disconnect, and Reconnect', () => {
       await robotPage.ensureReady();
 
       // Act
-      await robotPage.clickButton('connect-invalid-btn');
+      await robotPage.connectInvalid();
 
       // Assert
       await robotPage.waitForDialing();
-      await robotPage.waitForFirstDialingAttempt();
-      await robotPage.waitForSubsequentDialingAttempts();
+      await robotPage.waitForDialingAttempt(true);
+      await robotPage.waitForDialingAttempt(false);
 
       // Act
-      await robotPage.clickButton('connect-invalid-btn');
+      await robotPage.connectInvalid();
 
       // Assert
       await robotPage.waitForDialing();
-      await robotPage.waitForFirstDialingAttempt();
-      await robotPage.waitForSubsequentDialingAttempts();
+      await robotPage.waitForDialingAttempt(true);
+      await robotPage.waitForDialingAttempt(false);
 
       // Act
-      await robotPage.clickButton('connect-btn');
-      await robotPage.getPage().waitForTimeout(500);
+      await robotPage.connect();
 
       // Assert
-      const connectionStatus = await robotPage.getConnectionStatus();
-      const dialingStatus = await robotPage.getDialingStatus();
-
-      expect(connectionStatus).toBe('Connected');
-      expect(dialingStatus).toBe('');
+      expect(await robotPage.getConnectionStatus()).toBe('Connected');
+      expect(await robotPage.getDialingStatus()).toBe('');
     }
   );
 });

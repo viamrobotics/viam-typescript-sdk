@@ -19,14 +19,14 @@ import {
   withCredentials,
   withSignalingAccessToken,
   withSignalingCredentials,
-} from '../__fixtures__/dial-options';
+} from './fixtures/dial-options';
 
 import {
   createMockPeerConnection,
   createMockDataChannel,
-} from '../../__mocks__/webrtc';
-import { withICEServers } from '../__fixtures__/dial-webrtc-options';
-import { createMockTransport } from '../../__mocks__/transports';
+} from '../../__tests__/mocks/webrtc';
+import { withICEServers } from './fixtures/dial-webrtc-options';
+import { createMockTransport } from '../../__tests__/mocks/transports';
 import { ClientChannel } from '../client-channel';
 import type { Transport } from '@connectrpc/connect';
 
