@@ -36,4 +36,25 @@ describe('Arm API Tests', () => {
     expect(jointPositions.values).toBeDefined();
     expect(Array.isArray(jointPositions.values)).toBe(true);
   });
+
+  it('should move arm to joint positions and verify new joint state', async () => {
+    // Act - Get initial joint positions
+    const initialJoints = await arm.getJointPositions();
+
+    // Assert - Verify initial joint positions (fake arm starts at 0)
+    expect(initialJoints).toEqual({
+      values: [0],
+    });
+
+    // Act - Move to new joint position (45 degrees)
+    await arm.moveToJointPositions([45]);
+
+    // Act - Get joint positions after move
+    const movedJoints = await arm.getJointPositions();
+
+    // Assert - Verify joint position changed to 45 degrees
+    expect(movedJoints).toEqual({
+      values: [45],
+    });
+  });
 });

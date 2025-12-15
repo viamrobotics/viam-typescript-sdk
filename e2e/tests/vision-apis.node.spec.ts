@@ -37,4 +37,24 @@ describe('Vision API Tests', () => {
     // Assert - Should return an array of detections
     expect(detections.length).toBeGreaterThan(0);
   });
+
+  it('should capture all from camera', async () => {
+    // Act
+    const captureAll = await vision.captureAllFromCamera('fake_camera', {
+      returnImage: true,
+      returnClassifications: true,
+      returnDetections: true,
+      returnObjectPointClouds: true,
+    });
+
+    // Assert - Verify capture all structure
+    expect(captureAll).toEqual(
+      expect.objectContaining({
+        image: expect.any(Object),
+        classifications: expect.any(Array),
+        detections: expect.any(Array),
+        objectPointClouds: expect.any(Array),
+      })
+    );
+  });
 });
