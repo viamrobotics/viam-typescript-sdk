@@ -5,4 +5,4 @@ export {
   type DialWebRTCConf,
 } from './robot/client';
 export { createRobotClient } from './robot/dial';
-export type { CloudMetadata, Robot } from './robot/robot';
+export * from './robot/robot';
