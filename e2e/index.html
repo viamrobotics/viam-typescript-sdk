@@ -7,88 +7,30 @@
       content="width=device-width, initial-scale=1.0"
     />
     <title>E2E Harness</title>
-    <style>
-      body {
-        font-family: system-ui;
-        padding: 16px;
-        max-width: 800px;
-        margin: 0 auto;
-      }
-      h2 {
-        margin-top: 24px;
-        color: #333;
-      }
-      .button-group {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin: 8px 0;
-      }
-      button {
-        padding: 4px 8px;
-        font-size: 12px;
-        cursor: pointer;
-        background: rgb(244, 244, 244);
-        color: black;
-        border: 1px solid black;
-      }
-      button:hover {
-        background: rgb(234, 234, 234);
-      }
-      button:active {
-        background: rgb(224, 224, 224);
-        transform: translateY(1px);
-      }
-      [data-testid='connection-status'] {
-        padding: 8px;
-        font-weight: bold;
-        border-left: 4px solid black;
-        background: rgb(244, 244, 244);
-        height: 20px;
-      }
-      [data-testid='dialing-status'] {
-        padding: 8px;
-        border-left: 4px solid black;
-        background: rgb(244, 244, 244);
-        font-style: italic;
-        font-size: 12px;
-        height: 14px;
-      }
-      [data-testid='output'] {
-        background: rgb(244, 244, 244);
-        color: black;
-        padding: 8px;
-        border-radius: 4px;
-        overflow-x: auto;
-        min-height: 100px;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-      }
-    </style>
   </head>
   <body>
     <h1>E2E Test Harness</h1>
-    <div data-testid="connection-status"></div>
-    <div data-testid="dialing-status"></div>
+    <div data-connection-status></div>
+    <div data-dialing-status></div>
 
     <h2>Connection Controls</h2>
     <div class="button-group">
       <button
         id="connect-btn"
-        data-testid="connect-btn"
+        data-connect
       >
         Connect
       </button>
       <button
         id="disconnect-btn"
-        data-testid="disconnect-btn"
+        data-disconnect
         disabled
       >
         Disconnect
       </button>
       <button
         id="connect-invalid-btn"
-        data-testid="connect-invalid-btn"
+        data-connect-invalid
       >
         Connect Invalid
       </button>
@@ -109,75 +51,81 @@
         Get Machine Status
       </button>
       <button
-        data-robot-api="getSessions"
-        disabled
-      >
-        Get Sessions
-      </button>
-      <button
-        data-robot-api="getOperations"
-        disabled
-      >
-        Get Operations
-      </button>
-      <button
-        data-robot-api="stopAll"
-        disabled
-      >
-        Stop All
-      </button>
-      <button
-        data-robot-api="getModelsFromModules"
-        disabled
-      >
-        Get Models From Modules
-      </button>
-      <button
-        data-robot-api="resourceRPCSubtypes"
-        disabled
-      >
-        Get Resource RPC Subtypes
-      </button>
-      <button
-        data-robot-api="getCloudMetadata"
-        disabled
-      >
-        Get Cloud Metadata
-      </button>
-      <button
         data-robot-api="getVersion"
         disabled
       >
         Get Version
       </button>
     </div>
-    <div class="input-group">
-      <input
-        type="text"
-        id="operation-id-input"
-        data-testid="operation-id-input"
-        placeholder="Operation ID"
-      />
+
+    <h2>Arm APIs</h2>
+    <div class="button-group">
       <button
-        data-robot-api="cancelOperation"
+        data-arm-api="getEndPosition"
         disabled
       >
-        Cancel Operation
+        Get End Position
       </button>
       <button
-        data-robot-api="blockForOperation"
+        data-arm-api="getJointPositions"
         disabled
       >
-        Block For Operation
+        Get Joint Positions
+      </button>
+      <button
+        data-arm-api="moveToJointPositions"
+        data-arm-api-args="[[45]]"
+        disabled
+      >
+        Move to Joint Positions
+      </button>
+    </div>
+
+    <h2>Camera APIs</h2>
+    <div class="button-group">
+      <button
+        data-camera-api="getProperties"
+        disabled
+      >
+        Get Properties
+      </button>
+      <button
+        data-camera-api="getImages"
+        disabled
+      >
+        Get Images
+      </button>
+    </div>
+
+    <h2>Vision APIs</h2>
+    <div class="button-group">
+      <button
+        data-vision-api="getProperties"
+        disabled
+      >
+        Get Properties
+      </button>
+      <button
+        data-vision-api="getDetectionsFromCamera"
+        disabled
+      >
+        Get Detections From Camera
+      </button>
+      <button
+        data-vision-api="captureAllFromCamera"
+        data-vision-api-args='["fake_camera", {"returnImage": true, "returnClassifications": true, "returnDetections": true, "returnObjectPointClouds": true}]'
+        disabled
+      >
+        Capture All From Camera
       </button>
     </div>
 
     <h2>Output</h2>
-    <pre data-testid="output">No output yet</pre>
+    <pre data-output>No output yet</pre>
 
     <script
       type="module"
-      src="/src/main.ts"
+      src="/index.ts"
     ></script>
   </body>
 </html>

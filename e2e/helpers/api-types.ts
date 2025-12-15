@@ -7,3 +7,7 @@ export type ResolvedReturnType<T> = T extends (
 ) => Promise<infer R>
   ? R
   : never;
+
+/** Transforms void return types to { success: boolean } for test output */
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+export type OutputType<T> = [T] extends [void] ? { success: boolean } : T;
