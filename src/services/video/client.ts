@@ -61,11 +61,7 @@ export class VideoClient implements Video {
 
     // Yield each video chunk as it arrives from the server stream
     for await (const response of stream) {
-      yield {
-        videoData: response.videoData,
-        videoContainer: response.videoContainer,
-        requestId: response.requestId,
-      };
+      yield response;
     }
   }
 
