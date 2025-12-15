@@ -29,7 +29,7 @@ export interface Gantry extends Resource {
    *
    * ```ts
    * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
-   * 
+   *
    * // Get the kinematics information associated with the gantry
    * const kinematics = await gantry.getKinematics();
    * ```
@@ -50,7 +50,7 @@ export interface Gantry extends Resource {
     }[];
     links: Frame[];
   }>;
-  
+
   /**
    * Move each axis of the gantry to the positionsMm at the speeds in
    * speedsMmPerSec.
