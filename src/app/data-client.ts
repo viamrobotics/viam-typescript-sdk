@@ -478,20 +478,22 @@ export class DataClient {
    * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyids).
    *
    * @param ids The IDs of the requested binary data
+   * @param includeBinary Whether to include binary file data with each
+   *   retrieved file
    * @returns An array of data objects
    */
-  async binaryDataByIds(ids: string[] | BinaryID[]) {
+  async binaryDataByIds(ids: string[] | BinaryID[], includeBinary = true) {
     if (Array.isArray(ids) && typeof ids[0] === 'string') {
       const resp = await this.dataClient.binaryDataByIDs({
         binaryDataIds: ids as string[],
-        includeBinary: true,
+        includeBinary,
       });
       return resp.data;
     }
     logDeprecationWarning();
     const resp = await this.dataClient.binaryDataByIDs({
       binaryIds: ids as BinaryID[],
-      includeBinary: true,
+      includeBinary,
     });
     return resp.data;
   }
