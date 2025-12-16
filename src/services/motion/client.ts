@@ -172,6 +172,7 @@ export class MotionClient implements Motion {
     return this.client.listPlanStatuses(request, callOptions);
   }
 
+  /** @deprecated Use `RobotClient.getPose` instead. */
   async getPose(
     componentName: string,
     destinationFrame: string,

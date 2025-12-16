@@ -280,6 +280,7 @@ export interface Motion extends Resource {
   /**
    * Get the current location and orientation of a component.
    *
+   * @deprecated Use `RobotClient.getPose` instead.
    * @example
    *
    * ```ts
