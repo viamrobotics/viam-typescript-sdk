@@ -42,13 +42,12 @@ export interface Vision extends Resource {
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const vision = new VIAM.VisionClient(machine, 'my_vision');
    *
-   * const mimeType = 'image/jpeg';
-   * const image = await camera.getImage(mimeType);
+   * const { images } = await camera.getImages();
    * const detections = await vision.getDetections(
-   *   image,
+   *   images[0].image,
    *   600,
    *   600,
-   *   mimeType
+   *   images[0].mimeType
    * );
    * ```
    *
@@ -104,13 +103,12 @@ export interface Vision extends Resource {
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const vision = new VIAM.VisionClient(machine, 'my_vision');
    *
-   * const mimeType = 'image/jpeg';
-   * const image = await camera.getImage(mimeType);
+   * const { images } = await camera.getImages();
    * const classifications = await vision.getClassifications(
-   *   image,
+   *   images[0].image,
    *   600,
    *   600,
-   *   mimeType,
+   *   images[0].mimeType,
    *   10
    * );
    * ```

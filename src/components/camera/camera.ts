@@ -49,40 +49,6 @@ export interface Camera extends Resource {
    *
    * ```ts
    * const camera = new VIAM.CameraClient(machine, 'my_camera');
-   * const image = await camera.getImage();
-   *
-   * // Convert Uint8Array to base64
-   * const base64Image = btoa(
-   *   Array.from(image)
-   *     .map((byte) => String.fromCharCode(byte))
-   *     .join('')
-   * );
-   *
-   * // Convert image to base64 and display it
-   * const imageElement = document.createElement('img');
-   * imageElement.src = `data:image/jpeg;base64,${base64Image}`;
-   * const imageContainer = document.getElementById('#imageContainer');
-   * if (imageContainer) {
-   *   imageContainer.innerHTML = '';
-   *   imageContainer.appendChild(imageElement);
-   * }
-   * ```
-   *
-   * For more information, see [Camera
-   * API](https://docs.viam.com/dev/reference/apis/components/camera/#getimage).
-   *
-   * @param mimeType - A specific MIME type to request. This is not necessarily
-   *   the same type that will be returned.
-   */
-  getImage: (mimeType?: MimeType, extra?: Struct) => Promise<Uint8Array>;
-
-  /**
-   * Return a frame from a camera.
-   *
-   * @example
-   *
-   * ```ts
-   * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const images = await camera.getImages();
    * ```
    *
@@ -96,25 +62,6 @@ export interface Camera extends Resource {
     filterSourceNames?: string[],
     extra?: Struct
   ) => Promise<{ images: NamedImage[]; metadata: ResponseMetadata }>;
-
-  /**
-   * Render a frame from a camera to an HTTP response.
-   *
-   * @example
-   *
-   * ```ts
-   * const camera = new VIAM.CameraClient(machine, 'my_camera');
-   * const mimeType = 'image/jpeg';
-   * const image = await camera.renderFrame(mimeType);
-   * ```
-   *
-   * For more information, see [Camera
-   * API](https://docs.viam.com/dev/reference/apis/components/camera/#renderframe).
-   *
-   * @param mimeType - A specific MIME type to request. This is not necessarily
-   *   the same type that will be returned.
-   */
-  renderFrame: (mimeType?: MimeType, extra?: Struct) => Promise<Blob>;
 
   /**
    * Return a point cloud from a camera.
