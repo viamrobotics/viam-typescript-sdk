@@ -1,4 +1,4 @@
-import type { DialWebRTCOptions } from '../dial';
+import type { DialWebRTCOptions } from '../../dial';
 
 export const withICEServers = {
   disableTrickleICE: false,

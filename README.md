@@ -6,11 +6,6 @@ Build and connect to robots with TypeScript
 [![npm](https://img.shields.io/npm/v/@viamrobotics/sdk?color=33cd56&logo=npm)](https://www.npmjs.com/package/@viamrobotics/sdk)
 [![documentation](https://img.shields.io/static/v1?label=docs&message=ts.viam.dev&color=lightgray)](https://ts.viam.dev)
 
-## (In)stability Notice
-
-> **Warning**
-> This is a beta release of the Viam TypeScript SDK. Stability is not guaranteed. Breaking changes are likely to occur, and occur often.
-
 ## Usage
 
 ### Installation

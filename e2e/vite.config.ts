@@ -19,5 +19,6 @@ export default defineConfig({
     setupFiles: ['./e2e/helpers/node-setup.ts'],
     environment: 'node',
     teardownTimeout: 10_000,
+    fileParallelism: false,
   },
 });

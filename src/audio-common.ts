@@ -12,7 +12,7 @@ export const AudioCodec = {
   MP3: 'mp3',
   PCM16: 'pcm16',
   PCM32: 'pcm32',
-  PCM32_FLOAT: 'pcm32float',
+  PCM32_FLOAT: 'pcm32_float',
   AAC: 'aac',
   OPUS: 'opus',
   FLAC: 'flac',

@@ -26,6 +26,7 @@ import { ServoService } from '../gen/component/servo/v1/servo_connect';
 import { RobotService } from '../gen/robot/v1/robot_connect';
 import {
   GetModelsFromModulesRequest,
+  GetPoseRequest,
   RestartModuleRequest,
   TransformPCDRequest,
   TransformPoseRequest,
@@ -1206,5 +1207,25 @@ export class RobotClient extends EventDispatcher implements Robot {
       request.idOrName.value = moduleName;
     }
     await this.robotService.restartModule(request);
+  }
+
+  // GET POSE
+
+  async getPose(
+    componentName: string,
+    destinationFrame: string,
+    supplementalTransforms: Transform[]
+  ) {
+    const request = new GetPoseRequest({
+      componentName,
+      destinationFrame,
+      supplementalTransforms,
+    });
+    const response = await this.robotService.getPose(request);
+    const result = response.pose;
+    if (!result) {
+      throw new Error('no pose');
+    }
+    return result;
   }
 }

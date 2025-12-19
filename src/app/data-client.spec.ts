@@ -545,6 +545,16 @@ describe('DataClient tests', () => {
       expect(capReq).toStrictEqual(expectedRequest);
     });
 
+    it('get binary data by binary data id with includeBinary false', async () => {
+      const expectedRequest = new BinaryDataByIDsRequest({
+        binaryDataIds: [binaryDataId1],
+        includeBinary: false,
+      });
+
+      await subject().binaryDataByIds([binaryDataId1], false);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
     it('get binary data by id', async () => {
       const expectedRequest = new BinaryDataByIDsRequest({
         binaryIds: [binaryId1],
@@ -552,6 +562,16 @@ describe('DataClient tests', () => {
       });
 
       await subject().binaryDataByIds([binaryId1]);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
+    it('get binary data by id with includeBinary false', async () => {
+      const expectedRequest = new BinaryDataByIDsRequest({
+        binaryIds: [binaryId1],
+        includeBinary: false,
+      });
+
+      await subject().binaryDataByIds([binaryId1], false);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
