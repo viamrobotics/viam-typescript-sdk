@@ -141,6 +141,17 @@ describe('AppClient tests', () => {
     name: 'name',
   });
 
+  const fragmentImport = new pb.FragmentImport({
+    fragmentId: 'fragId1',
+    version: 'v1.0.0',
+    prefix: 'my_prefix',
+    variables: { key1: 'value1', key2: 'value2' },
+  });
+
+  const fragmentImportList = new pb.FragmentImportList({
+    imports: [fragmentImport],
+  });
+
   describe('getUserIDByEmail tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
@@ -289,10 +300,13 @@ describe('AppClient tests', () => {
   });
 
   describe('updateOrganization tests', () => {
+    let capturedReq: pb.UpdateOrganizationRequest | undefined;
+
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          updateOrganization: () => {
+          updateOrganization: (req) => {
+            capturedReq = req;
             return new pb.UpdateOrganizationResponse({
               organization: org,
             });
@@ -301,15 +315,33 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('updateOrganization', async () => {
+    it('updateOrganization with all parameters including fragment imports', async () => {
       const response = await subject().updateOrganization(
         'id',
         'name',
         'namespace',
         'region',
-        'cid'
+        'cid',
+        [fragmentImport]
       );
       expect(response).toEqual(org);
+      expect(capturedReq?.organizationId).toEqual('id');
+      expect(capturedReq?.name).toEqual('name');
+      expect(capturedReq?.publicNamespace).toEqual('namespace');
+      expect(capturedReq?.region).toEqual('region');
+      expect(capturedReq?.cid).toEqual('cid');
+      expect(capturedReq?.fragmentImports).toEqual(fragmentImportList);
+    });
+
+    it('updateOrganization with only required parameters and no fragment imports', async () => {
+      const response = await subject().updateOrganization('id');
+      expect(response).toEqual(org);
+      expect(capturedReq?.organizationId).toEqual('id');
+      expect(capturedReq?.name).toBeUndefined();
+      expect(capturedReq?.publicNamespace).toBeUndefined();
+      expect(capturedReq?.region).toBeUndefined();
+      expect(capturedReq?.cid).toBeUndefined();
+      expect(capturedReq?.fragmentImports).toBeUndefined();
     });
   });
 

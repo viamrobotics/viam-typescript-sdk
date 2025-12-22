@@ -11,15 +11,19 @@ import {
   CreateKeyResponse,
   CreateModuleResponse,
   Fragment,
+  FragmentImport,
+  FragmentImportList,
   FragmentVisibility,
   GetAppContentResponse,
   GetAppBrandingResponse,
   GetRobotPartLogsResponse,
   GetRobotPartResponse,
   GetRobotPartByNameAndLocationResponse,
+  ListMachineSummariesRequest,
   ListOrganizationMembersResponse,
   Location,
   LocationAuth,
+  LocationSummary,
   Model,
   Module,
   Organization,
@@ -34,8 +38,6 @@ import {
   RotateKeyResponse,
   RoverRentalRobot,
   Visibility,
-  ListMachineSummariesRequest,
-  LocationSummary,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -286,6 +288,7 @@ export class AppClient {
    * @param publicNamespace Optional namespace to update the organization with
    * @param region Optional region to update the organization with
    * @param cid Optional CRM ID to update the organization with
+   * @param fragmentImports Optional list of fragment imports to update the organization with
    * @returns The updated organization details
    */
   async updateOrganization(
@@ -293,7 +296,8 @@ export class AppClient {
     name?: string,
     publicNamespace?: string,
     region?: string,
-    cid?: string
+    cid?: string,
+    fragmentImports?: FragmentImport[]
   ): Promise<Organization | undefined> {
     const resp = await this.client.updateOrganization({
       organizationId,
@@ -301,6 +305,7 @@ export class AppClient {
       publicNamespace,
       region,
       cid,
+      fragmentImports: fragmentImports ? new FragmentImportList({ imports: fragmentImports }) : undefined,
     });
     return resp.organization;
   }
