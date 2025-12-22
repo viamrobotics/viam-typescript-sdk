@@ -6,7 +6,8 @@ import {
 import type { CallOptions } from '@connectrpc/connect';
 import { apiVersion } from './api-version';
 import { DoCommandRequest, DoCommandResponse, GetKinematicsRequest, GetKinematicsResponse, GetGeometriesRequest, GetGeometriesResponse, Geometry } from './gen/common/v1/common_pb';
-import type { Options } from './types';
+import type { Options, Vector3 } from './types';
+import type { Frame } from './gen/app/v1/robot_pb';
 
 export const clientHeaders = new Headers({
   'viam-client': `typescript;v${__VERSION__};${apiVersion}`,
@@ -84,18 +85,33 @@ export const deleteMetadata = (opts: CallOptions, key: string): void => {
   opts.headers = remainingHeaders;
 };
 
+/** Shared type for kinematics return value */
+export type KinematicsData = {
+  name: string;
+  kinematic_param_type: 'SVA' | 'URDF' | 'UNSPECIFIED';
+  joints: {
+    id: string;
+    type: string;
+    parent: string;
+    axis: Vector3;
+    max: number;
+    min: number;
+  }[];
+  links: Frame[];
+};
+
 type getKinematics = (
   request: PartialMessage<GetKinematicsRequest>,
   options?: CallOptions
 ) => Promise<GetKinematicsResponse>;
 
 /** Get kinematics information using a resource client */
-export const getKinematicsFromClient = async function getKinematicsFromClient<T>(
+export const getKinematicsFromClient = async function getKinematicsFromClient(
   getKinematicsMethod: getKinematics,
   name: string,
   extra: Struct = Struct.fromJson({}),
   callOptions: CallOptions = {}
-): Promise<T> {
+): Promise<KinematicsData> {
   const request = new GetKinematicsRequest({
     name,
     extra,
@@ -106,7 +122,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient<T>
   const decoder = new TextDecoder('utf8');
   const jsonString = decoder.decode(response.kinematicsData);
 
-  return JSON.parse(jsonString) as T;
+  return JSON.parse(jsonString) as KinematicsData;
 };
 
 type getGeometries = (

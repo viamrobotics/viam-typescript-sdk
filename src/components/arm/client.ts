@@ -54,7 +54,7 @@ export class ArmClient implements Arm {
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
     return getGeometriesFromClient(
-      this.client.getGeometries.bind(this.client),
+      this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
       callOptions
@@ -62,8 +62,8 @@ export class ArmClient implements Arm {
   }
 
   async getKinematics(extra = {}, callOptions = this.callOptions) {
-    return getKinematicsFromClient<ReturnType<Arm['getKinematics']>>(
-      this.client.getKinematics.bind(this.client),
+    return getKinematicsFromClient(
+      this.client.getKinematics,
       this.name,
       Struct.fromJson(extra),
       callOptions
