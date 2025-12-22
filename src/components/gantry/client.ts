@@ -11,7 +11,11 @@ import {
 } from '../../gen/component/gantry/v1/gantry_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient, getKinematicsFromClient, getGeometriesFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getKinematicsFromClient,
+  getGeometriesFromClient,
+} from '../../utils';
 import type { Gantry } from './gantry';
 
 /**

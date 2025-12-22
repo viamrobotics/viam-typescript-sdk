@@ -12,12 +12,13 @@ import {
 } from '../../gen/component/arm/v1/arm_pb';
 import type { RobotClient } from '../../robot';
 import type { Options, Pose } from '../../types';
-import { doCommandFromClient, getKinematicsFromClient, getGeometriesFromClient } from '../../utils';
-import type { Arm } from './arm';
 import {
-  Get3DModelsRequest,
-  Mesh,
-} from '../../gen/common/v1/common_pb';
+  doCommandFromClient,
+  getKinematicsFromClient,
+  getGeometriesFromClient,
+} from '../../utils';
+import type { Arm } from './arm';
+import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.

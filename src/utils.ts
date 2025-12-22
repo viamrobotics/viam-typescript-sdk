@@ -5,7 +5,15 @@ import {
 } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
 import { apiVersion } from './api-version';
-import { DoCommandRequest, DoCommandResponse, GetKinematicsRequest, GetKinematicsResponse, GetGeometriesRequest, GetGeometriesResponse, Geometry } from './gen/common/v1/common_pb';
+import {
+  DoCommandRequest,
+  DoCommandResponse,
+  GetKinematicsRequest,
+  GetKinematicsResponse,
+  GetGeometriesRequest,
+  GetGeometriesResponse,
+  Geometry,
+} from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
 import type { Frame } from './gen/app/v1/robot_pb';
 
@@ -86,7 +94,7 @@ export const deleteMetadata = (opts: CallOptions, key: string): void => {
 };
 
 /** Shared type for kinematics return value */
-export type KinematicsData = {
+export interface KinematicsData {
   name: string;
   kinematic_param_type: 'SVA' | 'URDF' | 'UNSPECIFIED';
   joints: {
@@ -98,7 +106,7 @@ export type KinematicsData = {
     min: number;
   }[];
   links: Frame[];
-};
+}
 
 type getKinematics = (
   request: PartialMessage<GetKinematicsRequest>,
@@ -145,4 +153,3 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
   const response = await getGeometriesMethod(request, callOptions);
   return response.geometries;
 };
-
