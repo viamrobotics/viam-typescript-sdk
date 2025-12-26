@@ -5,8 +5,17 @@ import {
 } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
 import { apiVersion } from './api-version';
-import { DoCommandRequest, DoCommandResponse } from './gen/common/v1/common_pb';
-import type { Options } from './types';
+import {
+  DoCommandRequest,
+  DoCommandResponse,
+  GetKinematicsRequest,
+  GetKinematicsResponse,
+  GetGeometriesRequest,
+  GetGeometriesResponse,
+  Geometry,
+} from './gen/common/v1/common_pb';
+import type { Options, Vector3 } from './types';
+import type { Frame } from './gen/app/v1/robot_pb';
 
 export const clientHeaders = new Headers({
   'viam-client': `typescript;v${__VERSION__};${apiVersion}`,
@@ -82,4 +91,65 @@ export const deleteMetadata = (opts: CallOptions, key: string): void => {
     string
   >;
   opts.headers = remainingHeaders;
+};
+
+/** Shared type for kinematics return value */
+export interface KinematicsData {
+  name: string;
+  kinematic_param_type: 'SVA' | 'URDF' | 'UNSPECIFIED';
+  joints: {
+    id: string;
+    type: string;
+    parent: string;
+    axis: Vector3;
+    max: number;
+    min: number;
+  }[];
+  links: Frame[];
+}
+
+type getKinematics = (
+  request: PartialMessage<GetKinematicsRequest>,
+  options?: CallOptions
+) => Promise<GetKinematicsResponse>;
+
+/** Get kinematics information using a resource client */
+export const getKinematicsFromClient = async function getKinematicsFromClient(
+  getKinematicsMethod: getKinematics,
+  name: string,
+  extra: Struct = Struct.fromJson({}),
+  callOptions: CallOptions = {}
+): Promise<KinematicsData> {
+  const request = new GetKinematicsRequest({
+    name,
+    extra,
+  });
+
+  const response = await getKinematicsMethod(request, callOptions);
+
+  const decoder = new TextDecoder('utf8');
+  const jsonString = decoder.decode(response.kinematicsData);
+
+  return JSON.parse(jsonString) as KinematicsData;
+};
+
+type getGeometries = (
+  request: PartialMessage<GetGeometriesRequest>,
+  options?: CallOptions
+) => Promise<GetGeometriesResponse>;
+
+/** Get geometries information using a resource client */
+export const getGeometriesFromClient = async function getGeometriesFromClient(
+  getGeometriesMethod: getGeometries,
+  name: string,
+  extra: Struct = Struct.fromJson({}),
+  callOptions: CallOptions = {}
+): Promise<Geometry[]> {
+  const request = new GetGeometriesRequest({
+    name,
+    extra,
+  });
+
+  const response = await getGeometriesMethod(request, callOptions);
+  return response.geometries;
 };

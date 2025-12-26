@@ -12,14 +12,13 @@ import {
 } from '../../gen/component/arm/v1/arm_pb';
 import type { RobotClient } from '../../robot';
 import type { Options, Pose } from '../../types';
-import { doCommandFromClient } from '../../utils';
-import type { Arm } from './arm';
 import {
-  GetGeometriesRequest,
-  GetKinematicsRequest,
-  Get3DModelsRequest,
-  Mesh,
-} from '../../gen/common/v1/common_pb';
+  doCommandFromClient,
+  getKinematicsFromClient,
+  getGeometriesFromClient,
+} from '../../utils';
+import type { Arm } from './arm';
+import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -55,13 +54,21 @@ export class ArmClient implements Arm {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    const request = new GetGeometriesRequest({
-      name: this.name,
-      extra: Struct.fromJson(extra),
-    });
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
+  }
 
-    const response = await this.client.getGeometries(request, callOptions);
-    return response.geometries;
+  async getKinematics(extra = {}, callOptions = this.callOptions) {
+    return getKinematicsFromClient(
+      this.client.getKinematics,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
   }
 
   async get3DModels(
@@ -75,20 +82,6 @@ export class ArmClient implements Arm {
 
     const response = await this.client.get3DModels(request, callOptions);
     return response.models;
-  }
-
-  async getKinematics(extra = {}, callOptions = this.callOptions) {
-    const request = new GetKinematicsRequest({
-      name: this.name,
-      extra: Struct.fromJson(extra),
-    });
-
-    const response = await this.client.getKinematics(request, callOptions);
-
-    const decoder = new TextDecoder('utf8');
-    const jsonString = decoder.decode(response.kinematicsData);
-
-    return JSON.parse(jsonString) as ReturnType<Arm['getKinematics']>;
   }
 
   async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
