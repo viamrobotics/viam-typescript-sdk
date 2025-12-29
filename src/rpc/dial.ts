@@ -238,9 +238,9 @@ export class AuthenticatedTransport implements Transport {
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
-    for (const [key, value] of this.extraHeaders) {
+    this.extraHeaders.forEach((value, key) => {
       newHeaders.set(key, value);
-    }
+    });
     return this.transport.unary(
       service,
       method,
@@ -265,9 +265,9 @@ export class AuthenticatedTransport implements Transport {
     contextValues?: ContextValues
   ): Promise<StreamResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
-    for (const [key, value] of this.extraHeaders) {
+    this.extraHeaders.forEach((value, key) => {
       newHeaders.set(key, value);
-    }
+    });
     return this.transport.stream(
       service,
       method,
