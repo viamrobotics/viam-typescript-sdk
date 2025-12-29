@@ -4,6 +4,7 @@ import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
 import {
+  APIKey,
   CloudConfig,
   GetNetworkListResponse,
   GetSmartMachineStatusResponse,
@@ -45,6 +46,7 @@ const cloud = new CloudConfig({
   id: 'id',
   secret: 'secret',
   appAddress: 'app_address',
+  apiKey: new APIKey({ id: 'api-key-id', key: 'api-key-value' }),
 });
 
 let setNetworkCredentialsReq: SetNetworkCredentialsRequest;
