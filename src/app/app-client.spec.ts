@@ -1,4 +1,5 @@
 import * as pb from '../gen/app/v1/app_pb';
+import { ModuleSourceType, ModuleLanguage } from '../gen/app/v1/app_pb';
 
 import { Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
@@ -139,6 +140,8 @@ describe('AppClient tests', () => {
     visibility: 2,
     organizationId: 'orgId',
     name: 'name',
+    sourceType: ModuleSourceType.EXTERNAL,
+    language: ModuleLanguage.GOLANG,
   });
 
   describe('getUserIDByEmail tests', () => {
@@ -1574,7 +1577,9 @@ describe('AppClient tests', () => {
         ['mac', 'unix'],
         [pb.RegistryItemStatus.PUBLISHED],
         'search',
-        'token'
+        'token',
+        [ModuleSourceType.EXTERNAL],
+        [ModuleLanguage.GOLANG]
       );
       expect(response).toEqual(items);
     });
@@ -1644,7 +1649,9 @@ describe('AppClient tests', () => {
         'url',
         'newDescription',
         [],
-        'entrypoint'
+        'entrypoint',
+        ModuleSourceType.VIAM_HOSTED,
+        ModuleLanguage.PYTHON
       );
       expect(response).toEqual('url');
     });

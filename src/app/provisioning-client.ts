@@ -1,6 +1,6 @@
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
-import type { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+import type { CloudConfig, APIKey } from '../gen/provisioning/v1/provisioning_pb';
 
 export class ProvisioningClient {
   private client: Client<typeof ProvisioningService>;
@@ -38,7 +38,7 @@ export class ProvisioningClient {
    * Set the Viam credentials of the smart machine credentials, so it connect to
    * the Cloud.
    *
-   * @param cloud - The configuration of the Cloud
+   * @param cloud - The configuration of the Cloud, which now includes an optional `apiKey` field.
    */
   async setSmartMachineCredentials(cloud?: CloudConfig) {
     await this.client.setSmartMachineCredentials({ cloud });
@@ -55,4 +55,4 @@ export class ProvisioningClient {
   }
 }
 
-export { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+export { CloudConfig, APIKey } from '../gen/provisioning/v1/provisioning_pb';

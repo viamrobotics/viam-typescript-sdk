@@ -22,6 +22,8 @@ import {
   LocationAuth,
   Model,
   Module,
+  ModuleSourceType,
+  ModuleLanguage,
   Organization,
   OrganizationIdentity,
   OrganizationInvite,
@@ -1707,7 +1709,11 @@ export class AppClient {
    *   [], // All package types
    *   [1], // Private packages
    *   [],
-   *   [1] // Active packages
+   *   [1], // Active packages
+   *   undefined,
+   *   undefined,
+   *   [VIAM.appApi.ModuleSourceType.EXTERNAL],
+   *   [VIAM.appApi.ModuleLanguage.GOLANG]
    * );
    * ```
    *
@@ -1726,6 +1732,8 @@ export class AppClient {
    * @param searchTerm Optional search term to filter on
    * @param pageToken Optional page token for results. If not provided, will
    *   return all results
+   * @param moduleSourceTypes Optional list of module source types to query for. If empty, will not filter on module source type
+   * @param moduleLanguages Optional list of module languages to query for. If empty, will not filter on module language
    * @returns The list of registry items
    */
   async listRegistryItems(
@@ -1735,7 +1743,9 @@ export class AppClient {
     platforms: string[],
     statuses: RegistryItemStatus[],
     searchTerm?: string,
-    pageToken?: string
+    pageToken?: string,
+    moduleSourceTypes: ModuleSourceType[] = [],
+    moduleLanguages: ModuleLanguage[] = []
   ): Promise<RegistryItem[]> {
     const req = {
       organizationId,
@@ -1745,6 +1755,8 @@ export class AppClient {
       statuses,
       searchTerm,
       pageToken,
+      moduleSourceTypes,
+      moduleLanguages,
     };
     const resp = await this.client.listRegistryItems(req);
     return resp.items;
@@ -1811,7 +1823,9 @@ export class AppClient {
    *   'https://example.com',
    *   'new description',
    *   [{ model: 'namespace:group:model1', api: 'rdk:component:generic' }],
-   *   'entrypoint'
+   *   'entrypoint',
+   *   VIAM.appApi.ModuleSourceType.VIAM_HOSTED,
+   *   VIAM.appApi.ModuleLanguage.PYTHON
    * );
    * ```
    *
@@ -1824,6 +1838,8 @@ export class AppClient {
    * @param description A short description of the module
    * @param models A list of models available in the module
    * @param entrypoint The executable to run to start the module program
+   * @param sourceType Optional. Determines where the source code of module is managed, either externally or hosted by Viam.
+   * @param language Optional. The language the module is written in.
    * @returns The module URL
    */
   async updateModule(
@@ -1832,7 +1848,9 @@ export class AppClient {
     url: string,
     description: string,
     models: Model[],
-    entrypoint: string
+    entrypoint: string,
+    sourceType?: ModuleSourceType,
+    language?: ModuleLanguage
   ): Promise<string> {
     const resp = await this.client.updateModule({
       moduleId,
@@ -1841,6 +1859,8 @@ export class AppClient {
       description,
       models,
       entrypoint,
+      sourceType,
+      language,
     });
     return resp.url;
   }
