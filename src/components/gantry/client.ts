@@ -11,9 +11,12 @@ import {
 } from '../../gen/component/gantry/v1/gantry_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getKinematicsFromClient,
+  getGeometriesFromClient,
+} from '../../utils';
 import type { Gantry } from './gantry';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Gantry component.
@@ -33,13 +36,21 @@ export class GantryClient implements Gantry {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    const request = new GetGeometriesRequest({
-      name: this.name,
-      extra: Struct.fromJson(extra),
-    });
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
+  }
 
-    const response = await this.client.getGeometries(request, callOptions);
-    return response.geometries;
+  async getKinematics(extra = {}, callOptions = this.callOptions) {
+    return getKinematicsFromClient(
+      this.client.getKinematics,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
   }
 
   async getPosition(extra = {}, callOptions = this.callOptions) {
