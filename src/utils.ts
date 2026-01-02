@@ -9,7 +9,7 @@ import { DoCommandRequest, DoCommandResponse } from './gen/common/v1/common_pb';
 import type { Options } from './types';
 
 export const clientHeaders = new Headers({
-  'viam_client': `typescript;v${__VERSION__};${apiVersion}`,
+  'viam-client': `typescript;v${__VERSION__};${apiVersion}`,
 });
 
 type doCommand = (
