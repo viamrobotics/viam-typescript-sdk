@@ -18,7 +18,7 @@ import type { Options, Vector3 } from './types';
 import type { Frame } from './gen/app/v1/robot_pb';
 
 export const clientHeaders = new Headers({
-  'viam-client': `typescript;v${__VERSION__};${apiVersion}`,
+  viam_client: `typescript;v${__VERSION__};${apiVersion}`,
 });
 
 type doCommand = (
