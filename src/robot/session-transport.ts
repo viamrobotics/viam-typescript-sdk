@@ -88,11 +88,11 @@ export default class SessionTransport implements Transport {
   ): Promise<StreamResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
-    
+
     for (const [key, value] of clientHeaders) {
       newHeaders.set(key, value);
     }
-    
+
     if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
       for (const [key, value] of md) {
