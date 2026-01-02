@@ -53,9 +53,9 @@ export default class SessionTransport implements Transport {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
 
-    clientHeaders.forEach((value, key) => {
+    for (const [key, value] of clientHeaders) {
       newHeaders.set(key, value);
-    });
+    }
 
     if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
@@ -89,9 +89,9 @@ export default class SessionTransport implements Transport {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
     
-    clientHeaders.forEach((value, key) => {
+    for (const [key, value] of clientHeaders) {
       newHeaders.set(key, value);
-    });
+    }
     
     if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
