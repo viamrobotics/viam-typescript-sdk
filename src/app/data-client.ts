@@ -101,6 +101,9 @@ export interface FileUploadOptions {
 
   /** Optional list of datasets to add the data to. */
   datasetIds?: string[];
+
+  /** Optional MIME type of the file. */
+  mimeType?: string;
 }
 
 export type Dataset = Partial<PBDataset> & {
@@ -1312,7 +1315,8 @@ export class DataClient {
     fileExtension: string,
     dataRequestTimes: [Date, Date],
     tags?: string[],
-    datasetIds?: string[]
+    datasetIds?: string[],
+    mimeType?: string
   ) {
     const metadata = new UploadMetadata({
       partId,
@@ -1323,6 +1327,7 @@ export class DataClient {
       tags,
       fileExtension,
       datasetIds,
+      mimeType,
     });
 
     const sensorData = new SensorData({
