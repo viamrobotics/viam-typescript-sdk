@@ -1990,6 +1990,7 @@ describe('fileUpload tests', () => {
     fileExtension: '.png',
     tags: ['testTag1', 'testTag2'],
     datasetIds: ['dataset1', 'dataset2'],
+    mimeType: 'image/jpeg',
   };
 
   const expectedFileId = 'testFileId';
@@ -2033,6 +2034,7 @@ describe('fileUpload tests', () => {
     expect(metadata.fileExtension).toBe(options.fileExtension);
     expect(metadata.tags).toStrictEqual(options.tags);
     expect(metadata.datasetIds).toStrictEqual(options.datasetIds);
+    expect(metadata.mimeType).toBe(options.mimeType);
 
     // Check file contents request
     const fileContentsRequest = capturedRequests[1]!;
@@ -2060,6 +2062,7 @@ describe('fileUpload tests', () => {
     expect(metadata.fileExtension).toBe('');
     expect(metadata.tags).toStrictEqual([]);
     expect(metadata.datasetIds).toStrictEqual([]);
+    expect(metadata.mimeType).toBe('');
 
     // Check file contents request
     const fileContentsRequest = capturedRequests[1]!;
@@ -2104,3 +2107,13 @@ describe('fileUpload tests', () => {
     expect(receivedData).toStrictEqual(data);
   });
 });
+
+
+Task: Regenerate the complete file contents, incorporating only the necessary edits as described in the implementation details provided.
+
+CRITICAL INSTRUCTIONS:
+1.  **Strict Adherence to Implementation Details**: Your primary guide for making changes is the `implementation_details`. Implement *only* what is explicitly requested there.
+2.  **Preserve Original Code (for existing files)**: If you are provided with existing file content, DO NOT modify any of that existing code unless it is directly specified in the `implementation_details`. The existing code provided to you must be reproduced exactly, including all comments, blank lines, and existing formatting. **For new files, generate the entire content from scratch.**
+3.  **Absolute Formatting Preservation**: When generating the new file contents, you MUST preserve all original formatting, including newlines, indentation, and whitespace, exactly as it appears in the provided existing file. DO NOT reformat any part of the code that is not explicitly altered by the new implementation. Your output must be valid, correctly formatted code.
+
+Provide the newly generated, complete file contents. The file contents should be raw code, not wrapped in markdown or any other formatting beyond standard syntax.
