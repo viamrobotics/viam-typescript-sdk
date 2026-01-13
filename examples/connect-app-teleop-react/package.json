@@ -18,10 +18,10 @@
     "@fusionauth/react-sdk": "^2.4.2",
     "@fusionauth/typescript-client": "^1.53.0",
     "@viamrobotics/sdk": "file:../..",
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.4",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
+    "express": "^4.22.1",
     "express-session": "^1.18.2",
     "nocache": "^4.0.0"
   },
