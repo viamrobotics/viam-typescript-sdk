@@ -141,6 +141,15 @@ describe('AppClient tests', () => {
     name: 'name',
   });
 
+  // New constants for testing FragmentImport and FragmentImportList
+  const fragmentImport = new pb.FragmentImport({
+    fragmentId: 'fragId',
+    name: 'fragName',
+  });
+  const fragmentImportList = new pb.FragmentImportList({
+    fragments: [fragmentImport],
+  });
+
   describe('getUserIDByEmail tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
@@ -289,10 +298,15 @@ describe('AppClient tests', () => {
   });
 
   describe('updateOrganization tests', () => {
+    // New variable declaration
+    let capReq: pb.UpdateOrganizationRequest;
+
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          updateOrganization: () => {
+          // Modified to capture request
+          updateOrganization: (req) => {
+            capReq = req;
             return new pb.UpdateOrganizationResponse({
               organization: org,
             });
@@ -301,15 +315,41 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('updateOrganization', async () => {
+    // Renamed test case
+    it('updateOrganization with all optional fields', async () => {
       const response = await subject().updateOrganization(
         'id',
         'name',
         'namespace',
         'region',
-        'cid'
+        'cid',
+        fragmentImportList // Added new parameter
       );
       expect(response).toEqual(org);
+      // Added assertion for captured request
+      expect(capReq).toStrictEqual(
+        new pb.UpdateOrganizationRequest({
+          organizationId: 'id',
+          name: 'name',
+          publicNamespace: 'namespace',
+          region: 'region',
+          cid: 'cid',
+          defaultFragments: fragmentImportList,
+        })
+      );
+    });
+
+    // Added new test case
+    it('updateOrganization with some optional fields and no defaultFragments', async () => {
+      const response = await subject().updateOrganization('id', 'name', 'namespace');
+      expect(response).toEqual(org);
+      expect(capReq).toStrictEqual(
+        new pb.UpdateOrganizationRequest({
+          organizationId: 'id',
+          name: 'name',
+          publicNamespace: 'namespace',
+        })
+      );
     });
   });
 
