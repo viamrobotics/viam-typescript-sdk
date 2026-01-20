@@ -34,6 +34,43 @@ To use this SDK with React Native, read the [documentation](https://github.com/v
 
 To run the TypeScript SDK in offline mode, see [Connect over local network or offline](https://docs.viam.com/dev/reference/sdks/connectivity/#connect-over-local-network-or-offline).
 
+## Debugging
+
+The SDK provides global helper functions on the `window` object for easier debugging in the browser console.
+
+### Logging Configuration
+
+You can change the logging level or mode for all loggers dynamically:
+
+```javascript
+// Change log level
+window.setLoggingLevel('debug');
+
+// Change log mode: 'formatted', 'raw'
+// 'formatted' is human-readable (default).
+// 'raw' is single-line JSON Lines for easy parsing by log viewers.
+window.setLoggingMode('raw');
+```
+
+The available levels (from most to least verbose) are:
+
+| Level   | `error` | `warn` | `info` | `debug` |
+| :------ | :-----: | :----: | :----: | :-----: |
+| `debug` |   ✅    |   ✅   |   ✅   |   ✅    |
+| `info`  |   ✅    |   ✅   |   ✅   |         |
+| `warn`  |   ✅    |   ✅   |        |         |
+| `error` |   ✅    |        |        |         |
+| `none`  |         |        |        |         |
+
+### Retrieving Logs
+
+The SDK maintains a circular buffer of the last 10,000 log statements. You can retrieve these logs as a JSON Lines string or copy them to your clipboard:
+
+```javascript
+// Copies logs to clipboard; otherwise, returns the logs
+await window.getLogs();
+```
+
 ## License
 
 Copyright 2022-2025 Viam Inc.
