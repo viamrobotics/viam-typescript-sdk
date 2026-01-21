@@ -15,7 +15,9 @@ interface StructuredLog {
 const LOG_STORAGE_CAPACITY = 10_000;
 
 class LogStorage {
-  private readonly buffer: (string | undefined)[] = Array.from({length: LOG_STORAGE_CAPACITY});
+  private readonly buffer: (string | undefined)[] = Array.from({
+    length: LOG_STORAGE_CAPACITY,
+  });
   private head = 0;
   private count = 0;
 
@@ -271,7 +273,9 @@ const setLoggingModeFor = (name: string, mode: LogMode): void => {
   const logger = LOGGERS[name];
   if (logger === undefined) {
     // eslint-disable-next-line no-console
-    console.warn(`Logger ${name} not found, current loggers are: ${Object.keys(LOGGERS).join(', ')}`);
+    console.warn(
+      `Logger ${name} not found, current loggers are: ${Object.keys(LOGGERS).join(', ')}`
+    );
     return;
   }
 
@@ -298,7 +302,9 @@ const setLoggingLevelFor = (name: string, level: LogLevel): void => {
   const logger = LOGGERS[name];
   if (logger === undefined) {
     // eslint-disable-next-line no-console
-    console.warn(`Logger ${name} not found, current loggers are: ${Object.keys(LOGGERS).join(', ')}`);
+    console.warn(
+      `Logger ${name} not found, current loggers are: ${Object.keys(LOGGERS).join(', ')}`
+    );
     return;
   }
 
