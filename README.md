@@ -43,13 +43,19 @@ The SDK provides global helper functions on the `window` object for easier debug
 You can change the logging level or mode for all loggers dynamically:
 
 ```javascript
-// Change log level
+// Change log level for all loggers
 window.setLoggingLevel('debug');
 
-// Change log mode: 'formatted', 'raw'
+// Change log level for a specific logger
+window.setLoggingLevelFor('RobotClient', 'debug');
+
+// Change log mode for all loggers: 'formatted', 'raw'
 // 'formatted' is human-readable (default).
 // 'raw' is single-line JSON Lines for easy parsing by log viewers.
 window.setLoggingMode('raw');
+
+// Change log mode for a specific logger
+window.setLoggingModeFor('RobotClient', 'raw');
 ```
 
 The available levels (from most to least verbose) are:
@@ -67,7 +73,7 @@ The available levels (from most to least verbose) are:
 The SDK maintains a circular buffer of the last 10,000 log statements. You can retrieve these logs as a JSON Lines string or copy them to your clipboard:
 
 ```javascript
-// Copies logs to clipboard; otherwise, returns the logs
+// Copies logs to clipboard; otherwise, prints the logs to the console
 await window.getLogs();
 ```
 

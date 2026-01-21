@@ -1,7 +1,7 @@
 const LOGGERS: Record<string, Logger> = {};
 
-type LogMode = 'raw' | 'formatted';
-type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
+export type LogMode = 'raw' | 'formatted';
+export type LogLevel = 'none' | 'error' | 'warn' | 'info' | 'debug';
 
 interface StructuredLog {
   name: string;
@@ -267,6 +267,18 @@ const setLoggingMode = (mode: string): void => {
   }
 };
 
+const setLoggingModeFor = (name: string, mode: LogMode): void => {
+  const logger = LOGGERS[name];
+  if (logger === undefined) {
+    // eslint-disable-next-line no-console
+    console.warn(`Logger ${name} not found, current loggers are: ${Object.keys(LOGGERS).join(', ')}`);
+    return;
+  }
+
+  logger.mode = mode;
+  setPersistedMode(name, mode);
+};
+
 const setLoggingLevel = (level: string): void => {
   if (!isLogLevel(level)) {
     // eslint-disable-next-line no-console
@@ -280,6 +292,18 @@ const setLoggingLevel = (level: string): void => {
     logger.level = level;
     setPersistedLevel(logger.name, level);
   }
+};
+
+const setLoggingLevelFor = (name: string, level: LogLevel): void => {
+  const logger = LOGGERS[name];
+  if (logger === undefined) {
+    // eslint-disable-next-line no-console
+    console.warn(`Logger ${name} not found, current loggers are: ${Object.keys(LOGGERS).join(', ')}`);
+    return;
+  }
+
+  logger.level = level;
+  setPersistedLevel(name, level);
 };
 
 const shouldLog = (current: LogLevel, target: LogLevel): boolean => {
@@ -395,7 +419,9 @@ const printFormattedLog = (log: StructuredLog): void => {
 // Expose logging utilities globally in browser environments
 if (typeof window !== 'undefined') {
   window.setLoggingMode = setLoggingMode;
+  window.setLoggingModeFor = setLoggingModeFor;
   window.setLoggingLevel = setLoggingLevel;
+  window.setLoggingLevelFor = setLoggingLevelFor;
   window.getLogs = async () => {
     return logStorage.copyToClipboard();
   };

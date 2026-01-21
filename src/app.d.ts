@@ -1,9 +1,9 @@
 declare global {
   interface Window {
-    setLoggingMode: (mode: 'raw' | 'formatted') => void;
-    setLoggingLevel: (
-      level: 'none' | 'error' | 'warn' | 'info' | 'debug'
-    ) => void;
+    setLoggingMode: (mode: import('./logging').LogMode) => void;
+    setLoggingModeFor: (name: string, mode: import('./logging').LogMode) => void;
+    setLoggingLevel: (level: import('./logging').LogLevel) => void;
+    setLoggingLevelFor: (name: string, level: import('./logging').LogLevel) => void;
     getLogs: () => Promise<string>;
   }
 }
