@@ -796,23 +796,27 @@ export class DataClient {
    *   0.3,
    *   0.3,
    *   0.6,
-   *   0.6
+   *   0.6,
+   *   0.4
    * );
    * ```
    *
    * For more information, see [Data
    * API](https://docs.viam.com/dev/reference/apis/data-client/#addboundingboxtoimagebyid).
    *
-   * @param binaryId The ID of the image to add the bounding box to
-   * @param label A label for the bounding box
-   * @param xMinNormalized The min X value of the bounding box normalized from 0
-   *   to 1
-   * @param yMinNormalized The min Y value of the bounding box normalized from 0
-   *   to 1
-   * @param xMaxNormalized The max X value of the bounding box normalized from 0
-   *   to 1
-   * @param yMaxNormalized The max Y value of the bounding box normalized from 0
-   *   to 1
+   * @param {string | BinaryID} binaryId The ID of the image to add the bounding
+   *   box to
+   * @param {string} label A label for the bounding box
+   * @param {number} xMinNormalized The min X value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} yMinNormalized The min Y value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} xMaxNormalized The max X value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} yMaxNormalized The max Y value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} [confidence] Model's confidence in a predicted bounding box
+   *   expressed as a normalized value from 0 to 1
    * @returns The bounding box ID
    */
   async addBoundingBoxToImageById(
@@ -821,7 +825,8 @@ export class DataClient {
     xMinNormalized: number,
     yMinNormalized: number,
     xMaxNormalized: number,
-    yMaxNormalized: number
+    yMaxNormalized: number,
+    confidence?: number
   ) {
     if (typeof binaryId === 'string') {
       const resp = await this.dataClient.addBoundingBoxToImageByID({
@@ -831,6 +836,7 @@ export class DataClient {
         yMinNormalized,
         xMaxNormalized,
         yMaxNormalized,
+        confidence,
       });
       return resp.bboxId;
     }
@@ -842,6 +848,7 @@ export class DataClient {
       yMinNormalized,
       xMaxNormalized,
       yMaxNormalized,
+      confidence,
     });
     return resp.bboxId;
   }
@@ -879,6 +886,75 @@ export class DataClient {
     await this.dataClient.removeBoundingBoxFromImageByID({
       binaryId: binId,
       bboxId,
+    });
+  }
+
+  /**
+   * Update an existing bounding box
+   *
+   * @example
+   *
+   * ```ts
+   * const bboxId = await dataClient.updateBoundingBox(
+   *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
+   *   '691361a6f124d202010cf415'
+   *   'label1',
+   *   0.3,
+   *   0.3,
+   *   0.6,
+   *   0.6,
+   *   0.4
+   * );
+   * ```
+   *
+   * @param {string | BinaryID} binaryId The ID of the image that the target
+   *   bounding box is attached to
+   * @param {string} bboxId The ID of the bounding box
+   * @param {string} [label] A label for the bounding box
+   * @param {number} [xMinNormalized] The min X value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} [yMinNormalized] The min Y value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} [xMaxNormalized] The max X value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} [yMaxNormalized] The max Y value of the bounding box
+   *   normalized from 0 to 1
+   * @param {number} [confidence] Model's confidence in a predicted bounding box
+   *   expressed as a normalized value from 0 to 1
+   */
+  async updateBoundingBox(
+    binaryId: string | BinaryID,
+    bboxId: string,
+    label: string,
+    xMinNormalized: number,
+    yMinNormalized: number,
+    xMaxNormalized: number,
+    yMaxNormalized: number,
+    confidence?: number
+  ) {
+    if (typeof binaryId === 'string') {
+      await this.dataClient.updateBoundingBox({
+        binaryDataId: binaryId,
+        bboxId,
+        label,
+        xMinNormalized,
+        yMinNormalized,
+        xMaxNormalized,
+        yMaxNormalized,
+        confidence,
+      });
+      return;
+    }
+    logDeprecationWarning();
+    await this.dataClient.updateBoundingBox({
+      binaryId,
+      bboxId,
+      label,
+      xMinNormalized,
+      yMinNormalized,
+      xMaxNormalized,
+      yMaxNormalized,
+      confidence,
     });
   }
 
