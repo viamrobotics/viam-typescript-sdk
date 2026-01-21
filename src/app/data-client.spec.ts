@@ -64,6 +64,8 @@ import {
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
+  UpdateBoundingBoxRequest,
+  UpdateBoundingBoxResponse,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
@@ -142,6 +144,7 @@ describe('DataClient tests', () => {
 
   const binaryDataId1 = 'testID1';
   const binaryDataId2 = 'testID2';
+  const boundingBoxId1 = 'testBoxID1';
   describe('exportTabularData tests', () => {
     const sharedAttributes = {
       partId: 'partId1',
@@ -919,7 +922,7 @@ describe('DataClient tests', () => {
         yMinNormalized: 0,
         yMaxNormalized: 1,
         xMaxNormalized: 1,
-        confidence: 0.9,
+        confidence: 0.4,
       });
 
       const promise = await subject().addBoundingBoxToImageById(
@@ -929,7 +932,7 @@ describe('DataClient tests', () => {
         0,
         1,
         1,
-        0.9
+        0.4
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual('bboxId');
@@ -943,7 +946,7 @@ describe('DataClient tests', () => {
         yMinNormalized: 0,
         yMaxNormalized: 1,
         xMaxNormalized: 1,
-        confidence: 0.8,
+        confidence: 0.4,
       });
 
       const promise = await subject().addBoundingBoxToImageById(
@@ -953,30 +956,7 @@ describe('DataClient tests', () => {
         0,
         1,
         1,
-        0.8
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(promise).toEqual('bboxId');
-    });
-
-    it('add bounding box to image with no confidence', async () => {
-      const expectedRequest = new AddBoundingBoxToImageByIDRequest({
-        binaryDataId: binaryDataId1,
-        label: 'label',
-        xMinNormalized: 0,
-        yMinNormalized: 0,
-        yMaxNormalized: 1,
-        xMaxNormalized: 1,
-        confidence: undefined,
-      });
-
-      const promise = await subject().addBoundingBoxToImageById(
-        binaryDataId1,
-        'label',
-        0,
-        0,
-        1,
-        1
+        0.4
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual('bboxId');
@@ -1013,6 +993,70 @@ describe('DataClient tests', () => {
       });
 
       await subject().removeBoundingBoxFromImageById(binaryId1, 'bboxId');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('updateBoundingBox tests', () => {
+    let capReq: UpdateBoundingBoxRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          updateBoundingBox: (req) => {
+            capReq = req;
+            return new UpdateBoundingBoxResponse();
+          },
+        });
+      });
+    });
+
+    it('update bounding box on image by binary data id', async () => {
+      const expectedRequest = new UpdateBoundingBoxRequest({
+        binaryDataId: binaryDataId1,
+        bboxId: boundingBoxId1,
+        label: 'label',
+        xMinNormalized: 0,
+        yMinNormalized: 0,
+        yMaxNormalized: 1,
+        xMaxNormalized: 1,
+        confidence: 0.4,
+      });
+
+      await subject().updateBoundingBox(
+        binaryDataId1,
+        boundingBoxId1,
+        'label',
+        0,
+        0,
+        1,
+        1,
+        0.4
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+
+    it('update bounding box on image by id', async () => {
+      const expectedRequest = new UpdateBoundingBoxRequest({
+        binaryId: binaryId1,
+        bboxId: boundingBoxId1,
+        label: 'label',
+        xMinNormalized: 0,
+        yMinNormalized: 0,
+        yMaxNormalized: 1,
+        xMaxNormalized: 1,
+        confidence: 0.4,
+      });
+
+      await subject().updateBoundingBox(
+        binaryId1,
+        boundingBoxId1,
+        'label',
+        0,
+        0,
+        1,
+        1,
+        0.4
+      );
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
