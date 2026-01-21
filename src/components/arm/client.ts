@@ -19,7 +19,7 @@ import {
 } from '../../utils';
 import type { Arm } from './arm';
 import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
-import { GetKinematicsResult } from '../../utils';
+import type { GetKinematicsResult } from '../../utils';
 
 /**
  * A gRPC-web client for the Arm component.

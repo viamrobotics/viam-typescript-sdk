@@ -1,7 +1,7 @@
 import type { Struct } from '@bufbuild/protobuf'
 import type { Resource } from '../../types'
 import type { Geometry } from '../../gen/common/v1/common_pb'
-import type { GetKinematicsResult, KinematicsData } from '../../utils'
+import type { GetKinematicsResult } from '../../utils'
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {

@@ -3,7 +3,7 @@ import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
-import type { GetKinematicsResult, KinematicsData } from '../../utils';
+import type { GetKinematicsResult } from '../../utils';
 
 export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
