@@ -895,7 +895,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const bboxId = await dataClient.updateBoundingBox(
+   * await dataClient.updateBoundingBox(
    *   'ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh',
    *   '691361a6f124d202010cf415'
    *   'label1',
