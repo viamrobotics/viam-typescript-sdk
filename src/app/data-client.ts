@@ -796,7 +796,8 @@ export class DataClient {
    *   0.3,
    *   0.3,
    *   0.6,
-   *   0.6
+   *   0.6,
+   *   0.9
    * );
    * ```
    *
@@ -813,6 +814,7 @@ export class DataClient {
    *   to 1
    * @param yMaxNormalized The max Y value of the bounding box normalized from 0
    *   to 1
+   * @param confidence Optional confidence score for the bounding box, from 0 to 1.
    * @returns The bounding box ID
    */
   async addBoundingBoxToImageById(
@@ -821,7 +823,8 @@ export class DataClient {
     xMinNormalized: number,
     yMinNormalized: number,
     xMaxNormalized: number,
-    yMaxNormalized: number
+    yMaxNormalized: number,
+    confidence?: number
   ) {
     if (typeof binaryId === 'string') {
       const resp = await this.dataClient.addBoundingBoxToImageByID({
@@ -831,6 +834,7 @@ export class DataClient {
         yMinNormalized,
         xMaxNormalized,
         yMaxNormalized,
+        confidence,
       });
       return resp.bboxId;
     }
@@ -842,6 +846,7 @@ export class DataClient {
       yMinNormalized,
       xMaxNormalized,
       yMaxNormalized,
+      confidence,
     });
     return resp.bboxId;
   }

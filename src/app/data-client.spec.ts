@@ -919,6 +919,7 @@ describe('DataClient tests', () => {
         yMinNormalized: 0,
         yMaxNormalized: 1,
         xMaxNormalized: 1,
+        confidence: 0.9,
       });
 
       const promise = await subject().addBoundingBoxToImageById(
@@ -927,7 +928,8 @@ describe('DataClient tests', () => {
         0,
         0,
         1,
-        1
+        1,
+        0.9
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual('bboxId');
@@ -941,10 +943,35 @@ describe('DataClient tests', () => {
         yMinNormalized: 0,
         yMaxNormalized: 1,
         xMaxNormalized: 1,
+        confidence: 0.8,
       });
 
       const promise = await subject().addBoundingBoxToImageById(
         binaryId1,
+        'label',
+        0,
+        0,
+        1,
+        1,
+        0.8
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(promise).toEqual('bboxId');
+    });
+
+    it('add bounding box to image with no confidence', async () => {
+      const expectedRequest = new AddBoundingBoxToImageByIDRequest({
+        binaryDataId: binaryDataId1,
+        label: 'label',
+        xMinNormalized: 0,
+        yMinNormalized: 0,
+        yMaxNormalized: 1,
+        xMaxNormalized: 1,
+        confidence: undefined,
+      });
+
+      const promise = await subject().addBoundingBoxToImageById(
+        binaryDataId1,
         'label',
         0,
         0,
