@@ -1760,7 +1760,7 @@ describe('DataSyncClient tests', () => {
       });
     });
 
-    it('binary data capture upload', async () => {
+    it('binary data capture upload (legacy signature)', async () => {
       metadata.type = DataType.BINARY_SENSOR;
       metadata.fileExtension = fileExtension;
       expectedRequest.metadata = metadata;
@@ -1786,6 +1786,45 @@ describe('DataSyncClient tests', () => {
         datasetIds
       );
       expect(capReq).toStrictEqual(expectedRequest);
+      expect(response).toStrictEqual('fileId');
+    });
+
+    it('binary data capture upload (options overload)', async () => {
+      const mimeType = 'image/png';
+
+      const expectedReq = new DataCaptureUploadRequest();
+      const expectedMd = new UploadMetadata({
+        partId,
+        componentType,
+        componentName,
+        methodName,
+        type: DataType.BINARY_SENSOR,
+        tags,
+        datasetIds,
+        mimeType,
+        fileExtension: '',
+      });
+      expectedReq.metadata = expectedMd;
+
+      const sensorData = new SensorData();
+      const sensorMetadata = new SensorMetadata();
+      sensorMetadata.timeRequested = Timestamp.fromDate(timeRequested1);
+      sensorMetadata.timeReceived = Timestamp.fromDate(timeReceived1);
+      sensorData.metadata = sensorMetadata;
+      sensorData.data.case = 'binary';
+      sensorData.data.value = binaryData;
+      expectedReq.sensorContents = [sensorData];
+
+      const response = await subject().binaryDataCaptureUpload(
+        binaryData,
+        partId,
+        componentType,
+        componentName,
+        methodName,
+        dataRequestTimes1,
+        { tags, datasetIds, mimeType }
+      );
+      expect(capReq).toStrictEqual(expectedReq);
       expect(response).toStrictEqual('fileId');
     });
   });
