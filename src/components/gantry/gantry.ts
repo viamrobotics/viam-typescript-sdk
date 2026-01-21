@@ -1,7 +1,7 @@
-import type { Struct } from '@bufbuild/protobuf'
-import type { Resource } from '../../types'
-import type { Geometry } from '../../gen/common/v1/common_pb'
-import type { GetKinematicsResult } from '../../utils'
+import type { Struct } from '@bufbuild/protobuf';
+import type { Resource } from '../../types';
+import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { GetKinematicsResult } from '../../utils';
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {
@@ -20,7 +20,7 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
   /**
    * Get the kinematics information associated with the gantry.
@@ -37,7 +37,7 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getkinematics).
    */
-  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>
+  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 
   /**
    * Move each axis of the gantry to the positionsMm at the speeds in
@@ -67,7 +67,7 @@ export interface Gantry extends Resource {
     positionsMm: number[],
     speedsMmPerSec: number[],
     extra?: Struct
-  ) => Promise<void>
+  ) => Promise<void>;
 
   /**
    * Get the current position of each axis.
@@ -86,7 +86,7 @@ export interface Gantry extends Resource {
    *
    * @returns A list of the current position of each axis in millimeters.
    */
-  getPosition: (extra?: Struct) => Promise<number[]>
+  getPosition: (extra?: Struct) => Promise<number[]>;
 
   /**
    * Runs the homing sequence to find the start and end positions of the gantry
@@ -107,7 +107,7 @@ export interface Gantry extends Resource {
    * @returns A bool representing whether the gantry has run the homing sequence
    *   successfully.
    */
-  home: (extra?: Struct) => Promise<boolean>
+  home: (extra?: Struct) => Promise<boolean>;
 
   /**
    * Get the lengths of the axes of the gantry in millimeters.
@@ -126,7 +126,7 @@ export interface Gantry extends Resource {
    *
    * @returns A list of the length of each axis in millimeters.
    */
-  getLengths: (extra?: Struct) => Promise<number[]>
+  getLengths: (extra?: Struct) => Promise<number[]>;
 
   /**
    * Stop the motion of the gantry.
@@ -143,7 +143,7 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#stop).
    */
-  stop: (extra?: Struct) => Promise<void>
+  stop: (extra?: Struct) => Promise<void>;
 
   /**
    * Get if the gantry is currently moving.
@@ -161,5 +161,5 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#ismoving).
    */
-  isMoving: () => Promise<boolean>
+  isMoving: () => Promise<boolean>;
 }

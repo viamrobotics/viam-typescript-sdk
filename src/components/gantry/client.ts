@@ -45,7 +45,10 @@ export class GantryClient implements Gantry {
     );
   }
 
-  async getKinematics(extra = {}, callOptions = this.callOptions): Promise<GetKinematicsResult> {
+  async getKinematics(
+    extra = {},
+    callOptions = this.callOptions
+  ): Promise<GetKinematicsResult> {
     return getKinematicsFromClient(
       this.client.getKinematics,
       this.name,

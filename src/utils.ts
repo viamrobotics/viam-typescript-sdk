@@ -112,7 +112,7 @@ export interface KinematicsData {
 /** Shared type for kinematics return value */
 export interface GetKinematicsResult {
   kinematicsData: KinematicsData;
-  meshesByUrdfFilepath: { [key: string]: Mesh };
+  meshesByUrdfFilepath: Record<string, Mesh>;
 }
 
 type getKinematics = (
