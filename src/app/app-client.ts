@@ -11,6 +11,7 @@ import {
   CreateKeyResponse,
   CreateModuleResponse,
   Fragment,
+  FragmentImportList,
   FragmentVisibility,
   GetAppContentResponse,
   GetAppBrandingResponse,
@@ -286,6 +287,8 @@ export class AppClient {
    * @param publicNamespace Optional namespace to update the organization with
    * @param region Optional region to update the organization with
    * @param cid Optional CRM ID to update the organization with
+   * @param defaultFragments Optional default fragments to set for the
+   *   organization
    * @returns The updated organization details
    */
   async updateOrganization(
@@ -293,7 +296,8 @@ export class AppClient {
     name?: string,
     publicNamespace?: string,
     region?: string,
-    cid?: string
+    cid?: string,
+    defaultFragments?: FragmentImportList
   ): Promise<Organization | undefined> {
     const resp = await this.client.updateOrganization({
       organizationId,
@@ -301,6 +305,7 @@ export class AppClient {
       publicNamespace,
       region,
       cid,
+      defaultFragments,
     });
     return resp.organization;
   }

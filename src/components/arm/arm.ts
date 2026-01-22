@@ -3,7 +3,7 @@ import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
-import type { KinematicsData } from '../../utils';
+import type { GetKinematicsResult } from '../../utils';
 
 export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
@@ -68,8 +68,11 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getkinematics).
    * ```
+   *
+   * @returns The legacy kinematics data shape or the newer object containing
+   *   kinematics data plus a map of URDF mesh file paths to mesh data.
    */
-  getKinematics: (extra?: Struct) => Promise<KinematicsData>;
+  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 
   /**
    * Move the end of the arm to the pose.

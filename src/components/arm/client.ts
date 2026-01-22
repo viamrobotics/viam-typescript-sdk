@@ -19,6 +19,7 @@ import {
 } from '../../utils';
 import type { Arm } from './arm';
 import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
+import type { GetKinematicsResult } from '../../utils';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -62,7 +63,10 @@ export class ArmClient implements Arm {
     );
   }
 
-  async getKinematics(extra = {}, callOptions = this.callOptions) {
+  async getKinematics(
+    extra = {},
+    callOptions = this.callOptions
+  ): Promise<GetKinematicsResult> {
     return getKinematicsFromClient(
       this.client.getKinematics,
       this.name,

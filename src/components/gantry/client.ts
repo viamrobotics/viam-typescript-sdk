@@ -17,6 +17,7 @@ import {
   getGeometriesFromClient,
 } from '../../utils';
 import type { Gantry } from './gantry';
+import type { GetKinematicsResult } from '../../utils';
 
 /**
  * A gRPC-web client for the Gantry component.
@@ -44,7 +45,10 @@ export class GantryClient implements Gantry {
     );
   }
 
-  async getKinematics(extra = {}, callOptions = this.callOptions) {
+  async getKinematics(
+    extra = {},
+    callOptions = this.callOptions
+  ): Promise<GetKinematicsResult> {
     return getKinematicsFromClient(
       this.client.getKinematics,
       this.name,

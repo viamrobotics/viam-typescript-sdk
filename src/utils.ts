@@ -13,6 +13,7 @@ import {
   GetGeometriesRequest,
   GetGeometriesResponse,
   Geometry,
+  Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
 import type { Frame } from './gen/app/v1/robot_pb';
@@ -108,6 +109,17 @@ export interface KinematicsData {
   links: Frame[];
 }
 
+/** Newer kinematics return shape that includes meshes */
+export interface GetKinematicsResultWithMeshes {
+  kinematicsData: KinematicsData;
+  meshesByUrdfFilepath: Record<string, Mesh>;
+}
+
+/** Shared type for kinematics return value (legacy or with meshes) */
+export type GetKinematicsResult =
+  | KinematicsData
+  | GetKinematicsResultWithMeshes;
+
 type getKinematics = (
   request: PartialMessage<GetKinematicsRequest>,
   options?: CallOptions
@@ -119,7 +131,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   name: string,
   extra: Struct = Struct.fromJson({}),
   callOptions: CallOptions = {}
-): Promise<KinematicsData> {
+): Promise<GetKinematicsResult> {
   const request = new GetKinematicsRequest({
     name,
     extra,
@@ -129,8 +141,13 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
   const decoder = new TextDecoder('utf8');
   const jsonString = decoder.decode(response.kinematicsData);
+  const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
 
-  return JSON.parse(jsonString) as KinematicsData;
+  return {
+    ...parsedKinematicsData,
+    kinematicsData: parsedKinematicsData,
+    meshesByUrdfFilepath: response.meshesByUrdfFilepath,
+  };
 };
 
 type getGeometries = (

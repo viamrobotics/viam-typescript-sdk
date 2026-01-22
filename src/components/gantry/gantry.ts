@@ -1,7 +1,7 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 import type { Geometry } from '../../gen/common/v1/common_pb';
-import type { KinematicsData } from '../../utils';
+import type { GetKinematicsResult } from '../../utils';
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {
@@ -36,8 +36,11 @@ export interface Gantry extends Resource {
    *
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getkinematics).
+   *
+   * @returns The legacy kinematics data shape or the newer object containing
+   *   kinematics data plus a map of URDF mesh file paths to mesh data.
    */
-  getKinematics: (extra?: Struct) => Promise<KinematicsData>;
+  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 
   /**
    * Move each axis of the gantry to the positionsMm at the speeds in
