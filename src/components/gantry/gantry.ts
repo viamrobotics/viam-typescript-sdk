@@ -36,6 +36,9 @@ export interface Gantry extends Resource {
    *
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getkinematics).
+   *
+   * @returns The legacy kinematics data shape or the newer object containing
+   *   kinematics data plus a map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 

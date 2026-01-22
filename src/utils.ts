@@ -109,11 +109,14 @@ export interface KinematicsData {
   links: Frame[];
 }
 
-/** Shared type for kinematics return value */
-export interface GetKinematicsResult {
+/** Newer kinematics return shape that includes meshes */
+export interface GetKinematicsResultWithMeshes {
   kinematicsData: KinematicsData;
   meshesByUrdfFilepath: Record<string, Mesh>;
 }
+
+/** Shared type for kinematics return value (legacy or with meshes) */
+export type GetKinematicsResult = KinematicsData | GetKinematicsResultWithMeshes;
 
 type getKinematics = (
   request: PartialMessage<GetKinematicsRequest>,
@@ -139,6 +142,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
 
   return {
+    ...parsedKinematicsData,
     kinematicsData: parsedKinematicsData,
     meshesByUrdfFilepath: response.meshesByUrdfFilepath,
   };

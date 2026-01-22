@@ -69,8 +69,8 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getkinematics).
    * ```
    *
-   * @returns The kinematics data and a map of URDF mesh file paths to mesh
-   *   data.
+   * @returns The legacy kinematics data shape or the newer object containing
+   *   kinematics data plus a map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 
