@@ -18,6 +18,7 @@ class LogStorage {
   private readonly buffer: (string | undefined)[] = Array.from({
     length: LOG_STORAGE_CAPACITY,
   });
+
   private head = 0;
   private count = 0;
 
