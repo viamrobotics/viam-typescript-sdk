@@ -116,7 +116,9 @@ export interface GetKinematicsResultWithMeshes {
 }
 
 /** Shared type for kinematics return value (legacy or with meshes) */
-export type GetKinematicsResult = KinematicsData | GetKinematicsResultWithMeshes;
+export type GetKinematicsResult =
+  | KinematicsData
+  | GetKinematicsResultWithMeshes;
 
 type getKinematics = (
   request: PartialMessage<GetKinematicsRequest>,
