@@ -15,6 +15,7 @@ import { ConnectionClosedError } from './connection-closed-error';
 import type { DialWebRTCOptions } from './dial';
 import { addSdpFields } from './peer';
 import { atob, btoa } from './polyfills';
+import { Logger } from '../logging';
 
 const callUUIDUnset = 'invariant: call uuid unset';
 
@@ -37,6 +38,8 @@ export class SignalingExchange {
   private numCallUpdates = 0;
   private maxCallUpdateDuration = 0;
   private totalCallUpdateDuration = 0;
+
+  private logger = new Logger('SignalingExchange');
 
   constructor(
     private readonly signalingClient: Client<typeof SignalingService>,
@@ -74,7 +77,9 @@ export class SignalingExchange {
         this.exchangeDone = true;
         await this.sendDone();
       })
-      .catch(console.error); // eslint-disable-line no-console
+      .catch((error) => {
+        this.logger.error('Client channel ready failed', error);
+      });
 
     // Initiate now the call now that all of our handlers are setup.
     const callResponses = this.signalingClient.call(callRequest, this.callOpts);
@@ -106,20 +111,17 @@ export class SignalingExchange {
         }
         const averageCallUpdateDuration =
           this.totalCallUpdateDuration / this.numCallUpdates;
-        console.groupCollapsed('Caller update statistics'); // eslint-disable-line no-console
-        // eslint-disable-next-line no-console
-        console.table({
+        this.logger.table('Caller update statistics', {
           num_updates: this.numCallUpdates,
           average_duration: `${averageCallUpdateDuration}ms`,
           max_duration: `${this.maxCallUpdateDuration}ms`,
         });
-        console.groupEnd(); // eslint-disable-line no-console
       });
       this.pc.addEventListener(
         'icecandidate',
         (event: { candidate: RTCIceCandidateInit | null }) => {
           this.onLocalICECandidate(event).catch((error) => {
-            console.error(`error processing local ICE candidate ${error}`); // eslint-disable-line no-console
+            this.logger.error('Error processing local ICE candidate', error);
           });
         }
       );
@@ -183,7 +185,7 @@ export class SignalingExchange {
       if (this.clientChannel.isClosed()) {
         throw new ConnectionClosedError('client channel is closed');
       }
-      console.error(error.message); // eslint-disable-line no-console
+      this.logger.error('error handling init response', { error });
     }
     throw error;
   }
@@ -238,12 +240,12 @@ export class SignalingExchange {
     }
     const cand = iceCandidateFromProto(response.candidate);
     if (cand.candidate !== undefined) {
-      console.debug(`received remote ICE ${cand.candidate}`); // eslint-disable-line no-console
+      this.logger.info('Received remote ICE', { candidate: cand });
     }
     try {
       await this.pc.addIceCandidate(cand);
     } catch (error) {
-      console.log('error adding ice candidate', error); // eslint-disable-line no-console
+      this.logger.error('Error adding remote ICE candidate', error);
       await this.sendError(JSON.stringify(error));
       throw error;
     }
@@ -258,9 +260,8 @@ export class SignalingExchange {
 
     if (this.exchangeDone || this.pc.iceConnectionState === 'connected') {
       if (event.candidate !== null) {
-        // eslint-disable-next-line no-console
-        console.info(
-          'Dropping ICE candidate - exchange done or already connected',
+        this.logger.info(
+          'Dropping local ICE candidate - exchange done or already connected',
           {
             exchangeDone: this.exchangeDone,
             iceConnectionState: this.pc.iceConnectionState,
@@ -272,22 +273,22 @@ export class SignalingExchange {
     }
 
     if (event.candidate === null) {
-      // eslint-disable-next-line no-console
-      console.info('ICE gathering complete');
+      this.logger.info('ICE gathering complete');
       this.iceComplete = true;
       await this.sendDone();
       return;
     }
 
     if (this.callUuid === undefined || this.callUuid === '') {
-      // eslint-disable-next-line no-console
-      console.error(callUUIDUnset);
-      throw new Error(callUUIDUnset);
+      const error = new Error(callUUIDUnset);
+      this.logger.error('Call UUID unset', error);
+      throw error;
     }
 
     if (event.candidate.candidate !== undefined) {
-      // eslint-disable-next-line no-console
-      console.info(`Gathered local ICE ${event.candidate.candidate}`);
+      this.logger.info('Gathered local ICE', {
+        candidate: event.candidate,
+      });
     }
 
     const iProto = iceCandidateToProto(event.candidate);
@@ -320,7 +321,7 @@ export class SignalingExchange {
       ) {
         return;
       }
-      console.error(error); // eslint-disable-line no-console
+      this.logger.error('Error processing call update', error);
     }
   }
 
@@ -350,7 +351,7 @@ export class SignalingExchange {
        * with another ICE candidate(s) will make the connection work. In the
        * future it may be better to figure out if this error is fatal or not.
        */
-      console.error('failed to send call update; continuing', error); // eslint-disable-line no-console
+      this.logger.error('Failed to send call update; continuing', error);
     }
   }
 
@@ -377,7 +378,7 @@ export class SignalingExchange {
        * with another ICE candidate(s) will make the connection work. In the
        * future it may be better to figure out if this error is fatal or not.
        */
-      console.error(error); // eslint-disable-line no-console
+      this.logger.error('Failed to send call update', error);
     }
   }
 }

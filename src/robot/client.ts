@@ -45,6 +45,7 @@ import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
 import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { assertExists } from '../assert';
+import { Logger } from '../logging';
 
 const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';
 
@@ -223,6 +224,8 @@ const throwOnAbortError = (error: unknown) => {
 export class RobotClient extends EventDispatcher implements Robot {
   private serviceHost = '';
 
+  private readonly logger = new Logger('RobotClient');
+
   private readonly webrtcOptions: WebRTCOptions = {
     enabled: false,
     host: '',
@@ -308,6 +311,8 @@ export class RobotClient extends EventDispatcher implements Robot {
   private onDataChannelClose?: (event: Event) => void;
   private onTrack?: (event: RTCTrackEvent) => void;
 
+  private static readonly notConnectedYetStr = 'Not connected yet';
+
   constructor(
     serviceHost?: string,
     webrtcOptions?: WebRTCOptions,
@@ -335,19 +340,34 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.gRPCConnectionManager = new GRPCConnectionManager(
       (): Transport => {
         if (!this.transport) {
-          throw new Error(RobotClient.notConnectedYetStr);
+          const error = new Error(RobotClient.notConnectedYetStr);
+          this.logger.error(
+            'No transport for GRPC connection manager, cannot create service client',
+            error
+          );
+          throw error;
         }
         return this.transport;
       },
       () => {
+        this.logger.info(
+          'GRPC connection manager disconnected, will try to reconnect'
+        );
         this.onDisconnect();
       }
     );
+
     this.sessionManager = new SessionManager(
       this.serviceHost,
       (): Transport => {
         if (!this.transport) {
-          throw new Error(RobotClient.notConnectedYetStr);
+          const error = new Error(RobotClient.notConnectedYetStr);
+          this.logger.error(
+            'No transport for session manager, cannot create service client',
+            error
+          );
+
+          throw error;
         }
         return this.transport;
       }
@@ -362,6 +382,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     // MachineConnectionEvents.
     for (const eventType of Object.values(MachineConnectionEvent)) {
       this.on(eventType, () => {
+        this.logger.debug('Connection state changed', { eventType });
         this.emit('connectionstatechange', { eventType });
       });
     }
@@ -370,6 +391,8 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private cleanupEventListeners() {
+    this.logger.debug('Cleaning up event listeners');
+
     if (this.peerConn && this.onICEConnectionStateChange) {
       this.peerConn.removeEventListener(
         'iceconnectionstatechange',
@@ -391,50 +414,32 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private onDisconnect(event?: Event) {
+    this.logger.debug('On disconnect', { event });
     this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
 
     if (this.noReconnect !== undefined && this.noReconnect) {
+      this.logger.debug('No reconnect, will not try to reconnect');
       return;
     }
 
     if (this.closed) {
+      this.logger.debug('Connection closed, will not try to reconnect');
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.debug('Connection closed, will try to reconnect');
-    const backOffOpts: Partial<IBackOffOptions> = {
-      retry: (error, attemptNumber) => {
-        // eslint-disable-next-line no-console
-        console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff`,
-          error
-        );
-
-        this.currentRetryAttempt = attemptNumber;
-        if (this.closed) {
-          return false;
-        }
-
-        const isRetryable = isRetryableError(error);
-        if (isRetryable) {
-          return true;
-        }
-
-        // eslint-disable-next-line no-console
-        console.debug(
-          'Non-retryable error encountered, stopping reconnection attempts',
-          error
-        );
-        return false;
-      },
-    };
+    const backOffOpts = this.createBackOffOpts();
 
     if (this.reconnectMaxWait !== undefined) {
+      this.logger.debug('Setting reconnect max delay', {
+        'max wait': this.reconnectMaxWait,
+      });
       backOffOpts.maxDelay = this.reconnectMaxWait;
     }
 
     if (this.reconnectMaxAttempts !== undefined) {
+      this.logger.debug('Setting reconnect max attempts', {
+        'max attempts': this.reconnectMaxAttempts,
+      });
       backOffOpts.numOfAttempts = this.reconnectMaxAttempts;
     }
 
@@ -442,21 +447,20 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
-        // eslint-disable-next-line no-console
-        console.debug('Reconnected successfully!');
+        this.logger.info('Reconnected successfully!');
       })
       .catch((error) => {
         if (
           this.reconnectMaxAttempts !== undefined &&
           this.currentRetryAttempt >= this.reconnectMaxAttempts
         ) {
-          // eslint-disable-next-line no-console
-          console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
+          this.logger.warn(
+            `Reached max attempts: ${this.reconnectMaxAttempts}`
+          );
           return;
         }
 
-        // eslint-disable-next-line no-console
-        console.error(error);
+        this.logger.error('Failed to reconnect', error);
       });
   }
 
@@ -480,8 +484,6 @@ export class RobotClient extends EventDispatcher implements Robot {
   get sessionId() {
     return this.sessionManager.sessionID;
   }
-
-  private static readonly notConnectedYetStr = 'not connected yet';
 
   get robotService() {
     if (!this.robotServiceClient) {
@@ -612,8 +614,14 @@ export class RobotClient extends EventDispatcher implements Robot {
     conf: DialWebRTCConf,
     abortSignal?: DialAbortSignal
   ) {
+    this.logger.debug('Dialing WebRTC', {
+      attempt: this.currentRetryAttempt,
+      config: conf,
+    });
+
     // Check if aborted before starting
     if (abortSignal?.abort === true) {
+      this.logger.info(DIAL_ABORTED_ERROR_MESSAGE);
       throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
     }
 
@@ -635,11 +643,14 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
-    await this.connect({
+    const connectOptions = {
       priority: conf.priority,
       dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
       creds: conf.credentials,
-    });
+    };
+
+    this.logger.debug('Connecting with WebRTC', { connectOptions });
+    await this.connect(connectOptions);
 
     return this;
   }
@@ -648,9 +659,16 @@ export class RobotClient extends EventDispatcher implements Robot {
     conf: DialDirectConf,
     abortSignal?: DialAbortSignal
   ) {
+    this.logger.debug('Dialing directly', {
+      attempt: this.currentRetryAttempt,
+      config: conf,
+    });
+
     // Check if aborted before starting
     if (abortSignal?.abort === true) {
-      throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
+      const error = new Error(DIAL_ABORTED_ERROR_MESSAGE);
+      this.logger.info(DIAL_ABORTED_ERROR_MESSAGE);
+      throw error;
     }
 
     this.emit(MachineConnectionEvent.DIALING, {
@@ -660,9 +678,11 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     /** Check if a url corresponds to a local connection via heuristic */
     if (!conf.host.includes('local')) {
-      throw new Error(
+      const error = new Error(
         `cannot dial "${conf.host}" directly, please use a local url instead.`
       );
+      this.logger.error('Cannot dial directly', error);
+      throw error;
     }
 
     this.serviceHost = conf.host;
@@ -676,15 +696,19 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
-    await this.connect({
+    const connectOptions = {
       creds: conf.credentials,
       dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
-    });
+    };
+
+    this.logger.debug('Connecting directly', { connectOptions });
+    await this.connect(connectOptions);
 
     return this;
   }
 
   private resetDialing(dialPromise: Promise<RobotClient>) {
+    this.logger.debug('Resetting dialing');
     if (this.dialing === dialPromise) {
       this.dialing = undefined;
       this.currentDialAbortSignal = undefined;
@@ -692,15 +716,20 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async dial(conf: DialConf) {
-    validateDialConf(conf);
+    this.logger.debug('Dialing', { conf });
+
+    try {
+      validateDialConf(conf);
+    } catch (error) {
+      this.logger.error('Invalid dial conf', error);
+      throw error;
+    }
 
     if (this.dialing && this.currentDialAbortSignal) {
-      // eslint-disable-next-line no-console
-      console.debug('Aborting previous dial attempt due to new dial call');
+      this.logger.info('Aborting previous dial attempt due to new dial call');
       this.currentDialAbortSignal.abort = true;
       this.dialing.catch(() => {
-        // eslint-disable-next-line no-console
-        console.debug('Ignored abort error from previous dial');
+        this.logger.info('Ignored abort error from previous dial');
       });
     }
 
@@ -722,8 +751,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         error instanceof Error &&
         error.message === DIAL_ABORTED_ERROR_MESSAGE
       ) {
-        // eslint-disable-next-line no-console
-        console.debug(DIAL_ABORTED_ERROR_MESSAGE);
+        this.logger.info(DIAL_ABORTED_ERROR_MESSAGE);
         return this;
       }
       throw error;
@@ -731,36 +759,73 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private createBackOffOpts(
-    { abort: internalAbort }: DialAbortSignal,
-    { abort: userAbort }: DialAbortSignal
+    internalAbortSignal?: DialAbortSignal,
+    userAbortSignal?: DialAbortSignal
   ): Partial<IBackOffOptions> {
     return {
       retry: (error, attemptNumber) => {
-        const aborted = internalAbort || userAbort;
-        if (aborted) {
-          throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
+        this.logger.info(`Retrying dial, attempt ${attemptNumber}`, {
+          reason: error,
+        });
+
+        // Check abort signals if provided
+        if (
+          internalAbortSignal?.abort === true ||
+          userAbortSignal?.abort === true
+        ) {
+          const abortedError = new Error(DIAL_ABORTED_ERROR_MESSAGE);
+          this.logger.info(`Dial attempt ${attemptNumber} aborted`);
+          throw abortedError;
         }
 
-        // eslint-disable-next-line no-console
-        console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff`,
-          error
-        );
+        // Check if a new dial operation has started (only if we have an abort signal to compare)
+        if (
+          internalAbortSignal &&
+          this.currentDialAbortSignal &&
+          this.currentDialAbortSignal !== internalAbortSignal
+        ) {
+          this.logger.info(
+            `Dial attempt ${attemptNumber} aborted due to new dial operation`
+          );
+          return false;
+        }
+
+        // Check if a new dial operation has started (when no abort signal provided, check dialing state)
+        if (!internalAbortSignal && this.dialing) {
+          this.logger.info(
+            `New dial operation in progress, stopping retry attempt ${attemptNumber}`
+          );
+          return false;
+        }
+
+        // Check if connection is already established
+        if (this.isConnected()) {
+          this.logger.info(
+            `Connection already established, stopping retry attempt ${attemptNumber}`
+          );
+          return false;
+        }
 
         this.currentRetryAttempt = attemptNumber;
 
         if (this.closed) {
+          this.logger.debug(
+            `Connection closed during dial attempt ${attemptNumber}, will not try to reconnect`
+          );
           return false;
         }
 
         if (isRetryableError(error)) {
+          this.logger.debug(
+            `Retryable error during dial attempt ${attemptNumber}, will try to reconnect`,
+            { error: error as unknown }
+          );
           return true;
         }
 
-        // eslint-disable-next-line no-console
-        console.debug(
-          'Non-retryable error encountered, stopping connection attempts',
-          error
+        this.logger.warn(
+          `Non-retryable error encountered during dial attempt ${attemptNumber}, stopping connection attempts`,
+          { error: error as unknown }
         );
         return false;
       },
@@ -784,8 +849,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       const dialWebRTCError =
         error instanceof Error ? error : new Error(String(error));
 
-      // eslint-disable-next-line no-console
-      console.debug('Failed to connect via WebRTC', dialWebRTCError);
+      this.logger.error('Failed to connect via WebRTC', dialWebRTCError);
       this.emit(MachineConnectionEvent.DISCONNECTED, {
         error: dialWebRTCError,
       });
@@ -811,8 +875,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       const dialDirectError =
         error instanceof Error ? error : new Error(String(error));
 
-      // eslint-disable-next-line no-console
-      console.debug('Failed to connect via gRPC', dialDirectError);
+      this.logger.error('Failed to connect via gRPC', dialDirectError);
       this.emit(MachineConnectionEvent.DISCONNECTED, {
         error: dialDirectError,
       });
@@ -826,18 +889,26 @@ export class RobotClient extends EventDispatcher implements Robot {
     internalAbortSignal: DialAbortSignal,
     userAbortSignal?: DialAbortSignal
   ): Promise<RobotClient> {
+    this.logger.debug('Performing dial', { conf });
     const backOffOpts = this.createBackOffOpts(
       internalAbortSignal,
       userAbortSignal ?? { abort: false }
     );
 
     if (conf.reconnectMaxWait !== undefined) {
+      this.logger.debug('Setting reconnect max delay', {
+        reconnectMaxWait: conf.reconnectMaxWait,
+      });
       backOffOpts.maxDelay = conf.reconnectMaxWait;
     }
 
     backOffOpts.numOfAttempts = conf.noReconnect
       ? 1
       : conf.reconnectMaxAttempts;
+
+    this.logger.debug('Setting reconnect max attempts', {
+      reconnectMaxAttempts: backOffOpts.numOfAttempts,
+    });
 
     this.currentRetryAttempt = 0;
     const errors: Error[] = [];
@@ -854,9 +925,11 @@ export class RobotClient extends EventDispatcher implements Robot {
       );
       // If WebRTC succeeded, return the client
       if (!error) {
+        this.logger.debug('WebRTC dial succeeded');
         return dialer;
       }
 
+      this.logger.debug('WebRTC dial failed', { error });
       errors.push(error);
     }
 
@@ -872,29 +945,33 @@ export class RobotClient extends EventDispatcher implements Robot {
       );
       // If gRPC succeeded, return the client
       if (!error) {
+        this.logger.debug('Direct dial succeeded');
         return dialer;
       }
 
+      this.logger.debug('Direct dial failed', { error });
       errors.push(error);
     }
 
     if (errors.length === potentialErrors) {
-      throw new Error('Failed to connect via all methods', {
+      const error = new Error('Failed to connect via all methods', {
         cause: errors,
       });
+      this.logger.error('Failed to connect via all methods', error);
+      throw error;
     }
 
     return this;
   }
 
   public async disconnect() {
+    this.logger.debug('Disconnecting');
     this.emit(MachineConnectionEvent.DISCONNECTING, {});
 
     if (this.currentDialAbortSignal && this.dialing) {
       this.currentDialAbortSignal.abort = true;
       this.dialing.catch(() => {
-        // eslint-disable-next-line no-console
-        console.debug('Ignored abort error from previous dial');
+        this.logger.info('Ignored abort error from previous dial');
       });
       this.resetDialing(this.dialing);
     }
@@ -932,16 +1009,20 @@ export class RobotClient extends EventDispatcher implements Robot {
     priority,
     dialTimeout,
   }: ConnectOptions = {}) {
+    this.logger.debug('Connecting');
     this.emit(MachineConnectionEvent.CONNECTING, {});
     this.closed = false;
 
     if (this.connecting) {
+      this.logger.debug('Connection already in progress');
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       while (this.connecting !== undefined) {
         // eslint-disable-next-line no-await-in-loop
         await this.connecting;
       }
+
+      this.logger.debug('Connection completed');
       return;
     }
 
@@ -964,6 +1045,7 @@ export class RobotClient extends EventDispatcher implements Robot {
      * otherwise our session and authentication context will no longer match.
      */
     if (!creds || creds !== this.savedCreds || this.sessionOptions.disabled) {
+      this.logger.debug('Resetting session');
       this.sessionManager.reset();
     }
 
@@ -1001,6 +1083,14 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         const signalingAddress =
           this.webrtcOptions.signalingAddress || this.serviceHost;
+
+        this.logger.debug('Creating WebRTC connection', {
+          signalingAddress,
+          host: this.webrtcOptions.host,
+          opts,
+          serviceHost: this.serviceHost,
+        });
+
         const webRTCConn = await dialWebRTC(
           signalingAddress,
           this.webrtcOptions.host,
@@ -1010,6 +1100,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.peerConn = webRTCConn.peerConnection;
         this.dataChannel = webRTCConn.dataChannel;
+
+        this.logger.debug('WebRTC connection created', { webRTCConn });
 
         this.cleanupEventListeners();
 
@@ -1023,8 +1115,10 @@ export class RobotClient extends EventDispatcher implements Robot {
            * recover.
            */
           if (this.peerConn?.iceConnectionState === 'connected') {
+            this.logger.debug('ICE connection state changed to connected');
             this.emit(MachineConnectionEvent.CONNECTED, {});
           } else if (this.peerConn?.iceConnectionState === 'closed') {
+            this.logger.debug('ICE connection state changed to closed');
             this.onDisconnect();
           }
         };
@@ -1043,10 +1137,14 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.transport = webRTCConn.transport;
 
         this.onTrack = (event: RTCTrackEvent) => {
+          this.logger.debug('Track event', { event });
+
           const [eventStream] = event.streams;
           if (!eventStream) {
+            const error = new Error('Expected event stream to exist');
+            this.logger.error('Expected event stream to exist', error);
             this.emit('track', event);
-            throw new Error('expected event stream to exist');
+            throw error;
           }
 
           /*
@@ -1073,11 +1171,13 @@ export class RobotClient extends EventDispatcher implements Robot {
 
       this.robotServiceClient = createClient(RobotService, clientTransport);
 
+      this.logger.debug('Connection completed');
       this.emit(MachineConnectionEvent.CONNECTED, {});
     } catch (error) {
       // Need to catch the error to properly emit disconnect but
       // also throw the error so reconnect backoff keeps retrying.
       // TODO(ethanlook): clean this up
+      this.logger.debug('Connection failed', { error });
       this.emit(MachineConnectionEvent.DISCONNECTED, {});
       throw error;
     } finally {
