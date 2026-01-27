@@ -63,7 +63,7 @@
   },
   "camera": {
     "importName": "CameraClient",
-    "func": "getImage",
+    "func": "getImages",
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM"
   },
