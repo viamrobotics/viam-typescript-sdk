@@ -47,6 +47,7 @@ const connect = async () => {
   updateConnectionStatus(VIAM.MachineConnectionEvent.CONNECTING);
 
   try {
+    console.log(HOST, API_KEY, API_KEY_ID);
     machine = await VIAM.createRobotClient({
       host: HOST,
       credentials: {

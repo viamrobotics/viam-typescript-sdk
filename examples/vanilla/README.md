@@ -2,7 +2,7 @@
 
 This example demonstrates how to connect to a robot. The example uses Vite + vanilla TypeScript and HTML.
 
-> NOTE: Firefox on macOS requires accessing the dev server via your local network IP instead of localhost. See the Firefox section below.
+> NOTE: Firefox on macOS requires using a local hostname instead of localhost. See the Firefox section below.
 
 ## Usage
 
@@ -26,22 +26,26 @@ Edit `src/main.ts` to change the robot logic being run. Edit `index.html` to cha
 
 ### Firefox
 
-Firefox has a limitation with WebRTC when accessing via `localhost`. To use this example in Firefox:
+Firefox has a limitation with WebRTC when accessing via `localhost` due to network interface enumeration restrictions. To work around this, use a local hostname that resolves to localhost:
 
-1. Start the dev server on all network interfaces:
-   ```
-   npm run dev -- --host 0.0.0.0
-   ```
+1. Add a local hostname to your hosts file:
 
-2. Find your local IP address:
-   ```
-   MacOS Example:
-   ifconfig | grep "inet " | grep -v 127.0.0.1
+   **macOS/Linux:**
+   ```bash
+   sudo bash -c 'echo "127.0.0.1	dev.local" >> /etc/hosts'
    ```
 
-3. Open Firefox and navigate to `http://<YOUR_LOCAL_IP>:5173` (e.g., `http://192.168.1.100:5173`)
+   **Windows (run Command Prompt as Administrator):**
+   ```cmd
+   echo 127.0.0.1	dev.local >> C:\Windows\System32\drivers\etc\hosts
+   ```
 
-**Security Note:** When running with `--host 0.0.0.0`, your dev server is accessible from other machines on your local network. Only use this on trusted networks (like your home WiFi).
+2. Start the dev server with the local hostname:
+   ```bash
+   npm run dev -- --host dev.local
+   ```
+
+3. Open Firefox and navigate to `http://dev.local:5173`
 
 ### Base Project Template
 
