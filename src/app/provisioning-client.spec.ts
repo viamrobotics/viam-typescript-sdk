@@ -4,6 +4,7 @@ import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
 import {
+  APIKey,
   CloudConfig,
   GetNetworkListResponse,
   GetSmartMachineStatusResponse,
@@ -41,10 +42,15 @@ const testSmartMachineStatus = new GetSmartMachineStatusResponse({
 const type = 'type';
 const ssid = 'ssid';
 const psk = 'psk';
+const apiKey = new APIKey({
+  id: 'api_key_id',
+  key: 'api_key_value',
+});
 const cloud = new CloudConfig({
   id: 'id',
   secret: 'secret',
   appAddress: 'app_address',
+  apiKey,
 });
 
 let setNetworkCredentialsReq: SetNetworkCredentialsRequest;
