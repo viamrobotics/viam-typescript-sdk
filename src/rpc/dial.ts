@@ -101,6 +101,71 @@ interface TransportInitOptions {
   baseUrl: string;
 }
 
+const enableGRPCTraceLogging = <T extends Transport>(
+  transport: T,
+  address: string
+): T => {
+  if (globalThis.VIAM?.GRPC_TRACE_LOGGING === true) {
+    const patchedUnary: typeof transport.unary = async <
+      I extends Message<I> = AnyMessage,
+      O extends Message<O> = AnyMessage,
+    >(
+      service: ServiceType,
+      method: MethodInfo<I, O>,
+      signal: AbortSignal | undefined,
+      timeoutMs: number | undefined,
+      header: HeadersInit | undefined,
+      message: PartialMessage<I>,
+      contextValues?: ContextValues
+    ): Promise<UnaryResponse<I, O>> => {
+      // eslint-disable-next-line no-console
+      console.trace(
+        `Unary request to ${address}/${service.typeName}.${method.name}`
+      );
+      return transport.unary(
+        service,
+        method,
+        signal,
+        timeoutMs,
+        header,
+        message,
+        contextValues
+      );
+    };
+
+    const patchedStream: typeof transport.stream = async <
+      I extends Message<I> = AnyMessage,
+      O extends Message<O> = AnyMessage,
+    >(
+      service: ServiceType,
+      method: MethodInfo<I, O>,
+      signal: AbortSignal | undefined,
+      timeoutMs: number | undefined,
+      header: HeadersInit | undefined,
+      input: AsyncIterable<PartialMessage<I>>,
+      contextValues?: ContextValues
+    ): Promise<StreamResponse<I, O>> => {
+      // eslint-disable-next-line no-console
+      console.trace(
+        `Stream request to ${address}/${service.typeName}.${method.name}`
+      );
+      return transport.stream(
+        service,
+        method,
+        signal,
+        timeoutMs,
+        header,
+        input,
+        contextValues
+      );
+    };
+
+    return { ...transport, unary: patchedUnary, stream: patchedStream };
+  }
+
+  return transport;
+};
+
 export const dialDirect = async (
   address: string,
   opts?: DialOptions,
@@ -129,7 +194,12 @@ export const dialDirect = async (
   ) {
     const headers = new Headers(opts.extraHeaders);
     headers.set('authorization', `Bearer ${opts.accessToken}`);
-    return new AuthenticatedTransport(transportOpts, createTransport, headers);
+    const transport = new AuthenticatedTransport(
+      transportOpts,
+      createTransport,
+      headers
+    );
+    return enableGRPCTraceLogging(transport, address);
   }
 
   if (
@@ -140,15 +210,17 @@ export const dialDirect = async (
     if (transportCredentialsInclude) {
       transportOpts.credentials = 'include';
     }
-    return createTransport(transportOpts);
+    const transport = createTransport(transportOpts);
+    return enableGRPCTraceLogging(transport, address);
   }
 
-  return makeAuthenticatedTransport(
+  const transport = await makeAuthenticatedTransport(
     address,
     createTransport,
     opts,
     transportOpts
   );
+  return enableGRPCTraceLogging(transport, address);
 };
 
 const addressCleanupRegex = /^.*:\/\//u;
@@ -225,7 +297,7 @@ export class AuthenticatedTransport implements Transport {
     this.transport = defaultFactory(opts);
   }
 
-  public async unary<
+  public unary = async <
     I extends Message<I> = AnyMessage,
     O extends Message<O> = AnyMessage,
   >(
@@ -236,7 +308,7 @@ export class AuthenticatedTransport implements Transport {
     header: HeadersInit | undefined,
     message: PartialMessage<I>,
     contextValues?: ContextValues
-  ): Promise<UnaryResponse<I, O>> {
+  ): Promise<UnaryResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
     for (const [key, value] of this.extraHeaders) {
       newHeaders.set(key, value);
@@ -250,9 +322,9 @@ export class AuthenticatedTransport implements Transport {
       message,
       contextValues
     );
-  }
+  };
 
-  public async stream<
+  public stream = async <
     I extends Message<I> = AnyMessage,
     O extends Message<O> = AnyMessage,
   >(
@@ -263,7 +335,7 @@ export class AuthenticatedTransport implements Transport {
     header: HeadersInit | undefined,
     input: AsyncIterable<PartialMessage<I>>,
     contextValues?: ContextValues
-  ): Promise<StreamResponse<I, O>> {
+  ): Promise<StreamResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
     for (const [key, value] of this.extraHeaders) {
       newHeaders.set(key, value);
@@ -277,7 +349,7 @@ export class AuthenticatedTransport implements Transport {
       input,
       contextValues
     );
-  }
+  };
 }
 
 export const cloneHeaders = (headers: HeadersInit | undefined): Headers => {
@@ -428,7 +500,7 @@ export const dialWebRTC = async (
 
     successful = true;
     return {
-      transport: cc,
+      transport: enableGRPCTraceLogging(cc, host),
       peerConnection: pc,
       dataChannel: dc,
     };
