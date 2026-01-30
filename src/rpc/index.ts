@@ -5,6 +5,7 @@ declare global {
   var VIAM:
     | {
         GRPC_TRANSPORT_FACTORY?: (opts: unknown) => Transport;
+        GRPC_TRACE_LOGGING?: boolean;
       }
     | undefined;
 }
