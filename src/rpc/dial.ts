@@ -30,6 +30,7 @@ import { newPeerConnectionForClient } from './peer';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { SignalingExchange } from './signaling-exchange';
+import { randomUUID } from 'node:crypto';
 
 export interface DialOptions {
   credentials?: Credentials | undefined;
@@ -118,11 +119,12 @@ const enableGRPCTraceLogging = <T extends Transport>(
       message: PartialMessage<I>,
       contextValues?: ContextValues
     ): Promise<UnaryResponse<I, O>> => {
+      const id = randomUUID();
       // eslint-disable-next-line no-console
       console.trace(
-        `Unary request to ${address}/${service.typeName}.${method.name}`
+        `Unary request ${id} : ${address}/${service.typeName}.${method.name}`
       );
-      return transport.unary(
+      const resp = await transport.unary(
         service,
         method,
         signal,
@@ -131,6 +133,9 @@ const enableGRPCTraceLogging = <T extends Transport>(
         message,
         contextValues
       );
+      // eslint-disable-next-line no-console
+      console.trace(`Unary response ${id} : ${JSON.stringify(resp)}`);
+      return resp;
     };
 
     const patchedStream: typeof transport.stream = async <
@@ -145,11 +150,12 @@ const enableGRPCTraceLogging = <T extends Transport>(
       input: AsyncIterable<PartialMessage<I>>,
       contextValues?: ContextValues
     ): Promise<StreamResponse<I, O>> => {
+      const id = randomUUID();
       // eslint-disable-next-line no-console
       console.trace(
-        `Stream request to ${address}/${service.typeName}.${method.name}`
+        `Stream request ${id} : ${address}/${service.typeName}.${method.name}`
       );
-      return transport.stream(
+      const resp = await transport.stream(
         service,
         method,
         signal,
@@ -158,6 +164,10 @@ const enableGRPCTraceLogging = <T extends Transport>(
         input,
         contextValues
       );
+
+      // eslint-disable-next-line no-console
+      console.trace(`Stream response ${id} : ${JSON.stringify(resp.message)}`);
+      return resp;
     };
 
     return { ...transport, unary: patchedUnary, stream: patchedStream };
