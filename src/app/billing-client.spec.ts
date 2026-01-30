@@ -15,6 +15,10 @@ import {
   SourceType,
   UsageCost,
   UsageCostType,
+  GetLocationBillingOrganizationResponse,
+  UpdateLocationBillingOrganizationResponse,
+  ChargeOrganizationResponse,
+  CreateInvoiceAndChargeImmediatelyResponse,
 } from '../gen/app/v1/billing_pb';
 import {
   BillingClient,
@@ -74,6 +78,20 @@ const testBillingInfo = {
   billingTier: 'platinum',
 };
 
+const testLocationBillingOrgResponse = new GetLocationBillingOrganizationResponse({
+  billingOrganizationId: 'test-billing-org-id',
+});
+
+const testUpdateLocationBillingOrgResponse = new UpdateLocationBillingOrganizationResponse({});
+
+const testChargeOrgResponse = new ChargeOrganizationResponse({
+  invoiceId: 'test-invoice-id',
+});
+
+const testCreateInvoiceAndChargeImmediatelyResponse = new CreateInvoiceAndChargeImmediatelyResponse({
+  invoiceId: 'test-invoice-id',
+});
+
 let testGetInvoicePdfStream: WritableIterable<GetInvoicePdfResponse>;
 
 let mockTransport: Transport;
@@ -118,6 +136,10 @@ describe('BillingClient tests', () => {
         getOrgBillingInformation: () => testBillingInfo,
         getInvoicesSummary: () => testInvoiceSummary,
         getInvoicePdf: () => testGetInvoicePdfStream,
+        getLocationBillingOrganization: () => testLocationBillingOrgResponse,
+        updateLocationBillingOrganization: () => testUpdateLocationBillingOrgResponse,
+        chargeOrganization: () => testChargeOrgResponse,
+        createInvoiceAndChargeImmediately: () => testCreateInvoiceAndChargeImmediatelyResponse,
       });
     });
   });
@@ -161,5 +183,44 @@ describe('BillingClient tests', () => {
 
     const array = new Uint8Array([1, 2, 3, 4]);
     await expect(promise).resolves.toStrictEqual(array);
+  });
+
+  it('getLocationBillingOrganization', async () => {
+    const response = await subject().getLocationBillingOrganization('locationId');
+    expect(response).toEqual(testLocationBillingOrgResponse);
+  });
+
+  it('updateLocationBillingOrganization', async () => {
+    const response = await subject().updateLocationBillingOrganization(
+      'locationId',
+      'billingOrgId'
+    );
+    expect(response).toEqual(testUpdateLocationBillingOrgResponse);
+  });
+
+  it('chargeOrganization', async () => {
+    const response = await subject().chargeOrganization('orgId', 10.0, 1.0, {
+      description: 'test charge',
+      orgIdForBranding: 'brandingOrgId',
+      disableConfirmationEmail: true,
+    });
+    expect(response).toEqual(testChargeOrgResponse);
+
+    const responseMinimal = await subject().chargeOrganization('orgId', 5.0, 0.5);
+    expect(responseMinimal).toEqual(testChargeOrgResponse);
+  });
+
+  it('createInvoiceAndChargeImmediately (deprecated)', async () => {
+    const response = await subject().createInvoiceAndChargeImmediately(
+      'orgId',
+      10.0,
+      1.0,
+      {
+        description: 'test invoice',
+        orgIdForBranding: 'brandingOrgId',
+        disableConfirmationEmail: true,
+      }
+    );
+    expect(response).toEqual(testCreateInvoiceAndChargeImmediatelyResponse);
   });
 });

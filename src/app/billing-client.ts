@@ -1,3 +1,8 @@
+import type {
+  GetLocationBillingOrganizationResponse,
+  UpdateLocationBillingOrganizationResponse,
+  ChargeOrganizationResponse
+} from '../gen/app/v1/billing_pb';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { BillingService } from '../gen/app/v1/billing_connect';
 import type { GetCurrentMonthUsageResponse as PBGetCurrentMonthUsageResponse } from '../gen/app/v1/billing_pb';
@@ -114,6 +119,89 @@ export class BillingClient {
       chunks.push(pdfPart.chunk);
     }
     return concatArrayU8(chunks);
+  }
+
+  /**
+   * Get the billing organization for a location.
+   *
+   * @param locationId - The location ID.
+   */
+  async getLocationBillingOrganization(locationId: string) {
+    return this.client.getLocationBillingOrganization({
+      locationId,
+    });
+  }
+
+  /**
+   * Update the billing organization for a location.
+   *
+   * @param locationId - The location ID.
+   * @param billingOrganizationId - The billing organization ID.
+   */
+  async updateLocationBillingOrganization(
+    locationId: string,
+    billingOrganizationId: string
+  ) {
+    return this.client.updateLocationBillingOrganization({
+      locationId,
+      billingOrganizationId,
+    });
+  }
+
+  /**
+   * Charge an organization on the spot.
+   *
+   * @param orgIdToCharge - The organization ID to charge.
+   * @param subtotal - The subtotal amount to charge.
+   * @param tax - The tax amount to charge.
+   * @param options - Optional parameters.
+   * @param options.description - A description for the charge.
+   * @param options.orgIdForBranding - The organization ID for branding purposes.
+   * @param options.disableConfirmationEmail - Whether to disable the confirmation email.
+   */
+  async chargeOrganization(
+    orgIdToCharge: string,
+    subtotal: number,
+    tax: number,
+    options?: {
+      description?: string;
+      orgIdForBranding?: string;
+      disableConfirmationEmail?: boolean;
+    }
+  ) {
+    return this.client.chargeOrganization({
+      orgIdToCharge,
+      description: options?.description,
+      subtotal,
+      tax,
+      orgIdForBranding: options?.orgIdForBranding,
+      disableConfirmationEmail: options?.disableConfirmationEmail ?? false,
+    });
+  }
+
+  /**
+   * @deprecated Use {@link BillingClient.chargeOrganization} instead.
+   * Directly create a flat fee invoice for an organization and charge on the spot.
+   *
+   * @param orgIdToCharge - The organization ID to charge.
+   * @param subtotal - The subtotal amount to charge.
+   * @param tax - The tax amount to charge.
+   * @param options - Optional parameters.
+   * @param options.description - A description for the invoice.
+   * @param options.orgIdForBranding - The organization ID for branding purposes.
+   * @param options.disableConfirmationEmail - Whether to disable the confirmation email.
+   */
+  async createInvoiceAndChargeImmediately(
+    orgIdToCharge: string,
+    subtotal: number,
+    tax: number,
+    options?: {
+      description?: string;
+      orgIdForBranding?: string;
+      disableConfirmationEmail?: boolean;
+    }
+  ) {
+    return this.chargeOrganization(orgIdToCharge, subtotal, tax, options);
   }
 }
 
