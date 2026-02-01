@@ -30,7 +30,7 @@ import { newPeerConnectionForClient } from './peer';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { SignalingExchange } from './signaling-exchange';
-import { randomUUID } from 'node:crypto';
+import { UuidTool } from 'uuid-tool';
 
 export interface DialOptions {
   credentials?: Credentials | undefined;
@@ -119,7 +119,7 @@ const enableGRPCTraceLogging = <T extends Transport>(
       message: PartialMessage<I>,
       contextValues?: ContextValues
     ): Promise<UnaryResponse<I, O>> => {
-      const id = randomUUID();
+      const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
       console.trace(
         `Unary request ${id} : ${address}/${service.typeName}.${method.name}`
@@ -134,7 +134,7 @@ const enableGRPCTraceLogging = <T extends Transport>(
         contextValues
       );
       // eslint-disable-next-line no-console
-      console.trace(`Unary response ${id} : ${JSON.stringify(resp)}`);
+      console.debug(`Unary response ${id} : ${JSON.stringify(resp)}`);
       return resp;
     };
 
@@ -150,7 +150,7 @@ const enableGRPCTraceLogging = <T extends Transport>(
       input: AsyncIterable<PartialMessage<I>>,
       contextValues?: ContextValues
     ): Promise<StreamResponse<I, O>> => {
-      const id = randomUUID();
+      const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
       console.trace(
         `Stream request ${id} : ${address}/${service.typeName}.${method.name}`
@@ -166,7 +166,7 @@ const enableGRPCTraceLogging = <T extends Transport>(
       );
 
       // eslint-disable-next-line no-console
-      console.trace(`Stream response ${id} : ${JSON.stringify(resp.message)}`);
+      console.debug(`Stream response ${id} : ${JSON.stringify(resp.message)}`);
       return resp;
     };
 
