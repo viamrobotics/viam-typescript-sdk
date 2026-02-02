@@ -141,22 +141,13 @@ export const dialDirect = async (
     // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
     if (transportCredentialsInclude) {
       transportOpts.credentials = 'include';
-
-      // Add viam_client header via interceptor for viam-app connections
+      // Add viam-client header for viam-app cookie-based connections
       if (opts?.extraHeaders) {
-        const extraHeaders = new Headers(opts.extraHeaders);
-
-        // Modify viam_client header to identify as viam-app to differentiate from typescript apps
-        extraHeaders.set('viam_client', (extraHeaders.get('viam_client') || 'typescript').replace('typescript', 'typescript(viam-app)'));
-
-        transportOpts.interceptors = [
-          (next) => async (req) => {
-            for (const [key, value] of extraHeaders) {
-              req.header.set(key, value);
-            }
-            return await next(req);
-          },
-        ];
+        const headers = new Headers(opts.extraHeaders);
+        // Modify viam-client to identify as viam-app
+        const baseViamClient = headers.get('viam-client');
+        headers.set('viam-client', (baseViamClient ?? 'typescript').replace('typescript', 'typescript(viam-app)'));
+        return new AuthenticatedTransport(transportOpts, createTransport, headers);
       }
     }
     return createTransport(transportOpts);
