@@ -134,7 +134,7 @@ const enableGRPCTraceLogging = <T extends Transport>(
         contextValues
       );
       // eslint-disable-next-line no-console
-      console.debug(`Unary response ${id} : ${JSON.stringify(resp)}`);
+      console.debug(`Unary response received: ${id}`);
       return resp;
     };
 
@@ -166,7 +166,7 @@ const enableGRPCTraceLogging = <T extends Transport>(
       );
 
       // eslint-disable-next-line no-console
-      console.debug(`Stream response ${id} : ${JSON.stringify(resp.message)}`);
+      console.debug(`Stream response received: ${id}`);
       return resp;
     };
 
