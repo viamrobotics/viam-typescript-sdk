@@ -99,8 +99,6 @@ export type TransportFactory = (
 
 interface TransportInitOptions {
   baseUrl: string;
-  credentials?: RequestCredentials;
-  interceptors?: import('@connectrpc/connect').Interceptor[];
 }
 
 export const dialDirect = async (
@@ -112,7 +110,7 @@ export const dialDirect = async (
   const createTransport =
     globalThis.VIAM?.GRPC_TRANSPORT_FACTORY ?? createGrpcWebTransport;
 
-  const transportOpts: TransportInitOptions = {
+  const transportOpts = {
     baseUrl: address,
     // Default is "same-origin", which does not include localhost:*.
     credentials: 'same-origin' as RequestCredentials,
