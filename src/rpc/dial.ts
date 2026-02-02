@@ -99,6 +99,8 @@ export type TransportFactory = (
 
 interface TransportInitOptions {
   baseUrl: string;
+  credentials?: RequestCredentials;
+  interceptors?: import('@connectrpc/connect').Interceptor[];
 }
 
 export const dialDirect = async (
@@ -110,7 +112,7 @@ export const dialDirect = async (
   const createTransport =
     globalThis.VIAM?.GRPC_TRANSPORT_FACTORY ?? createGrpcWebTransport;
 
-  const transportOpts = {
+  const transportOpts: TransportInitOptions = {
     baseUrl: address,
     // Default is "same-origin", which does not include localhost:*.
     credentials: 'same-origin' as RequestCredentials,
@@ -139,6 +141,23 @@ export const dialDirect = async (
     // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
     if (transportCredentialsInclude) {
       transportOpts.credentials = 'include';
+
+      // Add viam_client header via interceptor for viam-app connections
+      if (opts?.extraHeaders) {
+        const extraHeaders = new Headers(opts.extraHeaders);
+
+        // Modify viam_client header to identify as viam-app to differentiate from typescript apps
+        extraHeaders.set('viam_client', (extraHeaders.get('viam_client') || 'typescript').replace('typescript', 'typescript(viam-app)'));
+
+        transportOpts.interceptors = [
+          (next) => async (req) => {
+            for (const [key, value] of extraHeaders) {
+              req.header.set(key, value);
+            }
+            return await next(req);
+          },
+        ];
+      }
     }
     return createTransport(transportOpts);
   }
