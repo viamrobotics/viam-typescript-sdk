@@ -26,7 +26,7 @@ Edit `src/main.ts` to change the robot logic being run. Edit `index.html` to cha
 
 ### Firefox
 
-Firefox has a limitation with WebRTC when accessing via `localhost` due to network interface enumeration restrictions. To work around this, use a local hostname that resolves to localhost:
+Firefox has a limitation with WebRTC when accessing via `localhost` due to network interface enumeration restrictions. If you cannot use an alternative browser, you can follow these steps:
 
 1. Add a local hostname to your hosts file:
 
@@ -35,10 +35,11 @@ Firefox has a limitation with WebRTC when accessing via `localhost` due to netwo
    sudo bash -c 'echo "127.0.0.1	dev.local" >> /etc/hosts'
    ```
 
-   **Windows (run Command Prompt as Administrator):**
-   ```cmd
-   echo 127.0.0.1	dev.local >> C:\Windows\System32\drivers\etc\hosts
+   **Windows (run PowerShell as Administrator):**
+   ```powershell
+   Add-Content -Path "$env:SystemRoot\System32\drivers\etc\hosts" -Value "`n127.0.0.1 dev.local"
    ```
+
 
 2. Start the dev server with the local hostname:
    ```bash
@@ -46,6 +47,24 @@ Firefox has a limitation with WebRTC when accessing via `localhost` due to netwo
    ```
 
 3. Open Firefox and navigate to `http://dev.local:5173`
+
+You can remove the local hostname from the hosts file with:
+
+   **macOS**
+   ```bash
+   sudo sed -i '' '/dev.local/d' /etc/hosts
+   ```
+
+   **Linux**
+   ```bash
+   sudo sed -i '/dev.local/d' /etc/hosts
+   ```
+
+   **Windows (run PowerShell as Administrator):**
+   ```powershell
+   $content = Get-Content C:\Windows\System32\drivers\etc\hosts | Where-Object { $_ -notmatch 'dev.local' }
+   Set-Content C:\Windows\System32\drivers\etc\hosts $content
+   ```
 
 ### Base Project Template
 
