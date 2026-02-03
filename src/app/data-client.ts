@@ -101,6 +101,18 @@ export interface FileUploadOptions {
 
   /** Optional list of datasets to add the data to. */
   datasetIds?: string[];
+
+  /**
+   * Optional creation time of the file. The empty `Timestamp` will be assigned
+   * as the file create time if one isn't provided.
+   */
+  fileCreateTime?: Date;
+
+  /**
+   * Optional modification time of the file. The empty `Timestamp` will be
+   * assigned as the file modify time if one isn't provided.
+   */
+  fileModifyTime?: Date;
 }
 
 export type Dataset = Partial<PBDataset> & {
@@ -1458,6 +1470,12 @@ export class DataClient {
       partId,
       type: DataType.FILE,
       ...options,
+      fileCreateTime: options?.fileCreateTime
+        ? Timestamp.fromDate(options.fileCreateTime)
+        : undefined,
+      fileModifyTime: options?.fileModifyTime
+        ? Timestamp.fromDate(options.fileModifyTime)
+        : undefined,
     });
 
     const response = await this.dataSyncClient.fileUpload(

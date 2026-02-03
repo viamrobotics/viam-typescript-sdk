@@ -2061,6 +2061,8 @@ describe('fileUpload tests', () => {
     fileExtension: '.png',
     tags: ['testTag1', 'testTag2'],
     datasetIds: ['dataset1', 'dataset2'],
+    fileCreateTime: new Date(2023, 0, 1, 10, 0, 0),
+    fileModifyTime: new Date(2023, 0, 1, 11, 0, 0)
   };
 
   const expectedFileId = 'testFileId';
@@ -2104,6 +2106,8 @@ describe('fileUpload tests', () => {
     expect(metadata.fileExtension).toBe(options.fileExtension);
     expect(metadata.tags).toStrictEqual(options.tags);
     expect(metadata.datasetIds).toStrictEqual(options.datasetIds);
+    expect(metadata.fileCreateTime?.toDate()).toEqual(options.fileCreateTime);
+    expect(metadata.fileModifyTime?.toDate()).toEqual(options.fileModifyTime);
 
     // Check file contents request
     const fileContentsRequest = capturedRequests[1]!;
@@ -2131,6 +2135,8 @@ describe('fileUpload tests', () => {
     expect(metadata.fileExtension).toBe('');
     expect(metadata.tags).toStrictEqual([]);
     expect(metadata.datasetIds).toStrictEqual([]);
+    expect(metadata.fileCreateTime).toBeUndefined();
+    expect(metadata.fileModifyTime).toBeUndefined();
 
     // Check file contents request
     const fileContentsRequest = capturedRequests[1]!;
