@@ -106,17 +106,16 @@ export interface FileUploadOptions {
 /** Optional parameters for uploading binary sensor data. */
 export interface BinaryDataCaptureUploadOptions {
   /**
-   * Optional mime type of the binary data (for example, "image/jpeg").
+   * Optional MIME type of the binary data (for example, "image/jpeg").
    *
    * If provided, the backend will use this value. Otherwise, it may derive the
-   * mime type from the file extension.
+   * MIME type from the file extension.
    */
   mimeType?: string;
 
   /**
    * Optional file extension of the binary data including the period, for
-   * example ".jpg", ".png", or ".pcd". Files with a `.jpeg`, `.jpg`, or `.png`
-   * extension will be saved to the **Images** tab.
+   * example ".jpg", ".png", or ".pcd".
    */
   fileExtension?: string;
 
@@ -126,7 +125,7 @@ export interface BinaryDataCaptureUploadOptions {
    */
   tags?: string[];
 
-  /** Optional list of datasets to add the data to. */
+  /** Optional list of dataset IDs to add the data to. */
   datasetIds?: string[];
 }
 
