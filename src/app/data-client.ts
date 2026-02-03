@@ -1441,7 +1441,8 @@ export class DataClient {
     tags?: string[],
     datasetIds?: string[]
   ): Promise<string> {
-    const isLegacySignature = typeof fileExtensionOrDataRequestTimes === 'string';
+    const isLegacySignature =
+      typeof fileExtensionOrDataRequestTimes === 'string';
     if (isLegacySignature && !dataRequestTimesOrOptions) {
       throw new Error(
         'binaryDataCaptureUpload called with legacy signature but missing dataRequestTimes'
@@ -1454,7 +1455,9 @@ export class DataClient {
 
     const options = isLegacySignature
       ? undefined
-      : (dataRequestTimesOrOptions as BinaryDataCaptureUploadOptions | undefined);
+      : (dataRequestTimesOrOptions as
+          | BinaryDataCaptureUploadOptions
+          | undefined);
 
     const fileExtension = isLegacySignature
       ? fileExtensionOrDataRequestTimes
@@ -1462,7 +1465,9 @@ export class DataClient {
 
     const mimeType = options?.mimeType ?? '';
     const resolvedTags = isLegacySignature ? tags : options?.tags;
-    const resolvedDatasetIds = isLegacySignature ? datasetIds : options?.datasetIds;
+    const resolvedDatasetIds = isLegacySignature
+      ? datasetIds
+      : options?.datasetIds;
 
     const metadata = new UploadMetadata({
       partId,
