@@ -103,9 +103,11 @@ interface TransportInitOptions {
 
 export const dialDirect = async (
   address: string,
-  opts?: DialOptions,
-  transportCredentialsInclude = false
+  opts?: DialOptions
 ): Promise<Transport> => {
+  console.log('[DIAL-DIRECT] Called with address:', address);
+  console.log('[DIAL-DIRECT] opts:', opts);
+  console.log('[DIAL-DIRECT] opts?.extraHeaders:', opts?.extraHeaders);
   validateDialOptions(opts);
   const createTransport =
     globalThis.VIAM?.GRPC_TRANSPORT_FACTORY ?? createGrpcWebTransport;
@@ -127,8 +129,11 @@ export const dialDirect = async (
       opts.externalAuthToEntity !== ''
     )
   ) {
+    console.log('[PATH-1-ACCESS-TOKEN] Taking access token path');
     const headers = new Headers(opts.extraHeaders);
+    console.log('[PATH-1] Created headers:', Array.from(headers.entries()));
     headers.set('authorization', `Bearer ${opts.accessToken}`);
+    console.log('[PATH-1] After adding auth, headers:', Array.from(headers.entries()));
     return new AuthenticatedTransport(transportOpts, createTransport, headers);
   }
 
@@ -136,21 +141,25 @@ export const dialDirect = async (
     opts === undefined ||
     (opts.credentials === undefined && opts.accessToken === undefined)
   ) {
+    console.log('[PATH-2-NO-CREDS] Taking no-credentials (viam-app) path');
+    console.log('[PATH-2] opts?.extraHeaders:', opts?.extraHeaders);
     // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
-    if (transportCredentialsInclude) {
-      transportOpts.credentials = 'include';
-      // Add viam-client header for viam-app cookie-based connections
-      if (opts?.extraHeaders) {
-        const headers = new Headers(opts.extraHeaders);
-        // Modify viam-client to identify as viam-app
-        const baseViamClient = headers.get('viam-client');
-        headers.set('viam-client', (baseViamClient ?? 'typescript').replace('typescript', 'typescript(viam-app)'));
-        return new AuthenticatedTransport(transportOpts, createTransport, headers);
-      }
+    transportOpts.credentials = 'include';
+    // Add viam-client metadata for viam-app cookie-based connections
+    // Always create headers with viam_client to identify viam-app requests
+    const headers = new Headers(opts?.extraHeaders ?? {});
+    console.log('[PATH-2] Headers after creating from extraHeaders:', Array.from(headers.entries()));
+    // Ensure viam_client is set (in case it wasn't in extraHeaders)
+    if (!headers.has('viam_client')) {
+      console.log('[PATH-2] viam_client not found, setting it');
+      headers.set('viam_client', 'typescript(viam-app)');
     }
-    return createTransport(transportOpts);
+    console.log('[PATH-2] Final headers:', Array.from(headers.entries()));
+    return new AuthenticatedTransport(transportOpts, createTransport, headers);
   }
 
+  console.log('[PATH-3-CREDS-AUTH] Taking credentials authentication path');
+  console.log('[PATH-3] opts:', opts);
   return makeAuthenticatedTransport(
     address,
     createTransport,
@@ -245,10 +254,16 @@ export class AuthenticatedTransport implements Transport {
     message: PartialMessage<I>,
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> {
+    console.log('[AUTH-TRANSPORT-UNARY] Called for:', service.typeName, method.name);
+    console.log('[AUTH-TRANSPORT-UNARY] Incoming header:', header);
+    console.log('[AUTH-TRANSPORT-UNARY] this.extraHeaders:', Array.from(this.extraHeaders.entries()));
     const newHeaders = cloneHeaders(header);
+    console.log('[AUTH-TRANSPORT-UNARY] After cloneHeaders:', Array.from(newHeaders.entries()));
     for (const [key, value] of this.extraHeaders) {
+      console.log('[AUTH-TRANSPORT-UNARY] Setting header:', key, '=', value);
       newHeaders.set(key, value);
     }
+    console.log('[AUTH-TRANSPORT-UNARY] Final headers before transport.unary:', Array.from(newHeaders.entries()));
     return this.transport.unary(
       service,
       method,
@@ -319,13 +334,11 @@ export interface WebRTCConnection {
 
 const getSignalingClient = async (
   signalingAddress: string,
-  signalingExchangeOpts: DialOptions | undefined,
-  transportCredentialsInclude = false
+  signalingExchangeOpts: DialOptions | undefined
 ) => {
   const transport = await dialDirect(
     signalingAddress,
-    signalingExchangeOpts,
-    transportCredentialsInclude
+    signalingExchangeOpts
   );
 
   return createClient(SignalingService, transport);
@@ -357,8 +370,7 @@ const getOptionalWebRTCConfig = async (
 export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
-  dialOpts?: DialOptions,
-  transportCredentialsInclude = false
+  dialOpts?: DialOptions
 ): Promise<WebRTCConnection> => {
   const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   validateDialOptions(dialOpts);
@@ -387,8 +399,7 @@ export const dialWebRTC = async (
 
   const signalingClient = await getSignalingClient(
     usableSignalingAddress,
-    exchangeOpts,
-    transportCredentialsInclude
+    exchangeOpts
   );
 
   const webrtcOpts = await processWebRTCOpts(
@@ -435,8 +446,24 @@ export const dialWebRTC = async (
     }
 
     successful = true;
+
+    // Wrap ClientChannel with AuthenticatedTransport to inject extraHeaders
+    // This ensures viam_client and other metadata reach the robot
+    const headers = new Headers(dialOpts?.extraHeaders ?? {});
+    if (!headers.has('viam_client')) {
+      headers.set('viam_client', 'typescript(viam-app)');
+    }
+    console.log('[DIAL-WEBRTC] Wrapping ClientChannel with extraHeaders:', Array.from(headers.entries()));
+
+    // Create a wrapper transport that will inject headers into all requests
+    const wrappedTransport = new AuthenticatedTransport(
+      { baseUrl: host },
+      () => cc,  // Factory that returns the already-created ClientChannel
+      headers
+    );
+
     return {
-      transport: cc,
+      transport: wrappedTransport,
       peerConnection: pc,
       dataChannel: dc,
     };

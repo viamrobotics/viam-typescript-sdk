@@ -77,6 +77,8 @@ export interface DialWebRTCConf {
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
    */
   dialTimeout?: number;
+  /** Extra headers to include in all requests for this connection */
+  extraHeaders?: Record<string, string>;
 }
 
 /** Options required to dial a robot via gRPC. */
@@ -91,6 +93,8 @@ export interface DialDirectConf {
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
+  /** Extra headers to include in all requests for this connection */
+  extraHeaders?: Record<string, string>;
 }
 
 /** Options required to dial a robot. */
@@ -123,6 +127,9 @@ export interface ConnectOptions {
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
+
+  // extra headers to include in requests (e.g., viam_client metadata)
+  extraHeaders?: Record<string, string>;
 }
 
 interface DialAbortSignal {
@@ -603,9 +610,11 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private get clientTransport() {
-    return this.sessionOptions.disabled
+    const transport = this.sessionOptions.disabled
       ? this.transport
       : this.sessionManager.transport;
+    console.log('[ROBOT-CLIENT-TRANSPORT-GETTER] sessionOptions.disabled:', this.sessionOptions.disabled, 'using:', transport?.constructor.name);
+    return transport;
   }
 
   private async dialWebRTC(
@@ -639,6 +648,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       priority: conf.priority,
       dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
       creds: conf.credentials,
+      extraHeaders: conf.extraHeaders,
     });
 
     return this;
@@ -679,6 +689,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     await this.connect({
       creds: conf.credentials,
       dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
+      extraHeaders: conf.extraHeaders,
     });
 
     return this;
@@ -931,6 +942,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     creds = this.savedCreds,
     priority,
     dialTimeout,
+    extraHeaders,
   }: ConnectOptions = {}) {
     this.emit(MachineConnectionEvent.CONNECTING, {});
     this.closed = false;
@@ -968,13 +980,23 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     try {
+      // Merge app-provided extraHeaders with SDK's clientHeaders
+      // Priority: App's extraHeaders > SDK's clientHeaders
+      const mergedHeaders = new Headers(clientHeaders);
+      if (extraHeaders) {
+        for (const [key, value] of Object.entries(extraHeaders)) {
+          mergedHeaders.set(key, value);
+        }
+      }
+      console.log('[CONNECT-OPTIONS] Merged headers:', Array.from(mergedHeaders.entries()));
+
       const opts: DialOptions = {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions.rtcConfig,
         },
         dialTimeout: dialTimeout ?? DIAL_TIMEOUT,
-        extraHeaders: clientHeaders,
+        extraHeaders: mergedHeaders,
       };
 
       if (creds) {
@@ -1004,8 +1026,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         const webRTCConn = await dialWebRTC(
           signalingAddress,
           this.webrtcOptions.host,
-          opts,
-          this.serviceHost !== '' && signalingAddress !== this.serviceHost
+          opts
         );
 
         this.peerConn = webRTCConn.peerConnection;
