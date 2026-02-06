@@ -610,10 +610,9 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private get clientTransport() {
-    const transport = this.sessionOptions.disabled
+    return this.sessionOptions.disabled
       ? this.transport
       : this.sessionManager.transport;
-    return transport;
   }
 
   private async dialWebRTC(

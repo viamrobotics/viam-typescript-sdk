@@ -172,16 +172,6 @@ export class ClientChannel extends BaseChannel implements Transport {
     message: PartialMessage<I>,
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> {
-    console.log('[CLIENT-CHANNEL-UNARY] Called for:', `${service.typeName}/${method.name}`);
-    console.log('[CLIENT-CHANNEL-UNARY] Received header:', header);
-    if (header instanceof Headers) {
-      console.log('[CLIENT-CHANNEL-UNARY] Header is Headers with', Array.from(header.entries()).length, 'entries');
-      console.log('[CLIENT-CHANNEL-UNARY] Headers entries:', Array.from(header.entries()));
-    } else if (header !== undefined) {
-      console.log('[CLIENT-CHANNEL-UNARY] Header is Object with keys:', Object.keys(header));
-    } else {
-      console.log('[CLIENT-CHANNEL-UNARY] Header is undefined');
-    }
     return this.newStream<UnaryClientStream<I, O>, I, O>(
       UnaryClientStream<I, O>,
       this.nextStreamID(),
