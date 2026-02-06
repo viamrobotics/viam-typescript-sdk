@@ -84,21 +84,13 @@ export abstract class ClientStream<
     );
     this.parseMessage = parse;
     const svcMethod = `/${service.typeName}/${method.name}`;
-    console.log('[CLIENT-STREAM-CONSTRUCTOR] Creating stream for:', svcMethod);
-    console.log('[CLIENT-STREAM-CONSTRUCTOR] Incoming header:', header);
     this.requestHeaders = new RequestHeaders({
       method: svcMethod,
     });
     const clonedHeaders = cloneHeaders(header);
-    console.log('[CLIENT-STREAM-CONSTRUCTOR] After cloneHeaders:', Array.from(clonedHeaders.entries()));
     const metadataProto = fromGRPCMetadata(clonedHeaders);
-    console.log('[CLIENT-STREAM-CONSTRUCTOR] metadataProto:', metadataProto);
     if (metadataProto) {
-      console.log('[CLIENT-STREAM-CONSTRUCTOR] Setting metadata on requestHeaders');
-      console.log('[CLIENT-STREAM-CONSTRUCTOR] metadataProto.md:', metadataProto.md);
       this.requestHeaders.metadata = metadataProto;
-    } else {
-      console.log('[CLIENT-STREAM-CONSTRUCTOR] NO metadataProto, skipping metadata');
     }
   }
 
@@ -260,16 +252,8 @@ export abstract class ClientStream<
  * https://github.com/jsmouret/grpc-over-webrtc/blob/45cd6d6cf516e78b1e262ea7aa741bc7a7a93dbc/client-improbable/src/grtc/webrtcclient.ts#L7
  */
 const fromGRPCMetadata = (headers?: Headers): Metadata | undefined => {
-  console.log('[FROM-GRPC-METADATA] Called with headers:', headers);
   if (!headers) {
-    console.log('[FROM-GRPC-METADATA] Headers is falsy, returning undefined');
     return undefined;
-  }
-  const headerEntries = Array.from(headers.entries());
-  console.log('[FROM-GRPC-METADATA] Headers entries:', headerEntries);
-  console.log('[FROM-GRPC-METADATA] Actual key-value pairs:');
-  for (const [key, value] of headerEntries) {
-    console.log(`  - "${key}": "${value}"`);
   }
   const result = new Metadata({
     md: Object.fromEntries(
@@ -279,8 +263,6 @@ const fromGRPCMetadata = (headers?: Headers): Metadata | undefined => {
       ])
     ),
   });
-  console.log('[FROM-GRPC-METADATA] Result.md keys:', Object.keys(result.md));
-  console.log('[FROM-GRPC-METADATA] Result.md:', result.md);
 
   return Object.keys(result.md).length > 0 ? result : undefined;
 };
