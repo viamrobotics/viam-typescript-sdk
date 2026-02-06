@@ -613,7 +613,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     const transport = this.sessionOptions.disabled
       ? this.transport
       : this.sessionManager.transport;
-    console.log('[ROBOT-CLIENT-TRANSPORT-GETTER] sessionOptions.disabled:', this.sessionOptions.disabled, 'using:', transport?.constructor.name);
     return transport;
   }
 
