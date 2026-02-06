@@ -1,4 +1,3 @@
-console.log('[ ve] Version:', __VERSION__)
 export const version = __VERSION__;
 
 export {
