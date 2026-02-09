@@ -4,10 +4,13 @@ import type { Pose, Resource } from '../../types';
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
+import type { MoveOptions as MoveOptionsType } from '../../gen/component/arm/v1/arm_pb';
 
 export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
 export const { JointPositions: ArmJointPositions } = armApi;
+
+export type MoveOptions = PlainMessage<MoveOptionsType>;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
@@ -101,8 +104,13 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#movetoposition).
    *
    * @param pose - The destination pose for the arm.
+   * @param options - Optional parameters for the move. These include:
+   *   - `maxVelDegsPerSec`: Maximum allowable velocity of an arm joint, in degrees per second. Ignored when `maxVelDegsPerSecJoints` is set.
+   *   - `maxAccDegsPerSec2`: Maximum allowable acceleration of an arm joint, in degrees per second squared. Ignored when `maxAccDegsPerSec2Joints` is set.
+   *   - `maxVelDegsPerSecJoints`: Per-joint maximum velocity in degrees per second.
+   *   - `maxAccDegsPerSec2Joints`: Per-joint maximum acceleration in degrees per second squared.
    */
-  moveToPosition: (pose: Pose, extra?: Struct) => Promise<void>;
+  moveToPosition: (pose: Pose, options?: MoveOptions, extra?: Struct) => Promise<void>;
 
   /**
    * Move each joint of the arm based on the angles on the joint positions.
@@ -120,9 +128,15 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#movetojointpositions).
    *
    * @param jointPositionsList - List of angles (0-360) to move each joint to.
+   * @param options - Optional parameters for the move. These include:
+   *   - `maxVelDegsPerSec`: Maximum allowable velocity of an arm joint, in degrees per second. Ignored when `maxVelDegsPerSecJoints` is set.
+   *   - `maxAccDegsPerSec2`: Maximum allowable acceleration of an arm joint, in degrees per second squared. Ignored when `maxAccDegsPerSec2Joints` is set.
+   *   - `maxVelDegsPerSecJoints`: Per-joint maximum velocity in degrees per second.
+   *   - `maxAccDegsPerSec2Joints`: Per-joint maximum acceleration in degrees per second squared.
    */
   moveToJointPositions: (
     jointPositionsList: number[],
+    options?: MoveOptions,
     extra?: Struct
   ) => Promise<void>;
 
