@@ -13,8 +13,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  issues: write
-  id-token: write
 
 jobs:
   implement:
@@ -47,3 +45,16 @@ jobs:
             --max-turns 25
             --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
             --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git *)"
+
+      - name: Notify Slack of failure
+        uses: slackapi/slack-github-action@v1.24.0
+        if: ${{ failure() }}
+        with:
+          payload: |
+            {
+              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id }}: ${{ github.event.client_payload.summary }}",
+              "username": "Typescript SDK",
+              "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_TEAM_SDK_WEBHOOK_URL }}

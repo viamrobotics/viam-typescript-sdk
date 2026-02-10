@@ -12,7 +12,6 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
-  id-token: write
   actions: read
 
 jobs:
@@ -49,6 +48,8 @@ jobs:
             if (labels.includes('claude-fix-2')) {
               core.info(`PR #${pr.number}: max fix attempts (2) reached, skipping`);
               core.setOutput('should_fix', 'false');
+              core.setOutput('max_reached', 'true');
+              core.setOutput('pr_number', String(pr.number));
               return;
             }
 
@@ -80,7 +81,7 @@ jobs:
         run: |
           LOGS=$(gh run view ${{ github.event.workflow_run.id }} \
             --repo ${{ github.repository }} \
-            --log-failed 2>&1 | tail -200)
+            --log-failed 2>&1 | tail -500)
           {
             echo "content<<LOGS_EOF"
             echo "$LOGS"
@@ -113,3 +114,29 @@ jobs:
             --model claude-sonnet-4-5-20250929
             --max-turns 20
             --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git *)"
+
+      - name: Comment on PR if max retries exhausted
+        if: steps.check.outputs.max_reached == 'true'
+        # actions/github-script@v7.1.0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
+              body: '@team-sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
+            });
+
+      - name: Comment on PR if fix attempt failed
+        if: failure() && steps.check.outputs.should_fix == 'true'
+        # actions/github-script@v7.1.0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
+              body: '@team-sdk Automated fix attempt ${{ steps.check.outputs.attempt }} of 2 failed. This PR may need human intervention.'
+            });
