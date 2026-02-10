@@ -90,4 +90,22 @@ export interface Gripper extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#ismoving).
    */
   isMoving: () => Promise<boolean>;
+
+  /**
+   * Get information about whether the gripper is currently holding onto an object.
+   *
+   * @example
+   *
+   * ```ts
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   *
+   * // Check if the gripper is holding something
+   * const holding = await gripper.isHoldingSomething();
+   * console.log('Gripper is holding something:', holding);
+   * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#isholdingsomething).
+   */
+  isHoldingSomething: (extra?: Struct) => Promise<boolean>;
 }
