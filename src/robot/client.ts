@@ -980,7 +980,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         for (const [key, value] of Object.entries(extraHeaders)) {
           if (key === 'viam_client' && mergedHeaders.has('viam_client')) {
             const sdkValue = mergedHeaders.get('viam_client')!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-            const modifiedValue = sdkValue.replace('typescript;', `typescript(${value});`);
+            const modifiedValue = sdkValue.replace(
+              'typescript;',
+              `typescript(${value});`
+            );
             mergedHeaders.set('viam_client', modifiedValue);
           } else {
             mergedHeaders.set(key, value);

@@ -221,7 +221,11 @@ export const dialDirect = async (
       transportOpts.credentials = 'include';
     }
     const headers = new Headers(opts?.extraHeaders ?? {});
-    const transport = new AuthenticatedTransport(transportOpts, createTransport, headers);
+    const transport = new AuthenticatedTransport(
+      transportOpts,
+      createTransport,
+      headers
+    );
     return enableGRPCTraceLogging(transport, address);
   }
 
