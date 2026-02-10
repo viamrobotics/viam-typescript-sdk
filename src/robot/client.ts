@@ -1035,7 +1035,8 @@ export class RobotClient extends EventDispatcher implements Robot {
         const webRTCConn = await dialWebRTC(
           signalingAddress,
           this.webrtcOptions.host,
-          opts
+          opts,
+          this.serviceHost !== '' && signalingAddress !== this.serviceHost
         );
 
         this.peerConn = webRTCConn.peerConnection;

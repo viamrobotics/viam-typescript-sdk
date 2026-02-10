@@ -87,8 +87,7 @@ export abstract class ClientStream<
     this.requestHeaders = new RequestHeaders({
       method: svcMethod,
     });
-    const clonedHeaders = cloneHeaders(header);
-    const metadataProto = fromGRPCMetadata(clonedHeaders);
+    const metadataProto = fromGRPCMetadata(cloneHeaders(header));
     if (metadataProto) {
       this.requestHeaders.metadata = metadataProto;
     }

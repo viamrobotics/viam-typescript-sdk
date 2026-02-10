@@ -103,7 +103,8 @@ interface TransportInitOptions {
 
 export const dialDirect = async (
   address: string,
-  opts?: DialOptions
+  opts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<Transport> => {
   validateDialOptions(opts);
   const createTransport =
@@ -136,7 +137,9 @@ export const dialDirect = async (
     (opts.credentials === undefined && opts.accessToken === undefined)
   ) {
     // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
-    transportOpts.credentials = 'include';
+    if (transportCredentialsInclude) {
+      transportOpts.credentials = 'include';
+    }
     const headers = new Headers(opts?.extraHeaders ?? {});
     return new AuthenticatedTransport(transportOpts, createTransport, headers);
   }
@@ -309,11 +312,13 @@ export interface WebRTCConnection {
 
 const getSignalingClient = async (
   signalingAddress: string,
-  signalingExchangeOpts: DialOptions | undefined
+  signalingExchangeOpts: DialOptions | undefined,
+  transportCredentialsInclude = false
 ) => {
   const transport = await dialDirect(
     signalingAddress,
-    signalingExchangeOpts
+    signalingExchangeOpts,
+    transportCredentialsInclude
   );
 
   return createClient(SignalingService, transport);
@@ -345,7 +350,8 @@ const getOptionalWebRTCConfig = async (
 export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
-  dialOpts?: DialOptions
+  dialOpts?: DialOptions,
+  transportCredentialsInclude = false
 ): Promise<WebRTCConnection> => {
   const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   validateDialOptions(dialOpts);
@@ -374,7 +380,8 @@ export const dialWebRTC = async (
 
   const signalingClient = await getSignalingClient(
     usableSignalingAddress,
-    exchangeOpts
+    exchangeOpts,
+    transportCredentialsInclude
   );
 
   const webrtcOpts = await processWebRTCOpts(
@@ -422,14 +429,15 @@ export const dialWebRTC = async (
 
     successful = true;
 
-    // Wrap ClientChannel with AuthenticatedTransport to inject extraHeaders
-    // This ensures viam_client and other metadata reach the robot
+    // Wrap the already-created ClientChannel in AuthenticatedTransport so
+    // extraHeaders (e.g. viam_client) are injected into every request sent
+    // over the WebRTC data channel. The factory `() => cc` returns the
+    // existing ClientChannel directly; the baseUrl opt is unused since the
+    // channel is already established.
     const headers = new Headers(dialOpts?.extraHeaders ?? {});
-
-    // Create a wrapper transport that will inject headers into all requests
     const wrappedTransport = new AuthenticatedTransport(
       { baseUrl: host },
-      () => cc,  // Factory that returns the already-created ClientChannel
+      () => cc,
       headers
     );
 

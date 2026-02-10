@@ -14,7 +14,6 @@ import {
   type UnaryResponse,
 } from '@connectrpc/connect';
 import { cloneHeaders } from '../rpc/dial';
-import { clientHeaders } from '../utils';
 import SessionManager from './session-manager';
 
 export default class SessionTransport implements Transport {
@@ -53,10 +52,6 @@ export default class SessionTransport implements Transport {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
 
-    for (const [key, value] of clientHeaders) {
-      newHeaders.set(key, value);
-    }
-
     if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
       for (const [key, value] of md) {
@@ -88,10 +83,6 @@ export default class SessionTransport implements Transport {
   ): Promise<StreamResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
-
-    for (const [key, value] of clientHeaders) {
-      newHeaders.set(key, value);
-    }
 
     if (SessionManager.heartbeatMonitoredMethods[methodPath] ?? false) {
       const md = await this.getSessionMetadata();
