@@ -138,7 +138,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
-              body: '@team-sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
+              body: '@sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
             });
 
       - name: Comment on PR if fix attempt failed
@@ -151,5 +151,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
-              body: '@team-sdk Automated fix attempt ${{ steps.check.outputs.attempt }} of 2 failed. This PR may need human intervention.'
+              body: '@sdk Automated fix attempt ${{ steps.check.outputs.attempt }} of 2 failed. This PR may need human intervention.'
             });
