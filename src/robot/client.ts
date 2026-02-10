@@ -125,7 +125,6 @@ export interface ConnectOptions {
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
-
   extraHeaders?: Record<string, string>;
 }
 
