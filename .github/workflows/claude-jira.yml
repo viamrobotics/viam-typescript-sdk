@@ -9,6 +9,17 @@ name: Claude Jira Implementation
 on:
   repository_dispatch:
     types: [jira-ticket]
+  workflow_dispatch:
+    inputs:
+      ticket_id:
+        description: 'Jira ticket ID (e.g., SDK-123)'
+        required: true
+      summary:
+        description: 'Ticket summary'
+        required: true
+      description:
+        description: 'Ticket description'
+        required: true
 
 permissions:
   contents: write
@@ -27,9 +38,9 @@ jobs:
           prompt: |
             Implement the following Jira ticket:
 
-            Ticket: ${{ github.event.client_payload.ticket_id }}
-            Summary: ${{ github.event.client_payload.summary }}
-            Description: ${{ github.event.client_payload.description }}
+            Ticket: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
+            Summary: ${{ github.event.client_payload.summary || inputs.summary }}
+            Description: ${{ github.event.client_payload.description || inputs.description }}
 
             Follow these steps in order:
             1. Read CLAUDE.md for repository conventions and constraints.
@@ -52,7 +63,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id }}: ${{ github.event.client_payload.summary }}",
+              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}: ${{ github.event.client_payload.summary || inputs.summary }}",
               "username": "Typescript SDK",
               "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
             }
