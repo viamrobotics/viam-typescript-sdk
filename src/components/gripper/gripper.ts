@@ -92,7 +92,8 @@ export interface Gripper extends Resource {
   isMoving: () => Promise<boolean>;
 
   /**
-   * Get information about whether the gripper is currently holding onto an object.
+   * Get information about whether the gripper is currently holding onto an
+   * object.
    *
    * @example
    *
