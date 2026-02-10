@@ -1,5 +1,5 @@
 import type { JsonValue } from '@bufbuild/protobuf';
-import { Struct } from '@bufbuild/protobuf';
+import { Struct, Timestamp } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -902,6 +902,10 @@ export class AppClient {
    * @param filter Optional string to filter logs on
    * @param levels Optional array of log levels to return. Defaults to returning
    *   all log levels
+   * @param start Optional start time for log retrieval. Only logs created after
+   *   this time will be returned.
+   * @param end Optional end time for log retrieval. Only logs created before
+   *   this time will be returned.
    * @param pageToken Optional string indicating which page of logs to query.
    *   Defaults to the most recent
    * @returns The robot requested logs and the page token for the next page of
@@ -911,6 +915,8 @@ export class AppClient {
     id: string,
     filter?: string,
     levels?: string[],
+    start?: Date,
+    end?: Date,
     pageToken = ''
   ): Promise<GetRobotPartLogsResponse> {
     return this.client.getRobotPartLogs({
@@ -918,6 +924,8 @@ export class AppClient {
       filter,
       levels,
       pageToken,
+      start: start ? Timestamp.fromDate(start) : undefined,
+      end: end ? Timestamp.fromDate(end) : undefined,
     });
   }
 

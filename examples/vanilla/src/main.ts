@@ -1,5 +1,9 @@
 import * as VIAM from '@viamrobotics/sdk';
 
+globalThis.VIAM = {
+  GRPC_TRACE_LOGGING: true,
+};
+
 const HOST = import.meta.env.VITE_HOST;
 const API_KEY_ID = import.meta.env.VITE_API_KEY_ID;
 const API_KEY = import.meta.env.VITE_API_KEY;
