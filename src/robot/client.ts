@@ -77,7 +77,6 @@ export interface DialWebRTCConf {
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
    */
   dialTimeout?: number;
-  /** Extra headers to include in all requests for this connection */
   extraHeaders?: Record<string, string>;
 }
 
@@ -93,7 +92,6 @@ export interface DialDirectConf {
   // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
-  /** Extra headers to include in all requests for this connection */
   extraHeaders?: Record<string, string>;
 }
 
@@ -128,7 +126,6 @@ export interface ConnectOptions {
   // and a value of 0 would disable the timeout.
   dialTimeout?: number;
 
-  // extra headers to include in requests (e.g., viam_client metadata)
   extraHeaders?: Record<string, string>;
 }
 
@@ -978,21 +975,14 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     try {
-      // Merge app-provided extraHeaders with SDK's clientHeaders
-      // For viam_client, inject app identifier into typescript(): typescript(app_id);v...;v...
-      // For other headers, app takes priority
+      // inject source into header, like `viam-app` if provided
       const mergedHeaders = new Headers(clientHeaders);
       if (extraHeaders) {
         for (const [key, value] of Object.entries(extraHeaders)) {
           if (key === 'viam_client' && mergedHeaders.has('viam_client')) {
-            // Insert the app identifier into the typescript() part
-            // SDK format: "typescript;v0.62.1;v0.1.518"
-            // Result: "typescript(viam-app);v0.62.1;v0.1.518"
-            const sdkValue = mergedHeaders.get('viam_client');
-            if (sdkValue) {
-              const modifiedValue = sdkValue.replace('typescript;', `typescript(${value});`);
-              mergedHeaders.set('viam_client', modifiedValue);
-            }
+            const sdkValue = mergedHeaders.get('viam_client')!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+            const modifiedValue = sdkValue.replace('typescript;', `typescript(${value});`);
+            mergedHeaders.set('viam_client', modifiedValue);
           } else {
             mergedHeaders.set(key, value);
           }

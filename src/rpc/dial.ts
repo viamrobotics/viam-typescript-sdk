@@ -429,11 +429,7 @@ export const dialWebRTC = async (
 
     successful = true;
 
-    // Wrap the already-created ClientChannel in AuthenticatedTransport so
-    // extraHeaders (e.g. viam_client) are injected into every request sent
-    // over the WebRTC data channel. The factory `() => cc` returns the
-    // existing ClientChannel directly; the baseUrl opt is unused since the
-    // channel is already established.
+    // Wrap the transport with AuthenticatedTransport to inject extraHeaders
     const headers = new Headers(dialOpts?.extraHeaders ?? {});
     const wrappedTransport = new AuthenticatedTransport(
       { baseUrl: host },
