@@ -67,7 +67,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}: ${{ github.event.client_payload.summary || inputs.summary }}",
+              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}: ${{ github.event.client_payload.summary || inputs.summary }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
               "username": "Typescript SDK",
               "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
             }
