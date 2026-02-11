@@ -6,7 +6,6 @@ Public TypeScript SDK for the Viam robotics platform (`@viamrobotics/sdk`).
 
 - `src/main.ts` — Public API entry point. All public exports must go through this file.
 - `src/gen/` — Auto-generated protobuf code. Never edit. Not committed to git.
-- Unit tests go in `src/<module>/__tests__/<name>.spec.ts`
 
 ## Restrictions
 
