@@ -1,0 +1,71 @@
+name: Claude Jira Implementation
+
+# Triggered by Jira webhook via middleware that calls GitHub repository_dispatch API.
+# Expected payload:
+#   curl -X POST -H "Authorization: token $GITHUB_PAT" \
+#     https://api.github.com/repos/viamrobotics/viam-typescript-sdk/dispatches \
+#     -d '{"event_type":"jira-ticket","client_payload":{"ticket_id":"SDK-123","summary":"...","description":"..."}}'
+
+on:
+  repository_dispatch:
+    types: [jira-ticket]
+  workflow_dispatch:
+    inputs:
+      ticket_id:
+        description: 'Jira ticket ID (e.g., SDK-123)'
+        required: true
+      summary:
+        description: 'Ticket summary'
+        required: true
+      description:
+        description: 'Ticket description'
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  implement:
+    if: github.repository_owner == 'viamrobotics'
+    runs-on: ubuntu-latest
+    steps:
+      # anthropics/claude-code-action@v1.0.47
+      - uses: anthropics/claude-code-action@b433f16b30d54063fd3bab6b12f46f3da00e41b6
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          settings: .claude/settings.ci.json
+          prompt: |
+            Implement the following Jira ticket:
+
+            Ticket: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
+            Summary: ${{ github.event.client_payload.summary || inputs.summary }}
+            Description: ${{ github.event.client_payload.description || inputs.description }}
+
+            Follow these steps in order:
+            1. Read CLAUDE.md for repository conventions and constraints.
+            2. Explore the relevant source files to understand the existing code and patterns.
+            3. Think hard: consider at least two approaches, then select the one with the smallest diff and lowest risk that satisfies the acceptance criteria.
+            4. Implement the change. Add or update unit tests for changed behavior.
+            5. Run `npm ci`, then `npm run _prettier -- --write`, then `npm run lint:prettier`.
+            6. Open a PR with the Jira ticket ID in the title. The PR description must include a summary of what changed and why.
+
+            Do NOT run ESLint, typecheck, or tests, they require permissions and tooling not available here.
+          claude_args: |
+            --model claude-opus-4-6
+            --max-turns 25
+            --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
+            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git *)"
+
+      - name: Notify Slack of failure
+        uses: slackapi/slack-github-action@v1.24.0
+        if: ${{ failure() }}
+        with:
+          payload: |
+            {
+              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}: ${{ github.event.client_payload.summary || inputs.summary }}",
+              "username": "Typescript SDK",
+              "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_TEAM_SDK_WEBHOOK_URL }}

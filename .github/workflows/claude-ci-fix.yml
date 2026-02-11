@@ -1,0 +1,155 @@
+name: Claude CI Fix
+
+# Automatically retries CI failures on PRs opened by Claude (claude/* branches).
+# Caps at 2 fix attempts using labels to track retries.
+
+on:
+  workflow_run:
+    workflows: ["Pull Request Update"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Failed workflow run ID (from gh run list)'
+        required: true
+      branch:
+        description: 'PR branch name (e.g., claude/SDK-123)'
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+jobs:
+  fix-ci:
+    if: >-
+      github.repository_owner == 'viamrobotics' &&
+      (
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'failure' &&
+          startsWith(github.event.workflow_run.head_branch, 'claude/')
+        )
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR and check retry count
+        id: check
+        # actions/github-script@v7.1.0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            const branch = context.payload.workflow_run?.head_branch || '${{ inputs.branch }}';
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+
+            if (pulls.length === 0) {
+              core.info('No open PR found for branch ' + branch);
+              core.setOutput('should_fix', 'false');
+              return;
+            }
+
+            const pr = pulls[0];
+            const labels = pr.labels.map(l => l.name);
+
+            if (labels.includes('claude-fix-2')) {
+              core.info(`PR #${pr.number}: max fix attempts (2) reached, skipping`);
+              core.setOutput('should_fix', 'false');
+              core.setOutput('max_reached', 'true');
+              core.setOutput('pr_number', String(pr.number));
+              return;
+            }
+
+            const attempt = labels.includes('claude-fix-1') ? 2 : 1;
+            core.info(`PR #${pr.number}: fix attempt ${attempt} of 2`);
+            core.setOutput('should_fix', 'true');
+            core.setOutput('pr_number', String(pr.number));
+            core.setOutput('attempt', String(attempt));
+            core.setOutput('branch', branch);
+
+      - name: Label fix attempt
+        if: steps.check.outputs.should_fix == 'true'
+        # actions/github-script@v7.1.0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
+              labels: ['claude-fix-${{ steps.check.outputs.attempt }}']
+            });
+
+      - name: Get failure logs
+        if: steps.check.outputs.should_fix == 'true'
+        id: logs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LOGS=$(gh run view ${{ github.event.workflow_run.id || inputs.run_id }} \
+            --repo ${{ github.repository }} \
+            --log-failed 2>&1 | tail -500)
+          {
+            echo "content<<LOGS_EOF"
+            echo "$LOGS"
+            echo "LOGS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # anthropics/claude-code-action@v1.0.47
+      - uses: anthropics/claude-code-action@b433f16b30d54063fd3bab6b12f46f3da00e41b6
+        if: steps.check.outputs.should_fix == 'true'
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          settings: .claude/settings.ci.json
+          prompt: |
+            CI failed on PR #${{ steps.check.outputs.pr_number }} (fix attempt ${{ steps.check.outputs.attempt }} of 2).
+
+            The PR is on branch `${{ steps.check.outputs.branch }}`. Fix the issues and push to this branch.
+
+            CI failure logs:
+            ```
+            ${{ steps.logs.outputs.content }}
+            ```
+
+            Instructions:
+            - Read CLAUDE.md for repository conventions and constraints.
+            - Analyze the failure logs to understand what went wrong.
+            - Make the minimal fix to resolve the CI failures.
+            - Run `npm run _prettier -- --write` and `npm run lint:prettier` before pushing.
+            - Do NOT attempt to run ESLint, typecheck, or tests — they require permissions and tooling that are not available.
+          claude_args: |
+            --model claude-sonnet-4-5-20250929
+            --max-turns 20
+            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git *)"
+
+      - name: Comment on PR if max retries exhausted
+        if: steps.check.outputs.max_reached == 'true'
+        # actions/github-script@v7.1.0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
+              body: '@sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
+            });
+
+      - name: Comment on PR if fix attempt failed
+        if: failure() && steps.check.outputs.should_fix == 'true'
+        # actions/github-script@v7.1.0
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
+              body: '@sdk Automated fix attempt ${{ steps.check.outputs.attempt }} of 2 failed. This PR may need human intervention.'
+            });
