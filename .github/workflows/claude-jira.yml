@@ -22,16 +22,18 @@ on:
         required: true
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   implement:
+    permissions:
+      contents: write
+      pull-requests: write
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     steps:
-      # anthropics/claude-code-action@v1.0.47
-      - uses: anthropics/claude-code-action@b433f16b30d54063fd3bab6b12f46f3da00e41b6
+      # anthropics/claude-code-action@v1.0.48
+      - uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
@@ -55,10 +57,11 @@ jobs:
             --model claude-opus-4-6
             --max-turns 25
             --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git *)"
+            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
 
       - name: Notify Slack of failure
-        uses: slackapi/slack-github-action@v1.24.0
+        # slackapi/slack-github-action@v1.27.1
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3
         if: ${{ failure() }}
         with:
           payload: |
