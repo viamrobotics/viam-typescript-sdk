@@ -40,7 +40,6 @@ Firefox has a limitation with WebRTC when accessing via `localhost` due to netwo
    Add-Content -Path "$env:SystemRoot\System32\drivers\etc\hosts" -Value "`n127.0.0.1 dev.local"
    ```
 
-
 2. Start the dev server with the local hostname:
 
    ```bash
