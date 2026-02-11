@@ -220,7 +220,12 @@ export const dialDirect = async (
     if (transportCredentialsInclude) {
       transportOpts.credentials = 'include';
     }
-    const transport = createTransport(transportOpts);
+    const headers = new Headers(opts?.extraHeaders ?? {});
+    const transport = new AuthenticatedTransport(
+      transportOpts,
+      createTransport,
+      headers
+    );
     return enableGRPCTraceLogging(transport, address);
   }
 
@@ -509,8 +514,17 @@ export const dialWebRTC = async (
     }
 
     successful = true;
+
+    // Wrap the transport with AuthenticatedTransport to inject extraHeaders
+    const headers = new Headers(dialOpts?.extraHeaders ?? {});
+    const wrappedTransport = new AuthenticatedTransport(
+      { baseUrl: host },
+      () => cc,
+      headers
+    );
+
     return {
-      transport: enableGRPCTraceLogging(cc, host),
+      transport: enableGRPCTraceLogging(wrappedTransport, host),
       peerConnection: pc,
       dataChannel: dc,
     };
