@@ -2,7 +2,7 @@
 
 This example demonstrates how to connect to a robot. The example uses Vite + vanilla TypeScript and HTML.
 
-> NOTE: Firefox on macOS requires using a local hostname instead of localhost. See the Firefox section below.
+> NOTE: Firefox requires using a local hostname instead of localhost. See the Firefox section below.
 
 ## Usage
 
@@ -42,6 +42,7 @@ Firefox has a limitation with WebRTC when accessing via `localhost` due to netwo
 
 
 2. Start the dev server with the local hostname:
+
    ```bash
    npm run dev -- --host dev.local
    ```
