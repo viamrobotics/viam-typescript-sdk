@@ -3,6 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
 import {
   GrabRequest,
+  IsHoldingSomethingRequest,
   IsMovingRequest,
   OpenRequest,
   StopRequest,
@@ -82,6 +83,18 @@ export class GripperClient implements Gripper {
 
     const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
+  }
+
+  async isHoldingSomething(extra = {}, callOptions = this.callOptions) {
+    const request = new IsHoldingSomethingRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.isHoldingSomething(request, callOptions);
+    return resp.isHoldingSomething;
   }
 
   async doCommand(
