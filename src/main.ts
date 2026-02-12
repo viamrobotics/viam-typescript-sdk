@@ -421,6 +421,8 @@ export * as visionApi from './gen/service/vision/v1/vision_pb';
 
 export * from './services/world-state-store';
 
+export * from './services/video';
+
 export {
   GenericClient as GenericServiceClient,
   type Generic as GenericService,
