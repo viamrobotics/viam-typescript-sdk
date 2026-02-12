@@ -17,13 +17,16 @@ on:
         required: true
 
 permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  actions: read
+  contents: read
 
 jobs:
   fix-ci:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
     if: >-
       github.repository_owner == 'viamrobotics' &&
       (
@@ -37,8 +40,8 @@ jobs:
     steps:
       - name: Get PR and check retry count
         id: check
-        # actions/github-script@v7.1.0
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        # actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             const branch = context.payload.workflow_run?.head_branch || '${{ inputs.branch }}';
@@ -75,8 +78,8 @@ jobs:
 
       - name: Label fix attempt
         if: steps.check.outputs.should_fix == 'true'
-        # actions/github-script@v7.1.0
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        # actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             await github.rest.issues.addLabels({
@@ -91,9 +94,11 @@ jobs:
         id: logs
         env:
           GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          LOGS=$(gh run view ${{ github.event.workflow_run.id || inputs.run_id }} \
-            --repo ${{ github.repository }} \
+          LOGS=$(gh run view "$RUN_ID" \
+            --repo "$GH_REPO" \
             --log-failed 2>&1 | tail -500)
           {
             echo "content<<LOGS_EOF"
@@ -101,8 +106,8 @@ jobs:
             echo "LOGS_EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # anthropics/claude-code-action@v1.0.47
-      - uses: anthropics/claude-code-action@b433f16b30d54063fd3bab6b12f46f3da00e41b6
+      # anthropics/claude-code-action@v1.0.48
+      - uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476
         if: steps.check.outputs.should_fix == 'true'
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -126,12 +131,12 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 20
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git *)"
+            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
 
       - name: Comment on PR if max retries exhausted
         if: steps.check.outputs.max_reached == 'true'
-        # actions/github-script@v7.1.0
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        # actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             await github.rest.issues.createComment({
@@ -143,8 +148,8 @@ jobs:
 
       - name: Comment on PR if fix attempt failed
         if: failure() && steps.check.outputs.should_fix == 'true'
-        # actions/github-script@v7.1.0
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        # actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             await github.rest.issues.createComment({
