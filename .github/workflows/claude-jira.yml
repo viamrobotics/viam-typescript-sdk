@@ -33,6 +33,11 @@ jobs:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
     steps:
+      # actions/checkout@v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 1
+
       # anthropics/claude-code-action@v1.0.48
       - uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476
         with:
