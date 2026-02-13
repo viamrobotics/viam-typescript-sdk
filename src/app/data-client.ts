@@ -1401,7 +1401,7 @@ export class DataClient {
    *   `tags`, and `datasetIds`.
    * @returns The binary data ID of the uploaded data
    */
-  binaryDataCaptureUpload(
+  async binaryDataCaptureUpload(
     binaryData: Uint8Array,
     partId: string,
     componentType: string,
@@ -1409,76 +1409,17 @@ export class DataClient {
     methodName: string,
     dataRequestTimes: [Date, Date],
     options?: BinaryDataCaptureUploadOptions
-  ): Promise<string>;
-
-  /**
-   * @deprecated Use the overload that takes `(dataRequestTimes, options)` to
-   *   provide `mimeType`, `fileExtension`, `tags`, and `datasetIds`.
-   */
-  binaryDataCaptureUpload(
-    binaryData: Uint8Array,
-    partId: string,
-    componentType: string,
-    componentName: string,
-    methodName: string,
-    fileExtension: string,
-    dataRequestTimes: [Date, Date],
-    tags?: string[],
-    datasetIds?: string[]
-  ): Promise<string>;
-
-  async binaryDataCaptureUpload(
-    binaryData: Uint8Array,
-    partId: string,
-    componentType: string,
-    componentName: string,
-    methodName: string,
-    fileExtensionOrDataRequestTimes: string | [Date, Date],
-    dataRequestTimesOrOptions?:
-      | [Date, Date]
-      | BinaryDataCaptureUploadOptions
-      | undefined,
-    tags?: string[],
-    datasetIds?: string[]
   ): Promise<string> {
-    const isLegacySignature =
-      typeof fileExtensionOrDataRequestTimes === 'string';
-    if (isLegacySignature && !dataRequestTimesOrOptions) {
-      throw new Error(
-        'binaryDataCaptureUpload called with legacy signature but missing dataRequestTimes'
-      );
-    }
-
-    const dataRequestTimes: [Date, Date] = isLegacySignature
-      ? (dataRequestTimesOrOptions as [Date, Date])
-      : fileExtensionOrDataRequestTimes;
-
-    const options = isLegacySignature
-      ? undefined
-      : (dataRequestTimesOrOptions as
-          | BinaryDataCaptureUploadOptions
-          | undefined);
-
-    const fileExtension = isLegacySignature
-      ? fileExtensionOrDataRequestTimes
-      : (options?.fileExtension ?? '');
-
-    const mimeType = options?.mimeType ?? '';
-    const resolvedTags = isLegacySignature ? tags : options?.tags;
-    const resolvedDatasetIds = isLegacySignature
-      ? datasetIds
-      : options?.datasetIds;
-
     const metadata = new UploadMetadata({
       partId,
       componentType,
       componentName,
       methodName,
       type: DataType.BINARY_SENSOR,
-      tags: resolvedTags,
-      fileExtension,
-      datasetIds: resolvedDatasetIds,
-      mimeType,
+      tags: options?.tags,
+      fileExtension: options?.fileExtension ?? '',
+      datasetIds: options?.datasetIds,
+      mimeType: options?.mimeType ?? '',
     });
 
     const sensorData = new SensorData({
