@@ -202,7 +202,7 @@ export class MotionClient implements Motion {
   }
 
   async doCommand(
-    command: Struct,
+    command: Struct | Record<string, JsonValue>,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(
