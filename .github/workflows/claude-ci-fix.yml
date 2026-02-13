@@ -101,10 +101,17 @@ jobs:
             --repo "$GH_REPO" \
             --log-failed 2>&1 | tail -500)
           {
-            echo "content<<LOGS_EOF"
+            echo "content<<__CLAUDE_LOGS_EOF_7f3a__"
             echo "$LOGS"
-            echo "LOGS_EOF"
+            echo "__CLAUDE_LOGS_EOF_7f3a__"
           } >> "$GITHUB_OUTPUT"
+
+      # actions/checkout@v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        if: steps.check.outputs.should_fix == 'true'
+        with:
+          ref: ${{ steps.check.outputs.branch }}
+          fetch-depth: 1
 
       # anthropics/claude-code-action@v1.0.48
       - uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476
