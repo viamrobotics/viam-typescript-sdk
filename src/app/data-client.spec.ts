@@ -1675,7 +1675,6 @@ describe('DataSyncClient tests', () => {
   const componentType = 'testComponentType';
   const componentName = 'testComponentName';
   const methodName = 'testMethodName';
-  const fileExtension = '.png';
   const tags = ['testTag1', 'testTag2'];
   const datasetIds = ['dataset1', 'dataset2'];
   const timeRequested1 = new Date(1970, 1, 1, 1, 1, 1);
@@ -1760,36 +1759,7 @@ describe('DataSyncClient tests', () => {
       });
     });
 
-    it('binary data capture upload (legacy signature)', async () => {
-      metadata.type = DataType.BINARY_SENSOR;
-      metadata.fileExtension = fileExtension;
-      expectedRequest.metadata = metadata;
-      expectedRequest.metadata.datasetIds = datasetIds;
-      const sensorData = new SensorData();
-      const sensorMetadata = new SensorMetadata();
-      sensorMetadata.timeRequested = Timestamp.fromDate(timeRequested1);
-      sensorMetadata.timeReceived = Timestamp.fromDate(timeReceived1);
-      sensorData.metadata = sensorMetadata;
-      sensorData.data.case = 'binary';
-      sensorData.data.value = binaryData;
-      expectedRequest.sensorContents = [sensorData];
-
-      const response = await subject().binaryDataCaptureUpload(
-        binaryData,
-        partId,
-        componentType,
-        componentName,
-        methodName,
-        fileExtension,
-        dataRequestTimes1,
-        tags,
-        datasetIds
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(response).toStrictEqual('fileId');
-    });
-
-    it('binary data capture upload (options overload)', async () => {
+    it('binary data capture upload', async () => {
       const mimeType = 'image/png';
 
       const expectedReq = new DataCaptureUploadRequest();
