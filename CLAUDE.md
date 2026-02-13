@@ -36,6 +36,18 @@ All component/service clients follow the same pattern. Tests use `*.spec.ts` suf
 - Always prefer dedicated tools (Grep, Glob, Read, Edit, Write) over Bash equivalents (grep, find, cat, sed, etc.)
 - Minimize turns: chain Bash commands with `&&`, avoid re-reading files you already explored, and do not use TodoWrite
 
+## CI Environment
+
+These rules apply when running in GitHub Actions (CI) workflows:
+
+- Do NOT run ESLint, typecheck, or tests — they require tooling not available in CI.
+- Run `npm run _prettier -- --write && npm run lint:prettier` to format code before committing.
+- Dependencies are already installed — do NOT run `npm ci`.
+- Bash commands CANNOT use pipes (`|`), command substitution (`$()`), or shell redirection. Run each command separately with explicit arguments.
+- If a command is blocked or denied, do NOT retry it or try variations of the same approach. Switch to a different tool (e.g., use Edit instead of sed).
+- For commit messages use simple `-m "message"` — no heredocs or `$(cat ...)`.
+- Do NOT use TodoWrite — it wastes turns.
+
 ## Implementation
 
 - Follow existing patterns. Do not introduce new conventions or abstractions
