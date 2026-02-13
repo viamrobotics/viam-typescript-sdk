@@ -54,20 +54,18 @@ jobs:
             Description: ${{ github.event.client_payload.description || inputs.description }}
 
             Instructions:
-            - Read CLAUDE.md for repository conventions and constraints.
+            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment section).
             - Explore the relevant source files, then implement the minimal change.
             - Add or update unit tests for changed behavior.
-            - Run `npm run _prettier -- --write && npm run lint:prettier` to format code.
-            - Chain git commands to minimize turns: `git checkout -b <branch> && git add <files> && git commit -m "<msg>"`, then push and open a PR with the Jira ticket ID in the title.
-            - Do NOT use TodoWrite — it wastes turns.
-            - Do NOT run ESLint, typecheck, or tests — they require tooling not available here.
-            - Dependencies are already installed — do NOT run npm ci.
+            - Branch name MUST start with `claude/` prefix (e.g., `claude/rsdk-12345/short-description`).
+            - For gh pr create use simple --title and --body strings — no heredocs or command substitution.
+            - Include the Jira ticket ID in the PR title.
           show_full_output: true
           claude_args: |
             --model claude-opus-4-6
             --max-turns 50
             --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
+            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(sed *),Bash(grep *),Bash(find *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
       - name: Notify Slack of failure
         # slackapi/slack-github-action@v1.27.1
         uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3
