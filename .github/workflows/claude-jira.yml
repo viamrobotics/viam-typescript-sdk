@@ -59,9 +59,10 @@ jobs:
             6. Open a PR with the Jira ticket ID in the title. The PR description must include a summary of what changed and why.
 
             Do NOT run ESLint, typecheck, or tests, they require permissions and tooling not available here.
+          show_full_output: true
           claude_args: |
             --model claude-opus-4-6
-            --max-turns 25
+            --max-turns 40
             --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
             --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
 
