@@ -20,6 +20,7 @@ import {
 import type { Arm } from './arm';
 import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
+import type { MoveOptions } from './arm';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -88,11 +89,16 @@ export class ArmClient implements Arm {
     return response.models;
   }
 
-  async moveToPosition(pose: Pose, extra = {}, callOptions = this.callOptions) {
+  async moveToPosition(pose: Pose, options?: MoveOptions, extra = {}, callOptions = this.callOptions) {
+    const combinedExtra: Record<string, JsonValue> = {
+      ...(options ? options : {}),
+      ...(extra as Record<string, JsonValue>),
+    };
+
     const request = new MoveToPositionRequest({
       name: this.name,
       to: pose,
-      extra: Struct.fromJson(extra),
+      extra: Struct.fromJson(combinedExtra),
     });
 
     this.options.requestLogger?.(request);
@@ -102,6 +108,7 @@ export class ArmClient implements Arm {
 
   async moveToJointPositions(
     jointPositionsList: number[],
+    options?: MoveOptions,
     extra = {},
     callOptions = this.callOptions
   ) {
@@ -109,10 +116,15 @@ export class ArmClient implements Arm {
       values: jointPositionsList,
     });
 
+    const combinedExtra: Record<string, JsonValue> = {
+      ...(options ? options : {}),
+      ...(extra as Record<string, JsonValue>),
+    };
+
     const request = new MoveToJointPositionsRequest({
       name: this.name,
       positions: newJointPositions,
-      extra: Struct.fromJson(extra),
+      extra: Struct.fromJson(combinedExtra),
     });
 
     this.options.requestLogger?.(request);
