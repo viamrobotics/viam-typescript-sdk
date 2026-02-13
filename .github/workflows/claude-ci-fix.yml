@@ -135,7 +135,7 @@ jobs:
             - Make the minimal fix to resolve the CI failures.
             - Run `npm run _prettier -- --write` and `npm run lint:prettier` before pushing.
             - Do NOT attempt to run ESLint, typecheck, or tests — they require permissions and tooling that are not available.
-            - Use the Grep and Glob tools for searching code. Do NOT use Bash to run grep or find commands.
+
           claude_args: |
             --model claude-sonnet-4-5-20250929
             --max-turns 20

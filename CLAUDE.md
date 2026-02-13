@@ -13,6 +13,10 @@ Public TypeScript SDK for the Viam robotics platform (`@viamrobotics/sdk`).
 - **NEVER** run `make` targets — they require protobuf tooling not available here
 - Do NOT add dependencies unless absolutely necessary — this is a public SDK
 
+## Tools
+
+- Always prefer dedicated tools (Grep, Glob, Read, Edit, Write) over Bash equivalents (grep, find, cat, sed, etc.)
+
 ## Implementation
 
 - Follow existing patterns. Do not introduce new conventions or abstractions
