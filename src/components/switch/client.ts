@@ -7,7 +7,7 @@ import {
   GetNumberOfPositionsRequest,
 } from '../../gen/component/switch/v1/switch_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Switch } from './switch';
 
@@ -77,7 +77,7 @@ export class SwitchClient implements Switch {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

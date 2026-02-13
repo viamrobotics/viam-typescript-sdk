@@ -4,7 +4,7 @@ import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_conne
 import { DiscoverResourcesRequest } from '../../gen/service/discovery/v1/discovery_pb';
 import type { RobotClient } from '../../robot';
 import { doCommandFromClient } from '../../utils';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import type { Discovery } from './discovery';
 
 /**
@@ -37,7 +37,7 @@ export class DiscoveryClient implements Discovery {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

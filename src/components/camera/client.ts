@@ -7,7 +7,7 @@ import {
   GetPointCloudRequest,
 } from '../../gen/component/camera/v1/camera_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Camera, MimeType, ResponseMetadata } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
@@ -91,7 +91,7 @@ export class CameraClient implements Camera {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

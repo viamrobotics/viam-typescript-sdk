@@ -18,6 +18,7 @@ import type {
   Options,
   Pose,
   PoseInFrame,
+  StructInput,
   Transform,
   WorldState,
 } from '../../types';
@@ -202,7 +203,7 @@ export class MotionClient implements Motion {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

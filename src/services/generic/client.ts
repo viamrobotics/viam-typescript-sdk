@@ -2,7 +2,7 @@ import type { JsonValue, Struct } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GenericService } from '../../gen/service/generic/v1/generic_connect';
 import { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Generic } from './generic';
 
@@ -24,7 +24,7 @@ export class GenericClient implements Generic {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

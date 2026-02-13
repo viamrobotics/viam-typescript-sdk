@@ -13,7 +13,7 @@ import {
   GetPropertiesRequest,
 } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { MovementSensor } from './movement-sensor';
 
@@ -176,7 +176,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

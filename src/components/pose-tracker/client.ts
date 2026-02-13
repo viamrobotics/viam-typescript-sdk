@@ -2,7 +2,7 @@ import { type JsonValue, Struct } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { PoseTrackerService } from '../../gen/component/posetracker/v1/pose_tracker_connect';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { PoseTracker } from './pose-tracker';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
@@ -35,7 +35,7 @@ export class PoseTrackerClient implements PoseTracker {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

@@ -7,6 +7,12 @@ export interface Options {
   requestLogger?: (req: unknown) => void;
 }
 
+/**
+ * A command input: either a protobuf Struct or a plain JSON-serializable
+ * object.
+ */
+export type StructInput = Struct | Record<string, JsonValue>;
+
 export interface Resource {
   /** The name of the resource. */
   readonly name: string;
@@ -17,18 +23,14 @@ export interface Resource {
    * @example
    *
    * ```ts
-   * import { Struct } from '@viamrobotics/sdk';
-   *
-   * const result = await resource.doCommand(
-   *   Struct.fromJson({
-   *     myCommand: { key: 'value' },
-   *   })
-   * );
+   * const result = await resource.doCommand({
+   *   myCommand: { key: 'value' },
+   * });
    * ```
    *
-   * @param command - The command to execute.
+   * @param command - The command to execute, as a plain object or a Struct.
    */
-  doCommand(command: Struct): Promise<JsonValue>;
+  doCommand(command: StructInput): Promise<JsonValue>;
 }
 
 import * as commonApi from './gen/common/v1/common_pb';

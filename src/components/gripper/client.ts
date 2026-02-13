@@ -9,7 +9,7 @@ import {
   StopRequest,
 } from '../../gen/component/gripper/v1/gripper_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Gripper } from './gripper';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
@@ -98,7 +98,7 @@ export class GripperClient implements Gripper {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

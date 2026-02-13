@@ -8,7 +8,7 @@ import {
   StopRequest,
 } from '../../gen/component/servo/v1/servo_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Servo } from './servo';
 
@@ -76,7 +76,7 @@ export class ServoClient implements Servo {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

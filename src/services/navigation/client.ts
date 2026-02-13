@@ -13,7 +13,7 @@ import {
   SetModeRequest,
 } from '../../gen/service/navigation/v1/navigation_pb';
 import { RobotClient } from '../../robot';
-import type { GeoPoint, Options } from '../../types';
+import type { GeoPoint, Options, StructInput } from '../../types';
 import { isValidGeoPoint } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Navigation } from './navigation';
@@ -154,7 +154,7 @@ export class NavigationClient implements Navigation {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

@@ -7,7 +7,7 @@ import {
   UploadBinaryDataToDatasetsRequest,
 } from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { DataManager } from './data-manager';
 
@@ -63,17 +63,17 @@ export class DataManagerClient implements DataManager {
    *   machine,
    *   'my_data_manager'
    * );
-   * await dataManager.doCommand(new Struct({ cmd: 'test', data1: 500 }));
+   * await dataManager.doCommand({ cmd: 'test', data1: 500 });
    * ```
    *
    * For more information, see [Data Manager
    * API](https://docs.viam.com/dev/reference/apis/services/data/#docommand).
    *
-   * @param command - The command to do.
+   * @param command - The command to execute, as a plain object or a Struct.
    * @param callOptions - Call options for the command.
    */
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

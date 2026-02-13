@@ -14,7 +14,7 @@ import {
   StopRequest,
 } from '../../gen/component/motor/v1/motor_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Motor } from './motor';
 
@@ -172,7 +172,7 @@ export class MotorClient implements Motor {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

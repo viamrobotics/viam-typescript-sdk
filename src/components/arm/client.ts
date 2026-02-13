@@ -11,7 +11,7 @@ import {
   StopRequest,
 } from '../../gen/component/arm/v1/arm_pb';
 import type { RobotClient } from '../../robot';
-import type { Options, Pose } from '../../types';
+import type { Options, Pose, StructInput } from '../../types';
 import {
   doCommandFromClient,
   getKinematicsFromClient,
@@ -160,7 +160,7 @@ export class ArmClient implements Arm {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

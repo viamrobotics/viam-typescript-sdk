@@ -3,7 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { VideoService } from '../../gen/service/video/v1/video_connect';
 import { GetVideoRequest } from '../../gen/service/video/v1/video_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { VideoChunk } from './types';
 import type { Video } from './video';
@@ -66,7 +66,7 @@ export class VideoClient implements Video {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

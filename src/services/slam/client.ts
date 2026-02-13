@@ -8,7 +8,7 @@ import {
   GetPropertiesRequest,
 } from '../../gen/service/slam/v1/slam_pb';
 import { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Slam } from './slam';
 
@@ -82,7 +82,7 @@ export class SlamClient implements Slam {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

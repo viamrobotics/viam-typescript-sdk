@@ -100,10 +100,15 @@ describe('VideoClient Tests', () => {
   });
 
   describe('doCommand Tests', () => {
-    it('sends and receives arbitrary commands', async () => {
+    it('sends and receives arbitrary commands with a Struct', async () => {
       const result = await video.doCommand(
         Struct.fromJson({ command: 'test' })
       );
+      expect(result).toStrictEqual({});
+    });
+
+    it('accepts a plain object instead of a Struct', async () => {
+      const result = await video.doCommand({ command: 'test' });
       expect(result).toStrictEqual({});
     });
   });

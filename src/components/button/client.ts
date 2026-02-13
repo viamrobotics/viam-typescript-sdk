@@ -3,7 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { ButtonService } from '../../gen/component/button/v1/button_connect';
 import { PushRequest } from '../../gen/component/button/v1/button_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Button } from './button';
 
@@ -36,7 +36,7 @@ export class ButtonClient implements Button {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

@@ -11,7 +11,7 @@ import {
   StopRequest,
 } from '../../gen/component/base/v1/base_pb';
 import type { RobotClient } from '../../robot';
-import type { Options, Vector3 } from '../../types';
+import type { Options, StructInput, Vector3 } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { Base } from './base';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
@@ -138,7 +138,7 @@ export class BaseClient implements Base {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

@@ -7,7 +7,7 @@ import {
   StreamTransformChangesRequest,
 } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { WorldStateStore } from './world-state-store';
 import {
@@ -89,7 +89,7 @@ export class WorldStateStoreClient implements WorldStateStore {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

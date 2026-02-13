@@ -10,7 +10,7 @@ import {
   StopRequest,
 } from '../../gen/component/gantry/v1/gantry_pb';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import {
   doCommandFromClient,
   getKinematicsFromClient,
@@ -134,7 +134,7 @@ export class GantryClient implements Gantry {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

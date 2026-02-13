@@ -12,7 +12,7 @@ import {
 } from '../../gen/service/vision/v1/vision_pb';
 import type { MimeType } from '../../main';
 import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { Options, StructInput } from '../../types';
 import { doCommandFromClient } from '../../utils';
 import type { CaptureAllOptions } from './types';
 import type { Vision } from './vision';
@@ -195,7 +195,7 @@ export class VisionClient implements Vision {
   }
 
   async doCommand(
-    command: Struct,
+    command: StructInput,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

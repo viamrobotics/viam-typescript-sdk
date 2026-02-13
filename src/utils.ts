@@ -15,7 +15,7 @@ import {
   Geometry,
   Mesh,
 } from './gen/common/v1/common_pb';
-import type { Options, Vector3 } from './types';
+import type { Options, StructInput, Vector3 } from './types';
 import type { Frame } from './gen/app/v1/robot_pb';
 
 export const clientHeaders = new Headers({
@@ -31,13 +31,13 @@ type doCommand = (
 export const doCommandFromClient = async function doCommandFromClient(
   doCommander: doCommand,
   name: string,
-  command: Struct,
+  command: StructInput,
   options: Options = {},
   callOptions: CallOptions = {}
 ): Promise<JsonValue> {
   const request = new DoCommandRequest({
     name,
-    command,
+    command: command instanceof Struct ? command : Struct.fromJson(command),
   });
 
   options.requestLogger?.(request);
