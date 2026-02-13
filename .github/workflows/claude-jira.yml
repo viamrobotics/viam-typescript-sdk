@@ -38,6 +38,9 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Install dependencies
+        run: npm ci
+
       # anthropics/claude-code-action@v1.0.48
       - uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476
         with:
@@ -50,22 +53,21 @@ jobs:
             Summary: ${{ github.event.client_payload.summary || inputs.summary }}
             Description: ${{ github.event.client_payload.description || inputs.description }}
 
-            Follow these steps in order:
-            1. Read CLAUDE.md for repository conventions and constraints.
-            2. Explore the relevant source files to understand the existing code and patterns.
-            3. Think hard: consider at least two approaches, then select the one with the smallest diff and lowest risk that satisfies the acceptance criteria.
-            4. Implement the change. Add or update unit tests for changed behavior.
-            5. Run `npm ci`, then `npm run _prettier -- --write`, then `npm run lint:prettier`.
-            6. Open a PR with the Jira ticket ID in the title. The PR description must include a summary of what changed and why.
-
-            Do NOT run ESLint, typecheck, or tests, they require permissions and tooling not available here.
+            Instructions:
+            - Read CLAUDE.md for repository conventions and constraints.
+            - Explore the relevant source files, then implement the minimal change.
+            - Add or update unit tests for changed behavior.
+            - Run `npm run _prettier -- --write && npm run lint:prettier` to format code.
+            - Chain git commands to minimize turns: `git checkout -b <branch> && git add <files> && git commit -m "<msg>"`, then push and open a PR with the Jira ticket ID in the title.
+            - Do NOT use TodoWrite — it wastes turns.
+            - Do NOT run ESLint, typecheck, or tests — they require tooling not available here.
+            - Dependencies are already installed — do NOT run npm ci.
           show_full_output: true
           claude_args: |
             --model claude-opus-4-6
-            --max-turns 60
+            --max-turns 50
             --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
             --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm ci*),Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
-
       - name: Notify Slack of failure
         # slackapi/slack-github-action@v1.27.1
         uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3
