@@ -120,13 +120,21 @@ describe('WorldStateStoreClient Tests', () => {
   });
 
   describe('doCommand', () => {
-    it('executes arbitrary commands', async () => {
+    it('accepts a Struct argument', async () => {
       const command = Struct.fromJson({ test: 'value' });
       const expected = { success: true };
 
       await expect(worldStateStore.doCommand(command)).resolves.toStrictEqual(
         expected
       );
+    });
+
+    it('accepts a plain object argument', async () => {
+      const expected = { success: true };
+
+      await expect(
+        worldStateStore.doCommand({ test: 'value' })
+      ).resolves.toStrictEqual(expected);
     });
   });
 });
