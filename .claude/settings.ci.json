@@ -1,5 +1,29 @@
 {
   "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash(npm ci*)",
+      "Bash(npm run _prettier*)",
+      "Bash(npm run lint:prettier*)",
+      "Bash(sed *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git rev-parse *)",
+      "Bash(git fetch *)",
+      "Bash(gh pr create*)"
+    ],
     "deny": [
       "Edit(file_path=.github/**)",
       "Write(file_path=.github/**)",
