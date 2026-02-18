@@ -48,6 +48,8 @@ These rules apply when running in GitHub Actions (CI) workflows:
 - For commit messages use simple `-m "message"` — no heredocs or `$(cat ...)`.
 - Do NOT use TodoWrite — it wastes turns.
 - Do NOT use Task subagents for file editing. Use the Edit tool directly from the main agent. Bash-type subagents only have the Bash tool — they cannot use Edit, Grep, or Glob.
+- Always Read a file before Editing it. When editing many files in parallel, Read them all first in one batch, then Edit them all in a second batch.
+- For `git commit -m` and `gh pr create --body`, use simple single-line strings — no embedded newlines.
 
 ## Implementation
 
