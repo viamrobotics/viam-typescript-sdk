@@ -45,6 +45,8 @@ These rules apply when running in GitHub Actions (CI) workflows:
 - Dependencies are already installed — do NOT run `npm ci`.
 - Bash commands CANNOT use pipes (`|`), command substitution (`$()`), or shell redirection. Run each command separately with explicit arguments.
 - If a command is blocked or denied, do NOT retry it or try variations of the same approach. Switch to a different tool (e.g., use Edit instead of sed).
+- For bulk edits (same change across many files), use `Bash(sed -i 's/old/new/' file1 file2 ...)` instead of editing files one by one. This avoids the Read-before-Edit requirement and saves turns.
+- NEVER use `Bash(grep ...)` or `Bash(find ...)` — use the dedicated Grep and Glob tools. These are always available and don't need Bash approval.
 - For commit messages use simple `-m "message"` — no heredocs or `$(cat ...)`.
 - Do NOT use TodoWrite — it wastes turns.
 - Do NOT use Task subagents for file editing. Use the Edit tool directly from the main agent. Bash-type subagents only have the Bash tool — they cannot use Edit, Grep, or Glob.
