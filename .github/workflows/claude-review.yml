@@ -38,6 +38,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
+          allowed_bots: "claude[bot]"
           track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
@@ -100,6 +101,7 @@ jobs:
         uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
         if: ${{ failure() }}
         with:
+          webhook-type: incoming-webhook
           payload: |
             {
               "text": "Claude Code Review failed for PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",

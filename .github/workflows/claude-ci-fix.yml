@@ -119,6 +119,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
+          allowed_bots: "claude[bot]"
           prompt: |
             CI failed on PR #${{ steps.check.outputs.pr_number }} (fix attempt ${{ steps.check.outputs.attempt }} of 2).
 
@@ -149,18 +150,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
-              body: '@sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
-            });
-
-      - name: Comment on PR if fix attempt failed
-        if: failure() && steps.check.outputs.should_fix == 'true'
-        # actions/github-script@v8.0.0
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
-              body: '@sdk Automated fix attempt ${{ steps.check.outputs.attempt }} of 2 failed. This PR may need human intervention.'
+              body: '@viamrobotics/sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
             });
