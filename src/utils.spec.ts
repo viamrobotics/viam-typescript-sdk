@@ -1,6 +1,6 @@
 import { Struct } from '@bufbuild/protobuf';
 import { describe, expect, it, vi } from 'vitest';
-import { DoCommandResponse } from './gen/common/v1/common_pb';
+import { DoCommandRequest, DoCommandResponse } from './gen/common/v1/common_pb';
 import { doCommandFromClient } from './utils';
 
 describe('doCommandFromClient', () => {
@@ -21,7 +21,7 @@ describe('doCommandFromClient', () => {
 
     expect(result).toEqual({ status: 'done' });
 
-    const request = mockDoCommander.mock.calls[0]![0];
+    const [[request]] = mockDoCommander.mock.calls as [[DoCommandRequest]];
     expect(request.name).toBe(name);
     expect(request.command).toBeInstanceOf(Struct);
     expect(request.command?.toJson()).toEqual({ cmd: 'test', data: 500 });
@@ -38,7 +38,7 @@ describe('doCommandFromClient', () => {
 
     expect(result).toEqual({ ok: true });
 
-    const request = mockDoCommander.mock.calls[0]![0];
+    const [[request]] = mockDoCommander.mock.calls as [[DoCommandRequest]];
     expect(request.command).toBe(command);
   });
 
