@@ -80,4 +80,4 @@ jobs:
               "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_TEAM_SDK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}
