@@ -139,7 +139,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 30
-            --allowedTools "Edit,Read,Write,Glob,Grep,mcp__github_file_ops__commit_files,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
+            --allowedTools "Edit,Read,Write,Glob,Grep,mcp__github_file_ops__commit_files,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
 
       - name: Comment on PR if max retries exhausted
         if: steps.check.outputs.max_reached == 'true'
