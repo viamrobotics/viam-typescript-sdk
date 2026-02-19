@@ -1,8 +1,9 @@
 name: Claude Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  workflow_run:
+    workflows: ["Pull Request Update"]
+    types: [completed]
   issue_comment:
     types: [created]
   pull_request_review_comment:
@@ -13,28 +14,61 @@ permissions:
 
 jobs:
   auto-review:
-    # Automatically review PRs from claude/* branches with full push permissions.
+    # Automatically review PRs from claude/* branches after CI passes.
+    # Triggered via workflow_run so the review happens after CI (and any CI-fix attempts).
     if: >-
       github.repository_owner == 'viamrobotics' &&
-      github.event_name == 'pull_request' &&
-      startsWith(github.event.pull_request.head.ref, 'claude/')
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'claude/')
     permissions:
       contents: write
       pull-requests: write
+      issues: write
+      actions: read
       id-token: write
     runs-on: ubuntu-latest
     steps:
+      - name: Find PR for branch
+        id: pr
+        # actions/github-script@v8.0.0
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const branch = context.payload.workflow_run.head_branch;
+            const { data: pulls } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+
+            if (pulls.length === 0) {
+              core.info('No open PR found for branch ' + branch);
+              core.setOutput('found', 'false');
+              return;
+            }
+
+            const pr = pulls[0];
+            core.setOutput('found', 'true');
+            core.setOutput('number', String(pr.number));
+            core.setOutput('title', pr.title);
+            core.setOutput('branch', branch);
+
       # actions/checkout@v6.0.2
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        if: steps.pr.outputs.found == 'true'
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ steps.pr.outputs.branch }}
           fetch-depth: 1
 
       - name: Install dependencies
+        if: steps.pr.outputs.found == 'true'
         run: npm ci
 
       # anthropics/claude-code-action@v1.0.54
       - uses: anthropics/claude-code-action@0cf5eeec4f908121edd03a81411b55485994f8d3
+        if: steps.pr.outputs.found == 'true'
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
@@ -42,7 +76,7 @@ jobs:
           track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ steps.pr.outputs.number }}
 
             You are a senior staff engineer performing a rigorous code review.
             This PR was authored by an AI agent — assume nothing and verify everything.
@@ -99,12 +133,12 @@ jobs:
       - name: Notify Slack of failure
         # slackapi/slack-github-action@v2.1.1
         uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.pr.outputs.found == 'true' }}
         with:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "Claude Code Review failed for PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "text": "Claude Code Review failed for PR #${{ steps.pr.outputs.number }}: ${{ steps.pr.outputs.title }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
               "username": "Typescript SDK",
               "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
             }
