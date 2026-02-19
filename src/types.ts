@@ -17,18 +17,21 @@ export interface Resource {
    * @example
    *
    * ```ts
-   * import { Struct } from '@viamrobotics/sdk';
+   * // With a plain object (recommended):
+   * const result = await resource.doCommand({
+   *   myCommand: { key: 'value' },
+   * });
    *
+   * // With a Struct (also supported):
+   * import { Struct } from '@viamrobotics/sdk';
    * const result = await resource.doCommand(
-   *   Struct.fromJson({
-   *     myCommand: { key: 'value' },
-   *   })
+   *   Struct.fromJson({ myCommand: { key: 'value' } })
    * );
    * ```
    *
    * @param command - The command to execute.
    */
-  doCommand(command: Struct): Promise<JsonValue>;
+  doCommand(command: Struct | Record<string, JsonValue>): Promise<JsonValue>;
 }
 
 import * as commonApi from './gen/common/v1/common_pb';
