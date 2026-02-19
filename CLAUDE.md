@@ -2,16 +2,12 @@
 
 Public TypeScript SDK for the Viam robotics platform (`@viamrobotics/sdk`).
 
-## Key Paths
-
-- `src/main.ts` — Public API entry point. All public exports must go through this file.
-- `src/gen/` — Auto-generated protobuf code. Never edit. Not committed to git.
-
 ## Codebase Structure
 
 ```
 src/
   main.ts                          — Public API barrel file (all exports)
+  gen/                             — Auto-generated protobuf code (never edit, not in git)
   types.ts                         — Shared type definitions (Resource interface, Options, etc.)
   utils.ts                         — Shared utilities (doCommandFromClient, etc.)
   robot/                           — Robot client and session management
@@ -40,23 +36,20 @@ All component/service clients follow the same pattern. Tests use `*.spec.ts` suf
 
 These rules apply when running in GitHub Actions (CI) workflows:
 
-- Do NOT run ESLint, typecheck, or tests — they require tooling is not available here.
+- Do NOT run ESLint, typecheck, or tests — they require tooling not available here.
 - Run `npm run _prettier -- --write && npm run lint:prettier` to format code before committing.
 - Dependencies are already installed — do NOT run `npm ci`.
 - Bash commands CANNOT use pipes (`|`), command substitution (`$()`), or shell redirection. Run each command separately with explicit arguments.
 - If a command is blocked or denied, do NOT retry it or try variations of the same approach. Switch to a different tool (e.g., use Edit instead of sed).
-- For bulk edits (same change across many files), use `Bash(sed -i 's/old/new/' file1 file2 ...)` instead of editing files one by one. This avoids the Read-before-Edit requirement and saves turns.
-- NEVER use `Bash(grep ...)` or `Bash(find ...)` — use the dedicated Grep and Glob tools. These are always available and don't need Bash approval.
-- For commit messages use simple `-m "message"` — no heredocs or `$(cat ...)`.
-- Do NOT use TodoWrite — it wastes turns.
+- For bulk edits (same change across many files): Read all target files first (full reads, no offset/limit) in one parallel batch, then Edit all files in the next parallel batch. Do NOT use `Bash(sed -i ...)` — it is blocked by the sandbox.
+- Always Read a file (full read, no offset/limit) before Editing it. When editing many files in parallel, Read them all first in one batch, then Edit them all in a second batch.
 - Do NOT use Task subagents for file editing. Use the Edit tool directly from the main agent. Bash-type subagents only have the Bash tool — they cannot use Edit, Grep, or Glob.
-- Always Read a file before Editing it. When editing many files in parallel, Read them all first in one batch, then Edit them all in a second batch.
-- For `git commit -m` and `gh pr create --body`, use simple single-line strings — no embedded newlines.
+- For `git commit -m` and `gh pr create --body`, use simple single-line `-m "message"` strings — no heredocs, `$(cat ...)`, or embedded newlines.
 
 ## Implementation
 
-- Follow existing patterns. Do not introduce new conventions or abstractions
-- Implement the **minimal change**. No refactors, no new abstractions
-- Maintain backwards compatibility. No breaking changes to the public API
-- Export new public API through `src/main.ts`
+- Follow existing patterns. No new conventions or abstractions.
+- Implement the **minimal change**. No refactors or unnecessary additions.
+- Maintain backwards compatibility. No breaking changes to the public API.
+- Export new public API through `src/main.ts`.
 - Add or update unit tests for changed behavior. Tests should verify meaningful logic, edge cases, error paths, state transitions, not just trivial assertions.
