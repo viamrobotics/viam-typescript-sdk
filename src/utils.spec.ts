@@ -20,7 +20,7 @@ describe('doCommandFromClient', () => {
     expect(result).toEqual({ response: 'ok' });
     expect(doCommander).toHaveBeenCalledOnce();
 
-    const request: DoCommandRequest = doCommander.mock.calls[0][0];
+    const [[request]] = doCommander.mock.calls as [[DoCommandRequest]];
     expect(request.name).toBe(name);
     expect(request.command).toBeInstanceOf(Struct);
     expect(request.command?.toJson()).toEqual({ foo: 'bar', num: 42 });
@@ -36,7 +36,7 @@ describe('doCommandFromClient', () => {
     expect(result).toEqual({ ok: true });
     expect(doCommander).toHaveBeenCalledOnce();
 
-    const request: DoCommandRequest = doCommander.mock.calls[0][0];
+    const [[request]] = doCommander.mock.calls as [[DoCommandRequest]];
     expect(request.command).toBe(command);
   });
 
@@ -74,7 +74,7 @@ describe('doCommandFromClient', () => {
 
     await doCommandFromClient(doCommander, name, command);
 
-    const request: DoCommandRequest = doCommander.mock.calls[0][0];
+    const [[request]] = doCommander.mock.calls as [[DoCommandRequest]];
     expect(request.command?.toJson()).toEqual({
       outer: { inner: { deep: 'value' } },
       list: [1, 2, 3],
