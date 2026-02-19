@@ -31,13 +31,14 @@ type doCommand = (
 export const doCommandFromClient = async function doCommandFromClient(
   doCommander: doCommand,
   name: string,
-  command: Struct,
+  command: Struct | Record<string, JsonValue>,
   options: Options = {},
   callOptions: CallOptions = {}
 ): Promise<JsonValue> {
+  const cmd = command instanceof Struct ? command : Struct.fromJson(command);
   const request = new DoCommandRequest({
     name,
-    command,
+    command: cmd,
   });
 
   options.requestLogger?.(request);
