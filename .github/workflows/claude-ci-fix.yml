@@ -42,9 +42,11 @@ jobs:
         id: check
         # actions/github-script@v8.0.0
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        env:
+          INPUT_BRANCH: ${{ inputs.branch }}
         with:
           script: |
-            const branch = context.payload.workflow_run?.head_branch || '${{ inputs.branch }}';
+            const branch = context.payload.workflow_run?.head_branch || process.env.INPUT_BRANCH;
             const { data: pulls } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -113,13 +115,17 @@ jobs:
           ref: ${{ steps.check.outputs.branch }}
           fetch-depth: 1
 
+      - name: Install dependencies
+        if: steps.check.outputs.should_fix == 'true'
+        run: npm ci
+
       # anthropics/claude-code-action@v1.0.54
       - uses: anthropics/claude-code-action@0cf5eeec4f908121edd03a81411b55485994f8d3
         if: steps.check.outputs.should_fix == 'true'
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
-          use_commit_signing: true
+
           allowed_bots: "claude[bot]"
           prompt: |
             CI failed on PR #${{ steps.check.outputs.pr_number }} (fix attempt ${{ steps.check.outputs.attempt }} of 2).
@@ -139,7 +145,8 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 30
-            --allowedTools "Edit,Read,Write,Glob,Grep,mcp__github_file_ops__commit_files,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
+            --append-system-prompt "Do NOT use TodoWrite — it wastes turns. Chain Bash commands with && to minimize turns."
+            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
 
       - name: Comment on PR if max retries exhausted
         if: steps.check.outputs.max_reached == 'true'
