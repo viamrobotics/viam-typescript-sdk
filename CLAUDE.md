@@ -44,7 +44,8 @@ These rules apply when running in GitHub Actions (CI) workflows:
 - For bulk edits (same change across many files): work in small batches of up to 5 files at a time — Read 5 files, then Edit those 5 files, then move to the next 5. Do NOT read all files at once then edit all at once — the Edit tool may lose track of reads from large batches. Do NOT use `Bash(sed -i ...)` — it is blocked by the sandbox.
 - Always Read a file (full read, no offset/limit) before Editing it.
 - Do NOT use Task subagents for file editing. Use the Edit tool directly from the main agent. Bash-type subagents only have the Bash tool — they cannot use Edit, Grep, or Glob.
-- For `git commit -m` and `gh pr create --body`, use simple single-line `-m "message"` strings — no heredocs, `$(cat ...)`, or embedded newlines.
+- For commits, prefer `mcp__github_file_ops__commit_files` (available when `use_commit_signing` is enabled). Fall back to `git commit -m "single-line message"` if needed.
+- For PRs, write the body to `/tmp/pr-body.md` using the Write tool, then run `gh pr create --title "Title" --body-file /tmp/pr-body.md`. NEVER pass multi-line strings directly to `--body`.
 
 ## Implementation
 

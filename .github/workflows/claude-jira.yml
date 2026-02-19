@@ -46,6 +46,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
+          use_commit_signing: true
           prompt: |
             Implement the following Jira ticket:
 
@@ -64,8 +65,8 @@ jobs:
           claude_args: |
             --model claude-opus-4-6
             --max-turns 50
-            --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed."
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
+            --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed. CRITICAL: For PRs, write the body to /tmp/pr-body.md using the Write tool, then run gh pr create --title 'Title' --body-file /tmp/pr-body.md. NEVER pass multi-line strings directly to --body."
+            --allowedTools "Edit,Read,Write,Glob,Grep,mcp__github_file_ops__commit_files,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
       - name: Notify Slack of failure
         # slackapi/slack-github-action@v2.1.1
         uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
