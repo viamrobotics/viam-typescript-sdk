@@ -63,7 +63,7 @@ export class DataManagerClient implements DataManager {
    *   machine,
    *   'my_data_manager'
    * );
-   * await dataManager.doCommand(new Struct({ cmd: 'test', data1: 500 }));
+   * await dataManager.doCommand({ cmd: 'test', data1: 500 });
    * ```
    *
    * For more information, see [Data Manager
@@ -73,7 +73,7 @@ export class DataManagerClient implements DataManager {
    * @param callOptions - Call options for the command.
    */
   async doCommand(
-    command: Struct,
+    command: Struct | Record<string, JsonValue>,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

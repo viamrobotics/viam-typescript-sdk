@@ -91,7 +91,7 @@ export class CameraClient implements Camera {
   }
 
   async doCommand(
-    command: Struct,
+    command: Struct | Record<string, JsonValue>,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

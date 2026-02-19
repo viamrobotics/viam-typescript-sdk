@@ -17,18 +17,26 @@ export interface Resource {
    * @example
    *
    * ```ts
+   * // Plain object (recommended)
+   * const result = await resource.doCommand({
+   *   myCommand: { key: 'value' },
+   * });
+   * ```
+   *
+   * @example
+   *
+   * ```ts
+   * // Struct is also accepted for backwards compatibility
    * import { Struct } from '@viamrobotics/sdk';
    *
    * const result = await resource.doCommand(
-   *   Struct.fromJson({
-   *     myCommand: { key: 'value' },
-   *   })
+   *   Struct.fromJson({ myCommand: { key: 'value' } })
    * );
    * ```
    *
-   * @param command - The command to execute.
+   * @param command - The command to execute, as a plain object or Struct.
    */
-  doCommand(command: Struct): Promise<JsonValue>;
+  doCommand(command: Struct | Record<string, JsonValue>): Promise<JsonValue>;
 }
 
 import * as commonApi from './gen/common/v1/common_pb';
