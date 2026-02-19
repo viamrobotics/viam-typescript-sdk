@@ -166,6 +166,10 @@ jobs:
         with:
           script: |
             if (context.eventName === 'issue_comment') {
+              if (!context.payload.issue.pull_request) {
+                core.setFailed('on-demand-review only works on pull request comments.');
+                return;
+              }
               const { data: pr } = await github.rest.pulls.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
