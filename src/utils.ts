@@ -33,7 +33,7 @@ type doCommand = (
  * @example
  *
  * ```ts
- * // With a plain object (recommended):
+ * // With a plain object (preferred):
  * const result = await resource.doCommand({ myCommand: { key: 'value' } });
  *
  * // With a Struct (also supported):
