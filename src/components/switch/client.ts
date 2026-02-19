@@ -77,7 +77,7 @@ export class SwitchClient implements Switch {
   }
 
   async doCommand(
-    command: Struct,
+    command: Struct | Record<string, JsonValue>,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(

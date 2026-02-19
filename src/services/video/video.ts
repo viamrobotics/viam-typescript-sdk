@@ -45,8 +45,11 @@ export interface Video extends Resource {
   /**
    * Send/receive arbitrary commands to the resource.
    *
-   * @param command - The command to execute.
+   * @param command - The command to execute. Accepts a plain object or a
+   *   {@link Struct}.
    * @returns The result of the command.
    */
-  doCommand: (command: Struct) => Promise<JsonValue>;
+  doCommand: (
+    command: Struct | Record<string, JsonValue>
+  ) => Promise<JsonValue>;
 }

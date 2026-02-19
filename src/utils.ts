@@ -27,17 +27,37 @@ type doCommand = (
   options?: CallOptions
 ) => Promise<DoCommandResponse>;
 
-/** Send/Receive an arbitrary command using a resource client */
+/**
+ * Send/Receive an arbitrary command using a resource client.
+ *
+ * @example
+ *
+ * ```ts
+ * // Plain object (preferred)
+ * const result = await resource.doCommand({ myCommand: { key: 'value' } });
+ *
+ * // Struct (still supported)
+ * const result = await resource.doCommand(
+ *   Struct.fromJson({ myCommand: { key: 'value' } })
+ * );
+ * ```
+ *
+ * @param command - A {@link Struct} or a plain object (`Record<string,
+ *   JsonValue>`). Plain objects are automatically converted via
+ *   `Struct.fromJson`.
+ */
 export const doCommandFromClient = async function doCommandFromClient(
   doCommander: doCommand,
   name: string,
-  command: Struct,
+  command: Struct | Record<string, JsonValue>,
   options: Options = {},
   callOptions: CallOptions = {}
 ): Promise<JsonValue> {
+  const commandStruct =
+    command instanceof Struct ? command : Struct.fromJson(command);
   const request = new DoCommandRequest({
     name,
-    command,
+    command: commandStruct,
   });
 
   options.requestLogger?.(request);
