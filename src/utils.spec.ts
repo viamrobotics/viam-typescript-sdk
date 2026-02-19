@@ -21,7 +21,9 @@ describe('doCommandFromClient', () => {
     const result = await doCommandFromClient(mockDoCommander, name, plainObj);
 
     expect(mockDoCommander).toHaveBeenCalledOnce();
-    const calledRequest = mockDoCommander.mock.calls[0]![0] as DoCommandRequest;
+    const calledRequest = (
+      mockDoCommander.mock.calls[0] as [DoCommandRequest]
+    )[0];
     expect(calledRequest.name).toBe(name);
     expect(calledRequest.command?.toJson()).toEqual(plainObj);
     expect(result).toEqual({ response: 'ok' });
@@ -38,7 +40,9 @@ describe('doCommandFromClient', () => {
     const result = await doCommandFromClient(mockDoCommander, name, struct);
 
     expect(mockDoCommander).toHaveBeenCalled();
-    const calledRequest = mockDoCommander.mock.calls[1]![0] as DoCommandRequest;
+    const calledRequest = (
+      mockDoCommander.mock.calls[1] as [DoCommandRequest]
+    )[0];
     expect(calledRequest.name).toBe(name);
     expect(calledRequest.command).toBe(struct);
     expect(result).toEqual({ response: 'ok' });
