@@ -119,6 +119,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.ci.json
+          use_commit_signing: true
           allowed_bots: "claude[bot]"
           prompt: |
             CI failed on PR #${{ steps.check.outputs.pr_number }} (fix attempt ${{ steps.check.outputs.attempt }} of 2).
@@ -138,7 +139,7 @@ jobs:
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 30
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
+            --allowedTools "Edit,Read,Write,Glob,Grep,mcp__github_file_ops__commit_files,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
 
       - name: Comment on PR if max retries exhausted
         if: steps.check.outputs.max_reached == 'true'
