@@ -61,6 +61,7 @@ jobs:
         with:
           ref: ${{ steps.pr.outputs.branch }}
           fetch-depth: 1
+          token: ${{ secrets.GIT_ACCESS_TOKEN }}
 
       - name: Install dependencies
         if: steps.pr.outputs.found == 'true'

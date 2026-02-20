@@ -114,6 +114,7 @@ jobs:
         with:
           ref: ${{ steps.check.outputs.branch }}
           fetch-depth: 1
+          token: ${{ secrets.GIT_ACCESS_TOKEN }}
 
       - name: Install dependencies
         if: steps.check.outputs.should_fix == 'true'
