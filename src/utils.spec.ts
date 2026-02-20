@@ -24,7 +24,7 @@ describe('doCommandFromClient', () => {
 
     expect(result).toStrictEqual({ status: 'ok' });
     expect(mockDoCommand).toHaveBeenCalledOnce();
-    const request = mockDoCommand.mock.calls[0]![0] as DoCommandRequest;
+    const [request] = mockDoCommand.mock.calls[0]! as [DoCommandRequest];
     expect(request.name).toBe(name);
     expect(request.command?.toJson()).toStrictEqual({ action: 'test' });
   });
@@ -39,7 +39,7 @@ describe('doCommandFromClient', () => {
 
     expect(result).toStrictEqual({ status: 'ok' });
     expect(mockDoCommand).toHaveBeenCalledOnce();
-    const request = mockDoCommand.mock.calls[0]![0] as DoCommandRequest;
+    const [request] = mockDoCommand.mock.calls[0]! as [DoCommandRequest];
     expect(request.name).toBe(name);
     expect(request.command?.toJson()).toStrictEqual({
       action: 'test',
