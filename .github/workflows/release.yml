@@ -21,8 +21,6 @@ jobs:
   prepare:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/rdk-devenv:amd64
     outputs:
       version: ${{ steps.which_version.outputs.version }}
     steps:
@@ -30,12 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build + Lint + Test
-        run: |
-          sudo apt-get update && sudo apt-get upgrade -y
-          sudo apt-get install -y software-properties-common
-          apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
-          sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make build lint test'
+        run: make build lint test
 
       - name: Bump Version
         shell: bash
@@ -68,9 +61,7 @@ jobs:
           message: Bump version to ${{ steps.which_version.outputs.version }}
 
       - name: Open PR
-        run: |
-          sudo apt-get install -y gh
-          gh pr create -t "v${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the release branch back into main upon successful release" -B "main" -H "release/v${{ steps.which_version.outputs.version }}"
+        run: gh pr create -t "v${{ steps.which_version.outputs.version }}" -b "This is an auto-generated PR to merge the release branch back into main upon successful release" -B "main" -H "release/v${{ steps.which_version.outputs.version }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -78,8 +69,6 @@ jobs:
     needs: prepare
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -87,9 +76,7 @@ jobs:
           ref: release/v${{ needs.prepare.outputs.version }}
 
       - name: Build + Pack
-        run: |
-          sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make build pack'
+        run: make build pack
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -103,9 +90,6 @@ jobs:
     needs: [prepare, build]
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/canon:amd64
-
     steps:
       - uses: actions/download-artifact@v4
 
