@@ -73,7 +73,7 @@ export class DataManagerClient implements DataManager {
    * @param callOptions - Call options for the command.
    */
   async doCommand(
-    command: Struct,
+    command: Struct | Record<string, JsonValue>,
     callOptions = this.callOptions
   ): Promise<JsonValue> {
     return doCommandFromClient(
