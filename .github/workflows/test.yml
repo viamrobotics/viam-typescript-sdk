@@ -13,4 +13,4 @@ jobs:
 
       - name: Build, lint, and test
         run: |
-          make build lint test test-e2e 
+          make build lint test test-e2e
