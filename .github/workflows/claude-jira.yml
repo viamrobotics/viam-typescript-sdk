@@ -25,60 +25,17 @@ permissions:
   contents: read
 
 jobs:
-  implement:
-    permissions:
-      contents: write
-      pull-requests: write
-      id-token: write
-    if: github.repository_owner == 'viamrobotics'
-    runs-on: ubuntu-latest
-    steps:
-      # actions/checkout@v6.0.2
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          fetch-depth: 1
-
-      - name: Install dependencies
-        run: npm ci
-
-      # anthropics/claude-code-action@v1.0.54
-      - uses: anthropics/claude-code-action@0cf5eeec4f908121edd03a81411b55485994f8d3
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          settings: .claude/settings.ci.json
-
-          prompt: |
-            Implement the following Jira ticket:
-
-            Ticket: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
-            Summary: ${{ github.event.client_payload.summary || inputs.summary }}
-            Description: ${{ github.event.client_payload.description || inputs.description }}
-
-            Instructions:
-            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment and TypeScript Conventions sections).
-            - Before creating any new file, read 1-2 existing files of the same type to match patterns exactly (e.g., read an existing `client.spec.ts` before writing a new test file).
-            - Explore the relevant source files, then implement the minimal change.
-            - Add or update unit tests for changed behavior.
-            - You CANNOT run typecheck or tests in this environment (src/gen/ is not available). Write correct code by following existing patterns carefully.
-            - Branch name MUST start with `claude/` prefix (e.g., `claude/rsdk-12345/short-description`).
-            - For gh pr create, write the body to /tmp/pr-body.md using the Write tool, then use --body-file /tmp/pr-body.md. NEVER pass multi-line strings directly to --body.
-            - Include the Jira ticket ID in the PR title.
-          claude_args: |
-            --model claude-opus-4-6
-            --max-turns 50
-            --append-system-prompt "Before modifying any file, explore the relevant code first. Consider alternative approaches and select the smallest, safest change that reuses existing patterns. Do not introduce new abstractions or refactor beyond what is needed. CRITICAL: Do NOT use TodoWrite — it wastes turns. Chain Bash commands with && to minimize turns (e.g., git config && git add && git commit in one call). For PRs, write the body to /tmp/pr-body.md using the Write tool, then run gh pr create --title 'Title' --body-file /tmp/pr-body.md. NEVER pass multi-line strings directly to --body."
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*)"
-      - name: Notify Slack of failure
-        # slackapi/slack-github-action@v2.1.1
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a
-        if: ${{ failure() }}
-        with:
-          webhook-type: incoming-webhook
-          payload: |
-            {
-              "text": "Claude Jira implementation failed for ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}: ${{ github.event.client_payload.summary || inputs.summary }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-              "username": "Typescript SDK",
-              "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}
+  call-jira:
+    # viamrobotics/claude-ci-workflows@v1.0.0
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@83e95ca908b4066198f451273db6b8f5fe4b5397
+    with:
+      ticket_id: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
+      summary: ${{ github.event.client_payload.summary || inputs.summary }}
+      description: ${{ github.event.client_payload.description || inputs.description }}
+      install_command: npm ci && make build-buf
+      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
+      extra_prompt: |
+        - Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}
