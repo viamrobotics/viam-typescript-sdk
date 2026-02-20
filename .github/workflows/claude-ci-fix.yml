@@ -29,11 +29,11 @@ jobs:
     with:
       run_id: ${{ github.event.workflow_run.id || inputs.run_id }}
       branch: ${{ github.event.workflow_run.head_branch || inputs.branch }}
-      install_command: npm ci
-      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)'
+      install_command: npm ci && make build-buf
+      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)'
       team_mention: '@viamrobotics/sdk'
       extra_prompt: |
-        - You CANNOT run typecheck or tests in this environment (src/gen/ is not available).
+        - Run `npm run lint` and `npm run typecheck` to verify your fix before committing. Fix any errors.
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}

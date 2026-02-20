@@ -24,7 +24,7 @@ All component/service clients follow the same pattern. Tests use `*.spec.ts` suf
 ## Restrictions
 
 - **NEVER** modify `.github/`, `Makefile`, `src/gen/`, or `package-lock.json`
-- **NEVER** run `make` targets — they require protobuf tooling not available here
+- Only run `make build-buf` (to generate `src/gen/`). Do NOT run other make targets.
 - Do NOT add dependencies unless absolutely necessary — this is a public SDK
 
 ## Tools
@@ -36,8 +36,8 @@ All component/service clients follow the same pattern. Tests use `*.spec.ts` suf
 
 These rules apply when running in GitHub Actions (CI) workflows:
 
-- Do NOT run ESLint, typecheck, or tests — they require tooling not available here.
-- Run `npm run _prettier -- --write && npm run lint:prettier` to format code before committing.
+- Run `npm run lint` and `npm run typecheck` to verify changes before committing. Fix any errors.
+- Do NOT run tests — they require e2e infrastructure not available here.
 - Dependencies are already installed — do NOT run `npm ci`.
 - Bash commands CANNOT use pipes (`|`), command substitution (`$()`), or shell redirection. Run each command separately with explicit arguments.
 - If a command is blocked or denied, do NOT retry it or try variations of the same approach. Switch to a different tool (e.g., use Edit instead of sed).
