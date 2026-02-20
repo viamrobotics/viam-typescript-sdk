@@ -254,7 +254,12 @@ describe('ViamClient', () => {
       expect(results[0]?.id).toBe('robot-1');
       expect(results[0]?.name).toBe('Robot One');
       expect(results[1]?.id).toBe('robot-2');
+      expect(results[0]?.id).toBe('robot-1');
+      expect(results[0]?.name).toBe('Robot One');
+      expect(results[0]?.client).toBe(fakeRobotClient);
+      expect(results[1]?.id).toBe('robot-2');
       expect(results[1]?.name).toBe('Robot Two');
+      expect(results[1]?.client).toBe(fakeRobotClient);
     });
 
     it('skips machines that fail to connect', async () => {
