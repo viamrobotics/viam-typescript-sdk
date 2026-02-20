@@ -3,6 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   GetRobotPartByNameAndLocationResponse,
+  Robot,
   RobotPart,
 } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
@@ -220,6 +221,89 @@ describe('ViamClient', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('ViamClient.connectToMachinesInLocation', () => {
+    it('connects to all machines in a location', async () => {
+      options = { credentials: testCredential };
+      const client = await subject();
+
+      const robots = [
+        new Robot({ id: 'robot-1', name: 'Robot One' }),
+        new Robot({ id: 'robot-2', name: 'Robot Two' }),
+      ];
+      const listRobotsMock = vi.fn().mockResolvedValue(robots);
+      AppClient.prototype.listRobots = listRobotsMock;
+
+      const fakeRobotClient = {} as ReturnType<typeof createRobotClient>;
+      vi.mocked(createRobotClient).mockResolvedValue(fakeRobotClient as never);
+
+      const MAIN_PART = new RobotPart({
+        mainPart: true,
+        fqdn: 'main.part.fqdn',
+      });
+      const getRobotPartsMock = vi.fn().mockResolvedValue([MAIN_PART]);
+      AppClient.prototype.getRobotParts = getRobotPartsMock;
+
+      const results = await client.connectToMachinesInLocation('test-loc-id');
+
+      expect(listRobotsMock).toHaveBeenCalledWith('test-loc-id');
+      expect(getRobotPartsMock).toHaveBeenCalledTimes(2);
+      expect(results).toHaveLength(2);
+      expect(results[0]?.id).toBe('robot-1');
+      expect(results[0]?.name).toBe('Robot One');
+      expect(results[1]?.id).toBe('robot-2');
+      expect(results[1]?.name).toBe('Robot Two');
+    });
+
+    it('skips machines that fail to connect', async () => {
+      options = { credentials: testCredential };
+      const client = await subject();
+
+      const robots = [
+        new Robot({ id: 'robot-online', name: 'Online Robot' }),
+        new Robot({ id: 'robot-offline', name: 'Offline Robot' }),
+      ];
+      const listRobotsMock = vi.fn().mockResolvedValue(robots);
+      AppClient.prototype.listRobots = listRobotsMock;
+
+      const MAIN_PART_ONLINE = new RobotPart({
+        mainPart: true,
+        fqdn: 'online.part.fqdn',
+      });
+      const fakeRobotClient = {} as ReturnType<typeof createRobotClient>;
+      vi.mocked(createRobotClient).mockResolvedValue(fakeRobotClient as never);
+
+      const getRobotPartsMock = vi
+        .fn()
+        .mockImplementation((robotId: string) => {
+          if (robotId === 'robot-online') {
+            return Promise.resolve([MAIN_PART_ONLINE]);
+          }
+          return Promise.resolve([]);
+        });
+      AppClient.prototype.getRobotParts = getRobotPartsMock;
+
+      const results = await client.connectToMachinesInLocation('test-loc-id');
+
+      expect(listRobotsMock).toHaveBeenCalledWith('test-loc-id');
+      expect(results).toHaveLength(1);
+      expect(results[0]?.id).toBe('robot-online');
+      expect(results[0]?.name).toBe('Online Robot');
+    });
+
+    it('returns empty array when no machines in location', async () => {
+      options = { credentials: testCredential };
+      const client = await subject();
+
+      const listRobotsMock = vi.fn().mockResolvedValue([]);
+      AppClient.prototype.listRobots = listRobotsMock;
+
+      const results = await client.connectToMachinesInLocation('empty-loc');
+
+      expect(listRobotsMock).toHaveBeenCalledWith('empty-loc');
+      expect(results).toHaveLength(0);
     });
   });
 });

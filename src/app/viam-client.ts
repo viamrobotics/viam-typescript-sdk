@@ -1,4 +1,5 @@
 import type { Transport } from '@connectrpc/connect';
+import type { RobotClient } from '../robot/client';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -29,6 +30,16 @@ export const createViamClient = async ({
 interface ViamClientMachineConnectionOpts {
   host?: string;
   id?: string;
+}
+
+/** A successfully connected machine with its metadata. */
+export interface MachineConnectionResult {
+  /** The machine ID. */
+  id: string;
+  /** The machine name. */
+  name: string;
+  /** The connected RobotClient for this machine. */
+  client: RobotClient;
 }
 
 /** A gRPC client for method calls to Viam app. */
@@ -124,5 +135,49 @@ export class ViamClient {
       signalingAddress: 'https://app.viam.com:443',
       reconnectMaxAttempts: 1,
     });
+  }
+
+  /**
+   * List all machines in a location and connect to each one. Machines that fail
+   * to connect (e.g. offline machines) are silently skipped.
+   *
+   * @example
+   *
+   * ```ts
+   * const viamClient = await createViamClient({
+   *   credentials: {
+   *     authEntity: 'entity',
+   *     type: 'api-key',
+   *     payload: 'key',
+   *   },
+   * });
+   * const machines = await viamClient.connectToMachinesInLocation(
+   *   '<YOUR-LOCATION-ID>'
+   * );
+   * for (const machine of machines) {
+   *   console.log(`Connected to ${machine.name} (${machine.id})`);
+   * }
+   * ```
+   *
+   * @param locationId The ID of the location whose machines to connect to
+   * @returns An array of successfully connected machines with their metadata
+   */
+  public async connectToMachinesInLocation(
+    locationId: string
+  ): Promise<MachineConnectionResult[]> {
+    const robots = await this.appClient.listRobots(locationId);
+    const settled = await Promise.allSettled(
+      robots.map(async (robot) => {
+        const client = await this.connectToMachine({ id: robot.id });
+        return { id: robot.id, name: robot.name, client };
+      })
+    );
+    const results: MachineConnectionResult[] = [];
+    for (const result of settled) {
+      if (result.status === 'fulfilled') {
+        results.push(result.value);
+      }
+    }
+    return results;
   }
 }

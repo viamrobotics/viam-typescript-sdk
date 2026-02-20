@@ -22,6 +22,7 @@ export * as robotApi from './gen/robot/v1/robot_pb';
 
 export {
   createViamClient,
+  type MachineConnectionResult,
   type ViamClient,
   type ViamClientOptions,
 } from './app/viam-client';
