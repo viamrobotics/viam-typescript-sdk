@@ -8,9 +8,6 @@ jobs:
   build_lint_test:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/rdk-devenv:amd64
-
     steps:
       - uses: actions/checkout@v4
 
