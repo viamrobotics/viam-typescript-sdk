@@ -165,6 +165,9 @@ export class ViamClient {
   public async connectToMachinesInLocation(
     locationId: string
   ): Promise<MachineConnectionResult[]> {
+    if (!locationId) {
+      throw new Error('A location ID must be provided');
+    }
     const robots = await this.appClient.listRobots(locationId);
     const settled = await Promise.allSettled(
       robots.map(async (robot) => {
