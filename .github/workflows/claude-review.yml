@@ -125,6 +125,7 @@ jobs:
             - After reviewing and fixing, post a review summary using `gh pr review` with your findings.
             - If the code is solid, approve with `gh pr review --approve` and a brief summary.
             - Use `--comment`, `--approve`, or `--request-changes` as appropriate.
+            - IMPORTANT: For `gh pr review` and `gh pr comment`, NEVER pass multi-line text via `--body`. Instead, write the body to `/tmp/review-body.md` using the Write tool, then use `--body-file /tmp/review-body.md`.
           claude_args: |
             --model claude-sonnet-4-6
             --max-turns 30
