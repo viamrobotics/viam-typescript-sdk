@@ -17,7 +17,7 @@ describe('doCommandFromClient', () => {
     const result = await doCommandFromClient(doCommander, 'test', command);
 
     expect(result).toStrictEqual({ result: 'ok' });
-    const request = (doCommander.mock.calls[0] as [DoCommandRequest])[0];
+    const [request] = doCommander.mock.calls[0] as [DoCommandRequest];
     expect(request.name).toBe('test');
     expect(request.command?.toJson()).toStrictEqual({ foo: 'bar' });
   });
@@ -34,7 +34,7 @@ describe('doCommandFromClient', () => {
     });
 
     expect(result).toStrictEqual({ result: 'ok' });
-    const request = (doCommander.mock.calls[0] as [DoCommandRequest])[0];
+    const [request] = doCommander.mock.calls[0] as [DoCommandRequest];
     expect(request.name).toBe('test');
     expect(request.command?.toJson()).toStrictEqual({ foo: 'bar' });
   });
@@ -63,9 +63,7 @@ describe('doCommandFromClient', () => {
     );
 
     expect(requestLogger).toHaveBeenCalledOnce();
-    const loggedRequest = (
-      requestLogger.mock.calls[0] as [DoCommandRequest]
-    )[0];
+    const [loggedRequest] = requestLogger.mock.calls[0] as [DoCommandRequest];
     expect(loggedRequest.name).toBe('test');
   });
 });
