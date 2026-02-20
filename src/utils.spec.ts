@@ -65,5 +65,6 @@ describe('doCommandFromClient', () => {
     expect(requestLogger).toHaveBeenCalledOnce();
     const [loggedRequest] = requestLogger.mock.calls[0] as [DoCommandRequest];
     expect(loggedRequest.name).toBe('test');
+    expect(loggedRequest.command?.toJson()).toStrictEqual({ foo: 'bar' });
   });
 });
