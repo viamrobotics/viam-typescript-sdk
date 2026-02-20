@@ -1,8 +1,5 @@
 name: Claude CI Fix
 
-# Automatically retries CI failures on PRs opened by Claude (claude/* branches).
-# Caps at 2 fix attempts using labels to track retries.
-
 on:
   workflow_run:
     workflows: ["Pull Request Update"]
@@ -20,157 +17,23 @@ permissions:
   contents: read
 
 jobs:
-  fix-ci:
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      actions: read
-      id-token: write
+  call-ci-fix:
     if: >-
-      github.repository_owner == 'viamrobotics' &&
+      github.event_name == 'workflow_dispatch' ||
       (
-        github.event_name == 'workflow_dispatch' ||
-        (
-          github.event.workflow_run.conclusion == 'failure' &&
-          startsWith(github.event.workflow_run.head_branch, 'claude/')
-        )
+        github.event.workflow_run.conclusion == 'failure' &&
+        startsWith(github.event.workflow_run.head_branch, 'claude/')
       )
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get PR and check retry count
-        id: check
-        # actions/github-script@v8.0.0
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        env:
-          INPUT_BRANCH: ${{ inputs.branch }}
-        with:
-          script: |
-            const branch = context.payload.workflow_run?.head_branch || process.env.INPUT_BRANCH;
-            const { data: pulls } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              head: `${context.repo.owner}:${branch}`,
-              state: 'open'
-            });
-
-            if (pulls.length === 0) {
-              core.info('No open PR found for branch ' + branch);
-              core.setOutput('should_fix', 'false');
-              return;
-            }
-
-            const pr = pulls[0];
-            const labels = pr.labels.map(l => l.name);
-
-            if (labels.includes('claude-fix-2')) {
-              core.info(`PR #${pr.number}: max fix attempts (2) reached, skipping`);
-              core.setOutput('should_fix', 'false');
-              core.setOutput('max_reached', 'true');
-              core.setOutput('pr_number', String(pr.number));
-              return;
-            }
-
-            const attempt = labels.includes('claude-fix-1') ? 2 : 1;
-            core.info(`PR #${pr.number}: fix attempt ${attempt} of 2`);
-            core.setOutput('should_fix', 'true');
-            core.setOutput('pr_number', String(pr.number));
-            core.setOutput('attempt', String(attempt));
-            core.setOutput('branch', branch);
-
-      - name: Label fix attempt
-        if: steps.check.outputs.should_fix == 'true'
-        # actions/github-script@v8.0.0
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        with:
-          script: |
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
-              labels: ['claude-fix-${{ steps.check.outputs.attempt }}']
-            });
-
-      - name: Get failure logs
-        if: steps.check.outputs.should_fix == 'true'
-        id: logs
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ github.event.workflow_run.id || inputs.run_id }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          LOGS=$(gh run view "$RUN_ID" \
-            --repo "$GH_REPO" \
-            --log-failed 2>&1 | tail -500)
-          if [ -z "$LOGS" ]; then
-            LOGS=$(gh run view "$RUN_ID" \
-              --repo "$GH_REPO" \
-              --log 2>&1 | tail -500)
-          fi
-          # Strip ##[ workflow commands so they don't create false annotations
-          LOGS=$(echo "$LOGS" | sed 's/##\[/\[/g')
-          {
-            echo "content<<__CLAUDE_LOGS_EOF_7f3a__"
-            echo "$LOGS"
-            echo "__CLAUDE_LOGS_EOF_7f3a__"
-          } >> "$GITHUB_OUTPUT"
-
-      # actions/checkout@v6.0.2
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        if: steps.check.outputs.should_fix == 'true'
-        with:
-          ref: ${{ steps.check.outputs.branch }}
-          fetch-depth: 1
-          token: ${{ secrets.GIT_ACCESS_TOKEN }}
-
-      - name: Install dependencies
-        if: steps.check.outputs.should_fix == 'true'
-        run: npm ci
-
-      # anthropics/claude-code-action@v1.0.54
-      - uses: anthropics/claude-code-action@0cf5eeec4f908121edd03a81411b55485994f8d3
-        if: steps.check.outputs.should_fix == 'true'
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          settings: .claude/settings.ci.json
-
-          allowed_bots: "claude[bot]"
-          prompt: |
-            CI failed on PR #${{ steps.check.outputs.pr_number }} (fix attempt ${{ steps.check.outputs.attempt }} of 2).
-
-            The PR is on branch `${{ steps.check.outputs.branch }}`. Fix the issues and push to this branch.
-
-            CI failure logs:
-            ```
-            ${{ steps.logs.outputs.content }}
-            ```
-
-            Instructions:
-            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment and TypeScript Conventions sections).
-            - Analyze the failure logs to identify the exact error(s) and the file(s) involved.
-            - Read the failing file(s), then read 1-2 existing files of the same kind (e.g., other `client.spec.ts` files) to compare patterns.
-            - Understand the root cause before attempting a fix. Common issues:
-              - `verbatimModuleSyntax` requires type-only imports to use the `type` keyword.
-              - `noUncheckedIndexedAccess` means array/object index access may be `undefined`.
-              - `strict` mode requires explicit null checks.
-            - Make the minimal fix that matches existing codebase conventions.
-            - You CANNOT run typecheck or tests in this environment (src/gen/ is not available). Verify correctness by comparing your fix against existing patterns.
-
-          claude_args: |
-            --model claude-opus-4-6
-            --max-turns 30
-            --append-system-prompt "You are fixing a CI failure. Be precise and methodical: read the error, read the failing file, read a similar passing file for comparison, then apply the minimal fix. Do NOT guess — always check existing patterns first. Do NOT use TodoWrite — it wastes turns. Chain Bash commands with && to minimize turns."
-            --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
-
-      - name: Comment on PR if max retries exhausted
-        if: steps.check.outputs.max_reached == 'true'
-        # actions/github-script@v8.0.0
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: parseInt('${{ steps.check.outputs.pr_number }}'),
-              body: '@viamrobotics/sdk CI is still failing after 2 automated fix attempts. This PR needs human intervention.'
-            });
+    # viamrobotics/claude-ci-workflows@v1.0.0
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-ci-fix.yml@83e95ca908b4066198f451273db6b8f5fe4b5397
+    with:
+      run_id: ${{ github.event.workflow_run.id || inputs.run_id }}
+      branch: ${{ github.event.workflow_run.head_branch || inputs.branch }}
+      install_command: npm ci
+      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)'
+      team_mention: '@viamrobotics/sdk'
+      extra_prompt: |
+        - You CANNOT run typecheck or tests in this environment (src/gen/ is not available).
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
