@@ -46,6 +46,7 @@ These rules apply when running in GitHub Actions (CI) workflows:
 - Do NOT use Task subagents for file editing. Use the Edit tool directly from the main agent. Bash-type subagents only have the Bash tool — they cannot use Edit, Grep, or Glob.
 - For commits: do NOT use `mcp__github_file_ops__commit_files` — it cannot target feature branches and will fail on repos with branch protection. Instead, run `git config user.email "noreply@anthropic.com" && git config user.name "Claude"`, then `git commit -m "single-line message"`. The commit message MUST be a single line (no newlines) or the permission glob will reject it.
 - For PRs, write the body to `/tmp/pr-body.md` using the Write tool, then run `gh pr create --title "Title" --body-file /tmp/pr-body.md`. NEVER pass multi-line strings directly to `--body`.
+- For reviews and comments: write the body to a temp file, then use `--body-file`. Example: `gh pr review 123 --approve --body-file /tmp/review-body.md`. The `*` glob in permission patterns does not match newlines, so inline `--body` with newlines will be denied.
 
 ## TypeScript Conventions
 
