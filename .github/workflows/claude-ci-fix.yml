@@ -102,6 +102,13 @@ jobs:
           LOGS=$(gh run view "$RUN_ID" \
             --repo "$GH_REPO" \
             --log-failed 2>&1 | tail -500)
+          if [ -z "$LOGS" ]; then
+            LOGS=$(gh run view "$RUN_ID" \
+              --repo "$GH_REPO" \
+              --log 2>&1 | tail -500)
+          fi
+          # Strip ##[ workflow commands so they don't create false annotations
+          LOGS=$(echo "$LOGS" | sed 's/##\[/\[/g')
           {
             echo "content<<__CLAUDE_LOGS_EOF_7f3a__"
             echo "$LOGS"
@@ -139,14 +146,20 @@ jobs:
             ```
 
             Instructions:
-            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment section).
-            - Analyze the failure logs to understand what went wrong.
-            - Make the minimal fix to resolve the CI failures.
+            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment and TypeScript Conventions sections).
+            - Analyze the failure logs to identify the exact error(s) and the file(s) involved.
+            - Read the failing file(s), then read 1-2 existing files of the same kind (e.g., other `client.spec.ts` files) to compare patterns.
+            - Understand the root cause before attempting a fix. Common issues:
+              - `verbatimModuleSyntax` requires type-only imports to use the `type` keyword.
+              - `noUncheckedIndexedAccess` means array/object index access may be `undefined`.
+              - `strict` mode requires explicit null checks.
+            - Make the minimal fix that matches existing codebase conventions.
+            - You CANNOT run typecheck or tests in this environment (src/gen/ is not available). Verify correctness by comparing your fix against existing patterns.
 
           claude_args: |
-            --model claude-sonnet-4-6
+            --model claude-opus-4-6
             --max-turns 30
-            --append-system-prompt "Do NOT use TodoWrite — it wastes turns. Chain Bash commands with && to minimize turns."
+            --append-system-prompt "You are fixing a CI failure. Be precise and methodical: read the error, read the failing file, read a similar passing file for comparison, then apply the minimal fix. Do NOT guess — always check existing patterns first. Do NOT use TodoWrite — it wastes turns. Chain Bash commands with && to minimize turns."
             --allowedTools "Edit,Read,Write,Glob,Grep,Bash(npm run _prettier*),Bash(npm run lint:prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *)"
 
       - name: Comment on PR if max retries exhausted
