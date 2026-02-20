@@ -9,12 +9,11 @@ on:
   pull_request_review_comment:
     types: [created]
 
-permissions:
-  contents: read
-
 jobs:
   # --- Resolve PR data for auto-review ---
   resolve-pr:
+    permissions:
+      contents: read
     if: >-
       github.repository_owner == 'viamrobotics' &&
       github.event_name == 'workflow_run' &&
