@@ -21,9 +21,6 @@ on:
         description: 'Ticket description'
         required: true
 
-permissions:
-  contents: read
-
 jobs:
   call-jira:
     # viamrobotics/claude-ci-workflows@v1.0.0

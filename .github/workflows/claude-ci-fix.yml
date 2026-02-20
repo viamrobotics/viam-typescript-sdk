@@ -13,9 +13,6 @@ on:
         description: 'PR branch name (e.g., claude/SDK-123)'
         required: true
 
-permissions:
-  contents: read
-
 jobs:
   call-ci-fix:
     if: >-
