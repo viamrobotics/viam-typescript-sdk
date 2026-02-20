@@ -1,43 +1,38 @@
-# .github/workflows/run-htmltest.yml
-# (c) 2021 Robb Romans
-#
-# Run htmltest link checker on generated HTML output in dist/
+# Run htmltest link checker on generated HTML output in docs/dist/
 # https://github.com/wjdp/htmltest
-#
-name: run-htmltest-external
+name: Link Check
+
 on:
   schedule:
     # 10am UTC on Mondays
     - cron: "0 10 * * 1"
+  workflow_dispatch:
+
 jobs:
   htmltest:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build + Pack
-        run: |
-          sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make build pack'
+      - name: Build Docs
+        run: make build-docs
 
       - name: Test HTML
         # https://github.com/wjdp/htmltest-action/
-        # Don't fail the build on broken links
         continue-on-error: false
         uses: wjdp/htmltest-action@master
         with:
           config: .htmltest.yml
+
       - name: Archive htmltest results
         uses: actions/upload-artifact@v4
-        # Note: Set ACTIONS_RUNTIME_TOKEN env variable to test with nektos/act
         with:
           name: htmltest-report
           path: tmp/.htmltest/htmltest.log
-          retention-days: 7 # Default is 90 days
+          retention-days: 7
+
       - name: Login to Jira
         if: failure()
         uses: atlassian/gajira-login@v3
@@ -45,6 +40,7 @@ jobs:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
       - name: Create Jira ticket
         if: failure()
         id: create
@@ -56,6 +52,7 @@ jobs:
           issuetype: Bug
           summary: Broken link detected in TS docs
           description: "For more info see https://github.com/viamrobotics/viam-typescript-sdk/actions/runs/${{ env.GITHUB_RUN_ID }}."
+
       - name: Log created Jira issue
         if: failure()
         run: echo "Issue ${{ steps.create.outputs.issue }} was created"
