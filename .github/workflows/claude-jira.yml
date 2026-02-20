@@ -61,7 +61,6 @@ jobs:
             - Branch name MUST start with `claude/` prefix (e.g., `claude/rsdk-12345/short-description`).
             - For gh pr create, write the body to /tmp/pr-body.md using the Write tool, then use --body-file /tmp/pr-body.md. NEVER pass multi-line strings directly to --body.
             - Include the Jira ticket ID in the PR title.
-          show_full_output: true
           claude_args: |
             --model claude-opus-4-6
             --max-turns 50
