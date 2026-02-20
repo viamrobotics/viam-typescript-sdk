@@ -277,7 +277,7 @@ describe('ViamClient', () => {
 
       const getRobotPartsMock = vi
         .fn()
-        .mockImplementation((robotId: string) => {
+        .mockImplementation(async (robotId: string) => {
           if (robotId === 'robot-online') {
             return Promise.resolve([MAIN_PART_ONLINE]);
           }
