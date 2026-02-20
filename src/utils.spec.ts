@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { Struct } from '@bufbuild/protobuf';
+import { JsonObject, Struct } from '@bufbuild/protobuf';
 import { describe, expect, it, vi } from 'vitest';
 import { DoCommandRequest, DoCommandResponse } from './gen/common/v1/common_pb';
 import { doCommandFromClient } from './utils';
@@ -8,7 +8,7 @@ import { doCommandFromClient } from './utils';
 describe('doCommandFromClient', () => {
   const name = 'test-resource';
 
-  const createMockDoCommand = (expectedResult: Record<string, unknown>) => {
+  const createMockDoCommand = (expectedResult: JsonObject) => {
     return vi.fn().mockResolvedValue(
       new DoCommandResponse({
         result: Struct.fromJson(expectedResult),
