@@ -279,9 +279,9 @@ describe('ViamClient', () => {
         .fn()
         .mockImplementation(async (robotId: string) => {
           if (robotId === 'robot-online') {
-            return Promise.resolve([MAIN_PART_ONLINE]);
+            return [MAIN_PART_ONLINE];
           }
-          return Promise.resolve([]);
+          return [];
         });
       AppClient.prototype.getRobotParts = getRobotPartsMock;
 
