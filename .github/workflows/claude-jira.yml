@@ -55,9 +55,11 @@ jobs:
             Description: ${{ github.event.client_payload.description || inputs.description }}
 
             Instructions:
-            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment section).
+            - Read CLAUDE.md for repository conventions and constraints (including the CI Environment and TypeScript Conventions sections).
+            - Before creating any new file, read 1-2 existing files of the same type to match patterns exactly (e.g., read an existing `client.spec.ts` before writing a new test file).
             - Explore the relevant source files, then implement the minimal change.
             - Add or update unit tests for changed behavior.
+            - You CANNOT run typecheck or tests in this environment (src/gen/ is not available). Write correct code by following existing patterns carefully.
             - Branch name MUST start with `claude/` prefix (e.g., `claude/rsdk-12345/short-description`).
             - For gh pr create, write the body to /tmp/pr-body.md using the Write tool, then use --body-file /tmp/pr-body.md. NEVER pass multi-line strings directly to --body.
             - Include the Jira ticket ID in the PR title.

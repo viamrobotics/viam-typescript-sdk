@@ -47,6 +47,14 @@ These rules apply when running in GitHub Actions (CI) workflows:
 - For commits: do NOT use `mcp__github_file_ops__commit_files` — it cannot target feature branches and will fail on repos with branch protection. Instead, run `git config user.email "noreply@anthropic.com" && git config user.name "Claude"`, then `git commit -m "single-line message"`. The commit message MUST be a single line (no newlines) or the permission glob will reject it.
 - For PRs, write the body to `/tmp/pr-body.md` using the Write tool, then run `gh pr create --title "Title" --body-file /tmp/pr-body.md`. NEVER pass multi-line strings directly to `--body`.
 
+## TypeScript Conventions
+
+- **`verbatimModuleSyntax` is enabled.** Type-only imports MUST use the `type` keyword:
+  - `import { Struct, type JsonValue } from '@bufbuild/protobuf';` — mixed value + type
+  - `import type { Options } from '../../types';` — type-only import
+- **Before creating a new file**, read 1–2 existing files of the same kind to match patterns exactly (e.g., read an existing `client.spec.ts` before writing a new one).
+- Other strict checks enabled: `noUncheckedIndexedAccess`, `strict`, `noUnusedLocals`, `noUnusedParameters`.
+
 ## Implementation
 
 - Follow existing patterns. No new conventions or abstractions.
