@@ -31,6 +31,7 @@ jobs:
       description: ${{ github.event.client_payload.description || inputs.description }}
       install_command: npm ci && make build-buf
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
+      max_turns: 100
       extra_prompt: |
         - Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
       extra_system_prompt: >-
