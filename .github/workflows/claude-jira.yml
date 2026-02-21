@@ -23,8 +23,8 @@ on:
 
 jobs:
   call-jira:
-    # viamrobotics/claude-ci-workflows@v1.0.1
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@c9a5d56a0768a58c2bf5a3613f6520b43e740d67
+    # viamrobotics/claude-ci-workflows@v1.1.0
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@1a7decd70c0867cc5fefdfbf6e15a0116b350dd1
     with:
       ticket_id: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
       summary: ${{ github.event.client_payload.summary || inputs.summary }}
@@ -33,6 +33,8 @@ jobs:
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
       extra_prompt: |
         - Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
+      extra_system_prompt: >-
+        Bash commands in CI CANNOT use pipes, command substitution, or shell redirection.
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}
