@@ -4,7 +4,7 @@ name: Claude Jira Implementation
 # Expected payload:
 #   curl -X POST -H "Authorization: token $GITHUB_PAT" \
 #     https://api.github.com/repos/viamrobotics/viam-typescript-sdk/dispatches \
-#     -d '{"event_type":"jira-ticket","client_payload":{"ticket_id":"SDK-123","summary":"...","description":"..."}}'
+#     -d '{"event_type":"jira-ticket","client_payload":{"ticket_id":"SDK-123","summary":"...","description":"...","task_complexity":"medium"}}'
 
 on:
   repository_dispatch:
@@ -20,9 +20,35 @@ on:
       description:
         description: 'Ticket description'
         required: true
+      task_complexity:
+        description: 'Task complexity: small (50 turns), medium (75), large (100)'
+        required: false
+        default: 'small'
+        type: choice
+        options:
+          - small
+          - medium
+          - large
 
 jobs:
+  resolve-complexity:
+    runs-on: ubuntu-latest
+    outputs:
+      max_turns: ${{ steps.resolve.outputs.max_turns }}
+    steps:
+      - name: Map task complexity to max turns
+        id: resolve
+        env:
+          COMPLEXITY: ${{ github.event.client_payload.task_complexity || inputs.task_complexity || 'medium' }}
+        run: |
+          case "$COMPLEXITY" in
+            medium)  echo "max_turns=75" >> "$GITHUB_OUTPUT" ;;
+            large)  echo "max_turns=100" >> "$GITHUB_OUTPUT" ;;
+            *)      echo "max_turns=50" >> "$GITHUB_OUTPUT" ;;
+          esac
+
   call-jira:
+    needs: resolve-complexity
     # viamrobotics/claude-ci-workflows@v1.1.0
     uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@1a7decd70c0867cc5fefdfbf6e15a0116b350dd1
     with:
@@ -31,11 +57,12 @@ jobs:
       description: ${{ github.event.client_payload.description || inputs.description }}
       install_command: npm ci && make build-buf
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
-      max_turns: 100
+      max_turns: ${{ fromJSON(needs.resolve-complexity.outputs.max_turns) }}
       extra_prompt: |
         - Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
       extra_system_prompt: >-
         Bash commands in CI CANNOT use pipes, command substitution, or shell redirection.
+        Conserve turns: read multiple related files in parallel, batch similar edits, and plan your full approach before making changes. Do not explore one file at a time when you can read several at once.
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}
