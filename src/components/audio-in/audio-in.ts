@@ -41,5 +41,5 @@ export interface AudioIn extends Resource {
    * const properties = await audioIn.getProperties();
    * ```
    */
-  getProperties: () => Promise<AudioProperties>;
+  getProperties: (extra?: Struct) => Promise<AudioProperties>;
 }

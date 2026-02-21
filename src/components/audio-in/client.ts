@@ -61,9 +61,10 @@ export class AudioInClient implements AudioIn {
     }
   }
 
-  async getProperties(callOptions = this.callOptions) {
+  async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
+      extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);

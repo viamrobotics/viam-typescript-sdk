@@ -47,9 +47,10 @@ export class AudioOutClient implements AudioOut {
     await this.client.play(request, callOptions);
   }
 
-  async getProperties(callOptions = this.callOptions) {
+  async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
+      extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);

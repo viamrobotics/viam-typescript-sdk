@@ -2,14 +2,17 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GetAudioResponse } from '../../gen/component/audioin/v1/audioin_pb';
-import { GetPropertiesResponse } from '../../gen/common/v1/common_pb';
+import {
+  GetPropertiesRequest,
+  GetPropertiesResponse,
+} from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { type AudioChunk } from './audio-in';
 import { AudioInClient } from './client';
 import { AudioCodec } from '../../audio-common';
 vi.mock('../../robot');
 
-import type { PartialMessage } from '@bufbuild/protobuf';
+import { Struct, type PartialMessage } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import {
   createWritableIterable,
@@ -18,6 +21,7 @@ import {
 import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
 
 let audioin: AudioInClient;
+let capturedPropertiesReq: GetPropertiesRequest | undefined;
 
 let testAudioStream: WritableIterable<PartialMessage<GetAudioResponse>>;
 
@@ -37,7 +41,8 @@ describe('AudioInClient tests', () => {
         getAudio: () => {
           return testAudioStream;
         },
-        getProperties: () => {
+        getProperties: (req: GetPropertiesRequest) => {
+          capturedPropertiesReq = req;
           return testProperties;
         },
       });
@@ -124,6 +129,14 @@ describe('AudioInClient tests', () => {
       ]);
       expect(properties.sampleRateHz).toEqual(48_000);
       expect(properties.numChannels).toEqual(2);
+    });
+
+    it('getProperties passes extra to request', async () => {
+      const extra = { key: 'value' };
+      await audioin.getProperties(extra);
+      expect(capturedPropertiesReq?.extra).toStrictEqual(
+        Struct.fromJson(extra)
+      );
     });
   });
 });
