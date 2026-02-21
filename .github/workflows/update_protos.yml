@@ -16,8 +16,6 @@ jobs:
   update-protos:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/canon:amd64
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

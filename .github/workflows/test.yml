@@ -8,16 +8,9 @@ jobs:
   build_lint_test:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/viamrobotics/rdk-devenv:amd64
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Build, lint, and test
         run: |
-          sudo apt-get update && sudo apt-get upgrade -y
-          sudo apt-get install -y software-properties-common
-          apt-add-repository -y 'deb https://archive.debian.org/debian bullseye-backports main'
-          sudo chown -R testbot .
-          sudo -u testbot bash -lc 'make build lint test test-e2e'
+          make build lint test test-e2e
