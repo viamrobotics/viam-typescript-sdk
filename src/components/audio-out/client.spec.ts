@@ -2,6 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  GetPropertiesRequest,
   GetPropertiesResponse,
   AudioInfo,
 } from '../../gen/common/v1/common_pb';
@@ -10,10 +11,12 @@ import { AudioOutClient } from './client';
 import { AudioCodec } from '../../audio-common';
 vi.mock('../../robot');
 
+import { Struct } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
 
 let audioOut: AudioOutClient;
+let capturedPropertiesReq: GetPropertiesRequest | undefined;
 
 const testProperties = new GetPropertiesResponse({
   supportedCodecs: [AudioCodec.PCM16, AudioCodec.MP3, AudioCodec.PCM32_FLOAT],
@@ -28,7 +31,8 @@ describe('AudioOutClient tests', () => {
         play: () => {
           return {};
         },
-        getProperties: () => {
+        getProperties: (req: GetPropertiesRequest) => {
+          capturedPropertiesReq = req;
           return testProperties;
         },
       });
@@ -65,6 +69,14 @@ describe('AudioOutClient tests', () => {
       ]);
       expect(properties.sampleRateHz).toEqual(48_000);
       expect(properties.numChannels).toEqual(2);
+    });
+
+    it('getProperties passes extra to request', async () => {
+      const extra = { key: 'value' };
+      await audioOut.getProperties(extra);
+      expect(capturedPropertiesReq?.extra).toStrictEqual(
+        Struct.fromJson(extra)
+      );
     });
   });
 });
