@@ -4,7 +4,17 @@ name: Claude Jira Implementation
 # Expected payload:
 #   curl -X POST -H "Authorization: token $GITHUB_PAT" \
 #     https://api.github.com/repos/viamrobotics/viam-typescript-sdk/dispatches \
-#     -d '{"event_type":"jira-ticket","client_payload":{"ticket_id":"SDK-123","summary":"...","description":"...","task_complexity":"medium"}}'
+#     -d '{
+#       "event_type": "jira-ticket",
+#       "client_payload": {
+#         "ticket_id": "SDK-123",
+#         "summary": "...",
+#         "description": "...",
+#         "task_complexity": "medium",
+#         "assignee": "John Doe",
+#         "assignee_email": "jdoe@viam.com"
+#       }
+#     }'
 
 on:
   repository_dispatch:
@@ -29,26 +39,17 @@ on:
           - small
           - medium
           - large
+      assignee:
+        description: 'Atlassian display name of the responsible engineer (e.g., "John Doe")'
+        required: false
+        default: ''
+      assignee_email:
+        description: 'Atlassian email of the responsible engineer'
+        required: false
+        default: ''
 
 jobs:
-  resolve-complexity:
-    runs-on: ubuntu-latest
-    outputs:
-      max_turns: ${{ steps.resolve.outputs.max_turns }}
-    steps:
-      - name: Map task complexity to max turns
-        id: resolve
-        env:
-          COMPLEXITY: ${{ github.event.client_payload.task_complexity || inputs.task_complexity || 'medium' }}
-        run: |
-          case "$COMPLEXITY" in
-            medium)  echo "max_turns=75" >> "$GITHUB_OUTPUT" ;;
-            large)  echo "max_turns=100" >> "$GITHUB_OUTPUT" ;;
-            *)      echo "max_turns=50" >> "$GITHUB_OUTPUT" ;;
-          esac
-
   call-jira:
-    needs: resolve-complexity
     # viamrobotics/claude-ci-workflows@v1.4.0
     uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@df208c3d287bad0c5f4a4b6fa4cfd74de3208497
     with:
@@ -57,7 +58,9 @@ jobs:
       description: ${{ github.event.client_payload.description || inputs.description }}
       install_command: npm ci && make build-buf
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run test*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
-      max_turns: ${{ fromJSON(needs.resolve-complexity.outputs.max_turns) }}
+      task_complexity: ${{ github.event.client_payload.task_complexity || inputs.task_complexity || 'small' }}
+      assignee: ${{ github.event.client_payload.assignee || inputs.assignee || '' }}
+      assignee_email: ${{ github.event.client_payload.assignee_email || inputs.assignee_email || '' }}
       extra_system_prompt: >-
         Do NOT run npm ci.
         Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
