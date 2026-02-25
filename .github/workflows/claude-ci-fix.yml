@@ -21,8 +21,8 @@ jobs:
         github.event.workflow_run.conclusion == 'failure' &&
         startsWith(github.event.workflow_run.head_branch, 'claude/')
       )
-    # viamrobotics/claude-ci-workflows@v1.1.0
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-ci-fix.yml@1a7decd70c0867cc5fefdfbf6e15a0116b350dd1
+    # viamrobotics/claude-ci-workflows@v1.7.0
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-ci-fix.yml@21198529cf3048deeea8c1d9e791e2b458b0f757
     with:
       run_id: ${{ github.event.workflow_run.id || inputs.run_id }}
       branch: ${{ github.event.workflow_run.head_branch || inputs.branch }}
@@ -31,8 +31,11 @@ jobs:
       team_mention: '@viamrobotics/sdk'
       extra_prompt: |
         - Run `npm run lint` and `npm run typecheck` to verify your fix before committing. Fix any errors.
-      extra_system_prompt: >-
-        Bash commands in CI CANNOT use pipes, command substitution, or shell redirection.
+      extra_system_prompt: |
+        Only run make build-buf to generate src/gen/. Do NOT run other make targets.
+        Do NOT run tests — they require e2e infrastructure not available here.
+        verbatimModuleSyntax is enabled — type-only imports MUST use the type keyword (e.g., import type { Options } from '../../types').
+        Strict TypeScript checks enabled: noUncheckedIndexedAccess, strict, noUnusedLocals, noUnusedParameters.
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
