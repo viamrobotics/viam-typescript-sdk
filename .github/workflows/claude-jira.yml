@@ -4,7 +4,17 @@ name: Claude Jira Implementation
 # Expected payload:
 #   curl -X POST -H "Authorization: token $GITHUB_PAT" \
 #     https://api.github.com/repos/viamrobotics/viam-typescript-sdk/dispatches \
-#     -d '{"event_type":"jira-ticket","client_payload":{"ticket_id":"SDK-123","summary":"...","description":"...","task_complexity":"medium"}}'
+#     -d '{
+#       "event_type": "jira-ticket",
+#       "client_payload": {
+#         "ticket_id": "SDK-123",
+#         "summary": "...",
+#         "description": "...",
+#         "task_complexity": "medium",
+#         "assignee": "John Doe",
+#         "assignee_email": "john@example.com"
+#       }
+#     }'
 
 on:
   repository_dispatch:
@@ -29,40 +39,41 @@ on:
           - small
           - medium
           - large
+      assignee:
+        description: 'Jira assignee display name (for PR assignment)'
+        required: false
+      assignee_email:
+        description: 'Jira assignee email (for PR assignment)'
+        required: false
 
 jobs:
-  resolve-complexity:
-    runs-on: ubuntu-latest
-    outputs:
-      max_turns: ${{ steps.resolve.outputs.max_turns }}
-    steps:
-      - name: Map task complexity to max turns
-        id: resolve
-        env:
-          COMPLEXITY: ${{ github.event.client_payload.task_complexity || inputs.task_complexity || 'medium' }}
-        run: |
-          case "$COMPLEXITY" in
-            medium)  echo "max_turns=75" >> "$GITHUB_OUTPUT" ;;
-            large)  echo "max_turns=100" >> "$GITHUB_OUTPUT" ;;
-            *)      echo "max_turns=50" >> "$GITHUB_OUTPUT" ;;
-          esac
-
   call-jira:
-    needs: resolve-complexity
-    # viamrobotics/claude-ci-workflows@v1.1.0
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@1a7decd70c0867cc5fefdfbf6e15a0116b350dd1
+    # viamrobotics/claude-ci-workflows@v1.6.1
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@efc428a839b04cf3f135ad11ac0cae1e8e247aa1
     with:
       ticket_id: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
       summary: ${{ github.event.client_payload.summary || inputs.summary }}
       description: ${{ github.event.client_payload.description || inputs.description }}
+      task_complexity: ${{ github.event.client_payload.task_complexity || inputs.task_complexity || 'small' }}
+      assignee: ${{ github.event.client_payload.assignee || inputs.assignee || '' }}
+      assignee_email: ${{ github.event.client_payload.assignee_email || inputs.assignee_email || '' }}
       install_command: npm ci && make build-buf
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
-      max_turns: ${{ fromJSON(needs.resolve-complexity.outputs.max_turns) }}
       extra_prompt: |
         - Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
-      extra_system_prompt: >-
+      extra_system_prompt: |
+        NEVER modify .github/, Makefile, src/gen/, or package-lock.json.
+        Only run make build-buf to generate src/gen/. Do NOT run other make targets.
+        Always prefer dedicated tools (Grep, Glob, Read, Edit, Write) over Bash equivalents.
+        Minimize turns: chain Bash commands with &&, avoid re-reading files you already explored, do not use TodoWrite.
         Bash commands in CI CANNOT use pipes, command substitution, or shell redirection.
-        Conserve turns: read multiple related files in parallel, batch similar edits, and plan your full approach before making changes. Do not explore one file at a time when you can read several at once.
+        Conserve turns: read multiple related files in parallel, batch similar edits, and plan your full approach before making changes.
+        Do NOT run tests — they require e2e infrastructure not available here.
+        verbatimModuleSyntax is enabled — type-only imports MUST use the type keyword (e.g., import type { Options } from '../../types').
+        Before creating a new file, read 1-2 existing files of the same kind to match patterns exactly.
+        Strict TypeScript checks enabled: noUncheckedIndexedAccess, strict, noUnusedLocals, noUnusedParameters.
     secrets:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}
+      CI_GITHUB_APP_ID: ${{ secrets.CI_GITHUB_APP_ID }}
+      CI_GITHUB_APP_PRIVATE_KEY: ${{ secrets.CI_GITHUB_APP_PRIVATE_KEY }}
