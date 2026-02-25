@@ -21,14 +21,6 @@ src/
 
 All component/service clients follow the same pattern. Tests use `*.spec.ts` suffix.
 
-## Restrictions
+## Language Notes
 
-- Do NOT add dependencies unless absolutely necessary — this is a public SDK
-
-## Implementation
-
-- Follow existing patterns. No new conventions or abstractions.
-- Implement the **minimal change**. No refactors or unnecessary additions.
-- Maintain backwards compatibility. No breaking changes to the public API.
 - Export new public API through `src/main.ts`.
-- Add or update unit tests for changed behavior. Tests should verify meaningful logic, edge cases, error paths, state transitions, not just trivial assertions.
