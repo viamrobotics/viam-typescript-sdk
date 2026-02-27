@@ -34,6 +34,7 @@ export {
 } from './app/viam-transport';
 
 export {
+  type BinaryDataCaptureUploadOptions,
   type BinaryID,
   type DataClient,
   type FilterOptions,
