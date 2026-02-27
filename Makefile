@@ -32,6 +32,7 @@ lint: $(node_modules) build-buf
 	npm run lint
 	npm run typecheck
 	npm run check -- --reject="@bufbuild/protobuf,@connectrpc/connect,@connectrpc/connect-web"
+	$(MAKE) typecheck-examples
 
 .PHONY: format
 format: $(node_modules)
@@ -113,3 +114,26 @@ test-e2e-node: e2e/bin/viam-server
 .PHONY: test-e2e-browser
 test-e2e-browser: e2e/bin/viam-server install-playwright
 	npm run e2e:browser
+
+# example type-checking
+
+.PHONY: typecheck-examples
+typecheck-examples:
+	@failed=""; \
+	for dir in examples/*/; do \
+		if [ -f "$$dir/tsconfig.json" ]; then \
+			echo "Type-checking $$dir..."; \
+			if ! (cd "$$dir" && npm install --silent && npx tsc --noEmit) 2>&1; then \
+				failed="$$failed $$dir"; \
+			fi \
+		fi \
+	done; \
+	if [ -n "$$failed" ]; then \
+		echo ""; \
+		echo "========================================"; \
+		echo "ERROR: Your changes have broken example code."; \
+		echo "Failed examples:$$failed"; \
+		echo "Please fix the type errors above."; \
+		echo "========================================"; \
+		exit 1; \
+	fi
