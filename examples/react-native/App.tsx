@@ -24,8 +24,8 @@ import { GrpcWebTransportOptions } from "@connectrpc/connect-web";
 import { createXHRGrpcWebTransport } from './transport';
 
 globalThis.VIAM = {
-  GRPC_TRANSPORT_FACTORY: (opts: GrpcWebTransportOptions) => {
-    return createXHRGrpcWebTransport(opts);
+  GRPC_TRANSPORT_FACTORY: (opts: unknown) => {
+    return createXHRGrpcWebTransport(opts as GrpcWebTransportOptions);
   }
 };
 

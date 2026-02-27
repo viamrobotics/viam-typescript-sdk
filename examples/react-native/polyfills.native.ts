@@ -16,9 +16,9 @@ export function polyfills() {
   polyfillGlobal(
     'fetch',
     () =>
-      (...args: Parameters<typeof window.fetch>) =>
+      (...args: Parameters<typeof globalThis.fetch>) =>
         fetch(args[0], {
-          ...args[1],
+          ...(args[1] ?? {}),
           // Inject textStreaming: https://github.com/react-native-community/fetch/issues/15
           reactNative: {textStreaming: true},
         }),
