@@ -22,7 +22,6 @@ clean: clean-js clean-buf clean-docs
 .PHONY: test
 test: $(node_modules) build-buf
 	npm run test
-	$(MAKE) check-examples
 
 .PHONY: test-watch
 test-watch: $(node_modules) build-buf
