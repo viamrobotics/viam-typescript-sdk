@@ -1478,7 +1478,7 @@ export class DataClient {
       tags: resolvedTags,
       fileExtension,
       datasetIds: resolvedDatasetIds,
-      mimeType,
+      mimeType_10: mimeType,
     });
 
     const sensorData = new SensorData({

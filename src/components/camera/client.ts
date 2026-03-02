@@ -1,6 +1,6 @@
 import { type JsonValue, Struct, Timestamp } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
+import { GetPropertiesRequest, GetPropertiesResponse } from '../../gen/component/camera/v1/camera_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
 import {
   GetImagesRequest,
@@ -9,7 +9,7 @@ import {
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient } from '../../utils';
-import type { Camera, MimeType, ResponseMetadata } from './camera';
+import type { Camera, MimeType, ResponseMetadata, Properties } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
 const PointCloudPCD: MimeType = 'pointcloud/pcd';
@@ -80,14 +80,15 @@ export class CameraClient implements Camera {
     return resp.pointCloud;
   }
 
-  async getProperties(callOptions = this.callOptions) {
+  async getProperties(callOptions = this.callOptions): Promise<Properties> {
     const request = new GetPropertiesRequest({
       name: this.name,
     });
 
     this.options.requestLogger?.(request);
 
-    return this.client.getProperties(request, callOptions);
+    const response = await this.client.getProperties(request, callOptions);
+    return { supportsPcd: response.supportsPcd, intrinsicParameters: response.intrinsicParameters, distortionParameters: response.distortionParameters, frameRate: response.frameRate, extrinsicParameters: response.extrinsicParameters, };
   }
 
   async doCommand(

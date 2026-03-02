@@ -1801,7 +1801,7 @@ describe('DataSyncClient tests', () => {
         type: DataType.BINARY_SENSOR,
         tags,
         datasetIds,
-        mimeType,
+        mimeType_10: mimeType,
         fileExtension: '',
       });
       expectedReq.metadata = expectedMd;

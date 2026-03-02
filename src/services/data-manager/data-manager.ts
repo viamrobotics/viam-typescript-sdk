@@ -8,7 +8,7 @@ export interface DataManager extends Resource {
     binaryData: Uint8Array,
     tags: string[],
     datasetIds: string[],
-    mimeType: MimeType,
+    mimeType: string,
     extra?: Struct
   ) => Promise<void>;
 }

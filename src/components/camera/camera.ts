@@ -3,6 +3,7 @@ import type { Timestamp } from '@bufbuild/protobuf';
 import type {
   DistortionParameters,
   IntrinsicParameters,
+  ExtrinsicParameters,
 } from '../../gen/component/camera/v1/camera_pb';
 import type { Resource } from '../../types';
 import type { Geometry } from '../../gen/common/v1/common_pb';
@@ -16,6 +17,8 @@ export interface Properties {
   distortionParameters?: DistortionParameters;
   /** Camera frame rate parameters, if available. */
   frameRate?: number;
+  /** Camera extrinsic parameters, if available. */
+  extrinsicParameters?: ExtrinsicParameters;
 }
 
 export interface NamedImage {
