@@ -22,6 +22,7 @@ clean: clean-js clean-buf clean-docs
 .PHONY: test
 test: $(node_modules) build-buf
 	npm run test
+	$(MAKE) check-examples
 
 .PHONY: test-watch
 test-watch: $(node_modules) build-buf
@@ -32,7 +33,6 @@ lint: $(node_modules) build-buf
 	npm run lint
 	npm run typecheck
 	npm run check -- --reject="@bufbuild/protobuf,@connectrpc/connect,@connectrpc/connect-web"
-	$(MAKE) typecheck-examples
 
 .PHONY: format
 format: $(node_modules)
@@ -115,15 +115,25 @@ test-e2e-node: e2e/bin/viam-server
 test-e2e-browser: e2e/bin/viam-server install-playwright
 	npm run e2e:browser
 
+
 # example type-checking
 
-.PHONY: typecheck-examples
-typecheck-examples:
+.PHONY: check-examples
+check-examples:
 	@failed=""; \
 	for dir in examples/*/; do \
 		if [ -f "$$dir/tsconfig.json" ]; then \
 			echo "Type-checking $$dir..."; \
-			if ! (cd "$$dir" && npm install --silent && npx tsc --noEmit) 2>&1; then \
+			install_out=$$(cd "$$dir" && npm install 2>&1); \
+			if [ $$? -ne 0 ]; then \
+				echo "$$dir npm install failed:"; \
+				echo "$$install_out" | grep -A2 "npm error" | head -20; \
+				failed="$$failed $$dir"; \
+				continue; \
+			fi; \
+			tsc_out=$$(cd "$$dir" && npx tsc --noEmit --pretty 2>&1); \
+			if [ $$? -ne 0 ]; then \
+				echo "$$tsc_out" | sed "s|^|$$dir|"; \
 				failed="$$failed $$dir"; \
 			fi \
 		fi \
