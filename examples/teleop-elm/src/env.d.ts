@@ -10,6 +10,9 @@ interface ElmApp {
 }
 
 declare module '*.elm' {
-  const Elm: Record<string, { init: (options: { node: unknown; flags: unknown }) => ElmApp }>;
+  const Elm: Record<
+    string,
+    { init: (options: { node: unknown; flags: unknown }) => ElmApp }
+  >;
   export { Elm };
 }
