@@ -48,8 +48,8 @@ on:
 
 jobs:
   call-jira:
-    # viamrobotics/claude-ci-workflows@v1.7.0
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@21198529cf3048deeea8c1d9e791e2b458b0f757
+    # viamrobotics/claude-ci-workflows@v1.10.6
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-jira.yml@918148a29da73235a7d751a93912aeaea0320b04
     with:
       ticket_id: ${{ github.event.client_payload.ticket_id || inputs.ticket_id }}
       summary: ${{ github.event.client_payload.summary || inputs.summary }}
@@ -58,12 +58,12 @@ jobs:
       assignee: ${{ github.event.client_payload.assignee || inputs.assignee || '' }}
       assignee_email: ${{ github.event.client_payload.assignee_email || inputs.assignee_email || '' }}
       install_command: npm ci && make build-buf
-      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
+      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(make *),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*)'
       extra_prompt: |
-        - Run `npm run lint` and `npm run typecheck` to verify your changes before committing. Fix any errors.
+        - Run `make lint` and `make test` to verify your changes before committing. Fix any errors.
       extra_system_prompt: |
-        Only run make build-buf to generate src/gen/. Do NOT run other make targets.
-        Do NOT run tests — they require e2e infrastructure not available here.
+        Use make targets for build, lint, test, and format (e.g., `make build`, `make lint`, `make test`, `make format`).
+        Do NOT run e2e tests — they require infrastructure not available here.
         verbatimModuleSyntax is enabled — type-only imports MUST use the type keyword (e.g., import type { Options } from '../../types').
         Strict TypeScript checks enabled: noUncheckedIndexedAccess, strict, noUnusedLocals, noUnusedParameters.
     secrets:
