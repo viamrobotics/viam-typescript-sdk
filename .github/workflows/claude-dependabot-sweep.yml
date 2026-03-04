@@ -14,8 +14,6 @@ jobs:
       install_command: npm ci
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(make *),Bash(npm install*),Bash(npm ci*),Bash(npm update*),Bash(npm outdated*),Bash(npm ls*),Bash(npm view*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh issue comment*),Bash(gh issue view*)'
       extra_system_prompt: |
-        ## Node.js / npm project — IGNORE any Python/uv instructions above.
-
         ### Updating dependencies
         - To update a package: `npm install <package>@<version>` (NOT npm ci, which refuses to modify the lockfile).
         - To check installed version: `npm ls <package>`
@@ -28,7 +26,6 @@ jobs:
 
         ### Build & verify
         - Use make targets from the repo root: `make build`, `make lint`, `make test`, `make format`.
-        - `make build-buf` generates protobuf code in src/gen/ — run it if build fails due to missing generated files.
         - Do NOT run e2e tests — they require infrastructure not available here.
 
         ### TypeScript rules
