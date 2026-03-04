@@ -32,13 +32,9 @@ function injectMediaStream(eventStream) {
     const mediaElement = document.createElement('video');
     mediaElement.srcObject = eventStream;
     mediaElement.autoplay = true;
-    if (mediaElement instanceof HTMLVideoElement) {
-      mediaElement.playsInline = true;
-      mediaElement.controls = false;
-      mediaElement.muted = true;
-    } else {
-      mediaElement.controls = true;
-    }
+    mediaElement.playsInline = true;
+    mediaElement.controls = false;
+    mediaElement.muted = true;
 
     streamContainer.querySelector('video')?.remove();
     streamContainer.append(mediaElement);
