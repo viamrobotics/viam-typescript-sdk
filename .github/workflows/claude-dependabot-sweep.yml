@@ -1,0 +1,38 @@
+name: Claude Dependabot Sweep
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Every Monday at 9:00 UTC
+  workflow_dispatch:
+
+jobs:
+  call-dependabot-sweep:
+    if: github.repository_owner == 'viamrobotics'
+    # viamrobotics/claude-ci-workflows@v1.10.7
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-dependabot-sweep.yml@118d898f2b199075e1758901393fa6d20f8c6f59
+    with:
+      install_command: npm ci
+      allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(make *),Bash(npm install*),Bash(npm ci*),Bash(npm update*),Bash(npm outdated*),Bash(npm ls*),Bash(npm view*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh issue comment*),Bash(gh issue view*)'
+      extra_system_prompt: |
+        ### Updating dependencies
+        - To update a package: `npm install <package>@<version>` (NOT npm ci, which refuses to modify the lockfile).
+        - To check installed version: `npm ls <package>`
+        - To check available versions: `npm view <package> versions --json`
+        - After updating, run `npm install` in the same directory to regenerate package-lock.json.
+
+        ### Multiple package.json locations
+        This repo has package.json files in the root AND in example directories (examples/node/, examples/vanilla/, etc.).
+        Dependabot alerts reference specific manifest_paths — only update the directories listed in the alert.
+
+        ### Build & verify
+        - Use make targets from the repo root: `make build`, `make lint`, `make test`, `make format`.
+        - Do NOT run e2e tests — they require infrastructure not available here.
+
+        ### TypeScript rules
+        - verbatimModuleSyntax is enabled — type-only imports MUST use the type keyword (e.g., import type { Options } from '../../types').
+        - Strict TypeScript checks enabled: noUncheckedIndexedAccess, strict, noUnusedLocals, noUnusedParameters.
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CI_GITHUB_APP_ID: ${{ secrets.CI_GITHUB_APP_ID }}
+      CI_GITHUB_APP_PRIVATE_KEY: ${{ secrets.CI_GITHUB_APP_PRIVATE_KEY }}
+      SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL: ${{ secrets.SLACK_AI_WORKFLOW_ALERT_WEBHOOK_URL }}

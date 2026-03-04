@@ -55,17 +55,18 @@ jobs:
   auto-review:
     needs: resolve-pr
     if: needs.resolve-pr.outputs.pr_found == 'true'
-    # viamrobotics/claude-ci-workflows@v1.7.0
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-auto-review.yml@21198529cf3048deeea8c1d9e791e2b458b0f757
+    # viamrobotics/claude-ci-workflows@v1.10.7
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-auto-review.yml@118d898f2b199075e1758901393fa6d20f8c6f59
     with:
       pr_number: ${{ needs.resolve-pr.outputs.pr_number }}
       pr_title: ${{ needs.resolve-pr.outputs.pr_title }}
       branch: ${{ needs.resolve-pr.outputs.branch }}
       install_command: npm ci && make build-buf
-      allowed_tools: 'Edit,Read,Write,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(npm run build*),Bash(npm run lint*),Bash(npm run typecheck*),Bash(npm run _prettier*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr review*),Bash(gh pr comment*),Bash(gh pr diff*),Bash(gh pr view*)'
+      allowed_tools: 'Edit,Read,Write,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(make *),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr review*),Bash(gh pr comment*),Bash(gh pr diff*),Bash(gh pr view*)'
       extra_review_instructions: |
         - Ensure src/gen/ was not modified.
-        - If you fix issues, run `npm run lint` and `npm run typecheck` to verify, commit, and push.
+        - If you fix issues, run `make lint` and `make test` to verify, commit, and push.
+        - Do NOT run e2e tests — they require infrastructure not available here.
         - verbatimModuleSyntax is enabled — type-only imports MUST use the type keyword.
         - Strict TypeScript checks enabled: noUncheckedIndexedAccess, strict, noUnusedLocals, noUnusedParameters.
     secrets:
@@ -81,13 +82,14 @@ jobs:
         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
         (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
       )
-    # viamrobotics/claude-ci-workflows@v1.7.0
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-on-demand-review.yml@21198529cf3048deeea8c1d9e791e2b458b0f757
+    # viamrobotics/claude-ci-workflows@v1.10.7
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-on-demand-review.yml@118d898f2b199075e1758901393fa6d20f8c6f59
     with:
       install_command: npm ci
-      allowed_tools: 'Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(git diff*),Bash(git log*),Bash(git status*),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr diff*),Bash(gh pr view*)'
+      allowed_tools: 'Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(make test*),Bash(git diff*),Bash(git log*),Bash(git status*),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr diff*),Bash(gh pr view*)'
       extra_review_instructions: |
         - Ensure src/gen/ was not modified.
+        - Run `make test` to verify changes if needed. Do NOT run e2e tests.
         - verbatimModuleSyntax is enabled — type-only imports MUST use the type keyword.
         - Strict TypeScript checks enabled: noUncheckedIndexedAccess, strict, noUnusedLocals, noUnusedParameters.
     secrets:
