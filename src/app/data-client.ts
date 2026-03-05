@@ -17,7 +17,7 @@ import {
   Order,
   TabularDataSource,
   TabularDataSourceType,
-  TabularFilter,
+  DeleteTabularFilter,
   TagsFilter,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
@@ -592,7 +592,7 @@ export class DataClient {
   async deleteTabularData(
     organizationId: string,
     deleteOlderThanDays: number,
-    filter?: PartialMessage<TabularFilter>
+    filter?: PartialMessage<DeleteTabularFilter>
   ) {
     const resp = await this.dataClient.deleteTabularData({
       organizationId,

@@ -61,7 +61,7 @@ import {
   TabularDataByMQLResponse,
   TabularDataBySQLResponse,
   TabularDataSourceType,
-  TabularFilter,
+  DeleteTabularFilter,
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
@@ -649,7 +649,7 @@ describe('DataClient tests', () => {
     });
 
     it('delete tabular data with filter', async () => {
-      const filter: TabularFilter = {
+      const filter: DeleteTabularFilter = {
         locationIds: ['location-1'],
         componentName: 'camera',
       };
