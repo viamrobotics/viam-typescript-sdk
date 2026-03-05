@@ -17,7 +17,7 @@ export const invalidConfig: DialConf = {
   serviceHost: 'http://invalid-host:9999',
   signalingAddress: DEFAULT_SIGNALING_ADDRESS,
   iceServers: DEFAULT_ICE_SERVERS,
-  dialTimeout: 2000,
+  dialTimeoutMs: 2000,
 } as const;
 
 export const defaultNodeConfig: DialConf = {
