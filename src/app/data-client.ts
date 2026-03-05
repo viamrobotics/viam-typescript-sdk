@@ -17,6 +17,7 @@ import {
   Order,
   TabularDataSource,
   TabularDataSourceType,
+  DeleteTabularFilter,
   TagsFilter,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
@@ -562,6 +563,16 @@ export class DataClient {
    *   '123abc45-1234-5678-90ab-cdef12345678',
    *   10
    * );
+   *
+   * // Delete with additional filter constraints
+   * const data = await dataClient.deleteTabularData(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   10,
+   *   {
+   *     locationIds: ['location-id'],
+   *     componentName: 'camera'
+   *   }
+   * );
    * ```
    *
    * For more information, see [Data
@@ -572,12 +583,21 @@ export class DataClient {
    *   many days ago. For example if `deleteOlderThanDays` is 10, this deletes
    *   any data that was captured more than 10 days ago. If it is 0, all
    *   existing data is deleted.
+   * @param filter Optional filter to further constrain which data is deleted.
+   *   If provided, only data matching both the time constraint AND the filter
+   *   will be deleted. If omitted, data is deleted based on organization_id
+   *   and time only.
    * @returns The number of items deleted
    */
-  async deleteTabularData(organizationId: string, deleteOlderThanDays: number) {
+  async deleteTabularData(
+    organizationId: string,
+    deleteOlderThanDays: number,
+    filter?: PartialMessage<DeleteTabularFilter>
+  ) {
     const resp = await this.dataClient.deleteTabularData({
       organizationId,
       deleteOlderThanDays,
+      filter,
     });
     return resp.deletedCount;
   }

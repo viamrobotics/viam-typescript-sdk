@@ -61,6 +61,7 @@ import {
   TabularDataByMQLResponse,
   TabularDataBySQLResponse,
   TabularDataSourceType,
+  DeleteTabularFilter,
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
@@ -645,6 +646,20 @@ describe('DataClient tests', () => {
     it('delete newer tabular data', async () => {
       const promise = await subject().deleteTabularData('orgId', 5);
       expect(promise).toEqual(5n);
+    });
+
+    it('delete tabular data with filter', async () => {
+      const filter: DeleteTabularFilter = {
+        locationIds: ['location-1'],
+        componentName: 'camera',
+      };
+      const promise = await subject().deleteTabularData('orgId', 20, filter);
+      expect(promise).toEqual(10n);
+    });
+
+    it('delete tabular data with undefined filter', async () => {
+      const promise = await subject().deleteTabularData('orgId', 20, undefined);
+      expect(promise).toEqual(10n);
     });
   });
 
