@@ -52,6 +52,7 @@ export interface DialOptions {
 
   /**
    * Set timeout in milliseconds for dialing.
+   *
    * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number | undefined;

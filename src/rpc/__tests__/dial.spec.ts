@@ -166,7 +166,10 @@ describe('dialWebRTC', () => {
     it.each([
       { dialTimeoutMs: 0, description: 'when dialTimeoutMs is 0' },
       { dialTimeoutMs: -1000, description: 'when dialTimeoutMs is negative' },
-      { dialTimeoutMs: undefined, description: 'when dialTimeoutMs is undefined' },
+      {
+        dialTimeoutMs: undefined,
+        description: 'when dialTimeoutMs is undefined',
+      },
     ])('should not set timeout $description', async ({ dialTimeoutMs }) => {
       // Arrange
       vi.useFakeTimers();

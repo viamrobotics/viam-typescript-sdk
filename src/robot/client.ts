@@ -75,6 +75,7 @@ export interface DialWebRTCConf {
   /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   *
    * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number;
@@ -97,15 +98,16 @@ export interface DialDirectConf {
   reconnectMaxWait?: number;
   reconnectAbortSignal?: { abort: boolean };
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT.
-   * A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   *
    * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT.
-   * A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
    */
   dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
@@ -139,15 +141,16 @@ export interface ConnectOptions {
   priority?: number;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT.
-   * A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   *
    * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT.
-   * A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
    */
   dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
