@@ -120,3 +120,6 @@ src/api-version.ts
 playwright-report/
 vitest-report/
 vitest-e2e-report/
+
+# Claude Code
+.claude/worktrees
