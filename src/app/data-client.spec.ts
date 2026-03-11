@@ -66,6 +66,7 @@ import {
   TagsFilter,
   UpdateBoundingBoxRequest,
   UpdateBoundingBoxResponse,
+  DeleteTabularFilter,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
@@ -1503,6 +1504,25 @@ describe('DataClient tests', () => {
       );
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('createDeleteTabularFilter tests', () => {
+    it('creates a delete tabular filter with tags', () => {
+      const tags = ['tag1', 'tag2'];
+      const filterOptions = { tags };
+      const expectedFilter = new DeleteTabularFilter({
+        tagsFilter: new TagsFilter({ tags }),
+      });
+      const createdFilter = DataClient.createDeleteTabularFilter(filterOptions);
+      expect(createdFilter).toEqual(expectedFilter);
+    });
+
+    it('creates a delete tabular filter without tags', () => {
+      const filterOptions = {};
+      const expectedFilter = new DeleteTabularFilter();
+      const createdFilter = DataClient.createDeleteTabularFilter(filterOptions);
+      expect(createdFilter).toEqual(expectedFilter);
     });
   });
 });

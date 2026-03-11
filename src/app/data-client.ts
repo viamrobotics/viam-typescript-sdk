@@ -18,6 +18,7 @@ import {
   TabularDataSource,
   TabularDataSourceType,
   TagsFilter,
+  DeleteTabularFilter,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
@@ -127,6 +128,30 @@ export interface BinaryDataCaptureUploadOptions {
 
   /** Optional list of dataset IDs to add the data to. */
   datasetIds?: string[];
+}
+
+/** Optional parameters for deleting tabular data. */
+export interface DeleteTabularFilterOptions {
+  /** Optional list of location IDs to filter by. */
+  locationIds?: string[];
+
+  /** Optional robot ID to filter by. */
+  robotId?: string;
+
+  /** Optional part ID to filter by. */
+  partId?: string;
+
+  /** Optional component type to filter by. */
+  componentType?: string;
+
+  /** Optional component name to filter by. */
+  componentName?: string;
+
+  /** Optional method name to filter by. */
+  method?: string;
+
+  /** Optional list of tags to filter by. */
+  tags?: string[];
 }
 
 export type Dataset = Partial<PBDataset> & {
@@ -306,7 +331,7 @@ export class DataClient {
    */
   async tabularDataByMQL(
     organizationId: string,
-    query: Uint8Array[] | Record<string, Date | JsonValue>[],
+    query: Uint8Array[] | Record<string, JsonValue>[],
     useRecentData?: boolean,
     tabularDataSource?: TabularDataSource,
     queryPrefixName?: string
@@ -572,12 +597,24 @@ export class DataClient {
    *   many days ago. For example if `deleteOlderThanDays` is 10, this deletes
    *   any data that was captured more than 10 days ago. If it is 0, all
    *   existing data is deleted.
+   * @param filterOptions Optional options to filter the tabular data to be
+   *   deleted.
    * @returns The number of items deleted
    */
-  async deleteTabularData(organizationId: string, deleteOlderThanDays: number) {
+  async deleteTabularData(
+    organizationId: string,
+    deleteOlderThanDays: number,
+    filterOptions?: DeleteTabularFilterOptions
+  ) {
+    let filter: DeleteTabularFilter | undefined;
+    if (filterOptions) {
+      filter = DataClient.createDeleteTabularFilter(filterOptions);
+    }
+
     const resp = await this.dataClient.deleteTabularData({
       organizationId,
       deleteOlderThanDays,
+      filter,
     });
     return resp.deletedCount;
   }
@@ -1602,6 +1639,26 @@ export class DataClient {
   }
 
   /**
+   * Creates a `DeleteTabularFilter` from the given options.
+   *
+   * @param options The options to create the filter from.
+   * @returns A `DeleteTabularFilter` object.
+   */
+  static createDeleteTabularFilter(
+    options: DeleteTabularFilterOptions
+  ): DeleteTabularFilter {
+    const filter = new DeleteTabularFilter(options);
+
+    if (options.tags) {
+      const tagsFilter = new TagsFilter();
+      tagsFilter.tags = options.tags;
+      filter.tagsFilter = tagsFilter;
+    }
+
+    return filter;
+  }
+
+  /**
    * Gets the most recent tabular data captured from the specified data source,
    * as long as it was synced within the last year.
    *
@@ -1741,7 +1798,7 @@ export class DataClient {
   async createDataPipeline(
     organizationId: string,
     name: string,
-    query: Uint8Array[] | Record<string, Date | JsonValue>[],
+    query: Uint8Array[] | Record<string, JsonValue>[],
     schedule: string,
     enableBackfill: boolean,
     dataSourceType?: TabularDataSourceType
