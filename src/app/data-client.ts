@@ -579,14 +579,12 @@ export class DataClient {
    * API](https://docs.viam.com/dev/reference/apis/data-client/#deletetabulardata).
    *
    * @param organizationId The ID of organization to delete data from
-   * @param deleteOlderThanDays Delete data that was captured more than this
-   *   many days ago. For example if `deleteOlderThanDays` is 10, this deletes
-   *   any data that was captured more than 10 days ago. If it is 0, all
-   *   existing data is deleted.
+   * @param deleteOlderThanDays Delete data that was captured more than this many
+   *   days ago. For example, a value of 10 deletes any data that was captured
+   *   more than 10 days ago. A value of 0 deletes all existing data.
    * @param filter Optional filter to further constrain which data is deleted.
-   *   If provided, only data matching both the time constraint AND the filter
-   *   will be deleted. If omitted, data is deleted based on organization_id
-   *   and time only.
+   *   If provided, only data matching the filter will be deleted.
+   *   If omitted, data is deleted based on organization_id and delete_older_than_days.
    * @returns The number of items deleted
    */
   async deleteTabularData(
