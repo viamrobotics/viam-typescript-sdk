@@ -75,8 +75,16 @@ export interface DialWebRTCConf {
   /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   *
+   * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number;
+
+  /**
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   */
+  dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
 }
 
@@ -89,9 +97,19 @@ export interface DialDirectConf {
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
   reconnectAbortSignal?: { abort: boolean };
-  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
-  // and a value of 0 would disable the timeout.
+  /**
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   *
+   * @deprecated Use `dialTimeoutMs` instead.
+   */
   dialTimeout?: number;
+
+  /**
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   */
+  dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
 }
 
@@ -122,9 +140,19 @@ export interface ConnectOptions {
   creds?: Credentials;
   priority?: number;
 
-  // set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT,
-  // and a value of 0 would disable the timeout.
+  /**
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   *
+   * @deprecated Use `dialTimeoutMs` instead.
+   */
   dialTimeout?: number;
+
+  /**
+   * Set timeout in milliseconds for dialing. Default is defined by
+   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   */
+  dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
 }
 
@@ -640,7 +668,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     await this.connect({
       priority: conf.priority,
-      dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
+      dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
       creds: conf.credentials,
       extraHeaders: conf.extraHeaders,
     });
@@ -682,7 +710,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     await this.connect({
       creds: conf.credentials,
-      dialTimeout: conf.dialTimeout ?? DIAL_TIMEOUT,
+      dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
       extraHeaders: conf.extraHeaders,
     });
 
@@ -936,6 +964,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     creds = this.savedCreds,
     priority,
     dialTimeout,
+    dialTimeoutMs,
     extraHeaders,
   }: ConnectOptions = {}) {
     this.emit(MachineConnectionEvent.CONNECTING, {});
@@ -996,7 +1025,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions.rtcConfig,
         },
-        dialTimeout: dialTimeout ?? DIAL_TIMEOUT,
+        dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
       };
 

@@ -50,8 +50,15 @@ export interface DialOptions {
    */
   accessToken?: string | undefined;
 
-  // set timeout in milliseconds for dialing.
+  /**
+   * Set timeout in milliseconds for dialing.
+   *
+   * @deprecated Use `dialTimeoutMs` instead.
+   */
   dialTimeout?: number | undefined;
+
+  /** Set timeout in milliseconds for dialing. */
+  dialTimeoutMs?: number | undefined;
 
   extraHeaders?: Headers;
 }
@@ -492,12 +499,13 @@ export const dialWebRTC = async (
   );
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  if (dialOpts?.dialTimeout !== undefined && dialOpts.dialTimeout > 0) {
+  const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
+  if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
     timeoutId = setTimeout(() => {
       if (!successful) {
         exchange.terminate(new Error('timed out'));
       }
-    }, dialOpts.dialTimeout);
+    }, dialTimeoutMs);
   }
 
   try {
