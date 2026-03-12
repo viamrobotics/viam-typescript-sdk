@@ -98,10 +98,10 @@ describe('dialWebRTC', () => {
       // Arrange
       vi.useFakeTimers();
       const { peerConnection, signalingExchange } = setupDialWebRTCMocks();
-      const dialTimeout = 5000;
+      const dialTimeoutMs = 5000;
 
       // Act
-      const promise = dialWebRTC(TEST_URL, TEST_HOST, { dialTimeout });
+      const promise = dialWebRTC(TEST_URL, TEST_HOST, { dialTimeoutMs });
       await vi.advanceTimersByTimeAsync(100);
       await promise;
       await vi.advanceTimersByTimeAsync(10_000);
@@ -116,11 +116,11 @@ describe('dialWebRTC', () => {
       vi.useFakeTimers();
       const { peerConnection, signalingExchange } = setupDialWebRTCMocks();
       const error = new Error('Connection failed');
-      const dialTimeout = 5000;
+      const dialTimeoutMs = 5000;
       vi.mocked(signalingExchange.doExchange).mockRejectedValueOnce(error);
 
       // Act
-      const promise = dialWebRTC(TEST_URL, TEST_HOST, { dialTimeout }).catch(
+      const promise = dialWebRTC(TEST_URL, TEST_HOST, { dialTimeoutMs }).catch(
         (error_: unknown) => error_ as Error
       );
       await vi.advanceTimersByTimeAsync(100);
@@ -150,7 +150,7 @@ describe('dialWebRTC', () => {
       );
 
       // Act
-      dialWebRTC(TEST_URL, TEST_HOST, { dialTimeout: 1000 }).catch(() => {
+      dialWebRTC(TEST_URL, TEST_HOST, { dialTimeoutMs: 1000 }).catch(() => {
         // Ignore error for this test - we're testing timeout behavior
       });
       await vi.advanceTimersByTimeAsync(1000);
@@ -164,16 +164,19 @@ describe('dialWebRTC', () => {
     });
 
     it.each([
-      { dialTimeout: 0, description: 'when dialTimeout is 0' },
-      { dialTimeout: -1000, description: 'when dialTimeout is negative' },
-      { dialTimeout: undefined, description: 'when dialTimeout is undefined' },
-    ])('should not set timeout $description', async ({ dialTimeout }) => {
+      { dialTimeoutMs: 0, description: 'when dialTimeoutMs is 0' },
+      { dialTimeoutMs: -1000, description: 'when dialTimeoutMs is negative' },
+      {
+        dialTimeoutMs: undefined,
+        description: 'when dialTimeoutMs is undefined',
+      },
+    ])('should not set timeout $description', async ({ dialTimeoutMs }) => {
       // Arrange
       vi.useFakeTimers();
       const { signalingExchange } = setupDialWebRTCMocks();
 
       // Act
-      await dialWebRTC(TEST_URL, TEST_HOST, { dialTimeout });
+      await dialWebRTC(TEST_URL, TEST_HOST, { dialTimeoutMs });
       await vi.advanceTimersByTimeAsync(100_000);
 
       // Assert
