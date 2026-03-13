@@ -5,7 +5,14 @@ failed=""
 for dir in examples/*/; do
 	if [ -f "$dir/tsconfig.json" ]; then
 		echo "Type-checking $dir..."
-		if ! install_out=$(cd "$dir" && npm install --ignore-scripts 2>&1); then
+		# react-native uses Metro which can't follow symlinks, so it needs
+		# its install scripts to pack and install the SDK as a tarball.
+		if [[ "$dir" == *"react-native"* ]]; then
+			install_cmd="npm install"
+		else
+			install_cmd="npm install --ignore-scripts"
+		fi
+		if ! install_out=$(cd "$dir" && $install_cmd 2>&1); then
 			echo "$dir npm install failed:"
 			echo "$install_out" | grep -A2 "npm error" | head -20
 			failed="$failed $dir"
