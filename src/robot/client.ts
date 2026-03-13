@@ -1,11 +1,5 @@
 import { type ServiceType } from '@bufbuild/protobuf';
-import {
-  Code,
-  ConnectError,
-  createClient,
-  type Client,
-  type Transport,
-} from '@connectrpc/connect';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
@@ -172,41 +166,6 @@ export const isDialWebRTCConf = (value: DialConf): value is DialWebRTCConf => {
 
 const isPosInt = (x: number): boolean => {
   return x > 0 && Number.isInteger(x);
-};
-
-const isRetryableError = (error: unknown): boolean => {
-  // Don't retry on auth failures, invalid arguments, or not found
-  if (
-    error instanceof ConnectError &&
-    [
-      Code.Canceled,
-      Code.InvalidArgument,
-      Code.NotFound,
-      Code.AlreadyExists,
-      Code.PermissionDenied,
-      Code.FailedPrecondition,
-      Code.OutOfRange,
-      Code.Unimplemented,
-      Code.Unauthenticated,
-    ].includes(error.code)
-  ) {
-    return false;
-  }
-
-  if (error instanceof Error) {
-    const message = error.message.toLowerCase();
-    // Don't retry on configuration errors
-    if (
-      message.includes('invalid') ||
-      message.includes('configuration') ||
-      message.includes('cannot dial')
-    ) {
-      return false;
-    }
-  }
-
-  // Retry on network errors, timeouts, and other transient issues
-  return true;
 };
 
 /**
@@ -443,21 +402,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         );
 
         this.currentRetryAttempt = attemptNumber;
-        if (this.closed) {
-          return false;
-        }
-
-        const isRetryable = isRetryableError(error);
-        if (isRetryable) {
-          return true;
-        }
-
-        // eslint-disable-next-line no-console
-        console.debug(
-          'Non-retryable error encountered, stopping reconnection attempts',
-          error
-        );
-        return false;
+        return !this.closed;
       },
     };
 
@@ -781,21 +726,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         );
 
         this.currentRetryAttempt = attemptNumber;
-
-        if (this.closed) {
-          return false;
-        }
-
-        if (isRetryableError(error)) {
-          return true;
-        }
-
-        // eslint-disable-next-line no-console
-        console.debug(
-          'Non-retryable error encountered, stopping connection attempts',
-          error
-        );
-        return false;
+        return !this.closed;
       },
     };
   }
