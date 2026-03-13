@@ -33,6 +33,7 @@ import {
   DeleteBinaryDataByIDsResponse,
   DeleteIndexRequest,
   DeleteIndexResponse,
+  DeleteTabularDataRequest,
   DeleteTabularDataResponse,
   ExportTabularDataRequest,
   ExportTabularDataResponse,
@@ -61,6 +62,7 @@ import {
   TabularDataByMQLResponse,
   TabularDataBySQLResponse,
   TabularDataSourceType,
+  DeleteTabularFilter,
   TagsByFilterRequest,
   TagsByFilterResponse,
   TagsFilter,
@@ -624,13 +626,16 @@ describe('DataClient tests', () => {
   });
 
   describe('deleteTabularData tests', () => {
+    let capturedRequest: DeleteTabularDataRequest | undefined;
+
     beforeEach(() => {
+      capturedRequest = undefined;
       mockTransport = createRouterTransport(({ service }) => {
         service(DataService, {
           deleteTabularData: (req) => {
+            capturedRequest = req;
             const response = new DeleteTabularDataResponse();
-            response.deletedCount =
-              req.deleteOlderThanDays >= 10 ? BigInt(10) : BigInt(5);
+            response.deletedCount = BigInt(10);
             return response;
           },
         });
@@ -640,11 +645,29 @@ describe('DataClient tests', () => {
     it('delete tabular data', async () => {
       const promise = await subject().deleteTabularData('orgId', 20);
       expect(promise).toEqual(10n);
+      expect(capturedRequest?.filter).toBeUndefined();
     });
 
-    it('delete newer tabular data', async () => {
-      const promise = await subject().deleteTabularData('orgId', 5);
-      expect(promise).toEqual(5n);
+    it('delete tabular data with filter', async () => {
+      const deleteTabularFilter = new DeleteTabularFilter({
+        locationIds: ['location-1'],
+        componentName: 'camera',
+      });
+      const promise = await subject().deleteTabularData(
+        'orgId',
+        20,
+        deleteTabularFilter
+      );
+      expect(promise).toEqual(10n);
+      expect(capturedRequest?.filter).toBeDefined();
+      expect(capturedRequest?.filter?.locationIds).toEqual(['location-1']);
+      expect(capturedRequest?.filter?.componentName).toEqual('camera');
+    });
+
+    it('delete tabular data with undefined filter', async () => {
+      const promise = await subject().deleteTabularData('orgId', 20, undefined);
+      expect(promise).toEqual(10n);
+      expect(capturedRequest?.filter).toBeUndefined();
     });
   });
 
