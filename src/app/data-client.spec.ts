@@ -33,6 +33,7 @@ import {
   DeleteBinaryDataByIDsResponse,
   DeleteIndexRequest,
   DeleteIndexResponse,
+  DeleteTabularDataRequest,
   DeleteTabularDataResponse,
   ExportTabularDataRequest,
   ExportTabularDataResponse,
@@ -648,11 +649,15 @@ describe('DataClient tests', () => {
     });
 
     it('delete tabular data with filter', async () => {
-      const filter: DeleteTabularFilter = {
+      const deleteTabularFilter = new DeleteTabularFilter({
         locationIds: ['location-1'],
         componentName: 'camera',
-      };
-      const promise = await subject().deleteTabularData('orgId', 20, filter);
+      });
+      const promise = await subject().deleteTabularData(
+        'orgId',
+        20,
+        deleteTabularFilter
+      );
       expect(promise).toEqual(10n);
       expect(capturedRequest?.filter).toBeDefined();
       expect(capturedRequest?.filter?.locationIds).toEqual(['location-1']);
