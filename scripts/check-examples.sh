@@ -5,7 +5,7 @@ failed=""
 for dir in examples/*/; do
 	if [ -f "$dir/tsconfig.json" ]; then
 		echo "Type-checking $dir..."
-		if ! install_out=$(cd "$dir" && npm install 2>&1); then
+		if ! install_out=$(cd "$dir" && npm install --ignore-scripts 2>&1); then
 			echo "$dir npm install failed:"
 			echo "$install_out" | grep -A2 "npm error" | head -20
 			failed="$failed $dir"
