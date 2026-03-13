@@ -122,5 +122,5 @@ vitest-report/
 vitest-e2e-report/
 
 # Claude Code
-.claude/worktrees
-.claude/settings.local.json
+.claude/
+!.claude/settings.ci.json
