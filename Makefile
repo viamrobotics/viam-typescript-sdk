@@ -113,9 +113,3 @@ test-e2e-node: e2e/bin/viam-server
 .PHONY: test-e2e-browser
 test-e2e-browser: e2e/bin/viam-server install-playwright
 	npm run e2e:browser
-
-# example type-checking
-
-.PHONY: check-examples
-check-examples:
-	bash scripts/check-examples.sh
