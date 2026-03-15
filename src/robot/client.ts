@@ -1074,9 +1074,7 @@ export class RobotClient extends EventDispatcher implements Robot {
            * connection getting closed, so restarting ice is not a valid way to
            * recover.
            */
-          if (this.peerConn?.iceConnectionState === 'connected') {
-            this.emit(MachineConnectionEvent.CONNECTED, {});
-          } else if (this.peerConn?.iceConnectionState === 'closed') {
+          if (this.peerConn?.iceConnectionState === 'closed') {
             this.onDisconnect();
           }
         };
