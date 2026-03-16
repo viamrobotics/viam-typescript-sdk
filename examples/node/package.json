@@ -24,6 +24,7 @@
     "start": "tsx --env-file=.env src/main.ts"
   },
   "overrides": {
-    "serialize-javascript": ">=7.0.3"
+    "serialize-javascript": ">=7.0.3",
+    "undici": "^6.24.0"
   }
 }
