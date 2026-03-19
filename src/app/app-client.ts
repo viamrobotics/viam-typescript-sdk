@@ -998,7 +998,9 @@ export class AppClient {
    * ```ts
    * const robotPart = await appClient.updateRobotPart(
    *   '<YOUR-ROBOT-PART-ID>',
-   *   'newName'
+   *   'newName',
+   *   new Struct({ fields: { key: { stringValue: 'value' } } }),
+   *   '{"key": "value"}'
    * );
    * ```
    *
@@ -1008,14 +1010,16 @@ export class AppClient {
    * @param id The ID of the requested robot part
    * @param name The new name of the robot part
    * @param robotConfig The new config for the robot part
+   * @param robotConfigJson Optional raw JSON string of the robot config, preserving user-defined key order. When set, this takes precedence over robotConfig for storage purposes.
    * @returns The updated robot part
    */
   async updateRobotPart(
     id: string,
     name: string,
-    robotConfig: Struct
+    robotConfig: Struct,
+    robotConfigJson?: string
   ): Promise<RobotPart | undefined> {
-    const resp = await this.client.updateRobotPart({ id, name, robotConfig });
+    const resp = await this.client.updateRobotPart({ id, name, robotConfig, robotConfigJson });
     return resp.part;
   }
 

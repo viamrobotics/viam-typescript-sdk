@@ -910,10 +910,13 @@ describe('AppClient tests', () => {
   });
 
   describe('updateRobotPart tests', () => {
+    let capturedRequest: pb.UpdateRobotPartRequest;
+
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          updateRobotPart: () => {
+          updateRobotPart: (req) => {
+            capturedRequest = req;
             return new pb.UpdateRobotPartResponse({
               part: robotPart,
             });
@@ -922,13 +925,23 @@ describe('AppClient tests', () => {
       });
     });
 
-    it('updateRobotPart', async () => {
-      const response = await subject().updateRobotPart(
-        'id',
-        'name',
-        new Struct()
-      );
+    it('updates a robot part with name and robotConfig', async () => {
+      const id = 'id';
+      const name = 'name';
+      const robotConfig = new Struct();
+      const response = await subject().updateRobotPart(id, name, robotConfig);
       expect(response).toEqual(robotPart);
+      expect(capturedRequest).toEqual({ id, name, robotConfig });
+    });
+
+    it('updates a robot part with name, robotConfig, and robotConfigJson', async () => {
+      const id = 'id';
+      const name = 'name';
+      const robotConfig = new Struct();
+      const robotConfigJson = '{"foo": "bar"}';
+      const response = await subject().updateRobotPart(id, name, robotConfig, robotConfigJson);
+      expect(response).toEqual(robotPart);
+      expect(capturedRequest).toEqual({ id, name, robotConfig, robotConfigJson });
     });
   });
 
