@@ -98,6 +98,26 @@ export interface DialWebRTCOptions {
 
   // `additionalSDPValues` is a collection of additional SDP values that we want to pass into the connection's call request.
   additionalSdpFields?: Record<string, string | number>;
+
+  /**
+   * When true, sets ICE transport policy to relay-only so only TURN candidates
+   * are used. Useful for testing relay connectivity through a TURN server.
+   */
+  forceRelay?: boolean;
+
+  /**
+   * When `forceRelay` is true and this is non-empty, retains only ICE servers
+   * whose URLs contain this host substring. Useful for targeting a specific
+   * TURN deployment (e.g. a staging server). Ignored when `forceRelay` is false.
+   */
+  relayHostFilter?: string;
+
+  /**
+   * When true, strips TURN servers from the ICE configuration so only host and
+   * server-reflexive candidates are used. Useful for testing direct connectivity
+   * without relay fallback. Mutually exclusive with `forceRelay`.
+   */
+  forceP2P?: boolean;
 }
 
 export type TransportFactory = (
@@ -552,6 +572,18 @@ export const dialWebRTC = async (
   }
 };
 
+const iceServerHasTURN = (server: RTCIceServer): boolean => {
+  const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
+  return urls.some(
+    (url) => url.startsWith('turn:') || url.startsWith('turns:')
+  );
+};
+
+const iceServerMatchesHost = (server: RTCIceServer, host: string): boolean => {
+  const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
+  return urls.some((url) => url.includes(host));
+};
+
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
   callOpts: CallOptions,
@@ -600,6 +632,30 @@ const processWebRTCOpts = async (
         ...(webrtcOpts.rtcConfig.iceServers ?? []),
         ...additionalIceServers,
       ];
+    }
+  }
+
+  if (webrtcOpts.forceP2P) {
+    // Strip TURN servers from the assembled ICE config so only host and
+    // server-reflexive candidates are used.
+    webrtcOpts.rtcConfig = {
+      ...webrtcOpts.rtcConfig,
+      iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
+        (s) => !iceServerHasTURN(s)
+      ),
+    };
+  }
+
+  if (webrtcOpts.forceRelay) {
+    webrtcOpts.rtcConfig = {
+      ...webrtcOpts.rtcConfig,
+      iceTransportPolicy: 'relay',
+    };
+    if (webrtcOpts.relayHostFilter) {
+      const { relayHostFilter } = webrtcOpts;
+      webrtcOpts.rtcConfig.iceServers = (
+        webrtcOpts.rtcConfig.iceServers ?? []
+      ).filter((s) => iceServerMatchesHost(s, relayHostFilter));
     }
   }
 
