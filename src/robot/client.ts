@@ -94,6 +94,13 @@ export interface DialWebRTCConf {
   forceP2P?: boolean;
 
   /**
+   * When set, filters the assembled ICE server list to only TURN servers whose
+   * URL contains this substring. Non-TURN servers are unaffected. Can be
+   * combined with `forceRelay` to route through a specific TURN server.
+   */
+  relayHostFilter?: string;
+
+  /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
    *
@@ -156,6 +163,7 @@ interface WebRTCOptions {
   shouldRetryOnError?: () => boolean;
   forceRelay?: boolean;
   forceP2P?: boolean;
+  relayHostFilter?: string;
 }
 
 interface DirectOptions {
@@ -715,6 +723,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.webrtcOptions.shouldRetryOnError = conf.shouldRetryOnError;
     this.webrtcOptions.forceRelay = conf.forceRelay;
     this.webrtcOptions.forceP2P = conf.forceP2P;
+    this.webrtcOptions.relayHostFilter = conf.relayHostFilter;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
@@ -1079,6 +1088,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           rtcConfig: this.webrtcOptions.rtcConfig,
           forceRelay: this.webrtcOptions.forceRelay,
           forceP2P: this.webrtcOptions.forceP2P,
+          relayHostFilter: this.webrtcOptions.relayHostFilter,
         },
         dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,

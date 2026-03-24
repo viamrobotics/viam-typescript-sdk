@@ -111,6 +111,13 @@ export interface DialWebRTCOptions {
    * connectivity without relay fallback. Mutually exclusive with `forceRelay`.
    */
   forceP2P?: boolean;
+
+  /**
+   * When set, filters the assembled ICE server list to only TURN servers whose
+   * URL contains this substring. Non-TURN servers are unaffected. Can be
+   * combined with `forceRelay` to route through a specific TURN server.
+   */
+  relayHostFilter?: string;
 }
 
 export type TransportFactory = (
@@ -572,6 +579,11 @@ const iceServerHasTURN = (server: RTCIceServer): boolean => {
   );
 };
 
+const iceServerMatchesHost = (server: RTCIceServer, host: string): boolean => {
+  const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
+  return urls.some((url) => url.includes(host));
+};
+
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
   callOpts: CallOptions,
@@ -638,6 +650,16 @@ const processWebRTCOpts = async (
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceTransportPolicy: 'relay',
+    };
+  }
+
+  if (webrtcOpts.relayHostFilter) {
+    const host = webrtcOpts.relayHostFilter;
+    webrtcOpts.rtcConfig = {
+      ...webrtcOpts.rtcConfig,
+      iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
+        (server) => !iceServerHasTURN(server) || iceServerMatchesHost(server, host)
+      ),
     };
   }
 
