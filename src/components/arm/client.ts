@@ -18,7 +18,7 @@ import {
   getGeometriesFromClient,
 } from '../../utils';
 import type { Arm } from './arm';
-import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
+import { Get3DModelsRequest, GetStatusRequest, Mesh } from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
 
 /**
@@ -157,6 +157,21 @@ export class ArmClient implements Arm {
 
     const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
+  }
+
+  async getStatus(callOptions = this.callOptions) {
+    const request = new GetStatusRequest({
+      name: this.name,
+    });
+
+    this.options.requestLogger?.(request);
+
+    const response = await this.client.getStatus(request, callOptions);
+    const { result } = response;
+    if (!result) {
+      throw new Error('no status');
+    }
+    return result.toJson();
   }
 
   async doCommand(
