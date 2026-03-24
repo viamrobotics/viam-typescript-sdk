@@ -641,7 +641,7 @@ const processWebRTCOpts = async (
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
-        (s) => !iceServerHasTURN(s)
+        (server) => !iceServerHasTURN(server)
       ),
     };
   }
@@ -651,11 +651,11 @@ const processWebRTCOpts = async (
       ...webrtcOpts.rtcConfig,
       iceTransportPolicy: 'relay',
     };
-    if (webrtcOpts.relayHostFilter) {
+    if (webrtcOpts.relayHostFilter !== undefined && webrtcOpts.relayHostFilter !== '') {
       const { relayHostFilter } = webrtcOpts;
       webrtcOpts.rtcConfig.iceServers = (
         webrtcOpts.rtcConfig.iceServers ?? []
-      ).filter((s) => iceServerMatchesHost(s, relayHostFilter));
+      ).filter((server) => iceServerMatchesHost(server, relayHostFilter));
     }
   }
 
