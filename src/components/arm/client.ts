@@ -18,7 +18,11 @@ import {
   getGeometriesFromClient,
 } from '../../utils';
 import type { Arm } from './arm';
-import { Get3DModelsRequest, GetStatusRequest, Mesh } from '../../gen/common/v1/common_pb';
+import {
+  Get3DModelsRequest,
+  GetStatusRequest,
+  Mesh,
+} from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
 
 /**
