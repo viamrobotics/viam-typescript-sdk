@@ -108,14 +108,15 @@ export interface DialWebRTCOptions {
   /**
    * When `forceRelay` is true and this is non-empty, retains only ICE servers
    * whose URLs contain this host substring. Useful for targeting a specific
-   * TURN deployment (e.g. a staging server). Ignored when `forceRelay` is false.
+   * TURN deployment (e.g. a staging server). Ignored when `forceRelay` is
+   * false.
    */
   relayHostFilter?: string;
 
   /**
    * When true, strips TURN servers from the ICE configuration so only host and
-   * server-reflexive candidates are used. Useful for testing direct connectivity
-   * without relay fallback. Mutually exclusive with `forceRelay`.
+   * server-reflexive candidates are used. Useful for testing direct
+   * connectivity without relay fallback. Mutually exclusive with `forceRelay`.
    */
   forceP2P?: boolean;
 }
@@ -651,7 +652,10 @@ const processWebRTCOpts = async (
       ...webrtcOpts.rtcConfig,
       iceTransportPolicy: 'relay',
     };
-    if (webrtcOpts.relayHostFilter !== undefined && webrtcOpts.relayHostFilter !== '') {
+    if (
+      webrtcOpts.relayHostFilter !== undefined &&
+      webrtcOpts.relayHostFilter !== ''
+    ) {
       const { relayHostFilter } = webrtcOpts;
       webrtcOpts.rtcConfig.iceServers = (
         webrtcOpts.rtcConfig.iceServers ?? []
