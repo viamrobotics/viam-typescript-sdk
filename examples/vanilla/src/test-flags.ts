@@ -1,8 +1,8 @@
 import * as VIAM from '@viamrobotics/sdk';
 
-const HOST = 'machine-main.ozy75nuoux.viam.cloud';
-const API_KEY_ID = '4f04c6ca-b9df-440d-82db-6d383b0c92a1';
-const API_KEY = 'ymw99jc6h6ki2m9rlhzekp8r2tpj9zjy';
+const HOST = '<machine-fqdn>';
+const API_KEY_ID = '<api-key-id>';
+const API_KEY = '<api-key>';
 const SIGNALING = 'https://app.viam.com:443';
 
 const CREDS: VIAM.Credential = {
