@@ -87,14 +87,6 @@ export interface DialWebRTCConf {
   forceRelay?: boolean;
 
   /**
-   * When `forceRelay` is true and this is non-empty, retains only ICE servers
-   * whose URLs contain this host substring. Useful for targeting a specific
-   * TURN deployment (e.g. a staging server). Ignored when `forceRelay` is
-   * false.
-   */
-  relayHostFilter?: string;
-
-  /**
    * When true, strips TURN servers from the ICE configuration so only host and
    * server-reflexive candidates are used. Useful for testing direct
    * connectivity without relay fallback. Mutually exclusive with `forceRelay`.
@@ -163,7 +155,6 @@ interface WebRTCOptions {
   reconnectMaxWait?: number;
   shouldRetryOnError?: () => boolean;
   forceRelay?: boolean;
-  relayHostFilter?: string;
   forceP2P?: boolean;
 }
 
@@ -723,7 +714,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.webrtcOptions.reconnectMaxAttempts = conf.reconnectMaxAttempts;
     this.webrtcOptions.shouldRetryOnError = conf.shouldRetryOnError;
     this.webrtcOptions.forceRelay = conf.forceRelay;
-    this.webrtcOptions.relayHostFilter = conf.relayHostFilter;
     this.webrtcOptions.forceP2P = conf.forceP2P;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
@@ -1088,7 +1078,6 @@ export class RobotClient extends EventDispatcher implements Robot {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions.rtcConfig,
           forceRelay: this.webrtcOptions.forceRelay,
-          relayHostFilter: this.webrtcOptions.relayHostFilter,
           forceP2P: this.webrtcOptions.forceP2P,
         },
         dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,

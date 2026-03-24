@@ -66,25 +66,8 @@ async function main() {
   // 2. ForceRelay
   await dial('ForceRelay', { forceRelay: true });
 
-  // 3. ForceRelay + RelayHostFilter (matching — "turn" should match any TURN URL)
-  await dial('ForceRelay + RelayHostFilter=turn.viam.com', {
-    forceRelay: true,
-    relayHostFilter: 'turn.viam.com',
-  });
-
-  // 4. ForceP2P
+  // 3. ForceP2P
   await dial('ForceP2P', { forceP2P: true });
-
-  // 5. RelayHostFilter without ForceRelay (filter should be ignored, connects normally)
-  await dial('RelayHostFilter without ForceRelay (expect: connects normally)', {
-    relayHostFilter: 'turn.viam.com',
-  });
-
-  // 6. ForceRelay + non-matching filter (no TURN servers left — expect failure)
-  await dial(
-    'ForceRelay + RelayHostFilter=notexist.example.com (expect: fail/timeout)',
-    { forceRelay: true, relayHostFilter: 'notexist.example.com' }
-  );
 
   log('\nDone.');
 }
