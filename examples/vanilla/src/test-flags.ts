@@ -1,12 +1,12 @@
 import * as VIAM from '@viamrobotics/sdk';
 
-const HOST = '<machine-fqdn>';
-const API_KEY_ID = '<api-key-id>';
-const API_KEY = '<api-key>';
+const HOST = '';
+const API_KEY_ID = '';
+const API_KEY = '';
 const SIGNALING = 'https://app.viam.com:443';
-// RELAY_HOST should be a substring matching at least one TURN server URL returned
-// by the signaling server (e.g. 'turn.viam.com' for prod coturn).
-const RELAY_HOST = '<relay-host-substring>';
+// TURN_URI should be the URI of a TURN server returned by the signaling server.
+// Example: 'turn:turn.viam.com:443'
+const TURN_URI = '';
 
 const CREDS: VIAM.Credential = {
   type: 'api-key',
@@ -69,19 +69,28 @@ async function main() {
   // 2. ForceRelay
   await dial('ForceRelay', { forceRelay: true });
 
-  // 3. ForceRelay + RelayHostFilter matching a valid TURN server
-  await dial('ForceRelay + RelayHostFilter', { forceRelay: true, relayHostFilter: RELAY_HOST });
+  // 3. ForceRelay + TurnUri matching a valid TURN server
+  await dial('ForceRelay + TurnUri', { forceRelay: true, turnUri: TURN_URI });
 
   // 4. ForceP2P
   await dial('ForceP2P', { forceP2P: true });
 
-  // 5. RelayHostFilter alone — filter limits TURN options but ICE still picks host/srflx
-  await dial('RelayHostFilter (no ForceRelay)', { relayHostFilter: RELAY_HOST });
+  // 5. TurnUri alone — filters TURN options but ICE still picks host/srflx
+  await dial('TurnUri (no ForceRelay)', { turnUri: TURN_URI });
 
-  // 6. ForceRelay + non-matching RelayHostFilter — expect failure
-  await dial('ForceRelay + RelayHostFilter=notexist (expect: fail)', {
+  // 6. ForceRelay + non-matching TurnUri — expect failure
+  await dial('ForceRelay + TurnUri=notexist (expect: fail)', {
     forceRelay: true,
-    relayHostFilter: 'notexist.example.com',
+    turnUri: 'turn:notexist.example.com:3478',
+  });
+
+  // 7. ForceRelay + turns/tcp/443 — TLS relay for UDP-blocked firewalls
+  await dial('ForceRelay + turns/tcp/443', {
+    forceRelay: true,
+    turnUri: TURN_URI,
+    turnScheme: 'turns',
+    turnTransport: 'tcp',
+    turnPort: 443,
   });
 
   log('\nDone.');

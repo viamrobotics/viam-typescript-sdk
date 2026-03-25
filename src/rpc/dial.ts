@@ -113,11 +113,28 @@ export interface DialWebRTCOptions {
   forceP2P?: boolean;
 
   /**
-   * When set, filters the assembled ICE server list to only TURN servers whose
-   * URL contains this substring. Non-TURN servers are unaffected. Can be
-   * combined with `forceRelay` to route through a specific TURN server.
+   * When set, filters the signaling server's TURN list to only the server whose
+   * parsed URI matches. Uses struct comparison identical to the server-side
+   * `TURN_URI` env var. Leave transport unspecified for UDP default.
+   * Example: `"turn:turn.viam.com:443"`
    */
-  relayHostFilter?: string;
+  turnUri?: string;
+
+  /**
+   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`).
+   * Use `"turns"` for TLS relay when UDP is blocked by a firewall.
+   */
+  turnScheme?: 'turn' | 'turns';
+
+  /**
+   * Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`).
+   */
+  turnTransport?: 'tcp' | 'udp';
+
+  /**
+   * Overrides the port of the matched TURN URI. Use `443` for firewall traversal.
+   */
+  turnPort?: number;
 }
 
 export type TransportFactory = (
@@ -579,10 +596,43 @@ const iceServerHasTURN = (server: RTCIceServer): boolean => {
   );
 };
 
-const iceServerMatchesHost = (server: RTCIceServer, host: string): boolean => {
-  const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
-  return urls.some((url) => url.includes(host));
+interface TurnUri {
+  scheme: 'turn' | 'turns';
+  host: string;
+  port: number;
+  transport: 'udp' | 'tcp';
+}
+
+const parseTurnUri = (s: string): TurnUri | undefined => {
+  const colonIdx = s.indexOf(':');
+  if (colonIdx < 0) return undefined;
+  const scheme = s.slice(0, colonIdx);
+  if (scheme !== 'turn' && scheme !== 'turns') return undefined;
+  const rest = s.slice(colonIdx + 1);
+  const qIdx = rest.indexOf('?');
+  const hostport = qIdx >= 0 ? rest.slice(0, qIdx) : rest;
+  const query = qIdx >= 0 ? rest.slice(qIdx + 1) : '';
+  const lastColon = hostport.lastIndexOf(':');
+  if (lastColon < 0) return undefined;
+  const host = hostport.slice(0, lastColon);
+  const port = parseInt(hostport.slice(lastColon + 1), 10);
+  if (isNaN(port)) return undefined;
+  const transport =
+    (query
+      .split('&')
+      .find((p) => p.startsWith('transport='))
+      ?.slice('transport='.length) ?? 'udp') as 'udp' | 'tcp';
+  return { scheme: scheme as 'turn' | 'turns', host, port, transport };
 };
+
+const turnUriEqual = (a: TurnUri, b: TurnUri): boolean =>
+  a.scheme === b.scheme &&
+  a.host === b.host &&
+  a.port === b.port &&
+  a.transport === b.transport;
+
+const turnUriToString = (u: TurnUri): string =>
+  `${u.scheme}:${u.host}:${u.port}?transport=${u.transport}`;
 
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
@@ -653,13 +703,38 @@ const processWebRTCOpts = async (
     };
   }
 
-  if (webrtcOpts.relayHostFilter) {
-    const host = webrtcOpts.relayHostFilter;
+  if (
+    webrtcOpts.turnUri ||
+    webrtcOpts.turnScheme ||
+    webrtcOpts.turnTransport ||
+    webrtcOpts.turnPort !== undefined
+  ) {
+    const filterUri = webrtcOpts.turnUri
+      ? parseTurnUri(webrtcOpts.turnUri)
+      : undefined;
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
-      iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
-        (server) => !iceServerHasTURN(server) || iceServerMatchesHost(server, host)
-      ),
+      iceServers: (webrtcOpts.rtcConfig?.iceServers ?? [])
+        .map((server) => {
+          const rawUrls =
+            typeof server.urls === 'string' ? [server.urls] : server.urls;
+          const newUrls = rawUrls.flatMap((url) => {
+            const parsed = parseTurnUri(url);
+            if (!parsed) return [url]; // non-TURN: keep unchanged
+            if (filterUri && !turnUriEqual(parsed, filterUri)) return []; // filtered out
+            if (webrtcOpts.turnScheme) parsed.scheme = webrtcOpts.turnScheme;
+            if (webrtcOpts.turnPort !== undefined)
+              parsed.port = webrtcOpts.turnPort;
+            if (webrtcOpts.turnTransport)
+              parsed.transport = webrtcOpts.turnTransport;
+            return [turnUriToString(parsed)];
+          });
+          return { ...server, urls: newUrls };
+        })
+        .filter((s) => {
+          const urls = typeof s.urls === 'string' ? [s.urls] : s.urls;
+          return urls.length > 0;
+        }),
     };
   }
 
