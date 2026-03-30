@@ -89,7 +89,7 @@ export interface DialWebRTCConf {
   /**
    * When true, strips TURN servers from the ICE configuration so only host and
    * server-reflexive candidates are used. Useful for testing direct
-   * connectivity without relay fallback. Mutually exclusive with `forceRelay`.
+   * connectivity without relay fallback.
    */
   forceP2P?: boolean;
 
@@ -103,7 +103,6 @@ export interface DialWebRTCConf {
 
   /**
    * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`).
-   * Use `"turns"` for TLS relay when UDP is blocked by a firewall.
    */
   turnScheme?: 'turn' | 'turns';
 
@@ -113,7 +112,7 @@ export interface DialWebRTCConf {
   turnTransport?: 'tcp' | 'udp';
 
   /**
-   * Overrides the port of the matched TURN URI. Use `443` for firewall traversal.
+   * Overrides the port of the matched TURN URI.
    */
   turnPort?: number;
 

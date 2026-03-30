@@ -108,7 +108,7 @@ export interface DialWebRTCOptions {
   /**
    * When true, strips TURN servers from the ICE configuration so only host and
    * server-reflexive candidates are used. Useful for testing direct
-   * connectivity without relay fallback. Mutually exclusive with `forceRelay`.
+   * connectivity without relay fallback.
    */
   forceP2P?: boolean;
 
@@ -122,7 +122,6 @@ export interface DialWebRTCOptions {
 
   /**
    * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). Use
-   * `"turns"` for TLS relay when UDP is blocked by a firewall.
    */
   turnScheme?: 'turn' | 'turns';
 
@@ -684,8 +683,6 @@ const processWebRTCOpts = async (
   }
 
   if (webrtcOpts.forceP2P) {
-    // Strip TURN servers from the assembled ICE config so only host and
-    // server-reflexive candidates are used.
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
