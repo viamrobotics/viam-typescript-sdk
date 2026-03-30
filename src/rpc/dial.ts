@@ -121,7 +121,7 @@ export interface DialWebRTCOptions {
   turnUri?: string;
 
   /**
-   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). Use
+   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`).
    */
   turnScheme?: 'turn' | 'turns';
 
@@ -129,8 +129,7 @@ export interface DialWebRTCOptions {
   turnTransport?: 'tcp' | 'udp';
 
   /**
-   * Overrides the port of the matched TURN URI. Use `443` for firewall
-   * traversal.
+   * Overrides the port of the matched TURN URI.
    */
   turnPort?: number;
 }
@@ -601,23 +600,31 @@ interface TurnUri {
   transport: 'udp' | 'tcp';
 }
 
-const parseTurnUri = (s: string): TurnUri | undefined => {
-  const colonIdx = s.indexOf(':');
-  if (colonIdx < 0) return undefined;
-  const scheme = s.slice(0, colonIdx);
-  if (scheme !== 'turn' && scheme !== 'turns') return undefined;
-  const rest = s.slice(colonIdx + 1);
+const parseTurnUri = (raw: string): TurnUri | undefined => {
+  const colonIdx = raw.indexOf(':');
+  if (colonIdx < 0) {
+    return undefined;
+  }
+  const scheme = raw.slice(0, colonIdx);
+  if (scheme !== 'turn' && scheme !== 'turns') {
+    return undefined;
+  }
+  const rest = raw.slice(colonIdx + 1);
   const qIdx = rest.indexOf('?');
   const hostport = qIdx >= 0 ? rest.slice(0, qIdx) : rest;
   const query = qIdx >= 0 ? rest.slice(qIdx + 1) : '';
   const lastColon = hostport.lastIndexOf(':');
-  if (lastColon < 0) return undefined;
+  if (lastColon < 0) {
+    return undefined;
+  }
   const host = hostport.slice(0, lastColon);
-  const port = parseInt(hostport.slice(lastColon + 1), 10);
-  if (isNaN(port)) return undefined;
+  const port = Number.parseInt(hostport.slice(lastColon + 1), 10);
+  if (Number.isNaN(port)) {
+    return undefined;
+  }
   const transport = (query
     .split('&')
-    .find((p) => p.startsWith('transport='))
+    .find((part) => part.startsWith('transport='))
     ?.slice('transport='.length) ?? 'udp') as 'udp' | 'tcp';
   return { scheme: scheme as 'turn' | 'turns', host, port, transport };
 };
@@ -628,8 +635,8 @@ const turnUriEqual = (a: TurnUri, b: TurnUri): boolean =>
   a.port === b.port &&
   a.transport === b.transport;
 
-const turnUriToString = (u: TurnUri): string =>
-  `${u.scheme}:${u.host}:${u.port}?transport=${u.transport}`;
+const turnUriToString = (uri: TurnUri): string =>
+  `${uri.scheme}:${uri.host}:${uri.port}?transport=${uri.transport}`;
 
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
@@ -699,18 +706,19 @@ const processWebRTCOpts = async (
   }
 
   if (
-    webrtcOpts.turnUri ||
-    webrtcOpts.turnScheme ||
-    webrtcOpts.turnTransport ||
+    webrtcOpts.turnUri !== undefined ||
+    webrtcOpts.turnScheme !== undefined ||
+    webrtcOpts.turnTransport !== undefined ||
     webrtcOpts.turnPort !== undefined
   ) {
     let filterUri: TurnUri | undefined;
-    if (webrtcOpts.turnUri) {
+    if (webrtcOpts.turnUri !== undefined) {
       filterUri = parseTurnUri(webrtcOpts.turnUri);
-      if (!filterUri) {
+      if (filterUri === undefined) {
+        // eslint-disable-next-line no-console
         console.warn(
           `Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`
-        ); // eslint-disable-line no-console
+        );
         return webrtcOpts;
       }
     }
@@ -722,19 +730,30 @@ const processWebRTCOpts = async (
             typeof server.urls === 'string' ? [server.urls] : server.urls;
           const newUrls = rawUrls.flatMap((url) => {
             const parsed = parseTurnUri(url);
-            if (!parsed) return [url]; // non-TURN: keep unchanged
-            if (filterUri && !turnUriEqual(parsed, filterUri)) return []; // filtered out
-            if (webrtcOpts.turnScheme) parsed.scheme = webrtcOpts.turnScheme;
-            if (webrtcOpts.turnPort !== undefined)
+            // non-TURN: keep unchanged
+            if (parsed === undefined) {
+              return [url];
+            }
+            // filtered out
+            if (filterUri !== undefined && !turnUriEqual(parsed, filterUri)) {
+              return [];
+            }
+            if (webrtcOpts.turnScheme !== undefined) {
+              parsed.scheme = webrtcOpts.turnScheme;
+            }
+            if (webrtcOpts.turnPort !== undefined) {
               parsed.port = webrtcOpts.turnPort;
-            if (webrtcOpts.turnTransport)
+            }
+            if (webrtcOpts.turnTransport !== undefined) {
               parsed.transport = webrtcOpts.turnTransport;
+            }
             return [turnUriToString(parsed)];
           });
           return { ...server, urls: newUrls };
         })
-        .filter((s) => {
-          const urls = typeof s.urls === 'string' ? [s.urls] : s.urls;
+        .filter((server) => {
+          const urls =
+            typeof server.urls === 'string' ? [server.urls] : server.urls;
           return urls.length > 0;
         }),
     };
