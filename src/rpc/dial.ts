@@ -120,17 +120,13 @@ export interface DialWebRTCOptions {
    */
   turnUri?: string;
 
-  /**
-   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`).
-   */
+  /** Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). */
   turnScheme?: 'turn' | 'turns';
 
   /** Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`). */
   turnTransport?: 'tcp' | 'udp';
 
-  /**
-   * Overrides the port of the matched TURN URI.
-   */
+  /** Overrides the port of the matched TURN URI. */
   turnPort?: number;
 }
 

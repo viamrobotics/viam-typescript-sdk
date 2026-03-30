@@ -96,24 +96,18 @@ export interface DialWebRTCConf {
   /**
    * When set, filters the signaling server's TURN list to only the server whose
    * parsed URI matches (compared by scheme, host, port, and transport —
-   * defaulting transport to UDP if unspecified).
-   * Example: `"turn:turn.viam.com:443"`
+   * defaulting transport to UDP if unspecified). Example:
+   * `"turn:turn.viam.com:443"`
    */
   turnUri?: string;
 
-  /**
-   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`).
-   */
+  /** Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). */
   turnScheme?: 'turn' | 'turns';
 
-  /**
-   * Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`).
-   */
+  /** Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`). */
   turnTransport?: 'tcp' | 'udp';
 
-  /**
-   * Overrides the port of the matched TURN URI.
-   */
+  /** Overrides the port of the matched TURN URI. */
   turnPort?: number;
 
   /**
