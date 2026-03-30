@@ -1,12 +1,12 @@
 import * as VIAM from '@viamrobotics/sdk';
 
-const HOST = '';
-const API_KEY_ID = '';
-const API_KEY = '';
+const HOST = '<machine-fqdn>';
+const API_KEY_ID = '<api-key-id>';
+const API_KEY = '<api-key>';
 const SIGNALING = 'https://app.viam.com:443';
 // TURN_URI should be the URI of a TURN server returned by the signaling server.
 // Example: 'turn:turn.viam.com:443'
-const TURN_URI = '';
+const TURN_URI = '<turn-uri>';
 
 const CREDS: VIAM.Credential = {
   type: 'api-key',

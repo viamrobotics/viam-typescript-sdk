@@ -114,25 +114,24 @@ export interface DialWebRTCOptions {
 
   /**
    * When set, filters the signaling server's TURN list to only the server whose
-   * parsed URI matches. Uses struct comparison identical to the server-side
-   * `TURN_URI` env var. Leave transport unspecified for UDP default.
-   * Example: `"turn:turn.viam.com:443"`
+   * parsed URI matches (compared by scheme, host, port, and transport —
+   * defaulting transport to UDP if unspecified). Example:
+   * `"turn:turn.viam.com:443"`
    */
   turnUri?: string;
 
   /**
-   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`).
-   * Use `"turns"` for TLS relay when UDP is blocked by a firewall.
+   * Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). Use
+   * `"turns"` for TLS relay when UDP is blocked by a firewall.
    */
   turnScheme?: 'turn' | 'turns';
 
-  /**
-   * Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`).
-   */
+  /** Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`). */
   turnTransport?: 'tcp' | 'udp';
 
   /**
-   * Overrides the port of the matched TURN URI. Use `443` for firewall traversal.
+   * Overrides the port of the matched TURN URI. Use `443` for firewall
+   * traversal.
    */
   turnPort?: number;
 }
@@ -617,11 +616,10 @@ const parseTurnUri = (s: string): TurnUri | undefined => {
   const host = hostport.slice(0, lastColon);
   const port = parseInt(hostport.slice(lastColon + 1), 10);
   if (isNaN(port)) return undefined;
-  const transport =
-    (query
-      .split('&')
-      .find((p) => p.startsWith('transport='))
-      ?.slice('transport='.length) ?? 'udp') as 'udp' | 'tcp';
+  const transport = (query
+    .split('&')
+    .find((p) => p.startsWith('transport='))
+    ?.slice('transport='.length) ?? 'udp') as 'udp' | 'tcp';
   return { scheme: scheme as 'turn' | 'turns', host, port, transport };
 };
 
@@ -709,9 +707,16 @@ const processWebRTCOpts = async (
     webrtcOpts.turnTransport ||
     webrtcOpts.turnPort !== undefined
   ) {
-    const filterUri = webrtcOpts.turnUri
-      ? parseTurnUri(webrtcOpts.turnUri)
-      : undefined;
+    let filterUri: TurnUri | undefined;
+    if (webrtcOpts.turnUri) {
+      filterUri = parseTurnUri(webrtcOpts.turnUri);
+      if (!filterUri) {
+        console.warn(
+          `Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`
+        ); // eslint-disable-line no-console
+        return webrtcOpts;
+      }
+    }
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? [])

@@ -95,8 +95,8 @@ export interface DialWebRTCConf {
 
   /**
    * When set, filters the signaling server's TURN list to only the server whose
-   * parsed URI matches. Uses struct comparison identical to the server-side
-   * `TURN_URI` env var. Leave transport unspecified for UDP default.
+   * parsed URI matches (compared by scheme, host, port, and transport —
+   * defaulting transport to UDP if unspecified).
    * Example: `"turn:turn.viam.com:443"`
    */
   turnUri?: string;
