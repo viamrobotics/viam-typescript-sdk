@@ -446,8 +446,11 @@ const selectedICECandidateType = async (
 
   let remoteCandidateId = '';
   stats.forEach((stat) => {
-    if (stat.type === 'candidate-pair' && (stat as RTCIceCandidatePairStats).nominated) {
-      remoteCandidateId = (stat as RTCIceCandidatePairStats).remoteCandidateId;
+    if (stat.type === 'candidate-pair') {
+      const pair = stat as RTCIceCandidatePairStats;
+      if (pair.nominated) {
+        remoteCandidateId = pair.remoteCandidateId;
+      }
     }
   });
 
@@ -455,16 +458,9 @@ const selectedICECandidateType = async (
     return ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED;
   }
 
-  let candidateType = '';
-  let url = '';
-  stats.forEach((stat) => {
-    if (stat.id === remoteCandidateId && stat.type === 'remote-candidate') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const s = stat as any;
-      candidateType = s.candidateType ?? '';
-      url = s.url ?? '';
-    }
-  });
+  const remote = stats.get(remoteCandidateId) as any;
+  const candidateType = remote?.candidateType ?? '';
+  const url = remote?.url ?? '';
 
   switch (candidateType) {
     case 'host':
@@ -492,9 +488,6 @@ const reportConnectionMetadata = (
 ): void => {
   selectedICECandidateType(pc)
     .then(async (candidateType) => {
-      if (candidateType === ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED) {
-        return;
-      }
       await signalingClient.reportConnectionMetadata(
         new ReportConnectionMetadataRequest({
           candidateType,
@@ -587,7 +580,6 @@ export const dialWebRTC = async (
   try {
     const cc = await exchange.doExchange();
 
-    // Best-effort report of connection metadata for per-org metrics.
     reportConnectionMetadata(signalingClient, callOpts, pc);
 
     if (
