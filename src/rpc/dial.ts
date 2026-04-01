@@ -470,7 +470,7 @@ const selectedICECandidateType = async (
       return ICECandidateType.ICE_CANDIDATE_TYPE_STUN;
     case 'relay':
       if (!url) return ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED;
-      if (url.includes('viam.com') || url.includes('viaminternal')) {
+      if (url.includes('viam.com')) {
         return ICECandidateType.ICE_CANDIDATE_TYPE_COTURN_RELAY;
       }
       return ICECandidateType.ICE_CANDIDATE_TYPE_TWILIO_RELAY;
