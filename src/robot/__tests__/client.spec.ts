@@ -584,21 +584,25 @@ describe('RobotClient', () => {
   describe('retry logic on error', () => {
     const setupReconnectingEventCapture = (client: RobotClient) => {
       const events: unknown[] = [];
-      client.on(MachineConnectionEvent.RECONNECTING, (e) => events.push(e));
+      client.on(MachineConnectionEvent.RECONNECTING, (event) =>
+        events.push(event)
+      );
       return events;
     };
 
     const setupReconnectionFailedEventCapture = (client: RobotClient) => {
       const events: unknown[] = [];
-      client.on(MachineConnectionEvent.RECONNECTION_FAILED, (e) =>
-        events.push(e)
+      client.on(MachineConnectionEvent.RECONNECTION_FAILED, (event) =>
+        events.push(event)
       );
       return events;
     };
 
     const setupConnectedEventCapture = (client: RobotClient) => {
       const events: unknown[] = [];
-      client.on(MachineConnectionEvent.CONNECTED, (e) => events.push(e));
+      client.on(MachineConnectionEvent.CONNECTED, (event) =>
+        events.push(event)
+      );
       return events;
     };
 
