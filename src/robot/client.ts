@@ -509,10 +509,6 @@ export class RobotClient extends EventDispatcher implements Robot {
         console.debug('Reconnected successfully!');
       })
       .catch((error) => {
-        ) {
-          // eslint-disable-next-line no-console
-          console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
-          return;
         this.isReconnecting = false;
         // eslint-disable-next-line no-console
         console.debug(

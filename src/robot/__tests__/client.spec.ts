@@ -596,6 +596,12 @@ describe('RobotClient', () => {
       return events;
     };
 
+    const setupConnectedEventCapture = (client: RobotClient) => {
+      const events: unknown[] = [];
+      client.on(MachineConnectionEvent.CONNECTED, (e) => events.push(e));
+      return events;
+    };
+
     describe('dial() - non-retryable errors', () => {
       it.each([
         { error: errors.createCanceledError(), description: 'Canceled' },
@@ -1053,6 +1059,7 @@ describe('RobotClient', () => {
         const reconnectingEvents = setupReconnectingEventCapture(client);
         const reconnectionFailedEvents =
           setupReconnectionFailedEventCapture(client);
+        const connectedEvents = setupConnectedEventCapture(client);
 
         // Act
         expect(closeHandler).toBeDefined();
@@ -1065,6 +1072,7 @@ describe('RobotClient', () => {
         // Assert
         expect(dialWebRTCMock).toHaveBeenCalledTimes(4);
         expect(reconnectingEvents).toHaveLength(1);
+        expect(connectedEvents).toHaveLength(1);
         expect(reconnectionFailedEvents).toHaveLength(0);
       });
     });
