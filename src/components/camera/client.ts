@@ -91,7 +91,7 @@ export class CameraClient implements Camera {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(

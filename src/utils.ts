@@ -203,9 +203,11 @@ type getStatus = (
 export const getStatusFromClient = async function getStatusFromClient(
   getStatusMethod: getStatus,
   name: string,
+  options: Options = {},
   callOptions: CallOptions = {}
 ): Promise<JsonValue> {
   const request = new GetStatusRequest({ name });
+  options.requestLogger?.(request);
   const response = await getStatusMethod(request, callOptions);
   const result = response.result?.toJson();
   if (result === undefined) {

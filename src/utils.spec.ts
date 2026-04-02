@@ -98,4 +98,17 @@ describe('getStatusFromClient', () => {
 
     expect(result).toStrictEqual({});
   });
+
+  it('calls requestLogger when provided', async () => {
+    const getStatusMethod = vi
+      .fn()
+      .mockResolvedValue(new GetStatusResponse({}));
+    const requestLogger = vi.fn();
+
+    await getStatusFromClient(getStatusMethod, 'test', { requestLogger });
+
+    expect(requestLogger).toHaveBeenCalledOnce();
+    const [loggedRequest] = requestLogger.mock.calls[0] as [GetStatusRequest];
+    expect(loggedRequest.name).toBe('test');
+  });
 });
