@@ -12,6 +12,8 @@ import {
   GetKinematicsResponse,
   GetGeometriesRequest,
   GetGeometriesResponse,
+  GetStatusRequest,
+  GetStatusResponse,
   Geometry,
   Mesh,
 } from './gen/common/v1/common_pb';
@@ -190,4 +192,24 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
 
   const response = await getGeometriesMethod(request, callOptions);
   return response.geometries;
+};
+
+type getStatus = (
+  request: PartialMessage<GetStatusRequest>,
+  options?: CallOptions
+) => Promise<GetStatusResponse>;
+
+/** Get the status of a resource using a resource client */
+export const getStatusFromClient = async function getStatusFromClient(
+  getStatusMethod: getStatus,
+  name: string,
+  callOptions: CallOptions = {}
+): Promise<JsonValue> {
+  const request = new GetStatusRequest({ name });
+  const response = await getStatusMethod(request, callOptions);
+  const result = response.result?.toJson();
+  if (result === undefined) {
+    return {};
+  }
+  return result;
 };

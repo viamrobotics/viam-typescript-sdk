@@ -2,8 +2,13 @@
 
 import { Struct } from '@bufbuild/protobuf';
 import { describe, expect, it, vi } from 'vitest';
-import { DoCommandRequest, DoCommandResponse } from './gen/common/v1/common_pb';
-import { doCommandFromClient } from './utils';
+import {
+  DoCommandRequest,
+  DoCommandResponse,
+  GetStatusRequest,
+  GetStatusResponse,
+} from './gen/common/v1/common_pb';
+import { doCommandFromClient, getStatusFromClient } from './utils';
 
 describe('doCommandFromClient', () => {
   it('accepts a Struct command', async () => {
@@ -66,5 +71,31 @@ describe('doCommandFromClient', () => {
     const [loggedRequest] = requestLogger.mock.calls[0] as [DoCommandRequest];
     expect(loggedRequest.name).toBe('test');
     expect(loggedRequest.command?.toJson()).toStrictEqual({ foo: 'bar' });
+  });
+});
+
+describe('getStatusFromClient', () => {
+  it('returns the status as JSON', async () => {
+    const getStatusMethod = vi.fn().mockResolvedValue(
+      new GetStatusResponse({
+        result: Struct.fromJson({ state: 'running' }),
+      })
+    );
+
+    const result = await getStatusFromClient(getStatusMethod, 'test');
+
+    expect(result).toStrictEqual({ state: 'running' });
+    const [request] = getStatusMethod.mock.calls[0] as [GetStatusRequest];
+    expect(request.name).toBe('test');
+  });
+
+  it('returns empty object when result is undefined', async () => {
+    const getStatusMethod = vi
+      .fn()
+      .mockResolvedValue(new GetStatusResponse({}));
+
+    const result = await getStatusFromClient(getStatusMethod, 'test');
+
+    expect(result).toStrictEqual({});
   });
 });

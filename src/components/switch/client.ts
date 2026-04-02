@@ -8,7 +8,7 @@ import {
 } from '../../gen/component/switch/v1/switch_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Switch } from './switch';
 
 /**
@@ -74,6 +74,10 @@ export class SwitchClient implements Switch {
       );
     }
     return [resp.numberOfPositions, resp.labels] as [number, string[]];
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

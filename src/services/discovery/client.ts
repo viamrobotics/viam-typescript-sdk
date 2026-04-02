@@ -3,7 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
 import { DiscoverResourcesRequest } from '../../gen/service/discovery/v1/discovery_pb';
 import type { RobotClient } from '../../robot';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Options } from '../../types';
 import type { Discovery } from './discovery';
 
@@ -34,6 +34,10 @@ export class DiscoveryClient implements Discovery {
 
     const resp = await this.client.discoverResources(request, callOptions);
     return resp.discoveries;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

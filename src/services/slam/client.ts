@@ -9,7 +9,7 @@ import {
 } from '../../gen/service/slam/v1/slam_pb';
 import { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Slam } from './slam';
 
 /**
@@ -79,6 +79,10 @@ export class SlamClient implements Slam {
     this.options.requestLogger?.(request);
 
     return this.client.getProperties(request, callOptions);
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

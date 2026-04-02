@@ -3,7 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { GenericService } from '../../gen/service/generic/v1/generic_connect';
 import { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Generic } from './generic';
 
 /**
@@ -21,6 +21,10 @@ export class GenericClient implements Generic {
     this.client = client.createServiceClient(GenericService);
     this.name = name;
     this.options = options;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

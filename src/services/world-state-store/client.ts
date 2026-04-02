@@ -8,7 +8,7 @@ import {
 } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { WorldStateStore } from './world-state-store';
 import {
   transformWithUUID,
@@ -86,6 +86,10 @@ export class WorldStateStoreClient implements WorldStateStore {
         transform: transformWithUUID(response.transform),
       };
     }
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

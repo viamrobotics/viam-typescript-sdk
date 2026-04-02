@@ -10,7 +10,7 @@ import {
   type AudioInfo,
 } from '../../gen/common/v1/common_pb';
 import { type AudioOut } from './audio-out';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 
 /**
  * A gRPC-web client for the AudioOut component.
@@ -62,6 +62,10 @@ export class AudioOutClient implements AudioOut {
       sampleRateHz: response.sampleRateHz,
       numChannels: response.numChannels,
     };
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

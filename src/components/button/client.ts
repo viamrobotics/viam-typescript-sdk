@@ -4,7 +4,7 @@ import { ButtonService } from '../../gen/component/button/v1/button_connect';
 import { PushRequest } from '../../gen/component/button/v1/button_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Button } from './button';
 
 /**
@@ -33,6 +33,10 @@ export class ButtonClient implements Button {
     this.options.requestLogger?.(request);
 
     await this.client.push(request, callOptions);
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

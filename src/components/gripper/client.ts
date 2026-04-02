@@ -10,7 +10,7 @@ import {
 } from '../../gen/component/gripper/v1/gripper_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Gripper } from './gripper';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
@@ -95,6 +95,10 @@ export class GripperClient implements Gripper {
 
     const resp = await this.client.isHoldingSomething(request, callOptions);
     return resp.isHoldingSomething;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

@@ -1,4 +1,4 @@
-import type { JsonValue, PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
@@ -171,17 +171,4 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#ismoving).
    */
   isMoving: () => Promise<boolean>;
-
-  /**
-   * Get the status of the arm.
-   *
-   * @example
-   *
-   * ```ts
-   * const arm = new VIAM.ArmClient(machine, 'my_arm');
-   * const status = await arm.getStatus();
-   * console.log(status);
-   * ```
-   */
-  getStatus: () => Promise<JsonValue>;
 }

@@ -456,6 +456,7 @@ export {
   disableDebugLogging,
   doCommandFromClient,
   enableDebugLogging,
+  getStatusFromClient,
 } from './utils';
 
 export { MachineConnectionEvent } from './events';

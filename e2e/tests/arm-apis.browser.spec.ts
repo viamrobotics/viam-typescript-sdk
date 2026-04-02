@@ -41,18 +41,6 @@ withRobot.describe('Arm API Tests', () => {
     }
   );
 
-  withRobot('should get arm status', async ({ robotPage }) => {
-    // Arrange
-    await robotPage.connect();
-
-    // Act
-    await robotPage.getStatus();
-    const status = await robotPage.getOutput<ArmClient, 'getStatus'>();
-
-    // Assert
-    expect(status).toBeDefined();
-  });
-
   withRobot(
     'should move arm to joint positions and verify new joint state',
     async ({ robotPage }) => {

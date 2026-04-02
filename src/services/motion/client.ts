@@ -21,7 +21,7 @@ import type {
   Transform,
   WorldState,
 } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Motion } from './motion';
 import { type Constraints, type MotionConfiguration } from './types';
 
@@ -199,6 +199,10 @@ export class MotionClient implements Motion {
     }
 
     return result;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

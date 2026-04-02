@@ -12,7 +12,7 @@ import {
 } from '../../gen/component/base/v1/base_pb';
 import type { RobotClient } from '../../robot';
 import type { Options, Vector3 } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Base } from './base';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
@@ -135,6 +135,10 @@ export class BaseClient implements Base {
 
     const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(

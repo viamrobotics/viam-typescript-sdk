@@ -16,12 +16,6 @@ describe('Arm API Tests', () => {
     await client.disconnect();
   });
 
-  it('should get arm status', async () => {
-    const status = await arm.getStatus();
-
-    expect(status).toBeDefined();
-  });
-
   it('should get arm position and joint information after connecting', async () => {
     // Act - Get end position
     const endPosition = await arm.getEndPosition();

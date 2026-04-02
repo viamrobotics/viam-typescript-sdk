@@ -4,7 +4,7 @@ import { VideoService } from '../../gen/service/video/v1/video_connect';
 import { GetVideoRequest } from '../../gen/service/video/v1/video_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { VideoChunk } from './types';
 import type { Video } from './video';
 
@@ -63,6 +63,10 @@ export class VideoClient implements Video {
     for await (const response of stream) {
       yield response;
     }
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(this.client.getStatus, this.name, callOptions);
   }
 
   async doCommand(
