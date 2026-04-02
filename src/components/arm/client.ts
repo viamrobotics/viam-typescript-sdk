@@ -161,7 +161,12 @@ export class ArmClient implements Arm {
   }
 
   async getStatus(callOptions = this.callOptions) {
-    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(
