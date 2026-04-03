@@ -81,6 +81,36 @@ export interface DialWebRTCConf {
   priority?: number;
 
   /**
+   * When true, sets ICE transport policy to relay-only so only TURN candidates
+   * are used. Useful for testing relay connectivity through a TURN server.
+   */
+  forceRelay?: boolean;
+
+  /**
+   * When true, strips TURN servers from the ICE configuration so only host and
+   * server-reflexive candidates are used. Useful for testing direct
+   * connectivity without relay fallback.
+   */
+  forceP2P?: boolean;
+
+  /**
+   * When set, filters the signaling server's TURN list to only the server whose
+   * parsed URI matches (compared by scheme, host, port, and transport —
+   * defaulting transport to UDP if unspecified). Example:
+   * `"turn:turn.viam.com:443"`
+   */
+  turnUri?: string;
+
+  /** Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). */
+  turnScheme?: 'turn' | 'turns';
+
+  /** Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`). */
+  turnTransport?: 'tcp' | 'udp';
+
+  /** Overrides the port of the matched TURN URI. */
+  turnPort?: number;
+
+  /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
    *
@@ -141,6 +171,12 @@ interface WebRTCOptions {
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
   shouldRetryOnError?: () => boolean;
+  forceRelay?: boolean;
+  forceP2P?: boolean;
+  turnUri?: string;
+  turnScheme?: 'turn' | 'turns';
+  turnTransport?: 'tcp' | 'udp';
+  turnPort?: number;
 }
 
 interface DirectOptions {
@@ -698,6 +734,12 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.webrtcOptions.reconnectMaxWait = conf.reconnectMaxWait;
     this.webrtcOptions.reconnectMaxAttempts = conf.reconnectMaxAttempts;
     this.webrtcOptions.shouldRetryOnError = conf.shouldRetryOnError;
+    this.webrtcOptions.forceRelay = conf.forceRelay;
+    this.webrtcOptions.forceP2P = conf.forceP2P;
+    this.webrtcOptions.turnUri = conf.turnUri;
+    this.webrtcOptions.turnScheme = conf.turnScheme;
+    this.webrtcOptions.turnTransport = conf.turnTransport;
+    this.webrtcOptions.turnPort = conf.turnPort;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
@@ -1060,6 +1102,12 @@ export class RobotClient extends EventDispatcher implements Robot {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions.rtcConfig,
+          forceRelay: this.webrtcOptions.forceRelay,
+          forceP2P: this.webrtcOptions.forceP2P,
+          turnUri: this.webrtcOptions.turnUri,
+          turnScheme: this.webrtcOptions.turnScheme,
+          turnTransport: this.webrtcOptions.turnTransport,
+          turnPort: this.webrtcOptions.turnPort,
         },
         dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
