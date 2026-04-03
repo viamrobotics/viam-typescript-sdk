@@ -15,6 +15,7 @@ import {
   doCommandFromClient,
   getKinematicsFromClient,
   getGeometriesFromClient,
+  getStatusFromClient,
 } from '../../utils';
 import type { Gantry } from './gantry';
 import type { GetKinematicsResult } from '../../utils';
@@ -131,6 +132,15 @@ export class GantryClient implements Gantry {
 
     const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

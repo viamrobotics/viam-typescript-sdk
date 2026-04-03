@@ -15,7 +15,7 @@ import {
 import { RobotClient } from '../../robot';
 import type { GeoPoint, Options } from '../../types';
 import { isValidGeoPoint } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Navigation } from './navigation';
 import type { Mode } from './types';
 
@@ -151,6 +151,15 @@ export class NavigationClient implements Navigation {
     this.options.requestLogger?.(request);
 
     return this.client.getProperties(request, callOptions);
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

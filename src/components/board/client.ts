@@ -17,7 +17,7 @@ import {
   StreamTicksRequest,
   WriteAnalogRequest,
 } from '../../gen/component/board/v1/board_pb';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import { type Board, type PowerMode, type Tick } from './board';
 
 /**
@@ -227,6 +227,15 @@ export class BoardClient implements Board {
     this.options.requestLogger?.(request);
 
     await this.client.setPowerMode(request, callOptions);
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

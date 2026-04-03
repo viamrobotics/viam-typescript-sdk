@@ -8,7 +8,7 @@ import {
 } from '../../gen/component/encoder/v1/encoder_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import { EncoderPositionType, type Encoder } from './encoder';
 
 /**
@@ -65,6 +65,15 @@ export class EncoderClient implements Encoder {
 
     const response = await this.client.getPosition(request, callOptions);
     return [response.value, response.positionType] as const;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

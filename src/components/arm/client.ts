@@ -16,6 +16,7 @@ import {
   doCommandFromClient,
   getKinematicsFromClient,
   getGeometriesFromClient,
+  getStatusFromClient,
 } from '../../utils';
 import type { Arm } from './arm';
 import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
@@ -157,6 +158,15 @@ export class ArmClient implements Arm {
 
     const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
+  }
+
+  async getStatus(callOptions = this.callOptions) {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

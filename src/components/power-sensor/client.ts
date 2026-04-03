@@ -9,7 +9,7 @@ import {
 } from '../../gen/component/powersensor/v1/powersensor_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { PowerSensor } from './power-sensor';
 
 /**
@@ -87,6 +87,15 @@ export class PowerSensorClient implements PowerSensor {
       result[key] = value.toJson();
     }
     return result;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

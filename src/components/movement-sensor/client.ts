@@ -14,7 +14,7 @@ import {
 } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { MovementSensor } from './movement-sensor';
 
 /**
@@ -173,6 +173,15 @@ export class MovementSensorClient implements MovementSensor {
       result[key] = value.toJson();
     }
     return result;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(
