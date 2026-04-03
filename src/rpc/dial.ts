@@ -683,7 +683,8 @@ const applyTurnFilterOptions = (
         return urls.length > 0;
       }),
   };
-  console.debug('TURN filter options set', { // eslint-disable-line no-console
+  console.debug('TURN filter options set', {
+    // eslint-disable-line no-console
     turnUri: webrtcOpts.turnUri,
     turnScheme: webrtcOpts.turnScheme,
     turnPort: webrtcOpts.turnPort,
@@ -744,11 +745,15 @@ const processWebRTCOpts = async (
   }
 
   if (webrtcOpts.forceRelay && webrtcOpts.forceP2P) {
-    console.warn('forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail'); // eslint-disable-line no-console
+    console.warn(
+      'forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail'
+    ); // eslint-disable-line no-console
   }
 
   if (webrtcOpts.forceP2P) {
-    console.debug('force P2P enabled; stripping TURN servers and ignoring signaling server ICE config'); // eslint-disable-line no-console
+    console.debug(
+      'force P2P enabled; stripping TURN servers and ignoring signaling server ICE config'
+    ); // eslint-disable-line no-console
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
@@ -772,7 +777,9 @@ const processWebRTCOpts = async (
       webrtcOpts.turnTransport !== undefined ||
       webrtcOpts.turnPort !== undefined)
   ) {
-    console.warn('forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped'); // eslint-disable-line no-console
+    console.warn(
+      'forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped'
+    ); // eslint-disable-line no-console
   }
 
   if (
