@@ -634,6 +634,64 @@ const turnUriEqual = (a: TurnUri, b: TurnUri): boolean =>
 const turnUriToString = (uri: TurnUri): string =>
   `${uri.scheme}:${uri.host}:${uri.port}?transport=${uri.transport}`;
 
+const applyTurnFilterOptions = (
+  webrtcOpts: DialWebRTCOptions
+): DialWebRTCOptions => {
+  let filterUri: TurnUri | undefined;
+  if (webrtcOpts.turnUri !== undefined) {
+    filterUri = parseTurnUri(webrtcOpts.turnUri);
+    if (filterUri === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`
+      );
+      return webrtcOpts;
+    }
+  }
+  webrtcOpts.rtcConfig = {
+    ...webrtcOpts.rtcConfig,
+    iceServers: (webrtcOpts.rtcConfig?.iceServers ?? [])
+      .map((server) => {
+        const rawUrls =
+          typeof server.urls === 'string' ? [server.urls] : server.urls;
+        const newUrls = rawUrls.flatMap((url) => {
+          const parsed = parseTurnUri(url);
+          // non-TURN: keep unchanged
+          if (parsed === undefined) {
+            return [url];
+          }
+          // filtered out
+          if (filterUri !== undefined && !turnUriEqual(parsed, filterUri)) {
+            return [];
+          }
+          if (webrtcOpts.turnScheme !== undefined) {
+            parsed.scheme = webrtcOpts.turnScheme;
+          }
+          if (webrtcOpts.turnPort !== undefined) {
+            parsed.port = webrtcOpts.turnPort;
+          }
+          if (webrtcOpts.turnTransport !== undefined) {
+            parsed.transport = webrtcOpts.turnTransport;
+          }
+          return [turnUriToString(parsed)];
+        });
+        return { ...server, urls: newUrls };
+      })
+      .filter((server) => {
+        const urls =
+          typeof server.urls === 'string' ? [server.urls] : server.urls;
+        return urls.length > 0;
+      }),
+  };
+  console.debug('TURN filter options set', { // eslint-disable-line no-console
+    turnUri: webrtcOpts.turnUri,
+    turnScheme: webrtcOpts.turnScheme,
+    turnPort: webrtcOpts.turnPort,
+    turnTransport: webrtcOpts.turnTransport,
+  });
+  return webrtcOpts;
+};
+
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
   callOpts: CallOptions,
@@ -723,58 +781,7 @@ const processWebRTCOpts = async (
     webrtcOpts.turnTransport !== undefined ||
     webrtcOpts.turnPort !== undefined
   ) {
-    let filterUri: TurnUri | undefined;
-    if (webrtcOpts.turnUri !== undefined) {
-      filterUri = parseTurnUri(webrtcOpts.turnUri);
-      if (filterUri === undefined) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`
-        );
-        return webrtcOpts;
-      }
-    }
-    webrtcOpts.rtcConfig = {
-      ...webrtcOpts.rtcConfig,
-      iceServers: (webrtcOpts.rtcConfig?.iceServers ?? [])
-        .map((server) => {
-          const rawUrls =
-            typeof server.urls === 'string' ? [server.urls] : server.urls;
-          const newUrls = rawUrls.flatMap((url) => {
-            const parsed = parseTurnUri(url);
-            // non-TURN: keep unchanged
-            if (parsed === undefined) {
-              return [url];
-            }
-            // filtered out
-            if (filterUri !== undefined && !turnUriEqual(parsed, filterUri)) {
-              return [];
-            }
-            if (webrtcOpts.turnScheme !== undefined) {
-              parsed.scheme = webrtcOpts.turnScheme;
-            }
-            if (webrtcOpts.turnPort !== undefined) {
-              parsed.port = webrtcOpts.turnPort;
-            }
-            if (webrtcOpts.turnTransport !== undefined) {
-              parsed.transport = webrtcOpts.turnTransport;
-            }
-            return [turnUriToString(parsed)];
-          });
-          return { ...server, urls: newUrls };
-        })
-        .filter((server) => {
-          const urls =
-            typeof server.urls === 'string' ? [server.urls] : server.urls;
-          return urls.length > 0;
-        }),
-    };
-    console.debug('TURN filter options set', { // eslint-disable-line no-console
-      turnUri: webrtcOpts.turnUri,
-      turnScheme: webrtcOpts.turnScheme,
-      turnPort: webrtcOpts.turnPort,
-      turnTransport: webrtcOpts.turnTransport,
-    });
+    webrtcOpts = applyTurnFilterOptions(webrtcOpts);
   }
 
   return webrtcOpts;
