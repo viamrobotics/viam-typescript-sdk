@@ -8,7 +8,7 @@ import {
 } from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { DataManager } from './data-manager';
 
 export class DataManagerClient implements DataManager {
@@ -72,6 +72,15 @@ export class DataManagerClient implements DataManager {
    * @param command - The command to do.
    * @param callOptions - Call options for the command.
    */
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
+  }
+
   async doCommand(
     command: Struct | Record<string, JsonValue>,
     callOptions = this.callOptions

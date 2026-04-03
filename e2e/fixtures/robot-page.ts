@@ -102,6 +102,10 @@ export class RobotPage {
     await this.page.click(`[data-arm-api="moveToJointPositions"]`);
   }
 
+  async getStatus() {
+    await this.page.click(`[data-arm-api="getStatus"]`);
+  }
+
   async getCameraProperties() {
     await this.page.click(`[data-camera-api="getProperties"]`);
   }

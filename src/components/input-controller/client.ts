@@ -8,7 +8,7 @@ import {
   GetEventsRequest,
   TriggerEventRequest,
 } from '../../gen/component/inputcontroller/v1/input_controller_pb';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { InputController, InputControllerEvent } from './input-controller';
 
 /**
@@ -54,6 +54,15 @@ export class InputControllerClient implements InputController {
     this.options.requestLogger?.(request);
 
     await this.client.triggerEvent(request, callOptions);
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

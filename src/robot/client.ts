@@ -66,6 +66,14 @@ export interface DialWebRTCConf {
   /** @default Number.POSITIVE_INFINITY */
   reconnectMaxWait?: number;
   reconnectAbortSignal?: { abort: boolean };
+
+  /**
+   * Called when a non-retryable error is encountered during reconnection.
+   * Return true to treat the error as retryable. Does not override
+   * reconnectMaxAttempts — retries are still bounded by that limit.
+   */
+  shouldRetryOnError?: () => boolean;
+
   // WebRTC
   serviceHost?: string;
   signalingAddress: string;
@@ -97,6 +105,14 @@ export interface DialDirectConf {
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
   reconnectAbortSignal?: { abort: boolean };
+
+  /**
+   * Called when a non-retryable error is encountered during reconnection.
+   * Return true to treat the error as retryable. Does not override
+   * reconnectMaxAttempts — retries are still bounded by that limit.
+   */
+  shouldRetryOnError?: () => boolean;
+
   /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
@@ -124,12 +140,14 @@ interface WebRTCOptions {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
+  shouldRetryOnError?: () => boolean;
 }
 
 interface DirectOptions {
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
+  shouldRetryOnError?: () => boolean;
 }
 
 interface SessionOptions {
@@ -452,6 +470,15 @@ export class RobotClient extends EventDispatcher implements Robot {
           return true;
         }
 
+        if (this.shouldRetryOnError?.()) {
+          // eslint-disable-next-line no-console
+          console.debug(
+            'Non-retryable error encountered, but shouldRetryOnError returned true',
+            error
+          );
+          return true;
+        }
+
         // eslint-disable-next-line no-console
         console.debug(
           'Non-retryable error encountered, stopping reconnection attempts',
@@ -505,6 +532,13 @@ export class RobotClient extends EventDispatcher implements Robot {
   private get reconnectMaxWait() {
     return (
       this.webrtcOptions.reconnectMaxWait ?? this.directOptions.reconnectMaxWait
+    );
+  }
+
+  private get shouldRetryOnError() {
+    return (
+      this.webrtcOptions.shouldRetryOnError ??
+      this.directOptions.shouldRetryOnError
     );
   }
 
@@ -663,6 +697,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.webrtcOptions.noReconnect = conf.noReconnect;
     this.webrtcOptions.reconnectMaxWait = conf.reconnectMaxWait;
     this.webrtcOptions.reconnectMaxAttempts = conf.reconnectMaxAttempts;
+    this.webrtcOptions.shouldRetryOnError = conf.shouldRetryOnError;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
@@ -705,6 +740,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.directOptions.noReconnect = conf.noReconnect;
     this.directOptions.reconnectMaxWait = conf.reconnectMaxWait;
     this.directOptions.reconnectMaxAttempts = conf.reconnectMaxAttempts;
+    this.directOptions.shouldRetryOnError = conf.shouldRetryOnError;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
@@ -1074,9 +1110,7 @@ export class RobotClient extends EventDispatcher implements Robot {
            * connection getting closed, so restarting ice is not a valid way to
            * recover.
            */
-          if (this.peerConn?.iceConnectionState === 'connected') {
-            this.emit(MachineConnectionEvent.CONNECTED, {});
-          } else if (this.peerConn?.iceConnectionState === 'closed') {
+          if (this.peerConn?.iceConnectionState === 'closed') {
             this.onDisconnect();
           }
         };

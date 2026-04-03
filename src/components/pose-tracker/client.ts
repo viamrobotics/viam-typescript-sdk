@@ -3,7 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { PoseTrackerService } from '../../gen/component/posetracker/v1/pose_tracker_connect';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { PoseTracker } from './pose-tracker';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
@@ -32,6 +32,15 @@ export class PoseTrackerClient implements PoseTracker {
 
     const response = await this.client.getGeometries(request, callOptions);
     return response.geometries;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

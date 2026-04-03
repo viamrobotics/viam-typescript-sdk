@@ -34,6 +34,9 @@ export interface Resource {
    *   a plain object, which will be converted automatically.
    */
   doCommand(command: Struct | Record<string, JsonValue>): Promise<JsonValue>;
+
+  /** Get the status of the resource. */
+  getStatus(): Promise<JsonValue>;
 }
 
 import * as commonApi from './gen/common/v1/common_pb';

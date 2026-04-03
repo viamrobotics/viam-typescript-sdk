@@ -13,7 +13,7 @@ import {
 import type { MimeType } from '../../main';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { CaptureAllOptions } from './types';
 import type { Vision } from './vision';
 
@@ -192,6 +192,15 @@ export class VisionClient implements Vision {
       objectPointClouds: response.objects,
       extra: response.extra,
     };
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

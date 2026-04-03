@@ -15,7 +15,7 @@ import {
 } from '../../gen/component/motor/v1/motor_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Motor } from './motor';
 
 /**
@@ -169,6 +169,15 @@ export class MotorClient implements Motor {
 
     const resp = await this.client.isMoving(request, callOptions);
     return resp.isMoving;
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

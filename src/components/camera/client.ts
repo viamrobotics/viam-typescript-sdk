@@ -8,7 +8,7 @@ import {
 } from '../../gen/component/camera/v1/camera_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient } from '../../utils';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Camera, MimeType, ResponseMetadata } from './camera';
 import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
 
@@ -88,6 +88,15 @@ export class CameraClient implements Camera {
     this.options.requestLogger?.(request);
 
     return this.client.getProperties(request, callOptions);
+  }
+
+  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+    return getStatusFromClient(
+      this.client.getStatus,
+      this.name,
+      this.options,
+      callOptions
+    );
   }
 
   async doCommand(

@@ -34,6 +34,7 @@ export {
 } from './app/viam-transport';
 
 export {
+  type BinaryDataCaptureUploadOptions,
   type BinaryID,
   type DataClient,
   type FilterOptions,
@@ -455,6 +456,7 @@ export {
   disableDebugLogging,
   doCommandFromClient,
   enableDebugLogging,
+  getStatusFromClient,
 } from './utils';
 
 export { MachineConnectionEvent } from './events';
