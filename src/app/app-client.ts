@@ -1277,7 +1277,7 @@ export class AppClient {
    * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities
    *   instead. If true then only public fragments will be listed. Defaults to
    *   true
-   * @param fragmentVisibilities Optional list of fragment visibilities to
+   * @param fragmentVisibility Optional list of fragment visibilities to
    *   include in returned list. An empty fragmentVisibilities list defaults to
    *   normal publicOnly behavior (discludes unlisted public fragments)
    *   Otherwise, fragment visibilities should contain one of the three
@@ -2247,7 +2247,7 @@ export class AppClient {
    *
    * @param publicNamespace The public namespace of the organization
    * @param name The name of the app
-   * @returns The branding information for the app
+   * @returns The branding information for the app, including its logo path, text customizations, fragment IDs, and a list of allowed organization IDs.
    */
   async getAppBranding(
     publicNamespace: string,

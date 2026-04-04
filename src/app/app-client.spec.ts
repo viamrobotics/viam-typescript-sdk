@@ -2092,6 +2092,7 @@ describe('AppClient tests', () => {
                 }),
               },
               fragmentIds: ['frag1', 'frag2'],
+              allowedOrgIds: ['org1', 'org2'],
             }),
         });
       });
@@ -2110,6 +2111,7 @@ describe('AppClient tests', () => {
         response.textCustomizations.machinePicker!.fields.subheading
       ).toEqual('Select your machine.');
       expect(response.fragmentIds).toEqual(['frag1', 'frag2']);
+      expect(response.allowedOrgIds).toEqual(['org1', 'org2']);
     });
   });
 });
