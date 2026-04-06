@@ -1,11 +1,13 @@
-import type { Struct } from '@bufbuild/protobuf/wkt';
+import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { Pose, Resource } from '../../types';
 
-import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
+import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
 
-export type ArmJointPositions = armApi.JointPositions;
+export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
+
+export const { JointPositions: ArmJointPositions } = armApi;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
