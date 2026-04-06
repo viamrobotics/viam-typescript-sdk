@@ -1,6 +1,6 @@
 import { type JsonValue, Struct } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { PoseTrackerService } from '../../gen/component/posetracker/v1/pose_tracker_connect';
+import { PoseTrackerService } from '../../gen/component/posetracker/v1/pose_tracker_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';

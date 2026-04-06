@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { MotionService } from '../../gen/service/motion/v1/motion_connect';
+import { MotionService } from '../../gen/service/motion/v1/motion_pb';
 import {
   GetPlanRequest,
   GetPoseRequest,

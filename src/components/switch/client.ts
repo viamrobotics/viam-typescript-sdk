@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { SwitchService } from '../../gen/component/switch/v1/switch_connect';
+import { SwitchService } from '../../gen/component/switch/v1/switch_pb';
 import {
   SetPositionRequest,
   GetPositionRequest,

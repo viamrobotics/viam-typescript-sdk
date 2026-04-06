@@ -1,4 +1,5 @@
-import { Struct, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';
+import { type JsonValue } from '@bufbuild/protobuf';
+import { Struct } from '@bufbuild/protobuf/wkt';
 
 export { Code, ConnectError } from '@connectrpc/connect';
 export { ConnectionClosedError } from './rpc';
@@ -41,39 +42,21 @@ export interface Resource {
 
 import * as commonApi from './gen/common/v1/common_pb';
 
-export type Capsule = PlainMessage<commonApi.Capsule>;
-export type GeoGeometry = PlainMessage<commonApi.GeoGeometry>;
-export type GeoPoint = PlainMessage<commonApi.GeoPoint>;
-export type GeometriesInFrame = PlainMessage<commonApi.GeometriesInFrame>;
-export type Geometry = PlainMessage<commonApi.Geometry>;
-export type Orientation = PlainMessage<commonApi.Orientation>;
-export type PointCloud = PlainMessage<commonApi.PointCloud>;
-export type Pose = PlainMessage<commonApi.Pose>;
-export type PoseInFrame = PlainMessage<commonApi.PoseInFrame>;
-export type RectangularPrism = PlainMessage<commonApi.RectangularPrism>;
-export type ResourceName = PlainMessage<commonApi.ResourceName>;
-export type Sphere = PlainMessage<commonApi.Sphere>;
-export type Transform = PlainMessage<commonApi.Transform>;
-export type Vector3 = PlainMessage<commonApi.Vector3>;
-export type WorldState = PlainMessage<commonApi.WorldState>;
-
-export const {
-  Capsule,
-  GeoGeometry,
-  GeoPoint,
-  GeometriesInFrame,
-  Geometry,
-  Orientation,
-  PointCloud,
-  Pose,
-  PoseInFrame,
-  RectangularPrism,
-  ResourceName,
-  Sphere,
-  Transform,
-  Vector3,
-  WorldState,
-} = commonApi;
+export type Capsule = commonApi.Capsule;
+export type GeoGeometry = commonApi.GeoGeometry;
+export type GeoPoint = commonApi.GeoPoint;
+export type GeometriesInFrame = commonApi.GeometriesInFrame;
+export type Geometry = commonApi.Geometry;
+export type Orientation = commonApi.Orientation;
+export type PointCloud = commonApi.PointCloud;
+export type Pose = commonApi.Pose;
+export type PoseInFrame = commonApi.PoseInFrame;
+export type RectangularPrism = commonApi.RectangularPrism;
+export type ResourceName = commonApi.ResourceName;
+export type Sphere = commonApi.Sphere;
+export type Transform = commonApi.Transform;
+export type Vector3 = commonApi.Vector3;
+export type WorldState = commonApi.WorldState;
 
 export const isValidGeoPoint = (value: GeoPoint) => {
   const { latitude, longitude } = value;
@@ -86,10 +69,5 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export {
-  Duration,
-  Struct,
-  Timestamp,
-  type JsonValue,
-  type PlainMessage,
-} from '@bufbuild/protobuf';
+export { type JsonValue } from '@bufbuild/protobuf';
+export { Duration, Struct } from '@bufbuild/protobuf/wkt';

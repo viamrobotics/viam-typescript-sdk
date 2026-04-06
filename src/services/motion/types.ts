@@ -1,18 +1,14 @@
-import type { PlainMessage } from '@bufbuild/protobuf';
 import * as motionApi from '../../gen/service/motion/v1/motion_pb';
 
-export type CollisionSpecification =
-  PlainMessage<motionApi.CollisionSpecification>;
-export type Constraints = PlainMessage<motionApi.Constraints>;
+export type CollisionSpecification = motionApi.CollisionSpecification;
+export type Constraints = motionApi.Constraints;
 export type GetPlanResponse = motionApi.GetPlanResponse;
-export type LinearConstraint = PlainMessage<motionApi.LinearConstraint>;
-export type PseudolinearConstraint =
-  PlainMessage<motionApi.PseudolinearConstraint>;
+export type LinearConstraint = motionApi.LinearConstraint;
+export type PseudolinearConstraint = motionApi.PseudolinearConstraint;
 export type ListPlanStatusesResponse = motionApi.ListPlanStatusesResponse;
-export type MotionConfiguration = PlainMessage<motionApi.MotionConfiguration>;
-export type ObstacleDetector = PlainMessage<motionApi.ObstacleDetector>;
-export type OrientationConstraint =
-  PlainMessage<motionApi.OrientationConstraint>;
+export type MotionConfiguration = motionApi.MotionConfiguration;
+export type ObstacleDetector = motionApi.ObstacleDetector;
+export type OrientationConstraint = motionApi.OrientationConstraint;
 export type PlanState = motionApi.PlanState;
 
 export const {

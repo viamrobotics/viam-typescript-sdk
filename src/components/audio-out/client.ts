@@ -3,7 +3,7 @@ import type { Options } from '../../types';
 
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
+import { AudioOutService } from '../../gen/component/audioout/v1/audioout_pb';
 import { PlayRequest } from '../../gen/component/audioout/v1/audioout_pb';
 import {
   GetPropertiesRequest,

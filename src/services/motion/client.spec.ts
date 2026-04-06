@@ -9,7 +9,7 @@ vi.mock('../../robot');
 
 import { Struct, Timestamp } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { MotionService } from '../../gen/service/motion/v1/motion_connect';
+import { MotionService } from '../../gen/service/motion/v1/motion_pb';
 import {
   GetPlanRequest,
   ListPlanStatusesRequest,

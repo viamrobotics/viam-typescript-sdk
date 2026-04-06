@@ -3,7 +3,7 @@
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { Struct } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { VisionService } from '../../gen/service/vision/v1/vision_connect';
+import { VisionService } from '../../gen/service/vision/v1/vision_pb';
 import {
   CaptureAllFromCameraResponse,
   GetClassificationsFromCameraResponse,

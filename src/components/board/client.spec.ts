@@ -13,7 +13,7 @@ import {
   createWritableIterable,
   type WritableIterable,
 } from '@connectrpc/connect/protocol';
-import { BoardService } from '../../gen/component/board/v1/board_connect';
+import { BoardService } from '../../gen/component/board/v1/board_pb';
 vi.mock('../../gen/component/board/v1/board_pb_service');
 
 let board: BoardClient;

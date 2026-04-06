@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { ServoService } from '../../gen/component/servo/v1/servo_connect';
+import { ServoService } from '../../gen/component/servo/v1/servo_pb';
 import {
   GetPositionRequest,
   IsMovingRequest,

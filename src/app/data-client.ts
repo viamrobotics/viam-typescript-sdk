@@ -6,7 +6,7 @@ import {
 } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
-import { DataService } from '../gen/app/data/v1/data_connect';
+import { DataService } from '../gen/app/data/v1/data_pb';
 import {
   BinaryID,
   CaptureInterval,
@@ -20,14 +20,14 @@ import {
   DeleteTabularFilter,
   TagsFilter,
 } from '../gen/app/data/v1/data_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import {
   DataPipeline,
   DataPipelineRun,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_pb';
 import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+import { DataSyncService } from '../gen/app/datasync/v1/data_sync_pb';
 import {
   DataCaptureUploadRequest,
   DataType,

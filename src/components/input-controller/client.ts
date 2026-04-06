@@ -3,7 +3,7 @@ import type { Options } from '../../types';
 
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_connect';
+import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import {
   GetEventsRequest,
   TriggerEventRequest,

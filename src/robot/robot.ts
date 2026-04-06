@@ -1,19 +1,19 @@
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { Struct } from '@bufbuild/protobuf/wkt';
 import { MachineConnectionEvent } from '../events';
 import * as proto from '../gen/robot/v1/robot_pb';
 import type { PoseInFrame, ResourceName, Transform } from '../types';
 
-export type CloudMetadata = PlainMessage<proto.GetCloudMetadataResponse>;
-export type ConfigStatus = PlainMessage<proto.ConfigStatus>;
-export type FrameSystemConfig = PlainMessage<proto.FrameSystemConfig>;
-export type JobStatus = PlainMessage<proto.JobStatus>;
-export type MachineStatus = PlainMessage<proto.GetMachineStatusResponse>;
+export type CloudMetadata = proto.GetCloudMetadataResponse;
+export type ConfigStatus = proto.ConfigStatus;
+export type FrameSystemConfig = proto.FrameSystemConfig;
+export type JobStatus = proto.JobStatus;
+export type MachineStatus = proto.GetMachineStatusResponse;
 export type MachineStatusState = proto.GetMachineStatusResponse_State;
-export type ModuleModel = PlainMessage<proto.ModuleModel>;
-export type ResourceRPCSubtype = PlainMessage<proto.ResourceRPCSubtype>;
-export type ResourceStatus = PlainMessage<proto.ResourceStatus>;
-export type Session = PlainMessage<proto.Session>;
-export type Operation = PlainMessage<proto.Operation>;
+export type ModuleModel = proto.ModuleModel;
+export type ResourceRPCSubtype = proto.ResourceRPCSubtype;
+export type ResourceStatus = proto.ResourceStatus;
+export type Session = proto.Session;
+export type Operation = proto.Operation;
 
 type Callback = (args: unknown) => void;
 

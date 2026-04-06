@@ -1,7 +1,7 @@
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { Code, ConnectError } from '@connectrpc/connect';
 import { Status } from '../gen/google/rpc/status_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
+import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import {
   CallRequest,
   CallResponse,

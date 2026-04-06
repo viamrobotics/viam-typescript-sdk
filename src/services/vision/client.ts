@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { VisionService } from '../../gen/service/vision/v1/vision_connect';
+import { VisionService } from '../../gen/service/vision/v1/vision_pb';
 import {
   CaptureAllFromCameraRequest,
   GetClassificationsFromCameraRequest,

@@ -4,7 +4,7 @@ import type { Options } from '../../types';
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
-import { SensorService } from '../../gen/component/sensor/v1/sensor_connect';
+import { SensorService } from '../../gen/component/sensor/v1/sensor_pb';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Sensor } from './sensor';
 

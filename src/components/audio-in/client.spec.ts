@@ -18,7 +18,7 @@ import {
   createWritableIterable,
   type WritableIterable,
 } from '@connectrpc/connect/protocol';
-import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
+import { AudioInService } from '../../gen/component/audioin/v1/audioin_pb';
 
 let audioin: AudioInClient;
 let capturedPropertiesReq: GetPropertiesRequest | undefined;

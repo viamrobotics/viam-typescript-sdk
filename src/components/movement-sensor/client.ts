@@ -1,7 +1,7 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
-import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_connect';
+import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import {
   GetAccuracyRequest,
   GetAngularVelocityRequest,

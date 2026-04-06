@@ -1,5 +1,5 @@
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
-import { BillingService } from '../gen/app/v1/billing_connect';
+import { BillingService } from '../gen/app/v1/billing_pb';
 import type { GetCurrentMonthUsageResponse as PBGetCurrentMonthUsageResponse } from '../gen/app/v1/billing_pb';
 
 export type GetCurrentMonthUsageResponse =

@@ -6,7 +6,7 @@ vi.mock('../../gen/service/navigation/v1/navigation_pb_service');
 vi.mock('../../robot');
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
+import { NavigationService } from '../../gen/service/navigation/v1/navigation_pb';
 import { GetLocationResponse } from '../../gen/service/navigation/v1/navigation_pb';
 import { NavigationClient } from './client';
 

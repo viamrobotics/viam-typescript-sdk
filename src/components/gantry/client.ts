@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { GantryService } from '../../gen/component/gantry/v1/gantry_connect';
+import { GantryService } from '../../gen/component/gantry/v1/gantry_pb';
 import {
   GetLengthsRequest,
   GetPositionRequest,

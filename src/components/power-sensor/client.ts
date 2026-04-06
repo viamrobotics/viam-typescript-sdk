@@ -1,7 +1,7 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
-import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_connect';
+import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_pb';
 import {
   GetCurrentRequest,
   GetPowerRequest,

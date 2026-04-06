@@ -3,7 +3,7 @@
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
+import { SLAMService } from '../../gen/service/slam/v1/slam_pb';
 import {
   GetInternalStateResponse,
   GetPointCloudMapRequest,

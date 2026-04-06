@@ -5,7 +5,7 @@ import {
   type WritableIterable,
 } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { BillingService } from '../gen/app/v1/billing_connect';
+import { BillingService } from '../gen/app/v1/billing_pb';
 import {
   GetInvoicePdfResponse,
   GetInvoicesSummaryResponse,

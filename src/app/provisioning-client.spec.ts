@@ -2,7 +2,7 @@
 
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
+import { ProvisioningService } from '../gen/provisioning/v1/provisioning_pb';
 import {
   APIKey,
   CloudConfig,

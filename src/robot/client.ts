@@ -11,19 +11,19 @@ import { isCredential, type Credentials } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
 import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
-import { ArmService } from '../gen/component/arm/v1/arm_connect';
-import { BaseService } from '../gen/component/base/v1/base_connect';
-import { BoardService } from '../gen/component/board/v1/board_connect';
-import { EncoderService } from '../gen/component/encoder/v1/encoder_connect';
-import { GantryService } from '../gen/component/gantry/v1/gantry_connect';
-import { GenericService } from '../gen/component/generic/v1/generic_connect';
-import { GripperService } from '../gen/component/gripper/v1/gripper_connect';
-import { InputControllerService } from '../gen/component/inputcontroller/v1/input_controller_connect';
-import { MotorService } from '../gen/component/motor/v1/motor_connect';
-import { MovementSensorService } from '../gen/component/movementsensor/v1/movementsensor_connect';
-import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_connect';
-import { ServoService } from '../gen/component/servo/v1/servo_connect';
-import { RobotService } from '../gen/robot/v1/robot_connect';
+import { ArmService } from '../gen/component/arm/v1/arm_pb';
+import { BaseService } from '../gen/component/base/v1/base_pb';
+import { BoardService } from '../gen/component/board/v1/board_pb';
+import { EncoderService } from '../gen/component/encoder/v1/encoder_pb';
+import { GantryService } from '../gen/component/gantry/v1/gantry_pb';
+import { GenericService } from '../gen/component/generic/v1/generic_pb';
+import { GripperService } from '../gen/component/gripper/v1/gripper_pb';
+import { InputControllerService } from '../gen/component/inputcontroller/v1/input_controller_pb';
+import { MotorService } from '../gen/component/motor/v1/motor_pb';
+import { MovementSensorService } from '../gen/component/movementsensor/v1/movementsensor_pb';
+import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_pb';
+import { ServoService } from '../gen/component/servo/v1/servo_pb';
+import { RobotService } from '../gen/robot/v1/robot_pb';
 import {
   GetModelsFromModulesRequest,
   GetPoseRequest,
@@ -31,19 +31,19 @@ import {
   TransformPCDRequest,
   TransformPoseRequest,
 } from '../gen/robot/v1/robot_pb';
-import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
-import { MotionService } from '../gen/service/motion/v1/motion_connect';
-import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
-import { SLAMService } from '../gen/service/slam/v1/slam_connect';
-import { VisionService } from '../gen/service/vision/v1/vision_connect';
+import { DiscoveryService } from '../gen/service/discovery/v1/discovery_pb';
+import { MotionService } from '../gen/service/motion/v1/motion_pb';
+import { NavigationService } from '../gen/service/navigation/v1/navigation_pb';
+import { SLAMService } from '../gen/service/slam/v1/slam_pb';
+import { VisionService } from '../gen/service/vision/v1/vision_pb';
 import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
 import SessionManager from './session-manager';
-import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
+import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_pb';
 import type { AccessToken, Credential } from '../main';
-import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
+import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_pb';
 import { assertExists } from '../assert';
 
 const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';

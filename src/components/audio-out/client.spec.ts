@@ -13,7 +13,7 @@ vi.mock('../../robot');
 
 import { Struct } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
+import { AudioOutService } from '../../gen/component/audioout/v1/audioout_pb';
 
 let audioOut: AudioOutClient;
 let capturedPropertiesReq: GetPropertiesRequest | undefined;

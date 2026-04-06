@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { EncoderService } from '../../gen/component/encoder/v1/encoder_connect';
+import { EncoderService } from '../../gen/component/encoder/v1/encoder_pb';
 import {
   GetPositionRequest,
   GetPropertiesRequest,

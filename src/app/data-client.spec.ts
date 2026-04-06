@@ -2,7 +2,7 @@ import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataService } from '../gen/app/data/v1/data_connect';
+import { DataService } from '../gen/app/data/v1/data_pb';
 import {
   AddBinaryDataToDatasetByIDsRequest,
   AddBinaryDataToDatasetByIDsResponse,
@@ -69,7 +69,7 @@ import {
   UpdateBoundingBoxRequest,
   UpdateBoundingBoxResponse,
 } from '../gen/app/data/v1/data_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import {
   CreateDataPipelineRequest,
   CreateDataPipelineResponse,
@@ -85,7 +85,7 @@ import {
   ListDataPipelinesRequest,
   ListDataPipelinesResponse,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_pb';
 import {
   CreateDatasetRequest,
   CreateDatasetResponse,
@@ -99,7 +99,7 @@ import {
   RenameDatasetRequest,
   RenameDatasetResponse,
 } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+import { DataSyncService } from '../gen/app/datasync/v1/data_sync_pb';
 import {
   DataCaptureUploadRequest,
   DataCaptureUploadResponse,

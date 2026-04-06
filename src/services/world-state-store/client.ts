@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_connect';
+import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import {
   GetTransformRequest,
   ListUUIDsRequest,

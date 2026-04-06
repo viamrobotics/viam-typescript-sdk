@@ -4,7 +4,7 @@ import { Duration } from '@bufbuild/protobuf';
 import { ConnectError, createRouterTransport } from '@connectrpc/connect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionClosedError } from '../../rpc';
-import { RobotService } from '../../gen/robot/v1/robot_connect';
+import { RobotService } from '../../gen/robot/v1/robot_pb';
 import {
   SendSessionHeartbeatResponse,
   StartSessionResponse,

@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { BaseService } from '../../gen/component/base/v1/base_connect';
+import { BaseService } from '../../gen/component/base/v1/base_pb';
 import {
   GetPropertiesRequest,
   IsMovingRequest,

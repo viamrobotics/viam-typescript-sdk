@@ -1,7 +1,7 @@
 import { type JsonValue, Struct, Timestamp } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
-import { CameraService } from '../../gen/component/camera/v1/camera_connect';
+import { CameraService } from '../../gen/component/camera/v1/camera_pb';
 import {
   GetImagesRequest,
   GetPointCloudRequest,

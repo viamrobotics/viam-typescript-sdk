@@ -2,7 +2,7 @@
 
 import { ConnectError, createRouterTransport } from '@connectrpc/connect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { RobotService } from '../../gen/robot/v1/robot_connect';
+import { RobotService } from '../../gen/robot/v1/robot_pb';
 import { GetOperationsResponse } from '../../gen/robot/v1/robot_pb';
 import GRPCConnectionManager from '../grpc-connection-manager';
 

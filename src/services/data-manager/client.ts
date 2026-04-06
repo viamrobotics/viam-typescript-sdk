@@ -1,7 +1,7 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
-import { DataManagerService } from '../../gen/service/datamanager/v1/data_manager_connect.js';
+import { DataManagerService } from '../../gen/service/datamanager/v1/data_manager_pb.js';
 import {
   SyncRequest,
   UploadBinaryDataToDatasetsRequest,

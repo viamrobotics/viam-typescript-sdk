@@ -6,7 +6,7 @@ import {
   InferRequest,
   MetadataRequest,
 } from '../../gen/service/mlmodel/v1/mlmodel_pb';
-import { MLModelService } from '../../gen/service/mlmodel/v1/mlmodel_connect';
+import { MLModelService } from '../../gen/service/mlmodel/v1/mlmodel_pb';
 
 export class MLModelClient implements MLModel {
   private client: Client<typeof MLModelService>;

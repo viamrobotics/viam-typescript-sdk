@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Value } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { GetReadingsResponse } from '../../gen/common/v1/common_pb';
-import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_connect';
+import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { RobotClient } from '../../robot';
 import { MovementSensorClient } from './client';
 

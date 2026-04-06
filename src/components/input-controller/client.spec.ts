@@ -2,7 +2,7 @@
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_connect';
+import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import {
   GetEventsResponse,
   TriggerEventRequest,

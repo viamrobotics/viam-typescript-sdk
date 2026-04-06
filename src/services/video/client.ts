@@ -1,6 +1,6 @@
 import { Struct, type JsonValue, Timestamp } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { VideoService } from '../../gen/service/video/v1/video_connect';
+import { VideoService } from '../../gen/service/video/v1/video_pb';
 import { GetVideoRequest } from '../../gen/service/video/v1/video_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';

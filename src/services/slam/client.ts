@@ -1,6 +1,6 @@
 import type { JsonValue, Struct } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
+import { SLAMService } from '../../gen/service/slam/v1/slam_pb';
 import {
   GetInternalStateRequest,
   GetPointCloudMapRequest,

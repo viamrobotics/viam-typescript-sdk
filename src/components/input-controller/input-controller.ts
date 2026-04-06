@@ -1,9 +1,8 @@
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { Struct } from '@bufbuild/protobuf/wkt';
 import * as pb from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import type { Resource } from '../../types';
 
-export type InputControllerEvent = PlainMessage<pb.Event>;
-export const { Event: InputControllerEvent } = pb;
+export type InputControllerEvent = pb.Event;
 
 /**
  * Represents a human interface device like a mouse or keyboard that emits

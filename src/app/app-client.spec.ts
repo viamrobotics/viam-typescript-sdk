@@ -5,7 +5,7 @@ import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
-import { AppService } from '../gen/app/v1/app_connect';
+import { AppService } from '../gen/app/v1/app_pb';
 import { LogEntry } from '../gen/common/v1/common_pb';
 import { AppClient, createAuth } from './app-client';
 vi.mock('../gen/app/v1/app_pb_service');

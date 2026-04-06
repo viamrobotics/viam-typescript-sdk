@@ -4,7 +4,7 @@ import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { Struct } from '@bufbuild/protobuf';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { VideoService } from '../../gen/service/video/v1/video_connect';
+import { VideoService } from '../../gen/service/video/v1/video_pb';
 import { GetVideoResponse } from '../../gen/service/video/v1/video_pb';
 import { DoCommandResponse } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';

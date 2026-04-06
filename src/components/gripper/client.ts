@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
+import { GripperService } from '../../gen/component/gripper/v1/gripper_pb';
 import {
   GrabRequest,
   IsHoldingSomethingRequest,

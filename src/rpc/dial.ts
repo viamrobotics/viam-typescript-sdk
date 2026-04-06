@@ -15,15 +15,12 @@ import type {
   UnaryResponse,
 } from '@connectrpc/connect';
 import { Code, ConnectError, createClient } from '@connectrpc/connect';
-import {
-  AuthService,
-  ExternalAuthService,
-} from '../gen/proto/rpc/v1/auth_connect';
+import { AuthService, ExternalAuthService } from '../gen/proto/rpc/v1/auth_pb';
 import {
   AuthenticateRequest,
   Credentials as PBCredentials,
 } from '../gen/proto/rpc/v1/auth_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
+import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import { newPeerConnectionForClient } from './peer';
 

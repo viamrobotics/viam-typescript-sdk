@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
+import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_pb';
 import { DiscoverResourcesRequest } from '../../gen/service/discovery/v1/discovery_pb';
 import type { RobotClient } from '../../robot';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';

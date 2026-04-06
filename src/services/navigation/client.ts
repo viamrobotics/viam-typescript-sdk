@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
+import { NavigationService } from '../../gen/service/navigation/v1/navigation_pb';
 import {
   AddWaypointRequest,
   GetLocationRequest,

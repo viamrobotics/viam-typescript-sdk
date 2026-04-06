@@ -2,8 +2,8 @@ export const version = __VERSION__;
 
 export {
   RobotClient as Client,
-  createRobotClient,
   RobotClient,
+  createRobotClient,
   type CloudMetadata,
   type DialConf,
   type DialDirectConf,
@@ -29,8 +29,8 @@ export {
 export {
   type AccessToken,
   type Credential,
-  type Credentials,
   type CredentialType,
+  type Credentials,
 } from './app/viam-transport';
 
 export {
@@ -102,18 +102,18 @@ export { type BillingClient } from './app/billing-client';
  */
 export * as billingApi from './gen/app/v1/billing_pb';
 
-export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
-export {
-  AudioInClient,
-  type AudioIn,
-  type AudioChunk,
-} from './components/audioin';
-export { AudioOutClient, type AudioOut } from './components/audioout';
 export {
   AudioCodec,
   type AudioCodecType,
   type AudioProperties,
 } from './audio-common';
+export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
+export {
+  AudioInClient,
+  type AudioChunk,
+  type AudioIn,
+} from './components/audioin';
+export { AudioOutClient, type AudioOut } from './components/audioout';
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
@@ -215,8 +215,8 @@ export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
 export {
   MLModelClient,
   type FlatTensors,
-  type Metadata,
   type MLModel,
+  type Metadata,
   type TensorInfo,
 } from './services/ml-model';
 
@@ -267,7 +267,7 @@ export { SensorClient, type Sensor } from './components/sensor';
  * @deprecated Use {@link SensorClient} instead.
  * @group Raw Protobufs
  */
-export * as sensorApi from './gen/component/sensor/v1/sensor_connect';
+export * as sensorApi from './gen/component/sensor/v1/sensor_pb';
 
 export { StreamClient, type Stream } from './extra/stream';
 /**
@@ -306,7 +306,7 @@ export { PoseTrackerClient, type PoseTracker } from './components/posetracker';
  * @deprecated Use {@link GenericComponentClient} instead.
  * @group Raw Protobufs
  */
-export * as genericComponentApi from './gen/component/generic/v1/generic_connect';
+export * as genericComponentApi from './gen/component/generic/v1/generic_pb';
 
 export { GripperClient, type Gripper } from './components/gripper';
 /**
@@ -436,7 +436,7 @@ export {
  * @deprecated Use {@link GenericServiceClient} instead.
  * @group Raw Protobufs
  */
-export * as genericServiceApi from './gen/service/generic/v1/generic_connect';
+export * as genericServiceApi from './gen/service/generic/v1/generic_pb';
 
 /**
  * Raw Protobuf interfaces that are shared across multiple components and

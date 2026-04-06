@@ -13,7 +13,7 @@ import {
   type Transport,
 } from '@connectrpc/connect';
 import { EventDispatcher } from '../../events';
-import { StreamService } from '../../gen/stream/v1/stream_connect';
+import { StreamService } from '../../gen/stream/v1/stream_pb';
 import {
   AddStreamResponse,
   GetStreamOptionsResponse,

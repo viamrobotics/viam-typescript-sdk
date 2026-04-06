@@ -1,6 +1,6 @@
 import type { Client } from '@connectrpc/connect';
 import { EventDispatcher, MachineConnectionEvent } from '../../events';
-import { StreamService } from '../../gen/stream/v1/stream_connect';
+import { StreamService } from '../../gen/stream/v1/stream_pb';
 import {
   AddStreamRequest,
   RemoveStreamRequest,

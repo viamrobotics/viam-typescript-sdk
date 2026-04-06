@@ -3,7 +3,7 @@
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { Struct } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_connect';
+import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import {
   GetTransformResponse,
   ListUUIDsResponse,

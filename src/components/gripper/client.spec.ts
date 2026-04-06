@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
+import { GripperService } from '../../gen/component/gripper/v1/gripper_pb';
 import {
   GrabResponse,
   IsHoldingSomethingResponse,

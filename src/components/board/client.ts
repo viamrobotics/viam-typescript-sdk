@@ -3,7 +3,7 @@ import type { Options } from '../../types';
 
 import { Duration, Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { BoardService } from '../../gen/component/board/v1/board_connect';
+import { BoardService } from '../../gen/component/board/v1/board_pb';
 import {
   GetDigitalInterruptValueRequest,
   GetGPIORequest,

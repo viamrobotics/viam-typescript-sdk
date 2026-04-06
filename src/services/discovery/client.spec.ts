@@ -2,7 +2,7 @@
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
+import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_pb';
 import { DiscoverResourcesResponse } from '../../gen/service/discovery/v1/discovery_pb';
 import { RobotClient } from '../../robot';
 import { DiscoveryClient } from './client';

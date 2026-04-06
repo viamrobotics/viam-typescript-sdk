@@ -12,13 +12,13 @@ import {
 } from '@connectrpc/connect';
 import { createAsyncIterable } from '@connectrpc/connect/protocol';
 import { safety_heartbeat_monitored as safteyHeartbeatMonitored } from '../gen/common/v1/common_pb';
-import { ServerReflection } from '../gen/grpc/reflection/v1/reflection_connect';
+import { ServerReflection } from '../gen/grpc/reflection/v1/reflection_pb';
 import {
   FileDescriptorResponse,
   ListServiceResponse,
   ServerReflectionRequest,
 } from '../gen/grpc/reflection/v1/reflection_pb';
-import { RobotService } from '../gen/robot/v1/robot_connect';
+import { RobotService } from '../gen/robot/v1/robot_pb';
 import {
   SendSessionHeartbeatRequest,
   StartSessionRequest,

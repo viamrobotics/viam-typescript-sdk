@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Value } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { GetReadingsResponse } from '../../gen/common/v1/common_pb';
-import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_connect';
+import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_pb';
 import {
   GetCurrentResponse,
   GetPowerResponse,

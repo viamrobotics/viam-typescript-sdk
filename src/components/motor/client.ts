@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { MotorService } from '../../gen/component/motor/v1/motor_connect';
+import { MotorService } from '../../gen/component/motor/v1/motor_pb';
 import {
   GetPositionRequest,
   GetPropertiesRequest,

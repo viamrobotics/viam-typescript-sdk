@@ -2,7 +2,7 @@ import type { JsonValue } from '@bufbuild/protobuf';
 import { Struct, Timestamp } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
-import { AppService } from '../gen/app/v1/app_connect';
+import { AppService } from '../gen/app/v1/app_pb';
 import {
   APIKeyWithAuthorizations,
   Authorization,
