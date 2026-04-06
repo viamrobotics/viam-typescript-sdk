@@ -98,6 +98,36 @@ export interface DialWebRTCOptions {
 
   // `additionalSDPValues` is a collection of additional SDP values that we want to pass into the connection's call request.
   additionalSdpFields?: Record<string, string | number>;
+
+  /**
+   * When true, sets ICE transport policy to relay-only so only TURN candidates
+   * are used. Useful for testing relay connectivity through a TURN server.
+   */
+  forceRelay?: boolean;
+
+  /**
+   * When true, strips TURN servers from the ICE configuration so only host and
+   * server-reflexive candidates are used. Useful for testing direct
+   * connectivity without relay fallback.
+   */
+  forceP2P?: boolean;
+
+  /**
+   * When set, filters the signaling server's TURN list to only the server whose
+   * parsed URI matches (compared by scheme, host, port, and transport —
+   * defaulting transport to UDP if unspecified). Example:
+   * `"turn:turn.viam.com:443"`
+   */
+  turnUri?: string;
+
+  /** Overrides the scheme of the matched TURN URI (`"turn"` or `"turns"`). */
+  turnScheme?: 'turn' | 'turns';
+
+  /** Overrides the transport of the matched TURN URI (`"tcp"` or `"udp"`). */
+  turnTransport?: 'tcp' | 'udp';
+
+  /** Overrides the port of the matched TURN URI. */
+  turnPort?: number;
 }
 
 export type TransportFactory = (
@@ -552,6 +582,117 @@ export const dialWebRTC = async (
   }
 };
 
+const iceServerHasTURN = (server: RTCIceServer): boolean => {
+  const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
+  return urls.some(
+    (url) => url.startsWith('turn:') || url.startsWith('turns:')
+  );
+};
+
+interface TurnUri {
+  scheme: 'turn' | 'turns';
+  host: string;
+  port: number;
+  transport: 'udp' | 'tcp';
+}
+
+const parseTurnUri = (raw: string): TurnUri | undefined => {
+  const colonIdx = raw.indexOf(':');
+  if (colonIdx < 0) {
+    return undefined;
+  }
+  const scheme = raw.slice(0, colonIdx);
+  if (scheme !== 'turn' && scheme !== 'turns') {
+    return undefined;
+  }
+  const rest = raw.slice(colonIdx + 1);
+  const qIdx = rest.indexOf('?');
+  const hostport = qIdx >= 0 ? rest.slice(0, qIdx) : rest;
+  const query = qIdx >= 0 ? rest.slice(qIdx + 1) : '';
+  const lastColon = hostport.lastIndexOf(':');
+  if (lastColon < 0) {
+    return undefined;
+  }
+  const host = hostport.slice(0, lastColon);
+  const port = Number.parseInt(hostport.slice(lastColon + 1), 10);
+  if (Number.isNaN(port)) {
+    return undefined;
+  }
+  const transport = (query
+    .split('&')
+    .find((part) => part.startsWith('transport='))
+    ?.slice('transport='.length) ?? 'udp') as 'udp' | 'tcp';
+  return { scheme: scheme as 'turn' | 'turns', host, port, transport };
+};
+
+const turnUriEqual = (a: TurnUri, b: TurnUri): boolean =>
+  a.scheme === b.scheme &&
+  a.host === b.host &&
+  a.port === b.port &&
+  a.transport === b.transport;
+
+const turnUriToString = (uri: TurnUri): string =>
+  `${uri.scheme}:${uri.host}:${uri.port}?transport=${uri.transport}`;
+
+const applyTurnFilterOptions = (
+  webrtcOpts: DialWebRTCOptions
+): DialWebRTCOptions => {
+  let filterUri: TurnUri | undefined;
+  if (webrtcOpts.turnUri !== undefined) {
+    filterUri = parseTurnUri(webrtcOpts.turnUri);
+    if (filterUri === undefined) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`
+      );
+      return webrtcOpts;
+    }
+  }
+  webrtcOpts.rtcConfig = {
+    ...webrtcOpts.rtcConfig,
+    iceServers: (webrtcOpts.rtcConfig?.iceServers ?? [])
+      .map((server) => {
+        const rawUrls =
+          typeof server.urls === 'string' ? [server.urls] : server.urls;
+        const newUrls = rawUrls.flatMap((url) => {
+          const parsed = parseTurnUri(url);
+          // non-TURN: keep unchanged
+          if (parsed === undefined) {
+            return [url];
+          }
+          // filtered out
+          if (filterUri !== undefined && !turnUriEqual(parsed, filterUri)) {
+            return [];
+          }
+          if (webrtcOpts.turnScheme !== undefined) {
+            parsed.scheme = webrtcOpts.turnScheme;
+          }
+          if (webrtcOpts.turnPort !== undefined) {
+            parsed.port = webrtcOpts.turnPort;
+          }
+          if (webrtcOpts.turnTransport !== undefined) {
+            parsed.transport = webrtcOpts.turnTransport;
+          }
+          return [turnUriToString(parsed)];
+        });
+        return { ...server, urls: newUrls };
+      })
+      .filter((server) => {
+        const urls =
+          typeof server.urls === 'string' ? [server.urls] : server.urls;
+        return urls.length > 0;
+      }),
+  };
+  console.debug('TURN filter options set', {
+    // eslint-disable-line no-console
+    turnUri: webrtcOpts.turnUri,
+    turnScheme: webrtcOpts.turnScheme,
+    turnPort: webrtcOpts.turnPort,
+    turnTransport: webrtcOpts.turnTransport,
+  });
+  return webrtcOpts;
+};
+
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
   callOpts: CallOptions,
@@ -601,6 +742,53 @@ const processWebRTCOpts = async (
         ...additionalIceServers,
       ];
     }
+  }
+
+  if (webrtcOpts.forceRelay && webrtcOpts.forceP2P) {
+    console.warn(
+      'forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail'
+    ); // eslint-disable-line no-console
+  }
+
+  if (webrtcOpts.forceP2P) {
+    console.debug(
+      'force P2P enabled; stripping TURN servers and ignoring signaling server ICE config'
+    ); // eslint-disable-line no-console
+    webrtcOpts.rtcConfig = {
+      ...webrtcOpts.rtcConfig,
+      iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
+        (server) => !iceServerHasTURN(server)
+      ),
+    };
+  }
+
+  if (webrtcOpts.forceRelay) {
+    console.debug('force relay enabled; using relay-only ICE transport policy'); // eslint-disable-line no-console
+    webrtcOpts.rtcConfig = {
+      ...webrtcOpts.rtcConfig,
+      iceTransportPolicy: 'relay',
+    };
+  }
+
+  if (
+    webrtcOpts.forceP2P &&
+    (webrtcOpts.turnUri !== undefined ||
+      webrtcOpts.turnScheme !== undefined ||
+      webrtcOpts.turnTransport !== undefined ||
+      webrtcOpts.turnPort !== undefined)
+  ) {
+    console.warn(
+      'forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped'
+    ); // eslint-disable-line no-console
+  }
+
+  if (
+    webrtcOpts.turnUri !== undefined ||
+    webrtcOpts.turnScheme !== undefined ||
+    webrtcOpts.turnTransport !== undefined ||
+    webrtcOpts.turnPort !== undefined
+  ) {
+    webrtcOpts = applyTurnFilterOptions(webrtcOpts);
   }
 
   return webrtcOpts;
