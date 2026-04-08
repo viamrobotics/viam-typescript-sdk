@@ -1,13 +1,12 @@
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
-import type { Pose, Resource } from '../../types';
+import type { Pose, Resource, JsonObject } from '../../types';
 
-import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
+import * as armApi from '../../gen/component/arm/v1/arm_pb';
+import * as armApiV1 from '../../genv1/component/arm/v1/arm_pb';
 import type { GetKinematicsResult } from '../../utils';
 
-export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
-
-export const { JointPositions: ArmJointPositions } = armApi;
+export type ArmJointPositions = armApi.JointPositions;
+export const { JointPositions: ArmJointPositions } = armApiV1;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
@@ -24,7 +23,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getendposition).
    */
-  getEndPosition: (extra?: Struct) => Promise<Pose>;
+  getEndPosition: (extra?: JsonObject) => Promise<Pose>;
 
   /**
    * Get the geometries of the component in their current configuration
@@ -40,7 +39,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Get the 3D models of the component
@@ -53,7 +52,7 @@ export interface Arm extends Resource {
    * console.log(models);
    * ```
    */
-  get3DModels: (extra?: Struct) => Promise<Record<string, Mesh>>;
+  get3DModels: (extra?: JsonObject) => Promise<Record<string, Mesh>>;
 
   /**
    * Get the kinematics information associated with the arm.
@@ -72,7 +71,7 @@ export interface Arm extends Resource {
    * @returns The legacy kinematics data shape or the newer object containing
    *   kinematics data plus a map of URDF mesh file paths to mesh data.
    */
-  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
+  getKinematics: (extra?: JsonObject) => Promise<GetKinematicsResult>;
 
   /**
    * Move the end of the arm to the pose.
@@ -102,7 +101,7 @@ export interface Arm extends Resource {
    *
    * @param pose - The destination pose for the arm.
    */
-  moveToPosition: (pose: Pose, extra?: Struct) => Promise<void>;
+  moveToPosition: (pose: Pose, extra?: JsonObject) => Promise<void>;
 
   /**
    * Move each joint of the arm based on the angles on the joint positions.
@@ -123,7 +122,7 @@ export interface Arm extends Resource {
    */
   moveToJointPositions: (
     jointPositionsList: number[],
-    extra?: Struct
+    extra?: JsonObject
   ) => Promise<void>;
 
   /**
@@ -139,7 +138,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getjointpositions).
    */
-  getJointPositions: (extra?: Struct) => Promise<ArmJointPositions>;
+  getJointPositions: (extra?: JsonObject) => Promise<ArmJointPositions>;
 
   /**
    * Stop the motion of the arm.
@@ -154,7 +153,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#stop).
    */
-  stop: (extra?: Struct) => Promise<void>;
+  stop: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Get if the arm is currently moving.

@@ -1,22 +1,22 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { MotorService } from '../../gen/component/motor/v1/motor_pb';
+import { create } from "@bufbuild/protobuf";
+import type { CallOptions, Client } from "@connectrpc/connect";
 import {
-  GetPositionRequest,
-  GetPropertiesRequest,
-  GoForRequest,
-  GoToRequest,
-  IsMovingRequest,
-  IsPoweredRequest,
-  ResetZeroPositionRequest,
-  SetPowerRequest,
-  SetRPMRequest,
-  StopRequest,
-} from '../../gen/component/motor/v1/motor_pb';
-import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { Motor } from './motor';
+  GetPositionRequestSchema,
+  GetPropertiesRequestSchema,
+  GoForRequestSchema,
+  GoToRequestSchema,
+  IsMovingRequestSchema,
+  IsPoweredRequestSchema,
+  MotorService,
+  ResetZeroPositionRequestSchema,
+  SetPowerRequestSchema,
+  SetRPMRequestSchema,
+  StopRequestSchema,
+} from "../../gen/component/motor/v1/motor_pb";
+import type { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { Motor } from "./motor";
 
 /**
  * A gRPC-web client for the Motor component.
@@ -36,10 +36,10 @@ export class MotorClient implements Motor {
   }
 
   async setPower(power: number, extra = {}, callOptions = this.callOptions) {
-    const request = new SetPowerRequest({
+    const request = create(SetPowerRequestSchema, {
       name: this.name,
       powerPct: power,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -51,13 +51,13 @@ export class MotorClient implements Motor {
     rpm: number,
     revolutions: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new GoForRequest({
+    const request = create(GoForRequestSchema, {
       name: this.name,
       rpm,
       revolutions,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -69,13 +69,13 @@ export class MotorClient implements Motor {
     rpm: number,
     positionRevolutions: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new GoToRequest({
+    const request = create(GoToRequestSchema, {
       name: this.name,
       rpm,
       positionRevolutions,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -84,10 +84,10 @@ export class MotorClient implements Motor {
   }
 
   async setRPM(rpm: number, extra = {}, callOptions = this.callOptions) {
-    const request = new SetRPMRequest({
+    const request = create(SetRPMRequestSchema, {
       name: this.name,
       rpm,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -98,12 +98,12 @@ export class MotorClient implements Motor {
   async resetZeroPosition(
     offset: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new ResetZeroPositionRequest({
+    const request = create(ResetZeroPositionRequestSchema, {
       name: this.name,
       offset,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -112,9 +112,9 @@ export class MotorClient implements Motor {
   }
 
   async stop(extra = {}, callOptions = this.callOptions) {
-    const request = new StopRequest({
+    const request = create(StopRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -123,9 +123,9 @@ export class MotorClient implements Motor {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -137,9 +137,9 @@ export class MotorClient implements Motor {
   }
 
   async getPosition(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPositionRequest({
+    const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -149,9 +149,9 @@ export class MotorClient implements Motor {
   }
 
   async isPowered(extra = {}, callOptions = this.callOptions) {
-    const request = new IsPoweredRequest({
+    const request = create(IsPoweredRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -161,7 +161,7 @@ export class MotorClient implements Motor {
   }
 
   async isMoving(callOptions = this.callOptions) {
-    const request = new IsMovingRequest({
+    const request = create(IsMovingRequestSchema, {
       name: this.name,
     });
 
@@ -171,25 +171,25 @@ export class MotorClient implements Motor {
     return resp.isMoving;
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

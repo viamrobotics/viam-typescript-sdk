@@ -1,7 +1,6 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
-import type { Geometry } from '../../gen/common/v1/common_pb';
-import type { GetKinematicsResult } from '../../utils';
+import type { Geometry } from "../../gen/common/v1/common_pb";
+import type { JsonObject, Resource } from "../../types";
+import type { GetKinematicsResult } from "../../utils";
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {
@@ -11,7 +10,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Get the geometries of this component
    * const geometries = await gantry.getGeometries();
@@ -20,7 +19,7 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Get the kinematics information associated with the gantry.
@@ -28,7 +27,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Get the kinematics information associated with the gantry
    * const kinematics = await gantry.getKinematics();
@@ -40,7 +39,7 @@ export interface Gantry extends Resource {
    * @returns The legacy kinematics data shape or the newer object containing
    *   kinematics data plus a map of URDF mesh file paths to mesh data.
    */
-  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
+  getKinematics: (extra?: JsonObject) => Promise<GetKinematicsResult>;
 
   /**
    * Move each axis of the gantry to the positionsMm at the speeds in
@@ -49,7 +48,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Create positions for a 3-axis gantry
    * const positions = [1, 2, 3];
@@ -69,7 +68,7 @@ export interface Gantry extends Resource {
   moveToPosition: (
     positionsMm: number[],
     speedsMmPerSec: number[],
-    extra?: Struct
+    extra?: JsonObject,
   ) => Promise<void>;
 
   /**
@@ -78,7 +77,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Get the current positions of the axes in millimeters
    * const positions = await gantry.getPosition();
@@ -89,7 +88,7 @@ export interface Gantry extends Resource {
    *
    * @returns A list of the current position of each axis in millimeters.
    */
-  getPosition: (extra?: Struct) => Promise<number[]>;
+  getPosition: (extra?: JsonObject) => Promise<number[]>;
 
   /**
    * Runs the homing sequence to find the start and end positions of the gantry
@@ -98,7 +97,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Run the homing sequence
    * const success = await gantry.home();
@@ -110,7 +109,7 @@ export interface Gantry extends Resource {
    * @returns A bool representing whether the gantry has run the homing sequence
    *   successfully.
    */
-  home: (extra?: Struct) => Promise<boolean>;
+  home: (extra?: JsonObject) => Promise<boolean>;
 
   /**
    * Get the lengths of the axes of the gantry in millimeters.
@@ -118,7 +117,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Get the lengths of the axes in millimeters
    * const lengths = await gantry.getLengths();
@@ -129,7 +128,7 @@ export interface Gantry extends Resource {
    *
    * @returns A list of the length of each axis in millimeters.
    */
-  getLengths: (extra?: Struct) => Promise<number[]>;
+  getLengths: (extra?: JsonObject) => Promise<number[]>;
 
   /**
    * Stop the motion of the gantry.
@@ -137,7 +136,7 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Stop all motion of the gantry
    * await gantry.stop();
@@ -146,7 +145,7 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#stop).
    */
-  stop: (extra?: Struct) => Promise<void>;
+  stop: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Get if the gantry is currently moving.
@@ -154,11 +153,11 @@ export interface Gantry extends Resource {
    * @example
    *
    * ```ts
-   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   * const gantry = new VIAM.GantryClient(machine, "my_gantry");
    *
    * // Check if the gantry is moving
    * const moving = await gantry.isMoving();
-   * console.log('Moving:', moving);
+   * console.log("Moving:", moving);
    * ```
    *
    * For more information, see [Gantry

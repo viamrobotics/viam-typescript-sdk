@@ -1,15 +1,13 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
+import type { JsonObject, Resource } from "../../types";
 
-import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
+import * as encoderApi from "../../gen/component/encoder/v1/encoder_pb";
+import * as encoderApiV1 from "../../genv1/component/encoder/v1/encoder_pb";
 
 export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
 
-export const {
-  GetPropertiesResponse: EncoderProperties,
-  PositionType: EncoderPositionType,
-} = encoderApi;
+export const { PositionType: EncoderPositionType } = encoderApi;
+export const { GetPropertiesResponse: EncoderProperties } = encoderApiV1;
 
 /** Represents a physical encoder. */
 export interface Encoder extends Resource {
@@ -19,7 +17,7 @@ export interface Encoder extends Resource {
    * @example
    *
    * ```ts
-   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
+   * const encoder = new VIAM.EncoderClient(machine, "my_encoder");
    *
    * // Reset the zero position of the encoder
    * await encoder.resetPosition();
@@ -28,7 +26,7 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#resetposition).
    */
-  resetPosition(extra?: Struct): Promise<void>;
+  resetPosition(extra?: JsonObject): Promise<void>;
 
   /**
    * Return the encoder's properties.
@@ -36,7 +34,7 @@ export interface Encoder extends Resource {
    * @example
    *
    * ```ts
-   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
+   * const encoder = new VIAM.EncoderClient(machine, "my_encoder");
    *
    * // Get whether the encoder returns position in ticks or degrees
    * const properties = await encoder.getProperties();
@@ -45,7 +43,7 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getproperties).
    */
-  getProperties(extra?: Struct): Promise<EncoderProperties>;
+  getProperties(extra?: JsonObject): Promise<EncoderProperties>;
 
   /**
    * Return the current position either in relative units (ticks away from a
@@ -54,13 +52,13 @@ export interface Encoder extends Resource {
    * @example
    *
    * ```ts
-   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
+   * const encoder = new VIAM.EncoderClient(machine, "my_encoder");
    *
    * // Get the position of the encoder in ticks
    * const [position, posType] = await encoder.getPosition(
-   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT
+   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT,
    * );
-   * console.log('The encoder position is currently', position, posType);
+   * console.log("The encoder position is currently", position, posType);
    * ```
    *
    * For more information, see [Encoder
@@ -71,6 +69,6 @@ export interface Encoder extends Resource {
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: Struct
+    extra?: JsonObject,
   ): Promise<readonly [number, EncoderPositionType]>;
 }

@@ -1,6 +1,6 @@
-import type { Resource, Struct } from '../../types';
-import type { AudioInfo } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
+import type { AudioInfo } from '../../gen/common/v1/common_pb';
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a device that outputs audio. */
 export interface AudioOut extends Resource {
@@ -23,7 +23,7 @@ export interface AudioOut extends Resource {
   play: (
     audioData: Uint8Array,
     audioInfo?: AudioInfo,
-    extra?: Struct
+    extra?: JsonObject
   ) => Promise<void>;
 
   /**
@@ -36,5 +36,5 @@ export interface AudioOut extends Resource {
    * const properties = await audioOut.getProperties();
    * ```
    */
-  getProperties: (extra?: Struct) => Promise<AudioProperties>;
+  getProperties: (extra?: JsonObject) => Promise<AudioProperties>;
 }

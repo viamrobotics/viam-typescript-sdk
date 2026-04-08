@@ -1,4 +1,4 @@
-import { type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue } from '@bufbuild/protobuf';
 import { Struct } from '@bufbuild/protobuf/wkt';
 
 export { Code, ConnectError } from '@connectrpc/connect';
@@ -34,7 +34,7 @@ export interface Resource {
    * @param command - The command to execute. Accepts either a {@link Struct} or
    *   a plain object, which will be converted automatically.
    */
-  doCommand(command: Struct | Record<string, JsonValue>): Promise<JsonValue>;
+  doCommand(command: Struct | JsonObject): Promise<JsonValue>;
 
   /** Get the status of the resource. */
   getStatus(): Promise<JsonValue>;
@@ -69,5 +69,5 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export { type JsonValue } from '@bufbuild/protobuf';
+export { type JsonObject, type JsonValue } from '@bufbuild/protobuf';
 export { Duration, Struct } from '@bufbuild/protobuf/wkt';

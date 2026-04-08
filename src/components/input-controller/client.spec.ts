@@ -1,42 +1,44 @@
 // @vitest-environment happy-dom
 
-import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_pb';
+import { createClient, createRouterTransport } from "@connectrpc/connect";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  GetEventsResponse,
-  TriggerEventRequest,
-  TriggerEventResponse,
-} from '../../gen/component/inputcontroller/v1/input_controller_pb';
-import { RobotClient } from '../../robot';
-import { InputControllerClient } from './client';
-import { InputControllerEvent } from './input-controller';
-vi.mock('../../robot');
-vi.mock('../../gen/service/input_controller/v1/input_controller_pb_service');
+  EventSchema,
+  GetEventsResponseSchema,
+  InputControllerService,
+  type TriggerEventRequest,
+  TriggerEventResponseSchema,
+} from "../../gen/component/inputcontroller/v1/input_controller_pb";
+import { RobotClient } from "../../robot";
+import { InputControllerClient } from "./client";
+import { type InputControllerEvent } from "./input-controller";
+vi.mock("../../robot");
 
-const inputControllerClientName = 'test-input-controller';
+import { create } from "@bufbuild/protobuf";
+
+const inputControllerClientName = "test-input-controller";
 
 let inputController: InputControllerClient;
 
-const event = new InputControllerEvent({
-  event: 'some-event',
+const event: InputControllerEvent = create(EventSchema, {
+  event: "some-event",
   value: 0.5,
-  control: 'some-control',
+  control: "some-control",
 });
 
-describe('InputControllerClient Tests', () => {
+describe("InputControllerClient Tests", () => {
   let capturedEvent: TriggerEventRequest;
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(InputControllerService, {
         getEvents: () => {
-          return new GetEventsResponse({
+          return create(GetEventsResponseSchema, {
             events: [event],
           });
         },
         triggerEvent: (req) => {
           capturedEvent = req;
-          return new TriggerEventResponse();
+          return create(TriggerEventResponseSchema, {});
         },
       });
     });
@@ -44,22 +46,22 @@ describe('InputControllerClient Tests', () => {
     RobotClient.prototype.createServiceClient = vi
       .fn()
       .mockImplementation(() =>
-        createClient(InputControllerService, mockTransport)
+        createClient(InputControllerService, mockTransport),
       );
 
     inputController = new InputControllerClient(
-      new RobotClient('host'),
-      inputControllerClientName
+      new RobotClient("host"),
+      inputControllerClientName,
     );
   });
 
-  it('gets events', async () => {
+  it("gets events", async () => {
     const expected = [event];
 
     await expect(inputController.getEvents()).resolves.toStrictEqual(expected);
   });
 
-  it('triggers events', async () => {
+  it("triggers events", async () => {
     await expect(inputController.triggerEvent(event)).resolves.not.toThrow();
     expect(capturedEvent.event?.event).toStrictEqual(event.event);
     expect(capturedEvent.event?.value).toStrictEqual(event.value);

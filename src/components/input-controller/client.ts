@@ -1,15 +1,15 @@
-import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
+import type { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
 
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_pb';
+import { create } from "@bufbuild/protobuf";
+import type { CallOptions, Client } from "@connectrpc/connect";
 import {
-  GetEventsRequest,
-  TriggerEventRequest,
-} from '../../gen/component/inputcontroller/v1/input_controller_pb';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { InputController, InputControllerEvent } from './input-controller';
+  GetEventsRequestSchema,
+  InputControllerService,
+  TriggerEventRequestSchema,
+} from "../../gen/component/inputcontroller/v1/input_controller_pb";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { InputController, InputControllerEvent } from "./input-controller";
 
 /**
  * A gRPC-web client for the Input Controller component.
@@ -29,9 +29,9 @@ export class InputControllerClient implements InputController {
   }
 
   async getEvents(extra = {}, callOptions = this.callOptions) {
-    const request = new GetEventsRequest({
+    const request = create(GetEventsRequestSchema, {
       controller: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -43,12 +43,12 @@ export class InputControllerClient implements InputController {
   async triggerEvent(
     event: InputControllerEvent,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<void> {
-    const request = new TriggerEventRequest({
+    const request = create(TriggerEventRequestSchema, {
       controller: this.name,
       event,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -56,25 +56,25 @@ export class InputControllerClient implements InputController {
     await this.client.triggerEvent(request, callOptions);
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

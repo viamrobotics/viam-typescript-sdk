@@ -1,20 +1,22 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { StreamTicksResponse } from '../../gen/component/board/v1/board_pb';
+import {
+  ReadAnalogReaderResponseSchema,
+  StreamTicksResponseSchema,
+} from '../../gen/component/board/v1/board_pb';
 import { RobotClient } from '../../robot';
-import { AnalogValue, type Tick } from './board';
+import { type Tick } from './board';
 import { BoardClient } from './client';
 vi.mock('../../robot');
 
-import type { PartialMessage } from '@bufbuild/protobuf';
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import {
   createWritableIterable,
   type WritableIterable,
 } from '@connectrpc/connect/protocol';
 import { BoardService } from '../../gen/component/board/v1/board_pb';
-vi.mock('../../gen/component/board/v1/board_pb_service');
 
 let board: BoardClient;
 const testAnalogMin = 0;
@@ -22,14 +24,16 @@ const testAnalogMax = 5;
 const testStepSize = 0.5;
 const testValue = 2;
 
-const testAnalogValue: AnalogValue = new AnalogValue({
+const testAnalogValue = create(ReadAnalogReaderResponseSchema, {
   value: testValue,
   minRange: testAnalogMin,
   maxRange: testAnalogMax,
   stepSize: testStepSize,
 });
 
-let testTickStream: WritableIterable<PartialMessage<StreamTicksResponse>>;
+let testTickStream: WritableIterable<
+  MessageInitShape<typeof StreamTicksResponseSchema>
+>;
 
 describe('BoardClient tests', () => {
   beforeEach(() => {
@@ -54,7 +58,9 @@ describe('BoardClient tests', () => {
   afterEach(() => {
     vi.clearAllMocks();
     testTickStream =
-      createWritableIterable<PartialMessage<StreamTicksResponse>>();
+      createWritableIterable<
+        MessageInitShape<typeof StreamTicksResponseSchema>
+      >();
   });
 
   it('get analog reading', async () => {

@@ -1,11 +1,10 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Timestamp } from '@bufbuild/protobuf';
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import type { Geometry } from "../../gen/common/v1/common_pb";
 import type {
   DistortionParameters,
   IntrinsicParameters,
-} from '../../gen/component/camera/v1/camera_pb';
-import type { Resource } from '../../types';
-import type { Geometry } from '../../gen/common/v1/common_pb';
+} from "../../gen/component/camera/v1/camera_pb";
+import type { JsonObject, Resource } from "../../types";
 
 export interface Properties {
   /** Whether the camera supports the return of point cloud data. */
@@ -29,18 +28,18 @@ export interface ResponseMetadata {
 }
 
 export type MimeType =
-  | ''
-  | 'image/vnd.viam.rgba'
-  | 'image/vnd.viam.depth'
-  | 'image/jpeg'
-  | 'image/png'
-  | 'pointcloud/pcd'
-  | 'unsupported';
+  | ""
+  | "image/vnd.viam.rgba"
+  | "image/vnd.viam.depth"
+  | "image/jpeg"
+  | "image/png"
+  | "pointcloud/pcd"
+  | "unsupported";
 
 /** Represents any physical hardware that can capture frames. */
 export interface Camera extends Resource {
   /** Get the geometries of the component in their current configuration */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Return a frame from a camera.
@@ -48,7 +47,7 @@ export interface Camera extends Resource {
    * @example
    *
    * ```ts
-   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const camera = new VIAM.CameraClient(machine, "my_camera");
    * const images = await camera.getImages();
    * ```
    *
@@ -60,7 +59,7 @@ export interface Camera extends Resource {
    */
   getImages: (
     filterSourceNames?: string[],
-    extra?: Struct
+    extra?: JsonObject,
   ) => Promise<{ images: NamedImage[]; metadata: ResponseMetadata }>;
 
   /**
@@ -69,14 +68,14 @@ export interface Camera extends Resource {
    * @example
    *
    * ```ts
-   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const camera = new VIAM.CameraClient(machine, "my_camera");
    * const pointCloud = await camera.getPointCloud();
    * ```
    *
    * For more information, see [Camera
    * API](https://docs.viam.com/dev/reference/apis/components/camera/#getpointcloud).
    */
-  getPointCloud: (extra?: Struct) => Promise<Uint8Array>;
+  getPointCloud: (extra?: JsonObject) => Promise<Uint8Array>;
 
   /**
    * Return the camera properties.
@@ -84,7 +83,7 @@ export interface Camera extends Resource {
    * @example
    *
    * ```ts
-   * const camera = new VIAM.CameraClient(machine, 'my_camera');
+   * const camera = new VIAM.CameraClient(machine, "my_camera");
    * const properties = await camera.getProperties();
    * ```
    *

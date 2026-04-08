@@ -1,16 +1,16 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { ServoService } from '../../gen/component/servo/v1/servo_pb';
+import { create } from "@bufbuild/protobuf";
+import type { CallOptions, Client } from "@connectrpc/connect";
 import {
-  GetPositionRequest,
-  IsMovingRequest,
-  MoveRequest,
-  StopRequest,
-} from '../../gen/component/servo/v1/servo_pb';
-import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { Servo } from './servo';
+  GetPositionRequestSchema,
+  IsMovingRequestSchema,
+  MoveRequestSchema,
+  ServoService,
+  StopRequestSchema,
+} from "../../gen/component/servo/v1/servo_pb";
+import type { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { Servo } from "./servo";
 
 /**
  * A gRPC-web client for the Servo component.
@@ -30,10 +30,10 @@ export class ServoClient implements Servo {
   }
 
   async move(angleDeg: number, extra = {}, callOptions = this.callOptions) {
-    const request = new MoveRequest({
+    const request = create(MoveRequestSchema, {
       name: this.name,
       angleDeg,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -42,9 +42,9 @@ export class ServoClient implements Servo {
   }
 
   async getPosition(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPositionRequest({
+    const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -54,9 +54,9 @@ export class ServoClient implements Servo {
   }
 
   async stop(extra = {}, callOptions = this.callOptions) {
-    const request = new StopRequest({
+    const request = create(StopRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -65,7 +65,7 @@ export class ServoClient implements Servo {
   }
 
   async isMoving(callOptions = this.callOptions) {
-    const request = new IsMovingRequest({
+    const request = create(IsMovingRequestSchema, {
       name: this.name,
     });
 
@@ -75,25 +75,25 @@ export class ServoClient implements Servo {
     return resp.isMoving;
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

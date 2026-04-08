@@ -1,5 +1,5 @@
-export { InputControllerClient } from './input-controller/client';
+export { InputControllerClient } from "./input-controller/client";
 export {
-  InputControllerEvent,
   type InputController,
-} from './input-controller/input-controller';
+  type InputControllerEvent,
+} from "./input-controller/input-controller";

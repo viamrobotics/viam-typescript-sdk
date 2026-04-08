@@ -1,7 +1,8 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { Orientation, Resource, Vector3 } from '../../types';
+import type { JsonObject } from "@bufbuild/protobuf";
+import type { Orientation, Resource, Vector3 } from "../../types";
 
-import * as sensorApi from '../../gen/component/movementsensor/v1/movementsensor_pb';
+import * as sensorApi from "../../gen/component/movementsensor/v1/movementsensor_pb";
+import * as sensorApiV1 from "../../genv1/component/movementsensor/v1/movementsensor_pb";
 
 export type MovementSensorAccuracy = sensorApi.GetAccuracyResponse;
 export type MovementSensorPosition = sensorApi.GetPositionResponse;
@@ -11,7 +12,7 @@ export const {
   GetAccuracyResponse: MovementSensorAccuracy,
   GetPositionResponse: MovementSensorPosition,
   GetPropertiesResponse: MovementSensorProperties,
-} = sensorApi;
+} = sensorApiV1;
 
 /**
  * Represents any sensor that reports information about the robot's direction,
@@ -26,7 +27,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const linearVelocity = await movementSensor.getLinearVelocity();
    * ```
@@ -34,7 +35,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getlinearvelocity).
    */
-  getLinearVelocity(extra?: Struct): Promise<Vector3>;
+  getLinearVelocity(extra?: JsonObject): Promise<Vector3>;
 
   /**
    * Get the angular velocity across x/y/z axes.
@@ -44,7 +45,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const angularVelocity = await movementSensor.getAngularVelocity();
    * ```
@@ -52,7 +53,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getangularvelocity).
    */
-  getAngularVelocity(extra?: Struct): Promise<Vector3>;
+  getAngularVelocity(extra?: JsonObject): Promise<Vector3>;
 
   /**
    * Get the compass heading, which is a number from 0-359 where 0 is North, 90
@@ -63,7 +64,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const compassHeading = await movementSensor.getCompassHeading();
    * ```
@@ -71,7 +72,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getcompassheading).
    */
-  getCompassHeading(extra?: Struct): Promise<number>;
+  getCompassHeading(extra?: JsonObject): Promise<number>;
 
   /**
    * Get the current orientation of the sensor.
@@ -81,7 +82,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const orientation = await movementSensor.getOrientation();
    * ```
@@ -89,7 +90,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getorientation).
    */
-  getOrientation(extra?: Struct): Promise<Orientation>;
+  getOrientation(extra?: JsonObject): Promise<Orientation>;
 
   /**
    * Get the current position latitude, longitude, and altitude.
@@ -99,7 +100,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const position = await movementSensor.getPosition();
    * ```
@@ -107,7 +108,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getposition).
    */
-  getPosition(extra?: Struct): Promise<MovementSensorPosition>;
+  getPosition(extra?: JsonObject): Promise<MovementSensorPosition>;
 
   /**
    * Get the properties of this movement sensor.
@@ -117,7 +118,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const properties = await movementSensor.getProperties();
    * ```
@@ -125,7 +126,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getproperties).
    */
-  getProperties(extra?: Struct): Promise<MovementSensorProperties>;
+  getProperties(extra?: JsonObject): Promise<MovementSensorProperties>;
 
   /**
    * Get the accuracy of various sensors.
@@ -135,7 +136,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const accuracy = await movementSensor.getAccuracy();
    * ```
@@ -143,7 +144,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getaccuracy).
    */
-  getAccuracy(extra?: Struct): Promise<MovementSensorAccuracy>;
+  getAccuracy(extra?: JsonObject): Promise<MovementSensorAccuracy>;
 
   /**
    * Get linear acceleration across x/y/z axes.
@@ -153,7 +154,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const linearAcceleration =
    *   await movementSensor.getLinearAcceleration();
@@ -162,7 +163,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getlinearacceleration).
    */
-  getLinearAcceleration(extra?: Struct): Promise<Vector3>;
+  getLinearAcceleration(extra?: JsonObject): Promise<Vector3>;
 
   /**
    * Return the readings of a sensor.
@@ -172,7 +173,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   'my_movement_sensor'
+   *   "my_movement_sensor",
    * );
    * const readings = await movementSensor.getReadings();
    * ```
@@ -180,5 +181,5 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getreadings).
    */
-  getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
+  getReadings(extra?: JsonObject): Promise<JsonObject>;
 }

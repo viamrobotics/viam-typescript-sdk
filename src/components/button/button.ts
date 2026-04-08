@@ -1,5 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a physical button. */
 export interface Button extends Resource {
@@ -18,5 +17,5 @@ export interface Button extends Resource {
    * For more information, see [Button
    * API](https://docs.viam.com/dev/reference/apis/components/button/#push).
    */
-  push: (extra?: Struct) => Promise<void>;
+  push: (extra?: JsonObject) => Promise<void>;
 }

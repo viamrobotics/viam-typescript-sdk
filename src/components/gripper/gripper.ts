@@ -1,6 +1,5 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
-import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { Geometry } from "../../gen/common/v1/common_pb";
+import type { JsonObject, Resource } from "../../types";
 
 /** Represents a physical robotic gripper. */
 export interface Gripper extends Resource {
@@ -10,17 +9,17 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
    *
    * // Get the geometries of this component
    * const geometries = await gripper.getGeometries();
-   * console.log('Geometries:', geometries);
+   * console.log("Geometries:", geometries);
    * ```
    *
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Open a gripper of the underlying robot.
@@ -28,7 +27,7 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
    *
    * // Open the gripper
    * await gripper.open();
@@ -37,7 +36,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#open).
    */
-  open: (extra?: Struct) => Promise<void>;
+  open: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Request a gripper of the underlying robot to grab.
@@ -45,7 +44,7 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
    *
    * // Close the gripper to grab
    * await gripper.grab();
@@ -54,7 +53,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#grab).
    */
-  grab: (extra?: Struct) => Promise<void>;
+  grab: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Stop a robot's gripper.
@@ -62,7 +61,7 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
    *
    * // Stop the gripper's current motion
    * await gripper.stop();
@@ -71,7 +70,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#stop).
    */
-  stop: (extra?: Struct) => Promise<void>;
+  stop: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Report if the gripper is in motion.
@@ -79,11 +78,11 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
    *
    * // Check if the gripper is currently moving
    * const moving = await gripper.isMoving();
-   * console.log('Gripper is moving:', moving);
+   * console.log("Gripper is moving:", moving);
    * ```
    *
    * For more information, see [Gripper
@@ -98,15 +97,15 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
    *
    * // Check if the gripper is holding something
    * const holding = await gripper.isHoldingSomething();
-   * console.log('Gripper is holding something:', holding);
+   * console.log("Gripper is holding something:", holding);
    * ```
    *
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#isholdingsomething).
    */
-  isHoldingSomething: (extra?: Struct) => Promise<boolean>;
+  isHoldingSomething: (extra?: JsonObject) => Promise<boolean>;
 }

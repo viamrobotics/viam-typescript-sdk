@@ -1,11 +1,11 @@
-import type { Resource, Struct, Vector3 } from '../../types';
+import type { JsonObject, Resource, Vector3 } from '../../types';
 
-import * as baseApi from '../../gen/component/base/v1/base_pb';
 import type { Geometry } from '../../gen/common/v1/common_pb';
+import * as baseApi from '../../gen/component/base/v1/base_pb';
+import * as baseApiV1 from '../../genv1/component/base/v1/base_pb';
 
 export type BaseProperties = baseApi.GetPropertiesResponse;
-
-export const { GetPropertiesResponse: BaseProperties } = baseApi;
+export const { GetPropertiesResponse: BaseProperties } = baseApiV1;
 
 /** Represents a physical base of a robot. */
 
@@ -23,7 +23,7 @@ export interface Base extends Resource {
    * For more information, see [Base
    * API](https://docs.viam.com/dev/reference/apis/components/base/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Move a base in a straight line by a given distance at a given speed. This
@@ -50,7 +50,7 @@ export interface Base extends Resource {
   moveStraight(
     distanceMm: number,
     mmPerSec: number,
-    extra?: Struct
+    extra?: JsonObject
   ): Promise<void>;
 
   /**
@@ -75,7 +75,7 @@ export interface Base extends Resource {
    * @param angleDeg - Degrees to spin.
    * @param degsPerSec - Angular speed, in degrees per second.
    */
-  spin(angleDeg: number, degsPerSec: number, extra?: Struct): Promise<void>;
+  spin(angleDeg: number, degsPerSec: number, extra?: JsonObject): Promise<void>;
 
   /**
    * Set the linear and angular power of a base from -1 to 1 in terms of power
@@ -117,7 +117,11 @@ export interface Base extends Resource {
    * @param linear - Desired linear power percentage from -1 to 1.
    * @param angular - Desired angular power percentage from -1 to 1.
    */
-  setPower(linear: Vector3, angular: Vector3, extra?: Struct): Promise<void>;
+  setPower(
+    linear: Vector3,
+    angular: Vector3,
+    extra?: JsonObject
+  ): Promise<void>;
 
   /**
    * Set the linear and angular velocity of a base.
@@ -140,7 +144,11 @@ export interface Base extends Resource {
    * @param linear - Desired linear velocity in millimeters per second.
    * @param angular - Desired angular velocity in degrees per second.
    */
-  setVelocity(linear: Vector3, angular: Vector3, extra?: Struct): Promise<void>;
+  setVelocity(
+    linear: Vector3,
+    angular: Vector3,
+    extra?: JsonObject
+  ): Promise<void>;
 
   /**
    * Stop a base
@@ -155,7 +163,7 @@ export interface Base extends Resource {
    * For more information, see [Base
    * API](https://docs.viam.com/dev/reference/apis/components/base/#stop).
    */
-  stop(extra?: Struct): Promise<void>;
+  stop(extra?: JsonObject): Promise<void>;
 
   /**
    * Return true if the base is in motion.
@@ -185,5 +193,5 @@ export interface Base extends Resource {
    * For more information, see [Base
    * API](https://docs.viam.com/dev/reference/apis/components/base/#getproperties).
    */
-  getProperties(extra?: Struct): Promise<BaseProperties>;
+  getProperties(extra?: JsonObject): Promise<BaseProperties>;
 }

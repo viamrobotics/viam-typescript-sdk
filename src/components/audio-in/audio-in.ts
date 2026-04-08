@@ -1,4 +1,4 @@
-import type { Resource, Struct } from '../../types';
+import type { Resource, JsonObject } from '../../types';
 import type { AudioInfo } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
 
@@ -28,7 +28,7 @@ export interface AudioIn extends Resource {
     codec: string,
     durationSeconds: number,
     previousTimestamp?: bigint,
-    extra?: Struct
+    extra?: JsonObject
   ): AsyncIterable<AudioChunk>;
 
   /**
@@ -41,5 +41,5 @@ export interface AudioIn extends Resource {
    * const properties = await audioIn.getProperties();
    * ```
    */
-  getProperties: (extra?: Struct) => Promise<AudioProperties>;
+  getProperties: (extra?: JsonObject) => Promise<AudioProperties>;
 }

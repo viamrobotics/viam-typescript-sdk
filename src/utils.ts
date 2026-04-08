@@ -1,32 +1,32 @@
+import { create } from "@bufbuild/protobuf";
+import type { CallOptions } from "@connectrpc/connect";
+import { apiVersion } from "./api-version";
+import type { Frame } from "./gen/app/v1/robot_pb";
 import {
-  Struct,
-  type JsonValue,
-  type PartialMessage,
-} from '@bufbuild/protobuf';
-import type { CallOptions } from '@connectrpc/connect';
-import { apiVersion } from './api-version';
-import {
-  DoCommandRequest,
-  DoCommandResponse,
-  GetKinematicsRequest,
-  GetKinematicsResponse,
-  GetGeometriesRequest,
-  GetGeometriesResponse,
-  GetStatusRequest,
-  GetStatusResponse,
-  Geometry,
-  Mesh,
-} from './gen/common/v1/common_pb';
-import type { Options, Vector3 } from './types';
-import type { Frame } from './gen/app/v1/robot_pb';
+  type DoCommandRequest,
+  DoCommandRequestSchema,
+  type DoCommandResponse,
+  type Geometry,
+  type GetGeometriesRequest,
+  GetGeometriesRequestSchema,
+  type GetGeometriesResponse,
+  type GetKinematicsRequest,
+  GetKinematicsRequestSchema,
+  type GetKinematicsResponse,
+  type GetStatusRequest,
+  GetStatusRequestSchema,
+  type GetStatusResponse,
+  type Mesh,
+} from "./gen/common/v1/common_pb";
+import type { JsonObject, Options, Vector3 } from "./types";
 
 export const clientHeaders = new Headers({
   viam_client: `typescript;v${__VERSION__};${apiVersion}`,
 });
 
 type doCommand = (
-  request: PartialMessage<DoCommandRequest>,
-  options?: CallOptions
+  request: DoCommandRequest,
+  options?: CallOptions,
 ) => Promise<DoCommandResponse>;
 
 /**
@@ -35,38 +35,30 @@ type doCommand = (
  * @example
  *
  * ```ts
- * // Plain object (recommended)
  * const result = await doCommandFromClient(doFn, name, {
  *   myCommand: { key: 'value' },
  * });
  *
- * // Struct (still supported)
- * const result = await doCommandFromClient(
- *   doFn,
- *   name,
- *   Struct.fromJson({ myCommand: { key: 'value' } })
- * );
- * ```
- *
  * @param command - The command to execute. Accepts either a {@link Struct} or a
  *   plain object, which will be converted automatically.
+ * ```
  */
 export const doCommandFromClient = async function doCommandFromClient(
   doCommander: doCommand,
   name: string,
-  command: Struct | Record<string, JsonValue>,
+  command: JsonObject,
   options: Options = {},
-  callOptions: CallOptions = {}
-): Promise<JsonValue> {
-  const request = new DoCommandRequest({
+  callOptions: CallOptions = {},
+): Promise<JsonObject> {
+  const request = create(DoCommandRequestSchema, {
     name,
-    command: command instanceof Struct ? command : Struct.fromJson(command),
+    command: command,
   });
 
   options.requestLogger?.(request);
 
   const response = await doCommander(request, callOptions);
-  const result = response.result?.toJson();
+  const result = response.result;
   if (result === undefined) {
     return {};
   }
@@ -75,12 +67,12 @@ export const doCommandFromClient = async function doCommandFromClient(
 
 export const enableDebugLogging = (
   key?: string,
-  opts?: CallOptions
+  opts?: CallOptions,
 ): CallOptions => {
   const finalOpts = opts ?? { headers: {} as Record<string, string> };
-  let finalKey = '';
+  let finalKey = "";
   if (key === undefined) {
-    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const letters = "abcdefghijklmnopqrstuvwxyz";
     for (let i = 0; i < 6; i += 1) {
       finalKey += letters[Math.floor(Math.random() * 26)];
     }
@@ -101,7 +93,7 @@ export const disableDebugLogging = (opts: CallOptions): void => {
 export const addMetadata = (
   key: string,
   value: string,
-  opts?: CallOptions
+  opts?: CallOptions,
 ): CallOptions => {
   const finalOpts =
     opts ?? ({ headers: {} as Record<string, string> } as CallOptions);
@@ -120,7 +112,7 @@ export const deleteMetadata = (opts: CallOptions, key: string): void => {
 /** Shared type for kinematics return value */
 export interface KinematicsData {
   name: string;
-  kinematic_param_type: 'SVA' | 'URDF' | 'UNSPECIFIED';
+  kinematic_param_type: "SVA" | "URDF" | "UNSPECIFIED";
   joints: {
     id: string;
     type: string;
@@ -144,25 +136,25 @@ export type GetKinematicsResult =
   | GetKinematicsResultWithMeshes;
 
 type getKinematics = (
-  request: PartialMessage<GetKinematicsRequest>,
-  options?: CallOptions
+  request: GetKinematicsRequest,
+  options?: CallOptions,
 ) => Promise<GetKinematicsResponse>;
 
 /** Get kinematics information using a resource client */
 export const getKinematicsFromClient = async function getKinematicsFromClient(
   getKinematicsMethod: getKinematics,
   name: string,
-  extra: Struct = Struct.fromJson({}),
-  callOptions: CallOptions = {}
+  extra: {},
+  callOptions: CallOptions = {},
 ): Promise<GetKinematicsResult> {
-  const request = new GetKinematicsRequest({
+  const request = create(GetKinematicsRequestSchema, {
     name,
     extra,
   });
 
   const response = await getKinematicsMethod(request, callOptions);
 
-  const decoder = new TextDecoder('utf8');
+  const decoder = new TextDecoder("utf8");
   const jsonString = decoder.decode(response.kinematicsData);
   const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
 
@@ -174,18 +166,18 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 };
 
 type getGeometries = (
-  request: PartialMessage<GetGeometriesRequest>,
-  options?: CallOptions
+  request: GetGeometriesRequest,
+  options?: CallOptions,
 ) => Promise<GetGeometriesResponse>;
 
 /** Get geometries information using a resource client */
 export const getGeometriesFromClient = async function getGeometriesFromClient(
   getGeometriesMethod: getGeometries,
   name: string,
-  extra: Struct = Struct.fromJson({}),
-  callOptions: CallOptions = {}
+  extra: {},
+  callOptions: CallOptions = {},
 ): Promise<Geometry[]> {
-  const request = new GetGeometriesRequest({
+  const request = create(GetGeometriesRequestSchema, {
     name,
     extra,
   });
@@ -195,8 +187,8 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
 };
 
 type getStatus = (
-  request: PartialMessage<GetStatusRequest>,
-  options?: CallOptions
+  request: GetStatusRequest,
+  options?: CallOptions,
 ) => Promise<GetStatusResponse>;
 
 /** Get the status of a resource using a resource client */
@@ -204,12 +196,12 @@ export const getStatusFromClient = async function getStatusFromClient(
   getStatusMethod: getStatus,
   name: string,
   options: Options = {},
-  callOptions: CallOptions = {}
-): Promise<JsonValue> {
-  const request = new GetStatusRequest({ name });
+  callOptions: CallOptions = {},
+): Promise<JsonObject> {
+  const request = create(GetStatusRequestSchema, { name });
   options.requestLogger?.(request);
   const response = await getStatusMethod(request, callOptions);
-  const result = response.result?.toJson();
+  const result = response.result;
   if (result === undefined) {
     return {};
   }

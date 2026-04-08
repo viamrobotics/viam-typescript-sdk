@@ -1,18 +1,19 @@
-import { type JsonValue, Struct, Timestamp } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
-import { CameraService } from '../../gen/component/camera/v1/camera_pb';
+import { create } from "@bufbuild/protobuf";
+import { TimestampSchema } from "@bufbuild/protobuf/wkt";
+import type { CallOptions, Client } from "@connectrpc/connect";
+import { GetGeometriesRequestSchema } from "../../gen/common/v1/common_pb";
 import {
-  GetImagesRequest,
-  GetPointCloudRequest,
-} from '../../gen/component/camera/v1/camera_pb';
-import type { RobotClient } from '../../robot';
-import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { Camera, MimeType, ResponseMetadata } from './camera';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
+  CameraService,
+  GetImagesRequestSchema,
+  GetPointCloudRequestSchema,
+  GetPropertiesRequestSchema,
+} from "../../gen/component/camera/v1/camera_pb";
+import type { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { Camera, MimeType, ResponseMetadata } from "./camera";
 
-const PointCloudPCD: MimeType = 'pointcloud/pcd';
+const PointCloudPCD: MimeType = "pointcloud/pcd";
 
 /**
  * A gRPC-web client for the Camera component.
@@ -32,9 +33,9 @@ export class CameraClient implements Camera {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    const request = new GetGeometriesRequest({
+    const request = create(GetGeometriesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     const response = await this.client.getGeometries(request, callOptions);
@@ -44,12 +45,12 @@ export class CameraClient implements Camera {
   async getImages(
     filterSourceNames: string[] = [],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new GetImagesRequest({
+    const request = create(GetImagesRequestSchema, {
       name: this.name,
       filterSourceNames,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -61,17 +62,17 @@ export class CameraClient implements Camera {
       mimeType: image.mimeType,
     }));
     const metadata: ResponseMetadata = {
-      capturedAt: resp.responseMetadata?.capturedAt ?? new Timestamp(),
+      capturedAt: resp.responseMetadata?.capturedAt ?? create(TimestampSchema),
     };
 
     return { images, metadata };
   }
 
   async getPointCloud(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPointCloudRequest({
+    const request = create(GetPointCloudRequestSchema, {
       name: this.name,
       mimeType: PointCloudPCD,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -81,7 +82,7 @@ export class CameraClient implements Camera {
   }
 
   async getProperties(callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
     });
 
@@ -90,25 +91,25 @@ export class CameraClient implements Camera {
     return this.client.getProperties(request, callOptions);
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

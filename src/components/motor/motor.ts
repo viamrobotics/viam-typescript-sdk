@@ -1,5 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
+import type { JsonObject, Resource } from "../../types";
 
 export interface Properties {
   /** Whether a motor supports position reporting. */
@@ -14,7 +13,7 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Set the power to 40% forwards
    * await motor.setPower(0.4);
@@ -26,7 +25,7 @@ export interface Motor extends Resource {
    * @param power - A value between -1 and 1 where negative values indicate a
    *   backwards direction and positive values a forward direction.
    */
-  setPower(power: number, extra?: Struct): Promise<void>;
+  setPower(power: number, extra?: JsonObject): Promise<void>;
 
   /**
    * Turn the motor at a specified speed for either a specified number of
@@ -36,7 +35,7 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Turn the motor 7.2 revolutions at 60 RPM
    * await motor.goFor(60, 7.2);
@@ -51,7 +50,7 @@ export interface Motor extends Resource {
    *   indefinitely. If this value is nonzero, this will block until the number
    *   of revolutions has been completed or another operation comes in.
    */
-  goFor(rpm: number, revolutions: number, extra?: Struct): Promise<void>;
+  goFor(rpm: number, revolutions: number, extra?: JsonObject): Promise<void>;
 
   /**
    * Move the motor to a specific position relative to its home position at a
@@ -60,7 +59,7 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Turn the motor to 8.3 revolutions from home at 75 RPM
    * await motor.goTo(75, 8.3);
@@ -73,7 +72,11 @@ export interface Motor extends Resource {
    * @param positionRevolutions - Number of revolutions relative to the motor's
    *   home position.
    */
-  goTo(rpm: number, positionRevolutions: number, extra?: Struct): Promise<void>;
+  goTo(
+    rpm: number,
+    positionRevolutions: number,
+    extra?: JsonObject,
+  ): Promise<void>;
 
   /**
    * Move the motor indefinitely at a specified speed. Raise an error if
@@ -82,7 +85,7 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Spin the motor at 75 RPM
    * await motor.setRPM(75);
@@ -93,7 +96,7 @@ export interface Motor extends Resource {
    *
    * @param rpm - Speed in revolutions per minute.
    */
-  setRPM(rpm: number, extra?: Struct): Promise<void>;
+  setRPM(rpm: number, extra?: JsonObject): Promise<void>;
 
   /**
    * Set the current position of the motor as the new zero position, offset by a
@@ -102,7 +105,7 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Set the current position as the new home position with no offset
    * await motor.resetZeroPosition(0.0);
@@ -113,7 +116,7 @@ export interface Motor extends Resource {
    *
    * @param offset - Position from which to offset the current position.
    */
-  resetZeroPosition(offset: number, extra?: Struct): Promise<void>;
+  resetZeroPosition(offset: number, extra?: JsonObject): Promise<void>;
 
   /**
    * Turn the motor off.
@@ -121,7 +124,7 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Stop the motor
    * await motor.stop();
@@ -130,7 +133,7 @@ export interface Motor extends Resource {
    * For more information, see [Motor
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#stop).
    */
-  stop(extra?: Struct): Promise<void>;
+  stop(extra?: JsonObject): Promise<void>;
 
   /**
    * Return the motor's properties.
@@ -138,18 +141,18 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Report a dictionary mapping optional properties to whether it is supported by
    * // this motor
    * const properties = await motor.getProperties();
-   * console.log('Properties:', properties);
+   * console.log("Properties:", properties);
    * ```
    *
    * For more information, see [Motor
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#getproperties).
    */
-  getProperties(extra?: Struct): Promise<Properties>;
+  getProperties(extra?: JsonObject): Promise<Properties>;
 
   /**
    * Return the position of the motor relative to its zero position. Raise an
@@ -158,17 +161,17 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Get the current position of the motor
    * const position = await motor.getPosition();
-   * console.log('Position:', position);
+   * console.log("Position:", position);
    * ```
    *
    * For more information, see [Motor
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#getposition).
    */
-  getPosition(extra?: Struct): Promise<number>;
+  getPosition(extra?: JsonObject): Promise<number>;
 
   /**
    * Return true if the motor is on.
@@ -176,18 +179,18 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Check whether the motor is currently running
    * const [isPowered, powerPct] = await motor.isPowered();
-   * console.log('Powered:', isPowered);
-   * console.log('Power percentage:', powerPct);
+   * console.log("Powered:", isPowered);
+   * console.log("Power percentage:", powerPct);
    * ```
    *
    * For more information, see [Motor
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#ispowered).
    */
-  isPowered(extra?: Struct): Promise<readonly [boolean, number]>;
+  isPowered(extra?: JsonObject): Promise<readonly [boolean, number]>;
 
   /**
    * Return true if the motor is in motion.
@@ -195,11 +198,11 @@ export interface Motor extends Resource {
    * @example
    *
    * ```ts
-   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const motor = new VIAM.MotorClient(machine, "my_motor");
    *
    * // Check whether the motor is currently moving
    * const moving = await motor.isMoving();
-   * console.log('Moving:', moving);
+   * console.log("Moving:", moving);
    * ```
    *
    * For more information, see [Motor
