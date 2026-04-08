@@ -1,34 +1,37 @@
 // @vitest-environment happy-dom
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { Struct } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { VisionService } from '../../gen/service/vision/v1/vision_pb';
 import {
-  CaptureAllFromCameraResponse,
-  GetClassificationsFromCameraResponse,
-  GetClassificationsResponse,
-  GetDetectionsFromCameraResponse,
-  GetDetectionsResponse,
-  GetObjectPointCloudsResponse,
-  GetPropertiesResponse,
+  CaptureAllFromCameraResponseSchema,
+  ClassificationSchema,
+  DetectionSchema,
+  GetClassificationsFromCameraResponseSchema,
+  GetClassificationsResponseSchema,
+  GetDetectionsFromCameraResponseSchema,
+  GetDetectionsResponseSchema,
+  GetObjectPointCloudsResponseSchema,
+  GetPropertiesResponseSchema,
 } from '../../gen/service/vision/v1/vision_pb';
+import { PointCloudObjectSchema } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { VisionClient } from './client';
-import { Classification, Detection, PointCloudObject } from './types';
+import { type Classification, type Detection, type PointCloudObject } from './types';
 vi.mock('../../robot');
-vi.mock('../../gen/service/vision/v1/vision_pb_service');
+
+import { create } from '@bufbuild/protobuf';
 
 const visionClientName = 'test-vision';
 
 let vision: VisionClient;
 
-const classification: Classification = new Classification({
+const classification: Classification = create(ClassificationSchema, {
   className: 'face',
   confidence: 0.995_482_683_181_762_7,
 });
 
-const detection: Detection = new Detection({
+const detection: Detection = create(DetectionSchema, {
   xMin: BigInt(251),
   yMin: BigInt(225),
   xMax: BigInt(416),
@@ -37,37 +40,37 @@ const detection: Detection = new Detection({
   className: 'face',
 });
 
-const pco: PointCloudObject = new PointCloudObject({
+const pco: PointCloudObject = create(PointCloudObjectSchema, {
   pointCloud: new Uint8Array([1, 2, 3, 4]),
   geometries: undefined,
 });
 
-const extra: Struct = Struct.fromJson({ key: 'value' });
+const extra = { key: 'value' };
 
 describe('VisionClient Tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(VisionService, {
         getDetections: () =>
-          new GetDetectionsResponse({ detections: [detection] }),
+          create(GetDetectionsResponseSchema, { detections: [detection] }),
         getDetectionsFromCamera: () =>
-          new GetDetectionsFromCameraResponse({ detections: [detection] }),
+          create(GetDetectionsFromCameraResponseSchema, { detections: [detection] }),
         getClassifications: () =>
-          new GetClassificationsResponse({ classifications: [classification] }),
+          create(GetClassificationsResponseSchema, { classifications: [classification] }),
         getClassificationsFromCamera: () =>
-          new GetClassificationsFromCameraResponse({
+          create(GetClassificationsFromCameraResponseSchema, {
             classifications: [classification],
           }),
         getObjectPointClouds: () =>
-          new GetObjectPointCloudsResponse({ objects: [pco] }),
+          create(GetObjectPointCloudsResponseSchema, { objects: [pco] }),
         getProperties: () =>
-          new GetPropertiesResponse({
+          create(GetPropertiesResponseSchema, {
             classificationsSupported: true,
             detectionsSupported: true,
             objectPointCloudsSupported: true,
           }),
         captureAllFromCamera: () =>
-          new CaptureAllFromCameraResponse({
+          create(CaptureAllFromCameraResponseSchema, {
             classifications: [classification],
             detections: [detection],
             objects: [pco],

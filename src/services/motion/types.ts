@@ -11,15 +11,4 @@ export type ObstacleDetector = motionApi.ObstacleDetector;
 export type OrientationConstraint = motionApi.OrientationConstraint;
 export type PlanState = motionApi.PlanState;
 
-export const {
-  CollisionSpecification,
-  Constraints,
-  GetPlanResponse,
-  LinearConstraint,
-  PseudolinearConstraint,
-  ListPlanStatusesResponse,
-  MotionConfiguration,
-  ObstacleDetector,
-  OrientationConstraint,
-  PlanState,
-} = motionApi;
+export const { PlanState } = motionApi;

@@ -2,16 +2,19 @@
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
-import { Struct } from '@bufbuild/protobuf';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { VideoService } from '../../gen/service/video/v1/video_pb';
-import { GetVideoResponse } from '../../gen/service/video/v1/video_pb';
-import { DoCommandResponse } from '../../gen/common/v1/common_pb';
+import {
+  GetVideoResponseSchema,
+  type GetVideoResponse,
+} from '../../gen/service/video/v1/video_pb';
+import { DoCommandResponseSchema } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { VideoClient } from './client';
 
 vi.mock('../../robot');
-vi.mock('../../gen/service/video/v1/video_pb_service');
+
+import { create } from '@bufbuild/protobuf';
 
 const videoClientName = 'test-video';
 
@@ -23,7 +26,7 @@ describe('VideoClient Tests', () => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(VideoService, {
         getVideo: () => testVideoStream,
-        doCommand: () => new DoCommandResponse({ result: Struct.fromJson({}) }),
+        doCommand: () => create(DoCommandResponseSchema, { result: {} }),
       });
     });
 
@@ -57,7 +60,7 @@ describe('VideoClient Tests', () => {
       })();
 
       await testVideoStream.write(
-        new GetVideoResponse({
+        create(GetVideoResponseSchema, {
           videoData: chunk1,
           videoContainer: 'mp4',
           requestId: 'test-request-id',
@@ -65,7 +68,7 @@ describe('VideoClient Tests', () => {
       );
 
       await testVideoStream.write(
-        new GetVideoResponse({
+        create(GetVideoResponseSchema, {
           videoData: chunk2,
           videoContainer: 'mp4',
           requestId: 'test-request-id',
@@ -100,13 +103,6 @@ describe('VideoClient Tests', () => {
   });
 
   describe('doCommand Tests', () => {
-    it('sends and receives arbitrary commands with a Struct', async () => {
-      const result = await video.doCommand(
-        Struct.fromJson({ command: 'test' })
-      );
-      expect(result).toStrictEqual({});
-    });
-
     it('sends and receives arbitrary commands with a plain object', async () => {
       const result = await video.doCommand({ command: 'test' });
       expect(result).toStrictEqual({});

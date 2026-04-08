@@ -1,6 +1,5 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
-import type { ComponentConfig } from '../../gen/app/v1/robot_pb';
+import type { ComponentConfig } from "../../gen/app/v1/robot_pb";
+import type { JsonObject, Resource } from "../../types";
 
 /** A service that enables various computer vision algorithms */
 export interface Discovery extends Resource {
@@ -10,5 +9,5 @@ export interface Discovery extends Resource {
    * @param discoveryName - The name of the discovery service.
    * @returns - The list of ComponentConfigs.
    */
-  discoverResources: (extra?: Struct) => Promise<ComponentConfig[]>;
+  discoverResources: (extra?: JsonObject) => Promise<ComponentConfig[]>;
 }

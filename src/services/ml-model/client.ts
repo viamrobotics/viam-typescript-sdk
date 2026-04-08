@@ -1,12 +1,14 @@
-import type { CallOptions, Client } from '@connectrpc/connect';
-import type { FlatTensors, MLModel } from './ml-model';
-import { Struct, type Options } from '../../types';
-import type { RobotClient } from '../../robot';
+import { create, type MessageInitShape } from "@bufbuild/protobuf";
+import type { CallOptions, Client } from "@connectrpc/connect";
 import {
-  InferRequest,
-  MetadataRequest,
-} from '../../gen/service/mlmodel/v1/mlmodel_pb';
-import { MLModelService } from '../../gen/service/mlmodel/v1/mlmodel_pb';
+  FlatTensorsSchema,
+  InferRequestSchema,
+  MetadataRequestSchema,
+  MLModelService,
+} from "../../gen/service/mlmodel/v1/mlmodel_pb";
+import type { RobotClient } from "../../robot";
+import type { Options } from "../../types";
+import type { MLModel } from "./ml-model";
 
 export class MLModelClient implements MLModel {
   private client: Client<typeof MLModelService>;
@@ -22,9 +24,9 @@ export class MLModelClient implements MLModel {
   }
 
   async metadata(extra = {}, callOptions = this.callOptions) {
-    const request = new MetadataRequest({
+    const request = create(MetadataRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -33,14 +35,14 @@ export class MLModelClient implements MLModel {
   }
 
   async infer(
-    inputTensors: FlatTensors,
+    inputTensors: MessageInitShape<typeof FlatTensorsSchema>,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new InferRequest({
+    const request = create(InferRequestSchema, {
       name: this.name,
       inputTensors,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);

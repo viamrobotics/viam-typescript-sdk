@@ -1,15 +1,22 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type * as mlModelAPI from '../../gen/service/mlmodel/v1/mlmodel_pb';
+import type { MessageInitShape } from "@bufbuild/protobuf";
+import {
+  FlatTensorsSchema,
+  type InferResponse,
+  type MetadataResponse,
+} from "../../gen/service/mlmodel/v1/mlmodel_pb";
+import type { JsonObject } from "../../types";
 
-export type Metadata = mlModelAPI.Metadata;
-export type TensorInfo = mlModelAPI.TensorInfo;
-export type FlatTensors = mlModelAPI.FlatTensors;
+export {
+  type FlatTensors,
+  type Metadata,
+  type TensorInfo,
+} from "../../gen/service/mlmodel/v1/mlmodel_pb";
 
 export interface MLModel {
-  metadata: (extra?: Struct) => Promise<mlModelAPI.MetadataResponse>;
+  metadata: (extra?: JsonObject) => Promise<MetadataResponse>;
 
   infer: (
-    inputTensors: FlatTensors,
-    extra?: Struct
-  ) => Promise<mlModelAPI.InferResponse>;
+    inputTensors: MessageInitShape<typeof FlatTensorsSchema>,
+    extra?: JsonObject,
+  ) => Promise<InferResponse>;
 }

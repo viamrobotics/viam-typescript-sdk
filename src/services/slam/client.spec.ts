@@ -5,14 +5,18 @@ import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SLAMService } from '../../gen/service/slam/v1/slam_pb';
 import {
-  GetInternalStateResponse,
-  GetPointCloudMapRequest,
-  GetPointCloudMapResponse,
+  GetInternalStateResponseSchema,
+  GetPointCloudMapRequestSchema,
+  GetPointCloudMapResponseSchema,
+  type GetPointCloudMapRequest,
+  type GetPointCloudMapResponse,
+  type GetInternalStateResponse,
 } from '../../gen/service/slam/v1/slam_pb';
 import { RobotClient } from '../../robot';
 import { SlamClient } from './client';
-vi.mock('../../gen/service/slam/v1/slam_pb_service');
 vi.mock('../../robot');
+
+import { create } from '@bufbuild/protobuf';
 
 let slam: SlamClient;
 
@@ -57,14 +61,14 @@ describe('SlamClient tests', () => {
 
       const chunk1 = new Uint8Array([4, 13]);
       await testPcdStream.write(
-        new GetPointCloudMapResponse({
+        create(GetPointCloudMapResponseSchema, {
           pointCloudPcdChunk: chunk1,
         })
       );
 
       const chunk2 = new Uint8Array([16, 25]);
       await testPcdStream.write(
-        new GetPointCloudMapResponse({
+        create(GetPointCloudMapResponseSchema, {
           pointCloudPcdChunk: chunk2,
         })
       );
@@ -77,7 +81,7 @@ describe('SlamClient tests', () => {
       const promiseEdit = slam.getPointCloudMap(true);
       const chunk3Edited = new Uint8Array([5, 38]);
       await testPcdStreamEdited.write(
-        new GetPointCloudMapResponse({
+        create(GetPointCloudMapResponseSchema, {
           pointCloudPcdChunk: chunk3Edited,
         })
       );
@@ -94,14 +98,14 @@ describe('SlamClient tests', () => {
 
       const chunk1 = new Uint8Array([4, 13]);
       await testInternalStream.write(
-        new GetInternalStateResponse({
+        create(GetInternalStateResponseSchema, {
           internalStateChunk: chunk1,
         })
       );
 
       const chunk2 = new Uint8Array([16, 25]);
       await testInternalStream.write(
-        new GetInternalStateResponse({
+        create(GetInternalStateResponseSchema, {
           internalStateChunk: chunk2,
         })
       );

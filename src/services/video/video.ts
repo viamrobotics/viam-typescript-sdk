@@ -1,5 +1,4 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { Resource } from '../../types';
+import type { JsonObject, Resource } from '../../types';
 import type { VideoChunk } from './types';
 
 /** A service that enables video streaming and retrieval for a given time range. */
@@ -39,7 +38,7 @@ export interface Video extends Resource {
     endTimestamp?: Date,
     videoCodec?: string,
     videoContainer?: string,
-    extra?: Struct
+    extra?: JsonObject
   ) => AsyncIterable<VideoChunk>;
 
   /**
@@ -49,6 +48,6 @@ export interface Video extends Resource {
    * @returns The result of the command.
    */
   doCommand: (
-    command: Struct | Record<string, JsonValue>
-  ) => Promise<JsonValue>;
+    command: JsonObject
+  ) => Promise<JsonObject>;
 }

@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '../../types';
 import type { Transform, Resource } from '../../types';
 import type { TransformChangeEvent, TransformWithUUID } from './types';
 import { UuidTool } from 'uuid-tool';
@@ -25,7 +25,7 @@ export interface WorldStateStore extends Resource {
    *
    * @param extra - Additional arguments to the method
    */
-  listUUIDs: (extra?: Struct) => Promise<string[]>;
+  listUUIDs: (extra?: JsonObject) => Promise<string[]>;
 
   /**
    * GetTransform returns a world state transform by UUID.
@@ -45,7 +45,7 @@ export interface WorldStateStore extends Resource {
    * @param uuid - The UUID of the transform to retrieve
    * @param extra - Additional arguments to the method
    */
-  getTransform: (uuid: string, extra?: Struct) => Promise<TransformWithUUID>;
+  getTransform: (uuid: string, extra?: JsonObject) => Promise<TransformWithUUID>;
 
   /**
    * StreamTransformChanges streams changes to world state transforms.
@@ -74,7 +74,7 @@ export interface WorldStateStore extends Resource {
    * @param extra - Additional arguments to the method
    */
   streamTransformChanges: (
-    extra?: Struct
+    extra?: JsonObject
   ) => AsyncGenerator<TransformChangeEvent, void>;
 }
 

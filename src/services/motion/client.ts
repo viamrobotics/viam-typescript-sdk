@@ -1,29 +1,30 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { MotionService } from '../../gen/service/motion/v1/motion_pb';
-import {
-  GetPlanRequest,
-  GetPoseRequest,
-  ListPlanStatusesRequest,
-  MoveOnGlobeRequest,
-  MoveOnMapRequest,
-  MoveRequest,
-  StopPlanRequest,
-} from '../../gen/service/motion/v1/motion_pb';
-import type { RobotClient } from '../../robot';
+import { create, type MessageInitShape } from "@bufbuild/protobuf";
+import type { CallOptions, Client } from "@connectrpc/connect";
 import type {
-  GeoGeometry,
-  GeoPoint,
-  Geometry,
-  Options,
-  Pose,
-  PoseInFrame,
-  Transform,
-  WorldState,
-} from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { Motion } from './motion';
-import { type Constraints, type MotionConfiguration } from './types';
+  GeoGeometrySchema,
+  GeometrySchema,
+  GeoPointSchema,
+  PoseInFrameSchema,
+  PoseSchema,
+  TransformSchema,
+  WorldStateSchema,
+} from "../../gen/common/v1/common_pb";
+import {
+  ConstraintsSchema,
+  GetPlanRequestSchema,
+  GetPoseRequestSchema,
+  ListPlanStatusesRequestSchema,
+  MotionConfigurationSchema,
+  MotionService,
+  MoveOnGlobeRequestSchema,
+  MoveOnMapRequestSchema,
+  MoveRequestSchema,
+  StopPlanRequestSchema,
+} from "../../gen/service/motion/v1/motion_pb";
+import type { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { Motion } from "./motion";
 
 /**
  * A gRPC-web client for a Motion service.
@@ -43,20 +44,20 @@ export class MotionClient implements Motion {
   }
 
   async move(
-    destination: PoseInFrame,
+    destination: MessageInitShape<typeof PoseInFrameSchema>,
     componentName: string,
-    worldState?: WorldState,
-    constraints?: Constraints,
+    worldState?: MessageInitShape<typeof WorldStateSchema>,
+    constraints?: MessageInitShape<typeof ConstraintsSchema>,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new MoveRequest({
+    const request = create(MoveRequestSchema, {
       name: this.name,
       destination,
       componentName,
       worldState,
       constraints,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -66,22 +67,22 @@ export class MotionClient implements Motion {
   }
 
   async moveOnMap(
-    destination: Pose,
+    destination: MessageInitShape<typeof PoseSchema>,
     componentName: string,
     slamServiceName: string,
-    motionConfig?: MotionConfiguration,
-    obstacles?: Geometry[],
+    motionConfig?: MessageInitShape<typeof MotionConfigurationSchema>,
+    obstacles?: MessageInitShape<typeof GeometrySchema>[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new MoveOnMapRequest({
+    const request = create(MoveOnMapRequestSchema, {
       name: this.name,
       destination,
       componentName,
       slamServiceName,
       motionConfiguration: motionConfig,
       obstacles,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -91,17 +92,17 @@ export class MotionClient implements Motion {
   }
 
   async moveOnGlobe(
-    destination: GeoPoint,
+    destination: MessageInitShape<typeof GeoPointSchema>,
     componentName: string,
     movementSensorName: string,
     heading?: number,
-    obstaclesList?: GeoGeometry[],
-    motionConfig?: MotionConfiguration,
-    boundingRegionsList?: GeoGeometry[],
+    obstaclesList?: MessageInitShape<typeof GeoGeometrySchema>[],
+    motionConfig?: MessageInitShape<typeof MotionConfigurationSchema>,
+    boundingRegionsList?: MessageInitShape<typeof GeoGeometrySchema>[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new MoveOnGlobeRequest({
+    const request = create(MoveOnGlobeRequestSchema, {
       name: this.name,
       destination,
       componentName,
@@ -110,7 +111,7 @@ export class MotionClient implements Motion {
       obstacles: obstaclesList,
       boundingRegions: boundingRegionsList,
       motionConfiguration: motionConfig,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -122,12 +123,12 @@ export class MotionClient implements Motion {
   async stopPlan(
     componentName: string,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new StopPlanRequest({
+    const request = create(StopPlanRequestSchema, {
       name: this.name,
       componentName,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -141,14 +142,14 @@ export class MotionClient implements Motion {
     lastPlanOnly?: boolean,
     executionId?: string,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new GetPlanRequest({
+    const request = create(GetPlanRequestSchema, {
       name: this.name,
       componentName,
       lastPlanOnly,
       executionId,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -159,12 +160,12 @@ export class MotionClient implements Motion {
   async listPlanStatuses(
     onlyActivePlans?: boolean,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new ListPlanStatusesRequest({
+    const request = create(ListPlanStatusesRequestSchema, {
       name: this.name,
       onlyActivePlans,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -176,16 +177,16 @@ export class MotionClient implements Motion {
   async getPose(
     componentName: string,
     destinationFrame: string,
-    supplementalTransforms: Transform[],
+    supplementalTransforms: MessageInitShape<typeof TransformSchema>[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    const request = new GetPoseRequest({
+    const request = create(GetPoseRequestSchema, {
       name: this.name,
       componentName,
       destinationFrame,
       supplementalTransforms,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -195,31 +196,31 @@ export class MotionClient implements Motion {
     const result = response.pose;
 
     if (!result) {
-      throw new Error('no pose');
+      throw new Error("no pose");
     }
 
     return result;
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

@@ -1,16 +1,16 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { SLAMService } from '../../gen/service/slam/v1/slam_pb';
+import { create } from "@bufbuild/protobuf";
+import type { CallOptions, Client } from "@connectrpc/connect";
 import {
-  GetInternalStateRequest,
-  GetPointCloudMapRequest,
-  GetPositionRequest,
-  GetPropertiesRequest,
-} from '../../gen/service/slam/v1/slam_pb';
-import { RobotClient } from '../../robot';
-import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { Slam } from './slam';
+  GetInternalStateRequestSchema,
+  GetPointCloudMapRequestSchema,
+  GetPositionRequestSchema,
+  GetPropertiesRequestSchema,
+  SLAMService,
+} from "../../gen/service/slam/v1/slam_pb";
+import type { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { Slam } from "./slam";
 
 /**
  * A gRPC-web client for a SLAM service.
@@ -30,7 +30,7 @@ export class SlamClient implements Slam {
   }
 
   async getPosition(callOptions = this.callOptions) {
-    const request = new GetPositionRequest({
+    const request = create(GetPositionRequestSchema, {
       name: this.name,
     });
 
@@ -41,9 +41,9 @@ export class SlamClient implements Slam {
 
   async getPointCloudMap(
     returnEditedMap?: boolean,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<Uint8Array> {
-    const request = new GetPointCloudMapRequest({
+    const request = create(GetPointCloudMapRequestSchema, {
       name: this.name,
       returnEditedMap,
     });
@@ -58,7 +58,7 @@ export class SlamClient implements Slam {
   }
 
   async getInternalState(callOptions = this.callOptions): Promise<Uint8Array> {
-    const request = new GetInternalStateRequest({
+    const request = create(GetInternalStateRequestSchema, {
       name: this.name,
     });
     this.options.requestLogger?.(request);
@@ -72,7 +72,7 @@ export class SlamClient implements Slam {
   }
 
   async getProperties(callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
     });
 
@@ -81,25 +81,25 @@ export class SlamClient implements Slam {
     return this.client.getProperties(request, callOptions);
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

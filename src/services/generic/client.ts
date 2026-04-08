@@ -1,10 +1,9 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { GenericService } from '../../gen/service/generic/v1/generic_pb';
-import { RobotClient } from '../../robot';
-import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { Generic } from './generic';
+import type { CallOptions, Client } from "@connectrpc/connect";
+import { GenericService } from "../../gen/service/generic/v1/generic_pb";
+import { RobotClient } from "../../robot";
+import type { JsonObject, Options } from "../../types";
+import { doCommandFromClient, getStatusFromClient } from "../../utils";
+import type { Generic } from "./generic";
 
 /**
  * A gRPC-web client for a Generic service.
@@ -23,25 +22,25 @@ export class GenericClient implements Generic {
     this.options = options;
   }
 
-  async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
+  async getStatus(callOptions = this.callOptions): Promise<JsonObject> {
     return getStatusFromClient(
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
-  ): Promise<JsonValue> {
+    command: JsonObject,
+    callOptions = this.callOptions,
+  ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }
