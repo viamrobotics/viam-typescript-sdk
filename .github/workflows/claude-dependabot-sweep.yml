@@ -6,13 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  call-dependabot-sweep:
+  sweep:
     if: github.repository_owner == 'viamrobotics'
-    # viamrobotics/claude-ci-workflows@v1.10.7
-    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-dependabot-sweep.yml@118d898f2b199075e1758901393fa6d20f8c6f59
+    # viamrobotics/claude-ci-workflows@v1.17.3
+    uses: viamrobotics/claude-ci-workflows/.github/workflows/claude-dependabot-sweep.yml@3ad96b0ccbb5ee0d7e2cde98653fae0c453e68bb
     with:
       install_command: npm ci
       allowed_tools: 'Edit,Read,Write,Glob,Grep,Bash(make *),Bash(npm install*),Bash(npm ci*),Bash(npm update*),Bash(npm outdated*),Bash(npm ls*),Bash(npm view*),Bash(git config *),Bash(git add *),Bash(git commit *),Bash(git push *),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git checkout *),Bash(git branch *),Bash(git rev-parse *),Bash(git fetch *),Bash(gh pr create*),Bash(gh pr view*),Bash(gh issue comment*),Bash(gh issue view*)'
+      alert_severity: 'critical,high,medium'
+      max_turns: 40
       extra_system_prompt: |
         ### Updating dependencies
         - To update a package: `npm install <package>@<version>` (NOT npm ci, which refuses to modify the lockfile).
