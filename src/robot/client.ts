@@ -177,6 +177,13 @@ interface WebRTCOptions {
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
   shouldRetryOnError?: () => boolean;
+  forceRelay?: boolean;
+  forceP2P?: boolean;
+  turnUri?: string;
+  turnScheme?: 'turn' | 'turns';
+  turnTransport?: 'tcp' | 'udp';
+  turnPort?: number;
+  signalingInsecure?: boolean;
 }
 
 interface DirectOptions {
@@ -1103,6 +1110,13 @@ export class RobotClient extends EventDispatcher implements Robot {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions.rtcConfig,
+          forceRelay: this.webrtcOptions.forceRelay,
+          forceP2P: this.webrtcOptions.forceP2P,
+          turnUri: this.webrtcOptions.turnUri,
+          turnScheme: this.webrtcOptions.turnScheme,
+          turnTransport: this.webrtcOptions.turnTransport,
+          turnPort: this.webrtcOptions.turnPort,
+          signalingInsecure: this.webrtcOptions.signalingInsecure,
         },
         dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
