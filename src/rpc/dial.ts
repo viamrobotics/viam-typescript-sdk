@@ -98,7 +98,7 @@ export interface DialWebRTCOptions {
 
   // `additionalSDPValues` is a collection of additional SDP values that we want to pass into the connection's call request.
   additionalSdpFields?: Record<string, string | number>;
-  
+
   /**
    * When true, sets ICE transport policy to relay-only so only TURN candidates
    * are used. Useful for testing relay connectivity through a TURN server.
