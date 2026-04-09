@@ -111,6 +111,12 @@ export interface DialWebRTCConf {
   turnPort?: number;
 
   /**
+   * When true, the connection to the signaling server is made over plain HTTP
+   * (no TLS). Use this when connecting to a robot running with `no_tls: true`.
+   */
+  signalingInsecure?: boolean;
+
+  /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
    *
@@ -171,12 +177,6 @@ interface WebRTCOptions {
   reconnectMaxAttempts?: number;
   reconnectMaxWait?: number;
   shouldRetryOnError?: () => boolean;
-  forceRelay?: boolean;
-  forceP2P?: boolean;
-  turnUri?: string;
-  turnScheme?: 'turn' | 'turns';
-  turnTransport?: 'tcp' | 'udp';
-  turnPort?: number;
 }
 
 interface DirectOptions {
@@ -740,6 +740,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.webrtcOptions.turnScheme = conf.turnScheme;
     this.webrtcOptions.turnTransport = conf.turnTransport;
     this.webrtcOptions.turnPort = conf.turnPort;
+    this.webrtcOptions.signalingInsecure = conf.signalingInsecure;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
@@ -1102,12 +1103,6 @@ export class RobotClient extends EventDispatcher implements Robot {
         webrtcOptions: {
           disableTrickleICE: false,
           rtcConfig: this.webrtcOptions.rtcConfig,
-          forceRelay: this.webrtcOptions.forceRelay,
-          forceP2P: this.webrtcOptions.forceP2P,
-          turnUri: this.webrtcOptions.turnUri,
-          turnScheme: this.webrtcOptions.turnScheme,
-          turnTransport: this.webrtcOptions.turnTransport,
-          turnPort: this.webrtcOptions.turnPort,
         },
         dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
