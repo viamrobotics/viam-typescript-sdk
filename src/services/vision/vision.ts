@@ -1,5 +1,5 @@
-import type { JsonObject } from '../../types';
 import type { MimeType } from '../../main';
+import type { JsonObject } from '../../types';
 import type { Resource } from '../../types';
 import type {
   CaptureAllOptions,

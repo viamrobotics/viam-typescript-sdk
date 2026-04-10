@@ -47,7 +47,5 @@ export interface Video extends Resource {
    * @param command - The command to execute.
    * @returns The result of the command.
    */
-  doCommand: (
-    command: JsonObject
-  ) => Promise<JsonObject>;
+  doCommand: (command: JsonObject) => Promise<JsonObject>;
 }

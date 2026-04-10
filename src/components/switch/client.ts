@@ -1,15 +1,16 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   GetNumberOfPositionsRequestSchema,
   GetPositionRequestSchema,
   SetPositionRequestSchema,
   SwitchService,
-} from "../../gen/component/switch/v1/switch_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Switch } from "./switch";
+} from '../../gen/component/switch/v1/switch_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Switch } from './switch';
 
 /**
  * A gRPC-web client for the Switch component.
@@ -31,12 +32,12 @@ export class SwitchClient implements Switch {
   async setPosition(
     position: number,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(SetPositionRequestSchema, {
       name: this.name,
       position,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -47,7 +48,7 @@ export class SwitchClient implements Switch {
   async getPosition(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -59,7 +60,7 @@ export class SwitchClient implements Switch {
   async getNumberOfPositions(extra = {}, callOptions = this.callOptions) {
     const request = create(GetNumberOfPositionsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -70,7 +71,7 @@ export class SwitchClient implements Switch {
       resp.labels.length !== resp.numberOfPositions
     ) {
       throw new Error(
-        "the number of labels does not match the number of positions",
+        'the number of labels does not match the number of positions'
       );
     }
     return [resp.numberOfPositions, resp.labels] as [number, string[]];
@@ -81,20 +82,20 @@ export class SwitchClient implements Switch {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

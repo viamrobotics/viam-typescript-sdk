@@ -1,17 +1,18 @@
-import { create, toJson } from "@bufbuild/protobuf";
-import { ValueSchema } from "@bufbuild/protobuf/wkt";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetReadingsRequestSchema } from "../../gen/common/v1/common_pb";
+import { create, toJson } from '@bufbuild/protobuf';
+import { ValueSchema } from '@bufbuild/protobuf/wkt';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { GetReadingsRequestSchema } from '../../gen/common/v1/common_pb';
 import {
   GetCurrentRequestSchema,
   GetPowerRequestSchema,
   GetVoltageRequestSchema,
   PowerSensorService,
-} from "../../gen/component/powersensor/v1/powersensor_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { PowerSensor } from "./power-sensor";
+} from '../../gen/component/powersensor/v1/powersensor_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { PowerSensor } from './power-sensor';
 
 /**
  * A gRPC-web client for the PowerSensor component.
@@ -34,7 +35,7 @@ export class PowerSensorClient implements PowerSensor {
   async getVoltage(extra = {}, callOptions = this.callOptions) {
     const request = create(GetVoltageRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -47,7 +48,7 @@ export class PowerSensorClient implements PowerSensor {
   async getCurrent(extra = {}, callOptions = this.callOptions) {
     const request = create(GetCurrentRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -60,7 +61,7 @@ export class PowerSensorClient implements PowerSensor {
   async getPower(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPowerRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -72,7 +73,7 @@ export class PowerSensorClient implements PowerSensor {
   async getReadings(extra = {}, callOptions = this.callOptions) {
     const request = create(GetReadingsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -95,20 +96,20 @@ export class PowerSensorClient implements PowerSensor {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

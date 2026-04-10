@@ -1,5 +1,6 @@
-import type { JsonObject } from "@bufbuild/protobuf";
-import type { Sensor } from "../sensor";
+import type { JsonObject } from '@bufbuild/protobuf';
+
+import type { Sensor } from '../sensor';
 
 /** Represents any sensor that reports voltage, current, and/or power */
 export interface PowerSensor extends Sensor {
@@ -12,7 +13,7 @@ export interface PowerSensor extends Sensor {
    * ```ts
    * const powerSensor = new VIAM.PowerSensorClient(
    *   machine,
-   *   "my_power_sensor",
+   *   'my_power_sensor'
    * );
    * const [voltage, isAc] = await powerSensor.getVoltage();
    * ```
@@ -30,7 +31,7 @@ export interface PowerSensor extends Sensor {
    * ```ts
    * const powerSensor = new VIAM.PowerSensorClient(
    *   machine,
-   *   "my_power_sensor",
+   *   'my_power_sensor'
    * );
    * const [current, isAc] = await powerSensor.getCurrent();
    * ```
@@ -47,7 +48,7 @@ export interface PowerSensor extends Sensor {
    * ```ts
    * const powerSensor = new VIAM.PowerSensorClient(
    *   machine,
-   *   "my_power_sensor",
+   *   'my_power_sensor'
    * );
    * const power = await powerSensor.getPower();
    * ```
@@ -64,7 +65,7 @@ export interface PowerSensor extends Sensor {
    * ```ts
    * const powerSensor = new VIAM.PowerSensorClient(
    *   machine,
-   *   "my_power_sensor",
+   *   'my_power_sensor'
    * );
    * const readings = await powerSensor.getReadings();
    * ```

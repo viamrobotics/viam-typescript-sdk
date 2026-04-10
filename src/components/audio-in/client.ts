@@ -1,15 +1,15 @@
-import type { RobotClient } from "../../robot";
-import type { Options } from "../../types";
+import { create, type JsonObject } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
 
-import { create, type JsonObject } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetPropertiesRequestSchema } from "../../gen/common/v1/common_pb";
+import { GetPropertiesRequestSchema } from '../../gen/common/v1/common_pb';
 import {
   AudioInService,
   GetAudioRequestSchema,
-} from "../../gen/component/audioin/v1/audioin_pb";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import { type AudioChunk, type AudioIn } from "./audio-in";
+} from '../../gen/component/audioin/v1/audioin_pb';
+import type { RobotClient } from '../../robot';
+import type { Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { AudioChunk, AudioIn } from './audio-in';
 
 /*
  * A gRPC-web client for the AudioIn component.
@@ -33,14 +33,14 @@ export class AudioInClient implements AudioIn {
     durationSeconds: number,
     previousTimestamp = 0n,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): AsyncIterable<AudioChunk> {
     const request = create(GetAudioRequestSchema, {
       name: this.name,
       codec,
       durationSeconds,
       previousTimestampNanoseconds: previousTimestamp,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -66,7 +66,7 @@ export class AudioInClient implements AudioIn {
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -85,20 +85,20 @@ export class AudioInClient implements AudioIn {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

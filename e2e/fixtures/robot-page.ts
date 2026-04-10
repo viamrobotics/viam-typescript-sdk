@@ -1,4 +1,5 @@
-import { test as base, type Page } from '@playwright/test';
+import { type Page, test as base } from '@playwright/test';
+
 import type { OutputType, ResolvedReturnType } from '../helpers/api-types';
 
 export class RobotPage {

@@ -1,16 +1,17 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   GetPositionRequestSchema,
   IsMovingRequestSchema,
   MoveRequestSchema,
   ServoService,
   StopRequestSchema,
-} from "../../gen/component/servo/v1/servo_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Servo } from "./servo";
+} from '../../gen/component/servo/v1/servo_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Servo } from './servo';
 
 /**
  * A gRPC-web client for the Servo component.
@@ -33,7 +34,7 @@ export class ServoClient implements Servo {
     const request = create(MoveRequestSchema, {
       name: this.name,
       angleDeg,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -44,7 +45,7 @@ export class ServoClient implements Servo {
   async getPosition(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -56,7 +57,7 @@ export class ServoClient implements Servo {
   async stop(extra = {}, callOptions = this.callOptions) {
     const request = create(StopRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -80,20 +81,20 @@ export class ServoClient implements Servo {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

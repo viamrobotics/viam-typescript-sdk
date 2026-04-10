@@ -1,19 +1,19 @@
-import type { MessageInitShape } from "@bufbuild/protobuf";
+import type { MessageInitShape } from '@bufbuild/protobuf';
+
 import type {
   GeoGeometrySchema,
   GeometrySchema,
   GeoPointSchema,
   PoseInFrameSchema,
   PoseSchema,
-  TransformSchema,
   WorldStateSchema,
-} from "../../gen/common/v1/common_pb";
+} from '../../gen/common/v1/common_pb';
 import type {
   ConstraintsSchema,
   MotionConfigurationSchema,
-} from "../../gen/service/motion/v1/motion_pb";
-import type { JsonObject, PoseInFrame, Resource } from "../../types";
-import type { GetPlanResponse, ListPlanStatusesResponse } from "./types";
+} from '../../gen/service/motion/v1/motion_pb';
+import type { JsonObject, Resource } from '../../types';
+import type { GetPlanResponse, ListPlanStatusesResponse } from './types';
 
 /**
  * A service that coordinates motion planning across all of the components in a
@@ -67,7 +67,7 @@ export interface Motion extends Resource {
     componentName: string,
     worldState?: MessageInitShape<typeof WorldStateSchema>,
     constraints?: MessageInitShape<typeof ConstraintsSchema>,
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<boolean>;
 
   /**
@@ -82,7 +82,7 @@ export interface Motion extends Resource {
    * @example
    *
    * ```ts
-   * const motion = new VIAM.MotionClient(machine, "builtin");
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
    * // Define destination pose with respect to map origin
    * const myPose: VIAM.Pose = {
@@ -95,14 +95,14 @@ export interface Motion extends Resource {
    *   theta: 0,
    * };
    *
-   * const baseName = "my_base";
-   * const slamServiceName = "my_slam_service";
+   * const baseName = 'my_base';
+   * const slamServiceName = 'my_slam_service';
    *
    * // Move the base to Y=10 (location of 0,10,0) relative to map origin
    * const executionId = await motion.moveOnMap(
    *   myPose,
    *   baseName,
-   *   slamServiceName,
+   *   slamServiceName
    * );
    * ```
    *
@@ -124,7 +124,7 @@ export interface Motion extends Resource {
     slamServiceName: string,
     motionConfiguration?: MessageInitShape<typeof MotionConfigurationSchema>,
     obstacles?: MessageInitShape<typeof GeometrySchema>[],
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<string>;
 
   /**
@@ -139,7 +139,7 @@ export interface Motion extends Resource {
    * @example
    *
    * ```ts
-   * const motion = new VIAM.MotionClient(machine, "builtin");
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
    * // Define destination at GPS coordinates [0,0]
    * const destination: VIAM.GeoPoint = {
@@ -147,14 +147,14 @@ export interface Motion extends Resource {
    *   longitude: -73.98,
    * };
    *
-   * const baseName = "my_base";
-   * const movementSensorName = "my_movement_sensor";
+   * const baseName = 'my_base';
+   * const movementSensorName = 'my_movement_sensor';
    *
    * // Move the base to the geographic location
    * const globeExecutionId = await motion.moveOnGlobe(
    *   destination,
    *   baseName,
-   *   movementSensorName,
+   *   movementSensorName
    * );
    * ```
    *
@@ -181,7 +181,7 @@ export interface Motion extends Resource {
     obstaclesList?: MessageInitShape<typeof GeoGeometrySchema>[],
     motionConfiguration?: MessageInitShape<typeof MotionConfigurationSchema>,
     boundingRegion?: MessageInitShape<typeof GeoGeometrySchema>[],
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<string>;
 
   /**
@@ -191,8 +191,8 @@ export interface Motion extends Resource {
    * @example
    *
    * ```ts
-   * const motion = new VIAM.MotionClient(machine, "builtin");
-   * const baseName = "my_base";
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   * const baseName = 'my_base';
    *
    * // Stop the base component which was instructed to move
    * await motion.stopPlan(baseName);
@@ -222,8 +222,8 @@ export interface Motion extends Resource {
    * @example
    *
    * ```ts
-   * const motion = new VIAM.MotionClient(machine, "builtin");
-   * const baseName = "my_base";
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   * const baseName = 'my_base';
    *
    * // Get the plan(s) of the base component
    * const response = await motion.getPlan(baseName);
@@ -243,7 +243,7 @@ export interface Motion extends Resource {
     componentName: string,
     lastPlanOnly?: boolean,
     executionId?: string,
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<GetPlanResponse>;
 
   /**
@@ -259,7 +259,7 @@ export interface Motion extends Resource {
    * @example
    *
    * ```ts
-   * const motion = new VIAM.MotionClient(machine, "builtin");
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
    *
    * // List plan statuses within the TTL
    * const response = await motion.listPlanStatuses();
@@ -273,42 +273,6 @@ export interface Motion extends Resource {
    */
   listPlanStatuses: (
     onlyActivePlans?: boolean,
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<ListPlanStatusesResponse>;
-
-  /**
-   * Get the current location and orientation of a component.
-   *
-   * @deprecated Use `RobotClient.getPose` instead.
-   * @example
-   *
-   * ```ts
-   * const motion = new VIAM.MotionClient(machine, "builtin");
-   *
-   * const gripperName = "my_gripper";
-   *
-   * // Get the gripper's pose in world coordinates
-   * const gripperPoseInWorld = await motion.getPose(
-   *   gripperName,
-   *   "world",
-   *   [],
-   * );
-   * ```
-   *
-   * For more information, see [Motion
-   * API](https://docs.viam.com/dev/reference/apis/services/motion/#getpose).
-   *
-   * @param componentName - The component whose `Pose` is being requested.
-   * @param destinationFrame - The reference frame in which the component's
-   *   `Pose` should be provided, if unset this defaults to the "world"
-   *   reference frame.
-   * @param supplementalTransforms - `Pose` information on any additional
-   *   reference frames that are needed to compute the component's `Pose`.
-   */
-  getPose: (
-    componentName: string,
-    destinationFrame: string,
-    supplementalTransforms: MessageInitShape<typeof TransformSchema>[],
-    extra?: JsonObject,
-  ) => Promise<PoseInFrame>;
 }

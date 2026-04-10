@@ -1,5 +1,5 @@
-import type { Transport } from '@connectrpc/connect';
 import { vi } from 'vitest';
+import type { Transport } from '@connectrpc/connect';
 
 export const createMockTransport = (): Transport => {
   return {

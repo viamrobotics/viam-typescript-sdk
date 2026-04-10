@@ -1,9 +1,10 @@
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GenericService } from "../../gen/service/generic/v1/generic_pb";
-import { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Generic } from "./generic";
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { GenericService } from '../../gen/service/generic/v1/generic_pb';
+import { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Generic } from './generic';
 
 /**
  * A gRPC-web client for a Generic service.
@@ -27,20 +28,20 @@ export class GenericClient implements Generic {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

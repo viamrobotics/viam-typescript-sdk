@@ -2,13 +2,13 @@ export const version = __VERSION__;
 
 export {
   RobotClient as Client,
-  RobotClient,
-  createRobotClient,
   type CloudMetadata,
+  createRobotClient,
   type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
   type Robot,
+  RobotClient,
 } from './robot';
 /**
  * Raw Protobuf interfaces for a Robot component.
@@ -18,21 +18,6 @@ export {
  * @deprecated Use {@link RobotClient} instead.
  * @group Raw Protobufs
  */
-export * as robotApi from './gen/robot/v1/robot_pb';
-
-export {
-  createViamClient,
-  type ViamClient,
-  type ViamClientOptions,
-} from './app/viam-client';
-
-export {
-  type AccessToken,
-  type Credential,
-  type CredentialType,
-  type Credentials,
-} from './app/viam-transport';
-
 export {
   type BinaryDataCaptureUploadOptions,
   type BinaryID,
@@ -40,6 +25,18 @@ export {
   type FilterOptions,
   type IndexableCollection,
 } from './app/data-client';
+export {
+  createViamClient,
+  type ViamClient,
+  type ViamClientOptions,
+} from './app/viam-client';
+export {
+  type AccessToken,
+  type Credential,
+  type Credentials,
+  type CredentialType,
+} from './app/viam-transport';
+export * as robotApi from './gen/robot/v1/robot_pb';
 /**
  * Raw Protobuf interfaces for Data.
  *
@@ -48,9 +45,8 @@ export {
  * @deprecated Use {@link DataClient} instead.
  * @group Raw Protobufs
  */
-export * as dataApi from './gen/app/data/v1/data_pb';
-
 export { type AppClient } from './app/app-client';
+export * as dataApi from './gen/app/data/v1/data_pb';
 /**
  * Raw Protobuf interfaces for an App service.
  *
@@ -59,14 +55,13 @@ export { type AppClient } from './app/app-client';
  * @deprecated Use {@link AppClient} instead.
  * @group Raw Protobufs
  */
-export * as appApi from './gen/app/v1/app_pb';
-export * as appRobotApi from './gen/app/v1/robot_pb';
-
 export {
+  type MlTrainingClient,
   ModelType,
   TrainingStatus,
-  type MlTrainingClient,
 } from './app/ml-training-client';
+export * as appApi from './gen/app/v1/app_pb';
+export * as appRobotApi from './gen/app/v1/robot_pb';
 /**
  * Raw Protobuf interfaces for ML Training.
  *
@@ -75,12 +70,11 @@ export {
  * @deprecated Use {@link MlTrainingClient} instead.
  * @group Raw Protobufs
  */
-export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
-
-export {
+export type {
   CloudConfig,
-  type ProvisioningClient,
+  ProvisioningClient,
 } from './app/provisioning-client';
+export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
 /**
  * Raw Protobuf interfaces for Provisioning.
  *
@@ -89,9 +83,8 @@ export {
  * @deprecated Use {@link ProvisioningClient} instead.
  * @group Raw Protobufs
  */
-export * as provisioningApi from './gen/provisioning/v1/provisioning_pb';
-
 export { type BillingClient } from './app/billing-client';
+export * as provisioningApi from './gen/provisioning/v1/provisioning_pb';
 /**
  * Raw Protobuf interfaces for Billing.
  *
@@ -100,20 +93,19 @@ export { type BillingClient } from './app/billing-client';
  * @deprecated Use {@link BillingClient} instead.
  * @group Raw Protobufs
  */
-export * as billingApi from './gen/app/v1/billing_pb';
-
 export {
   AudioCodec,
   type AudioCodecType,
   type AudioProperties,
 } from './audio-common';
-export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
+export { type Arm, ArmClient, ArmJointPositions } from './components/arm';
 export {
-  AudioInClient,
   type AudioChunk,
   type AudioIn,
+  AudioInClient,
 } from './components/audioin';
-export { AudioOutClient, type AudioOut } from './components/audioout';
+export { type AudioOut, AudioOutClient } from './components/audioout';
+export * as billingApi from './gen/app/v1/billing_pb';
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
@@ -122,9 +114,8 @@ export { AudioOutClient, type AudioOut } from './components/audioout';
  * @deprecated Use {@link ArmClient} instead.
  * @group Raw Protobufs
  */
+export { type Base, BaseClient, BaseProperties } from './components/base';
 export * as armApi from './gen/component/arm/v1/arm_pb';
-
-export { BaseClient, BaseProperties, type Base } from './components/base';
 /**
  * Raw Protobuf interfaces for a Base component.
  *
@@ -133,15 +124,14 @@ export { BaseClient, BaseProperties, type Base } from './components/base';
  * @deprecated Use {@link BaseClient} instead.
  * @group Raw Protobufs
  */
-export * as baseApi from './gen/component/base/v1/base_pb';
-
 export {
   AnalogValue,
+  type Board,
   BoardClient,
   PowerMode,
-  type Board,
   type Tick,
 } from './components/board';
+export * as baseApi from './gen/component/base/v1/base_pb';
 /**
  * Raw Protobuf interfaces for a Board component.
  *
@@ -150,9 +140,8 @@ export {
  * @deprecated Use {@link BoardClient} instead.
  * @group Raw Protobufs
  */
+export { type Button, ButtonClient } from './components/button';
 export * as boardApi from './gen/component/board/v1/board_pb';
-
-export { ButtonClient, type Button } from './components/button';
 /**
  * Raw Protobuf interfaces for a Button component.
  *
@@ -161,9 +150,8 @@ export { ButtonClient, type Button } from './components/button';
  * @deprecated Use {@link ButtonClient} instead.
  * @group Raw Protobufs
  */
+export { type Camera, CameraClient, type MimeType } from './components/camera';
 export * as buttonApi from './gen/component/button/v1/button_pb';
-
-export { CameraClient, type Camera, type MimeType } from './components/camera';
 /**
  * Raw Protobuf interfaces for a Camera component.
  *
@@ -173,8 +161,7 @@ export { CameraClient, type Camera, type MimeType } from './components/camera';
  * @group Raw Protobufs
  */
 export * as cameraApi from './gen/component/camera/v1/camera_pb';
-
-export { DiscoveryClient, type Discovery } from './services/discovery';
+export { type Discovery, DiscoveryClient } from './services/discovery';
 /**
  * Raw Protobuf interfaces for a Discovery service.
  *
@@ -183,14 +170,13 @@ export { DiscoveryClient, type Discovery } from './services/discovery';
  * @deprecated Use {@link DiscoveryService} instead.
  * @group Raw Protobufs
  */
-export * as discoveryApi from './gen/service/discovery/v1/discovery_pb';
-
 export {
+  type Encoder,
   EncoderClient,
   EncoderPositionType,
   EncoderProperties,
-  type Encoder,
 } from './components/encoder';
+export * as discoveryApi from './gen/service/discovery/v1/discovery_pb';
 /**
  * Raw Protobuf interfaces for an Encoder component.
  *
@@ -199,9 +185,8 @@ export {
  * @deprecated Use {@link EncoderClient} instead.
  * @group Raw Protobufs
  */
+export { type Gantry, GantryClient } from './components/gantry';
 export * as encoderApi from './gen/component/encoder/v1/encoder_pb';
-
-export { GantryClient, type Gantry } from './components/gantry';
 /**
  * Raw Protobuf interfaces for a Gantry component.
  *
@@ -210,17 +195,15 @@ export { GantryClient, type Gantry } from './components/gantry';
  * @deprecated Use {@link GantryClient} instead.
  * @group Raw Protobufs
  */
+export { type Motor, MotorClient } from './components/motor';
 export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
-
 export {
-  MLModelClient,
   type FlatTensors,
-  type MLModel,
   type Metadata,
+  type MLModel,
+  MLModelClient,
   type TensorInfo,
 } from './services/ml-model';
-
-export { MotorClient, type Motor } from './components/motor';
 /**
  * Raw Protobuf interfaces for a Motor component.
  *
@@ -229,15 +212,14 @@ export { MotorClient, type Motor } from './components/motor';
  * @deprecated Use {@link MotorClient} instead.
  * @group Raw Protobufs
  */
-export * as motorApi from './gen/component/motor/v1/motor_pb';
-
 export {
+  type MovementSensor,
   MovementSensorAccuracy,
   MovementSensorClient,
   MovementSensorPosition,
   MovementSensorProperties,
-  type MovementSensor,
 } from './components/movementsensor';
+export * as motorApi from './gen/component/motor/v1/motor_pb';
 /**
  * Raw Protobuf interfaces for a MovementSensor component.
  *
@@ -246,9 +228,8 @@ export {
  * @deprecated Use {@link MovementSensorClient} instead.
  * @group Raw Protobufs
  */
+export { type PowerSensor, PowerSensorClient } from './components/powersensor';
 export * as movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb';
-
-export { PowerSensorClient, type PowerSensor } from './components/powersensor';
 /**
  * Raw Protobuf interfaces for a PowerSensor component.
  *
@@ -257,9 +238,8 @@ export { PowerSensorClient, type PowerSensor } from './components/powersensor';
  * @deprecated Use {@link PowerSensorClient} instead.
  * @group Raw Protobufs
  */
+export { type Sensor, SensorClient } from './components/sensor';
 export * as powerSensorApi from './gen/component/powersensor/v1/powersensor_pb';
-
-export { SensorClient, type Sensor } from './components/sensor';
 /**
  * Raw Protobuf interfaces generated with
  * https://github.com/connectrpc/connect-es for a Sensor component.
@@ -267,9 +247,8 @@ export { SensorClient, type Sensor } from './components/sensor';
  * @deprecated Use {@link SensorClient} instead.
  * @group Raw Protobufs
  */
+export { type Stream, StreamClient } from './extra/stream';
 export * as sensorApi from './gen/component/sensor/v1/sensor_pb';
-
-export { StreamClient, type Stream } from './extra/stream';
 /**
  * Raw Protobuf interfaces for a Stream.
  *
@@ -278,9 +257,8 @@ export { StreamClient, type Stream } from './extra/stream';
  * @deprecated Use {@link StreamClient} instead.
  * @group Raw Protobufs
  */
+export { type Switch, SwitchClient } from './components/switch';
 export * as streamApi from './gen/stream/v1/stream_pb';
-
-export { SwitchClient, type Switch } from './components/switch';
 /**
  * Raw Protobuf interfaces for a Switch component.
  *
@@ -289,14 +267,12 @@ export { SwitchClient, type Switch } from './components/switch';
  * @deprecated Use {@link SwitchClient} instead.
  * @group Raw Protobufs
  */
-export * as switchApi from './gen/component/switch/v1/switch_pb';
-
 export {
-  GenericClient as GenericComponentClient,
   type Generic as GenericComponent,
+  GenericClient as GenericComponentClient,
 } from './components/generic';
-
-export { PoseTrackerClient, type PoseTracker } from './components/posetracker';
+export { type PoseTracker, PoseTrackerClient } from './components/posetracker';
+export * as switchApi from './gen/component/switch/v1/switch_pb';
 
 /**
  * Raw Protobuf interfaces for a Generic component.
@@ -306,9 +282,8 @@ export { PoseTrackerClient, type PoseTracker } from './components/posetracker';
  * @deprecated Use {@link GenericComponentClient} instead.
  * @group Raw Protobufs
  */
+export { type Gripper, GripperClient } from './components/gripper';
 export * as genericComponentApi from './gen/component/generic/v1/generic_pb';
-
-export { GripperClient, type Gripper } from './components/gripper';
 /**
  * Raw Protobuf interfaces for a Gripper component.
  *
@@ -317,9 +292,8 @@ export { GripperClient, type Gripper } from './components/gripper';
  * @deprecated Use {@link GripperClient} instead.
  * @group Raw Protobufs
  */
-export * as gripperApi from './gen/component/gripper/v1/gripper_pb';
-
 export * from './components/inputcontroller';
+export * as gripperApi from './gen/component/gripper/v1/gripper_pb';
 /**
  * Raw Protobuf interfaces for an InputController component.
  *
@@ -329,18 +303,17 @@ export * from './components/inputcontroller';
  * @group Raw Protobufs
  */
 export * as inputControllerApi from './gen/component/inputcontroller/v1/input_controller_pb';
-
 export {
-  CollisionSpecification,
-  Constraints,
-  LinearConstraint,
-  ListPlanStatusesResponse,
-  MotionClient,
-  MotionConfiguration,
-  ObstacleDetector,
-  OrientationConstraint,
+  type CollisionSpecification,
+  type Constraints,
   type GetPlanResponse,
+  type LinearConstraint,
+  type ListPlanStatusesResponse,
   type Motion,
+  MotionClient,
+  type MotionConfiguration,
+  type ObstacleDetector,
+  type OrientationConstraint,
   type PlanState,
 } from './services/motion';
 /**
@@ -352,8 +325,7 @@ export {
  * @group Raw Protobufs
  */
 export * as motionApi from './gen/service/motion/v1/motion_pb';
-
-export { DataManagerClient, type DataManager } from './services/data-manager';
+export { type DataManager, DataManagerClient } from './services/data-manager';
 /**
  * Raw Protobuf interfaces for a DataManager service.
  *
@@ -363,14 +335,13 @@ export { DataManagerClient, type DataManager } from './services/data-manager';
  * @group Raw Protobufs
  */
 export * as dataManagerApi from './gen/service/datamanager/v1/data_manager_pb';
-
 export {
-  NavigationClient,
-  NavigationPosition,
-  NavigationProperties,
-  Path,
-  Waypoint,
   type Mode,
+  NavigationClient,
+  type NavigationPosition,
+  type NavigationProperties,
+  type Path,
+  type Waypoint,
 } from './services/navigation';
 /**
  * Raw Protobuf interfaces for a Navigation service.
@@ -380,9 +351,8 @@ export {
  * @deprecated Use {@link NavigationClient} instead.
  * @group Raw Protobufs
  */
+export { type Servo, ServoClient } from './components/servo';
 export * as navigationApi from './gen/service/navigation/v1/navigation_pb';
-
-export { ServoClient, type Servo } from './components/servo';
 /**
  * Raw Protobuf interfaces for a Servo component.
  *
@@ -392,8 +362,11 @@ export { ServoClient, type Servo } from './components/servo';
  * @group Raw Protobufs
  */
 export * as servoApi from './gen/component/servo/v1/servo_pb';
-
-export { SlamClient, SlamPosition, SlamProperties } from './services/slam';
+export {
+  SlamClient,
+  type SlamPosition,
+  type SlamProperties,
+} from './services/slam';
 /**
  * Raw Protobuf interfaces for a Slam service.
  *
@@ -403,11 +376,10 @@ export { SlamClient, SlamPosition, SlamProperties } from './services/slam';
  * @group Raw Protobufs
  */
 export * as slamApi from './gen/service/slam/v1/slam_pb';
-
 export {
-  Classification,
-  Detection,
-  PointCloudObject,
+  type Classification,
+  type Detection,
+  type PointCloudObject,
   VisionClient,
 } from './services/vision';
 /**
@@ -419,15 +391,12 @@ export {
  * @group Raw Protobufs
  */
 export * as visionApi from './gen/service/vision/v1/vision_pb';
-
-export * from './services/world-state-store';
-
-export * from './services/video';
-
 export {
-  GenericClient as GenericServiceClient,
   type Generic as GenericService,
+  GenericClient as GenericServiceClient,
 } from './services/generic';
+export * from './services/video';
+export * from './services/world-state-store';
 /**
  * Raw Protobuf interfaces for a Generic service.
  *
@@ -446,10 +415,9 @@ export * as genericServiceApi from './gen/service/generic/v1/generic_pb';
  *
  * @group Raw Protobufs
  */
+export { MachineConnectionEvent } from './events';
 export * as commonApi from './gen/common/v1/common_pb';
-
 export * from './types';
-
 export {
   addMetadata,
   deleteMetadata,
@@ -458,5 +426,3 @@ export {
   enableDebugLogging,
   getStatusFromClient,
 } from './utils';
-
-export { MachineConnectionEvent } from './events';

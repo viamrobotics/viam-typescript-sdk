@@ -1,18 +1,18 @@
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
 
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
 import {
-  GetPropertiesRequestSchema,
   type AudioInfo,
-} from "../../gen/common/v1/common_pb";
+  GetPropertiesRequestSchema,
+} from '../../gen/common/v1/common_pb';
 import {
   AudioOutService,
   PlayRequestSchema,
-} from "../../gen/component/audioout/v1/audioout_pb";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import { type AudioOut } from "./audio-out";
+} from '../../gen/component/audioout/v1/audioout_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { AudioOut } from './audio-out';
 
 /**
  * A gRPC-web client for the AudioOut component.
@@ -35,13 +35,13 @@ export class AudioOutClient implements AudioOut {
     audioData: Uint8Array,
     audioInfo?: AudioInfo,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(PlayRequestSchema, {
       name: this.name,
       audioData,
       audioInfo,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -52,7 +52,7 @@ export class AudioOutClient implements AudioOut {
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -71,20 +71,20 @@ export class AudioOutClient implements AudioOut {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

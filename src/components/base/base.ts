@@ -1,8 +1,7 @@
-import type { JsonObject, Resource, Vector3 } from '../../types';
-
 import type { Geometry } from '../../gen/common/v1/common_pb';
 import * as baseApi from '../../gen/component/base/v1/base_pb';
 import * as baseApiV1 from '../../genv1/component/base/v1/base_pb';
+import type { JsonObject, Resource, Vector3 } from '../../types';
 
 export type BaseProperties = baseApi.GetPropertiesResponse;
 export const { GetPropertiesResponse: BaseProperties } = baseApiV1;

@@ -1,6 +1,6 @@
-export { EncoderClient } from "./encoder/client";
+export { EncoderClient } from './encoder/client';
 export {
+  type Encoder,
   EncoderPositionType,
   EncoderProperties,
-  type Encoder,
-} from "./encoder/encoder";
+} from './encoder/encoder';

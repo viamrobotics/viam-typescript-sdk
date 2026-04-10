@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import path from 'node:path';
+
 import { defineConfig } from 'vite';
 
 import pkg from './package.json';
@@ -14,7 +15,7 @@ export default defineConfig({
     minify: true,
     target: 'esnext',
     lib: {
-      entry: path.resolve(__dirname, 'src/main.ts'),
+      entry: path.resolve(import.meta.dirname, 'src/main.ts'),
       name: 'sdk',
       fileName: (format) => `main.${format}.js`,
     },

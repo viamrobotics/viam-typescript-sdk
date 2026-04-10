@@ -1,41 +1,44 @@
 import {
-  Struct,
-  Timestamp,
+  create,
   type JsonValue,
-  type PartialMessage,
+  type MessageInitShape,
 } from '@bufbuild/protobuf';
-import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import { timestampDate, timestampFromDate } from '@bufbuild/protobuf/wkt';
+import { type Client, createClient, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
-import { DataService } from '../gen/app/data/v1/data_pb';
+
 import {
-  BinaryID,
-  CaptureInterval,
-  CaptureMetadata,
-  Filter,
-  Index,
+  CaptureIntervalSchema,
+  DataService,
+  DeleteTabularFilterSchema,
+  type Filter,
+  FilterSchema,
+  type Index,
   IndexableCollection,
   Order,
-  TabularDataSource,
+  TabularDataSourceSchema,
   TabularDataSourceType,
-  DeleteTabularFilter,
-  TagsFilter,
+  TagsFilterSchema,
 } from '../gen/app/data/v1/data_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import {
+import type {
   DataPipeline,
   DataPipelineRun,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_pb';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_pb';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_pb';
 import {
-  DataCaptureUploadRequest,
+  DataCaptureUploadRequestSchema,
+  DataSyncService,
   DataType,
-  FileData,
-  FileUploadRequest,
-  SensorData,
-  SensorMetadata,
-  UploadMetadata,
+  FileDataSchema,
+  type FileUploadRequest,
+  FileUploadRequestSchema,
+  type SensorData,
+  SensorDataSchema,
+  SensorMetadataSchema,
+  type UploadMetadata,
+  UploadMetadataSchema,
 } from '../gen/app/datasync/v1/data_sync_pb';
 
 export type FilterOptions = Partial<Filter> & {
@@ -43,13 +46,6 @@ export type FilterOptions = Partial<Filter> & {
   startTime?: Date;
   tags?: string[];
 };
-
-interface TabularData {
-  data?: JsonValue;
-  metadata?: CaptureMetadata;
-  timeRequested?: Date;
-  timeReceived?: Date;
-}
 
 interface TabularDataPoint {
   partId: string;
@@ -134,13 +130,6 @@ export type Dataset = Partial<PBDataset> & {
   created?: Date;
 };
 
-const logDeprecationWarning = () => {
-  // eslint-disable-next-line no-console
-  console.warn(
-    'The BinaryID type is deprecated and will be removed in a future release. Please migrate to the BinaryDataId field instead.'
-  );
-};
-
 export class DataClient {
   private dataClient: Client<typeof DataService>;
   private datasetClient: Client<typeof DatasetService>;
@@ -195,18 +184,13 @@ export class DataClient {
     endTime?: Date,
     additionalParams?: Record<string, JsonValue>
   ) {
-    const interval = new CaptureInterval();
-    if (startTime) {
-      interval.start = Timestamp.fromDate(startTime);
-    }
-    if (endTime) {
-      interval.end = Timestamp.fromDate(endTime);
-    }
+    const interval = create(CaptureIntervalSchema, {
+      start: startTime && timestampFromDate(startTime),
+      end: endTime && timestampFromDate(endTime),
+    });
 
-    let additionalParameters: Struct | undefined;
-    if (additionalParams) {
-      additionalParameters = Struct.fromJson(additionalParams);
-    }
+    const additionalParameters: Record<string, JsonValue> | undefined =
+      additionalParams;
 
     const req = {
       partId,
@@ -227,15 +211,15 @@ export class DataClient {
         resourceName: response.resourceName,
         resourceSubtype: response.resourceSubtype,
         methodName: response.methodName,
-        timeCaptured: response.timeCaptured!.toDate(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        timeCaptured: timestampDate(response.timeCaptured!), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         organizationId: response.organizationId,
         locationId: response.locationId,
         robotName: response.robotName,
         robotId: response.robotId,
         partName: response.partName,
-        methodParameters: response.methodParameters!.toJson(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        methodParameters: response.methodParameters!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
         tags: response.tags,
-        payload: response.payload!.toJson(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        payload: response.payload!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
       });
     }
 
@@ -309,7 +293,7 @@ export class DataClient {
     organizationId: string,
     query: Uint8Array[] | Record<string, Date | JsonValue>[],
     useRecentData?: boolean,
-    tabularDataSource?: TabularDataSource,
+    tabularDataSource?: MessageInitShape<typeof TabularDataSourceSchema>,
     queryPrefixName?: string
   ) {
     const binary: Uint8Array[] =
@@ -323,7 +307,7 @@ export class DataClient {
       useRecentData &&
       (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)
     ) {
-      dataSource = new TabularDataSource({
+      dataSource = create(TabularDataSourceSchema, {
         type: TabularDataSourceType.HOT_STORAGE,
       });
     }
@@ -335,90 +319,6 @@ export class DataClient {
       queryPrefixName,
     });
     return resp.rawData.map((value) => BSON.deserialize(value));
-  }
-
-  /**
-   * Filter and get a page of tabular data. The returned metadata might be empty
-   * if the metadata index of the data is out of the bounds of the returned
-   * metadata list. The data will be paginated into pages of `limit` items, and
-   * the pagination ID will be included in the returned tuple.
-   *
-   * @example
-   *
-   * ```ts
-   * const data = await dataClient.tabularDataByFilter(
-   *   {
-   *     componentName: 'sensor-1',
-   *     componentType: 'rdk:component:sensor',
-   *   } as Filter,
-   *   5
-   * );
-   * ```
-   *
-   * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabyfilter).
-   *
-   * @param filter Optional `pb.Filter` specifying tabular data to retrieve. No
-   *   `filter` implies all tabular data.
-   * @param limit The maximum number of entries to include in a page. Defaults
-   *   to 50 if unspecfied
-   * @param sortOrder The desired sort order of the data
-   * @param last Optional string indicating the ID of the last-returned data. If
-   *   provided, the server will return the next data entries after the `last`
-   *   ID.
-   * @param countOnly Whether to return only the total count of entries
-   * @param includeInternalData Whether to retun internal data. Internal data is
-   *   used for Viam-specific data ingestion, like cloud SLAM. Defaults to
-   *   `false`.
-   * @returns An array of data objects, the count (number of entries), and the
-   *   last-returned page ID.
-   */
-  async tabularDataByFilter(
-    filter?: Filter,
-    limit?: number,
-    sortOrder?: Order,
-    last = '',
-    countOnly = false,
-    includeInternalData = false
-  ) {
-    const dataReq = {
-      filter,
-      limit: limit === undefined ? undefined : BigInt(limit),
-      sortOrder,
-      last,
-    };
-
-    const req = {
-      dataRequest: dataReq,
-      countOnly,
-      includeInternalData,
-    };
-
-    const response = await this.dataClient.tabularDataByFilter(req);
-    const mdListLength = response.metadata.length;
-
-    const dataArray: TabularData[] = [];
-    dataArray.push(
-      ...response.data.map((data) => {
-        const mdIndex = data.metadataIndex;
-        const metadata =
-          mdListLength !== 0 && mdIndex >= mdListLength
-            ? new CaptureMetadata()
-            : response.metadata[mdIndex];
-        return {
-          data: data.data?.toJson(),
-          metadata,
-          timeRequested: data.timeRequested?.toDate(),
-          timeReceived: data.timeRequested?.toDate(),
-        };
-      })
-    );
-
-    return {
-      data: dataArray,
-      count: response.count,
-      last: response.last,
-    };
   }
 
   /**
@@ -460,7 +360,7 @@ export class DataClient {
    *   last-returned page ID.
    */
   async binaryDataByFilter(
-    filter?: Filter,
+    filter?: MessageInitShape<typeof FilterSchema>,
     limit?: number,
     sortOrder?: Order,
     last = '',
@@ -509,17 +409,9 @@ export class DataClient {
    *   retrieved file
    * @returns An array of data objects
    */
-  async binaryDataByIds(ids: string[] | BinaryID[], includeBinary = true) {
-    if (Array.isArray(ids) && typeof ids[0] === 'string') {
-      const resp = await this.dataClient.binaryDataByIDs({
-        binaryDataIds: ids as string[],
-        includeBinary,
-      });
-      return resp.data;
-    }
-    logDeprecationWarning();
+  async binaryDataByIds(ids: string[], includeBinary = true) {
     const resp = await this.dataClient.binaryDataByIDs({
-      binaryIds: ids as BinaryID[],
+      binaryDataIds: ids,
       includeBinary,
     });
     return resp.data;
@@ -590,7 +482,7 @@ export class DataClient {
   async deleteTabularData(
     organizationId: string,
     deleteOlderThanDays: number,
-    filter?: PartialMessage<DeleteTabularFilter>
+    filter?: MessageInitShape<typeof DeleteTabularFilterSchema>
   ) {
     const resp = await this.dataClient.deleteTabularData({
       organizationId,
@@ -624,7 +516,10 @@ export class DataClient {
    *   is true
    * @returns The number of items deleted
    */
-  async deleteBinaryDataByFilter(filter?: Filter, includeInternalData = true) {
+  async deleteBinaryDataByFilter(
+    filter?: MessageInitShape<typeof FilterSchema>,
+    includeInternalData = true
+  ) {
     const resp = await this.dataClient.deleteBinaryDataByFilter({
       filter,
       includeInternalData,
@@ -649,16 +544,9 @@ export class DataClient {
    * @param ids The IDs of the data to be deleted. Must be non-empty.
    * @returns The number of items deleted
    */
-  async deleteBinaryDataByIds(ids: string[] | BinaryID[]) {
-    if (Array.isArray(ids) && typeof ids[0] === 'string') {
-      const resp = await this.dataClient.deleteBinaryDataByIDs({
-        binaryDataIds: ids as string[],
-      });
-      return resp.deletedCount;
-    }
-    logDeprecationWarning();
+  async deleteBinaryDataByIds(ids: string[]) {
     const resp = await this.dataClient.deleteBinaryDataByIDs({
-      binaryIds: ids as BinaryID[],
+      binaryDataIds: ids,
     });
     return resp.deletedCount;
   }
@@ -684,48 +572,10 @@ export class DataClient {
    *   non-empty.
    * @param ids The IDs of the data to be tagged. Must be non-empty.
    */
-  async addTagsToBinaryDataByIds(tags: string[], ids: string[] | BinaryID[]) {
-    if (Array.isArray(ids) && typeof ids[0] === 'string') {
-      await this.dataClient.addTagsToBinaryDataByIDs({
-        tags,
-        binaryDataIds: ids as string[],
-      });
-      return;
-    }
-    logDeprecationWarning();
+  async addTagsToBinaryDataByIds(tags: string[], ids: string[]) {
     await this.dataClient.addTagsToBinaryDataByIDs({
       tags,
-      binaryIds: ids as BinaryID[],
-    });
-  }
-
-  /**
-   * Add tags to binary data, specified by filter.
-   *
-   * @example
-   *
-   * ```ts
-   * const data = await dataClient.addTagsToBinaryDataByFilter(
-   *   ['tag1', 'tag2'],
-   *   [
-   *     {
-   *       componentName: 'camera-1',
-   *     } as Filter,
-   *   ]
-   * );
-   * ```
-   *
-   * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyfilter).
-   *
-   * @param tags The tags to add to the data
-   * @param filter Optional `pb.Filter` specifying binary data to add tags to.
-   *   No `filter` implies all binary data.
-   */
-  async addTagsToBinaryDataByFilter(tags: string[], filter?: Filter) {
-    await this.dataClient.addTagsToBinaryDataByFilter({
-      tags,
-      filter,
+      binaryDataIds: ids,
     });
   }
 
@@ -751,81 +601,12 @@ export class DataClient {
    * @param ids The IDs of the data to be edited. Must be non-empty.
    * @returns The number of items deleted
    */
-  async removeTagsFromBinaryDataByIds(
-    tags: string[],
-    ids: string[] | BinaryID[]
-  ) {
-    if (Array.isArray(ids) && typeof ids[0] === 'string') {
-      const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
-        tags,
-        binaryDataIds: ids as string[],
-      });
-      return resp.deletedCount;
-    }
-    logDeprecationWarning();
+  async removeTagsFromBinaryDataByIds(tags: string[], ids: string[]) {
     const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
       tags,
-      binaryIds: ids as BinaryID[],
+      binaryDataIds: ids,
     });
     return resp.deletedCount;
-  }
-
-  /**
-   * Remove tags from binary data, specified by filter.
-   *
-   * @example
-   *
-   * ```ts
-   * const data = await dataClient.removeTagsFromBinaryDataByFilter(
-   *   ['tag1', 'tag2'],
-   *   {
-   *     componentName: 'camera-1',
-   *     componentType: 'rdk:component:camera',
-   *     organizationIds: ['123abc45-1234-5678-90ab-cdef12345678'],
-   *     startTime: new Date('2025-03-19'),
-   *     endTime: new Date('2025-03-20'),
-   *   } as Filter
-   * );
-   * ```
-   *
-   * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyfilter).
-   *
-   * @param tags List of tags to remove from specified binary data. Must be
-   *   non-empty.
-   * @param filter Optional `pb.Filter` specifying binary data to add tags to.
-   *   No `filter` implies all binary data.
-   * @returns The number of items deleted
-   */
-  async removeTagsFromBinaryDataByFilter(tags: string[], filter?: Filter) {
-    const resp = await this.dataClient.removeTagsFromBinaryDataByFilter({
-      tags,
-      filter,
-    });
-    return resp.deletedCount;
-  }
-
-  /**
-   * Get a list of tags using a filter.
-   *
-   * @example
-   *
-   * ```ts
-   * const data = await dataClient.tagsByFilter({
-   *   componentName: 'camera-1',
-   * } as Filter);
-   * ```
-   *
-   * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#tagsbyfilter).
-   *
-   * @param filter Optional `pb.Filter` specifying what data to get tags from.
-   *   No `filter` implies all data.
-   * @returns The list of tags
-   */
-  async tagsByFilter(filter?: Filter) {
-    const resp = await this.dataClient.tagsByFilter({ filter });
-    return resp.tags;
   }
 
   /**
@@ -864,7 +645,7 @@ export class DataClient {
    * @returns The bounding box ID
    */
   async addBoundingBoxToImageById(
-    binaryId: string | BinaryID,
+    binaryId: string,
     label: string,
     xMinNormalized: number,
     yMinNormalized: number,
@@ -872,21 +653,8 @@ export class DataClient {
     yMaxNormalized: number,
     confidence?: number
   ) {
-    if (typeof binaryId === 'string') {
-      const resp = await this.dataClient.addBoundingBoxToImageByID({
-        binaryDataId: binaryId,
-        label,
-        xMinNormalized,
-        yMinNormalized,
-        xMaxNormalized,
-        yMaxNormalized,
-        confidence,
-      });
-      return resp.bboxId;
-    }
-    logDeprecationWarning();
     const resp = await this.dataClient.addBoundingBoxToImageByID({
-      binaryId,
+      binaryDataId: binaryId,
       label,
       xMinNormalized,
       yMinNormalized,
@@ -915,20 +683,9 @@ export class DataClient {
    * @param binId The ID of the image to remove the bounding box from
    * @param bboxId The ID of the bounding box to remove
    */
-  async removeBoundingBoxFromImageById(
-    binId: string | BinaryID,
-    bboxId: string
-  ) {
-    if (typeof binId === 'string') {
-      await this.dataClient.removeBoundingBoxFromImageByID({
-        binaryDataId: binId,
-        bboxId,
-      });
-      return;
-    }
-    logDeprecationWarning();
+  async removeBoundingBoxFromImageById(binId: string, bboxId: string) {
     await this.dataClient.removeBoundingBoxFromImageByID({
-      binaryId: binId,
+      binaryDataId: binId,
       bboxId,
     });
   }
@@ -967,7 +724,7 @@ export class DataClient {
    *   expressed as a normalized value from 0 to 1
    */
   async updateBoundingBox(
-    binaryId: string | BinaryID,
+    binaryId: string,
     bboxId: string,
     label: string,
     xMinNormalized: number,
@@ -976,22 +733,8 @@ export class DataClient {
     yMaxNormalized: number,
     confidence?: number
   ) {
-    if (typeof binaryId === 'string') {
-      await this.dataClient.updateBoundingBox({
-        binaryDataId: binaryId,
-        bboxId,
-        label,
-        xMinNormalized,
-        yMinNormalized,
-        xMaxNormalized,
-        yMaxNormalized,
-        confidence,
-      });
-      return;
-    }
-    logDeprecationWarning();
     await this.dataClient.updateBoundingBox({
-      binaryId,
+      binaryDataId: binaryId,
       bboxId,
       label,
       xMinNormalized,
@@ -1000,31 +743,6 @@ export class DataClient {
       yMaxNormalized,
       confidence,
     });
-  }
-
-  /**
-   * Get a list of bounding box labels using a Filter.
-   *
-   * @example
-   *
-   * ```ts
-   * const data = await dataClient.boundingBoxLabelsByFilter({
-   *   componentName: 'camera-1',
-   * } as Filter);
-   * ```
-   *
-   * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#boundingboxlabelsbyfilter).
-   *
-   * @param filter Optional `pb.Filter` specifying what data to get tags from.
-   *   No `filter` implies all labels.
-   * @returns The list of bounding box labels
-   */
-  async boundingBoxLabelsByFilter(filter?: Filter) {
-    const resp = await this.dataClient.boundingBoxLabelsByFilter({
-      filter,
-    });
-    return resp.labels;
   }
 
   /**
@@ -1095,20 +813,9 @@ export class DataClient {
    * @param ids The IDs of binary data to add to dataset
    * @param datasetId The ID of the dataset to be added to
    */
-  async addBinaryDataToDatasetByIds(
-    ids: string[] | BinaryID[],
-    datasetId: string
-  ) {
-    if (Array.isArray(ids) && typeof ids[0] === 'string') {
-      await this.dataClient.addBinaryDataToDatasetByIDs({
-        binaryDataIds: ids as string[],
-        datasetId,
-      });
-      return;
-    }
-    logDeprecationWarning();
+  async addBinaryDataToDatasetByIds(ids: string[], datasetId: string) {
     await this.dataClient.addBinaryDataToDatasetByIDs({
-      binaryIds: ids as BinaryID[],
+      binaryDataIds: ids,
       datasetId,
     });
   }
@@ -1133,20 +840,9 @@ export class DataClient {
    * @param ids The IDs of the binary data to remove from dataset
    * @param datasetId The ID of the dataset to be removed from
    */
-  async removeBinaryDataFromDatasetByIds(
-    ids: string[] | BinaryID[],
-    datasetId: string
-  ) {
-    if (Array.isArray(ids) && typeof ids[0] === 'string') {
-      await this.dataClient.removeBinaryDataFromDatasetByIDs({
-        binaryDataIds: ids as string[],
-        datasetId,
-      });
-      return;
-    }
-    logDeprecationWarning();
+  async removeBinaryDataFromDatasetByIds(ids: string[], datasetId: string) {
     await this.dataClient.removeBinaryDataFromDatasetByIDs({
-      binaryIds: ids as BinaryID[],
+      binaryDataIds: ids,
       datasetId,
     });
   }
@@ -1244,7 +940,7 @@ export class DataClient {
     });
     return resp.datasets.map((ds) => {
       return {
-        created: ds.timeCreated?.toDate(),
+        created: ds.timeCreated ? timestampDate(ds.timeCreated) : undefined,
         ...ds,
       };
     });
@@ -1273,7 +969,7 @@ export class DataClient {
     });
     return resp.datasets.map((ds) => {
       return {
-        created: ds.timeCreated?.toDate(),
+        created: ds.timeCreated ? timestampDate(ds.timeCreated) : undefined,
         ...ds,
       };
     });
@@ -1344,7 +1040,7 @@ export class DataClient {
       throw new Error('dataRequestTimes and data lengths must be equal.');
     }
 
-    const metadata = new UploadMetadata({
+    const metadata = create(UploadMetadataSchema, {
       partId,
       componentType,
       componentName,
@@ -1355,24 +1051,27 @@ export class DataClient {
 
     const sensorContents: SensorData[] = [];
     for (const [i, data] of tabularData.entries()) {
-      const sensorMetadata = new SensorMetadata();
       const dates = dataRequestTimes[i];
-      if (dates) {
-        sensorMetadata.timeRequested = Timestamp.fromDate(dates[0]);
-        sensorMetadata.timeReceived = Timestamp.fromDate(dates[1]);
-      }
       sensorContents.push(
-        new SensorData({
-          metadata: sensorMetadata,
+        create(SensorDataSchema, {
+          metadata: create(
+            SensorMetadataSchema,
+            dates
+              ? {
+                  timeRequested: timestampFromDate(dates[0]),
+                  timeReceived: timestampFromDate(dates[1]),
+                }
+              : {}
+          ),
           data: {
             case: 'struct',
-            value: Struct.fromJson(data),
+            value: data,
           },
         })
       );
     }
 
-    const req = new DataCaptureUploadRequest({
+    const req = create(DataCaptureUploadRequestSchema, {
       metadata,
       sensorContents,
     });
@@ -1428,7 +1127,7 @@ export class DataClient {
     dataRequestTimes: [Date, Date],
     options?: BinaryDataCaptureUploadOptions
   ): Promise<string> {
-    const metadata = new UploadMetadata({
+    const metadata = create(UploadMetadataSchema, {
       partId,
       componentType,
       componentName,
@@ -1440,18 +1139,18 @@ export class DataClient {
       mimeType: options?.mimeType ?? '',
     });
 
-    const sensorData = new SensorData({
-      metadata: {
-        timeRequested: Timestamp.fromDate(dataRequestTimes[0]),
-        timeReceived: Timestamp.fromDate(dataRequestTimes[1]),
-      },
+    const sensorData = create(SensorDataSchema, {
+      metadata: create(SensorMetadataSchema, {
+        timeRequested: timestampFromDate(dataRequestTimes[0]),
+        timeReceived: timestampFromDate(dataRequestTimes[1]),
+      }),
       data: {
         case: 'binary',
         value: binaryData,
       },
     });
 
-    const req = new DataCaptureUploadRequest({
+    const req = create(DataCaptureUploadRequestSchema, {
       metadata,
       sensorContents: [sensorData],
     });
@@ -1493,7 +1192,7 @@ export class DataClient {
     partId: string,
     options?: FileUploadOptions
   ) {
-    const md = new UploadMetadata({
+    const md = create(UploadMetadataSchema, {
       partId,
       type: DataType.FILE,
       ...options,
@@ -1516,8 +1215,8 @@ export class DataClient {
   private static async *fileUploadRequests(
     metadata: UploadMetadata,
     data: Uint8Array
-  ): AsyncGenerator<PartialMessage<FileUploadRequest>> {
-    yield new FileUploadRequest({
+  ): AsyncGenerator<FileUploadRequest> {
+    yield create(FileUploadRequestSchema, {
       uploadPacket: {
         case: 'metadata',
         value: metadata,
@@ -1528,33 +1227,31 @@ export class DataClient {
       if (end > data.length) {
         end = data.length;
       }
-      yield new FileUploadRequest({
+      yield create(FileUploadRequestSchema, {
         uploadPacket: {
           case: 'fileContents',
-          value: new FileData({ data: data.slice(i, end) }),
+          value: create(FileDataSchema, { data: data.slice(i, end) }),
         },
       });
     }
   }
 
   static createFilter(options: FilterOptions): Filter {
-    const filter = new Filter(options);
+    const { startTime, endTime, tags, ...filterFields } = options;
+    const filter = create(
+      FilterSchema,
+      filterFields as MessageInitShape<typeof FilterSchema>
+    );
 
-    if (options.startTime ?? options.endTime) {
-      const interval = new CaptureInterval();
-      if (options.startTime) {
-        interval.start = Timestamp.fromDate(options.startTime);
-      }
-      if (options.endTime) {
-        interval.end = Timestamp.fromDate(options.endTime);
-      }
-      filter.interval = interval;
+    if (startTime ?? endTime) {
+      filter.interval = create(CaptureIntervalSchema, {
+        start: startTime && timestampFromDate(startTime),
+        end: endTime && timestampFromDate(endTime),
+      });
     }
 
-    const tagsFilter = new TagsFilter();
-    if (options.tags) {
-      tagsFilter.tags = options.tags;
-      filter.tagsFilter = tagsFilter;
+    if (tags) {
+      filter.tagsFilter = create(TagsFilterSchema, { tags });
     }
 
     return filter;
@@ -1595,10 +1292,8 @@ export class DataClient {
     methodName: string,
     additionalParams?: Record<string, JsonValue>
   ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
-    let additionalParameters: Struct | undefined;
-    if (additionalParams) {
-      additionalParameters = Struct.fromJson(additionalParams);
-    }
+    const additionalParameters: Record<string, JsonValue> | undefined =
+      additionalParams;
 
     const resp = await this.dataClient.getLatestTabularData({
       partId,
@@ -1613,9 +1308,9 @@ export class DataClient {
     }
 
     return [
-      resp.timeCaptured.toDate(),
-      resp.timeSynced.toDate(),
-      resp.payload.toJson() as Record<string, JsonValue>,
+      timestampDate(resp.timeCaptured),
+      timestampDate(resp.timeSynced),
+      resp.payload as Record<string, JsonValue>,
     ];
   }
 

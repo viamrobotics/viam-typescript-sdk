@@ -1,16 +1,16 @@
 // @vitest-environment happy-dom
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SLAMService } from '../../gen/service/slam/v1/slam_pb';
+
 import {
+  type GetInternalStateResponse,
   GetInternalStateResponseSchema,
-  GetPointCloudMapRequestSchema,
-  GetPointCloudMapResponseSchema,
   type GetPointCloudMapRequest,
   type GetPointCloudMapResponse,
-  type GetInternalStateResponse,
+  GetPointCloudMapResponseSchema,
+  SLAMService,
 } from '../../gen/service/slam/v1/slam_pb';
 import { RobotClient } from '../../robot';
 import { SlamClient } from './client';

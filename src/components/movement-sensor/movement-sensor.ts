@@ -1,8 +1,8 @@
-import type { JsonObject } from "@bufbuild/protobuf";
-import type { Orientation, Resource, Vector3 } from "../../types";
+import type { JsonObject } from '@bufbuild/protobuf';
 
-import * as sensorApi from "../../gen/component/movementsensor/v1/movementsensor_pb";
-import * as sensorApiV1 from "../../genv1/component/movementsensor/v1/movementsensor_pb";
+import * as sensorApi from '../../gen/component/movementsensor/v1/movementsensor_pb';
+import * as sensorApiV1 from '../../genv1/component/movementsensor/v1/movementsensor_pb';
+import type { Orientation, Resource, Vector3 } from '../../types';
 
 export type MovementSensorAccuracy = sensorApi.GetAccuracyResponse;
 export type MovementSensorPosition = sensorApi.GetPositionResponse;
@@ -27,7 +27,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const linearVelocity = await movementSensor.getLinearVelocity();
    * ```
@@ -45,7 +45,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const angularVelocity = await movementSensor.getAngularVelocity();
    * ```
@@ -64,7 +64,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const compassHeading = await movementSensor.getCompassHeading();
    * ```
@@ -82,7 +82,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const orientation = await movementSensor.getOrientation();
    * ```
@@ -100,7 +100,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const position = await movementSensor.getPosition();
    * ```
@@ -118,7 +118,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const properties = await movementSensor.getProperties();
    * ```
@@ -136,7 +136,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const accuracy = await movementSensor.getAccuracy();
    * ```
@@ -154,7 +154,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const linearAcceleration =
    *   await movementSensor.getLinearAcceleration();
@@ -173,7 +173,7 @@ export interface MovementSensor extends Resource {
    * ```ts
    * const movementSensor = new VIAM.MovementSensorClient(
    *   machine,
-   *   "my_movement_sensor",
+   *   'my_movement_sensor'
    * );
    * const readings = await movementSensor.getReadings();
    * ```

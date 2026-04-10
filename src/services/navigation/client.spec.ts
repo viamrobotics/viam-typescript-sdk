@@ -1,23 +1,25 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
-import { RobotClient } from "../../robot";
-vi.mock("../../robot");
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { create } from "@bufbuild/protobuf";
-import { createClient, createRouterTransport } from "@connectrpc/connect";
+import { RobotClient } from '../../robot';
+vi.mock('../../robot');
+
+import { create } from '@bufbuild/protobuf';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
+
 import {
   GetLocationResponseSchema,
   NavigationService,
-} from "../../gen/service/navigation/v1/navigation_pb";
-import { NavigationClient } from "./client";
+} from '../../gen/service/navigation/v1/navigation_pb';
+import { NavigationClient } from './client';
 
-const navigationClientName = "test-navigation";
+const navigationClientName = 'test-navigation';
 const testLatitude = 50;
 const testLongitude = 75;
 const testCompassHeading = 90;
 
-describe("getLocation", () => {
+describe('getLocation', () => {
   let latitude: Mock<[], number>;
   let longitude: Mock<[], number>;
   let compassHeading: Mock<[], number>;
@@ -46,24 +48,24 @@ describe("getLocation", () => {
       .mockImplementation(() => createClient(NavigationService, mockTransport));
 
     navigation = new NavigationClient(
-      new RobotClient("host"),
-      navigationClientName,
+      new RobotClient('host'),
+      navigationClientName
     );
   });
 
-  it("null location", async () => {
+  it('null location', async () => {
     location = vi.fn();
     compassHeading = vi.fn();
 
     await expect(navigation.getLocation()).rejects.toThrowError(
-      /^no location$/u,
+      /^no location$/u
     );
 
     expect(location).toHaveBeenCalledOnce();
     expect(compassHeading).toHaveBeenCalledOnce();
   });
 
-  it("valid geopoint", async () => {
+  it('valid geopoint', async () => {
     latitude = vi.fn(() => testLatitude);
     longitude = vi.fn(() => testLongitude);
     compassHeading = vi.fn(() => testCompassHeading);
@@ -79,12 +81,12 @@ describe("getLocation", () => {
     expect(compassHeading).toHaveBeenCalledOnce();
   });
 
-  it("invalid geopoint", async () => {
+  it('invalid geopoint', async () => {
     latitude = vi.fn(() => Number.NaN);
     longitude = vi.fn(() => Number.NaN);
 
     await expect(navigation.getLocation()).rejects.toThrowError(
-      /^invalid location$/u,
+      /^invalid location$/u
     );
 
     expect(location).toHaveBeenCalledOnce();

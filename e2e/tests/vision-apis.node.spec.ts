@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
 import { RobotClient, VisionClient } from '../../src/main';
 import { defaultNodeConfig } from '../fixtures/configs/dial-configs';
 

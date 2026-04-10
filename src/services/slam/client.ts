@@ -1,16 +1,17 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   GetInternalStateRequestSchema,
   GetPointCloudMapRequestSchema,
   GetPositionRequestSchema,
   GetPropertiesRequestSchema,
   SLAMService,
-} from "../../gen/service/slam/v1/slam_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Slam } from "./slam";
+} from '../../gen/service/slam/v1/slam_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Slam } from './slam';
 
 /**
  * A gRPC-web client for a SLAM service.
@@ -41,7 +42,7 @@ export class SlamClient implements Slam {
 
   async getPointCloudMap(
     returnEditedMap?: boolean,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<Uint8Array> {
     const request = create(GetPointCloudMapRequestSchema, {
       name: this.name,
@@ -86,20 +87,20 @@ export class SlamClient implements Slam {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

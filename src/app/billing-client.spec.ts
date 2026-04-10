@@ -1,19 +1,21 @@
-import { Timestamp } from '@bufbuild/protobuf';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+import { TimestampSchema } from '@bufbuild/protobuf/wkt';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import {
   createWritableIterable,
   type WritableIterable,
 } from '@connectrpc/connect/protocol';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { BillingService } from '../gen/app/v1/billing_pb';
+
 import {
-  GetInvoicePdfResponse,
-  GetInvoicesSummaryResponse,
+  BillingService,
+  GetCurrentMonthUsageResponseSchema,
+  type GetInvoicePdfResponse,
+  GetInvoicePdfResponseSchema,
+  GetInvoicesSummaryResponseSchema,
   PaymentMethodType,
-  ResourceUsageCosts,
-  ResourceUsageCostsBySource,
+  ResourceUsageCostsBySourceSchema,
   SourceType,
-  UsageCost,
   UsageCostType,
 } from '../gen/app/v1/billing_pb';
 import {
@@ -23,11 +25,11 @@ import {
 
 const SECONDS = 1;
 const NANOS = 2_000_000;
-const testStartDate = new Timestamp({
+const testStartDate = create(TimestampSchema, {
   seconds: BigInt(SECONDS),
   nanos: NANOS,
 });
-const testEndDate = new Timestamp({
+const testEndDate = create(TimestampSchema, {
   seconds: BigInt(SECONDS * 2),
   nanos: NANOS,
 });
@@ -45,13 +47,11 @@ const testMonthUsage: GetCurrentMonthUsageResponse = {
   perMachineUsageCost: 11,
   subtotal: 12,
   resourceUsageCostsBySource: [
-    new ResourceUsageCostsBySource({
+    create(ResourceUsageCostsBySourceSchema, {
       sourceType: SourceType.ORG,
-      resourceUsageCosts: new ResourceUsageCosts({
-        usageCosts: [
-          new UsageCost({ resourceType: UsageCostType.UNSPECIFIED, cost: 13 }),
-        ],
-      }),
+      resourceUsageCosts: {
+        usageCosts: [{ resourceType: UsageCostType.UNSPECIFIED, cost: 13 }],
+      },
     }),
   ],
   startDate: testStartDate,
@@ -59,7 +59,7 @@ const testMonthUsage: GetCurrentMonthUsageResponse = {
   start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
   end: new Date(SECONDS * 2000 + NANOS / 1_000_000),
 };
-const testInvoiceSummary = new GetInvoicesSummaryResponse({
+const testInvoiceSummary = create(GetInvoicesSummaryResponseSchema, {
   invoices: [
     {
       id: 'id',
@@ -85,7 +85,7 @@ describe('BillingClient tests', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(BillingService, {
         getCurrentMonthUsage: () => {
-          return {
+          return create(GetCurrentMonthUsageResponseSchema, {
             cloudStorageUsageCost: 1,
             dataUploadUsageCost: 2,
             dataEgresUsageCost: 3,
@@ -99,21 +99,21 @@ describe('BillingClient tests', () => {
             perMachineUsageCost: 11,
             subtotal: 12,
             resourceUsageCostsBySource: [
-              new ResourceUsageCostsBySource({
+              {
                 sourceType: SourceType.ORG,
-                resourceUsageCosts: new ResourceUsageCosts({
+                resourceUsageCosts: {
                   usageCosts: [
-                    new UsageCost({
+                    {
                       resourceType: UsageCostType.UNSPECIFIED,
                       cost: 13,
-                    }),
+                    },
                   ],
-                }),
-              }),
+                },
+              },
             ],
             startDate: testStartDate,
             endDate: testEndDate,
-          } as GetCurrentMonthUsageResponse;
+          });
         },
         getOrgBillingInformation: () => testBillingInfo,
         getInvoicesSummary: () => testInvoiceSummary,
@@ -146,14 +146,14 @@ describe('BillingClient tests', () => {
 
     const chunk1 = new Uint8Array([1, 2]);
     await testGetInvoicePdfStream.write(
-      new GetInvoicePdfResponse({
+      create(GetInvoicePdfResponseSchema, {
         chunk: chunk1,
       })
     );
 
     const chunk2 = new Uint8Array([3, 4]);
     await testGetInvoicePdfStream.write(
-      new GetInvoicePdfResponse({
+      create(GetInvoicePdfResponseSchema, {
         chunk: chunk2,
       })
     );

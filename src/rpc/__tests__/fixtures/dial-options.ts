@@ -1,9 +1,9 @@
-import type { DialOptions } from '../../dial';
 import { TEST_AUTH_ENTITY } from '../../../__tests__/fixtures/test-constants';
+import type { DialOptions } from '../../dial';
 
 export {
-  TEST_URL,
   TEST_HOST,
+  TEST_URL,
 } from '../../../__tests__/fixtures/test-constants';
 
 export const withAccessToken: DialOptions = {

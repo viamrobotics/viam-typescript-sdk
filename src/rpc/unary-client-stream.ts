@@ -1,4 +1,9 @@
-import type { Message, PartialMessage } from '@bufbuild/protobuf';
+import {
+  type DescMessage,
+  type DescMethodUnary,
+  type MessageShape,
+  toBinary,
+} from '@bufbuild/protobuf';
 import type {
   ContextValues,
   UnaryRequest,
@@ -6,36 +11,38 @@ import type {
 } from '@connectrpc/connect';
 import { createContextValues } from '@connectrpc/connect';
 import { runUnaryCall } from '@connectrpc/connect/protocol';
-import {
+
+import type {
   ResponseHeaders,
   ResponseTrailers,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { ClientStream, toGRPCMetadata } from './client-stream';
 
 export class UnaryClientStream<
-  I extends Message<I>,
-  O extends Message<O>,
-> extends ClientStream<I, O> {
+  I extends DescMessage,
+  O extends DescMessage,
+> extends ClientStream<DescMethodUnary<I, O>, I, O> {
   private result?: {
     success: (value: UnaryResponse<I, O>) => void;
     failure: (reason?: unknown) => void;
   };
 
   private headers?: Headers;
-  private message?: O;
+  private message?: MessageShape<O>;
 
   public async run(
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
-    message: PartialMessage<I>,
+    message: MessageShape<I>,
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> {
     const req = {
       stream: false as const,
       url: '',
       init: {},
-      service: this.service,
+      service: this.method.parent,
       method: this.method,
+      requestMethod: 'POST',
       header: new Headers(),
       contextValues: contextValues ?? createContextValues(),
       message,
@@ -53,7 +60,7 @@ export class UnaryClientStream<
         return new Promise((resolve, reject) => {
           this.result = { success: resolve, failure: reject };
           this.startRequest();
-          this.sendMessage(unaryReq.message.toBinary());
+          this.sendMessage(toBinary(this.method.input, unaryReq.message));
         });
       },
     };
@@ -100,7 +107,7 @@ export class UnaryClientStream<
         header: this.headers,
         message: this.message,
         trailer: trailers,
-        service: this.service,
+        service: this.method.parent,
         method: this.method,
       } satisfies UnaryResponse<I, O>);
       return;

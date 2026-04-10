@@ -1,10 +1,10 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { create, fromJson } from '@bufbuild/protobuf';
 import { ValueSchema } from '@bufbuild/protobuf/wkt';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
+
 import { GetReadingsResponseSchema } from '../../gen/common/v1/common_pb';
 import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_pb';
 import {

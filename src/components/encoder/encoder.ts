@@ -1,7 +1,6 @@
-import type { JsonObject, Resource } from "../../types";
-
-import * as encoderApi from "../../gen/component/encoder/v1/encoder_pb";
-import * as encoderApiV1 from "../../genv1/component/encoder/v1/encoder_pb";
+import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
+import * as encoderApiV1 from '../../genv1/component/encoder/v1/encoder_pb';
+import type { JsonObject, Resource } from '../../types';
 
 export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
@@ -17,7 +16,7 @@ export interface Encoder extends Resource {
    * @example
    *
    * ```ts
-   * const encoder = new VIAM.EncoderClient(machine, "my_encoder");
+   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
    *
    * // Reset the zero position of the encoder
    * await encoder.resetPosition();
@@ -34,7 +33,7 @@ export interface Encoder extends Resource {
    * @example
    *
    * ```ts
-   * const encoder = new VIAM.EncoderClient(machine, "my_encoder");
+   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
    *
    * // Get whether the encoder returns position in ticks or degrees
    * const properties = await encoder.getProperties();
@@ -52,13 +51,13 @@ export interface Encoder extends Resource {
    * @example
    *
    * ```ts
-   * const encoder = new VIAM.EncoderClient(machine, "my_encoder");
+   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
    *
    * // Get the position of the encoder in ticks
    * const [position, posType] = await encoder.getPosition(
-   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT,
+   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT
    * );
-   * console.log("The encoder position is currently", position, posType);
+   * console.log('The encoder position is currently', position, posType);
    * ```
    *
    * For more information, see [Encoder
@@ -69,6 +68,6 @@ export interface Encoder extends Resource {
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: JsonObject,
+    extra?: JsonObject
   ): Promise<readonly [number, EncoderPositionType]>;
 }

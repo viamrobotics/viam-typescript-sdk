@@ -1,9 +1,10 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   Get3DModelsRequestSchema,
   type Mesh,
-} from "../../gen/common/v1/common_pb";
+} from '../../gen/common/v1/common_pb';
 import {
   ArmService,
   GetEndPositionRequestSchema,
@@ -13,17 +14,17 @@ import {
   MoveToJointPositionsRequestSchema,
   MoveToPositionRequestSchema,
   StopRequestSchema,
-} from "../../gen/component/arm/v1/arm_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options, Pose } from "../../types";
-import type { GetKinematicsResult } from "../../utils";
+} from '../../gen/component/arm/v1/arm_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options, Pose } from '../../types';
+import type { GetKinematicsResult } from '../../utils';
 import {
   doCommandFromClient,
   getGeometriesFromClient,
   getKinematicsFromClient,
   getStatusFromClient,
-} from "../../utils";
-import type { Arm } from "./arm";
+} from '../../utils';
+import type { Arm } from './arm';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -45,7 +46,7 @@ export class ArmClient implements Arm {
   async getEndPosition(extra = {}, callOptions = this.callOptions) {
     const request = create(GetEndPositionRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -53,7 +54,7 @@ export class ArmClient implements Arm {
     const response = await this.client.getEndPosition(request, callOptions);
     const result = response.pose;
     if (!result) {
-      throw new Error("no pose");
+      throw new Error('no pose');
     }
     return result;
   }
@@ -63,29 +64,29 @@ export class ArmClient implements Arm {
       this.client.getGeometries,
       this.name,
       extra,
-      callOptions,
+      callOptions
     );
   }
 
   async getKinematics(
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<GetKinematicsResult> {
     return getKinematicsFromClient(
       this.client.getKinematics,
       this.name,
       extra,
-      callOptions,
+      callOptions
     );
   }
 
   async get3DModels(
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<Record<string, Mesh>> {
     const request = create(Get3DModelsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     const response = await this.client.get3DModels(request, callOptions);
@@ -96,7 +97,7 @@ export class ArmClient implements Arm {
     const request = create(MoveToPositionRequestSchema, {
       name: this.name,
       to: pose,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -107,7 +108,7 @@ export class ArmClient implements Arm {
   async moveToJointPositions(
     jointPositionsList: number[],
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const newJointPositions = create(JointPositionsSchema, {
       values: jointPositionsList,
@@ -116,7 +117,7 @@ export class ArmClient implements Arm {
     const request = create(MoveToJointPositionsRequestSchema, {
       name: this.name,
       positions: newJointPositions,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -127,7 +128,7 @@ export class ArmClient implements Arm {
   async getJointPositions(extra = {}, callOptions = this.callOptions) {
     const request = create(GetJointPositionsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -136,7 +137,7 @@ export class ArmClient implements Arm {
 
     const result = response.positions;
     if (!result) {
-      throw new Error("no pose");
+      throw new Error('no pose');
     }
     return result;
   }
@@ -144,7 +145,7 @@ export class ArmClient implements Arm {
   async stop(extra = {}, callOptions = this.callOptions) {
     const request = create(StopRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -168,20 +169,20 @@ export class ArmClient implements Arm {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

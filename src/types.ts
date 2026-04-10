@@ -1,8 +1,7 @@
-import { type JsonObject, type JsonValue } from '@bufbuild/protobuf';
-import { Struct } from '@bufbuild/protobuf/wkt';
+import type { JsonObject } from '@bufbuild/protobuf';
 
-export { Code, ConnectError } from '@connectrpc/connect';
 export { ConnectionClosedError } from './rpc';
+export { Code, ConnectError } from '@connectrpc/connect';
 
 export interface Options {
   requestLogger?: (req: unknown) => void;
@@ -34,10 +33,10 @@ export interface Resource {
    * @param command - The command to execute. Accepts either a {@link Struct} or
    *   a plain object, which will be converted automatically.
    */
-  doCommand(command: Struct | JsonObject): Promise<JsonValue>;
+  doCommand(command: JsonObject): Promise<JsonObject>;
 
   /** Get the status of the resource. */
-  getStatus(): Promise<JsonValue>;
+  getStatus(): Promise<JsonObject>;
 }
 
 import * as commonApi from './gen/common/v1/common_pb';
@@ -69,5 +68,5 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export { type JsonObject, type JsonValue } from '@bufbuild/protobuf';
-export { Duration, Struct } from '@bufbuild/protobuf/wkt';
+export type { JsonObject, JsonValue } from '@bufbuild/protobuf';
+export type { Duration, Struct } from '@bufbuild/protobuf/wkt';

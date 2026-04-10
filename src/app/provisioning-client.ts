@@ -1,6 +1,7 @@
-import { createClient, type Client, type Transport } from '@connectrpc/connect';
-import { ProvisioningService } from '../gen/provisioning/v1/provisioning_pb';
+import { type Client, createClient, type Transport } from '@connectrpc/connect';
+
 import type { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+import { ProvisioningService } from '../gen/provisioning/v1/provisioning_pb';
 
 export class ProvisioningClient {
   private client: Client<typeof ProvisioningService>;
@@ -55,4 +56,7 @@ export class ProvisioningClient {
   }
 }
 
-export { APIKey, CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+export type {
+  APIKey,
+  CloudConfig,
+} from '../gen/provisioning/v1/provisioning_pb';

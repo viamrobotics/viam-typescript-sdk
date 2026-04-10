@@ -1,8 +1,8 @@
 /* eslint-disable no-console, no-await-in-loop */
-import { spawn, type ChildProcess } from 'node:child_process';
+import { type ChildProcess, spawn } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
-import fs from 'node:fs';
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 

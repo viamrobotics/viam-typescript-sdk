@@ -1,9 +1,11 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+
 import {
-  GetRobotPartByNameAndLocationResponse,
-  RobotPart,
+  GetRobotPartByNameAndLocationResponseSchema,
+  RobotPartSchema,
 } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
@@ -13,8 +15,8 @@ import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
 import { createViamClient, type ViamClientOptions } from './viam-client';
 import {
-  createViamTransport,
   type AccessToken,
+  createViamTransport,
   type Credential,
 } from './viam-transport';
 vi.mock('./viam-transport', async (actualImport) => {
@@ -42,6 +44,7 @@ describe('ViamClient', () => {
     payload: 'testAccessToken',
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const subject = async () => createViamClient(options!);
 
   beforeEach(() => {
@@ -115,7 +118,7 @@ describe('ViamClient', () => {
     });
 
     it('gets main part address', async () => {
-      const MAIN_PART = new RobotPart({
+      const MAIN_PART = create(RobotPartSchema, {
         mainPart: true,
         fqdn: 'main.part.fqdn',
       });
@@ -123,7 +126,7 @@ describe('ViamClient', () => {
       const robotParts = [MAIN_PART];
       // eslint-disable-next-line no-plusplus
       for (let i = 0; i < 1000; i++) {
-        const part = new RobotPart({
+        const part = create(RobotPartSchema, {
           mainPart: false,
         });
         robotParts.push(part);
@@ -147,7 +150,7 @@ describe('ViamClient', () => {
       options = { credentials: testCredential };
       const client = await subject();
 
-      const MAIN_PART = new RobotPart({
+      const MAIN_PART = create(RobotPartSchema, {
         mainPart: true,
       });
       const robotParts = [MAIN_PART];
@@ -163,15 +166,17 @@ describe('ViamClient', () => {
       options = { credentials: testAccessToken };
       const client = await subject();
 
-      const MAIN_PART = new RobotPart({
+      const MAIN_PART = create(RobotPartSchema, {
         mainPart: true,
         name: 'main-part',
         secret: 'fake-robot-secret',
       });
-      const partByNameAndLocationResponse =
-        new GetRobotPartByNameAndLocationResponse({
+      const partByNameAndLocationResponse = create(
+        GetRobotPartByNameAndLocationResponseSchema,
+        {
           part: MAIN_PART,
-        });
+        }
+      );
       const getRobotPartByNameAndLocationMock = vi
         .fn()
         .mockImplementation(() => partByNameAndLocationResponse);
@@ -190,7 +195,7 @@ describe('ViamClient', () => {
           credentials: expect.objectContaining({
             type: 'robot-secret',
             payload: 'fake-robot-secret',
-          }),
+          }) as Credential,
         })
       );
     });
@@ -199,7 +204,7 @@ describe('ViamClient', () => {
       options = { credentials: testAccessToken };
       const client = await subject();
 
-      const MAIN_PART = new RobotPart({
+      const MAIN_PART = create(RobotPartSchema, {
         mainPart: true,
         fqdn: 'main-part.fqdn',
         secret: 'fake-robot-secret',
@@ -217,7 +222,7 @@ describe('ViamClient', () => {
           credentials: expect.objectContaining({
             type: 'robot-secret',
             payload: 'fake-robot-secret',
-          }),
+          }) as Credential,
         })
       );
     });

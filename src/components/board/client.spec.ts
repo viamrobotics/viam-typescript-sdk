@@ -1,12 +1,13 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import {
   ReadAnalogReaderResponseSchema,
   StreamTicksResponseSchema,
 } from '../../gen/component/board/v1/board_pb';
 import { RobotClient } from '../../robot';
-import { type Tick } from './board';
+import type { Tick } from './board';
 import { BoardClient } from './client';
 vi.mock('../../robot');
 
@@ -16,6 +17,7 @@ import {
   createWritableIterable,
   type WritableIterable,
 } from '@connectrpc/connect/protocol';
+
 import { BoardService } from '../../gen/component/board/v1/board_pb';
 
 let board: BoardClient;
@@ -91,11 +93,13 @@ describe('BoardClient tests', () => {
 
       expect(ticks.length).toEqual(2);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const tick1: Tick = ticks[0]!;
       expect(tick1.pinName).toEqual('1');
       expect(tick1.high).toBe(true);
       expect(tick1.time).toEqual(1000);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const tick2: Tick = ticks[1]!;
       expect(tick2.pinName).toEqual('2');
       expect(tick2.high).toBe(false);

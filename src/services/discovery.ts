@@ -1,2 +1,2 @@
-export { DiscoveryClient } from "./discovery/client";
-export type { Discovery } from "./discovery/discovery";
+export { DiscoveryClient } from './discovery/client';
+export type { Discovery } from './discovery/discovery';

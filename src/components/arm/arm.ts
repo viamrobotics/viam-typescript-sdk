@@ -1,8 +1,7 @@
-import type { Pose, Resource, JsonObject } from '../../types';
-
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import * as armApiV1 from '../../genv1/component/arm/v1/arm_pb';
+import type { JsonObject, Pose, Resource } from '../../types';
 import type { GetKinematicsResult } from '../../utils';
 
 export type ArmJointPositions = armApi.JointPositions;

@@ -1,15 +1,15 @@
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
 
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
 import {
   GetEventsRequestSchema,
   InputControllerService,
   TriggerEventRequestSchema,
-} from "../../gen/component/inputcontroller/v1/input_controller_pb";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { InputController, InputControllerEvent } from "./input-controller";
+} from '../../gen/component/inputcontroller/v1/input_controller_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { InputController, InputControllerEvent } from './input-controller';
 
 /**
  * A gRPC-web client for the Input Controller component.
@@ -31,7 +31,7 @@ export class InputControllerClient implements InputController {
   async getEvents(extra = {}, callOptions = this.callOptions) {
     const request = create(GetEventsRequestSchema, {
       controller: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -43,12 +43,12 @@ export class InputControllerClient implements InputController {
   async triggerEvent(
     event: InputControllerEvent,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<void> {
     const request = create(TriggerEventRequestSchema, {
       controller: this.name,
       event,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -61,20 +61,20 @@ export class InputControllerClient implements InputController {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

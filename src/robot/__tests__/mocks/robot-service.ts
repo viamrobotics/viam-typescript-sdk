@@ -1,12 +1,12 @@
+import type { MessageInitShape } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
-import { RobotService } from '../../../gen/robot/v1/robot_pb';
-import type { PartialMessage } from '@bufbuild/protobuf';
-import type { Operation } from '../../../gen/robot/v1/robot_pb';
-import type { ResourceName } from '../../../gen/common/v1/common_pb';
+
+import { ResourceNameSchema } from '../../../gen/common/v1/common_pb';
+import { OperationSchema, RobotService } from '../../../gen/robot/v1/robot_pb';
 
 export const createMockRobotServiceTransport = (
-  resources: PartialMessage<ResourceName>[] = [],
-  operations: PartialMessage<Operation>[] = []
+  resources: MessageInitShape<typeof ResourceNameSchema>[] = [],
+  operations: MessageInitShape<typeof OperationSchema>[] = []
 ): Transport => {
   return createRouterTransport(({ service }) => {
     service(RobotService, {

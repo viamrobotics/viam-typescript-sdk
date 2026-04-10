@@ -1,6 +1,7 @@
-import { create, type MessageInitShape } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import type { GeoPointSchema } from "../../gen/common/v1/common_pb";
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import type { GeoPointSchema } from '../../gen/common/v1/common_pb';
 import {
   AddWaypointRequestSchema,
   GetLocationRequestSchema,
@@ -12,13 +13,13 @@ import {
   NavigationService,
   RemoveWaypointRequestSchema,
   SetModeRequestSchema,
-} from "../../gen/service/navigation/v1/navigation_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { isValidGeoPoint } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Navigation } from "./navigation";
-import type { Mode } from "./types";
+} from '../../gen/service/navigation/v1/navigation_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { isValidGeoPoint } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Navigation } from './navigation';
+import type { Mode } from './types';
 
 /**
  * A gRPC-web client for a Navigation service.
@@ -40,7 +41,7 @@ export class NavigationClient implements Navigation {
   async getMode(extra = {}, callOptions = this.callOptions) {
     const request = create(GetModeRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -53,7 +54,7 @@ export class NavigationClient implements Navigation {
     const request = create(SetModeRequestSchema, {
       name: this.name,
       mode,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -64,7 +65,7 @@ export class NavigationClient implements Navigation {
   async getLocation(extra = {}, callOptions = this.callOptions) {
     const request = create(GetLocationRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -72,10 +73,10 @@ export class NavigationClient implements Navigation {
     const response = await this.client.getLocation(request, callOptions);
 
     if (!response.location) {
-      throw new Error("no location");
+      throw new Error('no location');
     }
     if (!isValidGeoPoint(response.location)) {
-      throw new Error("invalid location");
+      throw new Error('invalid location');
     }
     return response;
   }
@@ -83,7 +84,7 @@ export class NavigationClient implements Navigation {
   async getWayPoints(extra = {}, callOptions = this.callOptions) {
     const request = create(GetWaypointsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -95,12 +96,12 @@ export class NavigationClient implements Navigation {
   async addWayPoint(
     location: MessageInitShape<typeof GeoPointSchema>,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(AddWaypointRequestSchema, {
       name: this.name,
       location,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -112,7 +113,7 @@ export class NavigationClient implements Navigation {
     const request = create(RemoveWaypointRequestSchema, {
       name: this.name,
       id,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -123,7 +124,7 @@ export class NavigationClient implements Navigation {
   async getObstacles(extra = {}, callOptions = this.callOptions) {
     const request = create(GetObstaclesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -135,7 +136,7 @@ export class NavigationClient implements Navigation {
   async getPaths(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPathsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -159,20 +160,20 @@ export class NavigationClient implements Navigation {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

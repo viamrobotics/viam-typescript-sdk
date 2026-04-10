@@ -1,122 +1,141 @@
-import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { create, type JsonValue } from '@bufbuild/protobuf';
+import { timestampDate, timestampFromDate } from '@bufbuild/protobuf/wkt';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DataService } from '../gen/app/data/v1/data_pb';
+
 import {
-  AddBinaryDataToDatasetByIDsRequest,
-  AddBinaryDataToDatasetByIDsResponse,
-  AddBoundingBoxToImageByIDRequest,
-  AddBoundingBoxToImageByIDResponse,
-  AddTagsToBinaryDataByFilterRequest,
-  AddTagsToBinaryDataByFilterResponse,
-  AddTagsToBinaryDataByIDsRequest,
-  AddTagsToBinaryDataByIDsResponse,
-  BinaryData,
-  BinaryDataByFilterRequest,
-  BinaryDataByFilterResponse,
-  BinaryDataByIDsRequest,
-  BinaryDataByIDsResponse,
-  BinaryID,
-  BoundingBoxLabelsByFilterRequest,
-  BoundingBoxLabelsByFilterResponse,
-  CaptureInterval,
-  ConfigureDatabaseUserRequest,
-  ConfigureDatabaseUserResponse,
-  CreateBinaryDataSignedURLRequest,
-  CreateBinaryDataSignedURLResponse,
-  CreateIndexRequest,
-  CreateIndexResponse,
-  DataRequest,
-  DeleteBinaryDataByFilterRequest,
-  DeleteBinaryDataByFilterResponse,
-  DeleteBinaryDataByIDsResponse,
-  DeleteIndexRequest,
-  DeleteIndexResponse,
-  DeleteTabularDataRequest,
-  DeleteTabularDataResponse,
-  ExportTabularDataRequest,
-  ExportTabularDataResponse,
-  Filter,
-  GetDatabaseConnectionRequest,
-  GetDatabaseConnectionResponse,
-  GetLatestTabularDataRequest,
-  GetLatestTabularDataResponse,
-  Index,
+  type AddBinaryDataToDatasetByIDsRequest,
+  AddBinaryDataToDatasetByIDsRequestSchema,
+  AddBinaryDataToDatasetByIDsResponseSchema,
+  type AddBoundingBoxToImageByIDRequest,
+  AddBoundingBoxToImageByIDRequestSchema,
+  AddBoundingBoxToImageByIDResponseSchema,
+  type AddTagsToBinaryDataByIDsRequest,
+  AddTagsToBinaryDataByIDsRequestSchema,
+  AddTagsToBinaryDataByIDsResponseSchema,
+  type BinaryDataByFilterRequest,
+  BinaryDataByFilterRequestSchema,
+  BinaryDataByFilterResponseSchema,
+  type BinaryDataByIDsRequest,
+  BinaryDataByIDsRequestSchema,
+  BinaryDataByIDsResponseSchema,
+  BinaryDataSchema,
+  CaptureIntervalSchema,
+  type ConfigureDatabaseUserRequest,
+  ConfigureDatabaseUserRequestSchema,
+  ConfigureDatabaseUserResponseSchema,
+  type CreateBinaryDataSignedURLRequest,
+  CreateBinaryDataSignedURLRequestSchema,
+  CreateBinaryDataSignedURLResponseSchema,
+  type CreateIndexRequest,
+  CreateIndexResponseSchema,
+  DataRequestSchema,
+  DataService,
+  type DeleteBinaryDataByFilterRequest,
+  DeleteBinaryDataByFilterRequestSchema,
+  DeleteBinaryDataByFilterResponseSchema,
+  DeleteBinaryDataByIDsResponseSchema,
+  type DeleteIndexRequest,
+  DeleteIndexRequestSchema,
+  DeleteIndexResponseSchema,
+  type DeleteTabularDataRequest,
+  DeleteTabularDataResponseSchema,
+  DeleteTabularFilterSchema,
+  type ExportTabularDataRequest,
+  ExportTabularDataRequestSchema,
+  ExportTabularDataResponseSchema,
+  FilterSchema,
+  type GetDatabaseConnectionRequest,
+  GetDatabaseConnectionRequestSchema,
+  GetDatabaseConnectionResponseSchema,
+  type GetLatestTabularDataRequest,
+  GetLatestTabularDataRequestSchema,
+  GetLatestTabularDataResponseSchema,
   IndexableCollection,
   IndexCreator,
-  ListIndexesRequest,
-  ListIndexesResponse,
-  RemoveBinaryDataFromDatasetByIDsRequest,
-  RemoveBinaryDataFromDatasetByIDsResponse,
-  RemoveBoundingBoxFromImageByIDRequest,
-  RemoveBoundingBoxFromImageByIDResponse,
-  RemoveTagsFromBinaryDataByFilterRequest,
-  RemoveTagsFromBinaryDataByFilterResponse,
-  RemoveTagsFromBinaryDataByIDsRequest,
-  RemoveTagsFromBinaryDataByIDsResponse,
-  TabularData,
-  TabularDataByFilterRequest,
-  TabularDataByFilterResponse,
-  TabularDataByMQLRequest,
-  TabularDataByMQLResponse,
-  TabularDataBySQLResponse,
+  IndexSchema,
+  type ListIndexesRequest,
+  ListIndexesRequestSchema,
+  ListIndexesResponseSchema,
+  type RemoveBinaryDataFromDatasetByIDsRequest,
+  RemoveBinaryDataFromDatasetByIDsRequestSchema,
+  RemoveBinaryDataFromDatasetByIDsResponseSchema,
+  type RemoveBoundingBoxFromImageByIDRequest,
+  RemoveBoundingBoxFromImageByIDRequestSchema,
+  RemoveBoundingBoxFromImageByIDResponseSchema,
+  type RemoveTagsFromBinaryDataByIDsRequest,
+  RemoveTagsFromBinaryDataByIDsRequestSchema,
+  RemoveTagsFromBinaryDataByIDsResponseSchema,
+  type TabularDataByMQLRequest,
+  TabularDataByMQLRequestSchema,
+  TabularDataByMQLResponseSchema,
+  TabularDataBySQLResponseSchema,
   TabularDataSourceType,
-  DeleteTabularFilter,
-  TagsByFilterRequest,
-  TagsByFilterResponse,
-  TagsFilter,
-  UpdateBoundingBoxRequest,
-  UpdateBoundingBoxResponse,
+  TagsFilterSchema,
+  type UpdateBoundingBoxRequest,
+  UpdateBoundingBoxRequestSchema,
+  UpdateBoundingBoxResponseSchema,
 } from '../gen/app/data/v1/data_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import {
-  CreateDataPipelineRequest,
-  CreateDataPipelineResponse,
-  DataPipeline,
-  DataPipelineRun,
+  type CreateDataPipelineRequest,
+  CreateDataPipelineRequestSchema,
+  CreateDataPipelineResponseSchema,
+  DataPipelineRunSchema,
   DataPipelineRunStatus,
-  DeleteDataPipelineRequest,
-  DeleteDataPipelineResponse,
-  GetDataPipelineRequest,
-  GetDataPipelineResponse,
-  ListDataPipelineRunsRequest,
-  ListDataPipelineRunsResponse,
-  ListDataPipelinesRequest,
-  ListDataPipelinesResponse,
+  DataPipelineSchema,
+  DataPipelinesService,
+  type DeleteDataPipelineRequest,
+  DeleteDataPipelineRequestSchema,
+  DeleteDataPipelineResponseSchema,
+  type GetDataPipelineRequest,
+  GetDataPipelineRequestSchema,
+  GetDataPipelineResponseSchema,
+  type ListDataPipelineRunsRequest,
+  ListDataPipelineRunsRequestSchema,
+  ListDataPipelineRunsResponseSchema,
+  type ListDataPipelinesRequest,
+  ListDataPipelinesRequestSchema,
+  ListDataPipelinesResponseSchema,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_pb';
 import {
-  CreateDatasetRequest,
-  CreateDatasetResponse,
-  Dataset,
-  DeleteDatasetRequest,
-  DeleteDatasetResponse,
-  ListDatasetsByIDsRequest,
-  ListDatasetsByIDsResponse,
-  ListDatasetsByOrganizationIDRequest,
-  ListDatasetsByOrganizationIDResponse,
-  RenameDatasetRequest,
-  RenameDatasetResponse,
+  type CreateDatasetRequest,
+  CreateDatasetRequestSchema,
+  CreateDatasetResponseSchema,
+  DatasetSchema,
+  DatasetService,
+  type DeleteDatasetRequest,
+  DeleteDatasetRequestSchema,
+  DeleteDatasetResponseSchema,
+  type ListDatasetsByIDsRequest,
+  ListDatasetsByIDsRequestSchema,
+  ListDatasetsByIDsResponseSchema,
+  type ListDatasetsByOrganizationIDRequest,
+  ListDatasetsByOrganizationIDRequestSchema,
+  ListDatasetsByOrganizationIDResponseSchema,
+  type RenameDatasetRequest,
+  RenameDatasetRequestSchema,
+  RenameDatasetResponseSchema,
 } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_pb';
 import {
-  DataCaptureUploadRequest,
-  DataCaptureUploadResponse,
+  type DataCaptureUploadRequest,
+  DataCaptureUploadRequestSchema,
+  DataCaptureUploadResponseSchema,
+  DataSyncService,
   DataType,
-  FileData,
-  FileUploadRequest,
-  FileUploadResponse,
-  SensorData,
-  SensorMetadata,
-  UploadMetadata,
+  type FileData,
+  type FileUploadRequest,
+  FileUploadResponseSchema,
+  SensorDataSchema,
+  SensorMetadataSchema,
+  type UploadMetadata,
+  UploadMetadataSchema,
 } from '../gen/app/datasync/v1/data_sync_pb';
 import {
   DataClient,
   type FileUploadOptions,
   type FilterOptions,
 } from './data-client';
-vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
 const subject = () => new DataClient(mockTransport);
@@ -133,20 +152,10 @@ describe('DataClient tests', () => {
   const includeInternalData = false;
   const startDate = new Date(1, 1, 1, 1, 1, 1);
 
-  const binaryId1 = new BinaryID({
-    fileId: 'testFileId1',
-    organizationId: 'testOrgId',
-    locationId: 'testLocationId',
-  });
-  const binaryId2 = new BinaryID({
-    fileId: 'testFileId1',
-    organizationId: 'testOrgId',
-    locationId: 'testLocationId',
-  });
-
   const binaryDataId1 = 'testID1';
   const binaryDataId2 = 'testID2';
   const boundingBoxId1 = 'testBoxID1';
+
   describe('exportTabularData tests', () => {
     const sharedAttributes = {
       partId: 'partId1',
@@ -162,17 +171,17 @@ describe('DataClient tests', () => {
     };
     const timeCaptured1 = new Date(2024, 1, 1);
     const timeCaptured2 = new Date(2024, 1, 2);
-    const tabDataResponse1 = new ExportTabularDataResponse({
+    const tabDataResponse1 = create(ExportTabularDataResponseSchema, {
       ...sharedAttributes,
-      methodParameters: Struct.fromJson({ key: 'param1' }),
-      timeCaptured: Timestamp.fromDate(timeCaptured1),
-      payload: Struct.fromJson({ key: 'value1' }),
+      methodParameters: { key: 'param1' },
+      timeCaptured: timestampFromDate(timeCaptured1),
+      payload: { key: 'value1' },
     });
-    const tabDataResponse2 = new ExportTabularDataResponse({
+    const tabDataResponse2 = create(ExportTabularDataResponseSchema, {
       ...sharedAttributes,
-      methodParameters: Struct.fromJson({ key: 'param2' }),
-      timeCaptured: Timestamp.fromDate(timeCaptured2),
-      payload: Struct.fromJson({ key: 'value2' }),
+      methodParameters: { key: 'param2' },
+      timeCaptured: timestampFromDate(timeCaptured2),
+      payload: { key: 'value2' },
     });
 
     let capReq: ExportTabularDataRequest;
@@ -228,14 +237,14 @@ describe('DataClient tests', () => {
         timeCaptured2
       );
 
-      const expectedRequest = new ExportTabularDataRequest({
+      const expectedRequest = create(ExportTabularDataRequestSchema, {
         partId: 'partId1',
         resourceName: 'resource1',
         resourceSubtype: 'resource1:subtype',
         methodName: 'Readings',
         interval: {
-          start: Timestamp.fromDate(timeCaptured1),
-          end: Timestamp.fromDate(timeCaptured2),
+          start: timestampFromDate(timeCaptured1),
+          end: timestampFromDate(timeCaptured2),
         },
       });
 
@@ -258,18 +267,18 @@ describe('DataClient tests', () => {
         additionalParams
       );
 
-      const expectedRequest = new ExportTabularDataRequest({
+      const expectedRequest = create(ExportTabularDataRequestSchema, {
         partId: 'partId1',
         resourceName: 'resource1',
         resourceSubtype: 'resource1:subtype',
         methodName: 'Readings',
         interval: {
-          start: Timestamp.fromDate(timeCaptured1),
-          end: Timestamp.fromDate(timeCaptured2),
+          start: timestampFromDate(timeCaptured1),
+          end: timestampFromDate(timeCaptured2),
         },
-        additionalParameters: Struct.fromJson({
+        additionalParameters: {
           key: 'value1',
-        }),
+        },
       });
 
       expect(capReq).toStrictEqual(expectedRequest);
@@ -286,7 +295,7 @@ describe('DataClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(DataService, {
           tabularDataBySQL: () => {
-            return new TabularDataBySQLResponse({
+            return create(TabularDataBySQLResponseSchema, {
               rawData: data.map((x) => BSON.serialize(x)),
             });
           },
@@ -315,7 +324,7 @@ describe('DataClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(DataService, {
           tabularDataByMQL: () => {
-            return new TabularDataByMQLResponse({
+            return create(TabularDataByMQLResponseSchema, {
               rawData: data.map((x) => BSON.serialize(x)),
             });
           },
@@ -344,7 +353,7 @@ describe('DataClient tests', () => {
     });
 
     it('get tabular data from MQL with queryPrefixName', async () => {
-      const expectedRequest = new TabularDataByMQLRequest({
+      const expectedRequest = create(TabularDataByMQLRequestSchema, {
         organizationId: 'some_org_id',
         mqlBinary: [BSON.serialize({ query: 'some_mql_query' })],
         queryPrefixName: 'my_prefix',
@@ -354,7 +363,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           tabularDataByMQL: (req) => {
             capReq = req;
-            return new TabularDataByMQLResponse({
+            return create(TabularDataByMQLResponseSchema, {
               rawData: data.map((x) => BSON.serialize(x)),
             });
           },
@@ -374,79 +383,15 @@ describe('DataClient tests', () => {
     });
   });
 
-  describe('tabularDataByFilter tests', () => {
-    const tabData1 = new TabularData({
-      data: Struct.fromJson({ key: 'value1' }),
-    });
-    const tabData2 = new TabularData({
-      data: Struct.fromJson({ key: 'value2' }),
-    });
-    const tabDataResponse = new TabularDataByFilterResponse({
-      data: [tabData1, tabData2],
-      count: BigInt(limit),
-      last: lastId,
-    });
-
-    let capReq: TabularDataByFilterRequest;
-    beforeEach(() => {
-      let once = false;
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataService, {
-          tabularDataByFilter: (req) => {
-            capReq = req;
-            if (!once) {
-              once = true;
-              return tabDataResponse;
-            }
-            return new TabularDataByFilterResponse();
-          },
-        });
-      });
-    });
-
-    it('get tabular data', async () => {
-      const promise = await subject().tabularDataByFilter();
-      const { data, count, last } = promise;
-      expect(data.length).toEqual(2);
-      expect(data[0]?.data).toMatchObject({ key: 'value1' });
-      expect(data[1]?.data).toMatchObject({ key: 'value2' });
-      expect(count).toEqual(count);
-      expect(last).toEqual(lastId);
-    });
-
-    it('get filtered tabular data', async () => {
-      const dataReq = new DataRequest({
-        filter,
-        limit: BigInt(limit),
-        last: lastId,
-      });
-      const expectedRequest = new TabularDataByFilterRequest({
-        dataRequest: dataReq,
-        countOnly,
-        includeInternalData,
-      });
-
-      await subject().tabularDataByFilter(
-        filter,
-        limit,
-        undefined,
-        lastId,
-        countOnly,
-        includeInternalData
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-  });
-
   const bin1 = new Uint8Array([1, 2, 3]);
   const bin2 = new Uint8Array([4, 5, 6]);
-  const binData1 = new BinaryData({
+  const binData1 = create(BinaryDataSchema, {
     binary: new Uint8Array(bin1),
   });
-  const binData2 = new BinaryData({
+  const binData2 = create(BinaryDataSchema, {
     binary: bin2,
   });
-  const binDataResponse = new BinaryDataByFilterResponse({
+  const binDataResponse = create(BinaryDataByFilterResponseSchema, {
     data: [binData1, binData2],
     count: BigInt(limit),
     last: lastId,
@@ -464,11 +409,12 @@ describe('DataClient tests', () => {
               once = true;
               return binDataResponse;
             }
-            return new BinaryDataByFilterResponse();
+            return create(BinaryDataByFilterResponseSchema, {});
           },
         });
       });
     });
+
     it('get binary data', async () => {
       const promise = await subject().binaryDataByFilter();
       const { data, count, last } = promise;
@@ -480,12 +426,12 @@ describe('DataClient tests', () => {
     });
 
     it('get filtered binary data', async () => {
-      const dataReq = new DataRequest({
+      const dataReq = create(DataRequestSchema, {
         filter,
         limit: BigInt(limit),
         last: lastId,
       });
-      const expectedRequest = new BinaryDataByFilterRequest({
+      const expectedRequest = create(BinaryDataByFilterRequestSchema, {
         dataRequest: dataReq,
         includeBinary: true,
         countOnly,
@@ -505,7 +451,7 @@ describe('DataClient tests', () => {
     });
   });
 
-  const binDataByIdsResponse = new BinaryDataByIDsResponse({
+  const binDataByIdsResponse = create(BinaryDataByIDsResponseSchema, {
     data: [binData1, binData2],
     count: BigInt(limit),
   });
@@ -533,15 +479,8 @@ describe('DataClient tests', () => {
       expect(promise[1]?.binary).toEqual(bin2);
     });
 
-    it('get binary data by ids', async () => {
-      const promise = await subject().binaryDataByIds([binaryId1, binaryId2]);
-      expect(promise.length).toEqual(2);
-      expect(promise[0]?.binary).toEqual(bin1);
-      expect(promise[1]?.binary).toEqual(bin2);
-    });
-
     it('get binary data by binary data id', async () => {
-      const expectedRequest = new BinaryDataByIDsRequest({
+      const expectedRequest = create(BinaryDataByIDsRequestSchema, {
         binaryDataIds: [binaryDataId1],
         includeBinary: true,
       });
@@ -551,32 +490,12 @@ describe('DataClient tests', () => {
     });
 
     it('get binary data by binary data id with includeBinary false', async () => {
-      const expectedRequest = new BinaryDataByIDsRequest({
+      const expectedRequest = create(BinaryDataByIDsRequestSchema, {
         binaryDataIds: [binaryDataId1],
         includeBinary: false,
       });
 
       await subject().binaryDataByIds([binaryDataId1], false);
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-
-    it('get binary data by id', async () => {
-      const expectedRequest = new BinaryDataByIDsRequest({
-        binaryIds: [binaryId1],
-        includeBinary: true,
-      });
-
-      await subject().binaryDataByIds([binaryId1]);
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-
-    it('get binary data by id with includeBinary false', async () => {
-      const expectedRequest = new BinaryDataByIDsRequest({
-        binaryIds: [binaryId1],
-        includeBinary: false,
-      });
-
-      await subject().binaryDataByIds([binaryId1], false);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -591,7 +510,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           createBinaryDataSignedURL: (req) => {
             capReq = req;
-            return new CreateBinaryDataSignedURLResponse({
+            return create(CreateBinaryDataSignedURLResponseSchema, {
               signedUrl,
             });
           },
@@ -600,7 +519,7 @@ describe('DataClient tests', () => {
     });
 
     it('create signed URL for binary data', async () => {
-      const expectedRequest = new CreateBinaryDataSignedURLRequest({
+      const expectedRequest = create(CreateBinaryDataSignedURLRequestSchema, {
         binaryDataId,
       });
 
@@ -611,7 +530,7 @@ describe('DataClient tests', () => {
 
     it('create signed URL with expiration minutes', async () => {
       const expirationMinutes = 30;
-      const expectedRequest = new CreateBinaryDataSignedURLRequest({
+      const expectedRequest = create(CreateBinaryDataSignedURLRequestSchema, {
         binaryDataId,
         expirationMinutes,
       });
@@ -634,7 +553,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           deleteTabularData: (req) => {
             capturedRequest = req;
-            const response = new DeleteTabularDataResponse();
+            const response = create(DeleteTabularDataResponseSchema, {});
             response.deletedCount = BigInt(10);
             return response;
           },
@@ -649,7 +568,7 @@ describe('DataClient tests', () => {
     });
 
     it('delete tabular data with filter', async () => {
-      const deleteTabularFilter = new DeleteTabularFilter({
+      const deleteTabularFilter = create(DeleteTabularFilterSchema, {
         locationIds: ['location-1'],
         componentName: 'camera',
       });
@@ -681,13 +600,16 @@ describe('DataClient tests', () => {
             capReq = req;
             if (!once) {
               once = true;
-              const response = new DeleteBinaryDataByFilterResponse();
+              const response = create(
+                DeleteBinaryDataByFilterResponseSchema,
+                {}
+              );
               response.deletedCount = req.includeInternalData
                 ? BigInt(20)
                 : BigInt(10);
               return response;
             }
-            return new DeleteBinaryDataByFilterResponse({
+            return create(DeleteBinaryDataByFilterResponseSchema, {
               deletedCount: BigInt(10),
             });
           },
@@ -709,7 +631,7 @@ describe('DataClient tests', () => {
     });
 
     it('delete filtered binary data', async () => {
-      const expectedRequest = new DeleteBinaryDataByFilterRequest({
+      const expectedRequest = create(DeleteBinaryDataByFilterRequestSchema, {
         filter,
         includeInternalData: true,
       });
@@ -725,10 +647,8 @@ describe('DataClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(DataService, {
           deleteBinaryDataByIDs: (req) => {
-            return new DeleteBinaryDataByIDsResponse({
-              deletedCount: BigInt(
-                Math.max(req.binaryDataIds.length, req.binaryIds.length)
-              ),
+            return create(DeleteBinaryDataByIDsResponseSchema, {
+              deletedCount: BigInt(Math.max(req.binaryDataIds.length)),
             });
           },
         });
@@ -745,17 +665,6 @@ describe('DataClient tests', () => {
       ]);
       expect(promise2).toEqual(2n);
     });
-
-    it('delete binary data by ids', async () => {
-      const promise1 = await subject().deleteBinaryDataByIds([binaryId1]);
-      expect(promise1).toEqual(1n);
-
-      const promise2 = await subject().deleteBinaryDataByIds([
-        binaryId1,
-        binaryId2,
-      ]);
-      expect(promise2).toEqual(2n);
-    });
   });
 
   describe('addTagsToBinaryDataByIds tests', () => {
@@ -765,14 +674,14 @@ describe('DataClient tests', () => {
         service(DataService, {
           addTagsToBinaryDataByIDs: (req) => {
             capReq = req;
-            return new AddTagsToBinaryDataByIDsResponse();
+            return create(AddTagsToBinaryDataByIDsResponseSchema, {});
           },
         });
       });
     });
 
     it('add tags to binary data by binary data ids', async () => {
-      const expectedRequest = new AddTagsToBinaryDataByIDsRequest({
+      const expectedRequest = create(AddTagsToBinaryDataByIDsRequestSchema, {
         binaryDataIds: [binaryDataId1, binaryDataId2],
         tags: ['tag1', 'tag2'],
       });
@@ -781,43 +690,6 @@ describe('DataClient tests', () => {
         ['tag1', 'tag2'],
         [binaryDataId1, binaryDataId2]
       );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-
-    it('add tags to binary data', async () => {
-      const expectedRequest = new AddTagsToBinaryDataByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
-        tags: ['tag1', 'tag2'],
-      });
-
-      await subject().addTagsToBinaryDataByIds(
-        ['tag1', 'tag2'],
-        [binaryId1, binaryId2]
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-  });
-
-  describe('addTagsToBinaryDataByFilter tests', () => {
-    let capReq: AddTagsToBinaryDataByFilterRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataService, {
-          addTagsToBinaryDataByFilter: (req) => {
-            capReq = req;
-            return new AddTagsToBinaryDataByFilterResponse();
-          },
-        });
-      });
-    });
-
-    it('add tags to binary data', async () => {
-      const expectedRequest = new AddTagsToBinaryDataByFilterRequest({
-        filter,
-        tags: ['tag1', 'tag2'],
-      });
-
-      await subject().addTagsToBinaryDataByFilter(['tag1', 'tag2'], filter);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -829,7 +701,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           removeTagsFromBinaryDataByIDs: (req) => {
             capReq = req;
-            return new RemoveTagsFromBinaryDataByIDsResponse({
+            return create(RemoveTagsFromBinaryDataByIDsResponseSchema, {
               deletedCount: BigInt(2),
             });
           },
@@ -838,10 +710,13 @@ describe('DataClient tests', () => {
     });
 
     it('remove tags to binary data by binary data ids', async () => {
-      const expectedRequest = new RemoveTagsFromBinaryDataByIDsRequest({
-        binaryDataIds: [binaryDataId1, binaryDataId2],
-        tags: ['tag1', 'tag2'],
-      });
+      const expectedRequest = create(
+        RemoveTagsFromBinaryDataByIDsRequestSchema,
+        {
+          binaryDataIds: [binaryDataId1, binaryDataId2],
+          tags: ['tag1', 'tag2'],
+        }
+      );
 
       const promise = await subject().removeTagsFromBinaryDataByIds(
         ['tag1', 'tag2'],
@@ -849,76 +724,6 @@ describe('DataClient tests', () => {
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual(2n);
-    });
-
-    it('remove tags to binary data by ids', async () => {
-      const expectedRequest = new RemoveTagsFromBinaryDataByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
-        tags: ['tag1', 'tag2'],
-      });
-
-      const promise = await subject().removeTagsFromBinaryDataByIds(
-        ['tag1', 'tag2'],
-        [binaryId1, binaryId2]
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(promise).toEqual(2n);
-    });
-  });
-
-  describe('removeTagsFromBinaryDataByFilter tests', () => {
-    let capReq: RemoveTagsFromBinaryDataByFilterRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataService, {
-          removeTagsFromBinaryDataByFilter: (req) => {
-            capReq = req;
-            return new RemoveTagsFromBinaryDataByFilterResponse({
-              deletedCount: BigInt(5),
-            });
-          },
-        });
-      });
-    });
-
-    it('remove tags to binary data', async () => {
-      const expectedRequest = new RemoveTagsFromBinaryDataByFilterRequest({
-        filter,
-        tags: ['tag1', 'tag2'],
-      });
-
-      const promise = await subject().removeTagsFromBinaryDataByFilter(
-        ['tag1', 'tag2'],
-        filter
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(promise).toEqual(5n);
-    });
-  });
-
-  describe('tagsByFilter tests', () => {
-    let capReq: TagsByFilterRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataService, {
-          tagsByFilter: (req) => {
-            capReq = req;
-            return new TagsByFilterResponse({
-              tags: ['tag1', 'tag2'],
-            });
-          },
-        });
-      });
-    });
-
-    it('get tags by filter', async () => {
-      const expectedRequest = new TagsByFilterRequest({
-        filter,
-      });
-
-      const promise = await subject().tagsByFilter(filter);
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(promise).toEqual(['tag1', 'tag2']);
     });
   });
 
@@ -929,7 +734,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           addBoundingBoxToImageByID: (req) => {
             capReq = req;
-            return new AddBoundingBoxToImageByIDResponse({
+            return create(AddBoundingBoxToImageByIDResponseSchema, {
               bboxId: 'bboxId',
             });
           },
@@ -938,7 +743,7 @@ describe('DataClient tests', () => {
     });
 
     it('add bounding box to image by binary data id', async () => {
-      const expectedRequest = new AddBoundingBoxToImageByIDRequest({
+      const expectedRequest = create(AddBoundingBoxToImageByIDRequestSchema, {
         binaryDataId: binaryDataId1,
         label: 'label',
         xMinNormalized: 0,
@@ -950,30 +755,6 @@ describe('DataClient tests', () => {
 
       const promise = await subject().addBoundingBoxToImageById(
         binaryDataId1,
-        'label',
-        0,
-        0,
-        1,
-        1,
-        0.4
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(promise).toEqual('bboxId');
-    });
-
-    it('add bounding box to image by id', async () => {
-      const expectedRequest = new AddBoundingBoxToImageByIDRequest({
-        binaryId: binaryId1,
-        label: 'label',
-        xMinNormalized: 0,
-        yMinNormalized: 0,
-        yMaxNormalized: 1,
-        xMaxNormalized: 1,
-        confidence: 0.4,
-      });
-
-      const promise = await subject().addBoundingBoxToImageById(
-        binaryId1,
         'label',
         0,
         0,
@@ -993,29 +774,22 @@ describe('DataClient tests', () => {
         service(DataService, {
           removeBoundingBoxFromImageByID: (req) => {
             capReq = req;
-            return new RemoveBoundingBoxFromImageByIDResponse();
+            return create(RemoveBoundingBoxFromImageByIDResponseSchema, {});
           },
         });
       });
     });
 
     it('remove bounding box from image by binary data id', async () => {
-      const expectedRequest = new RemoveBoundingBoxFromImageByIDRequest({
-        binaryDataId: binaryDataId1,
-        bboxId: 'bboxId',
-      });
+      const expectedRequest = create(
+        RemoveBoundingBoxFromImageByIDRequestSchema,
+        {
+          binaryDataId: binaryDataId1,
+          bboxId: 'bboxId',
+        }
+      );
 
       await subject().removeBoundingBoxFromImageById(binaryDataId1, 'bboxId');
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-
-    it('remove bounding box from image by id', async () => {
-      const expectedRequest = new RemoveBoundingBoxFromImageByIDRequest({
-        binaryId: binaryId1,
-        bboxId: 'bboxId',
-      });
-
-      await subject().removeBoundingBoxFromImageById(binaryId1, 'bboxId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -1027,14 +801,14 @@ describe('DataClient tests', () => {
         service(DataService, {
           updateBoundingBox: (req) => {
             capReq = req;
-            return new UpdateBoundingBoxResponse();
+            return create(UpdateBoundingBoxResponseSchema, {});
           },
         });
       });
     });
 
     it('update bounding box on image by binary data id', async () => {
-      const expectedRequest = new UpdateBoundingBoxRequest({
+      const expectedRequest = create(UpdateBoundingBoxRequestSchema, {
         binaryDataId: binaryDataId1,
         bboxId: boundingBoxId1,
         label: 'label',
@@ -1057,57 +831,6 @@ describe('DataClient tests', () => {
       );
       expect(capReq).toStrictEqual(expectedRequest);
     });
-
-    it('update bounding box on image by id', async () => {
-      const expectedRequest = new UpdateBoundingBoxRequest({
-        binaryId: binaryId1,
-        bboxId: boundingBoxId1,
-        label: 'label',
-        xMinNormalized: 0,
-        yMinNormalized: 0,
-        yMaxNormalized: 1,
-        xMaxNormalized: 1,
-        confidence: 0.4,
-      });
-
-      await subject().updateBoundingBox(
-        binaryId1,
-        boundingBoxId1,
-        'label',
-        0,
-        0,
-        1,
-        1,
-        0.4
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-  });
-
-  describe('boundingBoxLabelsByFilter tests', () => {
-    let capReq: BoundingBoxLabelsByFilterRequest;
-    beforeEach(() => {
-      mockTransport = createRouterTransport(({ service }) => {
-        service(DataService, {
-          boundingBoxLabelsByFilter: (req) => {
-            capReq = req;
-            return new BoundingBoxLabelsByFilterResponse({
-              labels: ['label1', 'label2'],
-            });
-          },
-        });
-      });
-    });
-
-    it('get bounding box labels', async () => {
-      const expectedRequest = new BoundingBoxLabelsByFilterRequest({
-        filter,
-      });
-
-      const promise = await subject().boundingBoxLabelsByFilter(filter);
-      expect(capReq).toStrictEqual(expectedRequest);
-      expect(promise).toEqual(['label1', 'label2']);
-    });
   });
 
   describe('configureDatabaseUser tests', () => {
@@ -1117,14 +840,14 @@ describe('DataClient tests', () => {
         service(DataService, {
           configureDatabaseUser: (req) => {
             capReq = req;
-            return new ConfigureDatabaseUserResponse();
+            return create(ConfigureDatabaseUserResponseSchema, {});
           },
         });
       });
     });
 
     it('configure database user', async () => {
-      const expectedRequest = new ConfigureDatabaseUserRequest({
+      const expectedRequest = create(ConfigureDatabaseUserRequestSchema, {
         organizationId: 'orgId',
         password: 'password',
       });
@@ -1141,7 +864,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           getDatabaseConnection: (req) => {
             capReq = req;
-            return new GetDatabaseConnectionResponse({
+            return create(GetDatabaseConnectionResponseSchema, {
               hostname: 'hostname',
             });
           },
@@ -1150,7 +873,7 @@ describe('DataClient tests', () => {
     });
 
     it('get database connection', async () => {
-      const expectedRequest = new GetDatabaseConnectionRequest({
+      const expectedRequest = create(GetDatabaseConnectionRequestSchema, {
         organizationId: 'orgId',
       });
 
@@ -1167,33 +890,20 @@ describe('DataClient tests', () => {
         service(DataService, {
           addBinaryDataToDatasetByIDs: (req) => {
             capReq = req;
-            return new AddBinaryDataToDatasetByIDsResponse();
+            return create(AddBinaryDataToDatasetByIDsResponseSchema, {});
           },
         });
       });
     });
 
     it('add binary data to dataset by binary data ids', async () => {
-      const expectedRequest = new AddBinaryDataToDatasetByIDsRequest({
+      const expectedRequest = create(AddBinaryDataToDatasetByIDsRequestSchema, {
         binaryDataIds: [binaryDataId1, binaryDataId2],
         datasetId: 'datasetId',
       });
 
       await subject().addBinaryDataToDatasetByIds(
         [binaryDataId1, binaryDataId2],
-        'datasetId'
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-
-    it('add binary data to dataset by ids', async () => {
-      const expectedRequest = new AddBinaryDataToDatasetByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
-        datasetId: 'datasetId',
-      });
-
-      await subject().addBinaryDataToDatasetByIds(
-        [binaryId1, binaryId2],
         'datasetId'
       );
       expect(capReq).toStrictEqual(expectedRequest);
@@ -1207,33 +917,23 @@ describe('DataClient tests', () => {
         service(DataService, {
           removeBinaryDataFromDatasetByIDs: (req) => {
             capReq = req;
-            return new RemoveBinaryDataFromDatasetByIDsResponse();
+            return create(RemoveBinaryDataFromDatasetByIDsResponseSchema, {});
           },
         });
       });
     });
 
     it('remove binary data from dataset by binary data ids', async () => {
-      const expectedRequest = new RemoveBinaryDataFromDatasetByIDsRequest({
-        binaryDataIds: [binaryDataId1, binaryDataId2],
-        datasetId: 'datasetId',
-      });
+      const expectedRequest = create(
+        RemoveBinaryDataFromDatasetByIDsRequestSchema,
+        {
+          binaryDataIds: [binaryDataId1, binaryDataId2],
+          datasetId: 'datasetId',
+        }
+      );
 
       await subject().removeBinaryDataFromDatasetByIds(
         [binaryDataId1, binaryDataId2],
-        'datasetId'
-      );
-      expect(capReq).toStrictEqual(expectedRequest);
-    });
-
-    it('remove binary data from dataset by ids', async () => {
-      const expectedRequest = new RemoveBinaryDataFromDatasetByIDsRequest({
-        binaryIds: [binaryId1, binaryId2],
-        datasetId: 'datasetId',
-      });
-
-      await subject().removeBinaryDataFromDatasetByIds(
-        [binaryId1, binaryId2],
         'datasetId'
       );
       expect(capReq).toStrictEqual(expectedRequest);
@@ -1247,7 +947,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           createIndex: (req) => {
             capReq = req;
-            return new CreateIndexResponse();
+            return create(CreateIndexResponseSchema, {});
           },
         });
       });
@@ -1282,15 +982,16 @@ describe('DataClient tests', () => {
       ).toStrictEqual(indexSpec);
     });
   });
+
   describe('listIndexes tests', () => {
     let capReq: ListIndexesRequest;
-    const index1 = new Index({
+    const index1 = create(IndexSchema, {
       collectionType: IndexableCollection.HOT_STORE,
       indexName: 'index1',
       indexSpec: [new TextEncoder().encode(JSON.stringify({ field: 1 }))],
       createdBy: IndexCreator.CUSTOMER,
     });
-    const index2 = new Index({
+    const index2 = create(IndexSchema, {
       collectionType: IndexableCollection.PIPELINE_SINK,
       pipelineName: 'pipeline1',
       indexName: 'index2',
@@ -1305,7 +1006,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           listIndexes: (req) => {
             capReq = req;
-            return new ListIndexesResponse({
+            return create(ListIndexesResponseSchema, {
               indexes,
             });
           },
@@ -1316,7 +1017,7 @@ describe('DataClient tests', () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
       const pipelineName = 'pipeline1';
-      const expectedRequest = new ListIndexesRequest({
+      const expectedRequest = create(ListIndexesRequestSchema, {
         organizationId,
         collectionType,
         pipelineName,
@@ -1332,7 +1033,7 @@ describe('DataClient tests', () => {
     it('lists indexes without pipeline name', async () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
-      const expectedRequest = new ListIndexesRequest({
+      const expectedRequest = create(ListIndexesRequestSchema, {
         organizationId,
         collectionType,
       });
@@ -1344,6 +1045,7 @@ describe('DataClient tests', () => {
       expect(result).toEqual(indexes);
     });
   });
+
   describe('deleteIndex tests', () => {
     let capReq: DeleteIndexRequest;
     beforeEach(() => {
@@ -1351,7 +1053,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           deleteIndex: (req) => {
             capReq = req;
-            return new DeleteIndexResponse();
+            return create(DeleteIndexResponseSchema, {});
           },
         });
       });
@@ -1361,7 +1063,7 @@ describe('DataClient tests', () => {
       const collectionType = IndexableCollection.HOT_STORE;
       const indexName = 'my_index';
       const pipelineName = 'pipeline1';
-      const expectedRequest = new DeleteIndexRequest({
+      const expectedRequest = create(DeleteIndexRequestSchema, {
         organizationId,
         collectionType,
         indexName,
@@ -1379,7 +1081,7 @@ describe('DataClient tests', () => {
       const organizationId = 'orgId';
       const collectionType = IndexableCollection.HOT_STORE;
       const indexName = 'my_index';
-      const expectedRequest = new DeleteIndexRequest({
+      const expectedRequest = create(DeleteIndexRequestSchema, {
         organizationId,
         collectionType,
         indexName,
@@ -1392,14 +1094,14 @@ describe('DataClient tests', () => {
   describe('createFilter tests', () => {
     it('create empty filter', () => {
       const testFilter = DataClient.createFilter({});
-      expect(testFilter).toEqual(new Filter());
+      expect(testFilter).toEqual(create(FilterSchema, {}));
     });
 
     it('create filter', () => {
       const opts = { componentName: 'camera' };
       const testFilter = DataClient.createFilter(opts);
 
-      const expectedFilter = new Filter({
+      const expectedFilter = create(FilterSchema, {
         componentName: 'camera',
       });
 
@@ -1420,12 +1122,12 @@ describe('DataClient tests', () => {
       const bboxLabelsList = ['testBboxLabel1', 'testBboxLabel2'];
       const startTime = new Date(1, 1, 1, 1, 1, 1);
       const endTime = new Date(2, 2, 2, 2, 2, 2);
-      const interval = new CaptureInterval({
-        start: Timestamp.fromDate(startTime),
-        end: Timestamp.fromDate(endTime),
+      const interval = create(CaptureIntervalSchema, {
+        start: timestampFromDate(startTime),
+        end: timestampFromDate(endTime),
       });
       const tagsList = ['testTag1', 'testTag2'];
-      const tagsFilter = new TagsFilter({
+      const tagsFilter = create(TagsFilterSchema, {
         tags: tagsList,
       });
 
@@ -1448,7 +1150,7 @@ describe('DataClient tests', () => {
       const testFilter = DataClient.createFilter(opts);
       expect(testFilter.componentType).toEqual('testComponentType');
 
-      const expectedFilter = new Filter({
+      const expectedFilter = create(FilterSchema, {
         componentName,
         componentType,
         method,
@@ -1478,10 +1180,10 @@ describe('DataClient tests', () => {
         service(DataService, {
           getLatestTabularData: (req) => {
             capReq = req;
-            return new GetLatestTabularDataResponse({
-              timeCaptured: Timestamp.fromDate(timeCaptured),
-              timeSynced: Timestamp.fromDate(timeSynced),
-              payload: Struct.fromJson(payload),
+            return create(GetLatestTabularDataResponseSchema, {
+              timeCaptured: timestampFromDate(timeCaptured),
+              timeSynced: timestampFromDate(timeSynced),
+              payload,
             });
           },
         });
@@ -1491,7 +1193,7 @@ describe('DataClient tests', () => {
     let capReq: GetLatestTabularDataRequest;
 
     it('get latest tabular data', async () => {
-      const expectedRequest = new GetLatestTabularDataRequest({
+      const expectedRequest = create(GetLatestTabularDataRequestSchema, {
         partId: 'testPartId',
         resourceName: 'testResource',
         resourceSubtype: 'testSubtype',
@@ -1513,7 +1215,7 @@ describe('DataClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(DataService, {
           getLatestTabularData: () => {
-            return new GetLatestTabularDataResponse({});
+            return create(GetLatestTabularDataResponseSchema, {});
           },
         });
       });
@@ -1532,18 +1234,18 @@ describe('DataClient tests', () => {
 
 describe('DatasetClient tests', () => {
   const created1 = new Date(1, 1, 1, 1, 1, 1);
-  const dataset1 = new Dataset({
+  const dataset1 = create(DatasetSchema, {
     id: 'id1',
     name: 'name1',
     organizationId: 'orgId1',
-    timeCreated: Timestamp.fromDate(created1),
+    timeCreated: timestampFromDate(created1),
   });
   const created2 = new Date(2, 2, 2, 2, 2, 2);
-  const dataset2 = new Dataset({
+  const dataset2 = create(DatasetSchema, {
     id: 'id2',
     name: 'name2',
     organizationId: 'orgId2',
-    timeCreated: Timestamp.fromDate(created2),
+    timeCreated: timestampFromDate(created2),
   });
   const datasets = [dataset1, dataset2];
   const datasetIds = ['dataset1', 'dataset2'];
@@ -1555,7 +1257,7 @@ describe('DatasetClient tests', () => {
         service(DatasetService, {
           createDataset: (req) => {
             capReq = req;
-            return new CreateDatasetResponse({
+            return create(CreateDatasetResponseSchema, {
               id: 'id',
             });
           },
@@ -1564,7 +1266,7 @@ describe('DatasetClient tests', () => {
     });
 
     it('create dataset', async () => {
-      const expectedRequest = new CreateDatasetRequest({
+      const expectedRequest = create(CreateDatasetRequestSchema, {
         name: 'name',
         organizationId: 'orgId',
       });
@@ -1582,14 +1284,14 @@ describe('DatasetClient tests', () => {
         service(DatasetService, {
           deleteDataset: (req) => {
             capReq = req;
-            return new DeleteDatasetResponse();
+            return create(DeleteDatasetResponseSchema, {});
           },
         });
       });
     });
 
     it('delete dataset', async () => {
-      const expectedRequest = new DeleteDatasetRequest({
+      const expectedRequest = create(DeleteDatasetRequestSchema, {
         id: 'id',
       });
 
@@ -1605,14 +1307,14 @@ describe('DatasetClient tests', () => {
         service(DatasetService, {
           renameDataset: (req) => {
             capReq = req;
-            return new RenameDatasetResponse();
+            return create(RenameDatasetResponseSchema, {});
           },
         });
       });
     });
 
     it('rename dataset', async () => {
-      const expectedRequest = new RenameDatasetRequest({
+      const expectedRequest = create(RenameDatasetRequestSchema, {
         id: 'id',
         name: 'name',
       });
@@ -1629,7 +1331,7 @@ describe('DatasetClient tests', () => {
         service(DatasetService, {
           listDatasetsByOrganizationID: (req) => {
             capReq = req;
-            return new ListDatasetsByOrganizationIDResponse({
+            return create(ListDatasetsByOrganizationIDResponseSchema, {
               datasets,
             });
           },
@@ -1638,9 +1340,12 @@ describe('DatasetClient tests', () => {
     });
 
     it('list datasets by organization ID', async () => {
-      const expectedRequest = new ListDatasetsByOrganizationIDRequest({
-        organizationId: 'orgId',
-      });
+      const expectedRequest = create(
+        ListDatasetsByOrganizationIDRequestSchema,
+        {
+          organizationId: 'orgId',
+        }
+      );
 
       const promise = await subject().listDatasetsByOrganizationID('orgId');
       expect(capReq).toStrictEqual(expectedRequest);
@@ -1649,11 +1354,15 @@ describe('DatasetClient tests', () => {
       expect(set1?.id).toEqual('id1');
       expect(set1?.name).toEqual('name1');
       expect(set1?.organizationId).toEqual('orgId1');
-      expect(set1?.created).toEqual(dataset1.timeCreated?.toDate());
+      expect(set1?.created).toEqual(
+        dataset1.timeCreated ? timestampDate(dataset1.timeCreated) : undefined
+      );
       expect(set2?.id).toEqual('id2');
       expect(set2?.name).toEqual('name2');
       expect(set2?.organizationId).toEqual('orgId2');
-      expect(set2?.created).toEqual(dataset2.timeCreated?.toDate());
+      expect(set2?.created).toEqual(
+        dataset2.timeCreated ? timestampDate(dataset2.timeCreated) : undefined
+      );
     });
   });
 
@@ -1664,7 +1373,7 @@ describe('DatasetClient tests', () => {
         service(DatasetService, {
           listDatasetsByIDs: (req) => {
             capReq = req;
-            return new ListDatasetsByIDsResponse({
+            return create(ListDatasetsByIDsResponseSchema, {
               datasets,
             });
           },
@@ -1673,7 +1382,7 @@ describe('DatasetClient tests', () => {
     });
 
     it('list datasets by organization ID', async () => {
-      const expectedRequest = new ListDatasetsByIDsRequest({
+      const expectedRequest = create(ListDatasetsByIDsRequestSchema, {
         ids: datasetIds,
       });
 
@@ -1684,11 +1393,15 @@ describe('DatasetClient tests', () => {
       expect(set1?.id).toEqual('id1');
       expect(set1?.name).toEqual('name1');
       expect(set1?.organizationId).toEqual('orgId1');
-      expect(set1?.created).toEqual(dataset1.timeCreated?.toDate());
+      expect(set1?.created).toEqual(
+        dataset1.timeCreated ? timestampDate(dataset1.timeCreated) : undefined
+      );
       expect(set2?.id).toEqual('id2');
       expect(set2?.name).toEqual('name2');
       expect(set2?.organizationId).toEqual('orgId2');
-      expect(set2?.created).toEqual(dataset2.timeCreated?.toDate());
+      expect(set2?.created).toEqual(
+        dataset2.timeCreated ? timestampDate(dataset2.timeCreated) : undefined
+      );
     });
   });
 });
@@ -1710,8 +1423,8 @@ describe('DataSyncClient tests', () => {
   const tabularData2 = { key3: [1, 2, 3], key4: { key4sub1: 1 } };
   const binaryData = new Uint8Array([1, 2]);
 
-  const expectedRequest = new DataCaptureUploadRequest();
-  const metadata = new UploadMetadata({
+  const expectedRequest = create(DataCaptureUploadRequestSchema, {});
+  const metadata = create(UploadMetadataSchema, {
     partId,
     componentType,
     componentName,
@@ -1726,7 +1439,7 @@ describe('DataSyncClient tests', () => {
         service(DataSyncService, {
           dataCaptureUpload: (req) => {
             capReq = req;
-            return new DataCaptureUploadResponse({
+            return create(DataCaptureUploadResponseSchema, {
               fileId: 'fileId',
             });
           },
@@ -1737,20 +1450,20 @@ describe('DataSyncClient tests', () => {
     it('tabular data capture upload', async () => {
       metadata.type = DataType.TABULAR_SENSOR;
       expectedRequest.metadata = metadata;
-      const sensorData1 = new SensorData();
-      const sensorMetadata1 = new SensorMetadata();
-      sensorMetadata1.timeRequested = Timestamp.fromDate(timeRequested1);
-      sensorMetadata1.timeReceived = Timestamp.fromDate(timeReceived1);
+      const sensorData1 = create(SensorDataSchema, {});
+      const sensorMetadata1 = create(SensorMetadataSchema, {});
+      sensorMetadata1.timeRequested = timestampFromDate(timeRequested1);
+      sensorMetadata1.timeReceived = timestampFromDate(timeReceived1);
       sensorData1.metadata = sensorMetadata1;
       sensorData1.data.case = 'struct';
-      sensorData1.data.value = Struct.fromJson(tabularData1);
-      const sensorData2 = new SensorData();
-      const sensorMetadata2 = new SensorMetadata();
-      sensorMetadata2.timeRequested = Timestamp.fromDate(timeRequested2);
-      sensorMetadata2.timeReceived = Timestamp.fromDate(timeReceived2);
+      sensorData1.data.value = tabularData1;
+      const sensorData2 = create(SensorDataSchema, {});
+      const sensorMetadata2 = create(SensorMetadataSchema, {});
+      sensorMetadata2.timeRequested = timestampFromDate(timeRequested2);
+      sensorMetadata2.timeReceived = timestampFromDate(timeReceived2);
       sensorData2.metadata = sensorMetadata2;
       sensorData2.data.case = 'struct';
-      sensorData2.data.value = Struct.fromJson(tabularData2);
+      sensorData2.data.value = tabularData2;
       expectedRequest.sensorContents = [sensorData1, sensorData2];
 
       const response = await subject().tabularDataCaptureUpload(
@@ -1774,7 +1487,7 @@ describe('DataSyncClient tests', () => {
         service(DataSyncService, {
           dataCaptureUpload: (req) => {
             capReq = req;
-            return new DataCaptureUploadResponse({
+            return create(DataCaptureUploadResponseSchema, {
               binaryDataId: 'fileId',
             });
           },
@@ -1785,8 +1498,8 @@ describe('DataSyncClient tests', () => {
     it('binary data capture upload', async () => {
       const mimeType = 'image/png';
 
-      const expectedReq = new DataCaptureUploadRequest();
-      const expectedMd = new UploadMetadata({
+      const expectedReq = create(DataCaptureUploadRequestSchema, {});
+      const expectedMd = create(UploadMetadataSchema, {
         partId,
         componentType,
         componentName,
@@ -1799,10 +1512,10 @@ describe('DataSyncClient tests', () => {
       });
       expectedReq.metadata = expectedMd;
 
-      const sensorData = new SensorData();
-      const sensorMetadata = new SensorMetadata();
-      sensorMetadata.timeRequested = Timestamp.fromDate(timeRequested1);
-      sensorMetadata.timeReceived = Timestamp.fromDate(timeReceived1);
+      const sensorData = create(SensorDataSchema, {});
+      const sensorMetadata = create(SensorMetadataSchema, {});
+      sensorMetadata.timeRequested = timestampFromDate(timeRequested1);
+      sensorMetadata.timeReceived = timestampFromDate(timeReceived1);
       sensorData.metadata = sensorMetadata;
       sensorData.data.case = 'binary';
       sensorData.data.value = binaryData;
@@ -1834,13 +1547,13 @@ describe('DataPipelineClient tests', () => {
   const enableBackfill = true;
 
   describe('listDataPipelines tests', () => {
-    const pipeline1 = new DataPipeline({
+    const pipeline1 = create(DataPipelineSchema, {
       id: 'pipeline1',
       name: 'pipeline1',
       organizationId: 'org1',
       dataSourceType: dataSourceTypeStandard,
     });
-    const pipeline2 = new DataPipeline({
+    const pipeline2 = create(DataPipelineSchema, {
       id: 'pipeline2',
       name: 'pipeline2',
       organizationId: 'org2',
@@ -1854,7 +1567,7 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           listDataPipelines: (req: ListDataPipelinesRequest) => {
             capReq = req;
-            return new ListDataPipelinesResponse({
+            return create(ListDataPipelinesResponseSchema, {
               dataPipelines: pipelines,
             });
           },
@@ -1863,7 +1576,7 @@ describe('DataPipelineClient tests', () => {
     });
 
     it('list data pipelines', async () => {
-      const expectedRequest = new ListDataPipelinesRequest({
+      const expectedRequest = create(ListDataPipelinesRequestSchema, {
         organizationId,
       });
 
@@ -1874,7 +1587,7 @@ describe('DataPipelineClient tests', () => {
   });
 
   describe('getPipeline tests', () => {
-    const pipeline = new DataPipeline({
+    const pipeline = create(DataPipelineSchema, {
       id: pipelineId,
       name: pipelineName,
       organizationId,
@@ -1887,7 +1600,7 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           getDataPipeline: (req: GetDataPipelineRequest) => {
             capReq = req;
-            return new GetDataPipelineResponse({
+            return create(GetDataPipelineResponseSchema, {
               dataPipeline: pipeline,
             });
           },
@@ -1896,7 +1609,7 @@ describe('DataPipelineClient tests', () => {
     });
 
     it('get pipeline', async () => {
-      const expectedRequest = new GetDataPipelineRequest({
+      const expectedRequest = create(GetDataPipelineRequestSchema, {
         id: pipelineId,
       });
 
@@ -1909,7 +1622,7 @@ describe('DataPipelineClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(DataPipelinesService, {
           getDataPipeline: () => {
-            return new GetDataPipelineResponse({});
+            return create(GetDataPipelineResponseSchema, {});
           },
         });
       });
@@ -1926,7 +1639,7 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           createDataPipeline: (req: CreateDataPipelineRequest) => {
             capReq = req;
-            return new CreateDataPipelineResponse({
+            return create(CreateDataPipelineResponseSchema, {
               id: pipelineId,
             });
           },
@@ -1935,7 +1648,7 @@ describe('DataPipelineClient tests', () => {
     });
 
     it('create data pipeline', async () => {
-      const expectedRequest = new CreateDataPipelineRequest({
+      const expectedRequest = create(CreateDataPipelineRequestSchema, {
         organizationId,
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
@@ -1957,7 +1670,7 @@ describe('DataPipelineClient tests', () => {
     });
 
     it('create data pipeline with optional dataSourceType', async () => {
-      const expectedRequest = new CreateDataPipelineRequest({
+      const expectedRequest = create(CreateDataPipelineRequestSchema, {
         organizationId,
         name: pipelineName,
         mqlBinary: mqlQuery.map((value) => BSON.serialize(value)),
@@ -1985,14 +1698,14 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           deleteDataPipeline: (req: DeleteDataPipelineRequest) => {
             capReq = req;
-            return new DeleteDataPipelineResponse();
+            return create(DeleteDataPipelineResponseSchema, {});
           },
         });
       });
     });
 
     it('delete data pipeline', async () => {
-      const expectedRequest = new DeleteDataPipelineRequest({
+      const expectedRequest = create(DeleteDataPipelineRequestSchema, {
         id: pipelineId,
       });
 
@@ -2002,11 +1715,11 @@ describe('DataPipelineClient tests', () => {
   });
 
   describe('listDataPipelineRuns tests', () => {
-    const run1 = new DataPipelineRun({
+    const run1 = create(DataPipelineRunSchema, {
       id: 'run1',
       status: DataPipelineRunStatus.STARTED,
     });
-    const run2 = new DataPipelineRun({
+    const run2 = create(DataPipelineRunSchema, {
       id: 'run2',
       status: DataPipelineRunStatus.COMPLETED,
     });
@@ -2020,7 +1733,7 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           listDataPipelineRuns: (req: ListDataPipelineRunsRequest) => {
             capReq = req;
-            return new ListDataPipelineRunsResponse({
+            return create(ListDataPipelineRunsResponseSchema, {
               runs,
               nextPageToken,
             });
@@ -2030,7 +1743,7 @@ describe('DataPipelineClient tests', () => {
     });
 
     it('list data pipeline runs', async () => {
-      const expectedRequest = new ListDataPipelineRunsRequest({
+      const expectedRequest = create(ListDataPipelineRunsRequestSchema, {
         id: pipelineId,
         pageSize,
       });
@@ -2048,7 +1761,7 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           listDataPipelineRuns: (req: ListDataPipelineRunsRequest) => {
             capReq = req;
-            return new ListDataPipelineRunsResponse({
+            return create(ListDataPipelineRunsResponseSchema, {
               runs: nextPageRuns,
               nextPageToken: 'some-token',
             });
@@ -2067,7 +1780,7 @@ describe('DataPipelineClient tests', () => {
         service(DataPipelinesService, {
           listDataPipelineRuns: (req: ListDataPipelineRunsRequest) => {
             capReq = req;
-            return new ListDataPipelineRunsResponse({
+            return create(ListDataPipelineRunsResponseSchema, {
               runs: someRuns,
               nextPageToken: '',
             });
@@ -2108,7 +1821,7 @@ describe('fileUpload tests', () => {
           for await (const request of requests) {
             capturedRequests.push(request);
           }
-          return new FileUploadResponse({
+          return create(FileUploadResponseSchema, {
             fileId: expectedFileId,
             binaryDataId: expectedBinaryDataId,
           });
@@ -2124,6 +1837,7 @@ describe('fileUpload tests', () => {
     expect(capturedRequests).toHaveLength(2);
 
     // Check metadata request
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
     const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
@@ -2138,6 +1852,7 @@ describe('fileUpload tests', () => {
     expect(metadata.datasetIds).toStrictEqual(options.datasetIds);
 
     // Check file contents request
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileContentsRequest = capturedRequests[1]!;
     expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
     const fileContents = fileContentsRequest.uploadPacket.value as FileData;
@@ -2151,6 +1866,7 @@ describe('fileUpload tests', () => {
     expect(capturedRequests).toHaveLength(2);
 
     // Check metadata request
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
     const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
@@ -2165,6 +1881,7 @@ describe('fileUpload tests', () => {
     expect(metadata.datasetIds).toStrictEqual([]);
 
     // Check file contents request
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const fileContentsRequest = capturedRequests[1]!;
     expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
     const fileContents = fileContentsRequest.uploadPacket.value as FileData;
@@ -2182,6 +1899,7 @@ describe('fileUpload tests', () => {
     expect(result).toBe(expectedBinaryDataId);
     expect(capturedRequests).toHaveLength(1 + numChunks);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
 

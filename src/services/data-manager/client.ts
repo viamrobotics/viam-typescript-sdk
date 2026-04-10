@@ -1,15 +1,16 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { MimeType } from "../../gen/app/datasync/v1/data_sync_pb.js";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
 import {
   DataManagerService,
   SyncRequestSchema,
   UploadBinaryDataToDatasetsRequestSchema,
-} from "../../gen/service/datamanager/v1/data_manager_pb.js";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { DataManager } from "./data-manager";
+} from '../../gen/service/datamanager/v1/data_manager_pb.js';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { DataManager } from './data-manager';
 
 export class DataManagerClient implements DataManager {
   private client: Client<typeof DataManagerService>;
@@ -31,7 +32,7 @@ export class DataManagerClient implements DataManager {
    * ```ts
    * const dataManager = new VIAM.DataManagerClient(
    *   machine,
-   *   "my_data_manager",
+   *   'my_data_manager'
    * );
    * await dataManager.sync();
    * ```
@@ -45,7 +46,7 @@ export class DataManagerClient implements DataManager {
   async sync(extra = {}, callOptions = this.callOptions) {
     const request = create(SyncRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -61,9 +62,9 @@ export class DataManagerClient implements DataManager {
    * ```ts
    * const dataManager = new VIAM.DataManagerClient(
    *   machine,
-   *   "my_data_manager",
+   *   'my_data_manager'
    * );
-   * await dataManager.doCommand({ cmd: "test", data1: 500 });
+   * await dataManager.doCommand({ cmd: 'test', data1: 500 });
    * ```
    *
    * For more information, see [Data Manager
@@ -77,20 +78,20 @@ export class DataManagerClient implements DataManager {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
@@ -102,13 +103,13 @@ export class DataManagerClient implements DataManager {
    * ```ts
    * const dataManager = new VIAM.DataManagerClient(
    *   machine,
-   *   "my_data_manager",
+   *   'my_data_manager'
    * );
    * await dataManager.uploadBinaryDataToDatasets(
    *   new Uint8Array([1, 2, 3]),
-   *   ["tag1", "tag2"],
-   *   ["datasetId1", "datasetId2"],
-   *   MimeType.MIME_TYPE_JPEG,
+   *   ['tag1', 'tag2'],
+   *   ['datasetId1', 'datasetId2'],
+   *   MimeType.MIME_TYPE_JPEG
    * );
    * ```
    *
@@ -125,7 +126,7 @@ export class DataManagerClient implements DataManager {
     datasetIds: string[],
     mimeType: MimeType,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(UploadBinaryDataToDatasetsRequestSchema, {
       name: this.name,
@@ -133,7 +134,7 @@ export class DataManagerClient implements DataManager {
       tags,
       datasetIds,
       mimeType,
-      extra: extra,
+      extra,
     });
     this.options.requestLogger?.(request);
     await this.client.uploadBinaryDataToDatasets(request, callOptions);

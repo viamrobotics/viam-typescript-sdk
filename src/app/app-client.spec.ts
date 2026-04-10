@@ -1,68 +1,73 @@
-import * as pb from '../gen/app/v1/app_pb';
-
-import { Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import { timestampNow } from '@bufbuild/protobuf/wkt';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
-import { AppService } from '../gen/app/v1/app_pb';
-import { LogEntry } from '../gen/common/v1/common_pb';
+import * as pb from '../gen/app/v1/app_pb';
+import {
+  AppService,
+  DeleteOrganizationMemberResponseSchema,
+} from '../gen/app/v1/app_pb';
+import { type LogEntry, LogEntrySchema } from '../gen/common/v1/common_pb';
 import { AppClient, createAuth } from './app-client';
-vi.mock('../gen/app/v1/app_pb_service');
 
 let testLogStream =
-  createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
+  createWritableIterable<
+    MessageInitShape<typeof pb.TailRobotPartLogsResponseSchema>
+  >();
 
 let mockTransport: Transport;
 const subject = () => new AppClient(mockTransport);
 
 describe('AppClient tests', () => {
-  const org = new pb.Organization({
+  const org = create(pb.OrganizationSchema, {
     id: 'id',
     cid: 'cid',
     name: 'name',
     defaultRegion: 'region',
     publicNamespace: 'namespace',
-    createdOn: new Timestamp(),
+    createdOn: timestampNow(),
   });
 
-  const location = new pb.Location({
-    createdOn: new Timestamp(),
+  const location = create(pb.LocationSchema, {
+    createdOn: timestampNow(),
     id: 'id',
     name: 'name',
     robotCount: 3,
     parentLocationId: 'parent',
   });
 
-  const sharedSecret = new pb.SharedSecret({
-    createdOn: new Timestamp(),
+  const sharedSecret = create(pb.SharedSecretSchema, {
+    createdOn: timestampNow(),
     state: 2,
     secret: 'super-secret',
     id: 'id',
   });
-  const auth = new pb.LocationAuth({
+  const auth = create(pb.LocationAuthSchema, {
     secrets: [sharedSecret],
     locationId: 'locId',
     secret: 'secret',
   });
 
-  const robot = new pb.Robot({
-    createdOn: new Timestamp(),
+  const robot = create(pb.RobotSchema, {
+    createdOn: timestampNow(),
     id: 'id',
     location: 'location',
     name: 'name',
   });
 
-  const roverRentalRobot = new pb.RoverRentalRobot({
+  const roverRentalRobot = create(pb.RoverRentalRobotSchema, {
     locationId: 'locId',
     robotId: 'robotId',
     robotName: 'name',
     robotMainPartId: 'mainPartId',
   });
 
-  const robotPart = new pb.RobotPart({
+  const robotPart = create(pb.RobotPartSchema, {
     locationId: 'locId',
-    createdOn: new Timestamp(),
+    createdOn: timestampNow(),
     name: 'name',
     id: 'id',
     robot: 'robot',
@@ -71,33 +76,33 @@ describe('AppClient tests', () => {
     fqdn: 'fqdn',
   });
 
-  const logEntry = new LogEntry({
+  const logEntry = create(LogEntrySchema, {
     level: 'debug',
     loggerName: 'logger',
   });
 
-  const apiKey = new pb.APIKey({
+  const apiKey = create(pb.APIKeySchema, {
     id: 'id',
     name: 'name',
-    createdOn: new Timestamp(),
+    createdOn: timestampNow(),
     key: 'key',
   });
 
-  const fragment = new pb.Fragment({
+  const fragment = create(pb.FragmentSchema, {
     id: 'id',
-    createdOn: new Timestamp(),
+    createdOn: timestampNow(),
     public: true,
     name: 'name',
   });
 
-  const apiKeyWithAuths = new pb.APIKeyWithAuthorizations({
+  const apiKeyWithAuths = create(pb.APIKeyWithAuthorizationsSchema, {
     apiKey,
   });
 
-  const partHistory = new pb.RobotPartHistoryEntry({
+  const partHistory = create(pb.RobotPartHistoryEntrySchema, {
     old: robotPart,
     part: 'part',
-    when: new Timestamp(),
+    when: timestampNow(),
     robot: 'robot',
   });
 
@@ -110,20 +115,20 @@ describe('AppClient tests', () => {
     'resourceId'
   );
 
-  const invite = new pb.OrganizationInvite({
+  const invite = create(pb.OrganizationInviteSchema, {
     email: 'email',
     organizationId: 'id',
-    createdOn: new Timestamp(),
+    createdOn: timestampNow(),
     authorizations: [authorization],
   });
 
-  const permission = new pb.AuthorizedPermissions({
+  const permission = create(pb.AuthorizedPermissionsSchema, {
     resourceType: 'robot',
     resourceId: 'id',
     permissions: ['some', 'permissions'],
   });
 
-  const registryItem = new pb.RegistryItem({
+  const registryItem = create(pb.RegistryItemSchema, {
     organizationId: 'orgId',
     url: 'url',
     name: 'name',
@@ -132,7 +137,7 @@ describe('AppClient tests', () => {
     visibility: 2,
   });
 
-  const module = new pb.Module({
+  const module = create(pb.ModuleSchema, {
     url: 'url',
     moduleId: 'id',
     description: 'description',
@@ -146,7 +151,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getUserIDByEmail: () => {
-            return new pb.GetUserIDByEmailResponse({
+            return create(pb.GetUserIDByEmailResponseSchema, {
               userId: 'id',
             });
           },
@@ -165,7 +170,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createOrganization: () => {
-            return new pb.CreateOrganizationResponse({
+            return create(pb.CreateOrganizationResponseSchema, {
               organization: org,
             });
           },
@@ -185,7 +190,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listOrganizations: () => {
-            return new pb.ListOrganizationsResponse({
+            return create(pb.ListOrganizationsResponseSchema, {
               organizations,
             });
           },
@@ -200,7 +205,7 @@ describe('AppClient tests', () => {
   });
 
   describe('getOrganizationsWithAccessToLocation tests', () => {
-    const orgIdentity = new pb.OrganizationIdentity({
+    const orgIdentity = create(pb.OrganizationIdentitySchema, {
       name: 'name',
       id: 'id',
     });
@@ -210,9 +215,12 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getOrganizationsWithAccessToLocation: () => {
-            return new pb.GetOrganizationsWithAccessToLocationResponse({
-              organizationIdentities: orgIdentities,
-            });
+            return create(
+              pb.GetOrganizationsWithAccessToLocationResponseSchema,
+              {
+                organizationIdentities: orgIdentities,
+              }
+            );
           },
         });
       });
@@ -226,7 +234,7 @@ describe('AppClient tests', () => {
   });
 
   describe('listOrganizationsByUser tests', () => {
-    const orgDetail = new pb.OrgDetails({
+    const orgDetail = create(pb.OrgDetailsSchema, {
       orgId: 'id',
       orgName: 'name',
     });
@@ -235,7 +243,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listOrganizationsByUser: () => {
-            return new pb.ListOrganizationsByUserResponse({
+            return create(pb.ListOrganizationsByUserResponseSchema, {
               orgs: orgDetails,
             });
           },
@@ -254,7 +262,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getOrganization: () => {
-            return new pb.GetOrganizationResponse({
+            return create(pb.GetOrganizationResponseSchema, {
               organization: org,
             });
           },
@@ -273,9 +281,12 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getOrganizationNamespaceAvailability: () => {
-            return new pb.GetOrganizationNamespaceAvailabilityResponse({
-              available: true,
-            });
+            return create(
+              pb.GetOrganizationNamespaceAvailabilityResponseSchema,
+              {
+                available: true,
+              }
+            );
           },
         });
       });
@@ -293,7 +304,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateOrganization: () => {
-            return new pb.UpdateOrganizationResponse({
+            return create(pb.UpdateOrganizationResponseSchema, {
               organization: org,
             });
           },
@@ -314,7 +325,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteOrganization tests', () => {
-    const expectedRequest = new pb.DeleteOrganizationRequest({
+    const expectedRequest = create(pb.DeleteOrganizationRequestSchema, {
       organizationId: 'id',
     });
 
@@ -324,7 +335,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteOrganization: (req) => {
             capReq = req;
-            return new pb.DeleteOrganizationResponse();
+            return create(pb.DeleteOrganizationResponseSchema);
           },
         });
       });
@@ -337,15 +348,15 @@ describe('AppClient tests', () => {
   });
 
   describe('listOrganizationMembers tests', () => {
-    const orgMember = new pb.OrganizationMember({
+    const orgMember = create(pb.OrganizationMemberSchema, {
       userId: 'id',
-      dateAdded: new Timestamp(),
+      dateAdded: timestampNow(),
       emails: ['email'],
     });
     const members = [orgMember];
     const invites = [invite];
 
-    const expectedResponse = new pb.ListOrganizationMembersResponse({
+    const expectedResponse = create(pb.ListOrganizationMembersResponseSchema, {
       organizationId: 'orgId',
       members,
       invites,
@@ -372,7 +383,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createOrganizationInvite: () => {
-            return new pb.CreateOrganizationInviteResponse({
+            return create(pb.CreateOrganizationInviteResponseSchema, {
               invite,
             });
           },
@@ -396,9 +407,12 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateOrganizationInviteAuthorizations: () => {
-            return new pb.UpdateOrganizationInviteAuthorizationsResponse({
-              invite,
-            });
+            return create(
+              pb.UpdateOrganizationInviteAuthorizationsResponseSchema,
+              {
+                invite,
+              }
+            );
           },
         });
       });
@@ -416,7 +430,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteOrganizationMember tests', () => {
-    const expectedRequest = new pb.DeleteOrganizationMemberRequest({
+    const expectedRequest = create(pb.DeleteOrganizationMemberRequestSchema, {
       organizationId: 'orgId',
       userId: 'userId',
     });
@@ -427,7 +441,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteOrganizationMember: (req) => {
             capReq = req;
-            return new pb.DeleteOrganizationInviteResponse();
+            return create(DeleteOrganizationMemberResponseSchema);
           },
         });
       });
@@ -440,7 +454,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteOrganizationInvite tests', () => {
-    const expectedRequest = new pb.DeleteOrganizationInviteRequest({
+    const expectedRequest = create(pb.DeleteOrganizationInviteRequestSchema, {
       organizationId: 'orgId',
       email: 'email',
     });
@@ -451,7 +465,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteOrganizationInvite: (req) => {
             capReq = req;
-            return new pb.DeleteOrganizationInviteResponse();
+            return create(pb.DeleteOrganizationInviteResponseSchema);
           },
         });
       });
@@ -468,7 +482,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           resendOrganizationInvite: () => {
-            return new pb.ResendOrganizationInviteResponse({
+            return create(pb.ResendOrganizationInviteResponseSchema, {
               invite,
             });
           },
@@ -490,7 +504,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createLocation: () => {
-            return new pb.CreateLocationResponse({
+            return create(pb.CreateLocationResponseSchema, {
               location,
             });
           },
@@ -513,7 +527,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getLocation: () => {
-            return new pb.GetLocationResponse({
+            return create(pb.GetLocationResponseSchema, {
               location,
             });
           },
@@ -528,7 +542,7 @@ describe('AppClient tests', () => {
   });
 
   describe('updateLocation tests', () => {
-    const newLocation = new pb.Location({
+    const newLocation = create(pb.LocationSchema, {
       ...location,
       id: 'newId',
       name: 'newName',
@@ -539,7 +553,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateLocation: () => {
-            return new pb.UpdateLocationResponse({
+            return create(pb.UpdateLocationResponseSchema, {
               location: newLocation,
             });
           },
@@ -559,7 +573,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteLocation tests', () => {
-    const expectedRequest = new pb.DeleteLocationRequest({
+    const expectedRequest = create(pb.DeleteLocationRequestSchema, {
       locationId: 'id',
     });
 
@@ -569,7 +583,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteLocation: (req) => {
             capReq = req;
-            return new pb.DeleteLocationResponse();
+            return create(pb.DeleteLocationResponseSchema);
           },
         });
       });
@@ -587,7 +601,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listLocations: () => {
-            return new pb.ListLocationsResponse({
+            return create(pb.ListLocationsResponseSchema, {
               locations,
             });
           },
@@ -602,7 +616,7 @@ describe('AppClient tests', () => {
   });
 
   describe('shareLocation tests', () => {
-    const expectedRequest = new pb.ShareLocationRequest({
+    const expectedRequest = create(pb.ShareLocationRequestSchema, {
       locationId: 'locId',
       organizationId: 'orgId',
     });
@@ -613,7 +627,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           shareLocation: (req) => {
             capReq = req;
-            return new pb.ShareLocationResponse();
+            return create(pb.ShareLocationResponseSchema);
           },
         });
       });
@@ -626,7 +640,7 @@ describe('AppClient tests', () => {
   });
 
   describe('unshareLocation tests', () => {
-    const expectedRequest = new pb.UnshareLocationRequest({
+    const expectedRequest = create(pb.UnshareLocationRequestSchema, {
       organizationId: 'orgId',
       locationId: 'locId',
     });
@@ -637,7 +651,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           unshareLocation: (req) => {
             capReq = req;
-            return new pb.UnshareLocationResponse();
+            return create(pb.UnshareLocationResponseSchema);
           },
         });
       });
@@ -654,7 +668,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           locationAuth: () => {
-            return new pb.LocationAuthResponse({
+            return create(pb.LocationAuthResponseSchema, {
               auth,
             });
           },
@@ -673,7 +687,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createLocationSecret: () => {
-            return new pb.CreateLocationSecretResponse({
+            return create(pb.CreateLocationSecretResponseSchema, {
               auth,
             });
           },
@@ -688,7 +702,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteLocationSecret tests', () => {
-    const expectedRequest = new pb.DeleteLocationSecretRequest({
+    const expectedRequest = create(pb.DeleteLocationSecretRequestSchema, {
       locationId: 'locId',
       secretId: 'secret-id',
     });
@@ -699,7 +713,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteLocationSecret: (req) => {
             capReq = req;
-            return new pb.DeleteLocationSecretResponse();
+            return create(pb.DeleteLocationSecretResponseSchema);
           },
         });
       });
@@ -716,7 +730,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobot: () => {
-            return new pb.GetRobotResponse({
+            return create(pb.GetRobotResponseSchema, {
               robot,
             });
           },
@@ -737,7 +751,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRoverRentalRobots: () => {
-            return new pb.GetRoverRentalRobotsResponse({
+            return create(pb.GetRoverRentalRobotsResponseSchema, {
               robots: roverRentalRobots,
             });
           },
@@ -758,7 +772,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobotParts: () => {
-            return new pb.GetRobotPartsResponse({
+            return create(pb.GetRobotPartsResponseSchema, {
               parts,
             });
           },
@@ -773,7 +787,7 @@ describe('AppClient tests', () => {
   });
 
   describe('getRobotPart tests', () => {
-    const expectedResponse = new pb.GetRobotPartResponse({
+    const expectedResponse = create(pb.GetRobotPartResponseSchema, {
       part: robotPart,
       configJson: 'isJson: true',
     });
@@ -794,9 +808,12 @@ describe('AppClient tests', () => {
   });
 
   describe('getRobotPartByNameAndLocation tests', () => {
-    const expectedResponse = new pb.GetRobotPartByNameAndLocationResponse({
-      part: robotPart,
-    });
+    const expectedResponse = create(
+      pb.GetRobotPartByNameAndLocationResponseSchema,
+      {
+        part: robotPart,
+      }
+    );
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
@@ -817,7 +834,7 @@ describe('AppClient tests', () => {
   });
 
   describe('getRobotPartLogs tests', () => {
-    const expectedResponse = new pb.GetRobotPartLogsResponse({
+    const expectedResponse = create(pb.GetRobotPartLogsResponseSchema, {
       logs: [logEntry],
       nextPageToken: 'nextPage',
     });
@@ -841,7 +858,9 @@ describe('AppClient tests', () => {
   describe('tailRobotPartLogs tests', () => {
     beforeEach(() => {
       testLogStream =
-        createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
+        createWritableIterable<
+          MessageInitShape<typeof pb.TailRobotPartLogsResponseSchema>
+        >();
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           tailRobotPartLogs: () => {
@@ -853,7 +872,9 @@ describe('AppClient tests', () => {
 
     afterEach(() => {
       testLogStream =
-        createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
+        createWritableIterable<
+          MessageInitShape<typeof pb.TailRobotPartLogsResponseSchema>
+        >();
     });
 
     it('tailRobotPartLogs', async () => {
@@ -864,7 +885,7 @@ describe('AppClient tests', () => {
         logs: [logEntry],
       });
 
-      const logEntry2 = new LogEntry({
+      const logEntry2 = create(LogEntrySchema, {
         ...logEntry,
         loggerName: 'newLoggerName',
         level: 'error',
@@ -878,13 +899,13 @@ describe('AppClient tests', () => {
 
       expect(logs.length).toEqual(2);
 
-      const log1 = logs[0]!;
-      expect(log1.loggerName).toEqual('logger');
-      expect(log1.level).toEqual('debug');
+      const log1 = logs[0];
+      expect(log1?.loggerName).toEqual('logger');
+      expect(log1?.level).toEqual('debug');
 
-      const log2 = logs[1]!;
-      expect(log2.loggerName).toEqual('newLoggerName');
-      expect(log2.level).toEqual('error');
+      const log2 = logs[1];
+      expect(log2?.loggerName).toEqual('newLoggerName');
+      expect(log2?.level).toEqual('error');
     });
   });
 
@@ -895,7 +916,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobotPartHistory: () => {
-            return new pb.GetRobotPartHistoryResponse({
+            return create(pb.GetRobotPartHistoryResponseSchema, {
               history: histories,
             });
           },
@@ -914,7 +935,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateRobotPart: () => {
-            return new pb.UpdateRobotPartResponse({
+            return create(pb.UpdateRobotPartResponseSchema, {
               part: robotPart,
             });
           },
@@ -923,11 +944,7 @@ describe('AppClient tests', () => {
     });
 
     it('updateRobotPart', async () => {
-      const response = await subject().updateRobotPart(
-        'id',
-        'name',
-        new Struct()
-      );
+      const response = await subject().updateRobotPart('id', 'name', {});
       expect(response).toEqual(robotPart);
     });
   });
@@ -937,7 +954,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           newRobotPart: () => {
-            return new pb.NewRobotPartResponse({
+            return create(pb.NewRobotPartResponseSchema, {
               partId: 'id',
             });
           },
@@ -952,7 +969,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteRobotPart tests', () => {
-    const expectedRequest = new pb.DeleteRobotPartRequest({
+    const expectedRequest = create(pb.DeleteRobotPartRequestSchema, {
       partId: 'partId',
     });
 
@@ -962,7 +979,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteRobotPart: (req) => {
             capReq = req;
-            return new pb.DeleteRobotPartResponse();
+            return create(pb.DeleteRobotPartResponseSchema);
           },
         });
       });
@@ -981,7 +998,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRobotAPIKeys: () => {
-            return new pb.GetRobotAPIKeysResponse({
+            return create(pb.GetRobotAPIKeysResponseSchema, {
               apiKeys,
             });
           },
@@ -996,7 +1013,7 @@ describe('AppClient tests', () => {
   });
 
   describe('markPartAsMain tests', () => {
-    const expectedRequest = new pb.MarkPartAsMainRequest({
+    const expectedRequest = create(pb.MarkPartAsMainRequestSchema, {
       partId: 'id',
     });
 
@@ -1006,7 +1023,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           markPartAsMain: (req) => {
             capReq = req;
-            return new pb.MarkPartAsMainResponse();
+            return create(pb.MarkPartAsMainResponseSchema);
           },
         });
       });
@@ -1019,7 +1036,7 @@ describe('AppClient tests', () => {
   });
 
   describe('markPartForRestart tests', () => {
-    const expectedRequest = new pb.MarkPartForRestartRequest({
+    const expectedRequest = create(pb.MarkPartForRestartRequestSchema, {
       partId: 'id',
     });
 
@@ -1029,7 +1046,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           markPartForRestart: (req) => {
             capReq = req;
-            return new pb.MarkPartForRestartResponse();
+            return create(pb.MarkPartForRestartResponseSchema);
           },
         });
       });
@@ -1046,7 +1063,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createRobotPartSecret: () => {
-            return new pb.CreateRobotPartSecretResponse({
+            return create(pb.CreateRobotPartSecretResponseSchema, {
               part: robotPart,
             });
           },
@@ -1061,7 +1078,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteRobotPartSecret tests', () => {
-    const expectedRequest = new pb.DeleteRobotPartSecretRequest({
+    const expectedRequest = create(pb.DeleteRobotPartSecretRequestSchema, {
       partId: 'id',
       secretId: 'secretId',
     });
@@ -1072,7 +1089,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteRobotPartSecret: (req) => {
             capReq = req;
-            return new pb.DeleteRobotPartSecretResponse();
+            return create(pb.DeleteRobotPartSecretResponseSchema);
           },
         });
       });
@@ -1091,7 +1108,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listRobots: () => {
-            return new pb.ListRobotsResponse({
+            return create(pb.ListRobotsResponseSchema, {
               robots,
             });
           },
@@ -1106,8 +1123,8 @@ describe('AppClient tests', () => {
   });
 
   describe('listMachineSummaries tests', () => {
-    const locSummary1 = new pb.LocationSummary({});
-    const locSummary2 = new pb.LocationSummary({});
+    const locSummary1 = create(pb.LocationSummarySchema, {});
+    const locSummary2 = create(pb.LocationSummarySchema, {});
     const locationSummaries = [locSummary1, locSummary2];
     let capturedReq: pb.ListMachineSummariesRequest | undefined;
 
@@ -1116,7 +1133,9 @@ describe('AppClient tests', () => {
         service(AppService, {
           listMachineSummaries: (req: pb.ListMachineSummariesRequest) => {
             capturedReq = req;
-            return new pb.ListMachineSummariesResponse({ locationSummaries });
+            return create(pb.ListMachineSummariesResponseSchema, {
+              locationSummaries,
+            });
           },
         });
       });
@@ -1151,7 +1170,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           newRobot: () => {
-            return new pb.NewRobotResponse({
+            return create(pb.NewRobotResponseSchema, {
               id: 'robotId',
             });
           },
@@ -1170,7 +1189,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateRobot: () => {
-            return new pb.UpdateRobotResponse({
+            return create(pb.UpdateRobotResponseSchema, {
               robot,
             });
           },
@@ -1189,7 +1208,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteRobot tests', () => {
-    const expectedRequest = new pb.DeleteRobotRequest({
+    const expectedRequest = create(pb.DeleteRobotRequestSchema, {
       id: 'deleteRobotId',
     });
 
@@ -1199,7 +1218,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteRobot: (req) => {
             capReq = req;
-            return new pb.DeleteRobotResponse();
+            return create(pb.DeleteRobotResponseSchema);
           },
         });
       });
@@ -1218,7 +1237,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listFragments: () => {
-            return new pb.ListFragmentsResponse({
+            return create(pb.ListFragmentsResponseSchema, {
               fragments,
             });
           },
@@ -1237,7 +1256,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getFragment: () => {
-            return new pb.GetFragmentResponse({
+            return create(pb.GetFragmentResponseSchema, {
               fragment,
             });
           },
@@ -1256,7 +1275,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createFragment: () => {
-            return new pb.CreateFragmentResponse({
+            return create(pb.CreateFragmentResponseSchema, {
               fragment,
             });
           },
@@ -1265,11 +1284,7 @@ describe('AppClient tests', () => {
     });
 
     it('createFragment', async () => {
-      const response = await subject().createFragment(
-        'orgId',
-        'name',
-        new Struct()
-      );
+      const response = await subject().createFragment('orgId', 'name', {});
       expect(response).toEqual(fragment);
     });
   });
@@ -1279,7 +1294,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateFragment: () => {
-            return new pb.UpdateFragmentResponse({
+            return create(pb.UpdateFragmentResponseSchema, {
               fragment,
             });
           },
@@ -1288,17 +1303,13 @@ describe('AppClient tests', () => {
     });
 
     it('updateFragment', async () => {
-      const response = await subject().updateFragment(
-        'id',
-        'name',
-        new Struct()
-      );
+      const response = await subject().updateFragment('id', 'name', {});
       expect(response).toEqual(fragment);
     });
   });
 
   describe('deleteFragment tests', () => {
-    const expectedRequest = new pb.DeleteFragmentRequest({
+    const expectedRequest = create(pb.DeleteFragmentRequestSchema, {
       id: 'id',
     });
 
@@ -1308,7 +1319,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteFragment: (req) => {
             capReq = req;
-            return new pb.DeleteFragmentResponse();
+            return create(pb.DeleteFragmentResponseSchema);
           },
         });
       });
@@ -1328,7 +1339,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           listMachineFragments: (req) => {
             request = req;
-            return new pb.ListMachineFragmentsResponse({
+            return create(pb.ListMachineFragmentsResponseSchema, {
               fragments: response,
             });
           },
@@ -1350,7 +1361,7 @@ describe('AppClient tests', () => {
   });
 
   describe('addRole tests', () => {
-    const expectedRequest = new pb.AddRoleRequest({
+    const expectedRequest = create(pb.AddRoleRequestSchema, {
       authorization,
     });
 
@@ -1360,7 +1371,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           addRole: (req) => {
             capReq = req;
-            return new pb.AddRoleResponse();
+            return create(pb.AddRoleResponseSchema);
           },
         });
       });
@@ -1379,7 +1390,7 @@ describe('AppClient tests', () => {
   });
 
   describe('removeRole tests', () => {
-    const expectedRequest = new pb.RemoveRoleRequest({
+    const expectedRequest = create(pb.RemoveRoleRequestSchema, {
       authorization,
     });
 
@@ -1389,7 +1400,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           removeRole: (req) => {
             capReq = req;
-            return new pb.RemoveRoleResponse();
+            return create(pb.RemoveRoleResponseSchema);
           },
         });
       });
@@ -1408,11 +1419,11 @@ describe('AppClient tests', () => {
   });
 
   describe('changeRole tests', () => {
-    const newAuthorization = new pb.Authorization({
+    const newAuthorization = create(pb.AuthorizationSchema, {
       ...authorization,
       organizationId: 'newOrgId',
     });
-    const expectedRequest = new pb.ChangeRoleRequest({
+    const expectedRequest = create(pb.ChangeRoleRequestSchema, {
       oldAuthorization: authorization,
       newAuthorization,
     });
@@ -1423,7 +1434,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           changeRole: (req) => {
             capReq = req;
-            return new pb.ChangeRoleResponse();
+            return create(pb.ChangeRoleResponseSchema);
           },
         });
       });
@@ -1442,7 +1453,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listAuthorizations: () => {
-            return new pb.ListAuthorizationsResponse({
+            return create(pb.ListAuthorizationsResponseSchema, {
               authorizations,
             });
           },
@@ -1462,7 +1473,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           checkPermissions: () => {
-            return new pb.CheckPermissionsResponse({
+            return create(pb.CheckPermissionsResponseSchema, {
               authorizedPermissions: permissions,
             });
           },
@@ -1481,7 +1492,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getRegistryItem: () => {
-            return new pb.GetRegistryItemResponse({
+            return create(pb.GetRegistryItemResponseSchema, {
               item: registryItem,
             });
           },
@@ -1496,7 +1507,7 @@ describe('AppClient tests', () => {
   });
 
   describe('createRegistryItem tests', () => {
-    const expectedRequest = new pb.CreateRegistryItemRequest({
+    const expectedRequest = create(pb.CreateRegistryItemRequestSchema, {
       type: 2,
       name: 'name',
       organizationId: 'orgId',
@@ -1508,7 +1519,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           createRegistryItem: (req) => {
             capReq = req;
-            return new pb.CreateRegistryItemResponse();
+            return create(pb.CreateRegistryItemResponseSchema);
           },
         });
       });
@@ -1521,7 +1532,7 @@ describe('AppClient tests', () => {
   });
 
   describe('updateRegistryItem tests', () => {
-    const expectedRequest = new pb.UpdateRegistryItemRequest({
+    const expectedRequest = create(pb.UpdateRegistryItemRequestSchema, {
       type: 2,
       visibility: 2,
       itemId: 'itemId',
@@ -1534,7 +1545,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           updateRegistryItem: (req) => {
             capReq = req;
-            return new pb.UpdateRegistryItemResponse();
+            return create(pb.UpdateRegistryItemResponseSchema);
           },
         });
       });
@@ -1558,7 +1569,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listRegistryItems: () => {
-            return new pb.ListRegistryItemsResponse({
+            return create(pb.ListRegistryItemsResponseSchema, {
               items,
             });
           },
@@ -1581,7 +1592,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteRegistryItem tests', () => {
-    const expectedRequest = new pb.DeleteRegistryItemRequest({
+    const expectedRequest = create(pb.DeleteRegistryItemRequestSchema, {
       itemId: 'itemId',
     });
 
@@ -1591,7 +1602,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteRegistryItem: (req) => {
             capReq = req;
-            return new pb.DeleteRegistryItemResponse();
+            return create(pb.DeleteRegistryItemResponseSchema);
           },
         });
       });
@@ -1608,7 +1619,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createModule: () => {
-            return new pb.CreateModuleResponse({
+            return create(pb.CreateModuleResponseSchema, {
               url: 'url',
               moduleId: 'id',
             });
@@ -1629,7 +1640,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateModule: () => {
-            return new pb.UpdateModuleResponse({
+            return create(pb.UpdateModuleResponseSchema, {
               url: 'url',
             });
           },
@@ -1655,7 +1666,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getModule: () => {
-            return new pb.GetModuleResponse({
+            return create(pb.GetModuleResponseSchema, {
               module,
             });
           },
@@ -1676,7 +1687,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listModules: () => {
-            return new pb.ListModulesResponse({
+            return create(pb.ListModulesResponseSchema, {
               modules,
             });
           },
@@ -1695,7 +1706,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createKey: () => {
-            return new pb.CreateKeyResponse({
+            return create(pb.CreateKeyResponseSchema, {
               id: 'id',
               key: 'key',
             });
@@ -1712,7 +1723,7 @@ describe('AppClient tests', () => {
   });
 
   describe('deleteKey tests', () => {
-    const expectedRequest = new pb.DeleteKeyRequest({
+    const expectedRequest = create(pb.DeleteKeyRequestSchema, {
       id: 'id',
     });
 
@@ -1722,7 +1733,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           deleteKey: (req) => {
             capReq = req;
-            return new pb.DeleteKeyResponse();
+            return create(pb.DeleteKeyResponseSchema);
           },
         });
       });
@@ -1741,7 +1752,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           listKeys: () => {
-            return new pb.ListKeysResponse({
+            return create(pb.ListKeysResponseSchema, {
               apiKeys: keys,
             });
           },
@@ -1760,7 +1771,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           rotateKey: () => {
-            return new pb.RotateKeyResponse({
+            return create(pb.RotateKeyResponseSchema, {
               id: 'newId',
               key: 'eyK',
             });
@@ -1781,10 +1792,13 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           createKeyFromExistingKeyAuthorizations: () => {
-            return new pb.CreateKeyFromExistingKeyAuthorizationsResponse({
-              key: 'key',
-              id: 'id',
-            });
+            return create(
+              pb.CreateKeyFromExistingKeyAuthorizationsResponseSchema,
+              {
+                key: 'key',
+                id: 'id',
+              }
+            );
           },
         });
       });
@@ -1803,7 +1817,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getAppContent: () =>
-            new pb.GetAppContentResponse({
+            create(pb.GetAppContentResponseSchema, {
               blobPath: '/path/to/blob',
               entrypoint: 'index.html',
             }),
@@ -1826,7 +1840,7 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getOrganizationMetadata: () =>
-            new pb.GetOrganizationMetadataResponse(),
+            create(pb.GetOrganizationMetadataResponseSchema),
         });
       });
     });
@@ -1837,8 +1851,8 @@ describe('AppClient tests', () => {
     });
 
     it('preserves the map key when a Struct is found', async () => {
-      const testResponse = new pb.GetOrganizationMetadataResponse({
-        data: Struct.fromJson({ key1: 'value1' }),
+      const testResponse = create(pb.GetOrganizationMetadataResponseSchema, {
+        data: { key1: 'value1' },
       });
 
       mockTransport = createRouterTransport(({ service }) => {
@@ -1860,7 +1874,7 @@ describe('AppClient tests', () => {
         service(AppService, {
           updateOrganizationMetadata: (req) => {
             capturedRequest = req;
-            return new pb.UpdateOrganizationMetadataResponse();
+            return create(pb.UpdateOrganizationMetadataResponseSchema);
           },
         });
       });
@@ -1871,7 +1885,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         organizationId: 'orgId',
-        data: Struct.fromJson({}),
+        data: {},
       });
     });
 
@@ -1880,7 +1894,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         organizationId: 'orgId',
-        data: Struct.fromJson({ key1: 'value1' }),
+        data: { key1: 'value1' },
       });
     });
   });
@@ -1889,7 +1903,8 @@ describe('AppClient tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getLocationMetadata: () => new pb.GetLocationMetadataResponse(),
+          getLocationMetadata: () =>
+            create(pb.GetLocationMetadataResponseSchema),
         });
       });
     });
@@ -1900,8 +1915,8 @@ describe('AppClient tests', () => {
     });
 
     it('preserves the map key when a Struct is found', async () => {
-      const testResponse = new pb.GetLocationMetadataResponse({
-        data: Struct.fromJson({ key1: 'value1' }),
+      const testResponse = create(pb.GetLocationMetadataResponseSchema, {
+        data: { key1: 'value1' },
       });
 
       mockTransport = createRouterTransport(({ service }) => {
@@ -1916,14 +1931,14 @@ describe('AppClient tests', () => {
   });
 
   describe('updateLocationMetadata', () => {
-    let capturedRequest: pb.UpdateLocationMetadataResponse;
+    let capturedRequest: pb.UpdateLocationMetadataRequest;
 
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateLocationMetadata: (req) => {
             capturedRequest = req;
-            return new pb.UpdateLocationMetadataResponse();
+            return create(pb.UpdateLocationMetadataResponseSchema);
           },
         });
       });
@@ -1934,7 +1949,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         locationId: 'locId',
-        data: Struct.fromJson({}),
+        data: {},
       });
     });
 
@@ -1943,7 +1958,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         locationId: 'locId',
-        data: Struct.fromJson({ key1: 'value1' }),
+        data: { key1: 'value1' },
       });
     });
   });
@@ -1952,7 +1967,7 @@ describe('AppClient tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getRobotMetadata: () => new pb.GetRobotMetadataResponse(),
+          getRobotMetadata: () => create(pb.GetRobotMetadataResponseSchema),
         });
       });
     });
@@ -1963,8 +1978,8 @@ describe('AppClient tests', () => {
     });
 
     it('preserves the map key when a Struct is found', async () => {
-      const testResponse = new pb.GetRobotMetadataResponse({
-        data: Struct.fromJson({ key1: 'value1' }),
+      const testResponse = create(pb.GetRobotMetadataResponseSchema, {
+        data: { key1: 'value1' },
       });
 
       mockTransport = createRouterTransport(({ service }) => {
@@ -1979,14 +1994,14 @@ describe('AppClient tests', () => {
   });
 
   describe('updateRobotMetadata', () => {
-    let capturedRequest: pb.UpdateRobotMetadataResponse;
+    let capturedRequest: pb.UpdateRobotMetadataRequest;
 
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateRobotMetadata: (req) => {
             capturedRequest = req;
-            return new pb.UpdateLocationMetadataResponse();
+            return create(pb.UpdateRobotMetadataResponseSchema);
           },
         });
       });
@@ -1997,7 +2012,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         id: 'robotId',
-        data: Struct.fromJson({}),
+        data: {},
       });
     });
 
@@ -2006,7 +2021,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         id: 'robotId',
-        data: Struct.fromJson({ key1: 'value1' }),
+        data: { key1: 'value1' },
       });
     });
   });
@@ -2015,7 +2030,8 @@ describe('AppClient tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getRobotPartMetadata: () => new pb.GetRobotPartMetadataResponse(),
+          getRobotPartMetadata: () =>
+            create(pb.GetRobotPartMetadataResponseSchema),
         });
       });
     });
@@ -2026,8 +2042,8 @@ describe('AppClient tests', () => {
     });
 
     it('preserves the map key when a Struct is found', async () => {
-      const testResponse = new pb.GetRobotPartMetadataResponse({
-        data: Struct.fromJson({ key1: 'value1' }),
+      const testResponse = create(pb.GetRobotPartMetadataResponseSchema, {
+        data: { key1: 'value1' },
       });
 
       mockTransport = createRouterTransport(({ service }) => {
@@ -2042,14 +2058,14 @@ describe('AppClient tests', () => {
   });
 
   describe('updateRobotPartMetadata', () => {
-    let capturedRequest: pb.UpdateRobotPartMetadataResponse;
+    let capturedRequest: pb.UpdateRobotPartMetadataRequest;
 
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           updateRobotPartMetadata: (req) => {
             capturedRequest = req;
-            return new pb.UpdateRobotPartMetadataResponse();
+            return create(pb.UpdateRobotPartMetadataResponseSchema);
           },
         });
       });
@@ -2060,7 +2076,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         id: 'robotPartId',
-        data: Struct.fromJson({}),
+        data: {},
       });
     });
 
@@ -2071,7 +2087,7 @@ describe('AppClient tests', () => {
 
       expect(capturedRequest).toEqual({
         id: 'robotPartId',
-        data: Struct.fromJson({ key1: 'value1' }),
+        data: { key1: 'value1' },
       });
     });
   });
@@ -2081,15 +2097,15 @@ describe('AppClient tests', () => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           getAppBranding: () =>
-            new pb.GetAppBrandingResponse({
+            create(pb.GetAppBrandingResponseSchema, {
               logoPath: '/branding/logo.png',
               textCustomizations: {
-                machinePicker: new pb.TextOverrides({
+                machinePicker: {
                   fields: {
                     heading: 'Welcome',
                     subheading: 'Select your machine.',
                   },
-                }),
+                },
               },
               fragmentIds: ['frag1', 'frag2'],
             }),
@@ -2103,11 +2119,11 @@ describe('AppClient tests', () => {
         'appName'
       );
       expect(response.logoPath).toEqual('/branding/logo.png');
-      expect(response.textCustomizations.machinePicker!.fields.heading).toEqual(
+      expect(response.textCustomizations.machinePicker?.fields.heading).toEqual(
         'Welcome'
       );
       expect(
-        response.textCustomizations.machinePicker!.fields.subheading
+        response.textCustomizations.machinePicker?.fields.subheading
       ).toEqual('Select your machine.');
       expect(response.fragmentIds).toEqual(['frag1', 'frag2']);
     });

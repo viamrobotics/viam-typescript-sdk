@@ -1,23 +1,26 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { RobotClient } from '../../robot';
 vi.mock('../../robot');
 
 vi.mock('../../gen/stream/v1/stream_pb_service');
 
+import { create } from '@bufbuild/protobuf';
 import {
   ConnectError,
   createClient,
   createRouterTransport,
   type Transport,
 } from '@connectrpc/connect';
+
 import { EventDispatcher } from '../../events';
-import { StreamService } from '../../gen/stream/v1/stream_pb';
 import {
-  AddStreamResponse,
-  GetStreamOptionsResponse,
-  SetStreamOptionsResponse,
+  AddStreamResponseSchema,
+  GetStreamOptionsResponseSchema,
+  SetStreamOptionsResponseSchema,
+  StreamService,
 } from '../../gen/stream/v1/stream_pb';
 import { StreamClient } from './client';
 
@@ -58,13 +61,12 @@ describe('StreamClient', () => {
       service(StreamService, {
         addStream: () => {
           streamClient.emit('track', { streams: [fakeStream] });
-          return new AddStreamResponse();
+          return create(AddStreamResponseSchema);
         },
       });
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
@@ -85,7 +87,6 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(
       ConnectError.from(error)
@@ -99,13 +100,12 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         addStream: () => {
-          return new AddStreamResponse();
+          return create(AddStreamResponseSchema);
         },
       });
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     const promise = streamClient.getStream(fakeCamName);
     vi.runAllTimers();
@@ -123,13 +123,12 @@ describe('StreamClient', () => {
       service(StreamService, {
         addStream: () => {
           streamClient.emit('track', { streams: [fakeStream] });
-          return new AddStreamResponse();
+          return create(AddStreamResponseSchema);
         },
       });
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
@@ -146,7 +145,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         getStreamOptions: () => {
-          return new GetStreamOptionsResponse({
+          return create(GetStreamOptionsResponseSchema, {
             resolutions: Array.from({ length: 5 }, () => ({})),
           });
         },
@@ -176,7 +175,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         setStreamOptions: () => {
-          return new SetStreamOptionsResponse();
+          return create(SetStreamOptionsResponseSchema);
         },
       });
     });
@@ -209,7 +208,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         setStreamOptions: () => {
-          return new SetStreamOptionsResponse();
+          return create(SetStreamOptionsResponseSchema);
         },
       });
     });

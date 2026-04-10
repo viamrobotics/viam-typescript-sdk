@@ -1,13 +1,14 @@
-import type { MessageInitShape } from "@bufbuild/protobuf";
-import type { GeoPointSchema } from "../../gen/common/v1/common_pb";
-import type { GeoGeometry, JsonObject, Resource } from "../../types";
+import type { MessageInitShape } from '@bufbuild/protobuf';
+
+import type { GeoPointSchema } from '../../gen/common/v1/common_pb';
+import type { GeoGeometry, JsonObject, Resource } from '../../types';
 import type {
   Mode,
   NavigationPosition,
   NavigationProperties,
   Path,
   Waypoint,
-} from "./types";
+} from './types';
 
 /**
  * A service that uses GPS to automatically navigate a robot to user defined
@@ -16,7 +17,7 @@ import type {
  * @example
  *
  * ```ts
- * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+ * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
  *
  * const mode = await navigation.getMode();
  * ```
@@ -31,7 +32,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const mode = await navigation.getMode();
    * ```
@@ -47,7 +48,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * // Set the mode to 2 which corresponds to WAYPOINT
    * await navigation.setMode(2);
@@ -71,7 +72,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const location = await navigation.getLocation();
    * ```
@@ -87,7 +88,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const waypoints = await navigation.getWayPoints();
    * ```
@@ -103,7 +104,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const location = { latitude: 40.7128, longitude: -74.006 };
    * await navigation.addWayPoint(location);
@@ -116,7 +117,7 @@ export interface Navigation extends Resource {
    */
   addWayPoint: (
     location: MessageInitShape<typeof GeoPointSchema>,
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<void>;
 
   /**
@@ -125,7 +126,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * // Remove the first waypoint
    * if (waypoints.length > 0) {
@@ -147,7 +148,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const obstacles = await navigation.getObstacles();
    * ```
@@ -163,7 +164,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const paths = await navigation.getPaths();
    * ```
@@ -179,7 +180,7 @@ export interface Navigation extends Resource {
    * @example
    *
    * ```ts
-   * const navigation = new VIAM.NavigationClient(machine, "my_navigation");
+   * const navigation = new VIAM.NavigationClient(machine, 'my_navigation');
    *
    * const properties = await navigation.getProperties();
    * ```

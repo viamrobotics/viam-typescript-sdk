@@ -1,4 +1,4 @@
-import type { JsonObject, Resource } from "../../types";
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a physical sensing device that can provide measurement readings. */
 export interface Sensor extends Resource {
@@ -8,7 +8,7 @@ export interface Sensor extends Resource {
    * @example
    *
    * ```ts
-   * const sensor = new VIAM.SensorClient(machine, "my_sensor");
+   * const sensor = new VIAM.SensorClient(machine, 'my_sensor');
    *
    * // Get the readings of a sensor.
    * const readings = await sensor.getReadings();

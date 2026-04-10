@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { RobotClient, ArmClient } from '../../src/main';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { ArmClient, RobotClient } from '../../src/main';
 import { defaultNodeConfig } from '../fixtures/configs/dial-configs';
 
 describe('Arm API Tests', () => {

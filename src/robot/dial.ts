@@ -1,4 +1,4 @@
-import { RobotClient, type DialConf } from './client';
+import { type DialConf, RobotClient } from './client';
 
 /**
  * Connect to a robot via WebRTC or gRPC and return a RobotClient after

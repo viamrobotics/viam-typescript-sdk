@@ -1,7 +1,13 @@
 // @vitest-environment happy-dom
 
-import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
+
+import {
+  PoseInFrameSchema,
+  PoseSchema,
+  TransformSchema,
+} from '../../gen/common/v1/common_pb';
 import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import {
   GetTransformResponseSchema,
@@ -11,11 +17,6 @@ import {
 } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
 import { RobotClient } from '../../robot';
 import { WorldStateStoreClient } from './client';
-import {
-  TransformSchema,
-  PoseInFrameSchema,
-  PoseSchema,
-} from '../../gen/common/v1/common_pb';
 import { transformWithUUID, uuidToString } from './world-state-store';
 
 vi.mock('../../robot');

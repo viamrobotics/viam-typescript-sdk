@@ -36,7 +36,7 @@ export const atob = (input = '') => {
   }
   for (
     let bc = 0, bs = 0, buffer, i = 0;
-    (buffer = str.charAt(i++)); // eslint-disable-line no-cond-assign
+    (buffer = str.charAt(i++));
     ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4)
       ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6))))
       : 0

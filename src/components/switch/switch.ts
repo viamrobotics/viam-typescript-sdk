@@ -1,4 +1,4 @@
-import type { JsonObject, Resource } from "../../types";
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a physical switch with multiple positions. */
 export interface Switch extends Resource {
@@ -8,7 +8,7 @@ export interface Switch extends Resource {
    * @example
    *
    * ```ts
-   * const mySwitch = new VIAM.SwitchClient(machine, "my_switch");
+   * const mySwitch = new VIAM.SwitchClient(machine, 'my_switch');
    *
    * // Update the switch from its current position to position 1
    * await mySwitch.setPosition(1);
@@ -28,7 +28,7 @@ export interface Switch extends Resource {
    * @example
    *
    * ```ts
-   * const mySwitch = new VIAM.SwitchClient(machine, "my_switch");
+   * const mySwitch = new VIAM.SwitchClient(machine, 'my_switch');
    *
    * // Update the switch to position 1
    * await mySwitch.setPosition(1);
@@ -56,11 +56,11 @@ export interface Switch extends Resource {
    * @example
    *
    * ```ts
-   * const mySwitch = new VIAM.SwitchClient(machine, "my_switch");
+   * const mySwitch = new VIAM.SwitchClient(machine, 'my_switch');
    *
    * // Get the number of available positions
    * const numPositions = await mySwitch.getNumberOfPositions();
-   * console.log("Number of positions:", numPositions);
+   * console.log('Number of positions:', numPositions);
    * ```
    *
    * For more information, see [Switch

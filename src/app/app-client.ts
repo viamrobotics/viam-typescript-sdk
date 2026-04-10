@@ -1,42 +1,46 @@
-import type { JsonValue } from '@bufbuild/protobuf';
-import { Struct, Timestamp } from '@bufbuild/protobuf';
-import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import { create, type JsonObject, type JsonValue } from '@bufbuild/protobuf';
+import { timestampFromDate } from '@bufbuild/protobuf/wkt';
+import { type Client, createClient, type Transport } from '@connectrpc/connect';
+
 import { PackageType } from '../gen/app/packages/v1/packages_pb';
-import { AppService } from '../gen/app/v1/app_pb';
 import {
-  APIKeyWithAuthorizations,
-  Authorization,
-  AuthorizedPermissions,
-  CreateKeyFromExistingKeyAuthorizationsResponse,
-  CreateKeyResponse,
-  CreateModuleResponse,
-  Fragment,
-  FragmentImportList,
-  FragmentVisibility,
-  GetAppContentResponse,
-  GetAppBrandingResponse,
-  GetRobotPartLogsResponse,
-  GetRobotPartResponse,
-  GetRobotPartByNameAndLocationResponse,
-  ListOrganizationMembersResponse,
-  Location,
-  LocationAuth,
-  Model,
-  Module,
-  Organization,
-  OrganizationIdentity,
-  OrganizationInvite,
-  OrgDetails,
-  RegistryItem,
-  RegistryItemStatus,
-  Robot,
-  RobotPart,
-  RobotPartHistoryEntry,
-  RotateKeyResponse,
-  RoverRentalRobot,
-  Visibility,
-  ListMachineSummariesRequest,
-  LocationSummary,
+  type APIKeyWithAuthorizations,
+  AppService,
+  type Authorization,
+  AuthorizationSchema,
+  type AuthorizedPermissions,
+  AuthorizedPermissionsSchema,
+  type CreateKeyFromExistingKeyAuthorizationsResponse,
+  type CreateKeyResponse,
+  type CreateModuleResponse,
+  type Fragment,
+  type FragmentImportList,
+  type FragmentVisibility,
+  type GetAppBrandingResponse,
+  type GetAppContentResponse,
+  type GetRobotPartByNameAndLocationResponse,
+  type GetRobotPartLogsResponse,
+  type GetRobotPartResponse,
+  type ListMachineSummariesRequest,
+  ListMachineSummariesRequestSchema,
+  type ListOrganizationMembersResponse,
+  type Location,
+  type LocationAuth,
+  type LocationSummary,
+  type Model,
+  type Module,
+  type Organization,
+  type OrganizationIdentity,
+  type OrganizationInvite,
+  type OrgDetails,
+  type RegistryItem,
+  type RegistryItemStatus,
+  type Robot,
+  type RobotPart,
+  type RobotPartHistoryEntry,
+  type RotateKeyResponse,
+  type RoverRentalRobot,
+  type Visibility,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -61,7 +65,7 @@ export const createAuth = (
   identityType: string,
   resourceId: string
 ): Authorization => {
-  return new Authorization({
+  return create(AuthorizationSchema, {
     authorizationType: 'role',
     identityId: entityId,
     identityType,
@@ -110,7 +114,7 @@ export const createPermission = (
   resourceId: string,
   permissions: string[]
 ): AuthorizedPermissions => {
-  return new AuthorizedPermissions({
+  return create(AuthorizedPermissionsSchema, {
     resourceType,
     resourceId,
     permissions,
@@ -924,8 +928,8 @@ export class AppClient {
       filter,
       levels,
       pageToken,
-      start: start ? Timestamp.fromDate(start) : undefined,
-      end: end ? Timestamp.fromDate(end) : undefined,
+      start: start ? timestampFromDate(start) : undefined,
+      end: end ? timestampFromDate(end) : undefined,
     });
   }
 
@@ -1013,7 +1017,7 @@ export class AppClient {
   async updateRobotPart(
     id: string,
     name: string,
-    robotConfig: Struct
+    robotConfig: JsonObject
   ): Promise<RobotPart | undefined> {
     const resp = await this.client.updateRobotPart({ id, name, robotConfig });
     return resp.part;
@@ -1343,7 +1347,7 @@ export class AppClient {
   async createFragment(
     organizationId: string,
     name: string,
-    config: Struct
+    config: JsonObject
   ): Promise<Fragment | undefined> {
     const resp = await this.client.createFragment({
       organizationId,
@@ -1384,7 +1388,7 @@ export class AppClient {
   async updateFragment(
     id: string,
     name: string,
-    config: Struct,
+    config: JsonObject,
     makePublic?: boolean,
     visibility?: FragmentVisibility
   ): Promise<Fragment | undefined> {
@@ -2040,16 +2044,11 @@ export class AppClient {
    * @param id The ID of the organization
    * @returns The metadata associated with the organization
    */
-  async getOrganizationMetadata(
-    id: string
-  ): Promise<Record<string, JsonValue>> {
+  async getOrganizationMetadata(id: string): Promise<JsonObject> {
     const response = await this.client.getOrganizationMetadata({
       organizationId: id,
     });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2071,11 +2070,11 @@ export class AppClient {
    */
   async updateOrganizationMetadata(
     id: string,
-    data: Record<string, JsonValue>
+    data: JsonObject
   ): Promise<void> {
     await this.client.updateOrganizationMetadata({
       organizationId: id,
-      data: Struct.fromJson(data),
+      data,
     });
   }
 
@@ -2098,10 +2097,7 @@ export class AppClient {
    */
   async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getLocationMetadata({ locationId: id });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2127,7 +2123,7 @@ export class AppClient {
   ): Promise<void> {
     await this.client.updateLocationMetadata({
       locationId: id,
-      data: Struct.fromJson(data),
+      data,
     });
   }
 
@@ -2148,10 +2144,7 @@ export class AppClient {
    */
   async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotMetadata({ id });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2175,7 +2168,7 @@ export class AppClient {
     id: string,
     data: Record<string, JsonValue>
   ): Promise<void> {
-    await this.client.updateRobotMetadata({ id, data: Struct.fromJson(data) });
+    await this.client.updateRobotMetadata({ id, data });
   }
 
   /**
@@ -2197,10 +2190,7 @@ export class AppClient {
    */
   async getRobotPartMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotPartMetadata({ id });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2226,7 +2216,7 @@ export class AppClient {
   ): Promise<void> {
     await this.client.updateRobotPartMetadata({
       id,
-      data: Struct.fromJson(data),
+      data,
     });
   }
 
@@ -2283,12 +2273,15 @@ export class AppClient {
     locationIds?: string[],
     limit?: number
   ): Promise<LocationSummary[]> {
-    const req: ListMachineSummariesRequest = new ListMachineSummariesRequest({
-      organizationId,
-      fragmentIds,
-      locationIds,
-      limit,
-    });
+    const req: ListMachineSummariesRequest = create(
+      ListMachineSummariesRequestSchema,
+      {
+        organizationId,
+        fragmentIds,
+        locationIds,
+        limit,
+      }
+    );
     const resp = await this.client.listMachineSummaries(req);
     return resp.locationSummaries;
   }

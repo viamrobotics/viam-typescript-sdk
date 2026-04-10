@@ -1,15 +1,16 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   EncoderService,
   GetPositionRequestSchema,
   GetPropertiesRequestSchema,
   ResetPositionRequestSchema,
-} from "../../gen/component/encoder/v1/encoder_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import { EncoderPositionType, type Encoder } from "./encoder";
+} from '../../gen/component/encoder/v1/encoder_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import { type Encoder, EncoderPositionType } from './encoder';
 
 /**
  * A gRPC-web client for the Encoder component.
@@ -31,7 +32,7 @@ export class EncoderClient implements Encoder {
   async resetPosition(extra = {}, callOptions = this.callOptions) {
     const request = create(ResetPositionRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -42,7 +43,7 @@ export class EncoderClient implements Encoder {
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -53,12 +54,12 @@ export class EncoderClient implements Encoder {
   async getPosition(
     positionType: EncoderPositionType = EncoderPositionType.UNSPECIFIED,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(GetPositionRequestSchema, {
       name: this.name,
       positionType,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -72,20 +73,20 @@ export class EncoderClient implements Encoder {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

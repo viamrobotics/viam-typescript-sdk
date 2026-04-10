@@ -1,13 +1,15 @@
-import { type ServiceType } from '@bufbuild/protobuf';
+import { create, type DescService } from '@bufbuild/protobuf';
 import {
+  type Client,
   Code,
   ConnectError,
   createClient,
-  type Client,
   type Transport,
 } from '@connectrpc/connect';
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
-import { isCredential, type Credentials } from '../app/viam-transport';
+
+import { type Credentials, isCredential } from '../app/viam-transport';
+import { assertExists } from '../assert';
 import { DIAL_TIMEOUT } from '../constants';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
 import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
@@ -23,28 +25,27 @@ import { MotorService } from '../gen/component/motor/v1/motor_pb';
 import { MovementSensorService } from '../gen/component/movementsensor/v1/movementsensor_pb';
 import { PowerSensorService } from '../gen/component/powersensor/v1/powersensor_pb';
 import { ServoService } from '../gen/component/servo/v1/servo_pb';
-import { RobotService } from '../gen/robot/v1/robot_pb';
 import {
-  GetModelsFromModulesRequest,
-  GetPoseRequest,
-  RestartModuleRequest,
-  TransformPCDRequest,
-  TransformPoseRequest,
+  GetModelsFromModulesRequestSchema,
+  GetPoseRequestSchema,
+  RestartModuleRequestSchema,
+  RobotService,
+  TransformPCDRequestSchema,
+  TransformPoseRequestSchema,
 } from '../gen/robot/v1/robot_pb';
 import { DiscoveryService } from '../gen/service/discovery/v1/discovery_pb';
+import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_pb';
 import { MotionService } from '../gen/service/motion/v1/motion_pb';
 import { NavigationService } from '../gen/service/navigation/v1/navigation_pb';
 import { SLAMService } from '../gen/service/slam/v1/slam_pb';
 import { VisionService } from '../gen/service/vision/v1/vision_pb';
-import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
+import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_pb';
+import type { AccessToken, Credential } from '../main';
+import { dialDirect, type DialOptions, dialWebRTC } from '../rpc';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
 import SessionManager from './session-manager';
-import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_pb';
-import type { AccessToken, Credential } from '../main';
-import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_pb';
-import { assertExists } from '../assert';
 
 const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';
 
@@ -193,14 +194,6 @@ interface SessionOptions {
 export interface ConnectOptions {
   creds?: Credentials;
   priority?: number;
-
-  /**
-   * Set timeout in milliseconds for dialing. Default is defined by
-   * DIAL_TIMEOUT. A value of 0 disables the timeout.
-   *
-   * @deprecated Use `dialTimeoutMs` instead.
-   */
-  dialTimeout?: number;
 
   /**
    * Set timeout in milliseconds for dialing. Default is defined by
@@ -539,7 +532,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         // eslint-disable-next-line no-console
         console.debug('Reconnected successfully!');
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         if (
           this.reconnectMaxAttempts !== undefined &&
           this.currentRetryAttempt >= this.reconnectMaxAttempts
@@ -694,7 +687,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this.worldStateStoreServiceClient;
   }
 
-  createServiceClient<T extends ServiceType>(svcType: T): Client<T> {
+  createServiceClient<T extends DescService>(svcType: T): Client<T> {
     assertExists(this.clientTransport, RobotClient.notConnectedYetStr);
     return createClient(svcType, this.clientTransport);
   }
@@ -745,7 +738,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     await this.connect({
       priority: conf.priority,
-      dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
+      dialTimeoutMs: conf.dialTimeoutMs ?? DIAL_TIMEOUT,
       creds: conf.credentials,
       extraHeaders: conf.extraHeaders,
     });
@@ -788,7 +781,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     await this.connect({
       creds: conf.credentials,
-      dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
+      dialTimeoutMs: conf.dialTimeoutMs ?? DIAL_TIMEOUT,
       extraHeaders: conf.extraHeaders,
     });
 
@@ -1037,11 +1030,9 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   // TODO(RSDK-7672): refactor due to cognitive complexity
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   public async connect({
     creds = this.savedCreds,
     priority,
-    dialTimeout,
     dialTimeoutMs,
     extraHeaders,
   }: ConnectOptions = {}) {
@@ -1109,7 +1100,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           turnTransport: this.webrtcOptions.turnTransport,
           turnPort: this.webrtcOptions.turnPort,
         },
-        dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
+        dialTimeoutMs: dialTimeoutMs ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
       };
 
@@ -1261,7 +1252,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     destination: string,
     supplementalTransforms: Transform[]
   ) {
-    const request = new TransformPoseRequest({
+    const request = create(TransformPoseRequestSchema, {
       source,
       destination,
       supplementalTransforms,
@@ -1269,7 +1260,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     const response = await this.robotService.transformPose(request);
     const result = response.pose;
     if (!result) {
-      // eslint-disable-next-line no-warning-comments
       // TODO: Can the response frame be undefined or null?
       throw new Error('no pose');
     }
@@ -1281,7 +1271,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     source: string,
     destination: string
   ) {
-    const request = new TransformPCDRequest({
+    const request = create(TransformPCDRequestSchema, {
       pointCloudPcd: pointCloudPCD,
       source,
       destination,
@@ -1293,7 +1283,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   // GET MODELS FROM MODULES
 
   async getModelsFromModules() {
-    const request = new GetModelsFromModulesRequest({});
+    const request = create(GetModelsFromModulesRequestSchema);
     const resp = await this.robotService.getModelsFromModules(request);
     return resp.models;
   }
@@ -1331,7 +1321,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   // MODULES
 
   async restartModule(moduleId?: string, moduleName?: string) {
-    const request = new RestartModuleRequest();
+    const request = create(RestartModuleRequestSchema);
     if (moduleId !== undefined) {
       request.idOrName.case = 'moduleId';
       request.idOrName.value = moduleId;
@@ -1350,7 +1340,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     destinationFrame: string,
     supplementalTransforms: Transform[]
   ) {
-    const request = new GetPoseRequest({
+    const request = create(GetPoseRequestSchema, {
       componentName,
       destinationFrame,
       supplementalTransforms,

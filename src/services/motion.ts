@@ -1,5 +1,5 @@
-export { MotionClient } from "./motion/client";
-export type { Motion } from "./motion/motion";
+export { MotionClient } from './motion/client';
+export type { Motion } from './motion/motion';
 export {
   type CollisionSpecification,
   type Constraints,
@@ -10,4 +10,4 @@ export {
   type ObstacleDetector,
   type OrientationConstraint,
   type PlanState,
-} from "./motion/types";
+} from './motion/types';

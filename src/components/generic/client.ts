@@ -1,11 +1,12 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetGeometriesRequestSchema } from "../../gen/common/v1/common_pb";
-import { GenericService } from "../../gen/component/generic/v1/generic_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Generic } from "./generic";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
+import { GenericService } from '../../gen/component/generic/v1/generic_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Generic } from './generic';
 
 /**
  * A gRPC-web client for the Generic component.
@@ -27,7 +28,7 @@ export class GenericClient implements Generic {
   async getGeometries(extra = {}, callOptions = this.callOptions) {
     const request = create(GetGeometriesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     const response = await this.client.getGeometries(request, callOptions);
@@ -39,20 +40,20 @@ export class GenericClient implements Generic {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

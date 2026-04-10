@@ -1,7 +1,8 @@
-import type { JsonObject } from '../../types';
-import type { Transform, Resource } from '../../types';
-import type { TransformChangeEvent, TransformWithUUID } from './types';
 import { UuidTool } from 'uuid-tool';
+
+import type { JsonObject } from '../../types';
+import type { Resource, Transform } from '../../types';
+import type { TransformChangeEvent, TransformWithUUID } from './types';
 
 /**
  * A service that manages world state transforms, allowing storage and retrieval
@@ -45,7 +46,10 @@ export interface WorldStateStore extends Resource {
    * @param uuid - The UUID of the transform to retrieve
    * @param extra - Additional arguments to the method
    */
-  getTransform: (uuid: string, extra?: JsonObject) => Promise<TransformWithUUID>;
+  getTransform: (
+    uuid: string,
+    extra?: JsonObject
+  ) => Promise<TransformWithUUID>;
 
   /**
    * StreamTransformChanges streams changes to world state transforms.

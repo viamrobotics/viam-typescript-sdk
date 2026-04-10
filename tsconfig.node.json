@@ -1,13 +1,15 @@
 {
   "extends": "@viamrobotics/typescript-config/base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
   },
+  "allowJs": true,
   "include": [
     "./vite.config.ts",
     "./playwright.config.ts",
     "./*.cjs",
-    "./.*.cjs"
+    "./.*.cjs",
+    "eslint.config.js",
   ],
-  "exclude": ["**/src/**", "**/e2e/**", "**/examples/**", "**/scripts/**"]
+  "exclude": ["**/src/**", "**/e2e/**", "**/examples/**", "**/scripts/**"],
 }

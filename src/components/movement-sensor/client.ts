@@ -1,7 +1,8 @@
-import { create, toJson } from "@bufbuild/protobuf";
-import { ValueSchema } from "@bufbuild/protobuf/wkt";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetReadingsRequestSchema } from "../../gen/common/v1/common_pb";
+import { create, toJson } from '@bufbuild/protobuf';
+import { ValueSchema } from '@bufbuild/protobuf/wkt';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { GetReadingsRequestSchema } from '../../gen/common/v1/common_pb';
 import {
   GetAccuracyRequestSchema,
   GetAngularVelocityRequestSchema,
@@ -12,11 +13,11 @@ import {
   GetPositionRequestSchema,
   GetPropertiesRequestSchema,
   MovementSensorService,
-} from "../../gen/component/movementsensor/v1/movementsensor_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { MovementSensor } from "./movement-sensor";
+} from '../../gen/component/movementsensor/v1/movementsensor_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { MovementSensor } from './movement-sensor';
 
 /**
  * A gRPC-web client for the MovementSensor component.
@@ -38,7 +39,7 @@ export class MovementSensorClient implements MovementSensor {
   async getLinearVelocity(extra = {}, callOptions = this.callOptions) {
     const request = create(GetLinearVelocityRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -47,7 +48,7 @@ export class MovementSensorClient implements MovementSensor {
 
     const vel = response.linearVelocity;
     if (!vel) {
-      throw new Error("no linear velocity");
+      throw new Error('no linear velocity');
     }
 
     return vel;
@@ -56,7 +57,7 @@ export class MovementSensorClient implements MovementSensor {
   async getAngularVelocity(extra = {}, callOptions = this.callOptions) {
     const request = create(GetAngularVelocityRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -65,7 +66,7 @@ export class MovementSensorClient implements MovementSensor {
 
     const ang = response.angularVelocity;
     if (!ang) {
-      throw new Error("no angular velocity");
+      throw new Error('no angular velocity');
     }
 
     return ang;
@@ -74,7 +75,7 @@ export class MovementSensorClient implements MovementSensor {
   async getCompassHeading(extra = {}, callOptions = this.callOptions) {
     const request = create(GetCompassHeadingRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -86,7 +87,7 @@ export class MovementSensorClient implements MovementSensor {
   async getOrientation(extra = {}, callOptions = this.callOptions) {
     const request = create(GetOrientationRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -95,7 +96,7 @@ export class MovementSensorClient implements MovementSensor {
 
     const ori = response.orientation;
     if (!ori) {
-      throw new Error("no orientation");
+      throw new Error('no orientation');
     }
 
     return ori;
@@ -104,7 +105,7 @@ export class MovementSensorClient implements MovementSensor {
   async getPosition(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -115,7 +116,7 @@ export class MovementSensorClient implements MovementSensor {
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -126,7 +127,7 @@ export class MovementSensorClient implements MovementSensor {
   async getAccuracy(extra = {}, callOptions = this.callOptions) {
     const request = create(GetAccuracyRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -137,19 +138,19 @@ export class MovementSensorClient implements MovementSensor {
   async getLinearAcceleration(extra = {}, callOptions = this.callOptions) {
     const request = create(GetLinearAccelerationRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
 
     const response = await this.client.getLinearAcceleration(
       request,
-      callOptions,
+      callOptions
     );
 
     const acc = response.linearAcceleration;
     if (!acc) {
-      throw new Error("no linear acceleration");
+      throw new Error('no linear acceleration');
     }
 
     return acc;
@@ -158,7 +159,7 @@ export class MovementSensorClient implements MovementSensor {
   async getReadings(extra = {}, callOptions = this.callOptions) {
     const request = create(GetReadingsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -181,20 +182,20 @@ export class MovementSensorClient implements MovementSensor {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

@@ -1,25 +1,26 @@
 // @vitest-environment happy-dom
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { RobotClient } from '../client';
-import * as rpcModule from '../../rpc';
-import { createMockRobotServiceTransport } from './mocks/robot-service';
+
+import * as errors from '../../__tests__/fixtures/errors';
 import {
   TEST_HOST,
   TEST_LOCAL_HOST,
   TEST_SIGNALING_ADDRESS,
 } from '../../__tests__/fixtures/test-constants';
 import {
+  createMockDataChannel,
+  createMockPeerConnection,
+} from '../../__tests__/mocks/webrtc';
+import * as rpcModule from '../../rpc';
+import { RobotClient } from '../client';
+import {
   baseDialConfig,
   TEST_DIAL_TIMEOUT_MS,
   TEST_MAX_RETRY_ATTEMPTS,
   TEST_TIMER_ADVANCE_MS,
 } from './fixtures/dial-configs';
-import {
-  createMockDataChannel,
-  createMockPeerConnection,
-} from '../../__tests__/mocks/webrtc';
-import * as errors from '../../__tests__/fixtures/errors';
+import { createMockRobotServiceTransport } from './mocks/robot-service';
 
 vi.mock('../../rpc', async () => {
   const actual = await vi.importActual('../../rpc');

@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
-import { withRobot } from '../fixtures/robot-page';
+
 import type { Camera, CameraClient } from '../../src/components/camera';
+import { withRobot } from '../fixtures/robot-page';
 
 withRobot.describe('Camera API Tests', () => {
   withRobot(

@@ -1,36 +1,21 @@
 // @vitest-environment happy-dom
 
-import { Struct } from '@bufbuild/protobuf';
 import { describe, expect, it, vi } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+
 import {
-  DoCommandRequest,
-  DoCommandResponse,
-  GetStatusRequest,
-  GetStatusResponse,
+  type DoCommandRequest,
+  DoCommandResponseSchema,
+  type GetStatusRequest,
+  GetStatusResponseSchema,
 } from './gen/common/v1/common_pb';
 import { doCommandFromClient, getStatusFromClient } from './utils';
 
 describe('doCommandFromClient', () => {
-  it('accepts a Struct command', async () => {
-    const command = Struct.fromJson({ foo: 'bar' });
+  it('accepts a plain object', async () => {
     const doCommander = vi.fn().mockResolvedValue(
-      new DoCommandResponse({
-        result: Struct.fromJson({ result: 'ok' }),
-      })
-    );
-
-    const result = await doCommandFromClient(doCommander, 'test', command);
-
-    expect(result).toStrictEqual({ result: 'ok' });
-    const [request] = doCommander.mock.calls[0] as [DoCommandRequest];
-    expect(request.name).toBe('test');
-    expect(request.command?.toJson()).toStrictEqual({ foo: 'bar' });
-  });
-
-  it('accepts a plain object and converts it to a Struct', async () => {
-    const doCommander = vi.fn().mockResolvedValue(
-      new DoCommandResponse({
-        result: Struct.fromJson({ result: 'ok' }),
+      create(DoCommandResponseSchema, {
+        result: { result: 'ok' },
       })
     );
 
@@ -41,23 +26,23 @@ describe('doCommandFromClient', () => {
     expect(result).toStrictEqual({ result: 'ok' });
     const [request] = doCommander.mock.calls[0] as [DoCommandRequest];
     expect(request.name).toBe('test');
-    expect(request.command?.toJson()).toStrictEqual({ foo: 'bar' });
+    expect(request.command).toStrictEqual({ foo: 'bar' });
   });
 
   it('returns empty object when result is undefined', async () => {
-    const doCommander = vi.fn().mockResolvedValue(new DoCommandResponse({}));
+    const doCommander = vi
+      .fn()
+      .mockResolvedValue(create(DoCommandResponseSchema, {}));
 
-    const result = await doCommandFromClient(
-      doCommander,
-      'test',
-      Struct.fromJson({})
-    );
+    const result = await doCommandFromClient(doCommander, 'test', {});
 
     expect(result).toStrictEqual({});
   });
 
   it('calls requestLogger when provided', async () => {
-    const doCommander = vi.fn().mockResolvedValue(new DoCommandResponse({}));
+    const doCommander = vi
+      .fn()
+      .mockResolvedValue(create(DoCommandResponseSchema, {}));
     const requestLogger = vi.fn();
 
     await doCommandFromClient(
@@ -70,15 +55,15 @@ describe('doCommandFromClient', () => {
     expect(requestLogger).toHaveBeenCalledOnce();
     const [loggedRequest] = requestLogger.mock.calls[0] as [DoCommandRequest];
     expect(loggedRequest.name).toBe('test');
-    expect(loggedRequest.command?.toJson()).toStrictEqual({ foo: 'bar' });
+    expect(loggedRequest.command).toStrictEqual({ foo: 'bar' });
   });
 });
 
 describe('getStatusFromClient', () => {
   it('returns the status as JSON', async () => {
     const getStatusMethod = vi.fn().mockResolvedValue(
-      new GetStatusResponse({
-        result: Struct.fromJson({ state: 'running' }),
+      create(GetStatusResponseSchema, {
+        result: { state: 'running' },
       })
     );
 
@@ -92,7 +77,7 @@ describe('getStatusFromClient', () => {
   it('returns empty object when result is undefined', async () => {
     const getStatusMethod = vi
       .fn()
-      .mockResolvedValue(new GetStatusResponse({}));
+      .mockResolvedValue(create(GetStatusResponseSchema, {}));
 
     const result = await getStatusFromClient(getStatusMethod, 'test');
 
@@ -102,7 +87,7 @@ describe('getStatusFromClient', () => {
   it('calls requestLogger when provided', async () => {
     const getStatusMethod = vi
       .fn()
-      .mockResolvedValue(new GetStatusResponse({}));
+      .mockResolvedValue(create(GetStatusResponseSchema, {}));
     const requestLogger = vi.fn();
 
     await getStatusFromClient(getStatusMethod, 'test', { requestLogger });

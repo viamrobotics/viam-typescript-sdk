@@ -3,32 +3,30 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { Transport } from '@connectrpc/connect';
 import { Code, ConnectError } from '@connectrpc/connect';
 
+import { createMockTransport } from '../../__tests__/mocks/transports';
 import {
-  dialWebRTC,
-  dialDirect,
-  validateDialOptions,
+  createMockDataChannel,
+  createMockPeerConnection,
+} from '../../__tests__/mocks/webrtc';
+import { ClientChannel } from '../client-channel';
+import {
   AuthenticatedTransport,
+  dialDirect,
+  dialWebRTC,
+  validateDialOptions,
 } from '../dial';
-
 import {
-  TEST_URL,
   TEST_HOST,
+  TEST_URL,
   withAccessToken,
   withCredentials,
   withSignalingAccessToken,
   withSignalingCredentials,
 } from './fixtures/dial-options';
-
-import {
-  createMockPeerConnection,
-  createMockDataChannel,
-} from '../../__tests__/mocks/webrtc';
 import { withICEServers } from './fixtures/dial-webrtc-options';
-import { createMockTransport } from '../../__tests__/mocks/transports';
-import { ClientChannel } from '../client-channel';
-import type { Transport } from '@connectrpc/connect';
 
 vi.mock('../peer');
 vi.mock('../signaling-exchange');
@@ -45,6 +43,7 @@ vi.mock('@connectrpc/connect-web', () => ({
 
 import { createClient } from '@connectrpc/connect';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
+
 import { newPeerConnectionForClient } from '../peer';
 import { SignalingExchange } from '../signaling-exchange';
 

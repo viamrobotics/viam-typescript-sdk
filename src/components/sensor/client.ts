@@ -1,13 +1,13 @@
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
+import { create, toJson } from '@bufbuild/protobuf';
+import { ValueSchema } from '@bufbuild/protobuf/wkt';
+import type { CallOptions, Client } from '@connectrpc/connect';
 
-import { create, toJson } from "@bufbuild/protobuf";
-import { ValueSchema } from "@bufbuild/protobuf/wkt";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetReadingsRequestSchema } from "../../gen/common/v1/common_pb";
-import { SensorService } from "../../gen/component/sensor/v1/sensor_pb";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Sensor } from "./sensor";
+import { GetReadingsRequestSchema } from '../../gen/common/v1/common_pb';
+import { SensorService } from '../../gen/component/sensor/v1/sensor_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Sensor } from './sensor';
 
 /**
  * A gRPC-web client for the Sensor component.
@@ -29,7 +29,7 @@ export class SensorClient implements Sensor {
   async getReadings(extra = {}, callOptions = this.callOptions) {
     const request = create(GetReadingsRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -52,20 +52,20 @@ export class SensorClient implements Sensor {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

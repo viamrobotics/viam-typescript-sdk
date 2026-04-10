@@ -1,6 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
-import url from 'node:url';
 import path from 'node:path';
+import url from 'node:url';
+
+import { defineConfig, devices } from '@playwright/test';
 
 const dirname = path.dirname(url.fileURLToPath(import.meta.url));
 

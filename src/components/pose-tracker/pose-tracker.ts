@@ -1,5 +1,5 @@
-import type { Geometry } from "../../gen/common/v1/common_pb";
-import type { JsonObject, Resource } from "../../types";
+import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a generic component. */
 export interface PoseTracker extends Resource {
@@ -11,12 +11,12 @@ export interface PoseTracker extends Resource {
    * ```ts
    * const generic = new VIAM.GenericComponentClient(
    *   machine,
-   *   "my_generic_component",
+   *   'my_generic_component'
    * );
    *
    * // Get the geometries of this component
    * const geometries = await generic.getGeometries();
-   * console.log("Geometries:", geometries);
+   * console.log('Geometries:', geometries);
    * ```
    *
    * For more information, see [Generic

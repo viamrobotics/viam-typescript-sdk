@@ -1,6 +1,7 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetGeometriesRequestSchema } from "../../gen/common/v1/common_pb";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
 import {
   BaseService,
   GetPropertiesRequestSchema,
@@ -10,11 +11,11 @@ import {
   SetVelocityRequestSchema,
   SpinRequestSchema,
   StopRequestSchema,
-} from "../../gen/component/base/v1/base_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options, Vector3 } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Base } from "./base";
+} from '../../gen/component/base/v1/base_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options, Vector3 } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Base } from './base';
 
 /**
  * A gRPC-web client for the Base component.
@@ -36,7 +37,7 @@ export class BaseClient implements Base {
   async getGeometries(extra = {}, callOptions = this.callOptions) {
     const request = create(GetGeometriesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     const response = await this.client.getGeometries(request, callOptions);
@@ -47,13 +48,13 @@ export class BaseClient implements Base {
     distanceMm: number,
     mmPerSec: number,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(MoveStraightRequestSchema, {
       name: this.name,
       mmPerSec,
       distanceMm: distanceMm ? BigInt(distanceMm) : undefined,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -65,13 +66,13 @@ export class BaseClient implements Base {
     angleDeg: number,
     degsPerSec: number,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(SpinRequestSchema, {
       name: this.name,
       angleDeg,
       degsPerSec,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -83,13 +84,13 @@ export class BaseClient implements Base {
     linear: Vector3,
     angular: Vector3,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(SetPowerRequestSchema, {
       name: this.name,
       linear,
       angular,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -101,13 +102,13 @@ export class BaseClient implements Base {
     linear: Vector3,
     angular: Vector3,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(SetVelocityRequestSchema, {
       name: this.name,
       linear,
       angular,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -118,7 +119,7 @@ export class BaseClient implements Base {
   async stop(extra = {}, callOptions = this.callOptions) {
     const request = create(StopRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -142,27 +143,27 @@ export class BaseClient implements Base {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);

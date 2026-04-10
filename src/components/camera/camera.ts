@@ -1,10 +1,11 @@
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import type { Geometry } from "../../gen/common/v1/common_pb";
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+
+import type { Geometry } from '../../gen/common/v1/common_pb';
 import type {
   DistortionParameters,
   IntrinsicParameters,
-} from "../../gen/component/camera/v1/camera_pb";
-import type { JsonObject, Resource } from "../../types";
+} from '../../gen/component/camera/v1/camera_pb';
+import type { JsonObject, Resource } from '../../types';
 
 export interface Properties {
   /** Whether the camera supports the return of point cloud data. */
@@ -28,13 +29,13 @@ export interface ResponseMetadata {
 }
 
 export type MimeType =
-  | ""
-  | "image/vnd.viam.rgba"
-  | "image/vnd.viam.depth"
-  | "image/jpeg"
-  | "image/png"
-  | "pointcloud/pcd"
-  | "unsupported";
+  | ''
+  | 'image/vnd.viam.rgba'
+  | 'image/vnd.viam.depth'
+  | 'image/jpeg'
+  | 'image/png'
+  | 'pointcloud/pcd'
+  | 'unsupported';
 
 /** Represents any physical hardware that can capture frames. */
 export interface Camera extends Resource {
@@ -47,7 +48,7 @@ export interface Camera extends Resource {
    * @example
    *
    * ```ts
-   * const camera = new VIAM.CameraClient(machine, "my_camera");
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const images = await camera.getImages();
    * ```
    *
@@ -59,7 +60,7 @@ export interface Camera extends Resource {
    */
   getImages: (
     filterSourceNames?: string[],
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<{ images: NamedImage[]; metadata: ResponseMetadata }>;
 
   /**
@@ -68,7 +69,7 @@ export interface Camera extends Resource {
    * @example
    *
    * ```ts
-   * const camera = new VIAM.CameraClient(machine, "my_camera");
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const pointCloud = await camera.getPointCloud();
    * ```
    *
@@ -83,7 +84,7 @@ export interface Camera extends Resource {
    * @example
    *
    * ```ts
-   * const camera = new VIAM.CameraClient(machine, "my_camera");
+   * const camera = new VIAM.CameraClient(machine, 'my_camera');
    * const properties = await camera.getProperties();
    * ```
    *

@@ -1,5 +1,6 @@
-import { withRobot } from '../fixtures/robot-page';
 import { expect } from '@playwright/test';
+
+import { withRobot } from '../fixtures/robot-page';
 
 withRobot.describe('Connect, Disconnect, and Reconnect', () => {
   withRobot(

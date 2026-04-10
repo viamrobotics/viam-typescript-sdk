@@ -1,19 +1,20 @@
-import { create } from "@bufbuild/protobuf";
-import { TimestampSchema } from "@bufbuild/protobuf/wkt";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import { GetGeometriesRequestSchema } from "../../gen/common/v1/common_pb";
+import { create } from '@bufbuild/protobuf';
+import { TimestampSchema } from '@bufbuild/protobuf/wkt';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
+import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
 import {
   CameraService,
   GetImagesRequestSchema,
   GetPointCloudRequestSchema,
   GetPropertiesRequestSchema,
-} from "../../gen/component/camera/v1/camera_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Camera, MimeType, ResponseMetadata } from "./camera";
+} from '../../gen/component/camera/v1/camera_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Camera, MimeType, ResponseMetadata } from './camera';
 
-const PointCloudPCD: MimeType = "pointcloud/pcd";
+const PointCloudPCD: MimeType = 'pointcloud/pcd';
 
 /**
  * A gRPC-web client for the Camera component.
@@ -35,7 +36,7 @@ export class CameraClient implements Camera {
   async getGeometries(extra = {}, callOptions = this.callOptions) {
     const request = create(GetGeometriesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     const response = await this.client.getGeometries(request, callOptions);
@@ -45,12 +46,12 @@ export class CameraClient implements Camera {
   async getImages(
     filterSourceNames: string[] = [],
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(GetImagesRequestSchema, {
       name: this.name,
       filterSourceNames,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -72,7 +73,7 @@ export class CameraClient implements Camera {
     const request = create(GetPointCloudRequestSchema, {
       name: this.name,
       mimeType: PointCloudPCD,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -96,20 +97,20 @@ export class CameraClient implements Camera {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

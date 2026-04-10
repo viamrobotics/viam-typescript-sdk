@@ -1,4 +1,5 @@
 import type { Transport } from '@connectrpc/connect';
+
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -7,9 +8,9 @@ import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
 import {
   createViamTransport,
-  isCredential,
   type Credential,
   type Credentials,
+  isCredential,
 } from './viam-transport';
 
 export interface ViamClientOptions {
@@ -105,9 +106,7 @@ export class ViamClient {
     // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
     if (!isCredential(creds)) {
-      if (robotSecret === undefined) {
-        robotSecret = await this.getRobotSecretFromHost(address);
-      }
+      robotSecret ??= await this.getRobotSecretFromHost(address);
       creds =
         robotSecret === undefined
           ? creds

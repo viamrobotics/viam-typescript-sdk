@@ -1,13 +1,14 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   DiscoverResourcesRequestSchema,
   DiscoveryService,
-} from "../../gen/service/discovery/v1/discovery_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Discovery } from "./discovery";
+} from '../../gen/service/discovery/v1/discovery_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Discovery } from './discovery';
 
 /**
  * A gRPC-web client for a Vision service.
@@ -29,7 +30,7 @@ export class DiscoveryClient implements Discovery {
   async discoverResources(extra = {}, callOptions = this.callOptions) {
     const request = create(DiscoverResourcesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -43,20 +44,20 @@ export class DiscoveryClient implements Discovery {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

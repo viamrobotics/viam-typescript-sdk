@@ -1,4 +1,10 @@
-import type { Message } from '@bufbuild/protobuf';
+import {
+  create,
+  type DescMessage,
+  type MessageInitShape,
+  toBinary,
+} from '@bufbuild/protobuf';
+
 import { ConnectionClosedError } from './connection-closed-error';
 
 export class BaseChannel {
@@ -72,7 +78,10 @@ export class BaseChannel {
     this.closeWithReason(new Error(JSON.stringify(ev)));
   }
 
-  protected write(msg: Message) {
-    this.dataChannel.send(msg.toBinary());
+  protected write<Desc extends DescMessage>(
+    schema: Desc,
+    msg: MessageInitShape<Desc>
+  ) {
+    this.dataChannel.send(toBinary(schema, create(schema, msg)));
   }
 }

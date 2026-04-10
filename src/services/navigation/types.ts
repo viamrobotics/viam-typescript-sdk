@@ -1,4 +1,4 @@
-import * as navigationApi from "../../gen/service/navigation/v1/navigation_pb";
+import * as navigationApi from '../../gen/service/navigation/v1/navigation_pb';
 
 export type NavigationPosition = navigationApi.GetLocationResponse;
 export type NavigationProperties = navigationApi.GetPropertiesResponse;

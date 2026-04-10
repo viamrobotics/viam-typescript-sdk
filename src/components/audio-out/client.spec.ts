@@ -1,19 +1,21 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AudioCodec } from "../../audio-common";
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { AudioCodec } from '../../audio-common';
 import {
   AudioInfoSchema,
   type GetPropertiesRequest,
   GetPropertiesResponseSchema,
-} from "../../gen/common/v1/common_pb";
-import { RobotClient } from "../../robot";
-import { AudioOutClient } from "./client";
-vi.mock("../../robot");
+} from '../../gen/common/v1/common_pb';
+import { RobotClient } from '../../robot';
+import { AudioOutClient } from './client';
+vi.mock('../../robot');
 
-import { create } from "@bufbuild/protobuf";
-import { createClient, createRouterTransport } from "@connectrpc/connect";
-import { AudioOutService } from "../../gen/component/audioout/v1/audioout_pb";
+import { create } from '@bufbuild/protobuf';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
+
+import { AudioOutService } from '../../gen/component/audioout/v1/audioout_pb';
 
 let audioOut: AudioOutClient;
 let capturedPropertiesReq: GetPropertiesRequest | undefined;
@@ -24,7 +26,7 @@ const testProperties = create(GetPropertiesResponseSchema, {
   numChannels: 2,
 });
 
-describe("AudioOutClient tests", () => {
+describe('AudioOutClient tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(AudioOutService, {
@@ -42,11 +44,11 @@ describe("AudioOutClient tests", () => {
       .fn()
       .mockImplementation(() => createClient(AudioOutService, mockTransport));
 
-    audioOut = new AudioOutClient(new RobotClient("host"), "test-audio-out");
+    audioOut = new AudioOutClient(new RobotClient('host'), 'test-audio-out');
   });
 
-  describe("play tests", () => {
-    it("play sends audio data", async () => {
+  describe('play tests', () => {
+    it('play sends audio data', async () => {
       const audioData = new Uint8Array([1, 2, 3, 4, 5]);
       const audioInfo = create(AudioInfoSchema, {
         codec: AudioCodec.PCM16,
@@ -58,8 +60,8 @@ describe("AudioOutClient tests", () => {
     });
   });
 
-  describe("getProperties tests", () => {
-    it("getProperties returns audio properties", async () => {
+  describe('getProperties tests', () => {
+    it('getProperties returns audio properties', async () => {
       const properties = await audioOut.getProperties();
 
       expect(properties.supportedCodecs).toEqual([
@@ -71,8 +73,8 @@ describe("AudioOutClient tests", () => {
       expect(properties.numChannels).toEqual(2);
     });
 
-    it("getProperties passes extra to request", async () => {
-      const extra = { key: "value" };
+    it('getProperties passes extra to request', async () => {
+      const extra = { key: 'value' };
       await audioOut.getProperties(extra);
       expect(capturedPropertiesReq?.extra).toStrictEqual(extra);
     });

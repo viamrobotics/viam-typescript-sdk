@@ -1,2 +1,2 @@
-export type { DataManager } from "./data-manager/data-manager";
-export { DataManagerClient } from "./data-manager/client";
+export { DataManagerClient } from './data-manager/client';
+export type { DataManager } from './data-manager/data-manager';

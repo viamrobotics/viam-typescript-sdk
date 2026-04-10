@@ -1,8 +1,8 @@
-import type { Image } from "../../gen/component/camera/v1/camera_pb";
+import type { JsonObject } from '@bufbuild/protobuf';
 
-import type { JsonObject } from "@bufbuild/protobuf";
-import * as commonApi from "../../gen/common/v1/common_pb";
-import * as visionApi from "../../gen/service/vision/v1/vision_pb";
+import * as commonApi from '../../gen/common/v1/common_pb';
+import type { Image } from '../../gen/component/camera/v1/camera_pb';
+import * as visionApi from '../../gen/service/vision/v1/vision_pb';
 
 export type Classification = visionApi.Classification;
 export type Detection = visionApi.Detection;

@@ -1,12 +1,10 @@
-import { Message } from '@bufbuild/protobuf';
-
-import type {
-  AnyMessage,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
+import {
+  create,
+  type DescMessage,
+  type DescMethodStreaming,
+  type DescMethodUnary,
+  type MessageInitShape,
 } from '@bufbuild/protobuf';
-
 import type {
   CallOptions,
   ContextValues,
@@ -15,19 +13,24 @@ import type {
   UnaryResponse,
 } from '@connectrpc/connect';
 import { Code, ConnectError, createClient } from '@connectrpc/connect';
-import { AuthService, ExternalAuthService } from '../gen/proto/rpc/v1/auth_pb';
-import {
-  AuthenticateRequest,
-  Credentials as PBCredentials,
-} from '../gen/proto/rpc/v1/auth_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
-import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
-import { newPeerConnectionForClient } from './peer';
-
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
-import { isCredential, type Credentials } from '../app/viam-transport';
-import { SignalingExchange } from './signaling-exchange';
 import { UuidTool } from 'uuid-tool';
+
+import { type Credentials, isCredential } from '../app/viam-transport';
+import {
+  AuthenticateRequestSchema,
+  AuthenticateToRequestSchema,
+  AuthService,
+  CredentialsSchema,
+  ExternalAuthService,
+} from '../gen/proto/rpc/v1/auth_pb';
+import {
+  SignalingService,
+  type WebRTCConfig,
+  WebRTCConfigSchema,
+} from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+import { newPeerConnectionForClient } from './peer';
+import { SignalingExchange } from './signaling-exchange';
 
 export interface DialOptions {
   credentials?: Credentials | undefined;
@@ -46,13 +49,6 @@ export interface DialOptions {
    * webrtcOptions.signalingAccessToken
    */
   accessToken?: string | undefined;
-
-  /**
-   * Set timeout in milliseconds for dialing.
-   *
-   * @deprecated Use `dialTimeoutMs` instead.
-   */
-  dialTimeout?: number | undefined;
 
   /** Set timeout in milliseconds for dialing. */
   dialTimeoutMs?: number | undefined;
@@ -142,24 +138,22 @@ const enableGRPCTraceLogging = <T extends Transport>(
 ): T => {
   if (globalThis.VIAM?.GRPC_TRACE_LOGGING === true) {
     const patchedUnary: typeof transport.unary = async <
-      I extends Message<I> = AnyMessage,
-      O extends Message<O> = AnyMessage,
+      I extends DescMessage = DescMessage,
+      O extends DescMessage = DescMessage,
     >(
-      service: ServiceType,
-      method: MethodInfo<I, O>,
+      method: DescMethodUnary<I, O>,
       signal: AbortSignal | undefined,
       timeoutMs: number | undefined,
       header: HeadersInit | undefined,
-      message: PartialMessage<I>,
+      message: MessageInitShape<I>,
       contextValues?: ContextValues
     ): Promise<UnaryResponse<I, O>> => {
       const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
       console.trace(
-        `Unary request ${id} : ${address}/${service.typeName}.${method.name}`
+        `Unary request ${id} : ${address}/${method.parent.typeName}.${method.name}`
       );
       const resp = await transport.unary(
-        service,
         method,
         signal,
         timeoutMs,
@@ -173,24 +167,22 @@ const enableGRPCTraceLogging = <T extends Transport>(
     };
 
     const patchedStream: typeof transport.stream = async <
-      I extends Message<I> = AnyMessage,
-      O extends Message<O> = AnyMessage,
+      I extends DescMessage = DescMessage,
+      O extends DescMessage = DescMessage,
     >(
-      service: ServiceType,
-      method: MethodInfo<I, O>,
+      method: DescMethodStreaming<I, O>,
       signal: AbortSignal | undefined,
       timeoutMs: number | undefined,
       header: HeadersInit | undefined,
-      input: AsyncIterable<PartialMessage<I>>,
+      input: AsyncIterable<MessageInitShape<I>>,
       contextValues?: ContextValues
     ): Promise<StreamResponse<I, O>> => {
       const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
       console.trace(
-        `Stream request ${id} : ${address}/${service.typeName}.${method.name}`
+        `Stream request ${id} : ${address}/${method.parent.typeName}.${method.name}`
       );
       const resp = await transport.stream(
-        service,
         method,
         signal,
         timeoutMs,
@@ -284,14 +276,14 @@ const makeAuthenticatedTransport = async (
 
   let accessToken;
   if (opts.accessToken === undefined || opts.accessToken === '') {
-    const request = new AuthenticateRequest({
+    const request = create(AuthenticateRequestSchema, {
       entity:
         isCredential(opts.credentials) && opts.credentials.authEntity
           ? opts.credentials.authEntity
           : address.replace(addressCleanupRegex, ''),
     });
     if (opts.credentials) {
-      request.credentials = new PBCredentials({
+      request.credentials = create(CredentialsSchema, {
         type: opts.credentials.type,
         payload: opts.credentials.payload,
       });
@@ -317,7 +309,7 @@ const makeAuthenticatedTransport = async (
 
     accessToken = '';
 
-    const request = new AuthenticateRequest({
+    const request = create(AuthenticateToRequestSchema, {
       entity: opts.externalAuthToEntity,
     });
     const transport = defaultFactory({
@@ -347,15 +339,14 @@ export class AuthenticatedTransport implements Transport {
   }
 
   public unary = async <
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
+    I extends DescMessage = DescMessage,
+    O extends DescMessage = DescMessage,
   >(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+    method: DescMethodUnary<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    message: PartialMessage<I>,
+    message: MessageInitShape<I>,
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
@@ -363,7 +354,6 @@ export class AuthenticatedTransport implements Transport {
       newHeaders.set(key, value);
     }
     return this.transport.unary(
-      service,
       method,
       signal,
       timeoutMs,
@@ -374,15 +364,14 @@ export class AuthenticatedTransport implements Transport {
   };
 
   public stream = async <
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
+    I extends DescMessage = DescMessage,
+    O extends DescMessage = DescMessage,
   >(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+    method: DescMethodStreaming<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageInitShape<I>>,
     contextValues?: ContextValues
   ): Promise<StreamResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
@@ -390,7 +379,6 @@ export class AuthenticatedTransport implements Transport {
       newHeaders.set(key, value);
     }
     return this.transport.stream(
-      service,
       method,
       signal,
       timeoutMs,
@@ -450,10 +438,10 @@ const getOptionalWebRTCConfig = async (
 ): Promise<WebRTCConfig> => {
   try {
     const resp = await signalingClient.optionalWebRTCConfig({}, callOpts);
-    return resp.config ?? new WebRTCConfig();
+    return resp.config ?? create(WebRTCConfigSchema);
   } catch (error) {
     if (error instanceof ConnectError && error.code === Code.Unimplemented) {
-      return new WebRTCConfig();
+      return create(WebRTCConfigSchema);
     }
     throw error;
   }
@@ -526,7 +514,7 @@ export const dialWebRTC = async (
   );
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
+  const dialTimeoutMs = dialOpts?.dialTimeoutMs;
   if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
     timeoutId = setTimeout(() => {
       if (!successful) {
@@ -543,7 +531,6 @@ export const dialWebRTC = async (
       dialOpts.externalAuthAddress !== ''
     ) {
       // TODO(GOUT-11): prepare AuthenticateTo here  for client channel.
-      // eslint-disable-next-line sonarjs/no-duplicated-branches
     } else if (dialOpts?.credentials?.type !== undefined) {
       // TODO(GOUT-11): prepare Authenticate here for client channel
     }
@@ -595,7 +582,7 @@ interface TurnUri {
 
 const parseTurnUri = (raw: string): TurnUri | undefined => {
   const colonIdx = raw.indexOf(':');
-  if (colonIdx < 0) {
+  if (colonIdx === -1) {
     return undefined;
   }
   const scheme = raw.slice(0, colonIdx);
@@ -604,10 +591,10 @@ const parseTurnUri = (raw: string): TurnUri | undefined => {
   }
   const rest = raw.slice(colonIdx + 1);
   const qIdx = rest.indexOf('?');
-  const hostport = qIdx >= 0 ? rest.slice(0, qIdx) : rest;
-  const query = qIdx >= 0 ? rest.slice(qIdx + 1) : '';
+  const hostport = qIdx === -1 ? rest : rest.slice(0, qIdx);
+  const query = qIdx === -1 ? '' : rest.slice(qIdx + 1);
   const lastColon = hostport.lastIndexOf(':');
-  if (lastColon < 0) {
+  if (lastColon === -1) {
     return undefined;
   }
   const host = hostport.slice(0, lastColon);
@@ -619,7 +606,7 @@ const parseTurnUri = (raw: string): TurnUri | undefined => {
     .split('&')
     .find((part) => part.startsWith('transport='))
     ?.slice('transport='.length) ?? 'udp') as 'udp' | 'tcp';
-  return { scheme: scheme as 'turn' | 'turns', host, port, transport };
+  return { scheme, host, port, transport };
 };
 
 const turnUriEqual = (a: TurnUri, b: TurnUri): boolean =>
@@ -680,8 +667,8 @@ const applyTurnFilterOptions = (
         return urls.length > 0;
       }),
   };
+  // eslint-disable-next-line no-console
   console.debug('TURN filter options set', {
-    // eslint-disable-line no-console
     turnUri: webrtcOpts.turnUri,
     turnScheme: webrtcOpts.turnScheme,
     turnPort: webrtcOpts.turnPort,
@@ -728,9 +715,7 @@ const processWebRTCOpts = async (
     };
   } else {
     // RSDK-8715: We deep copy here to avoid mutating the input config's `rtcConfig.iceServers` list.
-    webrtcOpts = JSON.parse(
-      JSON.stringify(usableDialOpts.webrtcOptions)
-    ) as DialWebRTCOptions;
+    webrtcOpts = structuredClone(usableDialOpts.webrtcOptions);
     if (webrtcOpts.rtcConfig === undefined) {
       webrtcOpts.rtcConfig = { iceServers: additionalIceServers };
     } else {
@@ -742,15 +727,17 @@ const processWebRTCOpts = async (
   }
 
   if (webrtcOpts.forceRelay && webrtcOpts.forceP2P) {
+    // eslint-disable-next-line no-console
     console.warn(
       'forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail'
-    ); // eslint-disable-line no-console
+    );
   }
 
   if (webrtcOpts.forceP2P) {
+    // eslint-disable-next-line no-console
     console.debug(
       'force P2P enabled; stripping TURN servers and ignoring signaling server ICE config'
-    ); // eslint-disable-line no-console
+    );
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
@@ -774,9 +761,10 @@ const processWebRTCOpts = async (
       webrtcOpts.turnTransport !== undefined ||
       webrtcOpts.turnPort !== undefined)
   ) {
+    // eslint-disable-next-line no-console
     console.warn(
       'forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped'
-    ); // eslint-disable-line no-console
+    );
   }
 
   if (

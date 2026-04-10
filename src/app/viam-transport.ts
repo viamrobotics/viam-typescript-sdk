@@ -1,6 +1,6 @@
-import { dialDirect } from '../rpc';
-
 import type { Transport } from '@connectrpc/connect';
+
+import { dialDirect } from '../rpc';
 import { clientHeaders } from '../utils';
 
 /**

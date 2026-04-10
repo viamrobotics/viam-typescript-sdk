@@ -1,24 +1,26 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { AudioCodec } from "../../audio-common";
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { AudioCodec } from '../../audio-common';
 import {
   type GetPropertiesRequest,
   GetPropertiesResponseSchema,
-} from "../../gen/common/v1/common_pb";
-import { GetAudioResponseSchema } from "../../gen/component/audioin/v1/audioin_pb";
-import { RobotClient } from "../../robot";
-import { type AudioChunk } from "./audio-in";
-import { AudioInClient } from "./client";
-vi.mock("../../robot");
+} from '../../gen/common/v1/common_pb';
+import { GetAudioResponseSchema } from '../../gen/component/audioin/v1/audioin_pb';
+import { RobotClient } from '../../robot';
+import type { AudioChunk } from './audio-in';
+import { AudioInClient } from './client';
+vi.mock('../../robot');
 
-import { create, type MessageInitShape } from "@bufbuild/protobuf";
-import { createClient, createRouterTransport } from "@connectrpc/connect";
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
 import {
   createWritableIterable,
   type WritableIterable,
-} from "@connectrpc/connect/protocol";
-import { AudioInService } from "../../gen/component/audioin/v1/audioin_pb";
+} from '@connectrpc/connect/protocol';
+
+import { AudioInService } from '../../gen/component/audioin/v1/audioin_pb';
 
 let audioin: AudioInClient;
 let capturedPropertiesReq: GetPropertiesRequest | undefined;
@@ -33,7 +35,7 @@ const testProperties = create(GetPropertiesResponseSchema, {
   numChannels: 2,
 });
 
-describe("AudioInClient tests", () => {
+describe('AudioInClient tests', () => {
   beforeEach(() => {
     testAudioStream =
       createWritableIterable<MessageInitShape<typeof GetAudioResponseSchema>>();
@@ -54,22 +56,22 @@ describe("AudioInClient tests", () => {
       .fn()
       .mockImplementation(() => createClient(AudioInService, mockTransport));
 
-    audioin = new AudioInClient(new RobotClient("host"), "test-audio-in");
+    audioin = new AudioInClient(new RobotClient('host'), 'test-audio-in');
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("getAudio tests", () => {
-    it("getAudio streams audio chunks", async () => {
+  describe('getAudio tests', () => {
+    it('getAudio streams audio chunks', async () => {
       const audioChunks: AudioChunk[] = [];
 
       const streamProm = (async () => {
         for await (const chunk of audioin.getAudio(
           AudioCodec.PCM16,
           1.1,
-          BigInt(0),
+          BigInt(0)
         )) {
           audioChunks.push(chunk);
         }
@@ -87,7 +89,7 @@ describe("AudioInClient tests", () => {
           endTimestampNanoseconds: BigInt(2000),
           sequence: 1,
         },
-        requestId: "test-request-1",
+        requestId: 'test-request-1',
       });
 
       await testAudioStream.write({
@@ -102,7 +104,7 @@ describe("AudioInClient tests", () => {
           endTimestampNanoseconds: BigInt(3000),
           sequence: 2,
         },
-        requestId: "test-request-1",
+        requestId: 'test-request-1',
       });
 
       testAudioStream.close();
@@ -110,18 +112,20 @@ describe("AudioInClient tests", () => {
 
       expect(audioChunks.length).toEqual(2);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const chunk1 = audioChunks[0]!;
       expect(chunk1.audioData).toEqual(new Uint8Array([4, 5, 6]));
       expect(chunk1.sequence).toEqual(1);
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const chunk2 = audioChunks[1]!;
       expect(chunk2.audioData).toEqual(new Uint8Array([7, 8, 9]));
       expect(chunk2.sequence).toEqual(2);
     });
   });
 
-  describe("getProperties tests", () => {
-    it("getProperties returns audio properties", async () => {
+  describe('getProperties tests', () => {
+    it('getProperties returns audio properties', async () => {
       const properties = await audioin.getProperties();
 
       expect(properties.supportedCodecs).toEqual([
@@ -133,8 +137,8 @@ describe("AudioInClient tests", () => {
       expect(properties.numChannels).toEqual(2);
     });
 
-    it("getProperties passes extra to request", async () => {
-      const extra = { key: "value" };
+    it('getProperties passes extra to request', async () => {
+      const extra = { key: 'value' };
       await audioin.getProperties(extra);
       expect(capturedPropertiesReq?.extra).toStrictEqual(extra);
     });

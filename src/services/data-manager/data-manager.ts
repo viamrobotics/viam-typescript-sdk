@@ -1,5 +1,5 @@
-import { MimeType } from "../../gen/app/datasync/v1/data_sync_pb.js";
-import type { JsonObject, Resource } from "../../types";
+import { MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
+import type { JsonObject, Resource } from '../../types';
 
 export interface DataManager extends Resource {
   sync: (extra?: JsonObject) => Promise<void>;
@@ -8,6 +8,6 @@ export interface DataManager extends Resource {
     tags: string[],
     datasetIds: string[],
     mimeType: MimeType,
-    extra?: JsonObject,
+    extra?: JsonObject
   ) => Promise<void>;
 }

@@ -1,4 +1,5 @@
 import type { Struct } from '@bufbuild/protobuf/wkt';
+
 import { MachineConnectionEvent } from '../events';
 import * as proto from '../gen/robot/v1/robot_pb';
 import type { PoseInFrame, ResourceName, Transform } from '../types';

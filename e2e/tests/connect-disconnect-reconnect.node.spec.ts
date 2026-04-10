@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { RobotClient, MachineConnectionEvent } from '../../src/main';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+import { MachineConnectionEvent, RobotClient } from '../../src/main';
 import {
   defaultNodeConfig,
   invalidNodeConfig,

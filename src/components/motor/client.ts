@@ -1,5 +1,6 @@
-import { create } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   GetPositionRequestSchema,
   GetPropertiesRequestSchema,
@@ -12,11 +13,11 @@ import {
   SetPowerRequestSchema,
   SetRPMRequestSchema,
   StopRequestSchema,
-} from "../../gen/component/motor/v1/motor_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { Motor } from "./motor";
+} from '../../gen/component/motor/v1/motor_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { Motor } from './motor';
 
 /**
  * A gRPC-web client for the Motor component.
@@ -39,7 +40,7 @@ export class MotorClient implements Motor {
     const request = create(SetPowerRequestSchema, {
       name: this.name,
       powerPct: power,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -51,13 +52,13 @@ export class MotorClient implements Motor {
     rpm: number,
     revolutions: number,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(GoForRequestSchema, {
       name: this.name,
       rpm,
       revolutions,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -69,13 +70,13 @@ export class MotorClient implements Motor {
     rpm: number,
     positionRevolutions: number,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(GoToRequestSchema, {
       name: this.name,
       rpm,
       positionRevolutions,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -87,7 +88,7 @@ export class MotorClient implements Motor {
     const request = create(SetRPMRequestSchema, {
       name: this.name,
       rpm,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -98,12 +99,12 @@ export class MotorClient implements Motor {
   async resetZeroPosition(
     offset: number,
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ) {
     const request = create(ResetZeroPositionRequestSchema, {
       name: this.name,
       offset,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -114,7 +115,7 @@ export class MotorClient implements Motor {
   async stop(extra = {}, callOptions = this.callOptions) {
     const request = create(StopRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -125,7 +126,7 @@ export class MotorClient implements Motor {
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -139,7 +140,7 @@ export class MotorClient implements Motor {
   async getPosition(extra = {}, callOptions = this.callOptions) {
     const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -151,7 +152,7 @@ export class MotorClient implements Motor {
   async isPowered(extra = {}, callOptions = this.callOptions) {
     const request = create(IsPoweredRequestSchema, {
       name: this.name,
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -176,20 +177,20 @@ export class MotorClient implements Motor {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }

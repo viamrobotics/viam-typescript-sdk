@@ -1,4 +1,4 @@
-import type { JsonObject, Resource } from "../../types";
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a physical servo. */
 export interface Servo extends Resource {
@@ -8,7 +8,7 @@ export interface Servo extends Resource {
    * @example
    *
    * ```ts
-   * const servo = new VIAM.ServoClient(machine, "my_servo");
+   * const servo = new VIAM.ServoClient(machine, 'my_servo');
    *
    * // Move the servo from its origin to the desired angle of 10 degrees
    * await servo.move(10);
@@ -28,7 +28,7 @@ export interface Servo extends Resource {
    * @example
    *
    * ```ts
-   * const servo = new VIAM.ServoClient(machine, "my_servo");
+   * const servo = new VIAM.ServoClient(machine, 'my_servo');
    *
    * // Get the current set angle of the servo
    * const pos = await servo.getPosition();
@@ -45,7 +45,7 @@ export interface Servo extends Resource {
    * @example
    *
    * ```ts
-   * const servo = new VIAM.ServoClient(machine, "my_servo");
+   * const servo = new VIAM.ServoClient(machine, 'my_servo');
    *
    * // Move the servo from its origin to the desired angle of 10 degrees
    * await servo.move(10);
@@ -65,10 +65,10 @@ export interface Servo extends Resource {
    * @example
    *
    * ```ts
-   * const servo = new VIAM.ServoClient(machine, "my_servo");
+   * const servo = new VIAM.ServoClient(machine, 'my_servo');
    *
    * const moving = await servo.isMoving();
-   * console.log("Moving:", moving);
+   * console.log('Moving:', moving);
    * ```
    *
    * For more information, see [Servo

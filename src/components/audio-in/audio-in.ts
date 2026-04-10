@@ -1,6 +1,6 @@
-import type { Resource, JsonObject } from '../../types';
-import type { AudioInfo } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
+import type { AudioInfo } from '../../gen/common/v1/common_pb';
+import type { JsonObject, Resource } from '../../types';
 
 export interface AudioChunk {
   audioData: Uint8Array;

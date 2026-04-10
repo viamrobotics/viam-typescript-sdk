@@ -1,9 +1,13 @@
 // @vitest-environment happy-dom
 
-import { ConnectError, createRouterTransport } from '@connectrpc/connect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { RobotService } from '../../gen/robot/v1/robot_pb';
-import { GetOperationsResponse } from '../../gen/robot/v1/robot_pb';
+import { create } from '@bufbuild/protobuf';
+import { ConnectError, createRouterTransport } from '@connectrpc/connect';
+
+import {
+  GetOperationsResponseSchema,
+  RobotService,
+} from '../../gen/robot/v1/robot_pb';
 import GRPCConnectionManager from '../grpc-connection-manager';
 
 vi.mock('../../gen/robot/v1/robot_pb_service');
@@ -12,7 +16,7 @@ const setupConnectionManager = (
   transport = createRouterTransport(({ service }) => {
     service(RobotService, {
       getOperations: () => {
-        return new GetOperationsResponse();
+        return create(GetOperationsResponseSchema);
       },
     });
   }),
@@ -73,7 +77,7 @@ describe('GRPCConnectionManager', () => {
     vi.useFakeTimers();
     const getOperationsMock = vi
       .fn()
-      .mockReturnValueOnce(new GetOperationsResponse())
+      .mockReturnValueOnce(create(GetOperationsResponseSchema))
       .mockImplementationOnce(() => {
         throw ConnectError.from(new Error('disconnected'));
       });

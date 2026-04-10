@@ -1,5 +1,5 @@
-import type { Geometry } from "../../gen/common/v1/common_pb";
-import type { JsonObject, Resource } from "../../types";
+import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { JsonObject, Resource } from '../../types';
 
 /** Represents a physical robotic gripper. */
 export interface Gripper extends Resource {
@@ -9,11 +9,11 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
    *
    * // Get the geometries of this component
    * const geometries = await gripper.getGeometries();
-   * console.log("Geometries:", geometries);
+   * console.log('Geometries:', geometries);
    * ```
    *
    * For more information, see [Gripper
@@ -27,7 +27,7 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
    *
    * // Open the gripper
    * await gripper.open();
@@ -44,7 +44,7 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
    *
    * // Close the gripper to grab
    * await gripper.grab();
@@ -61,7 +61,7 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
    *
    * // Stop the gripper's current motion
    * await gripper.stop();
@@ -78,11 +78,11 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
    *
    * // Check if the gripper is currently moving
    * const moving = await gripper.isMoving();
-   * console.log("Gripper is moving:", moving);
+   * console.log('Gripper is moving:', moving);
    * ```
    *
    * For more information, see [Gripper
@@ -97,11 +97,11 @@ export interface Gripper extends Resource {
    * @example
    *
    * ```ts
-   * const gripper = new VIAM.GripperClient(machine, "my_gripper");
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
    *
    * // Check if the gripper is holding something
    * const holding = await gripper.isHoldingSomething();
-   * console.log("Gripper is holding something:", holding);
+   * console.log('Gripper is holding something:', holding);
    * ```
    *
    * For more information, see [Gripper

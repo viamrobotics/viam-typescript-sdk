@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
-import { withRobot } from '../fixtures/robot-page';
+
 import type { RobotClient } from '../../src/robot/client';
+import { withRobot } from '../fixtures/robot-page';
 
 withRobot.describe('Robot Client API Tests', () => {
   withRobot(

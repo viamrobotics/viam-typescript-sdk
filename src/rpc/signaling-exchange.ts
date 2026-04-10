@@ -1,14 +1,15 @@
+import { create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { Code, ConnectError } from '@connectrpc/connect';
-import { Status } from '../gen/google/rpc/status_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+
 import {
-  CallRequest,
-  CallResponse,
-  CallResponseInitStage,
-  CallResponseUpdateStage,
-  CallUpdateRequest,
-  ICECandidate,
+  CallRequestSchema,
+  type CallResponse,
+  type CallResponseInitStage,
+  type CallResponseUpdateStage,
+  CallUpdateRequestSchema,
+  ICECandidateSchema,
+  SignalingService,
 } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import { ClientChannel } from './client-channel';
 import { ConnectionClosedError } from './connection-closed-error';
@@ -57,10 +58,10 @@ export class SignalingExchange {
       this.dialOpts?.additionalSdpFields
     );
     const encodedSDP = btoa(JSON.stringify(description));
-    const callRequest = new CallRequest({
+    const callRequest = create(CallRequestSchema, {
       sdp: encodedSDP,
     });
-    if (this.dialOpts && this.dialOpts.disableTrickleICE) {
+    if (this.dialOpts?.disableTrickleICE) {
       callRequest.disableTrickle = this.dialOpts.disableTrickleICE;
     }
 
@@ -118,8 +119,11 @@ export class SignalingExchange {
       this.pc.addEventListener(
         'icecandidate',
         (event: { candidate: RTCIceCandidateInit | null }) => {
-          this.onLocalICECandidate(event).catch((error) => {
-            console.error(`error processing local ICE candidate ${error}`); // eslint-disable-line no-console
+          this.onLocalICECandidate(event).catch((error: unknown) => {
+            // eslint-disable-next-line no-console
+            console.error(
+              `error processing local ICE candidate ${String(error)}`
+            );
           });
         }
       );
@@ -229,15 +233,17 @@ export class SignalingExchange {
     }
 
     if (uuid !== this.callUuid) {
-      await this.sendError(`uuid mismatch; have=${uuid} want=${this.callUuid}`);
+      await this.sendError(
+        `uuid mismatch; have=${uuid} want=${String(this.callUuid)}`
+      );
       return false;
     }
     if (response.candidate === undefined) {
       await this.sendError(`no candidate`);
       return false;
     }
-    const cand = iceCandidateFromProto(response.candidate);
-    if (cand.candidate !== undefined) {
+    const cand = response.candidate;
+    if (cand.candidate) {
       console.debug(`received remote ICE ${cand.candidate}`); // eslint-disable-line no-console
     }
     try {
@@ -291,7 +297,7 @@ export class SignalingExchange {
     }
 
     const iProto = iceCandidateToProto(event.candidate);
-    const callRequestUpdate = new CallUpdateRequest({
+    const callRequestUpdate = create(CallUpdateRequestSchema, {
       uuid: this.callUuid,
       update: {
         case: 'candidate',
@@ -332,14 +338,14 @@ export class SignalingExchange {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
-    const callRequestUpdate = new CallUpdateRequest({
+    const callRequestUpdate = create(CallUpdateRequestSchema, {
       uuid: this.callUuid,
       update: {
         case: 'error',
-        value: new Status({
+        value: {
           code: Code.Unknown,
           message: err,
-        }),
+        },
       },
     });
     try {
@@ -362,7 +368,7 @@ export class SignalingExchange {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
-    const callRequestUpdate = new CallUpdateRequest({
+    const callRequestUpdate = create(CallUpdateRequestSchema, {
       uuid: this.callUuid,
       update: {
         case: 'done',
@@ -382,24 +388,8 @@ export class SignalingExchange {
   }
 }
 
-const iceCandidateFromProto = (i: ICECandidate) => {
-  const candidate: RTCIceCandidateInit = {
-    candidate: i.candidate,
-  };
-  if (i.sdpMid !== undefined) {
-    candidate.sdpMid = i.sdpMid;
-  }
-  if (i.sdpmLineIndex !== undefined) {
-    candidate.sdpMLineIndex = i.sdpmLineIndex;
-  }
-  if (i.usernameFragment !== undefined) {
-    candidate.usernameFragment = i.usernameFragment;
-  }
-  return candidate;
-};
-
 const iceCandidateToProto = (i: RTCIceCandidateInit) => {
-  const candidate = new ICECandidate();
+  const candidate = create(ICECandidateSchema);
   if (i.candidate !== undefined) {
     candidate.candidate = i.candidate;
   }

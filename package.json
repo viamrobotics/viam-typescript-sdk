@@ -41,8 +41,8 @@
     "e2e:node": "vitest run --config e2e/vite.config.ts",
     "e2e:node-watch": "vitest --config e2e/vite.config.ts",
     "e2e:test-harness": "vite e2e",
-    "_eslint": "eslint '.*.cjs' '**/*.{ts,js,cjs}'",
-    "_prettier": "prettier '.*.cjs' '**/*.{ts,js,cjs}'"
+    "_eslint": "eslint '**/*.{ts,js,cjs}'",
+    "_prettier": "prettier '**/*.{ts,js,cjs}'"
   },
   "repository": {
     "type": "git",

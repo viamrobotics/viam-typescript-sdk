@@ -1,11 +1,12 @@
 import type { ArgumentsType } from 'vitest';
+
 import {
-  RobotClient,
   ArmClient,
   CameraClient,
-  VisionClient,
   type DialConf,
   MachineConnectionEvent,
+  RobotClient,
+  VisionClient,
 } from '../src/main';
 import { defaultConfig, invalidConfig } from './fixtures/configs/dial-configs';
 import type { ResolvedReturnType } from './helpers/api-types';
@@ -15,24 +16,34 @@ const armClient = new ArmClient(client, 'fake_arm');
 const cameraClient = new CameraClient(client, 'fake_camera');
 const visionClient = new VisionClient(client, 'fake_vision');
 
-const getElement = <T extends HTMLElement>(id: string) =>
-  document.querySelector<T>(`[data-${id}]`);
+const getElement = <T extends HTMLElement>(
+  id: string,
+  ctor: new (...args: unknown[]) => T
+) => {
+  const el = document.querySelector<T>(`[data-${id}]`);
+  return el instanceof ctor ? el : null;
+};
 
-const getElements = <T extends HTMLElement>(id: string) =>
-  document.querySelectorAll<T>(`[data-${id}]`);
+const getElements = <T extends HTMLElement>(
+  id: string,
+  ctor: new (...args: unknown[]) => T
+) => {
+  const els = document.querySelectorAll<T>(`[data-${id}]`);
+  return els.values().every((el) => el instanceof ctor) ? els : [];
+};
 
-const connectionStatusEl = getElement<HTMLDivElement>('connection-status');
-const dialingStatusEl = getElement<HTMLDivElement>('dialing-status');
-const connectBtn = getElement<HTMLButtonElement>('connect');
-const disconnectBtn = getElement<HTMLButtonElement>('disconnect');
-const connectInvalidBtn = getElement<HTMLButtonElement>('connect-invalid');
+const connectionStatusEl = getElement('connection-status', HTMLDivElement);
+const dialingStatusEl = getElement('dialing-status', HTMLDivElement);
+const connectBtn = getElement('connect', HTMLButtonElement);
+const disconnectBtn = getElement('disconnect', HTMLButtonElement);
+const connectInvalidBtn = getElement('connect-invalid', HTMLButtonElement);
 
-const robotAPIButtons = getElements<HTMLButtonElement>('robot-api');
-const armAPIButtons = getElements<HTMLButtonElement>('arm-api');
-const cameraAPIButtons = getElements<HTMLButtonElement>('camera-api');
-const visionAPIButtons = getElements<HTMLButtonElement>('vision-api');
+const robotAPIButtons = getElements('robot-api', HTMLButtonElement);
+const armAPIButtons = getElements('arm-api', HTMLButtonElement);
+const cameraAPIButtons = getElements('camera-api', HTMLButtonElement);
+const visionAPIButtons = getElements('vision-api', HTMLButtonElement);
 
-const outputEl = getElement<HTMLPreElement>('output');
+const outputEl = getElement('output', HTMLPreElement);
 
 const setConnectionStatus = (status: string) => {
   if (!connectionStatusEl) {

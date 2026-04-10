@@ -1,7 +1,9 @@
 // @vitest-environment happy-dom
 
-import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createClient, createRouterTransport } from '@connectrpc/connect';
+
+import { PointCloudObjectSchema } from '../../gen/common/v1/common_pb';
 import { VisionService } from '../../gen/service/vision/v1/vision_pb';
 import {
   CaptureAllFromCameraResponseSchema,
@@ -14,10 +16,9 @@ import {
   GetObjectPointCloudsResponseSchema,
   GetPropertiesResponseSchema,
 } from '../../gen/service/vision/v1/vision_pb';
-import { PointCloudObjectSchema } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { VisionClient } from './client';
-import { type Classification, type Detection, type PointCloudObject } from './types';
+import type { Classification, Detection, PointCloudObject } from './types';
 vi.mock('../../robot');
 
 import { create } from '@bufbuild/protobuf';
@@ -54,9 +55,13 @@ describe('VisionClient Tests', () => {
         getDetections: () =>
           create(GetDetectionsResponseSchema, { detections: [detection] }),
         getDetectionsFromCamera: () =>
-          create(GetDetectionsFromCameraResponseSchema, { detections: [detection] }),
+          create(GetDetectionsFromCameraResponseSchema, {
+            detections: [detection],
+          }),
         getClassifications: () =>
-          create(GetClassificationsResponseSchema, { classifications: [classification] }),
+          create(GetClassificationsResponseSchema, {
+            classifications: [classification],
+          }),
         getClassificationsFromCamera: () =>
           create(GetClassificationsFromCameraResponseSchema, {
             classifications: [classification],

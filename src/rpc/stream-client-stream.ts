@@ -1,4 +1,9 @@
-import type { Message, PartialMessage } from '@bufbuild/protobuf';
+import {
+  type DescMessage,
+  type DescMethodStreaming,
+  type MessageShape,
+  toBinary,
+} from '@bufbuild/protobuf';
 import type {
   ContextValues,
   StreamRequest,
@@ -9,16 +14,17 @@ import {
   createWritableIterable,
   runStreamingCall,
 } from '@connectrpc/connect/protocol';
-import {
+
+import type {
   ResponseHeaders,
   ResponseTrailers,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { ClientStream, toGRPCMetadata } from './client-stream';
 
 export class StreamClientStream<
-  I extends Message<I>,
-  O extends Message<O>,
-> extends ClientStream<I, O> {
+  I extends DescMessage,
+  O extends DescMessage,
+> extends ClientStream<DescMethodStreaming<I, O>, I, O> {
   private awaitingHeadersResult?: {
     success: (value: Headers) => void;
     failure: (reason?: unknown) => void;
@@ -27,22 +33,23 @@ export class StreamClientStream<
   private gotHeaders = false;
 
   // trailers will be written to later
-  private readonly respStream = createWritableIterable<O>();
+  private readonly respStream = createWritableIterable<MessageShape<O>>();
   private readonly trailers: Headers = new Headers();
   private respStreamQueue?: Promise<void>;
 
   public async run(
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageShape<I>>,
     contextValues?: ContextValues
   ): Promise<StreamResponse<I, O>> {
     const req = {
       stream: true as const,
       url: '',
       init: {},
-      service: this.service,
+      service: this.method.parent,
       method: this.method,
+      requestMethod: 'POST',
       header: new Headers(),
       contextValues: contextValues ?? createContextValues(),
       message: input,
@@ -63,10 +70,12 @@ export class StreamClientStream<
             failure: reject,
           };
           this.startRequest(signal);
-          this.sendMessages(streamReq.message).catch((error) => {
-            console.error('error sending streaming message', error); // eslint-disable-line no-console
-            this.closeWithRecvError();
-          });
+          this.sendMessages(streamReq.method.input, streamReq.message).catch(
+            (error: unknown) => {
+              console.error('error sending streaming message', error); // eslint-disable-line no-console
+              this.closeWithRecvError();
+            }
+          );
         });
 
         const headers = await startRequest;
@@ -89,9 +98,12 @@ export class StreamClientStream<
     return runStreamingCall<I, O>(opt);
   }
 
-  protected async sendMessages(messages: AsyncIterable<I>) {
+  protected async sendMessages(
+    desc: I,
+    messages: AsyncIterable<MessageShape<I>>
+  ) {
     for await (const msg of messages) {
-      this.sendMessage(msg.toBinary());
+      this.sendMessage(toBinary(desc, msg));
     }
     // end of messages
     this.writeMessage(true, undefined);
@@ -134,10 +146,10 @@ export class StreamClientStream<
     this.respStreamQueue = this.respStreamQueue
       ? this.respStreamQueue.then(async () => this.respStream.write(msg))
       : this.respStream.write(msg);
-    this.respStreamQueue.catch((error) => {
+    this.respStreamQueue.catch((error: unknown) => {
       // eslint-disable-next-line no-console
       console.error(
-        `error pushing received message into stream; failing: ${error}`
+        `error pushing received message into stream; failing: ${String(error)}`
       );
       this.resetStream();
     });

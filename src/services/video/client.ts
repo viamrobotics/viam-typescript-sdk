@@ -1,15 +1,16 @@
-import { create } from "@bufbuild/protobuf";
-import { type Timestamp, timestampFromDate } from "@bufbuild/protobuf/wkt";
-import type { CallOptions, Client } from "@connectrpc/connect";
+import { create } from '@bufbuild/protobuf';
+import { type Timestamp, timestampFromDate } from '@bufbuild/protobuf/wkt';
+import type { CallOptions, Client } from '@connectrpc/connect';
+
 import {
   GetVideoRequestSchema,
   VideoService,
-} from "../../gen/service/video/v1/video_pb";
-import type { RobotClient } from "../../robot";
-import type { JsonObject, Options } from "../../types";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import type { VideoChunk } from "./types";
-import type { Video } from "./video";
+} from '../../gen/service/video/v1/video_pb';
+import type { RobotClient } from '../../robot';
+import type { JsonObject, Options } from '../../types';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import type { VideoChunk } from './types';
+import type { Video } from './video';
 
 /** Convert a Date to a protobuf Timestamp. */
 const dateToTimestamp = (date: Date): Timestamp => {
@@ -41,10 +42,10 @@ export class VideoClient implements Video {
   async *getVideo(
     startTimestamp?: Date,
     endTimestamp?: Date,
-    videoCodec = "",
-    videoContainer = "",
+    videoCodec = '',
+    videoContainer = '',
     extra = {},
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): AsyncIterable<VideoChunk> {
     const request = create(GetVideoRequestSchema, {
       name: this.name,
@@ -55,7 +56,7 @@ export class VideoClient implements Video {
       videoCodec,
       videoContainer,
       requestId: generateUUID(),
-      extra: extra,
+      extra,
     });
 
     this.options.requestLogger?.(request);
@@ -73,20 +74,20 @@ export class VideoClient implements Video {
       this.client.getStatus,
       this.name,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 
   async doCommand(
     command: JsonObject,
-    callOptions = this.callOptions,
+    callOptions = this.callOptions
   ): Promise<JsonObject> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions,
+      callOptions
     );
   }
 }
