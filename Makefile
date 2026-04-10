@@ -107,7 +107,7 @@ test-e2e: e2e/bin/viam-server install-playwright
 	npm run e2e:node
 
 .PHONY: test-e2e-node
-test-e2e-node: e2e/bin/viam-server 
+test-e2e-node: e2e/bin/viam-server
 	npm run e2e:node
 
 .PHONY: test-e2e-browser

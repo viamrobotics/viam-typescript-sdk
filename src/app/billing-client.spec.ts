@@ -13,6 +13,7 @@ import {
   type GetInvoicePdfResponse,
   GetInvoicePdfResponseSchema,
   GetInvoicesSummaryResponseSchema,
+  GetOrgBillingInformationResponseSchema,
   PaymentMethodType,
   ResourceUsageCostsBySourceSchema,
   SourceType,
@@ -34,28 +35,30 @@ const testEndDate = create(TimestampSchema, {
   nanos: NANOS,
 });
 const testMonthUsage: GetCurrentMonthUsageResponse = {
-  cloudStorageUsageCost: 1,
-  dataUploadUsageCost: 2,
-  dataEgresUsageCost: 3,
-  remoteControlUsageCost: 4,
-  standardComputeUsageCost: 5,
-  discountAmount: 6,
-  totalUsageWithDiscount: 7,
-  totalUsageWithoutDiscount: 8,
-  binaryDataCloudStorageUsageCost: 9,
-  otherCloudStorageUsageCost: 10,
-  perMachineUsageCost: 11,
-  subtotal: 12,
-  resourceUsageCostsBySource: [
-    create(ResourceUsageCostsBySourceSchema, {
-      sourceType: SourceType.ORG,
-      resourceUsageCosts: {
-        usageCosts: [{ resourceType: UsageCostType.UNSPECIFIED, cost: 13 }],
+  ...create(GetCurrentMonthUsageResponseSchema, {
+    cloudStorageUsageCost: 1,
+    dataUploadUsageCost: 2,
+    dataEgresUsageCost: 3,
+    remoteControlUsageCost: 4,
+    standardComputeUsageCost: 5,
+    discountAmount: 6,
+    totalUsageWithDiscount: 7,
+    totalUsageWithoutDiscount: 8,
+    binaryDataCloudStorageUsageCost: 9,
+    otherCloudStorageUsageCost: 10,
+    perMachineUsageCost: 11,
+    subtotal: 12,
+    resourceUsageCostsBySource: [
+      {
+        sourceType: SourceType.ORG,
+        resourceUsageCosts: {
+          usageCosts: [{ resourceType: UsageCostType.UNSPECIFIED, cost: 13 }],
+        },
       },
-    }),
-  ],
-  startDate: testStartDate,
-  endDate: testEndDate,
+    ],
+    startDate: testStartDate,
+    endDate: testEndDate,
+  }),
   start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
   end: new Date(SECONDS * 2000 + NANOS / 1_000_000),
 };
@@ -68,11 +71,11 @@ const testInvoiceSummary = create(GetInvoicesSummaryResponseSchema, {
     },
   ],
 });
-const testBillingInfo = {
+const testBillingInfo = create(GetOrgBillingInformationResponseSchema, {
   type: PaymentMethodType.UNSPECIFIED,
   billingEmail: 'email@email.com',
   billingTier: 'platinum',
-};
+});
 
 let testGetInvoicePdfStream: WritableIterable<GetInvoicePdfResponse>;
 

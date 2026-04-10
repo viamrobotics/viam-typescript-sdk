@@ -112,16 +112,20 @@ describe('WorldStateStoreClient Tests', () => {
       }
 
       expect(results).toHaveLength(2);
-      expect(results[0]).toEqual({
-        changeType: TransformChangeType.ADDED,
-        transform: transformWithUUID(mockTransform),
-        updatedFields: undefined,
-      });
-      expect(results[1]).toEqual({
-        changeType: TransformChangeType.UPDATED,
-        transform: transformWithUUID(mockTransform),
-        updatedFields: { paths: ['pose_in_observer_frame'] },
-      });
+      expect(results[0]).toEqual(
+        create(StreamTransformChangesResponseSchema, {
+          changeType: TransformChangeType.ADDED,
+          transform: transformWithUUID(mockTransform),
+          updatedFields: undefined,
+        })
+      );
+      expect(results[1]).toEqual(
+        create(StreamTransformChangesResponseSchema, {
+          changeType: TransformChangeType.UPDATED,
+          transform: transformWithUUID(mockTransform),
+          updatedFields: { paths: ['pose_in_observer_frame'] },
+        })
+      );
     });
   });
 

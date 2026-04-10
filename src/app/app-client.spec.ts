@@ -1883,19 +1883,23 @@ describe('AppClient tests', () => {
     it('should handle empty metadata correctly', async () => {
       await subject().updateOrganizationMetadata('orgId', {});
 
-      expect(capturedRequest).toEqual({
-        organizationId: 'orgId',
-        data: {},
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateOrganizationMetadataRequestSchema, {
+          organizationId: 'orgId',
+          data: {},
+        })
+      );
     });
 
     it('should successfully update metadata with valid data', async () => {
       await subject().updateOrganizationMetadata('orgId', { key1: 'value1' });
 
-      expect(capturedRequest).toEqual({
-        organizationId: 'orgId',
-        data: { key1: 'value1' },
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateOrganizationMetadataRequestSchema, {
+          organizationId: 'orgId',
+          data: { key1: 'value1' },
+        })
+      );
     });
   });
 
@@ -1947,19 +1951,23 @@ describe('AppClient tests', () => {
     it('should handle empty metadata correctly', async () => {
       await subject().updateLocationMetadata('locId', {});
 
-      expect(capturedRequest).toEqual({
-        locationId: 'locId',
-        data: {},
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateLocationMetadataRequestSchema, {
+          locationId: 'locId',
+          data: {},
+        })
+      );
     });
 
     it('should successfully update metadata with valid data', async () => {
       await subject().updateLocationMetadata('locId', { key1: 'value1' });
 
-      expect(capturedRequest).toEqual({
-        locationId: 'locId',
-        data: { key1: 'value1' },
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateLocationMetadataRequestSchema, {
+          locationId: 'locId',
+          data: { key1: 'value1' },
+        })
+      );
     });
   });
 
@@ -2010,19 +2018,23 @@ describe('AppClient tests', () => {
     it('should handle empty metadata correctly', async () => {
       await subject().updateRobotMetadata('robotId', {});
 
-      expect(capturedRequest).toEqual({
-        id: 'robotId',
-        data: {},
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateRobotMetadataRequestSchema, {
+          id: 'robotId',
+          data: {},
+        })
+      );
     });
 
     it('should successfully update metadata with valid data', async () => {
       await subject().updateRobotMetadata('robotId', { key1: 'value1' });
 
-      expect(capturedRequest).toEqual({
-        id: 'robotId',
-        data: { key1: 'value1' },
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateRobotMetadataRequestSchema, {
+          id: 'robotId',
+          data: { key1: 'value1' },
+        })
+      );
     });
   });
 
@@ -2074,10 +2086,12 @@ describe('AppClient tests', () => {
     it('should handle empty metadata correctly', async () => {
       await subject().updateRobotPartMetadata('robotPartId', {});
 
-      expect(capturedRequest).toEqual({
-        id: 'robotPartId',
-        data: {},
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateRobotPartMetadataRequestSchema, {
+          id: 'robotPartId',
+          data: {},
+        })
+      );
     });
 
     it('should successfully update metadata with valid data', async () => {
@@ -2085,10 +2099,12 @@ describe('AppClient tests', () => {
         key1: 'value1',
       });
 
-      expect(capturedRequest).toEqual({
-        id: 'robotPartId',
-        data: { key1: 'value1' },
-      });
+      expect(capturedRequest).toEqual(
+        create(pb.UpdateRobotPartMetadataRequestSchema, {
+          id: 'robotPartId',
+          data: { key1: 'value1' },
+        })
+      );
     });
   });
 
