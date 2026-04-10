@@ -1,11 +1,14 @@
 // Derived from https://raw.githubusercontent.com/connectrpc/examples-es/refs/heads/main/react-native
-import {Message, MethodKind} from '@bufbuild/protobuf';
+import {Message} from '@bufbuild/protobuf';
 
 import type {
-  AnyMessage,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
+  DescMessage,
+  DescMethod,
+  DescMethodStreaming,
+  DescMethodUnary,
+  DescService,
+  MessageInitShape,
+  MessageShape,
 } from '@bufbuild/protobuf';
 
 import type {
@@ -81,15 +84,14 @@ export function createXHRGrpcWebTransport(
   const useBinaryFormat = options.useBinaryFormat ?? true;
   return {
     async unary<
-      I extends Message<I> = AnyMessage,
-      O extends Message<O> = AnyMessage,
+      I extends DescMessage = DescMessage,
+      O extends DescMessage = DescMessage,
     >(
-      service: ServiceType,
-      method: MethodInfo<I, O>,
+      method: DescMethodUnary<I, O>,
       signal: AbortSignal | undefined,
       timeoutMs: number | undefined,
       header: Headers,
-      message: PartialMessage<I>,
+      message: MessageInitShape<I>,
       contextValues?: ContextValues,
     ): Promise<UnaryResponse<I, O>> {
       const {serialize, parse} = createClientMethodSerializers(
@@ -104,13 +106,10 @@ export function createXHRGrpcWebTransport(
         interceptors: options.interceptors,
         req: {
           stream: false,
-          service,
           method,
-          url: createMethodUrl(options.baseUrl, service, method),
-          init: {
-            method: 'POST',
-            mode: 'cors',
-          },
+          service: method.parent,
+          url: createMethodUrl(options.baseUrl, method),
+          requestMethod: 'POST',
           header: requestHeader(useBinaryFormat, timeoutMs, header, false),
           contextValues: contextValues ?? createContextValues(),
           message,
@@ -120,7 +119,7 @@ export function createXHRGrpcWebTransport(
             return new Promise((resolve, reject) => {
               const xhr = new XMLHttpRequest();
 
-              xhr.open(req.init.method ?? 'POST', req.url);
+              xhr.open(req.requestMethod ?? 'POST', req.url);
 
               function onAbort() {
                 xhr.abort();
@@ -164,7 +163,7 @@ export function createXHRGrpcWebTransport(
           const chunks = extractDataChunks(response.body);
 
           let trailer: Headers | undefined;
-          let message: O | undefined;
+          let message: MessageShape<O> | undefined;
 
           chunks.forEach(({flags, data}) => {
             if (flags === trailerFlag) {
@@ -201,25 +200,24 @@ export function createXHRGrpcWebTransport(
             header: response.headers,
             message,
             trailer,
-            service,
+            service: method.parent,
             method,
           } satisfies UnaryResponse<I, O>;
         },
       });
     },
     async stream<
-      I extends Message<I> = AnyMessage,
-      O extends Message<O> = AnyMessage,
+      I extends DescMessage = DescMessage,
+      O extends DescMessage = DescMessage,
     >(
-      service: ServiceType,
-      method: MethodInfo<I, O>,
+      method: DescMethodStreaming<I, O>,
       signal: AbortSignal | undefined,
       timeoutMs: number | undefined,
       header: Headers,
-      input: AsyncIterable<PartialMessage<I>>,
+      input: AsyncIterable<MessageInitShape<I>>,
       contextValues?: ContextValues,
     ): Promise<StreamResponse<I, O>> {
-      if (method.kind != MethodKind.ServerStreaming) {
+      if (method.methodKind != 'server_streaming') {
         throw 'client streaming not supported; use WebRTC';
       }
 
@@ -235,13 +233,10 @@ export function createXHRGrpcWebTransport(
         interceptors: options.interceptors,
         req: {
           stream: true as const,
-          service,
+          service: method.parent,
           method,
-          url: createMethodUrl(options.baseUrl, service, method),
-          init: {
-            method: 'POST',
-            mode: 'cors',
-          },
+          url: createMethodUrl(options.baseUrl, method),
+          requestMethod: 'POST',
           header: requestHeader(useBinaryFormat, timeoutMs, header, false),
           contextValues: contextValues ?? createContextValues(),
           message: input,
@@ -249,7 +244,7 @@ export function createXHRGrpcWebTransport(
         next: async (
           streamReq: StreamRequest<I, O>,
         ): Promise<StreamResponse<I, O>> => {
-          let respStream = createWritableIterable<O>();
+          let respStream = createWritableIterable<MessageShape<O>>();
           let trailers = new Headers();
           function fetchXHR(): Promise<FetchXHRResponse> {
             let index = 0;
@@ -321,14 +316,16 @@ export function createXHRGrpcWebTransport(
                 reject(new Error('Network Error'));
               });
 
-              xhr.open(streamReq.init.method ?? 'POST', streamReq.url);
+              xhr.open(streamReq.requestMethod ?? 'POST', streamReq.url);
 
               streamReq.header.forEach((value: string, key: string) => {
                 xhr.setRequestHeader(key, value);
               });
 
               // This is incomplete since client streaming is not supported
-              const sendMessages = async (messages: AsyncIterable<I>) => {
+              const sendMessages = async (
+                messages: AsyncIterable<MessageShape<I>>,
+              ) => {
                 let count = 0;
                 for await (const msg of streamReq.message) {
                   count += 1;

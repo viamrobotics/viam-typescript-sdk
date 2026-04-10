@@ -1,7 +1,10 @@
-import { create } from '@bufbuild/protobuf';
+import { create, type MessageInitShape } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 
-import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
+import {
+  GetGeometriesRequestSchema,
+  Vector3Schema,
+} from '../../gen/common/v1/common_pb';
 import {
   BaseService,
   GetPropertiesRequestSchema,
@@ -13,7 +16,7 @@ import {
   StopRequestSchema,
 } from '../../gen/component/base/v1/base_pb';
 import type { RobotClient } from '../../robot';
-import type { JsonObject, Options, Vector3 } from '../../types';
+import type { JsonObject, Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Base } from './base';
 
@@ -81,8 +84,8 @@ export class BaseClient implements Base {
   }
 
   async setPower(
-    linear: Vector3,
-    angular: Vector3,
+    linear: MessageInitShape<typeof Vector3Schema>,
+    angular: MessageInitShape<typeof Vector3Schema>,
     extra = {},
     callOptions = this.callOptions
   ) {
@@ -99,8 +102,8 @@ export class BaseClient implements Base {
   }
 
   async setVelocity(
-    linear: Vector3,
-    angular: Vector3,
+    linear: MessageInitShape<typeof Vector3Schema>,
+    angular: MessageInitShape<typeof Vector3Schema>,
     extra = {},
     callOptions = this.callOptions
   ) {

@@ -1,6 +1,8 @@
-import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+
+import type { Geometry, Vector3Schema } from '../../gen/common/v1/common_pb';
 import * as baseApi from '../../gen/component/base/v1/base_pb';
-import type { JsonObject, Resource, Vector3 } from '../../types';
+import type { JsonObject, Resource } from '../../types';
 
 export type BaseProperties = baseApi.GetPropertiesResponse;
 
@@ -115,8 +117,8 @@ export interface Base extends Resource {
    * @param angular - Desired angular power percentage from -1 to 1.
    */
   setPower(
-    linear: Vector3,
-    angular: Vector3,
+    linear: MessageInitShape<typeof Vector3Schema>,
+    angular: MessageInitShape<typeof Vector3Schema>,
     extra?: JsonObject
   ): Promise<void>;
 
@@ -142,8 +144,8 @@ export interface Base extends Resource {
    * @param angular - Desired angular velocity in degrees per second.
    */
   setVelocity(
-    linear: Vector3,
-    angular: Vector3,
+    linear: MessageInitShape<typeof Vector3Schema>,
+    angular: MessageInitShape<typeof Vector3Schema>,
     extra?: JsonObject
   ): Promise<void>;
 
