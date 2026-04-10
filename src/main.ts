@@ -98,7 +98,7 @@ export {
   type AudioCodecType,
   type AudioProperties,
 } from './audio-common';
-export { type Arm, ArmClient, ArmJointPositions } from './components/arm';
+export { type Arm, ArmClient, type ArmJointPositions } from './components/arm';
 export {
   type AudioChunk,
   type AudioIn,
@@ -114,7 +114,7 @@ export * as billingApi from './gen/app/v1/billing_pb';
  * @deprecated Use {@link ArmClient} instead.
  * @group Raw Protobufs
  */
-export { type Base, BaseClient, BaseProperties } from './components/base';
+export { type Base, BaseClient, type BaseProperties } from './components/base';
 export * as armApi from './gen/component/arm/v1/arm_pb';
 /**
  * Raw Protobuf interfaces for a Base component.
@@ -125,10 +125,10 @@ export * as armApi from './gen/component/arm/v1/arm_pb';
  * @group Raw Protobufs
  */
 export {
-  AnalogValue,
+  type AnalogValue,
   type Board,
   BoardClient,
-  PowerMode,
+  type PowerMode,
   type Tick,
 } from './components/board';
 export * as baseApi from './gen/component/base/v1/base_pb';
@@ -174,7 +174,7 @@ export {
   type Encoder,
   EncoderClient,
   EncoderPositionType,
-  EncoderProperties,
+  type EncoderProperties,
 } from './components/encoder';
 export * as discoveryApi from './gen/service/discovery/v1/discovery_pb';
 /**
@@ -214,10 +214,10 @@ export {
  */
 export {
   type MovementSensor,
-  MovementSensorAccuracy,
+  type MovementSensorAccuracy,
   MovementSensorClient,
-  MovementSensorPosition,
-  MovementSensorProperties,
+  type MovementSensorPosition,
+  type MovementSensorProperties,
 } from './components/movementsensor';
 export * as motorApi from './gen/component/motor/v1/motor_pb';
 /**

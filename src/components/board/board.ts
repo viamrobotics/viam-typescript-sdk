@@ -1,11 +1,8 @@
 import * as boardApi from '../../gen/component/board/v1/board_pb';
-import * as boardApiV1 from '../../genv1/component/board/v1/board_pb';
 import type { Duration, JsonObject, Resource } from '../../types';
 
 export type AnalogValue = boardApi.ReadAnalogReaderResponse;
 export type PowerMode = boardApi.PowerMode;
-
-export const { ReadAnalogReaderResponse: AnalogValue, PowerMode } = boardApiV1;
 
 export interface Tick {
   pinName: string;

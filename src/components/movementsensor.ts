@@ -1,6 +1,6 @@
 export { MovementSensorClient } from './movement-sensor/client';
-export {
-  type MovementSensor,
+export type {
+  MovementSensor,
   MovementSensorAccuracy,
   MovementSensorPosition,
   MovementSensorProperties,

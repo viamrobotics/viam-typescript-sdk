@@ -1,18 +1,11 @@
 import type { JsonObject } from '@bufbuild/protobuf';
 
 import * as sensorApi from '../../gen/component/movementsensor/v1/movementsensor_pb';
-import * as sensorApiV1 from '../../genv1/component/movementsensor/v1/movementsensor_pb';
 import type { Orientation, Resource, Vector3 } from '../../types';
 
 export type MovementSensorAccuracy = sensorApi.GetAccuracyResponse;
 export type MovementSensorPosition = sensorApi.GetPositionResponse;
 export type MovementSensorProperties = sensorApi.GetPropertiesResponse;
-
-export const {
-  GetAccuracyResponse: MovementSensorAccuracy,
-  GetPositionResponse: MovementSensorPosition,
-  GetPropertiesResponse: MovementSensorProperties,
-} = sensorApiV1;
 
 /**
  * Represents any sensor that reports information about the robot's direction,

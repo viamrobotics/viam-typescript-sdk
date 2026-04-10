@@ -1,12 +1,10 @@
 import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
-import * as encoderApiV1 from '../../genv1/component/encoder/v1/encoder_pb';
 import type { JsonObject, Resource } from '../../types';
 
 export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
 
 export const { PositionType: EncoderPositionType } = encoderApi;
-export const { GetPropertiesResponse: EncoderProperties } = encoderApiV1;
 
 /** Represents a physical encoder. */
 export interface Encoder extends Resource {
