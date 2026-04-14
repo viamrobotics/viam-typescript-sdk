@@ -122,7 +122,8 @@ export interface Robot {
   transformPose(
     source: PoseInFrame,
     destination: string,
-    supplementalTransforms: Transform[]
+    supplementalTransforms: Transform[],
+    signal?: AbortSignal
   ): Promise<PoseInFrame>;
 
   /**
