@@ -2,6 +2,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../client';
+import { MachineConnectionEvent } from '../../events';
 import * as rpcModule from '../../rpc';
 import { createMockRobotServiceTransport } from './mocks/robot-service';
 import {
@@ -581,6 +582,30 @@ describe('RobotClient', () => {
   });
 
   describe('retry logic on error', () => {
+    const setupReconnectingEventCapture = (client: RobotClient) => {
+      const events: unknown[] = [];
+      client.on(MachineConnectionEvent.RECONNECTING, (event) =>
+        events.push(event)
+      );
+      return events;
+    };
+
+    const setupReconnectionFailedEventCapture = (client: RobotClient) => {
+      const events: unknown[] = [];
+      client.on(MachineConnectionEvent.RECONNECTION_FAILED, (event) =>
+        events.push(event)
+      );
+      return events;
+    };
+
+    const setupConnectedEventCapture = (client: RobotClient) => {
+      const events: unknown[] = [];
+      client.on(MachineConnectionEvent.CONNECTED, (event) =>
+        events.push(event)
+      );
+      return events;
+    };
+
     describe('dial() - non-retryable errors', () => {
       it.each([
         { error: errors.createCanceledError(), description: 'Canceled' },
@@ -791,6 +816,10 @@ describe('RobotClient', () => {
         // Reset mock call count after initial connection
         dialWebRTCMock.mockClear();
 
+        const reconnectingEvents = setupReconnectingEventCapture(client);
+        const reconnectionFailedEvents =
+          setupReconnectionFailedEventCapture(client);
+
         // Act - trigger disconnect through data channel close event
         expect(closeHandler).toBeDefined();
         closeHandler!(new Event('close'));
@@ -801,6 +830,8 @@ describe('RobotClient', () => {
 
         // Assert
         expect(dialWebRTCMock).toHaveBeenCalledTimes(1);
+        expect(reconnectingEvents).toHaveLength(1);
+        expect(reconnectionFailedEvents).toHaveLength(1);
       });
 
       it('should retry non-retryable errors while shouldRetryOnError returns true', async () => {
@@ -963,6 +994,10 @@ describe('RobotClient', () => {
           // Reset mock call count after initial connection
           dialWebRTCMock.mockClear();
 
+          const reconnectingEvents = setupReconnectingEventCapture(client);
+          const reconnectionFailedEvents =
+            setupReconnectionFailedEventCapture(client);
+
           // Act
           expect(closeHandler).toBeDefined();
           closeHandler!(new Event('close'));
@@ -973,6 +1008,8 @@ describe('RobotClient', () => {
 
           // Assert
           expect(dialWebRTCMock).toHaveBeenCalledTimes(3);
+          expect(reconnectingEvents).toHaveLength(1);
+          expect(reconnectionFailedEvents).toHaveLength(1);
         }
       );
 
@@ -1023,6 +1060,11 @@ describe('RobotClient', () => {
         // Reset mock call count after initial connection
         dialWebRTCMock.mockClear();
 
+        const reconnectingEvents = setupReconnectingEventCapture(client);
+        const reconnectionFailedEvents =
+          setupReconnectionFailedEventCapture(client);
+        const connectedEvents = setupConnectedEventCapture(client);
+
         // Act
         expect(closeHandler).toBeDefined();
         closeHandler!(new Event('close'));
@@ -1033,6 +1075,9 @@ describe('RobotClient', () => {
 
         // Assert
         expect(dialWebRTCMock).toHaveBeenCalledTimes(4);
+        expect(reconnectingEvents).toHaveLength(1);
+        expect(connectedEvents).toHaveLength(1);
+        expect(reconnectionFailedEvents).toHaveLength(0);
       });
     });
 
