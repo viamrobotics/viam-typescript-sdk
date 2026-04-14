@@ -1,4 +1,5 @@
 import type { PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { CallOptions } from '@connectrpc/connect';
 import { MachineConnectionEvent } from '../events';
 import * as proto from '../gen/robot/v1/robot_pb';
 import type { PoseInFrame, ResourceName, Transform } from '../types';
@@ -123,7 +124,7 @@ export interface Robot {
     source: PoseInFrame,
     destination: string,
     supplementalTransforms: Transform[],
-    signal?: AbortSignal
+    callOptions?: CallOptions
   ): Promise<PoseInFrame>;
 
   /**
