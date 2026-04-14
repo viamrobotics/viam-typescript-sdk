@@ -37,6 +37,7 @@ import {
   Visibility,
   ListMachineSummariesRequest,
   LocationSummary,
+  GetRobotPartHistoryResponse,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -983,11 +984,32 @@ export class AppClient {
    * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotparthistory).
    *
    * @param id The ID of the requested robot part
-   * @returns The list of the robot part's history
+   * @param pageToken Optional string indicating which page of history to query.
+   *   Defaults to the most recent.
+   * @param pageLimit Optional number indicating the maximum number of history
+   *   entries to return per page.
+   * @param start Optional start time for history retrieval. Only entries created
+   *   after this time will be returned.
+   * @param end Optional end time for history retrieval. Only entries created
+   *   before this time will be returned.
+   * @returns An object containing the list of the robot part's history and a
+   *   token for the next page of results.
    */
-  async getRobotPartHistory(id: string): Promise<RobotPartHistoryEntry[]> {
-    const resp = await this.client.getRobotPartHistory({ id });
-    return resp.history;
+  async getRobotPartHistory(
+    id: string,
+    pageToken?: string,
+    pageLimit?: number,
+    start?: Date,
+    end?: Date
+  ): Promise<GetRobotPartHistoryResponse> {
+    const resp = await this.client.getRobotPartHistory({
+      id,
+      pageToken,
+      pageLimit: pageLimit ? BigInt(pageLimit) : undefined,
+      start: start ? Timestamp.fromDate(start) : undefined,
+      end: end ? Timestamp.fromDate(end) : undefined,
+    });
+    return resp;
   }
 
   /**

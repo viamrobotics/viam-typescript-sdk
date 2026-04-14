@@ -890,14 +890,18 @@ describe('AppClient tests', () => {
 
   describe('getRobotPartHistory tests', () => {
     const histories = [partHistory];
+    const expectedResponse = new pb.GetRobotPartHistoryResponse({
+      history: histories,
+      nextPageToken: 'nextPage',
+    });
+    let capReq: pb.GetRobotPartHistoryRequest;
 
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getRobotPartHistory: () => {
-            return new pb.GetRobotPartHistoryResponse({
-              history: histories,
-            });
+          getRobotPartHistory: (req) => {
+            capReq = req;
+            return expectedResponse;
           },
         });
       });
@@ -905,7 +909,30 @@ describe('AppClient tests', () => {
 
     it('getRobotPartHistory', async () => {
       const response = await subject().getRobotPartHistory('email');
-      expect(response).toEqual(histories);
+      expect(response).toEqual(expectedResponse);
+      expect(capReq).toStrictEqual(new pb.GetRobotPartHistoryRequest({ id: 'email' }));
+    });
+
+    it('getRobotPartHistory with all parameters', async () => {
+      const testStart = new Date();
+      const testEnd = new Date();
+      const response = await subject().getRobotPartHistory(
+        'email',
+        'token123',
+        10,
+        testStart,
+        testEnd
+      );
+      expect(response).toEqual(expectedResponse);
+      expect(capReq).toStrictEqual(
+        new pb.GetRobotPartHistoryRequest({
+          id: 'email',
+          pageToken: 'token123',
+          pageLimit: BigInt(10),
+          start: Timestamp.fromDate(testStart),
+          end: Timestamp.fromDate(testEnd),
+        })
+      );
     });
   });
 
