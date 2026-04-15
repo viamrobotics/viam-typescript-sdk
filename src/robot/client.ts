@@ -1268,7 +1268,10 @@ export class RobotClient extends EventDispatcher implements Robot {
       destination,
       supplementalTransforms,
     });
-    const response = await this.robotService.transformPose(request, callOptions);
+    const response = await this.robotService.transformPose(
+      request,
+      callOptions
+    );
     const result = response.pose;
     if (!result) {
       // eslint-disable-next-line no-warning-comments
