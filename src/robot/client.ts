@@ -3,6 +3,7 @@ import {
   Code,
   ConnectError,
   createClient,
+  type CallOptions,
   type Client,
   type Transport,
 } from '@connectrpc/connect';
@@ -1267,14 +1268,18 @@ export class RobotClient extends EventDispatcher implements Robot {
   async transformPose(
     source: PoseInFrame,
     destination: string,
-    supplementalTransforms: Transform[]
+    supplementalTransforms: Transform[],
+    callOptions?: CallOptions
   ) {
     const request = new TransformPoseRequest({
       source,
       destination,
       supplementalTransforms,
     });
-    const response = await this.robotService.transformPose(request);
+    const response = await this.robotService.transformPose(
+      request,
+      callOptions
+    );
     const result = response.pose;
     if (!result) {
       // eslint-disable-next-line no-warning-comments
