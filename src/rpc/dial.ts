@@ -24,7 +24,12 @@ import {
   Credentials as PBCredentials,
 } from '../gen/proto/rpc/v1/auth_pb';
 import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
-import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+import {
+  ICECandidateType,
+  ReportConnectionMetadataRequest,
+  SDKType,
+  WebRTCConfig,
+} from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import { newPeerConnectionForClient } from './peer';
 
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -468,6 +473,70 @@ const getOptionalWebRTCConfig = async (
   }
 };
 
+// selectedICECandidateType inspects a WebRTC stats report to determine which
+// ICE candidate type was selected for the connection.
+const selectedICECandidateType = async (
+  pc: RTCPeerConnection
+): Promise<ICECandidateType> => {
+  const stats = await pc.getStats();
+
+  let remoteCandidateId = '';
+  stats.forEach((stat) => {
+    if (stat.type === 'candidate-pair') {
+      const pair = stat as RTCIceCandidatePairStats;
+      if (pair.nominated) {
+        remoteCandidateId = pair.remoteCandidateId;
+      }
+    }
+  });
+
+  if (!remoteCandidateId) {
+    return ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED;
+  }
+
+  const remote = stats.get(remoteCandidateId) as any;
+  const candidateType = remote?.candidateType ?? '';
+  const url = remote?.url ?? '';
+
+  switch (candidateType) {
+    case 'host':
+      return ICECandidateType.ICE_CANDIDATE_TYPE_HOST;
+    case 'srflx':
+    case 'prflx':
+      return ICECandidateType.ICE_CANDIDATE_TYPE_STUN;
+    case 'relay':
+      if (!url) return ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED;
+      if (url.includes('viam.com')) {
+        return ICECandidateType.ICE_CANDIDATE_TYPE_COTURN_RELAY;
+      }
+      return ICECandidateType.ICE_CANDIDATE_TYPE_TWILIO_RELAY;
+    default:
+      return ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED;
+  }
+};
+
+// reportConnectionMetadata reports WebRTC connection metadata to the signaling
+// server as a best-effort fire-and-forget operation.
+const reportConnectionMetadata = (
+  signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
+  callOpts: CallOptions,
+  pc: RTCPeerConnection
+): void => {
+  selectedICECandidateType(pc)
+    .then(async (candidateType) => {
+      await signalingClient.reportConnectionMetadata(
+        new ReportConnectionMetadataRequest({
+          candidateType,
+          sdkType: SDKType.SDK_TYPE_TYPESCRIPT,
+        }),
+        { ...callOpts, timeoutMs: 5000 }
+      );
+    })
+    .catch(() => {
+      // best-effort, ignore errors
+    });
+};
+
 /**
  * DialWebRTC makes a connection to given host by signaling with the address
  * provided. A Promise is returned upon successful connection that contains a
@@ -552,6 +621,8 @@ export const dialWebRTC = async (
 
   try {
     const cc = await exchange.doExchange();
+
+    reportConnectionMetadata(signalingClient, callOpts, pc);
 
     if (
       dialOpts?.externalAuthAddress !== undefined &&
