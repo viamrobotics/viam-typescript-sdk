@@ -89,5 +89,10 @@
     "vite": "^5.0.10",
     "vitest": "^1.1.0",
     "yaml": "^2.3.3"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree@6.21.0": {
+      "minimatch": "9.0.9"
+    }
   }
 }
