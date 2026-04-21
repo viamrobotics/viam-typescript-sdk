@@ -56,7 +56,7 @@ update-buf: $(node_modules)
 build-buf: $(node_modules) clean-buf
 	$(buf) generate buf.build/googleapis/googleapis
 	$(buf) generate buf.build/opentelemetry/opentelemetry
-	$(buf) generate buf.build/viamrobotics/api:$$(cat api_version.lock) --path common,component,robot,service,app,provisioning,tagger,stream
+	$(buf) generate "https://github.com/viamrobotics/api.git#branch=gmulitz-oauth-create-user,subdir=proto/viam" --path common,component,robot,service,app,provisioning,tagger,stream
 	$(buf) generate buf.build/viamrobotics/goutils
 	$(buf) generate buf.build/grpc/grpc --path grpc/reflection/v1/reflection.proto
 

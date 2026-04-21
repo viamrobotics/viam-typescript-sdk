@@ -10,6 +10,7 @@ import {
   CreateKeyFromExistingKeyAuthorizationsResponse,
   CreateKeyResponse,
   CreateModuleResponse,
+  CreateOAuthAppUserResponse,
   Fragment,
   FragmentImportList,
   FragmentVisibility,
@@ -2291,5 +2292,48 @@ export class AppClient {
     });
     const resp = await this.client.listMachineSummaries(req);
     return resp.locationSummaries;
+  }
+
+  /**
+   * Creates a new user associated with an OAuth application. Used to
+   * provision end-user accounts for apps authenticating through Viam's
+   * OAuth service.
+   *
+   * @example
+   *
+   * ```ts
+   * const resp = await appClient.createOAuthAppUser(
+   *   '<YOUR-APPLICATION-ID>',
+   *   'user@example.com',
+   *   'Jane',
+   *   'Doe',
+   *   '<PASSWORD>'
+   * );
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#createoauthappuser).
+   *
+   * @param applicationId The ID of the OAuth application the user belongs to
+   * @param email The email address of the new user
+   * @param firstName The first name of the new user
+   * @param lastName The last name of the new user
+   * @param password The password to set for the new user
+   * @returns The auth token, registration ID, and user ID for the new user
+   */
+  async createOAuthAppUser(
+    applicationId: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string
+  ): Promise<CreateOAuthAppUserResponse> {
+    return this.client.createOAuthAppUser({
+      applicationId,
+      email,
+      firstName,
+      lastName,
+      password,
+    });
   }
 }
