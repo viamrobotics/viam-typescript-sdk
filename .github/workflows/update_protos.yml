@@ -4,10 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       api_version:
-        description: 'The version number of the API in buf.build'
+        description: 'The version number of the API in buf.build, including the `v`'
         type: string
         required: true
-
   repository_dispatch:
     types:
       - protos-updated
@@ -24,7 +23,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.REPO_READ_TOKEN }}
 
