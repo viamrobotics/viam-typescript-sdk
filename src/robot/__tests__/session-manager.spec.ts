@@ -16,7 +16,7 @@ import SessionManager from '../session-manager';
 vi.mock('../gen/robot/v1/robot_pb_service');
 
 const mockGetHeartBeatWindow = create(DurationSchema, {
-  seconds: BigInt(1),
+  seconds: 1n,
   nanos: 1,
 });
 

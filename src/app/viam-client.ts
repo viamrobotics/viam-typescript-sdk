@@ -74,10 +74,7 @@ export class ViamClient {
     return undefined;
   }
 
-  public async connectToMachine({
-    host = undefined,
-    id = undefined,
-  }: ViamClientMachineConnectionOpts) {
+  public async connectToMachine({ host, id }: ViamClientMachineConnectionOpts) {
     if (host === undefined && id === undefined) {
       throw new Error('Either a machine address or ID must be provided');
     }

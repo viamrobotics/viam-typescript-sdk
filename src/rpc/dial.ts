@@ -307,8 +307,6 @@ const makeAuthenticatedTransport = async (
     const extAuthHeaders = new Headers();
     extAuthHeaders.set('authorization', `Bearer ${accessToken}`);
 
-    accessToken = '';
-
     const request = create(AuthenticateToRequestSchema, {
       entity: opts.externalAuthToEntity,
     });
@@ -556,7 +554,6 @@ export const dialWebRTC = async (
   } finally {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
-      timeoutId = undefined;
     }
 
     if (!successful) {

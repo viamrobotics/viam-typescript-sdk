@@ -708,8 +708,8 @@ export class DataClient {
    * );
    * ```
    *
-   * @param {string | BinaryID} binaryId The ID of the image that the target
-   *   bounding box is attached to
+   * @param {string} binaryId The ID of the image that the target bounding box
+   *   is attached to
    * @param {string} bboxId The ID of the bounding box
    * @param {string} [label] A label for the bounding box
    * @param {number} [xMinNormalized] The min X value of the bounding box
@@ -1630,7 +1630,6 @@ export class ListDataPipelineRunsPage {
 }
 
 export {
-  type BinaryID,
   type IndexableCollection,
   type Order,
 } from '../gen/app/data/v1/data_pb';

@@ -156,7 +156,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
   const response = await getKinematicsMethod(request, callOptions);
 
-  const decoder = new TextDecoder('utf8');
+  const decoder = new TextDecoder('utf-8');
   const jsonString = decoder.decode(response.kinematicsData);
   const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
 

@@ -15,7 +15,6 @@ import {
   GetInvoicesSummaryResponseSchema,
   GetOrgBillingInformationResponseSchema,
   PaymentMethodType,
-  ResourceUsageCostsBySourceSchema,
   SourceType,
   UsageCostType,
 } from '../gen/app/v1/billing_pb';

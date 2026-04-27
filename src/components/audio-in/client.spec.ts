@@ -68,11 +68,7 @@ describe('AudioInClient tests', () => {
       const audioChunks: AudioChunk[] = [];
 
       const streamProm = (async () => {
-        for await (const chunk of audioin.getAudio(
-          AudioCodec.PCM16,
-          1.1,
-          BigInt(0)
-        )) {
+        for await (const chunk of audioin.getAudio(AudioCodec.PCM16, 1.1, 0n)) {
           audioChunks.push(chunk);
         }
       })();
@@ -85,8 +81,8 @@ describe('AudioInClient tests', () => {
             sampleRateHz: 48_000,
             numChannels: 2,
           },
-          startTimestampNanoseconds: BigInt(1000),
-          endTimestampNanoseconds: BigInt(2000),
+          startTimestampNanoseconds: 1000n,
+          endTimestampNanoseconds: 2000n,
           sequence: 1,
         },
         requestId: 'test-request-1',
@@ -100,8 +96,8 @@ describe('AudioInClient tests', () => {
             sampleRateHz: 48_000,
             numChannels: 2,
           },
-          startTimestampNanoseconds: BigInt(2000),
-          endTimestampNanoseconds: BigInt(3000),
+          startTimestampNanoseconds: 2000n,
+          endTimestampNanoseconds: 3000n,
           sequence: 2,
         },
         requestId: 'test-request-1',

@@ -79,13 +79,13 @@ describe('BoardClient tests', () => {
       await testTickStream.write({
         pinName: '1',
         high: true,
-        time: BigInt(1000),
+        time: 1000n,
       });
 
       await testTickStream.write({
         pinName: '2',
         high: false,
-        time: BigInt(2000),
+        time: 2000n,
       });
 
       testTickStream.close();

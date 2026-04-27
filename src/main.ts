@@ -20,7 +20,6 @@ export {
  */
 export {
   type BinaryDataCaptureUploadOptions,
-  type BinaryID,
   type DataClient,
   type FilterOptions,
   type IndexableCollection,
