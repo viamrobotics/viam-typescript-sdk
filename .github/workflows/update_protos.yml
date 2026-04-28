@@ -4,10 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       api_version:
-        description: 'The version number of the API in buf.build'
+        description: 'The version number of the API in buf.build, including the `v`'
         type: string
         required: true
-
   repository_dispatch:
     types:
       - protos-updated
@@ -16,43 +15,323 @@ jobs:
   update-protos:
     if: github.repository_owner == 'viamrobotics'
     runs-on: ubuntu-latest
+    env:
+      API_VERSION: ${{ inputs.api_version || github.event.client_payload.tag }}
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.REPO_READ_TOKEN }}
 
-      - name: Update API
-        if: ${{ !inputs.api_version }} # called from outside
-        run: |
-          echo ${{ github.event.client_payload.tag }} > api_version.lock
-
-      - name: Update API
-        if: ${{ inputs.api_version }} # called manually
-        run: |
-          echo ${{ inputs.api_version }} > api_version.lock
-
-      - name: Add + Commit + Open PR
-        uses: peter-evans/create-pull-request@v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          commit-message: '[WORKFLOW] Updating protos from ${{ github.event.client_payload.repo_name }}, commit: ${{ github.event.client_payload.sha }}'
-          branch: 'workflow/update-protos'
-          delete-branch: true
-          base: main
-          title: Automated Protos Update
-          body: This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes
-          team-reviewers: sdk-netcode
-          token: ${{ secrets.GIT_ACCESS_TOKEN }}
+          node-version-file: '.node-version'
+          cache: 'npm'
+
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --audit=false
+
+      - name: prune origin
+        run: git remote prune origin
+
+      - name: Create branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b workflow/update-protos
+
+      - name: Generate old protos for comparison
+        run: |
+          make build-buf
+          cp -r src/gen /tmp/gen_old
+
+      - name: Update API version
+        run: echo ${{ env.API_VERSION }} > api_version.lock
+
+      - name: Generate new protos
+        run: make build-buf
+
+      - name: Commit API version update
+        run: |
+          git add api_version.lock
+          git diff --cached --quiet || git commit -m "[WORKFLOW] Update API version to ${{ env.API_VERSION }}"
+
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Update TypeScript Wrappers with OpenCode CLI
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          cat > /tmp/opencode_prompt.txt << 'PROMPT_EOF'
+            The protobuf definitions have been updated and compiled into TypeScript files in `src/gen/`.
+
+            ## IMPORTANT: Use diff to identify changes
+
+            Run `diff -rq /tmp/gen_old/ src/gen/` to see which files changed, then use
+            `diff /tmp/gen_old/<path> src/gen/<path>` on individual files to see the specific changes.
+            DO NOT read through every generated file. ONLY look at the diffs to understand what needs to be updated.
+
+            Based on the diffs, update the corresponding TypeScript wrapper functions to reflect ONLY the changes shown.
+
+            ## Context
+            This repository wraps protobuf messages and ConnectRPC calls into native TypeScript for ergonomic usage.
+            Generated protobuf files live in `src/gen/` and are NEVER committed to the repository (they are gitignored).
+            The hand-written wrappers live in `src/components/`, `src/services/`, `src/app/`, and `src/robot/`.
+
+            ## Wrapper Architecture
+
+            ### Components and Services
+            For each component/service, there are typically four files:
+            1. **Interface definition** (`src/components/<name>/<name>.ts` or `src/services/<name>/<name>.ts`)
+               - Defines the TypeScript API contract with method signatures and JSDoc
+               - Extends the `Resource` interface from `src/types.ts`
+            2. **Client wrapper** (`src/components/<name>/client.ts` or `src/services/<name>/client.ts`)
+               - Implements the interface by wrapping ConnectRPC client calls
+               - Constructor takes `(client: RobotClient, name: string, options: Options = {})`
+               - Uses the generated service from `src/gen/.../..._connect.ts`
+            3. **Barrel re-export** (`src/components/<name>.ts` or `src/services/<name>.ts`)
+               - Re-exports the interface type and client class
+            4. **Test file** (`src/components/<name>/client.spec.ts` or `src/services/<name>/client.spec.ts`)
+               - Tests the client using vitest and `createRouterTransport` from `@connectrpc/connect`
+
+            ### Types File (services only, when needed)
+            Some services also have a `types.ts` file that exports protobuf message types as
+            `PlainMessage<T>` aliases for consumer convenience.
+
+            ### App API Clients
+            The `src/app/` directory contains clients for the application API:
+            - **Client files** (`src/app/<name>-client.ts` or similar)
+              - Wrap ConnectRPC calls to app services (from `src/gen/app/`)
+              - Take a `RobotClient` or transport in the constructor
+
+            ## Your Task
+
+            1. **First, check what changed**: Run `diff -rq /tmp/gen_old/ src/gen/` to get the list of changed files
+            2. **Inspect specific diffs**: Run `diff /tmp/gen_old/<path> src/gen/<path>` for each changed file
+            3. **Identify affected wrappers**: Based on the diffs, determine which wrapper files need updates
+            4. **Apply changes**: For ONLY the proto changes shown in the diffs:
+
+            ### For Components and Services (`src/components/` and `src/services/`)
+            - **New RPC methods** in the diff → Add method to interface + client + tests
+            - **Modified RPC methods** in the diff → Update method signatures, parameters, and tests
+            - **Removed RPC methods** in the diff → Remove from interface, client, and tests
+
+            ### For App API Clients (`src/app/`)
+            - **New RPC methods** in the diff → Add method to client + tests
+            - **Modified RPC methods** in the diff → Update method signatures and tests
+            - **Removed RPC methods** in the diff → Remove method and tests
+
+            ### For `src/main.ts`
+            - Add exports for any new types/classes introduced
+            - Remove exports for any deleted types/classes
+            - Keep exports in alphabetical order within each section
+
+            ## Wrapper Patterns to Follow
+
+            ### Interface definition pattern (`<name>.ts`):
+            ```typescript
+            import type { Resource } from '../../types';
+
+            export interface Motor extends Resource {
+              /**
+               * Brief description of what this method does.
+               * @param param1 - Description
+               * @example
+               * ```ts
+               * await motor.methodName(param1);
+               * ```
+               */
+              methodName(param1: Type1, extra?: Record<string, unknown>): Promise<ReturnType>;
+            }
+            ```
+
+            ### Client implementation pattern (`client.ts`):
+            ```typescript
+            import { Struct } from '@bufbuild/protobuf';
+            import { MotorService } from '../../gen/component/motor/v1/motor_connect';
+            import { MethodRequest } from '../../gen/component/motor/v1/motor_pb';
+            import type { RobotClient } from '../../robot';
+            import type { Options } from '../../types';
+            import type { Motor } from './motor';
+
+            export class MotorClient implements Motor {
+              private readonly client: Client<typeof MotorService>;
+              readonly name: string;
+
+              constructor(
+                client: RobotClient,
+                name: string,
+                private readonly options: Options = {}
+              ) {
+                this.name = name;
+                this.client = client.createServiceClient(MotorService);
+              }
+
+              private get callOptions() {
+                return { headers: this.options.requestLogger ? { 'x-debug': '1' } : {} };
+              }
+
+              async methodName(param1: Type1, extra = {}, callOptions = this.callOptions): Promise<ReturnType> {
+                const request = new MethodRequest({
+                  name: this.name,
+                  param1,
+                  extra: Struct.fromJson(extra),
+                });
+                this.options.requestLogger?.(request);
+                const resp = await this.client.methodName(request, callOptions);
+                return resp.resultField;
+              }
+            }
+            ```
+
+            ### Barrel re-export pattern (`<name>.ts` in parent directory):
+            ```typescript
+            export { MotorClient } from './motor/client';
+            export type { Motor } from './motor/motor';
+            ```
+
+            ### Test pattern (`client.spec.ts`):
+            ```typescript
+            // @vitest-environment happy-dom
+            import { createClient, createRouterTransport } from '@connectrpc/connect';
+            import { beforeEach, describe, expect, it, vi } from 'vitest';
+            import { MotorService } from '../../gen/component/motor/v1/motor_connect';
+            import { GetPositionResponse, SetPowerResponse } from '../../gen/component/motor/v1/motor_pb';
+            import { RobotClient } from '../../robot';
+            import { MotorClient } from './client';
+            vi.mock('../../robot');
+
+            describe('MotorClient', () => {
+              let motor: MotorClient;
+
+              beforeEach(() => {
+                const mockTransport = createRouterTransport(({ service }) => {
+                  service(MotorService, {
+                    setPower: async () => new SetPowerResponse({}),
+                    getPosition: async () => new GetPositionResponse({ position: 1.0 }),
+                  });
+                });
+
+                RobotClient.prototype.createServiceClient = vi.fn().mockImplementation(
+                  () => createClient(MotorService, mockTransport)
+                );
+
+                motor = new MotorClient(new RobotClient('host'), 'test-motor');
+              });
+
+              it('sets power correctly', async () => {
+                await expect(motor.setPower(0.5)).resolves.not.toThrow();
+              });
+
+              it('gets position', async () => {
+                await expect(motor.getPosition()).resolves.toStrictEqual(1.0);
+              });
+            });
+            ```
+
+            ### For streaming methods:
+            ```typescript
+            async *streamingMethod(
+              param1: Type1,
+              extra = {},
+              callOptions = this.callOptions
+            ): AsyncIterable<ReturnType> {
+              const request = new StreamingRequest({
+                name: this.name,
+                param1,
+                extra: Struct.fromJson(extra),
+              });
+              this.options.requestLogger?.(request);
+              const stream = this.client.streamingMethod(request, callOptions);
+              for await (const resp of stream) {
+                if (!resp.data) continue;
+                yield transformResponse(resp.data);
+              }
+            }
+            ```
+
+            ## Key Guidelines
+
+            - Use camelCase for TypeScript method names (matching the ConnectRPC generated stub, which converts PascalCase RPC names)
+            - Method signature: required params first, then optional `extra = {}`, then optional `callOptions = this.callOptions`
+            - Use `Struct.fromJson(extra)` for extra fields going to protobuf (import from `@bufbuild/protobuf`)
+            - Access response fields directly (ConnectRPC returns plain objects, not proto methods)
+            - Import new Request/Response types at the top of the file from the generated `*_pb` file
+            - Import the service definition from the generated `*_connect` file
+            - For methods that return void, don't return anything from the client wrapper
+            - For methods that return values, extract and return the appropriate field from the response
+            - Tests use `createRouterTransport` for mocking, not real gRPC connections
+            - Tests mock `RobotClient.prototype.createServiceClient` with `vi.fn()`
+            - Add the `// @vitest-environment happy-dom` comment at the top of new test files
+
+            ## Output Requirements
+            - Do NOT modify any files in `src/gen/` — those are auto-generated and gitignored.
+            - Do NOT create new component or service directories for protos that already have wrappers.
+            - Make focused, surgical changes — only modify what's necessary based on the proto diffs.
+            - Ensure all imports are updated to include new Request/Response types.
+            - Follow the established patterns in the repository.
+            - Update `src/main.ts` if new public types or clients are added.
+
+            ## Verification
+            After making changes, verify that:
+            - All new RPC methods from the diff have corresponding TypeScript wrappers
+            - All updated RPC methods from the diff reflect the new message structure
+            - All removed RPC methods from the diff are deleted from wrappers
+            - Tests are added/updated/removed for all wrapper changes
+            - `src/main.ts` exports are up to date
+          PROMPT_EOF
+
+          opencode run --model anthropic/claude-sonnet-4-6 --agent build "$(cat /tmp/opencode_prompt.txt)"
+
+      - name: Commit TypeScript wrapper updates
+        run: |
+          git add src/components/ src/services/ src/app/ src/robot/ src/main.ts
+          git diff --cached --quiet || git commit -m "[WORKFLOW] Update TypeScript wrappers from ${{ github.event.client_payload.repo_name }}, commit: ${{ github.event.client_payload.sha }}"
+
+      - name: Format
+        run: make format
+
+      - name: Commit formatting changes
+        run: |
+          git add -A
+          git diff --cached --quiet || git commit -m "[WORKFLOW] Apply formatting"
+
+      - name: Push branch and open PR
+        env:
+          GH_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+        run: |
+          git push --force origin workflow/update-protos
+          gh pr create \
+            --base main \
+            --head workflow/update-protos \
+            --title "Automated Protos Update" \
+            --body "This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes" \
+            --reviewer njooma \
+            || gh pr edit workflow/update-protos \
+              --title "Automated Protos Update" \
+              --body "This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes"
 
       - name: Notify slack of failure
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v3
         if: ${{ failure() }}
         with:
+          webhook: ${{ secrets.SLACK_TEAM_SDK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "text": "Typescript SDK update protos job has failed",
               "username": "Typescript SDK",
               "icon_url": "https://media.tenor.com/bZMubztJxGkAAAAe/charlie-brown-walking-charlie-brown.png"
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_TEAM_SDK_WEBHOOK_URL }}
