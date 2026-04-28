@@ -65,6 +65,8 @@ const testInvoiceSummary = new GetInvoicesSummaryResponse({
       id: 'id',
       invoiceAmount: 1,
       status: 'status',
+      lastPaymentFailureReason: '',
+      lastPaymentFailureAt: undefined,
     },
   ],
 });
