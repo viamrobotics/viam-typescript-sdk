@@ -2112,4 +2112,47 @@ describe('AppClient tests', () => {
       expect(response.fragmentIds).toEqual(['frag1', 'frag2']);
     });
   });
+
+  describe('createOAuthAppUser tests', () => {
+    let capturedRequest: pb.CreateOAuthAppUserRequest | undefined;
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          createOAuthAppUser: (req: pb.CreateOAuthAppUserRequest) => {
+            capturedRequest = req;
+            return new pb.CreateOAuthAppUserResponse({
+              authToken: 'auth-token',
+              registrationId: 'reg-id',
+              userId: 'user-id',
+              refreshToken: 'refresh-token',
+            });
+          },
+        });
+      });
+    });
+
+    it('createOAuthAppUser', async () => {
+      const response = await subject().createOAuthAppUser(
+        'orgId',
+        'appId',
+        'user@example.com',
+        'First',
+        'Last',
+        'password123'
+      );
+
+      expect(response.authToken).toEqual('auth-token');
+      expect(response.registrationId).toEqual('reg-id');
+      expect(response.userId).toEqual('user-id');
+      expect(response.refreshToken).toEqual('refresh-token');
+
+      expect(capturedRequest?.orgId).toEqual('orgId');
+      expect(capturedRequest?.applicationId).toEqual('appId');
+      expect(capturedRequest?.email).toEqual('user@example.com');
+      expect(capturedRequest?.firstName).toEqual('First');
+      expect(capturedRequest?.lastName).toEqual('Last');
+      expect(capturedRequest?.password).toEqual('password123');
+    });
+  });
 });

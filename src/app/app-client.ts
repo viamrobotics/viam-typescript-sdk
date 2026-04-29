@@ -10,6 +10,7 @@ import {
   CreateKeyFromExistingKeyAuthorizationsResponse,
   CreateKeyResponse,
   CreateModuleResponse,
+  CreateOAuthAppUserResponse,
   Fragment,
   FragmentImportList,
   FragmentVisibility,
@@ -2291,5 +2292,47 @@ export class AppClient {
     });
     const resp = await this.client.listMachineSummaries(req);
     return resp.locationSummaries;
+  }
+
+  /**
+   * Creates a new OAuth app user.
+   *
+   * @example
+   *
+   * ```ts
+   * const result = await appClient.createOAuthAppUser(
+   *   '<YOUR-ORGANIZATION-ID>',
+   *   '<YOUR-APPLICATION-ID>',
+   *   'user@example.com',
+   *   'First',
+   *   'Last',
+   *   'password'
+   * );
+   * ```
+   *
+   * @param orgId The ID of the organization
+   * @param applicationId The ID of the OAuth application
+   * @param email The email address for the new user
+   * @param firstName The first name of the new user
+   * @param lastName The last name of the new user
+   * @param password The password for the new user
+   * @returns The auth token, registration ID, user ID, and refresh token
+   */
+  async createOAuthAppUser(
+    orgId: string,
+    applicationId: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string
+  ): Promise<CreateOAuthAppUserResponse> {
+    return this.client.createOAuthAppUser({
+      orgId,
+      applicationId,
+      email,
+      firstName,
+      lastName,
+      password,
+    });
   }
 }
