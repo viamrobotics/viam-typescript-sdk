@@ -109,4 +109,41 @@ export interface Gripper extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#isholdingsomething).
    */
   isHoldingSomething: (extra?: Struct) => Promise<boolean>;
+
+  /**
+   * Get the current input values of the gripper.
+   *
+   * @example
+   *
+   * ```ts
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   *
+   * // Get the current input values
+   * const inputs = await gripper.getCurrentInputs();
+   * console.log('Current inputs:', inputs);
+   * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#getcurrentinputs).
+   */
+  getCurrentInputs: (extra?: Struct) => Promise<number[]>;
+
+  /**
+   * Move the gripper to the given input values.
+   *
+   * @example
+   *
+   * ```ts
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   *
+   * // Move the gripper to specified input values
+   * await gripper.goToInputs([0.5]);
+   * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#gotoinputs).
+   *
+   * @param values - The input values to move the gripper to
+   */
+  goToInputs: (values: number[], extra?: Struct) => Promise<void>;
 }

@@ -2,6 +2,8 @@ import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
 import {
+  GetCurrentInputsRequest,
+  GoToInputsRequest,
   GrabRequest,
   IsHoldingSomethingRequest,
   IsMovingRequest,
@@ -95,6 +97,34 @@ export class GripperClient implements Gripper {
 
     const resp = await this.client.isHoldingSomething(request, callOptions);
     return resp.isHoldingSomething;
+  }
+
+  async getCurrentInputs(extra = {}, callOptions = this.callOptions) {
+    const request = new GetCurrentInputsRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getCurrentInputs(request, callOptions);
+    return resp.values;
+  }
+
+  async goToInputs(
+    values: number[],
+    extra = {},
+    callOptions = this.callOptions
+  ) {
+    const request = new GoToInputsRequest({
+      name: this.name,
+      values,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    await this.client.goToInputs(request, callOptions);
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
