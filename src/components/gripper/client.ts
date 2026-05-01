@@ -111,7 +111,11 @@ export class GripperClient implements Gripper {
     return resp.values;
   }
 
-  async goToInputs(values: number[], extra = {}, callOptions = this.callOptions) {
+  async goToInputs(
+    values: number[],
+    extra = {},
+    callOptions = this.callOptions
+  ) {
     const request = new GoToInputsRequest({
       name: this.name,
       values,

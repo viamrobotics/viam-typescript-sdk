@@ -131,7 +131,6 @@ export interface Gripper extends Resource {
   /**
    * Move the gripper to the given input values.
    *
-   * @param values - The input values to move the gripper to
    * @example
    *
    * ```ts
@@ -143,6 +142,8 @@ export interface Gripper extends Resource {
    *
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#gotoinputs).
+   *
+   * @param values - The input values to move the gripper to
    */
   goToInputs: (values: number[], extra?: Struct) => Promise<void>;
 }
