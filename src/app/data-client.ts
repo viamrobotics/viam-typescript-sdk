@@ -1894,7 +1894,13 @@ export class DataClient {
    * ```ts
    * const sequenceId = await dataClient.createSequence(
    *   '123abc45-1234-5678-90ab-cdef12345678',
-   *   [{ partId: 'part-id', resourceName: 'my-sensor', methodName: 'Readings' }],
+   *   [
+   *     {
+   *       partId: 'part-id',
+   *       resourceName: 'my-sensor',
+   *       methodName: 'Readings',
+   *     },
+   *   ],
    *   ['tag1', 'tag2'],
    *   new Date('2025-01-01'),
    *   new Date('2025-12-31')
@@ -1953,7 +1959,13 @@ export class DataClient {
    * ```ts
    * await dataClient.updateSequence(
    *   'sequence-id',
-   *   [{ partId: 'part-id', resourceName: 'my-sensor', methodName: 'Readings' }],
+   *   [
+   *     {
+   *       partId: 'part-id',
+   *       resourceName: 'my-sensor',
+   *       methodName: 'Readings',
+   *     },
+   *   ],
    *   ['tag1'],
    *   new Date('2025-01-01'),
    *   new Date('2025-12-31'),

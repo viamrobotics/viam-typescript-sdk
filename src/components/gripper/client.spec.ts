@@ -20,7 +20,7 @@ vi.mock('../../robot');
 let gripper: GripperClient;
 const testIsMoving = true;
 const testIsHoldingSomething = true;
-const testCurrentInputs = [0.5, 1.0];
+const testCurrentInputs = [0.5, 1];
 
 describe('GripperClient tests', () => {
   beforeEach(() => {
@@ -92,6 +92,6 @@ describe('GripperClient tests', () => {
   });
 
   it('goToInputs', async () => {
-    await expect(gripper.goToInputs([0.5, 1.0])).resolves.toBeUndefined();
+    await expect(gripper.goToInputs([0.5, 1])).resolves.toBeUndefined();
   });
 });
