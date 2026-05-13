@@ -27,12 +27,16 @@ import {
   CreateBinaryDataSignedURLResponse,
   CreateIndexRequest,
   CreateIndexResponse,
+  CreateSequenceRequest,
+  CreateSequenceResponse,
   DataRequest,
   DeleteBinaryDataByFilterRequest,
   DeleteBinaryDataByFilterResponse,
   DeleteBinaryDataByIDsResponse,
   DeleteIndexRequest,
   DeleteIndexResponse,
+  DeleteSequenceRequest,
+  DeleteSequenceResponse,
   DeleteTabularDataRequest,
   DeleteTabularDataResponse,
   ExportTabularDataRequest,
@@ -42,11 +46,15 @@ import {
   GetDatabaseConnectionResponse,
   GetLatestTabularDataRequest,
   GetLatestTabularDataResponse,
+  GetSequenceRequest,
+  GetSequenceResponse,
   Index,
   IndexableCollection,
   IndexCreator,
   ListIndexesRequest,
   ListIndexesResponse,
+  ListSequencesRequest,
+  ListSequencesResponse,
   RemoveBinaryDataFromDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsResponse,
   RemoveBoundingBoxFromImageByIDRequest,
@@ -55,6 +63,8 @@ import {
   RemoveTagsFromBinaryDataByFilterResponse,
   RemoveTagsFromBinaryDataByIDsRequest,
   RemoveTagsFromBinaryDataByIDsResponse,
+  Sequence,
+  SequenceResourceFilter,
   TabularData,
   TabularDataByFilterRequest,
   TabularDataByFilterResponse,
@@ -68,6 +78,8 @@ import {
   TagsFilter,
   UpdateBoundingBoxRequest,
   UpdateBoundingBoxResponse,
+  UpdateSequenceRequest,
+  UpdateSequenceResponse,
 } from '../gen/app/data/v1/data_pb';
 import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
@@ -1526,6 +1538,148 @@ describe('DataClient tests', () => {
       );
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('createSequence tests', () => {
+    let capReq: CreateSequenceRequest;
+    const orgId = 'test-org-id';
+    const sequenceId = 'test-sequence-id';
+    const resources = [
+      new SequenceResourceFilter({
+        partId: 'part-id',
+        resourceName: 'my-sensor',
+        methodName: 'Readings',
+      }),
+    ];
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createSequence: (req) => {
+            capReq = req;
+            return new CreateSequenceResponse({ id: sequenceId });
+          },
+        });
+      });
+    });
+
+    it('creates a sequence', async () => {
+      const expectedRequest = new CreateSequenceRequest({
+        organizationId: orgId,
+        resources,
+      });
+
+      const result = await subject().createSequence(orgId, resources);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(sequenceId);
+    });
+  });
+
+  describe('getSequence tests', () => {
+    let capReq: GetSequenceRequest;
+    const sequenceId = 'test-sequence-id';
+    const sequence = new Sequence({ id: sequenceId, organizationId: 'org-id' });
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getSequence: (req) => {
+            capReq = req;
+            return new GetSequenceResponse({ sequence });
+          },
+        });
+      });
+    });
+
+    it('gets a sequence', async () => {
+      const expectedRequest = new GetSequenceRequest({ id: sequenceId });
+
+      const result = await subject().getSequence(sequenceId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(sequence);
+    });
+  });
+
+  describe('updateSequence tests', () => {
+    let capReq: UpdateSequenceRequest;
+    const sequenceId = 'test-sequence-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          updateSequence: (req) => {
+            capReq = req;
+            return new UpdateSequenceResponse();
+          },
+        });
+      });
+    });
+
+    it('updates a sequence', async () => {
+      const expectedRequest = new UpdateSequenceRequest({
+        id: sequenceId,
+        sequenceTags: ['tag1'],
+      });
+
+      await subject().updateSequence(sequenceId, undefined, ['tag1']);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('deleteSequence tests', () => {
+    let capReq: DeleteSequenceRequest;
+    const sequenceId = 'test-sequence-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          deleteSequence: (req) => {
+            capReq = req;
+            return new DeleteSequenceResponse();
+          },
+        });
+      });
+    });
+
+    it('deletes a sequence', async () => {
+      const expectedRequest = new DeleteSequenceRequest({ id: sequenceId });
+
+      await subject().deleteSequence(sequenceId);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('listSequences tests', () => {
+    let capReq: ListSequencesRequest;
+    const orgId = 'test-org-id';
+    const sequence1 = new Sequence({ id: 'seq1', organizationId: orgId });
+    const sequence2 = new Sequence({ id: 'seq2', organizationId: orgId });
+    const sequences = [sequence1, sequence2];
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          listSequences: (req) => {
+            capReq = req;
+            return new ListSequencesResponse({
+              sequences,
+              nextPageToken: 'next-token',
+            });
+          },
+        });
+      });
+    });
+
+    it('lists sequences', async () => {
+      const expectedRequest = new ListSequencesRequest({
+        organizationId: orgId,
+      });
+
+      const result = await subject().listSequences(orgId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result.sequences).toEqual(sequences);
+      expect(result.nextPageToken).toEqual('next-token');
     });
   });
 });

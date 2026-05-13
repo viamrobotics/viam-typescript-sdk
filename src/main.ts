@@ -39,6 +39,8 @@ export {
   type DataClient,
   type FilterOptions,
   type IndexableCollection,
+  type Sequence,
+  type SequenceResourceFilter,
 } from './app/data-client';
 /**
  * Raw Protobuf interfaces for Data.

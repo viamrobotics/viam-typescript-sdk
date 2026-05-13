@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
 import {
+  GetCurrentInputsResponse,
+  GoToInputsResponse,
   GrabResponse,
   IsHoldingSomethingResponse,
   IsMovingResponse,
@@ -18,6 +20,7 @@ vi.mock('../../robot');
 let gripper: GripperClient;
 const testIsMoving = true;
 const testIsHoldingSomething = true;
+const testCurrentInputs = [0.5, 1];
 
 describe('GripperClient tests', () => {
   beforeEach(() => {
@@ -39,6 +42,12 @@ describe('GripperClient tests', () => {
           return new IsHoldingSomethingResponse({
             isHoldingSomething: testIsHoldingSomething,
           });
+        },
+        getCurrentInputs: () => {
+          return new GetCurrentInputsResponse({ values: testCurrentInputs });
+        },
+        goToInputs: () => {
+          return new GoToInputsResponse();
         },
       });
     });
@@ -74,5 +83,15 @@ describe('GripperClient tests', () => {
     await expect(gripper.isHoldingSomething()).resolves.toBe(
       testIsHoldingSomething
     );
+  });
+
+  it('getCurrentInputs', async () => {
+    await expect(gripper.getCurrentInputs()).resolves.toStrictEqual(
+      testCurrentInputs
+    );
+  });
+
+  it('goToInputs', async () => {
+    await expect(gripper.goToInputs([0.5, 1])).resolves.toBeUndefined();
   });
 });
