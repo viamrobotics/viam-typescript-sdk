@@ -4,7 +4,12 @@ import type { Options } from '../../types';
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
-import { PlayRequest } from '../../gen/component/audioout/v1/audioout_pb';
+import {
+  PlayRequest,
+  PlayStreamChunk,
+  PlayStreamInit,
+  PlayStreamRequest,
+} from '../../gen/component/audioout/v1/audioout_pb';
 import {
   GetPropertiesRequest,
   type AudioInfo,
@@ -45,6 +50,39 @@ export class AudioOutClient implements AudioOut {
     this.options.requestLogger?.(request);
 
     await this.client.play(request, callOptions);
+  }
+
+  async playStream(
+    audioInfo: AudioInfo,
+    chunks: AsyncIterable<Uint8Array>,
+    extra = {},
+    callOptions = this.callOptions
+  ) {
+    const { name } = this;
+    const extraStruct = Struct.fromJson(extra);
+
+    const requests = async function* requestGen(): AsyncGenerator<PlayStreamRequest> {
+      yield new PlayStreamRequest({
+        payload: {
+          case: 'init',
+          value: new PlayStreamInit({
+            name,
+            audioInfo,
+            extra: extraStruct,
+          }),
+        },
+      });
+      for await (const audioData of chunks) {
+        yield new PlayStreamRequest({
+          payload: {
+            case: 'audioChunk',
+            value: new PlayStreamChunk({ audioData }),
+          },
+        });
+      }
+    };
+
+    await this.client.playStream(requests(), callOptions);
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {

@@ -14,9 +14,16 @@ vi.mock('../../robot');
 import { Struct } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
+import {
+  PlayStreamInit,
+  PlayStreamRequest,
+  PlayStreamResponse,
+} from '../../gen/component/audioout/v1/audioout_pb';
 
 let audioOut: AudioOutClient;
 let capturedPropertiesReq: GetPropertiesRequest | undefined;
+let capturedPlayStreamInit: PlayStreamInit | undefined;
+let capturedPlayStreamChunks: Uint8Array[] = [];
 
 const testProperties = new GetPropertiesResponse({
   supportedCodecs: [AudioCodec.PCM16, AudioCodec.MP3, AudioCodec.PCM32_FLOAT],
@@ -26,10 +33,22 @@ const testProperties = new GetPropertiesResponse({
 
 describe('AudioOutClient tests', () => {
   beforeEach(() => {
+    capturedPlayStreamInit = undefined;
+    capturedPlayStreamChunks = [];
     const mockTransport = createRouterTransport(({ service }) => {
       service(AudioOutService, {
         play: () => {
           return {};
+        },
+        playStream: async (reqs: AsyncIterable<PlayStreamRequest>) => {
+          for await (const req of reqs) {
+            if (req.payload.case === 'init') {
+              capturedPlayStreamInit = req.payload.value;
+            } else if (req.payload.case === 'audioChunk') {
+              capturedPlayStreamChunks.push(req.payload.value.audioData);
+            }
+          }
+          return new PlayStreamResponse();
         },
         getProperties: (req: GetPropertiesRequest) => {
           capturedPropertiesReq = req;
@@ -55,6 +74,54 @@ describe('AudioOutClient tests', () => {
       });
 
       await expect(audioOut.play(audioData, audioInfo)).resolves.not.toThrow();
+    });
+  });
+
+  describe('playStream tests', () => {
+    it('playStream sends init followed by chunks', async () => {
+      const audioInfo = new AudioInfo({
+        codec: AudioCodec.PCM16,
+        sampleRateHz: 22_050,
+        numChannels: 1,
+      });
+      const chunks = [
+        new Uint8Array([1, 2, 3]),
+        new Uint8Array([4, 5, 6]),
+        new Uint8Array([7, 8, 9]),
+      ];
+
+      // eslint-disable-next-line @typescript-eslint/require-await
+      const source = async function* sourceGen(): AsyncIterable<Uint8Array> {
+        for (const chunk of chunks) {
+          yield chunk;
+        }
+      };
+
+      await audioOut.playStream(audioInfo, source());
+
+      expect(capturedPlayStreamInit?.name).toEqual('test-audio-out');
+      expect(capturedPlayStreamInit?.audioInfo?.codec).toEqual(AudioCodec.PCM16);
+      expect(capturedPlayStreamInit?.audioInfo?.sampleRateHz).toEqual(22_050);
+      expect(capturedPlayStreamInit?.audioInfo?.numChannels).toEqual(1);
+      expect(capturedPlayStreamChunks).toEqual(chunks);
+    });
+
+    it('playStream with no chunks still sends init', async () => {
+      const audioInfo = new AudioInfo({
+        codec: AudioCodec.PCM16,
+        sampleRateHz: 48_000,
+        numChannels: 2,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/require-await
+      const empty = async function* emptyGen(): AsyncIterable<Uint8Array> {
+        // no chunks
+      };
+
+      await audioOut.playStream(audioInfo, empty());
+
+      expect(capturedPlayStreamInit?.name).toEqual('test-audio-out');
+      expect(capturedPlayStreamChunks).toEqual([]);
     });
   });
 
