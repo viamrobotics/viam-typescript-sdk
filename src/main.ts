@@ -461,4 +461,11 @@ export {
   getStatusFromClient,
 } from './utils';
 
+export {
+  createConsoleLogWriter,
+  setDebugLogWriter,
+  type DebugLogEntry,
+  type DebugLogWriter,
+} from './debug';
+
 export { MachineConnectionEvent } from './events';

@@ -15,6 +15,7 @@ export {
   cloneHeaders,
   dialDirect,
   dialWebRTC,
+  wrapTransportWithDebugLogging,
   type DialOptions,
   type DialWebRTCOptions,
   type WebRTCConnection,

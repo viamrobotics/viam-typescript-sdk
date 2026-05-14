@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../client';
 import { MachineConnectionEvent } from '../../events';
 import * as rpcModule from '../../rpc';
+import { setDebugLogWriter } from '../../debug';
 import { createMockRobotServiceTransport } from './mocks/robot-service';
 import {
   TEST_HOST,
@@ -73,6 +74,7 @@ const setupEventListenerMocks = () => {
 
   return {
     client,
+    peerConnection,
     pcAddEventListener,
     pcRemoveEventListener,
     dcAddEventListener,
@@ -1154,6 +1156,173 @@ describe('RobotClient', () => {
         expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
         expect(dialDirectMock).toHaveBeenCalledTimes(maxAttempts);
       });
+    });
+  });
+
+  describe('debug logging', () => {
+    afterEach(() => {
+      setDebugLogWriter(undefined);
+    });
+
+    it('logs dial_started when a connection attempt begins', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+
+      // Act
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Assert
+      const startedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'dial_started');
+      expect(startedEntries.length).toBeGreaterThanOrEqual(1);
+      const [entry] = startedEntries;
+      expect(entry.connectionId).toBeDefined();
+      expect(entry.host).toBeDefined();
+      expect(entry.method).toBeDefined();
+    });
+
+    it('logs dial_success after a successful connection', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+
+      // Act
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Assert
+      const successEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'dial_success');
+      expect(successEntries).toHaveLength(1);
+      expect(successEntries[0]!.connectionId).toBeDefined();
+    });
+
+    it('dial_started and dial_success share the same connectionId', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+
+      // Act
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Assert
+      const entries = writer.mock.calls.map(([entry]) => entry);
+      const startedId = entries.find((e) => e.event === 'dial_started')
+        ?.connectionId;
+      const successId = entries.find((e) => e.event === 'dial_success')
+        ?.connectionId;
+      expect(startedId).toBeDefined();
+      expect(startedId).toBe(successId);
+    });
+
+    it('logs dial_failed when a connection attempt fails', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = new RobotClient();
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(
+        new Error('WebRTC failed')
+      );
+
+      // Act — baseDialConfig uses TEST_HOST (non-local), so gRPC fallback also fails
+      try {
+        await client.dial({ ...baseDialConfig, noReconnect: true });
+      } catch {
+        // Expected to throw
+      }
+
+      // Assert
+      const failedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'dial_failed');
+      expect(failedEntries.length).toBeGreaterThanOrEqual(1);
+      expect(failedEntries[0]!.error).toBeDefined();
+      expect(failedEntries[0]!.connectionId).toBeDefined();
+    });
+
+    it('logs client_closed when disconnect is called', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Act
+      await client.disconnect();
+
+      // Assert
+      const closedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'client_closed');
+      expect(closedEntries).toHaveLength(1);
+    });
+
+    it('logs client_closed with the connectionId from the prior connection', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Act
+      await client.disconnect();
+
+      // Assert
+      const entries = writer.mock.calls.map(([entry]) => entry);
+      const successId = entries.find((e) => e.event === 'dial_success')
+        ?.connectionId;
+      const closedId = entries.find((e) => e.event === 'client_closed')
+        ?.connectionId;
+      expect(successId).toBeDefined();
+      expect(closedId).toBe(successId);
+    });
+
+    it('logs client_closed with undefined connectionId when disconnecting before any connection', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const client = new RobotClient();
+
+      // Act
+      await client.disconnect();
+
+      // Assert
+      const closedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'client_closed');
+      expect(closedEntries).toHaveLength(1);
+      expect(closedEntries[0]!.connectionId).toBeUndefined();
+    });
+
+    it('logs ice_disconnected when the ICE connection enters the disconnected state', async () => {
+      // Arrange
+      const writer = vi.fn();
+      setDebugLogWriter(writer);
+      const mocks = setupEventListenerMocks();
+      await mocks.client.dial({ ...baseDialConfig, noReconnect: true });
+
+      const iceHandler = mocks.pcAddEventListener.mock.calls.find(
+        ([event]) => event === 'iceconnectionstatechange'
+      )?.[1] as (() => void) | undefined;
+      expect(iceHandler).toBeDefined();
+
+      // Act — simulate the ICE state moving to 'disconnected'
+      (
+        mocks.peerConnection as unknown as Record<string, unknown>
+      ).iceConnectionState = 'disconnected';
+      iceHandler!();
+
+      // Assert
+      const disconnectedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'ice_disconnected');
+      expect(disconnectedEntries).toHaveLength(1);
+      expect(disconnectedEntries[0]!.connectionId).toBeDefined();
     });
   });
 });
