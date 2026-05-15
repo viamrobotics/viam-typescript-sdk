@@ -273,11 +273,14 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
     input: AsyncIterable<PartialMessage<I>>,
     contextValues?: ContextValues
   ): Promise<StreamResponse<I, O>> => {
+    // Skip wrapping entirely when logging is disabled — avoids generator overhead per message.
     if (!isDebugLogEnabled()) {
       return transport.stream(service, method, signal, timeoutMs, header, input, contextValues);
     }
     const rpcMethod = `${service.typeName}/${method.name}`;
     writeDebugLog('grpc_request', { connectionId, type: 'stream', method: rpcMethod });
+    // Separate try/catch for stream establishment vs. message iteration so we can
+    // distinguish a failure to open the stream from a mid-stream error.
     let resp: StreamResponse<I, O>;
     try {
       resp = await transport.stream(
@@ -298,6 +301,8 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
       });
       throw error;
     }
+    // Wrap resp.message in a generator so we can log each individual message.
+    // The caller receives a normal StreamResponse and iterates it as usual.
     async function* wrappedMessages(): AsyncIterable<O> {
       try {
         for await (const msg of resp.message) {
