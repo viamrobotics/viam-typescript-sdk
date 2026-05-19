@@ -14,7 +14,7 @@ import {
   AuthenticatedTransport,
   wrapTransportWithDebugLogging,
 } from '../dial';
-import { setDebugLogWriter } from '../../debug';
+import { setDebugLogWriter, type DebugLogEntry } from '../../debug';
 
 import {
   TEST_URL,
@@ -491,21 +491,23 @@ describe('dialDirect', () => {
 
 describe('wrapTransportWithDebugLogging', () => {
   const mockService = { typeName: 'test.TestService' } as ServiceType;
-  const mockMethod = { name: 'TestMethod' } as MethodInfo<AnyMessage, AnyMessage>;
+  const mockMethod = { name: 'TestMethod' } as MethodInfo;
   const connectionId = 'test-connection-id';
 
   const makeStreamResponse = (
     messages: AnyMessage[]
-  ): StreamResponse<AnyMessage, AnyMessage> => {
-    async function* gen() {
+  ): StreamResponse => {
+    const gen = function* gen() {
       for (const msg of messages) {
         yield msg;
       }
-    }
-    return { stream: true, message: gen() } as unknown as StreamResponse<
-      AnyMessage,
-      AnyMessage
-    >;
+    };
+    return { stream: true, message: gen() } as unknown as StreamResponse;
+  };
+
+  // Returns a new empty async generator instance for use as stream input.
+  const makeEmptyInput = async function* makeEmptyInput() {
+    // no input messages
   };
 
   afterEach(() => {
@@ -517,7 +519,7 @@ describe('wrapTransportWithDebugLogging', () => {
     it('delegates to the underlying transport with no writer set', async () => {
       // Arrange
       const transport = createMockTransport();
-      const mockResponse = {} as UnaryResponse<AnyMessage, AnyMessage>;
+      const mockResponse = {} as UnaryResponse;
       vi.mocked(transport.unary).mockResolvedValue(mockResponse);
 
       // Act
@@ -538,11 +540,11 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_request then grpc_response on success', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.unary).mockResolvedValue(
-        {} as UnaryResponse<AnyMessage, AnyMessage>
+        {} as UnaryResponse
       );
 
       // Act
@@ -565,7 +567,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error field and rethrows on failure', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.unary).mockRejectedValue(new Error('rpc failed'));
@@ -597,7 +599,7 @@ describe('wrapTransportWithDebugLogging', () => {
         undefined,
         undefined,
         undefined,
-        (async function* () {})()
+        makeEmptyInput()
       );
 
       // Assert — same object reference proves the short-circuit path was taken
@@ -606,7 +608,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_request once and grpc_response per message', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{}, {}, {}] as AnyMessage[];
@@ -620,7 +622,7 @@ describe('wrapTransportWithDebugLogging', () => {
         undefined,
         undefined,
         undefined,
-        (async function* () {})()
+        makeEmptyInput()
       );
       for await (const _ of resp.message) {
         /* consume */
@@ -645,7 +647,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('yields all original messages unchanged', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{ a: 1 }, { a: 2 }] as unknown as AnyMessage[];
@@ -659,7 +661,7 @@ describe('wrapTransportWithDebugLogging', () => {
         undefined,
         undefined,
         undefined,
-        (async function* () {})()
+        makeEmptyInput()
       );
       const received: AnyMessage[] = [];
       for await (const msg of resp.message) {
@@ -672,7 +674,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error when transport.stream rejects', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.stream).mockRejectedValue(new Error('stream open failed'));
@@ -686,7 +688,7 @@ describe('wrapTransportWithDebugLogging', () => {
           undefined,
           undefined,
           undefined,
-          (async function* () {})()
+          makeEmptyInput()
         )
       ).rejects.toThrow('stream open failed');
 
@@ -699,21 +701,21 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error on mid-stream failure', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const streamError = new Error('mid-stream error');
 
-      async function* failingMessages(): AsyncGenerator<AnyMessage> {
+      const failingMessages = function* failingMessages(): Generator<AnyMessage> {
         yield {} as AnyMessage;
         yield {} as AnyMessage;
         throw streamError;
-      }
+      };
 
       vi.mocked(transport.stream).mockResolvedValue({
         stream: true,
         message: failingMessages(),
-      } as unknown as StreamResponse<AnyMessage, AnyMessage>);
+      } as unknown as StreamResponse);
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -723,7 +725,7 @@ describe('wrapTransportWithDebugLogging', () => {
         undefined,
         undefined,
         undefined,
-        (async function* () {})()
+        makeEmptyInput()
       );
 
       await expect(async () => {

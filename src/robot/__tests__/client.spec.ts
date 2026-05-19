@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RobotClient } from '../client';
 import { MachineConnectionEvent } from '../../events';
 import * as rpcModule from '../../rpc';
-import { setDebugLogWriter } from '../../debug';
+import { setDebugLogWriter, type DebugLogEntry } from '../../debug';
 import { createMockRobotServiceTransport } from './mocks/robot-service';
 import {
   TEST_HOST,
@@ -1166,7 +1166,7 @@ describe('RobotClient', () => {
 
     it('logs dial_started when a connection attempt begins', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
 
@@ -1186,7 +1186,7 @@ describe('RobotClient', () => {
 
     it('logs dial_success after a successful connection', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
 
@@ -1203,7 +1203,7 @@ describe('RobotClient', () => {
 
     it('dial_started and dial_success share the same connectionId', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
 
@@ -1212,9 +1212,9 @@ describe('RobotClient', () => {
 
       // Assert
       const entries = writer.mock.calls.map(([entry]) => entry);
-      const startedId = entries.find((e) => e.event === 'dial_started')
+      const startedId = entries.find((entry) => entry.event === 'dial_started')
         ?.connectionId;
-      const successId = entries.find((e) => e.event === 'dial_success')
+      const successId = entries.find((entry) => entry.event === 'dial_success')
         ?.connectionId;
       expect(startedId).toBeDefined();
       expect(startedId).toBe(successId);
@@ -1222,7 +1222,7 @@ describe('RobotClient', () => {
 
     it('logs dial_failed when a connection attempt fails', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = new RobotClient();
       vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(
@@ -1247,7 +1247,7 @@ describe('RobotClient', () => {
 
     it('logs client_closed when disconnect is called', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
       await client.dial({ ...baseDialConfig, noReconnect: true });
@@ -1264,7 +1264,7 @@ describe('RobotClient', () => {
 
     it('logs client_closed with the connectionId from the prior connection', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
       await client.dial({ ...baseDialConfig, noReconnect: true });
@@ -1274,9 +1274,9 @@ describe('RobotClient', () => {
 
       // Assert
       const entries = writer.mock.calls.map(([entry]) => entry);
-      const successId = entries.find((e) => e.event === 'dial_success')
+      const successId = entries.find((entry) => entry.event === 'dial_success')
         ?.connectionId;
-      const closedId = entries.find((e) => e.event === 'client_closed')
+      const closedId = entries.find((entry) => entry.event === 'client_closed')
         ?.connectionId;
       expect(successId).toBeDefined();
       expect(closedId).toBe(successId);
@@ -1284,7 +1284,7 @@ describe('RobotClient', () => {
 
     it('logs client_closed with undefined connectionId when disconnecting before any connection', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const client = new RobotClient();
 
@@ -1301,7 +1301,7 @@ describe('RobotClient', () => {
 
     it('logs ice_disconnected when the ICE connection enters the disconnected state', async () => {
       // Arrange
-      const writer = vi.fn();
+      const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const mocks = setupEventListenerMocks();
       await mocks.client.dial({ ...baseDialConfig, noReconnect: true });

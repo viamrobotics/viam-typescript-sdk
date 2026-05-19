@@ -80,7 +80,9 @@ export const writeDebugLog = (
   event: string,
   fields: Record<string, unknown> = {}
 ): void => {
-  if (!currentWriter) return;
+  if (!currentWriter) {
+    return;
+  }
   currentWriter({
     timestamp: new Date().toISOString(),
     event,
@@ -92,7 +94,9 @@ export const writeDebugLog = (
  * Returns a {@link DebugLogWriter} that prints each entry to the console as a
  * JSON string, prefixed with `[viam-sdk]`.
  */
-export const createConsoleLogWriter = (): DebugLogWriter => (entry) => {
+const consoleLogWriter: DebugLogWriter = (entry) => {
   // eslint-disable-next-line no-console
   console.debug('[viam-sdk]', JSON.stringify(entry));
 };
+
+export const createConsoleLogWriter = (): DebugLogWriter => consoleLogWriter;

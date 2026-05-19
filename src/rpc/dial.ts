@@ -303,7 +303,7 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
     }
     // Wrap resp.message in a generator so we can log each individual message.
     // The caller receives a normal StreamResponse and iterates it as usual.
-    async function* wrappedMessages(): AsyncIterable<O> {
+    const wrappedMessages = async function* wrappedMessages(): AsyncIterable<O> {
       try {
         for await (const msg of resp.message) {
           writeDebugLog('grpc_response', { connectionId, type: 'stream', method: rpcMethod });
@@ -318,7 +318,7 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
         });
         throw error;
       }
-    }
+    };
     return { ...resp, message: wrappedMessages() };
   };
 
