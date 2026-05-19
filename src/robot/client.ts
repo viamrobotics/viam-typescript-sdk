@@ -39,7 +39,12 @@ import { NavigationService } from '../gen/service/navigation/v1/navigation_conne
 import { SLAMService } from '../gen/service/slam/v1/slam_connect';
 import { VisionService } from '../gen/service/vision/v1/vision_connect';
 import { writeDebugLog } from '../debug';
-import { dialDirect, dialWebRTC, wrapTransportWithDebugLogging, type DialOptions } from '../rpc';
+import {
+  dialDirect,
+  dialWebRTC,
+  wrapTransportWithDebugLogging,
+  type DialOptions,
+} from '../rpc';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
@@ -1191,7 +1196,9 @@ export class RobotClient extends EventDispatcher implements Robot {
            */
           const iceState = this.peerConn?.iceConnectionState;
           if (iceState === 'disconnected') {
-            writeDebugLog('ice_disconnected', { connectionId: this.connectionId });
+            writeDebugLog('ice_disconnected', {
+              connectionId: this.connectionId,
+            });
           }
           if (iceState === 'closed') {
             this.onDisconnect();

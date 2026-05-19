@@ -237,7 +237,11 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
     contextValues?: ContextValues
   ): Promise<UnaryResponse<I, O>> => {
     const rpcMethod = `${service.typeName}/${method.name}`;
-    writeDebugLog('grpc_request', { connectionId, type: 'unary', method: rpcMethod });
+    writeDebugLog('grpc_request', {
+      connectionId,
+      type: 'unary',
+      method: rpcMethod,
+    });
     try {
       const resp = await transport.unary(
         service,
@@ -248,7 +252,11 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
         message,
         contextValues
       );
-      writeDebugLog('grpc_response', { connectionId, type: 'unary', method: rpcMethod });
+      writeDebugLog('grpc_response', {
+        connectionId,
+        type: 'unary',
+        method: rpcMethod,
+      });
       return resp;
     } catch (error) {
       writeDebugLog('grpc_response', {
@@ -275,10 +283,22 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
   ): Promise<StreamResponse<I, O>> => {
     // Skip wrapping entirely when logging is disabled — avoids generator overhead per message.
     if (!isDebugLogEnabled()) {
-      return transport.stream(service, method, signal, timeoutMs, header, input, contextValues);
+      return transport.stream(
+        service,
+        method,
+        signal,
+        timeoutMs,
+        header,
+        input,
+        contextValues
+      );
     }
     const rpcMethod = `${service.typeName}/${method.name}`;
-    writeDebugLog('grpc_request', { connectionId, type: 'stream', method: rpcMethod });
+    writeDebugLog('grpc_request', {
+      connectionId,
+      type: 'stream',
+      method: rpcMethod,
+    });
     // Separate try/catch for stream establishment vs. message iteration so we can
     // distinguish a failure to open the stream from a mid-stream error.
     let resp: StreamResponse<I, O>;
@@ -303,22 +323,27 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
     }
     // Wrap resp.message in a generator so we can log each individual message.
     // The caller receives a normal StreamResponse and iterates it as usual.
-    const wrappedMessages = async function* wrappedMessages(): AsyncIterable<O> {
-      try {
-        for await (const msg of resp.message) {
-          writeDebugLog('grpc_response', { connectionId, type: 'stream', method: rpcMethod });
-          yield msg;
+    const wrappedMessages =
+      async function* wrappedMessages(): AsyncIterable<O> {
+        try {
+          for await (const msg of resp.message) {
+            writeDebugLog('grpc_response', {
+              connectionId,
+              type: 'stream',
+              method: rpcMethod,
+            });
+            yield msg;
+          }
+        } catch (error) {
+          writeDebugLog('grpc_response', {
+            connectionId,
+            type: 'stream',
+            method: rpcMethod,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          throw error;
         }
-      } catch (error) {
-        writeDebugLog('grpc_response', {
-          connectionId,
-          type: 'stream',
-          method: rpcMethod,
-          error: error instanceof Error ? error.message : String(error),
-        });
-        throw error;
-      }
-    };
+      };
     return { ...resp, message: wrappedMessages() };
   };
 

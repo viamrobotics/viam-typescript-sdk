@@ -494,9 +494,7 @@ describe('wrapTransportWithDebugLogging', () => {
   const mockMethod = { name: 'TestMethod' } as MethodInfo;
   const connectionId = 'test-connection-id';
 
-  const makeStreamResponse = (
-    messages: AnyMessage[]
-  ): StreamResponse => {
+  const makeStreamResponse = (messages: AnyMessage[]): StreamResponse => {
     const gen = function* gen() {
       for (const msg of messages) {
         yield msg;
@@ -543,13 +541,18 @@ describe('wrapTransportWithDebugLogging', () => {
       const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
-      vi.mocked(transport.unary).mockResolvedValue(
-        {} as UnaryResponse
-      );
+      vi.mocked(transport.unary).mockResolvedValue({} as UnaryResponse);
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
-      await wrapped.unary(mockService, mockMethod, undefined, undefined, undefined, {});
+      await wrapped.unary(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        {}
+      );
 
       // Assert
       const events = writer.mock.calls.map(([entry]) => entry.event);
@@ -575,7 +578,14 @@ describe('wrapTransportWithDebugLogging', () => {
       // Act & Assert
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
       await expect(
-        wrapped.unary(mockService, mockMethod, undefined, undefined, undefined, {})
+        wrapped.unary(
+          mockService,
+          mockMethod,
+          undefined,
+          undefined,
+          undefined,
+          {}
+        )
       ).rejects.toThrow('rpc failed');
 
       const [responseEntry] = writer.mock.calls[1]!;
@@ -612,7 +622,9 @@ describe('wrapTransportWithDebugLogging', () => {
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{}, {}, {}] as AnyMessage[];
-      vi.mocked(transport.stream).mockResolvedValue(makeStreamResponse(messages));
+      vi.mocked(transport.stream).mockResolvedValue(
+        makeStreamResponse(messages)
+      );
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -651,7 +663,9 @@ describe('wrapTransportWithDebugLogging', () => {
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{ a: 1 }, { a: 2 }] as unknown as AnyMessage[];
-      vi.mocked(transport.stream).mockResolvedValue(makeStreamResponse(messages));
+      vi.mocked(transport.stream).mockResolvedValue(
+        makeStreamResponse(messages)
+      );
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -677,7 +691,9 @@ describe('wrapTransportWithDebugLogging', () => {
       const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
-      vi.mocked(transport.stream).mockRejectedValue(new Error('stream open failed'));
+      vi.mocked(transport.stream).mockRejectedValue(
+        new Error('stream open failed')
+      );
 
       // Act & Assert
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -706,11 +722,12 @@ describe('wrapTransportWithDebugLogging', () => {
       const transport = createMockTransport();
       const streamError = new Error('mid-stream error');
 
-      const failingMessages = function* failingMessages(): Generator<AnyMessage> {
-        yield {} as AnyMessage;
-        yield {} as AnyMessage;
-        throw streamError;
-      };
+      const failingMessages =
+        function* failingMessages(): Generator<AnyMessage> {
+          yield {} as AnyMessage;
+          yield {} as AnyMessage;
+          throw streamError;
+        };
 
       vi.mocked(transport.stream).mockResolvedValue({
         stream: true,

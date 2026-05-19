@@ -4,20 +4,28 @@
  * Enable debug logging by calling {@link setDebugLogWriter} before connecting.
  *
  * @example Log connection events to the browser console:
+ *
  * ```ts
- * import { setDebugLogWriter, createConsoleLogWriter } from '@viamrobotics/sdk';
+ * import {
+ *   setDebugLogWriter,
+ *   createConsoleLogWriter,
+ * } from '@viamrobotics/sdk';
  * setDebugLogWriter(createConsoleLogWriter());
  * ```
  *
  * @example Write log entries to a file in Node.js:
+ *
  * ```ts
  * import fs from 'node:fs';
  * import { setDebugLogWriter } from '@viamrobotics/sdk';
  * const logFile = fs.createWriteStream('viam-debug.log', { flags: 'a' });
- * setDebugLogWriter((entry) => logFile.write(JSON.stringify(entry) + '\n'));
+ * setDebugLogWriter((entry) =>
+ *   logFile.write(JSON.stringify(entry) + '\n')
+ * );
  * ```
  *
  * Logged events:
+ *
  * - `dial_started` — a new connection attempt began
  * - `dial_success` — the connection was established; includes `connectionId`
  * - `dial_failed` — the connection attempt failed
@@ -32,9 +40,8 @@ export interface DebugLogEntry {
   /** ISO 8601 timestamp of when the event occurred. */
   timestamp: string;
   /**
-   * The type of event. One of:
-   * `dial_started`, `dial_success`, `dial_failed`, `grpc_request`,
-   * `grpc_response`, `client_closed`, `ice_disconnected`.
+   * The type of event. One of: `dial_started`, `dial_success`, `dial_failed`,
+   * `grpc_request`, `grpc_response`, `client_closed`, `ice_disconnected`.
    */
   event: string;
   /** The ID of the connection this event relates to, when applicable. */
@@ -52,8 +59,12 @@ let currentWriter: DebugLogWriter | undefined;
  * Pass `undefined` to disable debug logging.
  *
  * @example
+ *
  * ```ts
- * import { setDebugLogWriter, createConsoleLogWriter } from '@viamrobotics/sdk';
+ * import {
+ *   setDebugLogWriter,
+ *   createConsoleLogWriter,
+ * } from '@viamrobotics/sdk';
  * // Enable:
  * setDebugLogWriter(createConsoleLogWriter());
  * // Disable:

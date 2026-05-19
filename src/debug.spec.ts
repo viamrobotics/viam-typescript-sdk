@@ -82,7 +82,10 @@ describe('debug logging', () => {
 
       writer(entry);
 
-      expect(debugSpy).toHaveBeenCalledWith('[viam-sdk]', JSON.stringify(entry));
+      expect(debugSpy).toHaveBeenCalledWith(
+        '[viam-sdk]',
+        JSON.stringify(entry)
+      );
     });
   });
 });

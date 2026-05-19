@@ -1178,7 +1178,7 @@ describe('RobotClient', () => {
         .map(([entry]) => entry)
         .filter((entry) => entry.event === 'dial_started');
       expect(startedEntries.length).toBeGreaterThanOrEqual(1);
-      const [entry] = startedEntries;
+      const entry = startedEntries[0]!;
       expect(entry.connectionId).toBeDefined();
       expect(entry.host).toBeDefined();
       expect(entry.method).toBeDefined();
@@ -1212,10 +1212,12 @@ describe('RobotClient', () => {
 
       // Assert
       const entries = writer.mock.calls.map(([entry]) => entry);
-      const startedId = entries.find((entry) => entry.event === 'dial_started')
-        ?.connectionId;
-      const successId = entries.find((entry) => entry.event === 'dial_success')
-        ?.connectionId;
+      const startedId = entries.find(
+        (entry) => entry.event === 'dial_started'
+      )?.connectionId;
+      const successId = entries.find(
+        (entry) => entry.event === 'dial_success'
+      )?.connectionId;
       expect(startedId).toBeDefined();
       expect(startedId).toBe(successId);
     });
@@ -1274,10 +1276,12 @@ describe('RobotClient', () => {
 
       // Assert
       const entries = writer.mock.calls.map(([entry]) => entry);
-      const successId = entries.find((entry) => entry.event === 'dial_success')
-        ?.connectionId;
-      const closedId = entries.find((entry) => entry.event === 'client_closed')
-        ?.connectionId;
+      const successId = entries.find(
+        (entry) => entry.event === 'dial_success'
+      )?.connectionId;
+      const closedId = entries.find(
+        (entry) => entry.event === 'client_closed'
+      )?.connectionId;
       expect(successId).toBeDefined();
       expect(closedId).toBe(successId);
     });
