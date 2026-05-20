@@ -1,11 +1,11 @@
 'use strict';
 
-const baseConfig = require('@viamrobotics/prettier-config');
-
-const resolvedConfig = baseConfig.default ?? baseConfig;
-
 module.exports = {
-  ...resolvedConfig,
+  singleQuote: true,
+  jsxSingleQuote: true,
+  trailingComma: 'all',
+  printWidth: 100,
+  endOfLine: 'lf',
   plugins: ['prettier-plugin-jsdoc'],
   tsdoc: true,
 };

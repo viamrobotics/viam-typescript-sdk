@@ -1,10 +1,15 @@
-import { defineConfig, globalIgnores } from 'eslint/config';
-import tsdoc from 'eslint-plugin-tsdoc';
+// eslint.config.js
+'use strict';
 
-import { baseConfig } from '@viamrobotics/eslint-config';
+import { configs } from '@eslint/js';
+import tsdoc from 'eslint-plugin-tsdoc';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import { configs as _configs } from 'typescript-eslint';
 
 export default defineConfig([
-  ...baseConfig,
+  configs.recommended,
+  ..._configs.strictTypeChecked,
+  ..._configs.stylisticTypeChecked,
 
   {
     plugins: {
@@ -13,33 +18,48 @@ export default defineConfig([
 
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json', './tsconfig.node.json'],
+        projectService: true,
+        tsconfigRootDir: __dirname,
       },
     },
 
     rules: {
-      'no-void': [
+      eqeqeq: ['error', 'always'],
+      'no-console': 'warn',
+      'no-param-reassign': 'error',
+      'no-void': ['error', { allowAsStatement: true }],
+
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unused-vars': [
         'error',
         {
-          allowAsStatement: true,
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
         },
       ],
-
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      '@typescript-eslint/no-empty-interface': 'warn',
-      '@typescript-eslint/no-unsafe-call': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/prefer-promise-reject-errors': 'warn',
-      'unicorn/prefer-add-event-listener': 'warn',
-
+      '@typescript-eslint/prefer-promise-reject-errors': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          fixStyle: 'inline-type-imports',
+        },
+      ],
       '@typescript-eslint/strict-boolean-expressions': [
         'error',
         {
           allowNullableBoolean: true,
         },
       ],
+
+      // TODO: fix remaining violations and upgrade to error
+      '@typescript-eslint/no-empty-interface': 'warn',
     },
   },
 
@@ -61,10 +81,12 @@ export default defineConfig([
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      'no-console': 'off',
       'vitest/no-restricted-vi-methods': 'warn',
-      'vitest/valid-expect': 'warn',
-      'vitest/require-top-level-describe': 'warn',
       'vitest/consistent-test-filename': 'warn',
+      'vitest/valid-expect': 'error',
+      'vitest/require-top-level-describe': 'error',
     },
   },
 ]);
