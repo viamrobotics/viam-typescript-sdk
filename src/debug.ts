@@ -37,8 +37,8 @@
 
 /** A single structured debug log entry emitted by the Viam SDK. */
 export interface DebugLogEntry {
-  /** ISO 8601 timestamp of when the event occurred. */
-  timestamp: string;
+  /** The time at which the event occurred. */
+  timestamp: Date;
   /**
    * The type of event. One of: `dial_started`, `dial_success`, `dial_failed`,
    * `grpc_request`, `grpc_response`, `client_closed`, `ice_disconnected`.
@@ -95,7 +95,7 @@ export const writeDebugLog = (
     return;
   }
   currentWriter({
-    timestamp: new Date().toISOString(),
+    timestamp: new Date(),
     event,
     ...fields,
   });

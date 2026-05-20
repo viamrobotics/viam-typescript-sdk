@@ -23,7 +23,7 @@ describe('debug logging', () => {
       expect(writer).not.toHaveBeenCalled();
     });
 
-    it('calls the writer with event, fields, and an ISO 8601 timestamp', () => {
+    it('calls the writer with event, fields, and a Date timestamp', () => {
       const writer = vi.fn<[DebugLogEntry]>();
       setDebugLogWriter(writer);
 
@@ -34,7 +34,7 @@ describe('debug logging', () => {
       expect(entry.event).toBe('test_event');
       expect(entry.connectionId).toBe('abc');
       expect(entry.extra).toBe(123);
-      expect(entry.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/u);
+      expect(entry.timestamp).toBeInstanceOf(Date);
     });
 
     it('stops calling the writer after it is cleared', () => {
@@ -78,7 +78,7 @@ describe('debug logging', () => {
       const debugSpy = vi.fn<[string, string]>();
       vi.stubGlobal('console', { ...console, debug: debugSpy });
       const writer = createConsoleLogWriter();
-      const entry = { timestamp: '2024-01-01T00:00:00.000Z', event: 'test' };
+      const entry = { timestamp: new Date('2024-01-01T00:00:00.000Z'), event: 'test' };
 
       writer(entry);
 
