@@ -121,6 +121,12 @@ export interface DialWebRTCOptions {
 
   /** Overrides the port of the matched TURN URI. */
   turnPort?: number;
+
+  /**
+   * When true, the connection to the signaling server is made over plain HTTP
+   * (no TLS). Use this when connecting to a robot running with `no_tls: true`.
+   */
+  signalingInsecure?: boolean;
 }
 
 export type TransportFactory = (
@@ -459,7 +465,13 @@ export const dialWebRTC = async (
   dialOpts?: DialOptions,
   transportCredentialsInclude = false
 ): Promise<WebRTCConnection> => {
-  const usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
+  let usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
+  if (dialOpts?.webrtcOptions?.signalingInsecure) {
+    // TLS for the signaling connection is determined by the URL scheme passed
+    // as baseUrl to the gRPC-web transport. Strip any existing http/https scheme
+    // and force http:// so the signaling server is contacted without TLS.
+    usableSignalingAddress = `http://${usableSignalingAddress.replace(/^https?:\/\//u, '')}`;
+  }
   validateDialOptions(dialOpts);
 
   /**

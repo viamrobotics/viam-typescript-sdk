@@ -3,7 +3,11 @@ import {
   type JsonValue,
   type MessageInitShape,
 } from '@bufbuild/protobuf';
-import { timestampDate, timestampFromDate } from '@bufbuild/protobuf/wkt';
+import {
+  FieldMaskSchema,
+  timestampDate,
+  timestampFromDate,
+} from '@bufbuild/protobuf/wkt';
 import { type Client, createClient, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
 
@@ -16,6 +20,8 @@ import {
   type Index,
   IndexableCollection,
   Order,
+  type Sequence,
+  SequenceResourceFilterSchema,
   TabularDataSourceSchema,
   TabularDataSourceType,
   TagsFilterSchema,
@@ -1577,6 +1583,162 @@ export class DataClient {
       pipelineName,
     });
   }
+
+  /**
+   * Create a new sequence.
+   *
+   * @example
+   *
+   * ```ts
+   * const sequenceId = await dataClient.createSequence(
+   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   [
+   *     {
+   *       partId: 'part-id',
+   *       resourceName: 'my-sensor',
+   *       methodName: 'Readings',
+   *     },
+   *   ],
+   *   ['tag1', 'tag2'],
+   *   new Date('2025-01-01'),
+   *   new Date('2025-12-31')
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param resources The resource filters for the sequence
+   * @param sequenceTags Optional tags for the sequence
+   * @param startTime Optional start time of the sequence
+   * @param endTime Optional end time of the sequence
+   * @returns The ID of the created sequence
+   */
+  async createSequence(
+    organizationId: string,
+    resources: MessageInitShape<typeof SequenceResourceFilterSchema>[],
+    sequenceTags?: string[],
+    startTime?: Date,
+    endTime?: Date
+  ): Promise<string> {
+    const resp = await this.dataClient.createSequence({
+      organizationId,
+      resources,
+      sequenceTags,
+      startTime: startTime ? timestampFromDate(startTime) : undefined,
+      endTime: endTime ? timestampFromDate(endTime) : undefined,
+    });
+    return resp.id;
+  }
+
+  /**
+   * Retrieve a sequence by ID.
+   *
+   * @example
+   *
+   * ```ts
+   * const sequence = await dataClient.getSequence('sequence-id');
+   * ```
+   *
+   * @param id The ID of the sequence
+   * @returns The sequence
+   */
+  async getSequence(id: string): Promise<Sequence> {
+    const resp = await this.dataClient.getSequence({ id });
+    if (!resp.sequence) {
+      throw new Error('no sequence returned');
+    }
+    return resp.sequence;
+  }
+
+  /**
+   * Update the mutable fields of a sequence.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.updateSequence(
+   *   'sequence-id',
+   *   [
+   *     {
+   *       partId: 'part-id',
+   *       resourceName: 'my-sensor',
+   *       methodName: 'Readings',
+   *     },
+   *   ],
+   *   ['tag1'],
+   *   new Date('2025-01-01'),
+   *   new Date('2025-12-31'),
+   *   { paths: ['resources', 'sequence_tags'] }
+   * );
+   * ```
+   *
+   * @param id The ID of the sequence to update
+   * @param resources The updated resource filters
+   * @param sequenceTags The updated tags
+   * @param startTime The updated start time
+   * @param endTime The updated end time
+   * @param fieldMask Optional field mask specifying which fields to update
+   */
+  async updateSequence(
+    id: string,
+    resources?: MessageInitShape<typeof SequenceResourceFilterSchema>[],
+    sequenceTags?: string[],
+    startTime?: Date,
+    endTime?: Date,
+    fieldMask?: MessageInitShape<typeof FieldMaskSchema>
+  ): Promise<void> {
+    await this.dataClient.updateSequence({
+      id,
+      resources,
+      sequenceTags,
+      startTime: startTime ? timestampFromDate(startTime) : undefined,
+      endTime: endTime ? timestampFromDate(endTime) : undefined,
+      fieldMask,
+    });
+  }
+
+  /**
+   * Delete a sequence by ID.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.deleteSequence('sequence-id');
+   * ```
+   *
+   * @param id The ID of the sequence to delete
+   */
+  async deleteSequence(id: string): Promise<void> {
+    await this.dataClient.deleteSequence({ id });
+  }
+
+  /**
+   * List sequences for a given organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const { sequences, nextPageToken } = await dataClient.listSequences(
+   *   '123abc45-1234-5678-90ab-cdef12345678'
+   * );
+   * ```
+   *
+   * @param organizationId The ID of the organization
+   * @param pageToken Optional page token for pagination
+   * @param pageSize Optional page size
+   * @returns The list of sequences and a next page token
+   */
+  async listSequences(
+    organizationId: string,
+    pageToken?: string,
+    pageSize?: number
+  ): Promise<{ sequences: Sequence[]; nextPageToken: string }> {
+    const resp = await this.dataClient.listSequences({
+      organizationId,
+      pageToken,
+      pageSize,
+    });
+    return { sequences: resp.sequences, nextPageToken: resp.nextPageToken };
+  }
 }
 
 export class ListDataPipelineRunsPage {
@@ -1632,5 +1794,7 @@ export class ListDataPipelineRunsPage {
 export {
   type IndexableCollection,
   type Order,
+  type Sequence,
+  type SequenceResourceFilter,
 } from '../gen/app/data/v1/data_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';

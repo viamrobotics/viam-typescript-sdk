@@ -30,6 +30,9 @@ import {
   CreateBinaryDataSignedURLResponseSchema,
   type CreateIndexRequest,
   CreateIndexResponseSchema,
+  type CreateSequenceRequest,
+  CreateSequenceRequestSchema,
+  CreateSequenceResponseSchema,
   DataRequestSchema,
   DataService,
   type DeleteBinaryDataByFilterRequest,
@@ -39,6 +42,9 @@ import {
   type DeleteIndexRequest,
   DeleteIndexRequestSchema,
   DeleteIndexResponseSchema,
+  type DeleteSequenceRequest,
+  DeleteSequenceRequestSchema,
+  DeleteSequenceResponseSchema,
   type DeleteTabularDataRequest,
   DeleteTabularDataResponseSchema,
   DeleteTabularFilterSchema,
@@ -52,12 +58,18 @@ import {
   type GetLatestTabularDataRequest,
   GetLatestTabularDataRequestSchema,
   GetLatestTabularDataResponseSchema,
+  type GetSequenceRequest,
+  GetSequenceRequestSchema,
+  GetSequenceResponseSchema,
   IndexableCollection,
   IndexCreator,
   IndexSchema,
   type ListIndexesRequest,
   ListIndexesRequestSchema,
   ListIndexesResponseSchema,
+  type ListSequencesRequest,
+  ListSequencesRequestSchema,
+  ListSequencesResponseSchema,
   type RemoveBinaryDataFromDatasetByIDsRequest,
   RemoveBinaryDataFromDatasetByIDsRequestSchema,
   RemoveBinaryDataFromDatasetByIDsResponseSchema,
@@ -67,6 +79,8 @@ import {
   type RemoveTagsFromBinaryDataByIDsRequest,
   RemoveTagsFromBinaryDataByIDsRequestSchema,
   RemoveTagsFromBinaryDataByIDsResponseSchema,
+  SequenceResourceFilterSchema,
+  SequenceSchema,
   type TabularDataByMQLRequest,
   TabularDataByMQLRequestSchema,
   TabularDataByMQLResponseSchema,
@@ -76,6 +90,9 @@ import {
   type UpdateBoundingBoxRequest,
   UpdateBoundingBoxRequestSchema,
   UpdateBoundingBoxResponseSchema,
+  type UpdateSequenceRequest,
+  UpdateSequenceRequestSchema,
+  UpdateSequenceResponseSchema,
 } from '../gen/app/data/v1/data_pb';
 import {
   type CreateDataPipelineRequest,
@@ -1226,6 +1243,161 @@ describe('DataClient tests', () => {
       );
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('createSequence tests', () => {
+    let capReq: CreateSequenceRequest;
+    const orgId = 'test-org-id';
+    const sequenceId = 'test-sequence-id';
+    const resources = [
+      create(SequenceResourceFilterSchema, {
+        partId: 'part-id',
+        resourceName: 'my-sensor',
+        methodName: 'Readings',
+      }),
+    ];
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          createSequence: (req) => {
+            capReq = req;
+            return create(CreateSequenceResponseSchema, { id: sequenceId });
+          },
+        });
+      });
+    });
+
+    it('creates a sequence', async () => {
+      const expectedRequest = create(CreateSequenceRequestSchema, {
+        organizationId: orgId,
+        resources,
+      });
+
+      const result = await subject().createSequence(orgId, resources);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(sequenceId);
+    });
+  });
+
+  describe('getSequence tests', () => {
+    let capReq: GetSequenceRequest;
+    const sequenceId = 'test-sequence-id';
+    const sequence = create(SequenceSchema, {
+      id: sequenceId,
+      organizationId: 'org-id',
+    });
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getSequence: (req) => {
+            capReq = req;
+            return create(GetSequenceResponseSchema, { sequence });
+          },
+        });
+      });
+    });
+
+    it('gets a sequence', async () => {
+      const expectedRequest = create(GetSequenceRequestSchema, {
+        id: sequenceId,
+      });
+
+      const result = await subject().getSequence(sequenceId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(sequence);
+    });
+  });
+
+  describe('updateSequence tests', () => {
+    let capReq: UpdateSequenceRequest;
+    const sequenceId = 'test-sequence-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          updateSequence: (req) => {
+            capReq = req;
+            return create(UpdateSequenceResponseSchema);
+          },
+        });
+      });
+    });
+
+    it('updates a sequence', async () => {
+      const expectedRequest = create(UpdateSequenceRequestSchema, {
+        id: sequenceId,
+        sequenceTags: ['tag1'],
+      });
+
+      await subject().updateSequence(sequenceId, undefined, ['tag1']);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('deleteSequence tests', () => {
+    let capReq: DeleteSequenceRequest;
+    const sequenceId = 'test-sequence-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          deleteSequence: (req) => {
+            capReq = req;
+            return create(DeleteSequenceResponseSchema);
+          },
+        });
+      });
+    });
+
+    it('deletes a sequence', async () => {
+      const expectedRequest = create(DeleteSequenceRequestSchema, {
+        id: sequenceId,
+      });
+
+      await subject().deleteSequence(sequenceId);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('listSequences tests', () => {
+    let capReq: ListSequencesRequest;
+    const orgId = 'test-org-id';
+    const sequence1 = create(SequenceSchema, {
+      id: 'seq1',
+      organizationId: orgId,
+    });
+    const sequence2 = create(SequenceSchema, {
+      id: 'seq2',
+      organizationId: orgId,
+    });
+    const sequences = [sequence1, sequence2];
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          listSequences: (req) => {
+            capReq = req;
+            return create(ListSequencesResponseSchema, {
+              sequences,
+              nextPageToken: 'next-token',
+            });
+          },
+        });
+      });
+    });
+
+    it('lists sequences', async () => {
+      const expectedRequest = create(ListSequencesRequestSchema, {
+        organizationId: orgId,
+      });
+
+      const result = await subject().listSequences(orgId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result.sequences).toEqual(sequences);
+      expect(result.nextPageToken).toEqual('next-token');
     });
   });
 });

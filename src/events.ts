@@ -10,6 +10,8 @@ export enum MachineConnectionEvent {
   DISCONNECTING = 'disconnecting',
   DISCONNECTED = 'disconnected',
   DIALING = 'dialing',
+  RECONNECTING = 'reconnecting',
+  RECONNECTION_FAILED = 'reconnection_failed',
 }
 
 export class EventDispatcher {

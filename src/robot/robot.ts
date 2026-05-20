@@ -1,4 +1,5 @@
 import type { Struct } from '@bufbuild/protobuf/wkt';
+import type { CallOptions } from '@connectrpc/connect';
 
 import { MachineConnectionEvent } from '../events';
 import * as proto from '../gen/robot/v1/robot_pb';
@@ -123,7 +124,8 @@ export interface Robot {
   transformPose(
     source: PoseInFrame,
     destination: string,
-    supplementalTransforms: Transform[]
+    supplementalTransforms: Transform[],
+    callOptions?: CallOptions
   ): Promise<PoseInFrame>;
 
   /**

@@ -1,5 +1,6 @@
 import { create, type DescService } from '@bufbuild/protobuf';
 import {
+  type CallOptions,
   type Client,
   Code,
   ConnectError,
@@ -112,6 +113,12 @@ export interface DialWebRTCConf {
   turnPort?: number;
 
   /**
+   * When true, the connection to the signaling server is made over plain HTTP
+   * (no TLS). Use this when connecting to a robot running with `no_tls: true`.
+   */
+  signalingInsecure?: boolean;
+
+  /**
    * Set timeout in milliseconds for dialing. Default is defined by
    * DIAL_TIMEOUT. A value of 0 disables the timeout.
    *
@@ -178,6 +185,7 @@ interface WebRTCOptions {
   turnScheme?: 'turn' | 'turns';
   turnTransport?: 'tcp' | 'udp';
   turnPort?: number;
+  signalingInsecure?: boolean;
 }
 
 interface DirectOptions {
@@ -381,6 +389,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     | undefined;
 
   private currentRetryAttempt = 0;
+  private isReconnecting = false;
 
   private onICEConnectionStateChange?: () => void;
   private onDataChannelClose?: (event: Event) => void;
@@ -469,15 +478,18 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private onDisconnect(event?: Event) {
-    this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
-
     if (this.noReconnect !== undefined && this.noReconnect) {
+      this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
       return;
     }
 
     if (this.closed) {
+      this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
       return;
     }
+
+    this.isReconnecting = true;
+    this.emit(MachineConnectionEvent.RECONNECTING, { event: event ?? {} });
 
     // eslint-disable-next-line no-console
     console.debug('Connection closed, will try to reconnect');
@@ -529,21 +541,21 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     void backOff(async () => this.connect(), backOffOpts)
       .then(() => {
+        this.isReconnecting = false;
         // eslint-disable-next-line no-console
         console.debug('Reconnected successfully!');
       })
       .catch((error: unknown) => {
-        if (
-          this.reconnectMaxAttempts !== undefined &&
-          this.currentRetryAttempt >= this.reconnectMaxAttempts
-        ) {
-          // eslint-disable-next-line no-console
-          console.debug(`Reached max attempts: ${this.reconnectMaxAttempts}`);
-          return;
-        }
-
+        this.isReconnecting = false;
         // eslint-disable-next-line no-console
-        console.error(error);
+        console.debug(
+          `Reconnection failed after ${this.currentRetryAttempt} attempt(s)`,
+          error
+        );
+        this.emit(MachineConnectionEvent.RECONNECTION_FAILED, {
+          error,
+          attempts: this.currentRetryAttempt,
+        });
       });
   }
 
@@ -733,6 +745,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     this.webrtcOptions.turnScheme = conf.turnScheme;
     this.webrtcOptions.turnTransport = conf.turnTransport;
     this.webrtcOptions.turnPort = conf.turnPort;
+    this.webrtcOptions.signalingInsecure = conf.signalingInsecure;
 
     this.sessionOptions.disabled = conf.disableSessions ?? false;
 
@@ -1036,7 +1049,9 @@ export class RobotClient extends EventDispatcher implements Robot {
     dialTimeoutMs,
     extraHeaders,
   }: ConnectOptions = {}) {
-    this.emit(MachineConnectionEvent.CONNECTING, {});
+    if (!this.isReconnecting) {
+      this.emit(MachineConnectionEvent.CONNECTING, {});
+    }
     this.closed = false;
 
     if (this.connecting) {
@@ -1099,6 +1114,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           turnScheme: this.webrtcOptions.turnScheme,
           turnTransport: this.webrtcOptions.turnTransport,
           turnPort: this.webrtcOptions.turnPort,
+          signalingInsecure: this.webrtcOptions.signalingInsecure,
         },
         dialTimeoutMs: dialTimeoutMs ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
@@ -1203,7 +1219,9 @@ export class RobotClient extends EventDispatcher implements Robot {
       // Need to catch the error to properly emit disconnect but
       // also throw the error so reconnect backoff keeps retrying.
       // TODO(ethanlook): clean this up
-      this.emit(MachineConnectionEvent.DISCONNECTED, {});
+      if (!this.isReconnecting) {
+        this.emit(MachineConnectionEvent.DISCONNECTED, {});
+      }
       throw error;
     } finally {
       this.connectResolve?.();
@@ -1250,14 +1268,18 @@ export class RobotClient extends EventDispatcher implements Robot {
   async transformPose(
     source: PoseInFrame,
     destination: string,
-    supplementalTransforms: Transform[]
+    supplementalTransforms: Transform[],
+    callOptions?: CallOptions
   ) {
     const request = create(TransformPoseRequestSchema, {
       source,
       destination,
       supplementalTransforms,
     });
-    const response = await this.robotService.transformPose(request);
+    const response = await this.robotService.transformPose(
+      request,
+      callOptions
+    );
     const result = response.pose;
     if (!result) {
       // TODO: Can the response frame be undefined or null?

@@ -31,7 +31,7 @@ export interface ResponseMetadata {
 export type MimeType =
   | ''
   | 'image/vnd.viam.rgba'
-  | 'image/vnd.viam.depth'
+  | 'image/vnd.viam.dep'
   | 'image/jpeg'
   | 'image/png'
   | 'pointcloud/pcd'

@@ -3,6 +3,8 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 
 import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
 import {
+  GetCurrentInputsRequestSchema,
+  GoToInputsRequestSchema,
   GrabRequestSchema,
   GripperService,
   IsHoldingSomethingRequestSchema,
@@ -96,6 +98,34 @@ export class GripperClient implements Gripper {
 
     const resp = await this.client.isHoldingSomething(request, callOptions);
     return resp.isHoldingSomething;
+  }
+
+  async getCurrentInputs(extra = {}, callOptions = this.callOptions) {
+    const request = create(GetCurrentInputsRequestSchema, {
+      name: this.name,
+      extra,
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getCurrentInputs(request, callOptions);
+    return resp.values;
+  }
+
+  async goToInputs(
+    values: number[],
+    extra = {},
+    callOptions = this.callOptions
+  ) {
+    const request = create(GoToInputsRequestSchema, {
+      name: this.name,
+      values,
+      extra,
+    });
+
+    this.options.requestLogger?.(request);
+
+    await this.client.goToInputs(request, callOptions);
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonObject> {

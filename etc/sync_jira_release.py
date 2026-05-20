@@ -256,6 +256,8 @@ def main(version_input):
             skipped_count += 1
 
     # 6. Summary
+    release_page_url = f"{JIRA_BASE_URL}/projects/{JIRA_PROJECT_KEY}/versions/{version_id}/tab/release-report-all-issues"
+
     print(f"\n{'=' * 60}")
     print("🎉 Release sync complete!")
     print(f"   Version: Typescript SDK v{version}")
@@ -263,8 +265,21 @@ def main(version_input):
     print(f"   Tickets tagged (already closed): {tagged_count}")
     print(f"   Tickets skipped: {skipped_count}")
     print(f"   Total tickets: {len(ticket_keys)}")
-    print(f"   Release page: {JIRA_BASE_URL}/projects/{JIRA_PROJECT_KEY}/versions/{version_id}/tab/release-report-all-issues")
+    print(f"   Release page: {release_page_url}")
     print(f"{'=' * 60}")
+
+    # Write release page link to GitHub Actions job summary if running in CI
+    github_summary = os.getenv("GITHUB_STEP_SUMMARY")
+    if github_summary:
+        with open(github_summary, "a") as f:
+            f.write(f"### 🎉 Release sync complete!\n\n")
+            f.write(f"**Version:** Typescript SDK v{version}\n\n")
+            f.write(f"| Metric | Count |\n|---|---|\n")
+            f.write(f"| Tickets closed | {closed_count} |\n")
+            f.write(f"| Tickets tagged (already closed) | {tagged_count} |\n")
+            f.write(f"| Tickets skipped | {skipped_count} |\n")
+            f.write(f"| **Total tickets** | **{len(ticket_keys)}** |\n\n")
+            f.write(f"📋 [Release page]({release_page_url})\n")
 
 
 if __name__ == "__main__":

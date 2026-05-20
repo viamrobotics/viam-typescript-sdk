@@ -4,9 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { create } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 
-import { GripperService } from '../../gen/component/gripper/v1/gripper_pb';
 import {
+  GetCurrentInputsResponseSchema,
+  GoToInputsResponseSchema,
   GrabResponseSchema,
+  GripperService,
   IsHoldingSomethingResponseSchema,
   IsMovingResponseSchema,
   OpenResponseSchema,
@@ -19,6 +21,7 @@ vi.mock('../../robot');
 let gripper: GripperClient;
 const testIsMoving = true;
 const testIsHoldingSomething = true;
+const testCurrentInputs = [0.5, 1];
 
 describe('GripperClient tests', () => {
   beforeEach(() => {
@@ -40,6 +43,14 @@ describe('GripperClient tests', () => {
           return create(IsHoldingSomethingResponseSchema, {
             isHoldingSomething: testIsHoldingSomething,
           });
+        },
+        getCurrentInputs: () => {
+          return create(GetCurrentInputsResponseSchema, {
+            values: testCurrentInputs,
+          });
+        },
+        goToInputs: () => {
+          return create(GoToInputsResponseSchema);
         },
       });
     });
@@ -75,5 +86,15 @@ describe('GripperClient tests', () => {
     await expect(gripper.isHoldingSomething()).resolves.toBe(
       testIsHoldingSomething
     );
+  });
+
+  it('getCurrentInputs', async () => {
+    await expect(gripper.getCurrentInputs()).resolves.toStrictEqual(
+      testCurrentInputs
+    );
+  });
+
+  it('goToInputs', async () => {
+    await expect(gripper.goToInputs([0.5, 1])).resolves.toBeUndefined();
   });
 });
