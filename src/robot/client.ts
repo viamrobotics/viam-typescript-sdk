@@ -8,6 +8,7 @@ import {
   type Transport,
 } from '@connectrpc/connect';
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
+import { UuidTool } from 'uuid-tool';
 import { isCredential, type Credentials } from '../app/viam-transport';
 import { DIAL_TIMEOUT } from '../constants';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
@@ -37,7 +38,13 @@ import { MotionService } from '../gen/service/motion/v1/motion_connect';
 import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
 import { SLAMService } from '../gen/service/slam/v1/slam_connect';
 import { VisionService } from '../gen/service/vision/v1/vision_connect';
-import { dialDirect, dialWebRTC, type DialOptions } from '../rpc';
+import { writeDebugLog } from '../debug';
+import {
+  dialDirect,
+  dialWebRTC,
+  wrapTransportWithDebugLogging,
+  type DialOptions,
+} from '../rpc';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
@@ -397,6 +404,8 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private currentRetryAttempt = 0;
   private isReconnecting = false;
+
+  private connectionId: string | undefined;
 
   private onICEConnectionStateChange?: () => void;
   private onDataChannelClose?: (event: Event) => void;
@@ -1012,6 +1021,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   public async disconnect() {
+    writeDebugLog('client_closed', { connectionId: this.connectionId });
     this.emit(MachineConnectionEvent.DISCONNECTING, {});
 
     if (this.currentDialAbortSignal && this.dialing) {
@@ -1073,6 +1083,8 @@ export class RobotClient extends EventDispatcher implements Robot {
       return;
     }
 
+    const connectionId = UuidTool.newUuid();
+
     this.connecting = new Promise<void>((resolve) => {
       this.connectResolve = resolve;
     });
@@ -1096,6 +1108,13 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     try {
+      writeDebugLog('dial_started', {
+        connectionId,
+        method: this.webrtcOptions.enabled ? 'webrtc' : 'grpc',
+        host: this.serviceHost,
+        attempt: this.currentRetryAttempt,
+      });
+
       // inject source into header, like `viam-app` if provided
       const mergedHeaders = new Headers(clientHeaders);
       if (extraHeaders) {
@@ -1162,6 +1181,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.peerConn = webRTCConn.peerConnection;
         this.dataChannel = webRTCConn.dataChannel;
+        this.connectionId = connectionId;
 
         this.cleanupEventListeners();
 
@@ -1174,7 +1194,13 @@ export class RobotClient extends EventDispatcher implements Robot {
            * connection getting closed, so restarting ice is not a valid way to
            * recover.
            */
-          if (this.peerConn?.iceConnectionState === 'closed') {
+          const iceState = this.peerConn?.iceConnectionState;
+          if (iceState === 'disconnected') {
+            writeDebugLog('ice_disconnected', {
+              connectionId: this.connectionId,
+            });
+          }
+          if (iceState === 'closed') {
             this.onDisconnect();
           }
         };
@@ -1190,7 +1216,10 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.onDataChannelClose = (event: Event) => this.onDisconnect(event);
         this.dataChannel.addEventListener('close', this.onDataChannelClose);
 
-        this.transport = webRTCConn.transport;
+        this.transport = wrapTransportWithDebugLogging(
+          webRTCConn.transport,
+          connectionId
+        );
 
         this.onTrack = (event: RTCTrackEvent) => {
           const [eventStream] = event.streams;
@@ -1213,7 +1242,11 @@ export class RobotClient extends EventDispatcher implements Robot {
 
         this.peerConn.addEventListener('track', this.onTrack);
       } else {
-        this.transport = await dialDirect(this.serviceHost, opts);
+        this.connectionId = connectionId;
+        this.transport = wrapTransportWithDebugLogging(
+          await dialDirect(this.serviceHost, opts),
+          connectionId
+        );
         await this.gRPCConnectionManager.start();
       }
 
@@ -1223,11 +1256,22 @@ export class RobotClient extends EventDispatcher implements Robot {
 
       this.robotServiceClient = createClient(RobotService, clientTransport);
 
+      writeDebugLog('dial_success', {
+        connectionId,
+        method: this.webrtcOptions.enabled ? 'webrtc' : 'grpc',
+        host: this.serviceHost,
+      });
       this.emit(MachineConnectionEvent.CONNECTED, {});
     } catch (error) {
       // Need to catch the error to properly emit disconnect but
       // also throw the error so reconnect backoff keeps retrying.
       // TODO(ethanlook): clean this up
+      writeDebugLog('dial_failed', {
+        connectionId,
+        method: this.webrtcOptions.enabled ? 'webrtc' : 'grpc',
+        host: this.serviceHost,
+        error: error instanceof Error ? error.message : String(error),
+      });
       if (!this.isReconnecting) {
         this.emit(MachineConnectionEvent.DISCONNECTED, {});
       }

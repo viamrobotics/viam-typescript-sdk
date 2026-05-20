@@ -4,13 +4,17 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Code, ConnectError } from '@connectrpc/connect';
+import type { StreamResponse, UnaryResponse } from '@connectrpc/connect';
+import type { AnyMessage, MethodInfo, ServiceType } from '@bufbuild/protobuf';
 
 import {
   dialWebRTC,
   dialDirect,
   validateDialOptions,
   AuthenticatedTransport,
+  wrapTransportWithDebugLogging,
 } from '../dial';
+import { setDebugLogWriter, type DebugLogEntry } from '../../debug';
 
 import {
   TEST_URL,
@@ -482,5 +486,279 @@ describe('dialDirect', () => {
 
     // Assert
     expect(result).toBeInstanceOf(AuthenticatedTransport);
+  });
+});
+
+describe('wrapTransportWithDebugLogging', () => {
+  const mockService = { typeName: 'test.TestService' } as ServiceType;
+  const mockMethod = { name: 'TestMethod' } as MethodInfo;
+  const connectionId = 'test-connection-id';
+
+  const makeStreamResponse = (messages: AnyMessage[]): StreamResponse => {
+    const gen = function* gen() {
+      for (const msg of messages) {
+        yield msg;
+      }
+    };
+    return { stream: true, message: gen() } as unknown as StreamResponse;
+  };
+
+  // Returns a new empty async generator instance for use as stream input.
+  const makeEmptyInput = async function* makeEmptyInput() {
+    // no input messages
+  };
+
+  afterEach(() => {
+    setDebugLogWriter(undefined);
+    vi.restoreAllMocks();
+  });
+
+  describe('unary', () => {
+    it('delegates to the underlying transport with no writer set', async () => {
+      // Arrange
+      const transport = createMockTransport();
+      const mockResponse = {} as UnaryResponse;
+      vi.mocked(transport.unary).mockResolvedValue(mockResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const result = await wrapped.unary(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        {}
+      );
+
+      // Assert
+      expect(result).toBe(mockResponse);
+      expect(transport.unary).toHaveBeenCalledOnce();
+    });
+
+    it('logs grpc_request then grpc_response on success', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      vi.mocked(transport.unary).mockResolvedValue({} as UnaryResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      await wrapped.unary(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        {}
+      );
+
+      // Assert
+      const events = writer.mock.calls.map(([entry]) => entry.event);
+      expect(events).toEqual(['grpc_request', 'grpc_response']);
+
+      const [requestEntry] = writer.mock.calls[0]!;
+      expect(requestEntry.connectionId).toBe(connectionId);
+      expect(requestEntry.type).toBe('unary');
+      expect(requestEntry.method).toBe('test.TestService/TestMethod');
+
+      const [responseEntry] = writer.mock.calls[1]!;
+      expect(responseEntry.connectionId).toBe(connectionId);
+      expect(responseEntry.error).toBeUndefined();
+    });
+
+    it('logs grpc_response with error field and rethrows on failure', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      vi.mocked(transport.unary).mockRejectedValue(new Error('rpc failed'));
+
+      // Act & Assert
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      await expect(
+        wrapped.unary(
+          mockService,
+          mockMethod,
+          undefined,
+          undefined,
+          undefined,
+          {}
+        )
+      ).rejects.toThrow('rpc failed');
+
+      const [responseEntry] = writer.mock.calls[1]!;
+      expect(responseEntry.event).toBe('grpc_response');
+      expect(responseEntry.error).toBe('rpc failed');
+    });
+  });
+
+  describe('stream', () => {
+    it('returns the original response object directly when no writer is set', async () => {
+      // Arrange
+      const transport = createMockTransport();
+      const mockResponse = makeStreamResponse([]);
+      vi.mocked(transport.stream).mockResolvedValue(mockResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const result = await wrapped.stream(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput()
+      );
+
+      // Assert — same object reference proves the short-circuit path was taken
+      expect(result).toBe(mockResponse);
+    });
+
+    it('logs grpc_request once and grpc_response per message', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      const messages = [{}, {}, {}] as AnyMessage[];
+      vi.mocked(transport.stream).mockResolvedValue(
+        makeStreamResponse(messages)
+      );
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const resp = await wrapped.stream(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput()
+      );
+      for await (const _ of resp.message) {
+        /* consume */
+      }
+
+      // Assert
+      const requestCalls = writer.mock.calls.filter(
+        ([entry]) => entry.event === 'grpc_request'
+      );
+      const responseCalls = writer.mock.calls.filter(
+        ([entry]) => entry.event === 'grpc_response'
+      );
+      expect(requestCalls).toHaveLength(1);
+      expect(responseCalls).toHaveLength(3);
+
+      for (const [entry] of responseCalls) {
+        expect(entry.connectionId).toBe(connectionId);
+        expect(entry.type).toBe('stream');
+        expect(entry.error).toBeUndefined();
+      }
+    });
+
+    it('yields all original messages unchanged', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      const messages = [{ a: 1 }, { a: 2 }] as unknown as AnyMessage[];
+      vi.mocked(transport.stream).mockResolvedValue(
+        makeStreamResponse(messages)
+      );
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const resp = await wrapped.stream(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput()
+      );
+      const received: AnyMessage[] = [];
+      for await (const msg of resp.message) {
+        received.push(msg);
+      }
+
+      // Assert
+      expect(received).toEqual(messages);
+    });
+
+    it('logs grpc_response with error when transport.stream rejects', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      vi.mocked(transport.stream).mockRejectedValue(
+        new Error('stream open failed')
+      );
+
+      // Act & Assert
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      await expect(
+        wrapped.stream(
+          mockService,
+          mockMethod,
+          undefined,
+          undefined,
+          undefined,
+          makeEmptyInput()
+        )
+      ).rejects.toThrow('stream open failed');
+
+      const responseCalls = writer.mock.calls.filter(
+        ([entry]) => entry.event === 'grpc_response'
+      );
+      expect(responseCalls).toHaveLength(1);
+      expect(responseCalls[0]![0].error).toBe('stream open failed');
+    });
+
+    it('logs grpc_response with error on mid-stream failure', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      const streamError = new Error('mid-stream error');
+
+      const failingMessages =
+        function* failingMessages(): Generator<AnyMessage> {
+          yield {} as AnyMessage;
+          yield {} as AnyMessage;
+          throw streamError;
+        };
+
+      vi.mocked(transport.stream).mockResolvedValue({
+        stream: true,
+        message: failingMessages(),
+      } as unknown as StreamResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const resp = await wrapped.stream(
+        mockService,
+        mockMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput()
+      );
+
+      await expect(async () => {
+        for await (const _ of resp.message) {
+          /* consume */
+        }
+      }).rejects.toThrow('mid-stream error');
+
+      // Assert — 2 successful messages + 1 error
+      const responseCalls = writer.mock.calls.filter(
+        ([entry]) => entry.event === 'grpc_response'
+      );
+      expect(responseCalls).toHaveLength(3);
+      expect(responseCalls[0]![0].error).toBeUndefined();
+      expect(responseCalls[1]![0].error).toBeUndefined();
+      expect(responseCalls[2]![0].error).toBe('mid-stream error');
+    });
   });
 });
