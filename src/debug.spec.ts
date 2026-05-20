@@ -78,7 +78,10 @@ describe('debug logging', () => {
       const debugSpy = vi.fn<[string, string]>();
       vi.stubGlobal('console', { ...console, debug: debugSpy });
       const writer = createConsoleLogWriter();
-      const entry = { timestamp: new Date('2024-01-01T00:00:00.000Z'), event: 'test' };
+      const entry = {
+        timestamp: new Date('2024-01-01T00:00:00.000Z'),
+        event: 'test',
+      };
 
       writer(entry);
 
