@@ -1,4 +1,4 @@
-import { create, type DescService } from '@bufbuild/protobuf';
+import { create, type DescService, MessageInitShape } from '@bufbuild/protobuf';
 import {
   type CallOptions,
   type Client,
@@ -13,7 +13,7 @@ import { type Credentials, isCredential } from '../app/viam-transport';
 import { assertExists } from '../assert';
 import { DIAL_TIMEOUT } from '../constants';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
-import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
+import type { PoseInFrameSchema, Transform } from '../gen/common/v1/common_pb';
 import { ArmService } from '../gen/component/arm/v1/arm_pb';
 import { BaseService } from '../gen/component/base/v1/base_pb';
 import { BoardService } from '../gen/component/board/v1/board_pb';
@@ -70,9 +70,9 @@ export interface DialWebRTCConf {
   reconnectAbortSignal?: { abort: boolean };
 
   /**
-   * Called when a non-retryable error is encountered during reconnection.
-   * Return true to treat the error as retryable. Does not override
-   * reconnectMaxAttempts — retries are still bounded by that limit.
+   * Called when a non-retryable error is encountered during reconnection. Return true to treat the
+   * error as retryable. Does not override reconnectMaxAttempts — retries are still bounded by that
+   * limit.
    */
   shouldRetryOnError?: () => boolean;
 
@@ -83,23 +83,21 @@ export interface DialWebRTCConf {
   priority?: number;
 
   /**
-   * When true, sets ICE transport policy to relay-only so only TURN candidates
-   * are used. Useful for testing relay connectivity through a TURN server.
+   * When true, sets ICE transport policy to relay-only so only TURN candidates are used. Useful for
+   * testing relay connectivity through a TURN server.
    */
   forceRelay?: boolean;
 
   /**
-   * When true, strips TURN servers from the ICE configuration so only host and
-   * server-reflexive candidates are used. Useful for testing direct
-   * connectivity without relay fallback.
+   * When true, strips TURN servers from the ICE configuration so only host and server-reflexive
+   * candidates are used. Useful for testing direct connectivity without relay fallback.
    */
   forceP2P?: boolean;
 
   /**
-   * When set, filters the signaling server's TURN list to only the server whose
-   * parsed URI matches (compared by scheme, host, port, and transport —
-   * defaulting transport to UDP if unspecified). Example:
-   * `"turn:turn.viam.com:443"`
+   * When set, filters the signaling server's TURN list to only the server whose parsed URI matches
+   * (compared by scheme, host, port, and transport — defaulting transport to UDP if unspecified).
+   * Example: `"turn:turn.viam.com:443"`
    */
   turnUri?: string;
 
@@ -113,22 +111,22 @@ export interface DialWebRTCConf {
   turnPort?: number;
 
   /**
-   * When true, the connection to the signaling server is made over plain HTTP
-   * (no TLS). Use this when connecting to a robot running with `no_tls: true`.
+   * When true, the connection to the signaling server is made over plain HTTP (no TLS). Use this
+   * when connecting to a robot running with `no_tls: true`.
    */
   signalingInsecure?: boolean;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by
-   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
+   * disables the timeout.
    *
    * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by
-   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
+   * disables the timeout.
    */
   dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
@@ -145,23 +143,23 @@ export interface DialDirectConf {
   reconnectAbortSignal?: { abort: boolean };
 
   /**
-   * Called when a non-retryable error is encountered during reconnection.
-   * Return true to treat the error as retryable. Does not override
-   * reconnectMaxAttempts — retries are still bounded by that limit.
+   * Called when a non-retryable error is encountered during reconnection. Return true to treat the
+   * error as retryable. Does not override reconnectMaxAttempts — retries are still bounded by that
+   * limit.
    */
   shouldRetryOnError?: () => boolean;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by
-   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
+   * disables the timeout.
    *
    * @deprecated Use `dialTimeoutMs` instead.
    */
   dialTimeout?: number;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by
-   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
+   * disables the timeout.
    */
   dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
@@ -204,8 +202,8 @@ export interface ConnectOptions {
   priority?: number;
 
   /**
-   * Set timeout in milliseconds for dialing. Default is defined by
-   * DIAL_TIMEOUT. A value of 0 disables the timeout.
+   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
+   * disables the timeout.
    */
   dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
@@ -264,10 +262,7 @@ const isRetryableError = (error: unknown): boolean => {
   return true;
 };
 
-/**
- * Validates a DialConf passed to createRobotClient. Throws an error for invalid
- * configs.
- */
+/** Validates a DialConf passed to createRobotClient. Throws an error for invalid configs. */
 export const validateDialConf = (conf: DialConf) => {
   if (conf.credentials && isCredential(conf.credentials)) {
     try {
@@ -279,18 +274,15 @@ export const validateDialConf = (conf: DialConf) => {
     }
   }
 
-  if (
-    conf.reconnectMaxAttempts !== undefined &&
-    !isPosInt(conf.reconnectMaxAttempts)
-  ) {
+  if (conf.reconnectMaxAttempts !== undefined && !isPosInt(conf.reconnectMaxAttempts)) {
     throw new Error(
-      `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`
+      `Value of max reconnect attempts (${conf.reconnectMaxAttempts}) should be a positive integer`,
     );
   }
 
   if (conf.reconnectMaxWait !== undefined && !isPosInt(conf.reconnectMaxWait)) {
     throw new Error(
-      `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`
+      `Value of max reconnect wait (${conf.reconnectMaxWait}) should be a positive integer`,
     );
   }
 };
@@ -358,17 +350,11 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private mlModelServiceClient: Client<typeof MLModelService> | undefined;
 
-  private movementSensorServiceClient:
-    | Client<typeof MovementSensorService>
-    | undefined;
+  private movementSensorServiceClient: Client<typeof MovementSensorService> | undefined;
 
-  private powerSensorServiceClient:
-    | Client<typeof PowerSensorService>
-    | undefined;
+  private powerSensorServiceClient: Client<typeof PowerSensorService> | undefined;
 
-  private inputControllerServiceClient:
-    | Client<typeof InputControllerService>
-    | undefined;
+  private inputControllerServiceClient: Client<typeof InputControllerService> | undefined;
 
   private motorServiceClient: Client<typeof MotorService> | undefined;
 
@@ -384,9 +370,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private slamServiceClient: Client<typeof SLAMService> | undefined;
 
-  private worldStateStoreServiceClient:
-    | Client<typeof WorldStateStoreService>
-    | undefined;
+  private worldStateStoreServiceClient: Client<typeof WorldStateStoreService> | undefined;
 
   private currentRetryAttempt = 0;
   private isReconnecting = false;
@@ -399,7 +383,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     serviceHost?: string,
     webrtcOptions?: WebRTCOptions,
     sessionOptions?: SessionOptions,
-    directOptions?: DirectOptions
+    directOptions?: DirectOptions,
   ) {
     super();
 
@@ -428,17 +412,14 @@ export class RobotClient extends EventDispatcher implements Robot {
       },
       () => {
         this.onDisconnect();
-      }
+      },
     );
-    this.sessionManager = new SessionManager(
-      this.serviceHost,
-      (): Transport => {
-        if (!this.transport) {
-          throw new Error(RobotClient.notConnectedYetStr);
-        }
-        return this.transport;
+    this.sessionManager = new SessionManager(this.serviceHost, (): Transport => {
+      if (!this.transport) {
+        throw new Error(RobotClient.notConnectedYetStr);
       }
-    );
+      return this.transport;
+    });
 
     // For each connection event type, add a listener to capture that
     // event and re-emit it with the 'connectionstatechange' event
@@ -460,7 +441,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     if (this.peerConn && this.onICEConnectionStateChange) {
       this.peerConn.removeEventListener(
         'iceconnectionstatechange',
-        this.onICEConnectionStateChange
+        this.onICEConnectionStateChange,
       );
 
       this.onICEConnectionStateChange = undefined;
@@ -496,10 +477,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     const backOffOpts: Partial<IBackOffOptions> = {
       retry: (error, attemptNumber) => {
         // eslint-disable-next-line no-console
-        console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff`,
-          error
-        );
+        console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`, error);
 
         this.currentRetryAttempt = attemptNumber;
         if (this.closed) {
@@ -515,16 +493,13 @@ export class RobotClient extends EventDispatcher implements Robot {
           // eslint-disable-next-line no-console
           console.debug(
             'Non-retryable error encountered, but shouldRetryOnError returned true',
-            error
+            error,
           );
           return true;
         }
 
         // eslint-disable-next-line no-console
-        console.debug(
-          'Non-retryable error encountered, stopping reconnection attempts',
-          error
-        );
+        console.debug('Non-retryable error encountered, stopping reconnection attempts', error);
         return false;
       },
     };
@@ -548,10 +523,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       .catch((error: unknown) => {
         this.isReconnecting = false;
         // eslint-disable-next-line no-console
-        console.debug(
-          `Reconnection failed after ${this.currentRetryAttempt} attempt(s)`,
-          error
-        );
+        console.debug(`Reconnection failed after ${this.currentRetryAttempt} attempt(s)`, error);
         this.emit(MachineConnectionEvent.RECONNECTION_FAILED, {
           error,
           attempts: this.currentRetryAttempt,
@@ -564,23 +536,15 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private get reconnectMaxAttempts() {
-    return (
-      this.webrtcOptions.reconnectMaxAttempts ??
-      this.directOptions.reconnectMaxAttempts
-    );
+    return this.webrtcOptions.reconnectMaxAttempts ?? this.directOptions.reconnectMaxAttempts;
   }
 
   private get reconnectMaxWait() {
-    return (
-      this.webrtcOptions.reconnectMaxWait ?? this.directOptions.reconnectMaxWait
-    );
+    return this.webrtcOptions.reconnectMaxWait ?? this.directOptions.reconnectMaxWait;
   }
 
   private get shouldRetryOnError() {
-    return (
-      this.webrtcOptions.shouldRetryOnError ??
-      this.directOptions.shouldRetryOnError
-    );
+    return this.webrtcOptions.shouldRetryOnError ?? this.directOptions.shouldRetryOnError;
   }
 
   get sessionId() {
@@ -637,22 +601,17 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   get movementSensorService() {
-    this.movementSensorServiceClient ??= this.createServiceClient(
-      MovementSensorService
-    );
+    this.movementSensorServiceClient ??= this.createServiceClient(MovementSensorService);
     return this.movementSensorServiceClient;
   }
 
   get powerSensorService() {
-    this.powerSensorServiceClient ??=
-      this.createServiceClient(PowerSensorService);
+    this.powerSensorServiceClient ??= this.createServiceClient(PowerSensorService);
     return this.powerSensorServiceClient;
   }
 
   get inputControllerService() {
-    this.inputControllerServiceClient ??= this.createServiceClient(
-      InputControllerService
-    );
+    this.inputControllerServiceClient ??= this.createServiceClient(InputControllerService);
     return this.inputControllerServiceClient;
   }
 
@@ -662,8 +621,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   get navigationService() {
-    this.navigationServiceClient ??=
-      this.createServiceClient(NavigationService);
+    this.navigationServiceClient ??= this.createServiceClient(NavigationService);
     return this.navigationServiceClient;
   }
 
@@ -693,9 +651,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   get worldStateStoreService() {
-    this.worldStateStoreServiceClient ??= this.createServiceClient(
-      WorldStateStoreService
-    );
+    this.worldStateStoreServiceClient ??= this.createServiceClient(WorldStateStoreService);
     return this.worldStateStoreServiceClient;
   }
 
@@ -709,15 +665,10 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   private get clientTransport() {
-    return this.sessionOptions.disabled
-      ? this.transport
-      : this.sessionManager.transport;
+    return this.sessionOptions.disabled ? this.transport : this.sessionManager.transport;
   }
 
-  private async dialWebRTC(
-    conf: DialWebRTCConf,
-    abortSignal?: DialAbortSignal
-  ) {
+  private async dialWebRTC(conf: DialWebRTCConf, abortSignal?: DialAbortSignal) {
     // Check if aborted before starting
     if (abortSignal?.abort === true) {
       throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
@@ -759,10 +710,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     return this;
   }
 
-  private async dialDirect(
-    conf: DialDirectConf,
-    abortSignal?: DialAbortSignal
-  ) {
+  private async dialDirect(conf: DialDirectConf, abortSignal?: DialAbortSignal) {
     // Check if aborted before starting
     if (abortSignal?.abort === true) {
       throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
@@ -775,9 +723,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     /** Check if a url corresponds to a local connection via heuristic */
     if (!conf.host.includes('local')) {
-      throw new Error(
-        `cannot dial "${conf.host}" directly, please use a local url instead.`
-      );
+      throw new Error(`cannot dial "${conf.host}" directly, please use a local url instead.`);
     }
 
     this.serviceHost = conf.host;
@@ -825,7 +771,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     const dialPromise = this.performDial(
       conf,
       this.currentDialAbortSignal,
-      conf.reconnectAbortSignal ?? { abort: false }
+      conf.reconnectAbortSignal ?? { abort: false },
     );
 
     this.dialing = dialPromise;
@@ -835,10 +781,7 @@ export class RobotClient extends EventDispatcher implements Robot {
       return result;
     } catch (error) {
       this.resetDialing(dialPromise);
-      if (
-        error instanceof Error &&
-        error.message === DIAL_ABORTED_ERROR_MESSAGE
-      ) {
+      if (error instanceof Error && error.message === DIAL_ABORTED_ERROR_MESSAGE) {
         // eslint-disable-next-line no-console
         console.debug(DIAL_ABORTED_ERROR_MESSAGE);
         return this;
@@ -849,7 +792,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
   private createBackOffOpts(
     { abort: internalAbort }: DialAbortSignal,
-    { abort: userAbort }: DialAbortSignal
+    { abort: userAbort }: DialAbortSignal,
   ): Partial<IBackOffOptions> {
     return {
       retry: (error, attemptNumber) => {
@@ -859,10 +802,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         }
 
         // eslint-disable-next-line no-console
-        console.debug(
-          `Failed to connect, attempt ${attemptNumber} with backoff`,
-          error
-        );
+        console.debug(`Failed to connect, attempt ${attemptNumber} with backoff`, error);
 
         this.currentRetryAttempt = attemptNumber;
 
@@ -875,10 +815,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         }
 
         // eslint-disable-next-line no-console
-        console.debug(
-          'Non-retryable error encountered, stopping connection attempts',
-          error
-        );
+        console.debug('Non-retryable error encountered, stopping connection attempts', error);
         return false;
       },
     };
@@ -887,19 +824,18 @@ export class RobotClient extends EventDispatcher implements Robot {
   private async tryWebRTCDial(
     conf: DialWebRTCConf,
     internalAbortSignal: DialAbortSignal,
-    backOffOpts: Partial<IBackOffOptions>
+    backOffOpts: Partial<IBackOffOptions>,
   ): Promise<{ dialer: RobotClient; error?: Error }> {
     try {
       const dialer = await backOff(
         async () => this.dialWebRTC(conf, internalAbortSignal),
-        backOffOpts
+        backOffOpts,
       );
       return { dialer };
     } catch (error) {
       throwOnAbortError(error);
 
-      const dialWebRTCError =
-        error instanceof Error ? error : new Error(String(error));
+      const dialWebRTCError = error instanceof Error ? error : new Error(String(error));
 
       // eslint-disable-next-line no-console
       console.debug('Failed to connect via WebRTC', dialWebRTCError);
@@ -914,19 +850,18 @@ export class RobotClient extends EventDispatcher implements Robot {
   private async tryDirectDial(
     conf: DialDirectConf,
     internalAbortSignal: DialAbortSignal,
-    backOffOpts: Partial<IBackOffOptions>
+    backOffOpts: Partial<IBackOffOptions>,
   ): Promise<{ dialer: RobotClient; error?: Error }> {
     try {
       const dialer = await backOff(
         async () => this.dialDirect(conf, internalAbortSignal),
-        backOffOpts
+        backOffOpts,
       );
       return { dialer };
     } catch (error) {
       throwOnAbortError(error);
 
-      const dialDirectError =
-        error instanceof Error ? error : new Error(String(error));
+      const dialDirectError = error instanceof Error ? error : new Error(String(error));
 
       // eslint-disable-next-line no-console
       console.debug('Failed to connect via gRPC', dialDirectError);
@@ -941,34 +876,27 @@ export class RobotClient extends EventDispatcher implements Robot {
   private async performDial(
     conf: DialConf,
     internalAbortSignal: DialAbortSignal,
-    userAbortSignal?: DialAbortSignal
+    userAbortSignal?: DialAbortSignal,
   ): Promise<RobotClient> {
     const backOffOpts = this.createBackOffOpts(
       internalAbortSignal,
-      userAbortSignal ?? { abort: false }
+      userAbortSignal ?? { abort: false },
     );
 
     if (conf.reconnectMaxWait !== undefined) {
       backOffOpts.maxDelay = conf.reconnectMaxWait;
     }
 
-    backOffOpts.numOfAttempts = conf.noReconnect
-      ? 1
-      : conf.reconnectMaxAttempts;
+    backOffOpts.numOfAttempts = conf.noReconnect ? 1 : conf.reconnectMaxAttempts;
 
     this.currentRetryAttempt = 0;
     const errors: Error[] = [];
     const isWebRTC = isDialWebRTCConf(conf);
     const potentialErrors = isWebRTC ? 2 : 1;
 
-    const aborted =
-      internalAbortSignal.abort || userAbortSignal?.abort === true;
+    const aborted = internalAbortSignal.abort || userAbortSignal?.abort === true;
     if (isWebRTC && !aborted) {
-      const { dialer, error } = await this.tryWebRTCDial(
-        conf,
-        internalAbortSignal,
-        backOffOpts
-      );
+      const { dialer, error } = await this.tryWebRTCDial(conf, internalAbortSignal, backOffOpts);
       // If WebRTC succeeded, return the client
       if (!error) {
         return dialer;
@@ -979,14 +907,9 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     this.currentRetryAttempt = 0;
 
-    const abortedAfterWebRTC =
-      internalAbortSignal.abort || userAbortSignal?.abort === true;
+    const abortedAfterWebRTC = internalAbortSignal.abort || userAbortSignal?.abort === true;
     if (!abortedAfterWebRTC) {
-      const { dialer, error } = await this.tryDirectDial(
-        conf,
-        internalAbortSignal,
-        backOffOpts
-      );
+      const { dialer, error } = await this.tryDirectDial(conf, internalAbortSignal, backOffOpts);
       // If gRPC succeeded, return the client
       if (!error) {
         return dialer;
@@ -1093,10 +1016,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         for (const [key, value] of Object.entries(extraHeaders)) {
           if (key === 'viam_client' && mergedHeaders.has('viam_client')) {
             const sdkValue = mergedHeaders.get('viam_client')!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-            const modifiedValue = sdkValue.replace(
-              'typescript;',
-              `typescript(${value});`
-            );
+            const modifiedValue = sdkValue.replace('typescript;', `typescript(${value});`);
             mergedHeaders.set('viam_client', modifiedValue);
           } else {
             mergedHeaders.set(key, value);
@@ -1142,13 +1062,12 @@ export class RobotClient extends EventDispatcher implements Robot {
           opts.webrtcOptions.signalingCredentials = opts.credentials;
         }
 
-        const signalingAddress =
-          this.webrtcOptions.signalingAddress || this.serviceHost;
+        const signalingAddress = this.webrtcOptions.signalingAddress || this.serviceHost;
         const webRTCConn = await dialWebRTC(
           signalingAddress,
           this.webrtcOptions.host,
           opts,
-          this.serviceHost !== '' && signalingAddress !== this.serviceHost
+          this.serviceHost !== '' && signalingAddress !== this.serviceHost,
         );
 
         this.peerConn = webRTCConn.peerConnection;
@@ -1170,10 +1089,7 @@ export class RobotClient extends EventDispatcher implements Robot {
           }
         };
 
-        this.peerConn.addEventListener(
-          'iceconnectionstatechange',
-          this.onICEConnectionStateChange
-        );
+        this.peerConn.addEventListener('iceconnectionstatechange', this.onICEConnectionStateChange);
 
         // There is not an iceconnectionstatechange nor connectionstatechange
         // event when the peerConn closes. Instead, listen to the data channel
@@ -1266,20 +1182,17 @@ export class RobotClient extends EventDispatcher implements Robot {
   }
 
   async transformPose(
-    source: PoseInFrame,
+    source: MessageInitShape<typeof PoseInFrameSchema>,
     destination: string,
     supplementalTransforms: Transform[],
-    callOptions?: CallOptions
+    callOptions?: CallOptions,
   ) {
     const request = create(TransformPoseRequestSchema, {
       source,
       destination,
       supplementalTransforms,
     });
-    const response = await this.robotService.transformPose(
-      request,
-      callOptions
-    );
+    const response = await this.robotService.transformPose(request, callOptions);
     const result = response.pose;
     if (!result) {
       // TODO: Can the response frame be undefined or null?
@@ -1288,11 +1201,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     return result;
   }
 
-  async transformPCD(
-    pointCloudPCD: Uint8Array,
-    source: string,
-    destination: string
-  ) {
+  async transformPCD(pointCloudPCD: Uint8Array, source: string, destination: string) {
     const request = create(TransformPCDRequestSchema, {
       pointCloudPcd: pointCloudPCD,
       source,
@@ -1360,7 +1269,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   async getPose(
     componentName: string,
     destinationFrame: string,
-    supplementalTransforms: Transform[]
+    supplementalTransforms: Transform[],
   ) {
     const request = create(GetPoseRequestSchema, {
       componentName,

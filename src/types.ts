@@ -25,13 +25,11 @@ export interface Resource {
    * // Struct (still supported)
    * import { Struct } from '@viamrobotics/sdk';
    *
-   * const result = await resource.doCommand(
-   *   Struct.fromJson({ myCommand: { key: 'value' } })
-   * );
+   * const result = await resource.doCommand(Struct.fromJson({ myCommand: { key: 'value' } }));
    * ```
    *
-   * @param command - The command to execute. Accepts either a {@link Struct} or
-   *   a plain object, which will be converted automatically.
+   * @param command - The command to execute. Accepts either a {@link Struct} or a plain object,
+   *   which will be converted automatically.
    */
   doCommand(command: JsonObject): Promise<JsonObject>;
 
@@ -68,5 +66,5 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export type { JsonObject, JsonValue } from '@bufbuild/protobuf';
+export type { JsonObject, JsonValue, MessageInitShape, MessageShape } from '@bufbuild/protobuf';
 export type { Duration, Struct } from '@bufbuild/protobuf/wkt';
