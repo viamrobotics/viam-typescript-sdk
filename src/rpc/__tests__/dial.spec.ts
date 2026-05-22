@@ -2,22 +2,22 @@
 
 /* eslint-disable @typescript-eslint/unbound-method */
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { Transport } from '@connectrpc/connect';
+import type { StreamResponse, Transport, UnaryResponse } from '@connectrpc/connect';
 import { Code, ConnectError } from '@connectrpc/connect';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createMockTransport } from '../../__tests__/mocks/transports';
-import {
-  createMockDataChannel,
-  createMockPeerConnection,
-} from '../../__tests__/mocks/webrtc';
+import { createMockDataChannel, createMockPeerConnection } from '../../__tests__/mocks/webrtc';
+import { setDebugLogWriter, type DebugLogEntry } from '../../debug';
 import { ClientChannel } from '../client-channel';
 import {
   AuthenticatedTransport,
   dialDirect,
   dialWebRTC,
   validateDialOptions,
+  wrapTransportWithDebugLogging,
 } from '../dial';
+
 import {
   TEST_HOST,
   TEST_URL,
@@ -44,6 +44,7 @@ vi.mock('@connectrpc/connect-web', () => ({
 import { createClient } from '@connectrpc/connect';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
 
+import { DescMethodStreaming, DescMethodUnary, DescService, Message } from '@bufbuild/protobuf';
 import { newPeerConnectionForClient } from '../peer';
 import { SignalingExchange } from '../signaling-exchange';
 
@@ -120,7 +121,7 @@ describe('dialWebRTC', () => {
 
       // Act
       const promise = dialWebRTC(TEST_URL, TEST_HOST, { dialTimeoutMs }).catch(
-        (error_: unknown) => error_ as Error
+        (error_: unknown) => error_ as Error,
       );
       await vi.advanceTimersByTimeAsync(100);
       const result = await promise;
@@ -137,15 +138,14 @@ describe('dialWebRTC', () => {
     it('should terminate exchange when timeout fires', async () => {
       // Arrange
       vi.useFakeTimers();
-      const { peerConnection, dataChannel, signalingExchange } =
-        setupDialWebRTCMocks();
+      const { peerConnection, dataChannel, signalingExchange } = setupDialWebRTCMocks();
       vi.mocked(signalingExchange.doExchange).mockImplementation(
         async () =>
           new Promise<ClientChannel>((resolve) => {
             setTimeout(() => {
               resolve(new ClientChannel(peerConnection, dataChannel));
             }, 10_000);
-          })
+          }),
       );
 
       // Act
@@ -158,7 +158,7 @@ describe('dialWebRTC', () => {
       expect(vi.mocked(signalingExchange.terminate)).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'timed out',
-        })
+        }),
       );
     });
 
@@ -195,7 +195,7 @@ describe('dialWebRTC', () => {
       expect(createGrpcWebTransport).toHaveBeenCalledWith(
         expect.objectContaining({
           baseUrl: TEST_URL,
-        })
+        }),
       );
     });
   });
@@ -208,9 +208,7 @@ describe('dialWebRTC', () => {
       vi.mocked(signalingExchange.doExchange).mockRejectedValueOnce(error);
 
       // Act & Assert
-      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow(
-        'Exchange failed'
-      );
+      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow('Exchange failed');
       expect(vi.mocked(peerConnection.close)).toHaveBeenCalled();
     });
 
@@ -222,9 +220,7 @@ describe('dialWebRTC', () => {
       });
 
       // Act & Assert
-      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow(
-        'Transport creation failed'
-      );
+      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow('Transport creation failed');
       expect(newPeerConnectionForClient).not.toHaveBeenCalled();
     });
 
@@ -235,9 +231,7 @@ describe('dialWebRTC', () => {
       vi.mocked(signalingExchange.doExchange).mockRejectedValueOnce(error);
 
       // Act & Assert
-      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow(
-        'Custom error'
-      );
+      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow('Custom error');
     });
   });
 
@@ -264,7 +258,7 @@ describe('dialWebRTC', () => {
             expect.objectContaining({ urls: 'stun:test.server.com' }),
           ]),
         }),
-        additionalSdpFields
+        additionalSdpFields,
       );
 
       expect(SignalingExchange).toHaveBeenCalledWith(
@@ -276,7 +270,7 @@ describe('dialWebRTC', () => {
         }),
         peerConnection,
         dataChannel,
-        { additionalSdpFields, disableTrickleICE: true, rtcConfig }
+        { additionalSdpFields, disableTrickleICE: true, rtcConfig },
       );
     });
   });
@@ -305,14 +299,12 @@ describe('validateDialOptions', () => {
     {
       description: 'both accessToken and signalingAccessToken are set',
       options: { ...withAccessToken, ...withSignalingAccessToken },
-      expectedError:
-        'cannot set webrtcOptions.signalingAccessToken with accessToken',
+      expectedError: 'cannot set webrtcOptions.signalingAccessToken with accessToken',
     },
     {
       description: 'both accessToken and signalingCredentials are set',
       options: { ...withAccessToken, ...withSignalingCredentials },
-      expectedError:
-        'cannot set webrtcOptions.signalingCredentials with accessToken',
+      expectedError: 'cannot set webrtcOptions.signalingCredentials with accessToken',
     },
     {
       description: 'both signalingAccessToken and signalingCredentials are set',
@@ -356,10 +348,7 @@ describe('resource management', () => {
 
     // Assert
     expect(createClient).toHaveBeenCalledTimes(1);
-    expect(createClient).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything()
-    );
+    expect(createClient).toHaveBeenCalledWith(expect.anything(), expect.anything());
   });
 
   it('should not leak transports on successful connection', async () => {
@@ -406,19 +395,17 @@ describe('resource management', () => {
     setupDialWebRTCMocks();
     const capturedTransports: Transport[] = [];
 
-    vi.mocked(createClient).mockImplementation(
-      (_service, capturedTransport) => {
-        capturedTransports.push(capturedTransport);
-        return {
-          optionalWebRTCConfig: vi.fn().mockResolvedValue({
-            config: {
-              additionalIceServers: [],
-              disableTrickle: false,
-            },
-          }),
-        } as unknown as ReturnType<typeof createClient>;
-      }
-    );
+    vi.mocked(createClient).mockImplementation((_service, capturedTransport) => {
+      capturedTransports.push(capturedTransport);
+      return {
+        optionalWebRTCConfig: vi.fn().mockResolvedValue({
+          config: {
+            additionalIceServers: [],
+            disableTrickle: false,
+          },
+        }),
+      } as unknown as ReturnType<typeof createClient>;
+    });
 
     // Act
     await dialWebRTC(TEST_URL, TEST_HOST);
@@ -465,9 +452,9 @@ describe('dialDirect', () => {
 
   it('should validate options before creating transport', async () => {
     // Act & Assert
-    await expect(
-      dialDirect(TEST_URL, { ...withAccessToken, ...withCredentials })
-    ).rejects.toThrow('cannot set credentials with accessToken');
+    await expect(dialDirect(TEST_URL, { ...withAccessToken, ...withCredentials })).rejects.toThrow(
+      'cannot set credentials with accessToken',
+    );
   });
 
   it('should return AuthenticatedTransport when accessToken is provided', async () => {
@@ -481,5 +468,233 @@ describe('dialDirect', () => {
 
     // Assert
     expect(result).toBeInstanceOf(AuthenticatedTransport);
+  });
+});
+
+describe('wrapTransportWithDebugLogging', () => {
+  const mockService = { typeName: 'test.TestService' } as DescService;
+  const mockUnaryMethod = { name: 'TestUnaryMethod' } as DescMethodUnary;
+  const mockStreamMethod = { name: 'TestStreamMethod' } as DescMethodStreaming;
+  const connectionId = 'test-connection-id';
+
+  const makeStreamResponse = (messages: Message[]): StreamResponse => {
+    const gen = function* gen() {
+      for (const msg of messages) {
+        yield msg;
+      }
+    };
+    return { stream: true, message: gen() } as unknown as StreamResponse;
+  };
+
+  // Returns a new empty async generator instance for use as stream input.
+  const makeEmptyInput = async function* makeEmptyInput() {
+    // no input messages
+  };
+
+  afterEach(() => {
+    setDebugLogWriter(undefined);
+    vi.restoreAllMocks();
+  });
+
+  describe('unary', () => {
+    it('delegates to the underlying transport with no writer set', async () => {
+      // Arrange
+      const transport = createMockTransport();
+      const mockResponse = {} as UnaryResponse;
+      vi.mocked(transport.unary).mockResolvedValue(mockResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const result = await wrapped.unary(mockUnaryMethod, undefined, undefined, undefined, {});
+
+      // Assert
+      expect(result).toBe(mockResponse);
+      expect(transport.unary).toHaveBeenCalledOnce();
+    });
+
+    it('logs grpc_request then grpc_response on success', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      vi.mocked(transport.unary).mockResolvedValue({} as UnaryResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      await wrapped.unary(mockUnaryMethod, undefined, undefined, undefined, {});
+
+      // Assert
+      const events = writer.mock.calls.map(([entry]) => entry.event);
+      expect(events).toEqual(['grpc_request', 'grpc_response']);
+
+      const [requestEntry] = writer.mock.calls[0]!;
+      expect(requestEntry.connectionId).toBe(connectionId);
+      expect(requestEntry.type).toBe('unary');
+      expect(requestEntry.method).toBe('test.TestService/TestMethod');
+
+      const [responseEntry] = writer.mock.calls[1]!;
+      expect(responseEntry.connectionId).toBe(connectionId);
+      expect(responseEntry.error).toBeUndefined();
+    });
+
+    it('logs grpc_response with error field and rethrows on failure', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      vi.mocked(transport.unary).mockRejectedValue(new Error('rpc failed'));
+
+      // Act & Assert
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      await expect(
+        wrapped.unary(mockUnaryMethod, undefined, undefined, undefined, {}),
+      ).rejects.toThrow('rpc failed');
+
+      const [responseEntry] = writer.mock.calls[1]!;
+      expect(responseEntry.event).toBe('grpc_response');
+      expect(responseEntry.error).toBe('rpc failed');
+    });
+  });
+
+  describe('stream', () => {
+    it('returns the original response object directly when no writer is set', async () => {
+      // Arrange
+      const transport = createMockTransport();
+      const mockResponse = makeStreamResponse([]);
+      vi.mocked(transport.stream).mockResolvedValue(mockResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const result = await wrapped.stream(
+        mockStreamMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput(),
+      );
+
+      // Assert — same object reference proves the short-circuit path was taken
+      expect(result).toBe(mockResponse);
+    });
+
+    it('logs grpc_request once and grpc_response per message', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      const messages = [{}, {}, {}] as Message[];
+      vi.mocked(transport.stream).mockResolvedValue(makeStreamResponse(messages));
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const resp = await wrapped.stream(
+        mockStreamMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput(),
+      );
+      for await (const _ of resp.message) {
+        /* consume */
+      }
+
+      // Assert
+      const requestCalls = writer.mock.calls.filter(([entry]) => entry.event === 'grpc_request');
+      const responseCalls = writer.mock.calls.filter(([entry]) => entry.event === 'grpc_response');
+      expect(requestCalls).toHaveLength(1);
+      expect(responseCalls).toHaveLength(3);
+
+      for (const [entry] of responseCalls) {
+        expect(entry.connectionId).toBe(connectionId);
+        expect(entry.type).toBe('stream');
+        expect(entry.error).toBeUndefined();
+      }
+    });
+
+    it('yields all original messages unchanged', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      const messages = [{ a: 1 }, { a: 2 }] as unknown as Message[];
+      vi.mocked(transport.stream).mockResolvedValue(makeStreamResponse(messages));
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const resp = await wrapped.stream(
+        mockStreamMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput(),
+      );
+      const received: Message[] = [];
+      for await (const msg of resp.message) {
+        received.push(msg);
+      }
+
+      // Assert
+      expect(received).toEqual(messages);
+    });
+
+    it('logs grpc_response with error when transport.stream rejects', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      vi.mocked(transport.stream).mockRejectedValue(new Error('stream open failed'));
+
+      // Act & Assert
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      await expect(
+        wrapped.stream(mockStreamMethod, undefined, undefined, undefined, makeEmptyInput()),
+      ).rejects.toThrow('stream open failed');
+
+      const responseCalls = writer.mock.calls.filter(([entry]) => entry.event === 'grpc_response');
+      expect(responseCalls).toHaveLength(1);
+      expect(responseCalls[0]![0].error).toBe('stream open failed');
+    });
+
+    it('logs grpc_response with error on mid-stream failure', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const transport = createMockTransport();
+      const streamError = new Error('mid-stream error');
+
+      const failingMessages = function* failingMessages(): Generator<Message> {
+        yield {} as Message;
+        yield {} as Message;
+        throw streamError;
+      };
+
+      vi.mocked(transport.stream).mockResolvedValue({
+        stream: true,
+        message: failingMessages(),
+      } as unknown as StreamResponse);
+
+      // Act
+      const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
+      const resp = await wrapped.stream(
+        mockStreamMethod,
+        undefined,
+        undefined,
+        undefined,
+        makeEmptyInput(),
+      );
+
+      await expect(async () => {
+        for await (const _ of resp.message) {
+          /* consume */
+        }
+      }).rejects.toThrow('mid-stream error');
+
+      // Assert — 2 successful messages + 1 error
+      const responseCalls = writer.mock.calls.filter(([entry]) => entry.event === 'grpc_response');
+      expect(responseCalls).toHaveLength(3);
+      expect(responseCalls[0]![0].error).toBeUndefined();
+      expect(responseCalls[1]![0].error).toBeUndefined();
+      expect(responseCalls[2]![0].error).toBe('mid-stream error');
+    });
   });
 });

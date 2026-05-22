@@ -439,3 +439,10 @@ export {
   enableDebugLogging,
   getStatusFromClient,
 } from './utils';
+
+export {
+  createConsoleLogWriter,
+  setDebugLogWriter,
+  type DebugLogEntry,
+  type DebugLogWriter,
+} from './debug';

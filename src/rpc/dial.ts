@@ -4,6 +4,7 @@ import {
   type DescMethodStreaming,
   type DescMethodUnary,
   type MessageInitShape,
+  MessageShape,
 } from '@bufbuild/protobuf';
 import type {
   CallOptions,
@@ -17,6 +18,7 @@ import { createGrpcWebTransport } from '@connectrpc/connect-web';
 import { UuidTool } from 'uuid-tool';
 
 import { type Credentials, isCredential } from '../app/viam-transport';
+import { isDebugLogEnabled, writeDebugLog } from '../debug';
 import {
   AuthenticateRequestSchema,
   AuthenticateToRequestSchema,
@@ -39,14 +41,12 @@ export interface DialOptions {
   externalAuthToEntity?: string | undefined;
 
   /**
-   * `accessToken` allows a pre-authenticated client to dial with an
-   * authorization header. Direct dial will have the access token appended to
-   * the "Authorization: Bearer" header. WebRTC dial will appened it to the
-   * signaling server communication
+   * `accessToken` allows a pre-authenticated client to dial with an authorization header. Direct
+   * dial will have the access token appended to the "Authorization: Bearer" header. WebRTC dial
+   * will appened it to the signaling server communication
    *
    * If enabled, other auth options have no affect. Eg. authEntity, credentials,
-   * externalAuthAddress, externalAuthToEntity,
-   * webrtcOptions.signalingAccessToken
+   * externalAuthAddress, externalAuthToEntity, webrtcOptions.signalingAccessToken
    */
   accessToken?: string | undefined;
 
@@ -61,16 +61,15 @@ export interface DialWebRTCOptions {
   rtcConfig?: RTCConfiguration;
 
   /**
-   * SignalingExternalAuthAddress is the address to perform external auth yet.
-   * This is unlikely to be needed since the signaler is typically in the same
-   * place where authentication happens.
+   * SignalingExternalAuthAddress is the address to perform external auth yet. This is unlikely to
+   * be needed since the signaler is typically in the same place where authentication happens.
    */
   signalingExternalAuthAddress?: string;
 
   /**
-   * SignalingExternalAuthToEntity is the entity to authenticate for after
-   * externally authenticating. This is unlikely to be needed since the signaler
-   * is typically in the same place where authentication happens.
+   * SignalingExternalAuthToEntity is the entity to authenticate for after externally
+   * authenticating. This is unlikely to be needed since the signaler is typically in the same place
+   * where authentication happens.
    */
   signalingExternalAuthToEntity?: string;
 
@@ -78,11 +77,10 @@ export interface DialWebRTCOptions {
   signalingCredentials?: Credentials;
 
   /**
-   * `signalingAccessToken` allows a pre-authenticated client to dial with an
-   * authorization header to the signaling server. This skips the Authenticate()
-   * request to the singaling server or external auth but does not skip the
-   * AuthenticateTo() request to retrieve the credentials at the external auth
-   * endpoint.
+   * `signalingAccessToken` allows a pre-authenticated client to dial with an authorization header
+   * to the signaling server. This skips the Authenticate() request to the singaling server or
+   * external auth but does not skip the AuthenticateTo() request to retrieve the credentials at the
+   * external auth endpoint.
    *
    * If enabled, other auth options have no affect. Eg. authEntity, credentials,
    * signalingAuthEntity, signalingCredentials.
@@ -93,23 +91,21 @@ export interface DialWebRTCOptions {
   additionalSdpFields?: Record<string, string | number>;
 
   /**
-   * When true, sets ICE transport policy to relay-only so only TURN candidates
-   * are used. Useful for testing relay connectivity through a TURN server.
+   * When true, sets ICE transport policy to relay-only so only TURN candidates are used. Useful for
+   * testing relay connectivity through a TURN server.
    */
   forceRelay?: boolean;
 
   /**
-   * When true, strips TURN servers from the ICE configuration so only host and
-   * server-reflexive candidates are used. Useful for testing direct
-   * connectivity without relay fallback.
+   * When true, strips TURN servers from the ICE configuration so only host and server-reflexive
+   * candidates are used. Useful for testing direct connectivity without relay fallback.
    */
   forceP2P?: boolean;
 
   /**
-   * When set, filters the signaling server's TURN list to only the server whose
-   * parsed URI matches (compared by scheme, host, port, and transport —
-   * defaulting transport to UDP if unspecified). Example:
-   * `"turn:turn.viam.com:443"`
+   * When set, filters the signaling server's TURN list to only the server whose parsed URI matches
+   * (compared by scheme, host, port, and transport — defaulting transport to UDP if unspecified).
+   * Example: `"turn:turn.viam.com:443"`
    */
   turnUri?: string;
 
@@ -123,25 +119,22 @@ export interface DialWebRTCOptions {
   turnPort?: number;
 
   /**
-   * When true, the connection to the signaling server is made over plain HTTP
-   * (no TLS). Use this when connecting to a robot running with `no_tls: true`.
+   * When true, the connection to the signaling server is made over plain HTTP (no TLS). Use this
+   * when connecting to a robot running with `no_tls: true`.
    */
   signalingInsecure?: boolean;
 }
 
 export type TransportFactory = (
   // platform specific
-  init: TransportInitOptions
+  init: TransportInitOptions,
 ) => Transport;
 
 interface TransportInitOptions {
   baseUrl: string;
 }
 
-const enableGRPCTraceLogging = <T extends Transport>(
-  transport: T,
-  address: string
-): T => {
+const enableGRPCTraceLogging = <T extends Transport>(transport: T, address: string): T => {
   if (globalThis.VIAM?.GRPC_TRACE_LOGGING === true) {
     const patchedUnary: typeof transport.unary = async <
       I extends DescMessage = DescMessage,
@@ -152,21 +145,12 @@ const enableGRPCTraceLogging = <T extends Transport>(
       timeoutMs: number | undefined,
       header: HeadersInit | undefined,
       message: MessageInitShape<I>,
-      contextValues?: ContextValues
+      contextValues?: ContextValues,
     ): Promise<UnaryResponse<I, O>> => {
       const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
-      console.trace(
-        `Unary request ${id} : ${address}/${method.parent.typeName}.${method.name}`
-      );
-      const resp = await transport.unary(
-        method,
-        signal,
-        timeoutMs,
-        header,
-        message,
-        contextValues
-      );
+      console.trace(`Unary request ${id} : ${address}/${method.parent.typeName}.${method.name}`);
+      const resp = await transport.unary(method, signal, timeoutMs, header, message, contextValues);
       // eslint-disable-next-line no-console
       console.debug(`Unary response received: ${id}`);
       return resp;
@@ -181,21 +165,12 @@ const enableGRPCTraceLogging = <T extends Transport>(
       timeoutMs: number | undefined,
       header: HeadersInit | undefined,
       input: AsyncIterable<MessageInitShape<I>>,
-      contextValues?: ContextValues
+      contextValues?: ContextValues,
     ): Promise<StreamResponse<I, O>> => {
       const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
-      console.trace(
-        `Stream request ${id} : ${address}/${method.parent.typeName}.${method.name}`
-      );
-      const resp = await transport.stream(
-        method,
-        signal,
-        timeoutMs,
-        header,
-        input,
-        contextValues
-      );
+      console.trace(`Stream request ${id} : ${address}/${method.parent.typeName}.${method.name}`);
+      const resp = await transport.stream(method, signal, timeoutMs, header, input, contextValues);
 
       // eslint-disable-next-line no-console
       console.debug(`Stream response received: ${id}`);
@@ -208,14 +183,116 @@ const enableGRPCTraceLogging = <T extends Transport>(
   return transport;
 };
 
+export const wrapTransportWithDebugLogging = <T extends Transport>(
+  transport: T,
+  connectionId: string,
+): T => {
+  const patchedUnary: typeof transport.unary = async <
+    I extends DescMessage = DescMessage,
+    O extends DescMessage = DescMessage,
+  >(
+    method: DescMethodUnary<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    message: MessageInitShape<I>,
+    contextValues?: ContextValues,
+  ): Promise<UnaryResponse<I, O>> => {
+    const rpcMethod = `${method.parent.typeName}/${method.name}`;
+    writeDebugLog('grpc_request', {
+      connectionId,
+      type: 'unary',
+      method: rpcMethod,
+    });
+    try {
+      const resp = await transport.unary(method, signal, timeoutMs, header, message, contextValues);
+      writeDebugLog('grpc_response', {
+        connectionId,
+        type: 'unary',
+        method: rpcMethod,
+      });
+      return resp;
+    } catch (error) {
+      writeDebugLog('grpc_response', {
+        connectionId,
+        type: 'unary',
+        method: rpcMethod,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  };
+
+  const patchedStream: typeof transport.stream = async <
+    I extends DescMessage = DescMessage,
+    O extends DescMessage = DescMessage,
+  >(
+    method: DescMethodStreaming<I, O>,
+    signal: AbortSignal | undefined,
+    timeoutMs: number | undefined,
+    header: HeadersInit | undefined,
+    input: AsyncIterable<MessageInitShape<I>>,
+    contextValues?: ContextValues,
+  ): Promise<StreamResponse<I, O>> => {
+    // Skip wrapping entirely when logging is disabled — avoids generator overhead per message.
+    if (!isDebugLogEnabled()) {
+      return transport.stream(method, signal, timeoutMs, header, input, contextValues);
+    }
+    const rpcMethod = `${method.parent.typeName}/${method.name}`;
+    writeDebugLog('grpc_request', {
+      connectionId,
+      type: 'stream',
+      method: rpcMethod,
+    });
+    // Separate try/catch for stream establishment vs. message iteration so we can
+    // distinguish a failure to open the stream from a mid-stream error.
+    let resp: StreamResponse<I, O>;
+    try {
+      resp = await transport.stream(method, signal, timeoutMs, header, input, contextValues);
+    } catch (error) {
+      writeDebugLog('grpc_response', {
+        connectionId,
+        type: 'stream',
+        method: rpcMethod,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+    // Wrap resp.message in a generator so we can log each individual message.
+    // The caller receives a normal StreamResponse and iterates it as usual.
+    const wrappedMessages = async function* wrappedMessages(): AsyncIterable<MessageShape<O>> {
+      try {
+        for await (const msg of resp.message) {
+          writeDebugLog('grpc_response', {
+            connectionId,
+            type: 'stream',
+            method: rpcMethod,
+          });
+          yield msg;
+        }
+      } catch (error) {
+        writeDebugLog('grpc_response', {
+          connectionId,
+          type: 'stream',
+          method: rpcMethod,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    };
+    return { ...resp, message: wrappedMessages() };
+  };
+
+  return { ...transport, unary: patchedUnary, stream: patchedStream };
+};
+
 export const dialDirect = async (
   address: string,
   opts?: DialOptions,
-  transportCredentialsInclude = false
+  transportCredentialsInclude = false,
 ): Promise<Transport> => {
   validateDialOptions(opts);
-  const createTransport =
-    globalThis.VIAM?.GRPC_TRANSPORT_FACTORY ?? createGrpcWebTransport;
+  const createTransport = globalThis.VIAM?.GRPC_TRANSPORT_FACTORY ?? createGrpcWebTransport;
 
   const transportOpts = {
     baseUrl: address,
@@ -236,37 +313,21 @@ export const dialDirect = async (
   ) {
     const headers = new Headers(opts.extraHeaders);
     headers.set('authorization', `Bearer ${opts.accessToken}`);
-    const transport = new AuthenticatedTransport(
-      transportOpts,
-      createTransport,
-      headers
-    );
+    const transport = new AuthenticatedTransport(transportOpts, createTransport, headers);
     return enableGRPCTraceLogging(transport, address);
   }
 
-  if (
-    opts === undefined ||
-    (opts.credentials === undefined && opts.accessToken === undefined)
-  ) {
+  if (opts === undefined || (opts.credentials === undefined && opts.accessToken === undefined)) {
     // With same-origin, services running on other ports that expect cookies from App would otherwise not receive them.
     if (transportCredentialsInclude) {
       transportOpts.credentials = 'include';
     }
     const headers = new Headers(opts?.extraHeaders ?? {});
-    const transport = new AuthenticatedTransport(
-      transportOpts,
-      createTransport,
-      headers
-    );
+    const transport = new AuthenticatedTransport(transportOpts, createTransport, headers);
     return enableGRPCTraceLogging(transport, address);
   }
 
-  const transport = await makeAuthenticatedTransport(
-    address,
-    createTransport,
-    opts,
-    transportOpts
-  );
+  const transport = await makeAuthenticatedTransport(address, createTransport, opts, transportOpts);
   return enableGRPCTraceLogging(transport, address);
 };
 
@@ -276,7 +337,7 @@ const makeAuthenticatedTransport = async (
   address: string,
   defaultFactory: TransportFactory,
   opts: DialOptions,
-  transportOpts: TransportInitOptions
+  transportOpts: TransportInitOptions,
 ): Promise<Transport> => {
   const authHeaders = new Headers(opts.extraHeaders);
 
@@ -333,63 +394,39 @@ export class AuthenticatedTransport implements Transport {
   protected readonly transport: Transport;
   protected readonly extraHeaders: Headers;
 
-  constructor(
-    opts: TransportInitOptions,
-    defaultFactory: TransportFactory,
-    extraHeaders: Headers
-  ) {
+  constructor(opts: TransportInitOptions, defaultFactory: TransportFactory, extraHeaders: Headers) {
     this.extraHeaders = extraHeaders;
     this.transport = defaultFactory(opts);
   }
 
-  public unary = async <
-    I extends DescMessage = DescMessage,
-    O extends DescMessage = DescMessage,
-  >(
+  public unary = async <I extends DescMessage = DescMessage, O extends DescMessage = DescMessage>(
     method: DescMethodUnary<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     message: MessageInitShape<I>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
     for (const [key, value] of this.extraHeaders) {
       newHeaders.set(key, value);
     }
-    return this.transport.unary(
-      method,
-      signal,
-      timeoutMs,
-      newHeaders,
-      message,
-      contextValues
-    );
+    return this.transport.unary(method, signal, timeoutMs, newHeaders, message, contextValues);
   };
 
-  public stream = async <
-    I extends DescMessage = DescMessage,
-    O extends DescMessage = DescMessage,
-  >(
+  public stream = async <I extends DescMessage = DescMessage, O extends DescMessage = DescMessage>(
     method: DescMethodStreaming<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     input: AsyncIterable<MessageInitShape<I>>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
     for (const [key, value] of this.extraHeaders) {
       newHeaders.set(key, value);
     }
-    return this.transport.stream(
-      method,
-      signal,
-      timeoutMs,
-      newHeaders,
-      input,
-      contextValues
-    );
+    return this.transport.stream(method, signal, timeoutMs, newHeaders, input, contextValues);
   };
 }
 
@@ -425,12 +462,12 @@ export interface WebRTCConnection {
 const getSignalingClient = async (
   signalingAddress: string,
   signalingExchangeOpts: DialOptions | undefined,
-  transportCredentialsInclude = false
+  transportCredentialsInclude = false,
 ) => {
   const transport = await dialDirect(
     signalingAddress,
     signalingExchangeOpts,
-    transportCredentialsInclude
+    transportCredentialsInclude,
   );
 
   return createClient(SignalingService, transport);
@@ -438,7 +475,7 @@ const getSignalingClient = async (
 
 const getOptionalWebRTCConfig = async (
   callOpts: CallOptions,
-  signalingClient: ReturnType<typeof createClient<typeof SignalingService>>
+  signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
 ): Promise<WebRTCConfig> => {
   try {
     const resp = await signalingClient.optionalWebRTCConfig({}, callOpts);
@@ -452,18 +489,17 @@ const getOptionalWebRTCConfig = async (
 };
 
 /**
- * DialWebRTC makes a connection to given host by signaling with the address
- * provided. A Promise is returned upon successful connection that contains a
- * transport factory to use with gRPC client as well as the WebRTC
- * PeerConnection itself. Care should be taken with the PeerConnection and is
- * currently returned for experimental use. TODO(GOUT-7): figure out decent way
- * to handle reconnect on connection termination
+ * DialWebRTC makes a connection to given host by signaling with the address provided. A Promise is
+ * returned upon successful connection that contains a transport factory to use with gRPC client as
+ * well as the WebRTC PeerConnection itself. Care should be taken with the PeerConnection and is
+ * currently returned for experimental use. TODO(GOUT-7): figure out decent way to handle reconnect
+ * on connection termination
  */
 export const dialWebRTC = async (
   signalingAddress: string,
   host: string,
   dialOpts?: DialOptions,
-  transportCredentialsInclude = false
+  transportCredentialsInclude = false,
 ): Promise<WebRTCConnection> => {
   let usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   if (dialOpts?.webrtcOptions?.signalingInsecure) {
@@ -475,8 +511,7 @@ export const dialWebRTC = async (
   validateDialOptions(dialOpts);
 
   /**
-   * TODO(RSDK-2836): In general, this logic should be in parity with the golang
-   * implementation.
+   * TODO(RSDK-2836): In general, this logic should be in parity with the golang implementation.
    * https://github.com/viamrobotics/goutils/blob/main/rpc/wrtc_client.go#L160-L175
    */
   const callOpts = {
@@ -486,42 +521,28 @@ export const dialWebRTC = async (
   };
 
   /**
-   * First, derive options specifically for signaling against our target. Then
-   * complete our WebRTC options, gathering any extra information like TURN
-   * servers from a cloud server. This also creates the transport and signaling
-   * client that we'll reuse to avoid resource leaks.
+   * First, derive options specifically for signaling against our target. Then complete our WebRTC
+   * options, gathering any extra information like TURN servers from a cloud server. This also
+   * creates the transport and signaling client that we'll reuse to avoid resource leaks.
    */
-  const exchangeOpts = processSignalingExchangeOpts(
-    usableSignalingAddress,
-    dialOpts
-  );
+  const exchangeOpts = processSignalingExchangeOpts(usableSignalingAddress, dialOpts);
 
   const signalingClient = await getSignalingClient(
     usableSignalingAddress,
     exchangeOpts,
-    transportCredentialsInclude
+    transportCredentialsInclude,
   );
 
-  const webrtcOpts = await processWebRTCOpts(
-    signalingClient,
-    callOpts,
-    dialOpts
-  );
+  const webrtcOpts = await processWebRTCOpts(signalingClient, callOpts, dialOpts);
 
   const { pc, dc } = await newPeerConnectionForClient(
     webrtcOpts.disableTrickleICE,
     webrtcOpts.rtcConfig,
-    webrtcOpts.additionalSdpFields
+    webrtcOpts.additionalSdpFields,
   );
   let successful = false;
 
-  const exchange = new SignalingExchange(
-    signalingClient,
-    callOpts,
-    pc,
-    dc,
-    webrtcOpts
-  );
+  const exchange = new SignalingExchange(signalingClient, callOpts, pc, dc, webrtcOpts);
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const dialTimeoutMs = dialOpts?.dialTimeoutMs;
@@ -536,10 +557,7 @@ export const dialWebRTC = async (
   try {
     const cc = await exchange.doExchange();
 
-    if (
-      dialOpts?.externalAuthAddress !== undefined &&
-      dialOpts.externalAuthAddress !== ''
-    ) {
+    if (dialOpts?.externalAuthAddress !== undefined && dialOpts.externalAuthAddress !== '') {
       // TODO(GOUT-11): prepare AuthenticateTo here  for client channel.
     } else if (dialOpts?.credentials?.type !== undefined) {
       // TODO(GOUT-11): prepare Authenticate here for client channel
@@ -549,11 +567,7 @@ export const dialWebRTC = async (
 
     // Wrap the transport with AuthenticatedTransport to inject extraHeaders
     const headers = new Headers(dialOpts?.extraHeaders ?? {});
-    const wrappedTransport = new AuthenticatedTransport(
-      { baseUrl: host },
-      () => cc,
-      headers
-    );
+    const wrappedTransport = new AuthenticatedTransport({ baseUrl: host }, () => cc, headers);
 
     return {
       transport: enableGRPCTraceLogging(wrappedTransport, host),
@@ -577,9 +591,7 @@ export const dialWebRTC = async (
 
 const iceServerHasTURN = (server: RTCIceServer): boolean => {
   const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
-  return urls.some(
-    (url) => url.startsWith('turn:') || url.startsWith('turns:')
-  );
+  return urls.some((url) => url.startsWith('turn:') || url.startsWith('turns:'));
 };
 
 interface TurnUri {
@@ -619,25 +631,18 @@ const parseTurnUri = (raw: string): TurnUri | undefined => {
 };
 
 const turnUriEqual = (a: TurnUri, b: TurnUri): boolean =>
-  a.scheme === b.scheme &&
-  a.host === b.host &&
-  a.port === b.port &&
-  a.transport === b.transport;
+  a.scheme === b.scheme && a.host === b.host && a.port === b.port && a.transport === b.transport;
 
 const turnUriToString = (uri: TurnUri): string =>
   `${uri.scheme}:${uri.host}:${uri.port}?transport=${uri.transport}`;
 
-const applyTurnFilterOptions = (
-  webrtcOpts: DialWebRTCOptions
-): DialWebRTCOptions => {
+const applyTurnFilterOptions = (webrtcOpts: DialWebRTCOptions): DialWebRTCOptions => {
   let filterUri: TurnUri | undefined;
   if (webrtcOpts.turnUri !== undefined) {
     filterUri = parseTurnUri(webrtcOpts.turnUri);
     if (filterUri === undefined) {
       // eslint-disable-next-line no-console
-      console.warn(
-        `Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`
-      );
+      console.warn(`Failed to parse turnUri, ignoring all TURN URI options: ${webrtcOpts.turnUri}`);
       return webrtcOpts;
     }
   }
@@ -645,8 +650,7 @@ const applyTurnFilterOptions = (
     ...webrtcOpts.rtcConfig,
     iceServers: (webrtcOpts.rtcConfig?.iceServers ?? [])
       .map((server) => {
-        const rawUrls =
-          typeof server.urls === 'string' ? [server.urls] : server.urls;
+        const rawUrls = typeof server.urls === 'string' ? [server.urls] : server.urls;
         const newUrls = rawUrls.flatMap((url) => {
           const parsed = parseTurnUri(url);
           // non-TURN: keep unchanged
@@ -671,8 +675,7 @@ const applyTurnFilterOptions = (
         return { ...server, urls: newUrls };
       })
       .filter((server) => {
-        const urls =
-          typeof server.urls === 'string' ? [server.urls] : server.urls;
+        const urls = typeof server.urls === 'string' ? [server.urls] : server.urls;
         return urls.length > 0;
       }),
   };
@@ -689,27 +692,25 @@ const applyTurnFilterOptions = (
 const processWebRTCOpts = async (
   signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
   callOpts: CallOptions,
-  dialOpts: DialOptions | undefined
+  dialOpts: DialOptions | undefined,
 ): Promise<DialWebRTCOptions> => {
   const config = await getOptionalWebRTCConfig(callOpts, signalingClient);
-  const additionalIceServers: RTCIceServer[] = config.additionalIceServers.map(
-    (ice) => {
-      const iceUrls = [];
-      // always extend the list with tcp variants in order to facilitate cases
-      // where udp might be blocked
-      for (const iUrl of ice.urls) {
-        if (iUrl.endsWith('udp')) {
-          iceUrls.push(`${iUrl.slice(0, -3)}tcp`);
-        }
-        iceUrls.push(iUrl);
+  const additionalIceServers: RTCIceServer[] = config.additionalIceServers.map((ice) => {
+    const iceUrls = [];
+    // always extend the list with tcp variants in order to facilitate cases
+    // where udp might be blocked
+    for (const iUrl of ice.urls) {
+      if (iUrl.endsWith('udp')) {
+        iceUrls.push(`${iUrl.slice(0, -3)}tcp`);
       }
-      return {
-        urls: iceUrls,
-        credential: ice.credential,
-        username: ice.username,
-      };
+      iceUrls.push(iUrl);
     }
-  );
+    return {
+      urls: iceUrls,
+      credential: ice.credential,
+      username: ice.username,
+    };
+  });
 
   const usableDialOpts = dialOpts ?? {};
 
@@ -738,19 +739,19 @@ const processWebRTCOpts = async (
   if (webrtcOpts.forceRelay && webrtcOpts.forceP2P) {
     // eslint-disable-next-line no-console
     console.warn(
-      'forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail'
+      'forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail',
     );
   }
 
   if (webrtcOpts.forceP2P) {
     // eslint-disable-next-line no-console
     console.debug(
-      'force P2P enabled; stripping TURN servers and ignoring signaling server ICE config'
+      'force P2P enabled; stripping TURN servers and ignoring signaling server ICE config',
     );
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
-        (server) => !iceServerHasTURN(server)
+        (server) => !iceServerHasTURN(server),
       ),
     };
   }
@@ -772,7 +773,7 @@ const processWebRTCOpts = async (
   ) {
     // eslint-disable-next-line no-console
     console.warn(
-      'forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped'
+      'forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped',
     );
   }
 
@@ -788,23 +789,16 @@ const processWebRTCOpts = async (
   return webrtcOpts;
 };
 
-const processSignalingExchangeOpts = (
-  signalingAddress: string,
-  dialOpts?: DialOptions
-) => {
+const processSignalingExchangeOpts = (signalingAddress: string, dialOpts?: DialOptions) => {
   // replace auth entity and creds
   let optsCopy = dialOpts;
   if (dialOpts) {
     optsCopy = { ...dialOpts } as DialOptions;
 
     if (dialOpts.accessToken === undefined) {
-      if (
-        isCredential(optsCopy.credentials) &&
-        !optsCopy.credentials.authEntity
-      ) {
+      if (isCredential(optsCopy.credentials) && !optsCopy.credentials.authEntity) {
         optsCopy.credentials.authEntity =
-          optsCopy.externalAuthAddress !== undefined &&
-          optsCopy.externalAuthAddress !== ''
+          optsCopy.externalAuthAddress !== undefined && optsCopy.externalAuthAddress !== ''
             ? optsCopy.externalAuthAddress.replace(addressCleanupRegex, '')
             : signalingAddress.replace(addressCleanupRegex, '');
       }
@@ -812,10 +806,8 @@ const processSignalingExchangeOpts = (
       optsCopy.accessToken = dialOpts.webrtcOptions?.signalingAccessToken;
     }
 
-    optsCopy.externalAuthAddress =
-      dialOpts.webrtcOptions?.signalingExternalAuthAddress;
-    optsCopy.externalAuthToEntity =
-      dialOpts.webrtcOptions?.signalingExternalAuthToEntity;
+    optsCopy.externalAuthAddress = dialOpts.webrtcOptions?.signalingExternalAuthAddress;
+    optsCopy.externalAuthToEntity = dialOpts.webrtcOptions?.signalingExternalAuthToEntity;
   }
   return optsCopy;
 };
@@ -831,15 +823,11 @@ export const validateDialOptions = (opts?: DialOptions) => {
     }
 
     if (opts.webrtcOptions?.signalingAccessToken !== undefined) {
-      throw new Error(
-        'cannot set webrtcOptions.signalingAccessToken with accessToken'
-      );
+      throw new Error('cannot set webrtcOptions.signalingAccessToken with accessToken');
     }
 
     if (opts.webrtcOptions?.signalingCredentials !== undefined) {
-      throw new Error(
-        'cannot set webrtcOptions.signalingCredentials with accessToken'
-      );
+      throw new Error('cannot set webrtcOptions.signalingCredentials with accessToken');
     }
   }
 
@@ -849,7 +837,7 @@ export const validateDialOptions = (opts?: DialOptions) => {
     opts.webrtcOptions.signalingCredentials !== undefined
   ) {
     throw new Error(
-      'cannot set webrtcOptions.signalingCredentials with webrtcOptions.signalingAccessToken'
+      'cannot set webrtcOptions.signalingCredentials with webrtcOptions.signalingAccessToken',
     );
   }
 };

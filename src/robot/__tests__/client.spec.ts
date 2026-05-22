@@ -8,10 +8,8 @@ import {
   TEST_LOCAL_HOST,
   TEST_SIGNALING_ADDRESS,
 } from '../../__tests__/fixtures/test-constants';
-import {
-  createMockDataChannel,
-  createMockPeerConnection,
-} from '../../__tests__/mocks/webrtc';
+import { createMockDataChannel, createMockPeerConnection } from '../../__tests__/mocks/webrtc';
+import { setDebugLogWriter, type DebugLogEntry } from '../../debug';
 import { MachineConnectionEvent } from '../../events';
 import * as rpcModule from '../../rpc';
 import { RobotClient } from '../client';
@@ -52,14 +50,14 @@ const setupEventListenerMocks = () => {
     vi.fn(),
     pcAddEventListener,
     pcRemoveEventListener,
-    'connected'
+    'connected',
   );
 
   const dataChannel = createMockDataChannel(
     vi.fn(),
     dcAddEventListener,
     dcRemoveEventListener,
-    'open'
+    'open',
   );
 
   const transport = createMockRobotServiceTransport();
@@ -74,6 +72,7 @@ const setupEventListenerMocks = () => {
 
   return {
     client,
+    peerConnection,
     pcAddEventListener,
     pcRemoveEventListener,
     dcAddEventListener,
@@ -95,22 +94,19 @@ describe('RobotClient', () => {
       {
         eventType: 'iceconnectionstatechange',
         getAddSpy: (mocks: EventListenerMocks) => mocks.pcAddEventListener,
-        getRemoveSpy: (mocks: EventListenerMocks) =>
-          mocks.pcRemoveEventListener,
+        getRemoveSpy: (mocks: EventListenerMocks) => mocks.pcRemoveEventListener,
         description: 'peer connection iceconnectionstatechange',
       },
       {
         eventType: 'close',
         getAddSpy: (mocks: EventListenerMocks) => mocks.dcAddEventListener,
-        getRemoveSpy: (mocks: EventListenerMocks) =>
-          mocks.dcRemoveEventListener,
+        getRemoveSpy: (mocks: EventListenerMocks) => mocks.dcRemoveEventListener,
         description: 'data channel close',
       },
       {
         eventType: 'track',
         getAddSpy: (mocks: EventListenerMocks) => mocks.pcAddEventListener,
-        getRemoveSpy: (mocks: EventListenerMocks) =>
-          mocks.pcRemoveEventListener,
+        getRemoveSpy: (mocks: EventListenerMocks) => mocks.pcRemoveEventListener,
         description: 'peer connection track',
       },
     ])(
@@ -128,15 +124,11 @@ describe('RobotClient', () => {
         });
 
         // Verify initial handler was added
-        const firstCallArgs = addSpy.mock.calls.find(
-          (call) => call[0] === eventType
-        );
+        const firstCallArgs = addSpy.mock.calls.find((call) => call[0] === eventType);
         const firstHandler = firstCallArgs?.[1];
         expect(firstHandler).toBeDefined();
 
-        const firstConnectionCalls = addSpy.mock.calls.filter(
-          (call) => call[0] === eventType
-        );
+        const firstConnectionCalls = addSpy.mock.calls.filter((call) => call[0] === eventType);
         expect(firstConnectionCalls).toHaveLength(1);
 
         addSpy.mockClear();
@@ -146,28 +138,20 @@ describe('RobotClient', () => {
         await mocks.client.connect();
 
         // Assert - old handler should be removed before new handler is added
-        const removeCallArgs = removeSpy.mock.calls.find(
-          (call) => call[0] === eventType
-        );
+        const removeCallArgs = removeSpy.mock.calls.find((call) => call[0] === eventType);
         expect(removeCallArgs).toBeDefined();
         expect(removeCallArgs?.[1]).toBe(firstHandler);
 
         // Assert - new handler should be added
-        const secondCallArgs = addSpy.mock.calls.find(
-          (call) => call[0] === eventType
-        );
+        const secondCallArgs = addSpy.mock.calls.find((call) => call[0] === eventType);
         expect(secondCallArgs).toBeDefined();
 
         // Assert - only one handler added and one removed during reconnection
-        const totalAddCalls = addSpy.mock.calls.filter(
-          (call) => call[0] === eventType
-        );
-        const totalRemoveCalls = removeSpy.mock.calls.filter(
-          (call) => call[0] === eventType
-        );
+        const totalAddCalls = addSpy.mock.calls.filter((call) => call[0] === eventType);
+        const totalRemoveCalls = removeSpy.mock.calls.filter((call) => call[0] === eventType);
         expect(totalAddCalls).toHaveLength(1);
         expect(totalRemoveCalls).toHaveLength(1);
-      }
+      },
     );
 
     it('should not accumulate handlers over multiple reconnections', async () => {
@@ -189,10 +173,10 @@ describe('RobotClient', () => {
 
       // Assert
       const iceAddCalls = mocks.pcAddEventListener.mock.calls.filter(
-        (call) => call[0] === 'iceconnectionstatechange'
+        (call) => call[0] === 'iceconnectionstatechange',
       );
       const iceRemoveCalls = mocks.pcRemoveEventListener.mock.calls.filter(
-        (call) => call[0] === 'iceconnectionstatechange'
+        (call) => call[0] === 'iceconnectionstatechange',
       );
 
       expect(iceAddCalls).toHaveLength(6);
@@ -218,13 +202,13 @@ describe('RobotClient', () => {
 
       // Assert
       const iceRemoveCalls = mocks.pcRemoveEventListener.mock.calls.filter(
-        (call) => call[0] === 'iceconnectionstatechange'
+        (call) => call[0] === 'iceconnectionstatechange',
       );
       const trackRemoveCalls = mocks.pcRemoveEventListener.mock.calls.filter(
-        (call) => call[0] === 'track'
+        (call) => call[0] === 'track',
       );
       const dcRemoveCalls = mocks.dcRemoveEventListener.mock.calls.filter(
-        (call) => call[0] === 'close'
+        (call) => call[0] === 'close',
       );
 
       expect(iceRemoveCalls.length).toBeGreaterThanOrEqual(1);
@@ -272,7 +256,7 @@ describe('RobotClient', () => {
         client.dial({
           ...baseDialConfig,
           noReconnect: true,
-        })
+        }),
       ).rejects.toThrow('Failed to connect via all methods');
     });
 
@@ -297,7 +281,7 @@ describe('RobotClient', () => {
       // Assert
       expect(events.length).toBeGreaterThanOrEqual(2);
       const webrtcEvent = events.find(
-        (event) => event.error?.message === 'WebRTC connection failed'
+        (event) => event.error?.message === 'WebRTC connection failed',
       );
       expect(webrtcEvent).toBeDefined();
       expect(webrtcEvent?.error).toBe(webrtcError);
@@ -391,9 +375,7 @@ describe('RobotClient', () => {
       const events = setupDisconnectedEventCapture(client);
 
       vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(webrtcError);
-      vi.mocked(rpcModule.dialDirect).mockResolvedValue(
-        createMockRobotServiceTransport()
-      );
+      vi.mocked(rpcModule.dialDirect).mockResolvedValue(createMockRobotServiceTransport());
 
       // Act
       const result = await client.dial({
@@ -406,7 +388,7 @@ describe('RobotClient', () => {
       expect(result).toBe(client);
       expect(events.length).toBeGreaterThanOrEqual(1);
       const webrtcEvent = events.find(
-        (event) => event.error?.message === 'WebRTC connection failed'
+        (event) => event.error?.message === 'WebRTC connection failed',
       );
       expect(webrtcEvent).toBeDefined();
     });
@@ -414,9 +396,7 @@ describe('RobotClient', () => {
     it('should return client instance when only gRPC connection is used', async () => {
       // Arrange
       const client = new RobotClient();
-      vi.mocked(rpcModule.dialDirect).mockResolvedValue(
-        createMockRobotServiceTransport()
-      );
+      vi.mocked(rpcModule.dialDirect).mockResolvedValue(createMockRobotServiceTransport());
 
       // Act
       const result = await client.dial({
@@ -440,7 +420,7 @@ describe('RobotClient', () => {
         client.dial({
           host: TEST_LOCAL_HOST,
           noReconnect: true,
-        })
+        }),
       ).rejects.toThrow('Failed to connect via all methods');
     });
 
@@ -550,15 +530,13 @@ describe('RobotClient', () => {
       // Arrange
       vi.useFakeTimers();
       const client = new RobotClient();
-      const dialWebRTCMock = vi
-        .mocked(rpcModule.dialWebRTC)
-        .mockImplementation(async () => {
-          return new Promise((_, reject) => {
-            setTimeout(() => {
-              reject(errors.createUnavailableError());
-            }, TEST_DIAL_TIMEOUT_MS);
-          });
+      const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC).mockImplementation(async () => {
+        return new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(errors.createUnavailableError());
+          }, TEST_DIAL_TIMEOUT_MS);
         });
+      });
 
       // Act - store promise and add rejection handler immediately
       const dialPromise = client
@@ -576,34 +554,26 @@ describe('RobotClient', () => {
       await dialPromise;
 
       // Assert - verify that dialWebRTC wasn't called excessively (disconnect should stop retries)
-      expect(dialWebRTCMock.mock.calls.length).toBeLessThanOrEqual(
-        TEST_MAX_RETRY_ATTEMPTS
-      );
+      expect(dialWebRTCMock.mock.calls.length).toBeLessThanOrEqual(TEST_MAX_RETRY_ATTEMPTS);
     });
   });
 
   describe('retry logic on error', () => {
     const setupReconnectingEventCapture = (client: RobotClient) => {
       const events: unknown[] = [];
-      client.on(MachineConnectionEvent.RECONNECTING, (event) =>
-        events.push(event)
-      );
+      client.on(MachineConnectionEvent.RECONNECTING, (event) => events.push(event));
       return events;
     };
 
     const setupReconnectionFailedEventCapture = (client: RobotClient) => {
       const events: unknown[] = [];
-      client.on(MachineConnectionEvent.RECONNECTION_FAILED, (event) =>
-        events.push(event)
-      );
+      client.on(MachineConnectionEvent.RECONNECTION_FAILED, (event) => events.push(event));
       return events;
     };
 
     const setupConnectedEventCapture = (client: RobotClient) => {
       const events: unknown[] = [];
-      client.on(MachineConnectionEvent.CONNECTED, (event) =>
-        events.push(event)
-      );
+      client.on(MachineConnectionEvent.CONNECTED, (event) => events.push(event));
       return events;
     };
 
@@ -649,9 +619,7 @@ describe('RobotClient', () => {
         vi.useFakeTimers();
         const client = new RobotClient();
 
-        const dialWebRTCMock = vi
-          .mocked(rpcModule.dialWebRTC)
-          .mockRejectedValue(error);
+        const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(error);
 
         // Mock dialDirect to also fail immediately to prevent fallback from starting heartbeat
         vi.mocked(rpcModule.dialDirect).mockRejectedValue(error);
@@ -680,39 +648,34 @@ describe('RobotClient', () => {
         { error: errors.createUnknownError(), description: 'Unknown' },
         { error: errors.createNetworkError(), description: 'network error' },
         { error: errors.createTimeoutError(), description: 'timeout error' },
-      ])(
-        'should retry on $description up to max attempts',
-        async ({ error }) => {
-          // Arrange
-          vi.useFakeTimers();
-          const client = new RobotClient();
-          const maxAttempts = 3;
+      ])('should retry on $description up to max attempts', async ({ error }) => {
+        // Arrange
+        vi.useFakeTimers();
+        const client = new RobotClient();
+        const maxAttempts = 3;
 
-          const dialWebRTCMock = vi
-            .mocked(rpcModule.dialWebRTC)
-            .mockRejectedValue(error);
+        const dialWebRTCMock = vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(error);
 
-          // Act
-          const dialPromise = client.dial({
-            ...baseDialConfig,
-            noReconnect: false,
-            reconnectMaxAttempts: maxAttempts,
-          });
+        // Act
+        const dialPromise = client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: maxAttempts,
+        });
 
-          // Ensure promise rejection is handled to prevent unhandled rejections
-          // The backOff library creates internal promises that reject asynchronously
-          dialPromise.catch(() => {
-            // Expected rejection - handled to prevent unhandled rejection warnings
-          });
+        // Ensure promise rejection is handled to prevent unhandled rejections
+        // The backOff library creates internal promises that reject asynchronously
+        dialPromise.catch(() => {
+          // Expected rejection - handled to prevent unhandled rejection warnings
+        });
 
-          // Run timers to allow backOff to complete
-          await vi.runAllTimersAsync();
+        // Run timers to allow backOff to complete
+        await vi.runAllTimersAsync();
 
-          // Assert - await the rejection to ensure it's handled
-          await expect(dialPromise).rejects.toThrow();
-          expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
-        }
-      );
+        // Assert - await the rejection to ensure it's handled
+        await expect(dialPromise).rejects.toThrow();
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
+      });
 
       it('should succeed on retry after transient error', async () => {
         // Arrange
@@ -787,15 +750,10 @@ describe('RobotClient', () => {
             if (event === 'close') {
               closeHandler = handler as (event: Event) => void;
             }
-          }
+          },
         );
 
-        const dataChannel = createMockDataChannel(
-          vi.fn(),
-          dcAddEventListener,
-          vi.fn(),
-          'open'
-        );
+        const dataChannel = createMockDataChannel(vi.fn(), dcAddEventListener, vi.fn(), 'open');
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
@@ -818,8 +776,7 @@ describe('RobotClient', () => {
         dialWebRTCMock.mockClear();
 
         const reconnectingEvents = setupReconnectingEventCapture(client);
-        const reconnectionFailedEvents =
-          setupReconnectionFailedEventCapture(client);
+        const reconnectionFailedEvents = setupReconnectionFailedEventCapture(client);
 
         // Act - trigger disconnect through data channel close event
         expect(closeHandler).toBeDefined();
@@ -846,15 +803,10 @@ describe('RobotClient', () => {
             if (event === 'close') {
               closeHandler = handler as (event: Event) => void;
             }
-          }
+          },
         );
 
-        const dataChannel = createMockDataChannel(
-          vi.fn(),
-          dcAddEventListener,
-          vi.fn(),
-          'open'
-        );
+        const dataChannel = createMockDataChannel(vi.fn(), dcAddEventListener, vi.fn(), 'open');
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
@@ -900,15 +852,10 @@ describe('RobotClient', () => {
             if (event === 'close') {
               closeHandler = handler as (event: Event) => void;
             }
-          }
+          },
         );
 
-        const dataChannel = createMockDataChannel(
-          vi.fn(),
-          dcAddEventListener,
-          vi.fn(),
-          'open'
-        );
+        const dataChannel = createMockDataChannel(vi.fn(), dcAddEventListener, vi.fn(), 'open');
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
@@ -953,66 +900,57 @@ describe('RobotClient', () => {
         { error: errors.createAbortedError(), description: 'Aborted' },
         { error: errors.createInternalError(), description: 'Internal' },
         { error: errors.createUnknownError(), description: 'Unknown' },
-      ])(
-        'should retry reconnection on $description error',
-        async ({ error }) => {
-          // Arrange
-          vi.useFakeTimers();
-          let closeHandler: ((event: Event) => void) | undefined;
+      ])('should retry reconnection on $description error', async ({ error }) => {
+        // Arrange
+        vi.useFakeTimers();
+        let closeHandler: ((event: Event) => void) | undefined;
 
-          const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
-            (event: string, handler: (event: unknown) => void) => {
-              if (event === 'close') {
-                closeHandler = handler as (event: Event) => void;
-              }
+        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+          (event: string, handler: (event: unknown) => void) => {
+            if (event === 'close') {
+              closeHandler = handler as (event: Event) => void;
             }
-          );
+          },
+        );
 
-          const dataChannel = createMockDataChannel(
-            vi.fn(),
-            dcAddEventListener,
-            vi.fn(),
-            'open'
-          );
+        const dataChannel = createMockDataChannel(vi.fn(), dcAddEventListener, vi.fn(), 'open');
 
-          const dialWebRTCMock = vi
-            .mocked(rpcModule.dialWebRTC)
-            .mockResolvedValueOnce({
-              transport: createMockRobotServiceTransport(),
-              peerConnection: createMockPeerConnection(),
-              dataChannel,
-            })
-            .mockRejectedValue(error);
+        const dialWebRTCMock = vi
+          .mocked(rpcModule.dialWebRTC)
+          .mockResolvedValueOnce({
+            transport: createMockRobotServiceTransport(),
+            peerConnection: createMockPeerConnection(),
+            dataChannel,
+          })
+          .mockRejectedValue(error);
 
-          const client = new RobotClient();
+        const client = new RobotClient();
 
-          await client.dial({
-            ...baseDialConfig,
-            noReconnect: false,
-            reconnectMaxAttempts: 3,
-          });
+        await client.dial({
+          ...baseDialConfig,
+          noReconnect: false,
+          reconnectMaxAttempts: 3,
+        });
 
-          // Reset mock call count after initial connection
-          dialWebRTCMock.mockClear();
+        // Reset mock call count after initial connection
+        dialWebRTCMock.mockClear();
 
-          const reconnectingEvents = setupReconnectingEventCapture(client);
-          const reconnectionFailedEvents =
-            setupReconnectionFailedEventCapture(client);
+        const reconnectingEvents = setupReconnectingEventCapture(client);
+        const reconnectionFailedEvents = setupReconnectionFailedEventCapture(client);
 
-          // Act
-          expect(closeHandler).toBeDefined();
-          closeHandler!(new Event('close'));
+        // Act
+        expect(closeHandler).toBeDefined();
+        closeHandler!(new Event('close'));
 
-          // Wait for backoff attempts to complete
-          await vi.runAllTimersAsync();
-          await vi.runOnlyPendingTimersAsync();
+        // Wait for backoff attempts to complete
+        await vi.runAllTimersAsync();
+        await vi.runOnlyPendingTimersAsync();
 
-          // Assert
-          expect(dialWebRTCMock).toHaveBeenCalledTimes(3);
-          expect(reconnectingEvents).toHaveLength(1);
-          expect(reconnectionFailedEvents).toHaveLength(1);
-        }
-      );
+        // Assert
+        expect(dialWebRTCMock).toHaveBeenCalledTimes(3);
+        expect(reconnectingEvents).toHaveLength(1);
+        expect(reconnectionFailedEvents).toHaveLength(1);
+      });
 
       it('should succeed on reconnection retry after transient error', async () => {
         // Arrange
@@ -1024,15 +962,10 @@ describe('RobotClient', () => {
             if (event === 'close') {
               closeHandler = handler as (event: Event) => void;
             }
-          }
+          },
         );
 
-        const dataChannel = createMockDataChannel(
-          vi.fn(),
-          dcAddEventListener,
-          vi.fn(),
-          'open'
-        );
+        const dataChannel = createMockDataChannel(vi.fn(), dcAddEventListener, vi.fn(), 'open');
 
         const dialWebRTCMock = vi
           .mocked(rpcModule.dialWebRTC)
@@ -1062,8 +995,7 @@ describe('RobotClient', () => {
         dialWebRTCMock.mockClear();
 
         const reconnectingEvents = setupReconnectingEventCapture(client);
-        const reconnectionFailedEvents =
-          setupReconnectionFailedEventCapture(client);
+        const reconnectionFailedEvents = setupReconnectionFailedEventCapture(client);
         const connectedEvents = setupConnectedEventCapture(client);
 
         // Act
@@ -1155,6 +1087,166 @@ describe('RobotClient', () => {
         expect(dialWebRTCMock).toHaveBeenCalledTimes(maxAttempts);
         expect(dialDirectMock).toHaveBeenCalledTimes(maxAttempts);
       });
+    });
+  });
+
+  describe('debug logging', () => {
+    afterEach(() => {
+      setDebugLogWriter(undefined);
+    });
+
+    it('logs dial_started when a connection attempt begins', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+
+      // Act
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Assert
+      const startedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'dial_started');
+      expect(startedEntries.length).toBeGreaterThanOrEqual(1);
+      const entry = startedEntries[0]!;
+      expect(entry.connectionId).toBeDefined();
+      expect(entry.host).toBeDefined();
+      expect(entry.method).toBeDefined();
+    });
+
+    it('logs dial_success after a successful connection', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+
+      // Act
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Assert
+      const successEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'dial_success');
+      expect(successEntries).toHaveLength(1);
+      expect(successEntries[0]!.connectionId).toBeDefined();
+    });
+
+    it('dial_started and dial_success share the same connectionId', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+
+      // Act
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Assert
+      const entries = writer.mock.calls.map(([entry]) => entry);
+      const startedId = entries.find((entry) => entry.event === 'dial_started')?.connectionId;
+      const successId = entries.find((entry) => entry.event === 'dial_success')?.connectionId;
+      expect(startedId).toBeDefined();
+      expect(startedId).toBe(successId);
+    });
+
+    it('logs dial_failed when a connection attempt fails', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = new RobotClient();
+      vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(new Error('WebRTC failed'));
+
+      // Act — baseDialConfig uses TEST_HOST (non-local), so gRPC fallback also fails
+      try {
+        await client.dial({ ...baseDialConfig, noReconnect: true });
+      } catch {
+        // Expected to throw
+      }
+
+      // Assert
+      const failedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'dial_failed');
+      expect(failedEntries.length).toBeGreaterThanOrEqual(1);
+      expect(failedEntries[0]!.error).toBeDefined();
+      expect(failedEntries[0]!.connectionId).toBeDefined();
+    });
+
+    it('logs client_closed when disconnect is called', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Act
+      await client.disconnect();
+
+      // Assert
+      const closedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'client_closed');
+      expect(closedEntries).toHaveLength(1);
+    });
+
+    it('logs client_closed with the connectionId from the prior connection', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = setupClientMocks();
+      await client.dial({ ...baseDialConfig, noReconnect: true });
+
+      // Act
+      await client.disconnect();
+
+      // Assert
+      const entries = writer.mock.calls.map(([entry]) => entry);
+      const successId = entries.find((entry) => entry.event === 'dial_success')?.connectionId;
+      const closedId = entries.find((entry) => entry.event === 'client_closed')?.connectionId;
+      expect(successId).toBeDefined();
+      expect(closedId).toBe(successId);
+    });
+
+    it('logs client_closed with undefined connectionId when disconnecting before any connection', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const client = new RobotClient();
+
+      // Act
+      await client.disconnect();
+
+      // Assert
+      const closedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'client_closed');
+      expect(closedEntries).toHaveLength(1);
+      expect(closedEntries[0]!.connectionId).toBeUndefined();
+    });
+
+    it('logs ice_disconnected when the ICE connection enters the disconnected state', async () => {
+      // Arrange
+      const writer = vi.fn<[DebugLogEntry]>();
+      setDebugLogWriter(writer);
+      const mocks = setupEventListenerMocks();
+      await mocks.client.dial({ ...baseDialConfig, noReconnect: true });
+
+      const iceHandler = mocks.pcAddEventListener.mock.calls.find(
+        ([event]) => event === 'iceconnectionstatechange',
+      )?.[1] as (() => void) | undefined;
+      expect(iceHandler).toBeDefined();
+
+      // Act — simulate the ICE state moving to 'disconnected'
+      (mocks.peerConnection as unknown as Record<string, unknown>).iceConnectionState =
+        'disconnected';
+      iceHandler!();
+
+      // Assert
+      const disconnectedEntries = writer.mock.calls
+        .map(([entry]) => entry)
+        .filter((entry) => entry.event === 'ice_disconnected');
+      expect(disconnectedEntries).toHaveLength(1);
+      expect(disconnectedEntries[0]!.connectionId).toBeDefined();
     });
   });
 });

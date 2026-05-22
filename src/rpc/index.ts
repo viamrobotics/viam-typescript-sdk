@@ -15,8 +15,9 @@ export { ConnectionClosedError } from './connection-closed-error';
 export {
   cloneHeaders,
   dialDirect,
-  type DialOptions,
   dialWebRTC,
+  wrapTransportWithDebugLogging,
+  type DialOptions,
   type DialWebRTCOptions,
   type WebRTCConnection,
 } from './dial';
