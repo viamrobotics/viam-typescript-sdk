@@ -15,9 +15,12 @@ export default defineConfig({
     minify: true,
     target: 'esnext',
     lib: {
-      entry: path.resolve(import.meta.dirname, 'src/main.ts'),
+      entry: {
+        main: path.resolve(import.meta.dirname, 'src/main.ts'),
+        'proto/main': path.resolve(import.meta.dirname, 'src/proto/main.ts'),
+      },
       name: 'sdk',
-      fileName: (format) => `main.${format}.js`,
+      fileName: (format, entryName) => `${entryName}.${format}.js`,
     },
     rollupOptions: {
       onwarn: (warning, warn) => {
@@ -29,10 +32,7 @@ export default defineConfig({
     },
   },
   test: {
-    reporters: [
-      'verbose',
-      ['html', { outputFile: './vitest-report/index.html' }],
-    ],
+    reporters: ['verbose', ['html', { outputFile: './vitest-report/index.html' }]],
     include: ['src/**/*.spec.ts'],
     environment: 'happy-dom',
     mockReset: true,

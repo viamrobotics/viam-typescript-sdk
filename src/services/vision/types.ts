@@ -1,13 +1,12 @@
-import type { JsonObject } from '@bufbuild/protobuf';
+import type { JsonObject, MessageInitShape } from '@bufbuild/protobuf';
 
 import * as commonApi from '../../gen/common/v1/common_pb';
 import type { Image } from '../../gen/component/camera/v1/camera_pb';
 import * as visionApi from '../../gen/service/vision/v1/vision_pb';
 
-export type Classification = visionApi.Classification;
-export type Detection = visionApi.Detection;
-
-export type PointCloudObject = commonApi.PointCloudObject;
+export type Classification = MessageInitShape<typeof visionApi.ClassificationSchema>;
+export type Detection = MessageInitShape<typeof visionApi.DetectionSchema>;
+export type PointCloudObject = MessageInitShape<typeof commonApi.PointCloudObjectSchema>;
 
 export interface Properties {
   /** Whether or not classifactions are supported by the vision service */

@@ -25,10 +25,7 @@ export const clientHeaders = new Headers({
   viam_client: `typescript;v${__VERSION__};${apiVersion}`,
 });
 
-type doCommand = (
-  request: DoCommandRequest,
-  options?: CallOptions
-) => Promise<DoCommandResponse>;
+type doCommand = (request: DoCommandRequest, options?: CallOptions) => Promise<DoCommandResponse>;
 
 /**
  * Send/Receive an arbitrary command using a resource client.
@@ -49,7 +46,7 @@ export const doCommandFromClient = async function doCommandFromClient(
   name: string,
   command: JsonObject,
   options: Options = {},
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<JsonObject> {
   const request = create(DoCommandRequestSchema, {
     name,
@@ -66,10 +63,7 @@ export const doCommandFromClient = async function doCommandFromClient(
   return result;
 };
 
-export const enableDebugLogging = (
-  key?: string,
-  opts?: CallOptions
-): CallOptions => {
+export const enableDebugLogging = (key?: string, opts?: CallOptions): CallOptions => {
   const finalOpts = opts ?? { headers: {} as Record<string, string> };
   let finalKey = '';
   if (key === undefined) {
@@ -92,22 +86,14 @@ export const disableDebugLogging = (opts: CallOptions): void => {
   }
 };
 
-export const addMetadata = (
-  key: string,
-  value: string,
-  opts?: CallOptions
-): CallOptions => {
-  const finalOpts =
-    opts ?? ({ headers: {} as Record<string, string> } as CallOptions);
+export const addMetadata = (key: string, value: string, opts?: CallOptions): CallOptions => {
+  const finalOpts = opts ?? ({ headers: {} as Record<string, string> } as CallOptions);
   (finalOpts.headers as Record<string, string>)[key] = value;
   return finalOpts;
 };
 
 export const deleteMetadata = (opts: CallOptions, key: string): void => {
-  const { [key]: _, ...remainingHeaders } = opts.headers as Record<
-    string,
-    string
-  >;
+  const { [key]: _, ...remainingHeaders } = opts.headers as Record<string, string>;
   opts.headers = remainingHeaders;
 };
 
@@ -133,13 +119,11 @@ export interface GetKinematicsResultWithMeshes {
 }
 
 /** Shared type for kinematics return value (legacy or with meshes) */
-export type GetKinematicsResult =
-  | KinematicsData
-  | GetKinematicsResultWithMeshes;
+export type GetKinematicsResult = KinematicsData | GetKinematicsResultWithMeshes;
 
 type getKinematics = (
   request: GetKinematicsRequest,
-  options?: CallOptions
+  options?: CallOptions,
 ) => Promise<GetKinematicsResponse>;
 
 /** Get kinematics information using a resource client */
@@ -147,7 +131,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   getKinematicsMethod: getKinematics,
   name: string,
   extra: JsonObject = {},
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<GetKinematicsResult> {
   const request = create(GetKinematicsRequestSchema, {
     name,
@@ -169,7 +153,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
 type getGeometries = (
   request: GetGeometriesRequest,
-  options?: CallOptions
+  options?: CallOptions,
 ) => Promise<GetGeometriesResponse>;
 
 /** Get geometries information using a resource client */
@@ -177,7 +161,7 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
   getGeometriesMethod: getGeometries,
   name: string,
   extra: JsonObject = {},
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<Geometry[]> {
   const request = create(GetGeometriesRequestSchema, {
     name,
@@ -188,17 +172,14 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
   return response.geometries;
 };
 
-type getStatus = (
-  request: GetStatusRequest,
-  options?: CallOptions
-) => Promise<GetStatusResponse>;
+type getStatus = (request: GetStatusRequest, options?: CallOptions) => Promise<GetStatusResponse>;
 
 /** Get the status of a resource using a resource client */
 export const getStatusFromClient = async function getStatusFromClient(
   getStatusMethod: getStatus,
   name: string,
   options: Options = {},
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<JsonObject> {
   const request = create(GetStatusRequestSchema, { name });
   options.requestLogger?.(request);

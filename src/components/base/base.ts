@@ -4,7 +4,7 @@ import type { Geometry, Vector3Schema } from '../../gen/common/v1/common_pb';
 import * as baseApi from '../../gen/component/base/v1/base_pb';
 import type { JsonObject, Resource } from '../../types';
 
-export type BaseProperties = baseApi.GetPropertiesResponse;
+export type BaseProperties = MessageInitShape<typeof baseApi.GetPropertiesResponseSchema>;
 
 /** Represents a physical base of a robot. */
 
@@ -25,8 +25,8 @@ export interface Base extends Resource {
   getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
-   * Move a base in a straight line by a given distance at a given speed. This
-   * method blocks until completed or cancelled.
+   * Move a base in a straight line by a given distance at a given speed. This method blocks until
+   * completed or cancelled.
    *
    * @example
    *
@@ -46,15 +46,11 @@ export interface Base extends Resource {
    * @param distanceMm - Distance to move, in millimeters.
    * @param mmPerSec - Movement speed, in millimeters per second.
    */
-  moveStraight(
-    distanceMm: number,
-    mmPerSec: number,
-    extra?: JsonObject
-  ): Promise<void>;
+  moveStraight(distanceMm: number, mmPerSec: number, extra?: JsonObject): Promise<void>;
 
   /**
-   * Spin a base by a given angle at a given angular speed. This method blocks
-   * until completed or cancelled.
+   * Spin a base by a given angle at a given angular speed. This method blocks until completed or
+   * cancelled.
    *
    * @example
    *
@@ -77,8 +73,7 @@ export interface Base extends Resource {
   spin(angleDeg: number, degsPerSec: number, extra?: JsonObject): Promise<void>;
 
   /**
-   * Set the linear and angular power of a base from -1 to 1 in terms of power
-   * for each direction.
+   * Set the linear and angular power of a base from -1 to 1 in terms of power for each direction.
    *
    * @example
    *
@@ -88,25 +83,25 @@ export interface Base extends Resource {
    * // Move forward at 75% power
    * await base.setPower(
    *   { x: 0, y: 0.75, z: 0 }, // linear power
-   *   { x: 0, y: 0, z: 0 } // no rotation
+   *   { x: 0, y: 0, z: 0 }, // no rotation
    * );
    *
    * // Move straight back at 100% power
    * await base.setPower(
    *   { x: 0, y: -1, z: 0 }, // linear power
-   *   { x: 0, y: 0, z: 0 } // no rotation
+   *   { x: 0, y: 0, z: 0 }, // no rotation
    * );
    *
    * // Turn counter-clockwise at 50% power
    * await base.setPower(
    *   { x: 0, y: 0, z: 0 }, // no linear movement
-   *   { x: 0, y: 0, z: 0.5 } // rotate around z-axis
+   *   { x: 0, y: 0, z: 0.5 }, // rotate around z-axis
    * );
    *
    * // Turn clockwise at 60% power
    * await base.setPower(
    *   { x: 0, y: 0, z: 0 }, // no linear movement
-   *   { x: 0, y: 0, z: -0.6 } // rotate around z-axis
+   *   { x: 0, y: 0, z: -0.6 }, // rotate around z-axis
    * );
    * ```
    *
@@ -119,7 +114,7 @@ export interface Base extends Resource {
   setPower(
     linear: MessageInitShape<typeof Vector3Schema>,
     angular: MessageInitShape<typeof Vector3Schema>,
-    extra?: JsonObject
+    extra?: JsonObject,
   ): Promise<void>;
 
   /**
@@ -133,7 +128,7 @@ export interface Base extends Resource {
    * // Move forward at 50mm/s while spinning 15 degrees per second to the left
    * await base.setVelocity(
    *   { x: 0, y: 50, z: 0 }, // linear velocity in mm/s
-   *   { x: 0, y: 0, z: 15 } // 15 degrees per second counter-clockwise
+   *   { x: 0, y: 0, z: 15 }, // 15 degrees per second counter-clockwise
    * );
    * ```
    *
@@ -146,7 +141,7 @@ export interface Base extends Resource {
   setVelocity(
     linear: MessageInitShape<typeof Vector3Schema>,
     angular: MessageInitShape<typeof Vector3Schema>,
-    extra?: JsonObject
+    extra?: JsonObject,
   ): Promise<void>;
 
   /**
@@ -192,5 +187,5 @@ export interface Base extends Resource {
    * For more information, see [Base
    * API](https://docs.viam.com/dev/reference/apis/components/base/#getproperties).
    */
-  getProperties(extra?: JsonObject): Promise<BaseProperties>;
+  getProperties(extra?: JsonObject): Promise<baseApi.GetPropertiesResponse>;
 }

@@ -64,10 +64,7 @@ export class ViamClient {
       }
       const name = host.split('.').at(0);
       if (name !== undefined) {
-        const resp = await this.appClient.getRobotPartByNameAndLocation(
-          name,
-          locationId
-        );
+        const resp = await this.appClient.getRobotPartByNameAndLocation(name, locationId);
         return resp.part?.secret;
       }
     }
@@ -86,18 +83,14 @@ export class ViamClient {
       const parts = await this.appClient.getRobotParts(id);
       const mainPart = parts.find((part) => part.mainPart);
       if (!mainPart) {
-        throw new Error(
-          `Could not find a main part for the machine with UUID: ${id}`
-        );
+        throw new Error(`Could not find a main part for the machine with UUID: ${id}`);
       }
       address = mainPart.fqdn;
       robotSecret = mainPart.secret;
     }
 
     if (address === undefined || address === '') {
-      throw new Error(
-        'Host was not provided and could not be obtained from the machine ID'
-      );
+      throw new Error('Host was not provided and could not be obtained from the machine ID');
     }
 
     // If credentials is AccessToken, then attempt to use the robot part secret

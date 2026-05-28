@@ -1,9 +1,10 @@
+import { MessageInitShape } from '@bufbuild/protobuf';
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import type { JsonObject, Pose, Resource } from '../../types';
 import type { GetKinematicsResult } from '../../utils';
 
-export type ArmJointPositions = armApi.JointPositions;
+export type ArmJointPositions = MessageInitShape<typeof armApi.JointPositionsSchema>;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
@@ -65,8 +66,8 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getkinematics).
    * ```
    *
-   * @returns The legacy kinematics data shape or the newer object containing
-   *   kinematics data plus a map of URDF mesh file paths to mesh data.
+   * @returns The legacy kinematics data shape or the newer object containing kinematics data plus a
+   *   map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: JsonObject) => Promise<GetKinematicsResult>;
 
@@ -117,10 +118,7 @@ export interface Arm extends Resource {
    *
    * @param jointPositionsList - List of angles (0-360) to move each joint to.
    */
-  moveToJointPositions: (
-    jointPositionsList: number[],
-    extra?: JsonObject
-  ) => Promise<void>;
+  moveToJointPositions: (jointPositionsList: number[], extra?: JsonObject) => Promise<void>;
 
   /**
    * Gets the current position of each joint.
@@ -135,7 +133,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getjointpositions).
    */
-  getJointPositions: (extra?: JsonObject) => Promise<ArmJointPositions>;
+  getJointPositions: (extra?: JsonObject) => Promise<armApi.JointPositions>;
 
   /**
    * Stop the motion of the arm.

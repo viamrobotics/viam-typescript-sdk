@@ -1,6 +1,7 @@
 import { type Client, createClient, type Transport } from '@connectrpc/connect';
 
-import type { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import type { CloudConfigSchema } from '../gen/provisioning/v1/provisioning_pb';
 import { ProvisioningService } from '../gen/provisioning/v1/provisioning_pb';
 
 export class ProvisioningClient {
@@ -20,8 +21,7 @@ export class ProvisioningClient {
   }
 
   /**
-   * Set the network credentials of the Smart Machine, so it can connect to the
-   * internet.
+   * Set the network credentials of the Smart Machine, so it can connect to the internet.
    *
    * @param type - The type of network
    * @param ssid - The SSID of the network
@@ -36,12 +36,11 @@ export class ProvisioningClient {
   }
 
   /**
-   * Set the Viam credentials of the smart machine credentials, so it connect to
-   * the Cloud.
+   * Set the Viam credentials of the smart machine credentials, so it connect to the Cloud.
    *
    * @param cloud - The configuration of the Cloud
    */
-  async setSmartMachineCredentials(cloud?: CloudConfig) {
+  async setSmartMachineCredentials(cloud?: MessageInitShape<typeof CloudConfigSchema>) {
     await this.client.setSmartMachineCredentials({ cloud });
   }
 
@@ -56,7 +55,5 @@ export class ProvisioningClient {
   }
 }
 
-export type {
-  APIKey,
-  CloudConfig,
-} from '../gen/provisioning/v1/provisioning_pb';
+export type { APIKey } from '../gen/provisioning/v1/provisioning_pb';
+export type CloudConfig = MessageInitShape<typeof CloudConfigSchema>;

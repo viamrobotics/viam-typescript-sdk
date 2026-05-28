@@ -8,9 +8,7 @@ const HOST = import.meta.env.VITE_HOST;
 const API_KEY_ID = import.meta.env.VITE_API_KEY_ID;
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-const connectionStatusEl = <HTMLElement>(
-  document.getElementById('connection-status')
-);
+const connectionStatusEl = <HTMLElement>document.getElementById('connection-status');
 const connectEl = <HTMLButtonElement>document.getElementById('connect');
 const disconnectEl = <HTMLButtonElement>document.getElementById('disconnect');
 const resourcesEl = <HTMLButtonElement>document.getElementById('resources');
@@ -19,9 +17,7 @@ let machine: VIAM.RobotClient | undefined = undefined;
 const reconnectAbortSignal = { abort: false };
 
 const handleConnectionStateChange = (event: unknown) => {
-  updateConnectionStatus(
-    (event as { eventType: VIAM.MachineConnectionEvent }).eventType
-  );
+  updateConnectionStatus((event as { eventType: VIAM.MachineConnectionEvent }).eventType);
 };
 
 const updateConnectionStatus = (eventType: VIAM.MachineConnectionEvent) => {
@@ -81,9 +77,7 @@ const disconnect = async () => {
 };
 
 const logResources = async () => {
-  console.log(
-    machine?.isConnected() ? await machine.resourceNames() : 'Not connected'
-  );
+  console.log(machine?.isConnected() ? await machine.resourceNames() : 'Not connected');
 };
 
 async function main() {

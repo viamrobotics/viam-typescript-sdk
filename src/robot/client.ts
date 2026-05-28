@@ -9,10 +9,11 @@ import {
 } from '@connectrpc/connect';
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 
-import { assertExists } from '../assert';
 import { UuidTool } from 'uuid-tool';
-import { isCredential, type Credentials } from '../app/viam-transport';
+import { type Credentials, isCredential } from '../app/viam-transport';
+import { assertExists } from '../assert';
 import { DIAL_TIMEOUT } from '../constants';
+import { writeDebugLog } from '../debug';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
 import type { PoseInFrameSchema, Transform } from '../gen/common/v1/common_pb';
 import { ArmService } from '../gen/component/arm/v1/arm_pb';
@@ -35,7 +36,6 @@ import {
   TransformPCDRequestSchema,
   TransformPoseRequestSchema,
 } from '../gen/robot/v1/robot_pb';
-<<<<<<< HEAD
 import { DiscoveryService } from '../gen/service/discovery/v1/discovery_pb';
 import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_pb';
 import { MotionService } from '../gen/service/motion/v1/motion_pb';
@@ -44,21 +44,7 @@ import { SLAMService } from '../gen/service/slam/v1/slam_pb';
 import { VisionService } from '../gen/service/vision/v1/vision_pb';
 import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_pb';
 import type { AccessToken, Credential } from '../main';
-import { dialDirect, type DialOptions, dialWebRTC } from '../rpc';
-=======
-import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
-import { MotionService } from '../gen/service/motion/v1/motion_connect';
-import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
-import { SLAMService } from '../gen/service/slam/v1/slam_connect';
-import { VisionService } from '../gen/service/vision/v1/vision_connect';
-import { writeDebugLog } from '../debug';
-import {
-  dialDirect,
-  dialWebRTC,
-  wrapTransportWithDebugLogging,
-  type DialOptions,
-} from '../rpc';
->>>>>>> 82ec31c91b0c70ca9ead99cea61b73c1ad3c6976
+import { dialDirect, type DialOptions, dialWebRTC, wrapTransportWithDebugLogging } from '../rpc';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
@@ -1132,10 +1118,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.onDataChannelClose = (event: Event) => this.onDisconnect(event);
         this.dataChannel.addEventListener('close', this.onDataChannelClose);
 
-        this.transport = wrapTransportWithDebugLogging(
-          webRTCConn.transport,
-          connectionId
-        );
+        this.transport = wrapTransportWithDebugLogging(webRTCConn.transport, connectionId);
 
         this.onTrack = (event: RTCTrackEvent) => {
           const [eventStream] = event.streams;
@@ -1161,7 +1144,7 @@ export class RobotClient extends EventDispatcher implements Robot {
         this.connectionId = connectionId;
         this.transport = wrapTransportWithDebugLogging(
           await dialDirect(this.serviceHost, opts),
-          connectionId
+          connectionId,
         );
         await this.gRPCConnectionManager.start();
       }

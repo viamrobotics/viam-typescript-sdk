@@ -1,14 +1,40 @@
 export const version = __VERSION__;
 
-/**
- * Raw Protobuf interfaces for a Robot component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link RobotClient} instead.
- * @group Raw Protobufs
- */
-export * as robotApi from './gen/robot/v1/robot_pb';
+export { robotProto as robotApi } from './proto/main';
+export { dataProto as dataApi } from './proto/main';
+export { appProto as appApi } from './proto/main';
+export { appRobotProto as appRobotApi } from './proto/main';
+export { mlTrainingProto as mlTrainingApi } from './proto/main';
+export { provisioningProto as provisioningApi } from './proto/main';
+export { billingProto as billingApi } from './proto/main';
+export { armProto as armApi } from './proto/main';
+export { audioInProto as audioInApi } from './proto/main';
+export { audioOutProto as audioOutApi } from './proto/main';
+export { baseProto as baseApi } from './proto/main';
+export { boardProto as boardApi } from './proto/main';
+export { buttonProto as buttonApi } from './proto/main';
+export { cameraProto as cameraApi } from './proto/main';
+export { discoveryProto as discoveryApi } from './proto/main';
+export { encoderProto as encoderApi } from './proto/main';
+export { gantryProto as gantryApi } from './proto/main';
+export { motorProto as motorApi } from './proto/main';
+export { movementSensorProto as movementSensorApi } from './proto/main';
+export { powerSensorProto as powerSensorApi } from './proto/main';
+export { sensorProto as sensorApi } from './proto/main';
+export { streamProto as streamApi } from './proto/main';
+export { switchProto as switchApi } from './proto/main';
+export { genericComponentProto as genericComponentApi } from './proto/main';
+export { gripperProto as gripperApi } from './proto/main';
+export { inputControllerProto as inputControllerApi } from './proto/main';
+export { motionProto as motionApi } from './proto/main';
+export { dataManagerProto as dataManagerApi } from './proto/main';
+export { navigationProto as navigationApi } from './proto/main';
+export { servoProto as servoApi } from './proto/main';
+export { slamProto as slamApi } from './proto/main';
+export { visionProto as visionApi } from './proto/main';
+export { genericServiceProto as genericServiceApi } from './proto/main';
+export { commonProto as commonApi } from './proto/main';
+
 export {
   RobotClient as Client,
   type CloudMetadata,
@@ -29,15 +55,6 @@ export {
 
 export { createViamClient, type ViamClient, type ViamClientOptions } from './app/viam-client';
 
-/**
- * Raw Protobuf interfaces for Data.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link DataClient} instead.
- * @group Raw Protobufs
- */
-export * as dataApi from './gen/app/data/v1/data_pb';
 export {
   type BinaryDataCaptureUploadOptions,
   type DataClient,
@@ -47,86 +64,22 @@ export {
   type SequenceResourceFilter,
 } from './app/data-client';
 
-/**
- * Raw Protobuf interfaces for an App service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link AppClient} instead.
- * @group Raw Protobufs
- */
-export * as appApi from './gen/app/v1/app_pb';
-export * as appRobotApi from './gen/app/v1/robot_pb';
 export { type AppClient } from './app/app-client';
 
-/**
- * Raw Protobuf interfaces for ML Training.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link MlTrainingClient} instead.
- * @group Raw Protobufs
- */
-export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
 export { type MlTrainingClient, ModelType, TrainingStatus } from './app/ml-training-client';
 
-/**
- * Raw Protobuf interfaces for Provisioning.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link ProvisioningClient} instead.
- * @group Raw Protobufs
- */
-export * as provisioningApi from './gen/provisioning/v1/provisioning_pb';
 export type { CloudConfig, ProvisioningClient } from './app/provisioning-client';
 
-/**
- * Raw Protobuf interfaces for Billing.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link BillingClient} instead.
- * @group Raw Protobufs
- */
-export * as billingApi from './gen/app/v1/billing_pb';
 export { type BillingClient } from './app/billing-client';
 
 export { AudioCodec, type AudioCodecType, type AudioProperties } from './audio-common';
 export { type AudioChunk, type AudioIn, AudioInClient } from './components/audioin';
 export { type AudioOut, AudioOutClient } from './components/audioout';
 
-/**
- * Raw Protobuf interfaces for an Arm component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link ArmClient} instead.
- * @group Raw Protobufs
- */
-export * as armApi from './gen/component/arm/v1/arm_pb';
 export { type Arm, ArmClient, type ArmJointPositions } from './components/arm';
 
-/**
- * Raw Protobuf interfaces for a Base component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link BaseClient} instead.
- * @group Raw Protobufs
- */
-export * as baseApi from './gen/component/base/v1/base_pb';
 export { type Base, BaseClient, type BaseProperties } from './components/base';
 
-/**
- * Raw Protobuf interfaces for a Board component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link BoardClient} instead.
- * @group Raw Protobufs
- */
-export * as boardApi from './gen/component/board/v1/board_pb';
 export {
   type AnalogValue,
   type Board,
@@ -135,48 +88,12 @@ export {
   type Tick,
 } from './components/board';
 
-/**
- * Raw Protobuf interfaces for a Button component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link ButtonClient} instead.
- * @group Raw Protobufs
- */
-export * as buttonApi from './gen/component/button/v1/button_pb';
 export { type Button, ButtonClient } from './components/button';
 
-/**
- * Raw Protobuf interfaces for a Camera component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link CameraClient} instead.
- * @group Raw Protobufs
- */
-export * as cameraApi from './gen/component/camera/v1/camera_pb';
 export { type Camera, CameraClient, type MimeType } from './components/camera';
 
-/**
- * Raw Protobuf interfaces for a Discovery service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link DiscoveryService} instead.
- * @group Raw Protobufs
- */
-export * as discoveryApi from './gen/service/discovery/v1/discovery_pb';
 export { type Discovery, DiscoveryClient } from './services/discovery';
 
-/**
- * Raw Protobuf interfaces for an Encoder component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link EncoderClient} instead.
- * @group Raw Protobufs
- */
-export * as encoderApi from './gen/component/encoder/v1/encoder_pb';
 export {
   type Encoder,
   EncoderClient,
@@ -184,26 +101,8 @@ export {
   type EncoderProperties,
 } from './components/encoder';
 
-/**
- * Raw Protobuf interfaces for a Gantry component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link GantryClient} instead.
- * @group Raw Protobufs
- */
-export * as gantryApi from './gen/component/gantry/v1/gantry_pb';
 export { type Gantry, GantryClient } from './components/gantry';
 
-/**
- * Raw Protobuf interfaces for a Motor component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link MotorClient} instead.
- * @group Raw Protobufs
- */
-export * as motorApi from './gen/component/motor/v1/motor_pb';
 export { type Motor, MotorClient } from './components/motor';
 
 export {
@@ -214,15 +113,6 @@ export {
   type TensorInfo,
 } from './services/ml-model';
 
-/**
- * Raw Protobuf interfaces for a MovementSensor component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link MovementSensorClient} instead.
- * @group Raw Protobufs
- */
-export * as movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb';
 export {
   type MovementSensor,
   type MovementSensorAccuracy,
@@ -231,58 +121,14 @@ export {
   type MovementSensorProperties,
 } from './components/movementsensor';
 
-/**
- * Raw Protobuf interfaces for a PowerSensor component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link PowerSensorClient} instead.
- * @group Raw Protobufs
- */
-export * as powerSensorApi from './gen/component/powersensor/v1/powersensor_pb';
 export { type PowerSensor, PowerSensorClient } from './components/powersensor';
 
-/**
- * Raw Protobuf interfaces generated with https://github.com/connectrpc/connect-es for a Sensor
- * component.
- *
- * @deprecated Use {@link SensorClient} instead.
- * @group Raw Protobufs
- */
-export * as sensorApi from './gen/component/sensor/v1/sensor_pb';
 export { type Sensor, SensorClient } from './components/sensor';
 
-/**
- * Raw Protobuf interfaces for a Stream.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link StreamClient} instead.
- * @group Raw Protobufs
- */
-export * as streamApi from './gen/stream/v1/stream_pb';
 export { type Stream, StreamClient } from './extra/stream';
 
-/**
- * Raw Protobuf interfaces for a Switch component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link SwitchClient} instead.
- * @group Raw Protobufs
- */
-export * as switchApi from './gen/component/switch/v1/switch_pb';
 export { type Switch, SwitchClient } from './components/switch';
 
-/**
- * Raw Protobuf interfaces for a Generic component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link GenericComponentClient} instead.
- * @group Raw Protobufs
- */
-export * as genericComponentApi from './gen/component/generic/v1/generic_pb';
 export {
   type Generic as GenericComponent,
   GenericClient as GenericComponentClient,
@@ -290,37 +136,10 @@ export {
 
 export { type PoseTracker, PoseTrackerClient } from './components/posetracker';
 
-/**
- * Raw Protobuf interfaces for a Gripper component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link GripperClient} instead.
- * @group Raw Protobufs
- */
-export * as gripperApi from './gen/component/gripper/v1/gripper_pb';
 export { type Gripper, GripperClient } from './components/gripper';
 
-/**
- * Raw Protobuf interfaces for an InputController component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link GripperClient} instead.
- * @group Raw Protobufs
- */
-export * as inputControllerApi from './gen/component/inputcontroller/v1/input_controller_pb';
 export * from './components/inputcontroller';
 
-/**
- * Raw Protobuf interfaces for a Motion service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link MotionClient} instead.
- * @group Raw Protobufs
- */
-export * as motionApi from './gen/service/motion/v1/motion_pb';
 export {
   type CollisionSpecification,
   type Constraints,
@@ -335,26 +154,8 @@ export {
   type PlanState,
 } from './services/motion';
 
-/**
- * Raw Protobuf interfaces for a DataManager service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link DataManagerClient} instead.
- * @group Raw Protobufs
- */
-export * as dataManagerApi from './gen/service/datamanager/v1/data_manager_pb';
 export { type DataManager, DataManagerClient } from './services/data-manager';
 
-/**
- * Raw Protobuf interfaces for a Navigation service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link NavigationClient} instead.
- * @group Raw Protobufs
- */
-export * as navigationApi from './gen/service/navigation/v1/navigation_pb';
 export {
   type Mode,
   NavigationClient,
@@ -364,37 +165,10 @@ export {
   type Waypoint,
 } from './services/navigation';
 
-/**
- * Raw Protobuf interfaces for a Servo component.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link ServoClient} instead.
- * @group Raw Protobufs
- */
-export * as servoApi from './gen/component/servo/v1/servo_pb';
 export { type Servo, ServoClient } from './components/servo';
 
-/**
- * Raw Protobuf interfaces for a Slam service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link SlamClient} instead.
- * @group Raw Protobufs
- */
-export * as slamApi from './gen/service/slam/v1/slam_pb';
 export { SlamClient, type SlamPosition, type SlamProperties } from './services/slam';
 
-/**
- * Raw Protobuf interfaces for a Vision service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link VisionClient} instead.
- * @group Raw Protobufs
- */
-export * as visionApi from './gen/service/vision/v1/vision_pb';
 export {
   type Classification,
   type Detection,
@@ -402,15 +176,6 @@ export {
   VisionClient,
 } from './services/vision';
 
-/**
- * Raw Protobuf interfaces for a Generic service.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @deprecated Use {@link GenericServiceClient} instead.
- * @group Raw Protobufs
- */
-export * as genericServiceApi from './gen/service/generic/v1/generic_pb';
 export {
   type Generic as GenericService,
   GenericClient as GenericServiceClient,
@@ -418,15 +183,6 @@ export {
 
 export * from './services/video';
 export * from './services/world-state-store';
-
-/**
- * Raw Protobuf interfaces that are shared across multiple components and services.
- *
- * Generated with https://github.com/connectrpc/connect-es
- *
- * @group Raw Protobufs
- */
-export * as commonApi from './gen/common/v1/common_pb';
 
 export { MachineConnectionEvent } from './events';
 

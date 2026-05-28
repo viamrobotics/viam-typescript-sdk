@@ -1,10 +1,15 @@
-import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
+import { MessageInitShape } from '@bufbuild/protobuf';
+import {
+  type GetPropertiesResponseSchema,
+  type GetPropertiesResponse,
+  PositionType,
+} from '../../gen/component/encoder/v1/encoder_pb';
 import type { JsonObject, Resource } from '../../types';
 
-export type EncoderProperties = encoderApi.GetPropertiesResponse;
-export type EncoderPositionType = encoderApi.PositionType;
+export type EncoderProperties = MessageInitShape<typeof GetPropertiesResponseSchema>;
+export type EncoderPositionType = PositionType;
 
-export const { PositionType: EncoderPositionType } = encoderApi;
+export const EncoderPositionType = PositionType;
 
 /** Represents a physical encoder. */
 export interface Encoder extends Resource {
@@ -40,11 +45,11 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getproperties).
    */
-  getProperties(extra?: JsonObject): Promise<EncoderProperties>;
+  getProperties(extra?: JsonObject): Promise<GetPropertiesResponse>;
 
   /**
-   * Return the current position either in relative units (ticks away from a
-   * zero position) or absolute units (degrees along a circle).
+   * Return the current position either in relative units (ticks away from a zero position) or
+   * absolute units (degrees along a circle).
    *
    * @example
    *
@@ -53,7 +58,7 @@ export interface Encoder extends Resource {
    *
    * // Get the position of the encoder in ticks
    * const [position, posType] = await encoder.getPosition(
-   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT
+   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT,
    * );
    * console.log('The encoder position is currently', position, posType);
    * ```
@@ -61,11 +66,10 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getposition).
    *
-   * @param positionType - The type of position the encoder returns (ticks or
-   *   degrees)
+   * @param positionType - The type of position the encoder returns (ticks or degrees)
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: JsonObject
+    extra?: JsonObject,
   ): Promise<readonly [number, EncoderPositionType]>;
 }

@@ -1,12 +1,13 @@
 import type { Transform } from '../../gen/common/v1/common_pb';
 import type { StreamTransformChangesResponse } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
+import { DeepOmitProtobufInternals } from '../../internal/types';
 
-export interface TransformWithUUID extends Transform {
+export type TransformWithUUID = DeepOmitProtobufInternals<Transform> & {
   uuidString: string;
-}
+};
 
 export type TransformChangeEvent = Omit<
-  StreamTransformChangesResponse,
+  DeepOmitProtobufInternals<StreamTransformChangesResponse>,
   'transform'
 > & {
   transform: TransformWithUUID | undefined;

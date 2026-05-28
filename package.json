@@ -14,6 +14,11 @@
       "types": "./dist/main.d.ts",
       "require": "./dist/main.umd.js",
       "default": "./dist/main.es.js"
+    },
+    "./proto": {
+      "types": "./dist/proto/main.d.ts",
+      "require": "./dist/proto/main.umd.js",
+      "default": "./dist/proto/main.es.js"
     }
   },
   "scripts": {
@@ -57,6 +62,7 @@
     "@bufbuild/protobuf": "^2.11.0",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
+    "@viamrobotics/sdk": "link:",
     "bsonfy": "^1.0.2",
     "exponential-backoff": "^3.1.3"
   },

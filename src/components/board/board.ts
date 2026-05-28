@@ -1,7 +1,8 @@
+import { MessageInitShape } from '@bufbuild/protobuf';
 import * as boardApi from '../../gen/component/board/v1/board_pb';
 import type { Duration, JsonObject, Resource } from '../../types';
 
-export type AnalogValue = boardApi.ReadAnalogReaderResponse;
+export type AnalogValue = MessageInitShape<typeof boardApi.ReadAnalogReaderResponseSchema>;
 export type PowerMode = boardApi.PowerMode;
 
 export interface Tick {
@@ -11,8 +12,8 @@ export interface Tick {
 }
 
 /**
- * Represents a physical general purpose compute board that contains various
- * components such as analog readers, and digital interrupts.
+ * Represents a physical general purpose compute board that contains various components such as
+ * analog readers, and digital interrupts.
  */
 export interface Board extends Resource {
   /**
@@ -49,8 +50,7 @@ export interface Board extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/board/#setgpio).
    *
    * @param pin - The pin number.
-   * @param high - When true, set the given pin to high. When false, set the
-   *   given pin to low.
+   * @param high - When true, set the given pin to high. When false, set the given pin to low.
    */
   setGPIO(pin: string, high: boolean, extra?: JsonObject): Promise<void>;
   /**
@@ -126,14 +126,9 @@ export interface Board extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/board/#setpwmfrequency).
    *
    * @param pin - The pin.
-   * @param frequencyHz - The PWM frequency, in hertz. 0 will use the board's
-   *   default PWM frequency.
+   * @param frequencyHz - The PWM frequency, in hertz. 0 will use the board's default PWM frequency.
    */
-  setPWMFrequency(
-    pin: string,
-    frequencyHz: number,
-    extra?: JsonObject
-  ): Promise<void>;
+  setPWMFrequency(pin: string, frequencyHz: number, extra?: JsonObject): Promise<void>;
   /**
    * Read the current value of an analog reader of a board.
    *
@@ -144,9 +139,7 @@ export interface Board extends Resource {
    *
    * // Get the value of the analog signal "my_example_analog_reader" has most
    * // recently measured.
-   * const reading = await board.readAnalogReader(
-   *   'my_example_analog_reader'
-   * );
+   * const reading = await board.readAnalogReader('my_example_analog_reader');
    * ```
    *
    * For more information, see [Board
@@ -156,8 +149,8 @@ export interface Board extends Resource {
    */
   readAnalogReader(
     analogReader: string,
-    extra?: JsonObject
-  ): Promise<AnalogValue>;
+    extra?: JsonObject,
+  ): Promise<boardApi.ReadAnalogReaderResponse>;
   /**
    * Write an analog value to a pin on the board.
    *
@@ -178,8 +171,7 @@ export interface Board extends Resource {
    */
   writeAnalog(pin: string, value: number, extra?: JsonObject): Promise<void>;
   /**
-   * Return the current value of the interrupt which is based on the type of
-   * interrupt.
+   * Return the current value of the interrupt which is based on the type of interrupt.
    *
    * @example
    *
@@ -187,9 +179,7 @@ export interface Board extends Resource {
    * const board = new VIAM.BoardClient(machine, 'my_board');
    *
    * // Get the number of times this DigitalInterrupt has been interrupted with a tick.
-   * const count = await board.getDigitalInterruptValue(
-   *   'my_example_digital_interrupt'
-   * );
+   * const count = await board.getDigitalInterruptValue('my_example_digital_interrupt');
    * ```
    *
    * For more information, see [Board
@@ -197,10 +187,7 @@ export interface Board extends Resource {
    *
    * @param digitalInterruptName - The name of the digital interrupt.
    */
-  getDigitalInterruptValue(
-    digitalInterruptName: string,
-    extra?: JsonObject
-  ): Promise<number>;
+  getDigitalInterruptValue(digitalInterruptName: string, extra?: JsonObject): Promise<number>;
   /**
    * Stream digital interrupt ticks on the board.
    *
@@ -214,7 +201,7 @@ export interface Board extends Resource {
    *
    * for await (const tick of ticks) {
    *   console.log(
-   *     `Pin ${tick.pinName} changed to ${tick.high ? 'high' : 'low'} at ${tick.time}`
+   *     `Pin ${tick.pinName} changed to ${tick.high ? 'high' : 'low'} at ${tick.time}`,
    *   );
    * }
    * ```
@@ -225,11 +212,7 @@ export interface Board extends Resource {
    * @param interrupts - Names of the interrupts to stream.
    * @param queue - Array to put the ticks in.
    */
-  streamTicks(
-    interrupts: string[],
-    queue: Tick[],
-    extra?: JsonObject
-  ): Promise<void>;
+  streamTicks(interrupts: string[], queue: Tick[], extra?: JsonObject): Promise<void>;
   /**
    * Set power mode of the board.
    *
@@ -249,9 +232,5 @@ export interface Board extends Resource {
    * @param powerMode - The requested power mode.
    * @param duration - The requested duration to stay in power mode.
    */
-  setPowerMode(
-    powerMode: PowerMode,
-    duration: Duration,
-    extra?: JsonObject
-  ): Promise<void>;
+  setPowerMode(powerMode: PowerMode, duration: Duration, extra?: JsonObject): Promise<void>;
 }
