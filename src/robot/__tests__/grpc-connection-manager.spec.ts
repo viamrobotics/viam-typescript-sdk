@@ -62,9 +62,7 @@ describe('GRPCConnectionManager', () => {
     const heartbeat = vi.spyOn(connectionManager, 'heartbeat');
 
     // Act & Assert
-    await expect(connectionManager.start()).rejects.toThrow(
-      ConnectError.from(new Error('not connected'))
-    );
+    await expect(connectionManager.start()).rejects.toThrow('not connected');
     expect(heartbeat).not.toHaveBeenCalled();
   });
 

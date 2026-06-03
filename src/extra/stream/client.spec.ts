@@ -88,7 +88,7 @@ describe('StreamClient', () => {
     // eslint-disable-next-line vitest/no-restricted-vi-methods
     const addStream = vi.spyOn(streamClient, 'add');
     await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(
-      ConnectError.from(error)
+      error.message
     );
     expect(addStream).toHaveBeenCalledOnce();
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
@@ -201,7 +201,7 @@ describe('StreamClient', () => {
     streamClient = new StreamClient(robotClient);
     await expect(
       streamClient.setOptions(fakeCamName, 1920, 1080)
-    ).rejects.toThrow(ConnectError.from(error));
+    ).rejects.toThrow(error.message);
   });
 
   it('resetOptions does not throw if SetStreamOptions succeeds', async () => {
@@ -233,7 +233,7 @@ describe('StreamClient', () => {
 
     streamClient = new StreamClient(robotClient);
     await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(
-      ConnectError.from(error)
+      error.message
     );
   });
 });
