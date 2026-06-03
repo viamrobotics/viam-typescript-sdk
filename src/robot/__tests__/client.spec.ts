@@ -786,7 +786,7 @@ describe('RobotClient', () => {
         const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
-              closeHandler = handler as (event: Event) => void;
+              closeHandler = handler;
             }
           }
         );
@@ -845,7 +845,7 @@ describe('RobotClient', () => {
         const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
-              closeHandler = handler as (event: Event) => void;
+              closeHandler = handler;
             }
           }
         );
@@ -899,7 +899,7 @@ describe('RobotClient', () => {
         const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
-              closeHandler = handler as (event: Event) => void;
+              closeHandler = handler;
             }
           }
         );
@@ -964,7 +964,7 @@ describe('RobotClient', () => {
           const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
             (event: string, handler: (event: unknown) => void) => {
               if (event === 'close') {
-                closeHandler = handler as (event: Event) => void;
+                closeHandler = handler;
               }
             }
           );
@@ -1023,7 +1023,7 @@ describe('RobotClient', () => {
         const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
-              closeHandler = handler as (event: Event) => void;
+              closeHandler = handler;
             }
           }
         );

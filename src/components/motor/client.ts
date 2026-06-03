@@ -27,7 +27,7 @@ export class MotorClient implements Motor {
   private client: Client<typeof MotorService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MotorService);

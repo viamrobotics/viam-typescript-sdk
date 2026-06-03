@@ -26,7 +26,7 @@ export class AudioOutClient implements AudioOut {
   private client: Client<typeof AudioOutService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(AudioOutService);

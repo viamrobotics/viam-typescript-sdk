@@ -74,8 +74,8 @@ export class ViamClient {
   }
 
   public async connectToMachine({
-    host = undefined,
-    id = undefined,
+    host,
+    id,
   }: ViamClientMachineConnectionOpts) {
     if (host === undefined && id === undefined) {
       throw new Error('Either a machine address or ID must be provided');
@@ -115,7 +115,7 @@ export class ViamClient {
               type: 'robot-secret',
               payload: robotSecret,
               authEntity: address,
-            } as Credential);
+            });
     }
 
     return createRobotClient({
