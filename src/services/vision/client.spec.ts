@@ -29,10 +29,10 @@ const classification: Classification = new Classification({
 });
 
 const detection: Detection = new Detection({
-  xMin: BigInt(251),
-  yMin: BigInt(225),
-  xMax: BigInt(416),
-  yMax: BigInt(451),
+  xMin: 251n,
+  yMin: 225n,
+  xMax: 416n,
+  yMax: 451n,
   confidence: 0.995_482_683_181_762_7,
   className: 'face',
 });

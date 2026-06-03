@@ -283,7 +283,7 @@ module.exports = defineConfig([{
         "unicorn/consistent-function-scoping": "off",
 
         "vitest/consistent-test-filename": ["error", {
-            pattern: ".*\\.spec\\.(ts|svelte)$",
+            pattern: String.raw`.*\.spec\.(ts|svelte)$`,
         }],
 
         "vitest/consistent-test-it": ["error", {

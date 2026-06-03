@@ -104,7 +104,7 @@ export const addMetadata = (
   opts?: CallOptions
 ): CallOptions => {
   const finalOpts =
-    opts ?? ({ headers: {} as Record<string, string> } as CallOptions);
+    opts ?? ({ headers: {} });
   (finalOpts.headers as Record<string, string>)[key] = value;
   return finalOpts;
 };

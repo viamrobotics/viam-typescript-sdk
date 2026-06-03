@@ -113,7 +113,7 @@ describe('BillingClient tests', () => {
             ],
             startDate: testStartDate,
             endDate: testEndDate,
-          } as GetCurrentMonthUsageResponse;
+          };
         },
         getOrgBillingInformation: () => testBillingInfo,
         getInvoicesSummary: () => testInvoiceSummary,

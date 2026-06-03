@@ -1335,7 +1335,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     );
     const result = response.pose;
     if (!result) {
-      // eslint-disable-next-line no-warning-comments
+       
       // TODO: Can the response frame be undefined or null?
       throw new Error('no pose');
     }

@@ -2,7 +2,7 @@ import type { Transport } from '@connectrpc/connect';
 import type { GrpcWebTransportOptions } from '@connectrpc/connect-web';
 
 declare global {
-  // eslint-disable-next-line vars-on-top,no-var
+  // eslint-disable-next-line vars-on-top
   var VIAM:
     | {
         GRPC_TRANSPORT_FACTORY?: (opts: GrpcWebTransportOptions) => Transport;
