@@ -1,13 +1,30 @@
 {
-  "extends": "@viamrobotics/typescript-config/base.json",
   "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true,
     "types": ["vite/client", "node"],
+    "skipLibCheck": true,
+    "strict": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noEmit": true,
     "rootDirs": ["src", "e2e"],
-    "outDir": "dist",
-
-    // TODO(mc, 2023-04-06): remove overrides to default to error, fix issues
-    "exactOptionalPropertyTypes": false
+    "outDir": "dist"
   },
   "include": ["src/**/*.ts", "e2e/**/*.ts", "playwright.config.ts"]
 }
