@@ -69,8 +69,7 @@ describe('StreamClient', () => {
     await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
       fakeStream
     );
-    expect(addStream).toHaveBeenCalledOnce();
-    expect(addStream).toHaveBeenCalledWith(fakeCamName);
+    expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
   it('getStream fails when add stream fails', async () => {
@@ -90,8 +89,7 @@ describe('StreamClient', () => {
     await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(
       error.message
     );
-    expect(addStream).toHaveBeenCalledOnce();
-    expect(addStream).toHaveBeenCalledWith(fakeCamName);
+    expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
   it('getStream fails when timeout exceeded', async () => {
@@ -112,8 +110,7 @@ describe('StreamClient', () => {
     await expect(promise).rejects.toThrowError(
       'Did not receive a stream after 5000 ms'
     );
-    expect(addStream).toHaveBeenCalledOnce();
-    expect(addStream).toHaveBeenCalledWith(fakeCamName);
+    expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
   it('getStream can add the same stream twice', async () => {

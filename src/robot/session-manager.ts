@@ -138,7 +138,7 @@ export default class SessionManager {
      */
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.backgroundHeartbeat && globalThis.Worker !== undefined) {
-      const url = window.URL.createObjectURL(timeoutBlob);
+      const url = globalThis.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
       worker.addEventListener('message', () => {

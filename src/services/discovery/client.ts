@@ -16,7 +16,7 @@ export class DiscoveryClient implements Discovery {
   private client: Client<typeof DiscoveryService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(DiscoveryService);

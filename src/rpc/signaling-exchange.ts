@@ -60,7 +60,7 @@ export class SignalingExchange {
     const callRequest = new CallRequest({
       sdp: encodedSDP,
     });
-    if (this.dialOpts && this.dialOpts.disableTrickleICE) {
+    if (this.dialOpts?.disableTrickleICE) {
       callRequest.disableTrickle = this.dialOpts.disableTrickleICE;
     }
 

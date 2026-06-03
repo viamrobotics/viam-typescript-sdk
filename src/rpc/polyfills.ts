@@ -13,7 +13,7 @@ export const btoa = (input = '') => {
   ) {
     charCode = str.charCodeAt((i += 3 / 4));
 
-    if (charCode > 0xff) {
+    if (charCode > 0xFF) {
       throw new Error(
         "'btoa' failed: The string to be encoded contains characters outside of the Latin1 range."
       );
@@ -36,7 +36,7 @@ export const atob = (input = '') => {
   }
   for (
     let bc = 0, bs = 0, buffer, i = 0;
-    (buffer = str.charAt(i++)); // eslint-disable-line no-cond-assign
+    (buffer = str.charAt(i++));  
     ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4)
       ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6))))
       : 0

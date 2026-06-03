@@ -659,7 +659,7 @@ describe('DataClient tests', () => {
           deleteTabularData: (req) => {
             capturedRequest = req;
             const response = new DeleteTabularDataResponse();
-            response.deletedCount = BigInt(10);
+            response.deletedCount = 10n;
             return response;
           },
         });
@@ -707,12 +707,12 @@ describe('DataClient tests', () => {
               once = true;
               const response = new DeleteBinaryDataByFilterResponse();
               response.deletedCount = req.includeInternalData
-                ? BigInt(20)
-                : BigInt(10);
+                ? 20n
+                : 10n;
               return response;
             }
             return new DeleteBinaryDataByFilterResponse({
-              deletedCount: BigInt(10),
+              deletedCount: 10n,
             });
           },
         });
@@ -854,7 +854,7 @@ describe('DataClient tests', () => {
           removeTagsFromBinaryDataByIDs: (req) => {
             capReq = req;
             return new RemoveTagsFromBinaryDataByIDsResponse({
-              deletedCount: BigInt(2),
+              deletedCount: 2n,
             });
           },
         });
@@ -898,7 +898,7 @@ describe('DataClient tests', () => {
           removeTagsFromBinaryDataByFilter: (req) => {
             capReq = req;
             return new RemoveTagsFromBinaryDataByFilterResponse({
-              deletedCount: BigInt(5),
+              deletedCount: 5n,
             });
           },
         });
