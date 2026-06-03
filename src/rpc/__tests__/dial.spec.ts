@@ -81,7 +81,11 @@ const setupDialWebRTCMocks = () => {
     terminate: vi.fn(),
   } as unknown as SignalingExchange;
 
-  vi.mocked(SignalingExchange).mockImplementation(() => signalingExchange);
+  // Cannot use arrow-function because vitest updates disallow it.
+  // eslint-disable-next-line prefer-arrow-callback, func-names
+  vi.mocked(SignalingExchange).mockImplementation(function () {
+    return signalingExchange;
+  });
 
   return {
     peerConnection,
