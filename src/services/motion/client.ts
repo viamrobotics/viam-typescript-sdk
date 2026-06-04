@@ -3,7 +3,6 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
-  // eslint-disable-next-line sonarjs/deprecation
   GetPoseRequest,
   ListPlanStatusesRequest,
   MoveOnGlobeRequest,
@@ -49,7 +48,7 @@ export class MotionClient implements Motion {
     worldState?: WorldState,
     constraints?: Constraints,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new MoveRequest({
       name: this.name,
@@ -73,7 +72,7 @@ export class MotionClient implements Motion {
     motionConfig?: MotionConfiguration,
     obstacles?: Geometry[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new MoveOnMapRequest({
       name: this.name,
@@ -100,7 +99,7 @@ export class MotionClient implements Motion {
     motionConfig?: MotionConfiguration,
     boundingRegionsList?: GeoGeometry[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new MoveOnGlobeRequest({
       name: this.name,
@@ -120,11 +119,7 @@ export class MotionClient implements Motion {
     return resp.executionId;
   }
 
-  async stopPlan(
-    componentName: string,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async stopPlan(componentName: string, extra = {}, callOptions = this.callOptions) {
     const request = new StopPlanRequest({
       name: this.name,
       componentName,
@@ -142,7 +137,7 @@ export class MotionClient implements Motion {
     lastPlanOnly?: boolean,
     executionId?: string,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new GetPlanRequest({
       name: this.name,
@@ -157,11 +152,7 @@ export class MotionClient implements Motion {
     return this.client.getPlan(request, callOptions);
   }
 
-  async listPlanStatuses(
-    onlyActivePlans?: boolean,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async listPlanStatuses(onlyActivePlans?: boolean, extra = {}, callOptions = this.callOptions) {
     const request = new ListPlanStatusesRequest({
       name: this.name,
       onlyActivePlans,
@@ -179,9 +170,9 @@ export class MotionClient implements Motion {
     destinationFrame: string,
     supplementalTransforms: Transform[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const request = new GetPoseRequest({
       name: this.name,
       componentName,
@@ -192,7 +183,7 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const response = await this.client.getPose(request, callOptions);
 
     const result = response.pose;
@@ -205,24 +196,19 @@ export class MotionClient implements Motion {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

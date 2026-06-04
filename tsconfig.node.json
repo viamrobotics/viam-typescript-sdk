@@ -27,6 +27,7 @@
   "include": [
     "./vite.config.ts",
     "./playwright.config.ts",
+    "./eslint.config.js",
     "./*.cjs",
     "./.*.cjs"
   ],

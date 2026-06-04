@@ -19,7 +19,7 @@ import {
   getStatusFromClient,
 } from '../../utils';
 import type { Arm } from './arm';
-import { Get3DModelsRequest, Mesh } from '../../gen/common/v1/common_pb';
+import { Get3DModelsRequest, type Mesh } from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
 
 /**
@@ -60,26 +60,20 @@ export class ArmClient implements Arm {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 
-  async getKinematics(
-    extra = {},
-    callOptions = this.callOptions
-  ): Promise<GetKinematicsResult> {
+  async getKinematics(extra = {}, callOptions = this.callOptions): Promise<GetKinematicsResult> {
     return getKinematicsFromClient(
       this.client.getKinematics,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 
-  async get3DModels(
-    extra = {},
-    callOptions = this.callOptions
-  ): Promise<Record<string, Mesh>> {
+  async get3DModels(extra = {}, callOptions = this.callOptions): Promise<Record<string, Mesh>> {
     const request = new Get3DModelsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
@@ -104,7 +98,7 @@ export class ArmClient implements Arm {
   async moveToJointPositions(
     jointPositionsList: number[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const newJointPositions = new JointPositions({
       values: jointPositionsList,
@@ -161,24 +155,19 @@ export class ArmClient implements Arm {
   }
 
   async getStatus(callOptions = this.callOptions) {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

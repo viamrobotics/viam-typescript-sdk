@@ -41,13 +41,11 @@ export class VideoClient implements Video {
     videoCodec = '',
     videoContainer = '',
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): AsyncIterable<VideoChunk> {
     const request = new GetVideoRequest({
       name: this.name,
-      startTimestamp: startTimestamp
-        ? dateToTimestamp(startTimestamp)
-        : undefined,
+      startTimestamp: startTimestamp ? dateToTimestamp(startTimestamp) : undefined,
       endTimestamp: endTimestamp ? dateToTimestamp(endTimestamp) : undefined,
       videoCodec,
       videoContainer,
@@ -66,24 +64,19 @@ export class VideoClient implements Video {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

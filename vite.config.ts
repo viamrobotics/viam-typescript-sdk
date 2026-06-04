@@ -14,7 +14,6 @@ export default defineConfig({
     minify: true,
     target: 'esnext',
     lib: {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       entry: path.resolve(__dirname, 'src/main.ts'),
       name: 'sdk',
 
@@ -22,20 +21,16 @@ export default defineConfig({
     },
     rollupOptions: {
       onwarn: (warning, warn) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (warning.code === 'EVAL') {
           return;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+
         warn(warning);
       },
     },
   },
   test: {
-    reporters: [
-      'verbose',
-      ['html', { outputFile: './vitest-report/index.html' }],
-    ],
+    reporters: ['verbose', ['html', { outputFile: './vitest-report/index.html' }]],
     include: ['src/**/*.spec.ts'],
     environment: 'happy-dom',
     mockReset: true,

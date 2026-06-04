@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  GetPropertiesRequest,
+  type GetPropertiesRequest,
   GetPropertiesResponse,
   AudioInfo,
 } from '../../gen/common/v1/common_pb';
@@ -143,9 +143,7 @@ describe('AudioOutClient tests', () => {
     it('getProperties passes extra to request', async () => {
       const extra = { key: 'value' };
       await audioOut.getProperties(extra);
-      expect(capturedPropertiesReq?.extra).toStrictEqual(
-        Struct.fromJson(extra)
-      );
+      expect(capturedPropertiesReq?.extra).toStrictEqual(Struct.fromJson(extra));
     });
   });
 });

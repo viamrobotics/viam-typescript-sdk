@@ -142,19 +142,13 @@ disconnectBtn?.addEventListener('click', () => {
   void disconnect();
 });
 
-const callAPI = async <T, K extends keyof T>(
-  apiClient: T,
-  api: K,
-  args: ArgumentsType<T[K]>
-) => {
+const callAPI = async <T, K extends keyof T>(apiClient: T, api: K, args: ArgumentsType<T[K]>) => {
   const clientFunc = apiClient[api] as (
     ...args: ArgumentsType<T[K]>
   ) => Promise<ResolvedReturnType<T[K]>>;
 
   if (typeof clientFunc !== 'function') {
-    throw new TypeError(
-      `${String(api)} is not a method on the resource client.`
-    );
+    throw new TypeError(`${String(api)} is not a method on the resource client.`);
   }
 
   try {
@@ -201,9 +195,9 @@ for (const button of visionAPIButtons) {
 
     const api = button.dataset.visionApi as keyof VisionClient;
 
-    const args = JSON.parse(
-      button.dataset.visionApiArgs ?? '[]'
-    ) as ArgumentsType<VisionClient[typeof api]>;
+    const args = JSON.parse(button.dataset.visionApiArgs ?? '[]') as ArgumentsType<
+      VisionClient[typeof api]
+    >;
     void callAPI(visionClient, api, args);
   });
 }

@@ -20,7 +20,7 @@ import SessionManager from './session-manager';
 export default class SessionTransport implements Transport {
   constructor(
     protected readonly deferredTransport: () => Transport,
-    protected readonly sessionManager: SessionManager
+    protected readonly sessionManager: SessionManager,
   ) {}
 
   private async getSessionMetadata(): Promise<Headers> {
@@ -38,17 +38,14 @@ export default class SessionTransport implements Transport {
     }
   }
 
-  public async unary<
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
-  >(
+  public async unary<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
     service: ServiceType,
     method: MethodInfo<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     message: PartialMessage<I>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
@@ -70,21 +67,18 @@ export default class SessionTransport implements Transport {
       timeoutMs,
       newHeaders,
       message,
-      contextValues
+      contextValues,
     );
   }
 
-  public async stream<
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
-  >(
+  public async stream<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
     service: ServiceType,
     method: MethodInfo<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     input: AsyncIterable<PartialMessage<I>>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
     const methodPath = `/${service.typeName}/${method.name}`;
@@ -106,7 +100,7 @@ export default class SessionTransport implements Transport {
       timeoutMs,
       newHeaders,
       input,
-      contextValues
+      contextValues,
     );
   }
 }

@@ -1,4 +1,4 @@
-/* eslint-disable sonarjs/deprecation, @typescript-eslint/no-deprecated */
+/* eslint-disable @typescript-eslint/no-deprecated */
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
@@ -28,7 +28,7 @@ import {
   ConfigureDatabaseUserResponse,
   CreateBinaryDataSignedURLRequest,
   CreateBinaryDataSignedURLResponse,
-  CreateIndexRequest,
+  type CreateIndexRequest,
   CreateIndexResponse,
   CreateSequenceRequest,
   CreateSequenceResponse,
@@ -40,7 +40,7 @@ import {
   DeleteIndexResponse,
   DeleteSequenceRequest,
   DeleteSequenceResponse,
-  DeleteTabularDataRequest,
+  type DeleteTabularDataRequest,
   DeleteTabularDataResponse,
   ExportTabularDataRequest,
   ExportTabularDataResponse,
@@ -129,18 +129,14 @@ import {
   DataCaptureUploadRequest,
   DataCaptureUploadResponse,
   DataType,
-  FileData,
-  FileUploadRequest,
+  type FileData,
+  type FileUploadRequest,
   FileUploadResponse,
   SensorData,
   SensorMetadata,
   UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
-import {
-  DataClient,
-  type FileUploadOptions,
-  type FilterOptions,
-} from './data-client';
+import { DataClient, type FileUploadOptions, type FilterOptions } from './data-client';
 vi.mock('../gen/app/data/v1/data_pb_service');
 
 let mockTransport: Transport;
@@ -221,7 +217,7 @@ describe('DataClient tests', () => {
         'partId1',
         'resource1',
         'resource1:subtype',
-        'Readings'
+        'Readings',
       );
 
       expect(data.length).toEqual(2);
@@ -250,7 +246,7 @@ describe('DataClient tests', () => {
         'resource1:subtype',
         'Readings',
         timeCaptured1,
-        timeCaptured2
+        timeCaptured2,
       );
 
       const expectedRequest = new ExportTabularDataRequest({
@@ -280,7 +276,7 @@ describe('DataClient tests', () => {
         'Readings',
         timeCaptured1,
         timeCaptured2,
-        additionalParams
+        additionalParams,
       );
 
       const expectedRequest = new ExportTabularDataRequest({
@@ -320,10 +316,7 @@ describe('DataClient tests', () => {
     });
 
     it('get tabular data from SQL', async () => {
-      const promise = await subject().tabularDataBySQL(
-        'some_org_id',
-        'some_sql_query'
-      );
+      const promise = await subject().tabularDataBySQL('some_org_id', 'some_sql_query');
       const result = promise as typeof data;
       expect(result[0]?.key1).toBeInstanceOf(Date);
       expect(promise).toEqual(data);
@@ -361,7 +354,7 @@ describe('DataClient tests', () => {
       const promise = await subject().tabularDataByMQL(
         'some_org_id',
         [{ query: 'some_mql_query' }],
-        true
+        true,
       );
       const result = promise as typeof data;
       expect(result[0]?.key1).toBeInstanceOf(Date);
@@ -390,7 +383,7 @@ describe('DataClient tests', () => {
         [{ query: 'some_mql_query' }],
         false,
         undefined,
-        'my_prefix'
+        'my_prefix',
       );
       expect(capReq).toStrictEqual(expectedRequest);
       const result = promise as typeof data;
@@ -457,7 +450,7 @@ describe('DataClient tests', () => {
         undefined,
         lastId,
         countOnly,
-        includeInternalData
+        includeInternalData,
       );
       expect(capReq).toStrictEqual(expectedRequest);
     });
@@ -517,15 +510,7 @@ describe('DataClient tests', () => {
         includeInternalData,
       });
 
-      await subject().binaryDataByFilter(
-        filter,
-        limit,
-        undefined,
-        lastId,
-        true,
-        countOnly,
-        false
-      );
+      await subject().binaryDataByFilter(filter, limit, undefined, lastId, true, countOnly, false);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -549,10 +534,7 @@ describe('DataClient tests', () => {
     });
 
     it('get binary data by binary data ids', async () => {
-      const promise = await subject().binaryDataByIds([
-        binaryDataId1,
-        binaryDataId2,
-      ]);
+      const promise = await subject().binaryDataByIds([binaryDataId1, binaryDataId2]);
       expect(promise.length).toEqual(2);
       expect(promise[0]?.binary).toEqual(bin1);
       expect(promise[1]?.binary).toEqual(bin2);
@@ -641,10 +623,7 @@ describe('DataClient tests', () => {
         expirationMinutes,
       });
 
-      const response = await subject().createBinaryDataSignedURL(
-        binaryDataId,
-        expirationMinutes
-      );
+      const response = await subject().createBinaryDataSignedURL(binaryDataId, expirationMinutes);
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(signedUrl);
     });
@@ -678,11 +657,7 @@ describe('DataClient tests', () => {
         locationIds: ['location-1'],
         componentName: 'camera',
       });
-      const promise = await subject().deleteTabularData(
-        'orgId',
-        20,
-        deleteTabularFilter
-      );
+      const promise = await subject().deleteTabularData('orgId', 20, deleteTabularFilter);
       expect(promise).toEqual(10n);
       expect(capturedRequest?.filter).toBeDefined();
       expect(capturedRequest?.filter?.locationIds).toEqual(['location-1']);
@@ -724,10 +699,7 @@ describe('DataClient tests', () => {
     });
 
     it('do not delete internal binary data', async () => {
-      const promise = await subject().deleteBinaryDataByFilter(
-        undefined,
-        includeInternalData
-      );
+      const promise = await subject().deleteBinaryDataByFilter(undefined, includeInternalData);
       expect(promise).toEqual(10n);
     });
 
@@ -749,9 +721,7 @@ describe('DataClient tests', () => {
         service(DataService, {
           deleteBinaryDataByIDs: (req) => {
             return new DeleteBinaryDataByIDsResponse({
-              deletedCount: BigInt(
-                Math.max(req.binaryDataIds.length, req.binaryIds.length)
-              ),
+              deletedCount: BigInt(Math.max(req.binaryDataIds.length, req.binaryIds.length)),
             });
           },
         });
@@ -762,10 +732,7 @@ describe('DataClient tests', () => {
       const promise1 = await subject().deleteBinaryDataByIds([binaryDataId1]);
       expect(promise1).toEqual(1n);
 
-      const promise2 = await subject().deleteBinaryDataByIds([
-        binaryDataId1,
-        binaryDataId2,
-      ]);
+      const promise2 = await subject().deleteBinaryDataByIds([binaryDataId1, binaryDataId2]);
       expect(promise2).toEqual(2n);
     });
 
@@ -773,10 +740,7 @@ describe('DataClient tests', () => {
       const promise1 = await subject().deleteBinaryDataByIds([binaryId1]);
       expect(promise1).toEqual(1n);
 
-      const promise2 = await subject().deleteBinaryDataByIds([
-        binaryId1,
-        binaryId2,
-      ]);
+      const promise2 = await subject().deleteBinaryDataByIds([binaryId1, binaryId2]);
       expect(promise2).toEqual(2n);
     });
   });
@@ -800,10 +764,7 @@ describe('DataClient tests', () => {
         tags: ['tag1', 'tag2'],
       });
 
-      await subject().addTagsToBinaryDataByIds(
-        ['tag1', 'tag2'],
-        [binaryDataId1, binaryDataId2]
-      );
+      await subject().addTagsToBinaryDataByIds(['tag1', 'tag2'], [binaryDataId1, binaryDataId2]);
       expect(capReq).toStrictEqual(expectedRequest);
     });
 
@@ -813,10 +774,7 @@ describe('DataClient tests', () => {
         tags: ['tag1', 'tag2'],
       });
 
-      await subject().addTagsToBinaryDataByIds(
-        ['tag1', 'tag2'],
-        [binaryId1, binaryId2]
-      );
+      await subject().addTagsToBinaryDataByIds(['tag1', 'tag2'], [binaryId1, binaryId2]);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -868,7 +826,7 @@ describe('DataClient tests', () => {
 
       const promise = await subject().removeTagsFromBinaryDataByIds(
         ['tag1', 'tag2'],
-        [binaryDataId1, binaryDataId2]
+        [binaryDataId1, binaryDataId2],
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual(2n);
@@ -882,7 +840,7 @@ describe('DataClient tests', () => {
 
       const promise = await subject().removeTagsFromBinaryDataByIds(
         ['tag1', 'tag2'],
-        [binaryId1, binaryId2]
+        [binaryId1, binaryId2],
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual(2n);
@@ -910,10 +868,7 @@ describe('DataClient tests', () => {
         tags: ['tag1', 'tag2'],
       });
 
-      const promise = await subject().removeTagsFromBinaryDataByFilter(
-        ['tag1', 'tag2'],
-        filter
-      );
+      const promise = await subject().removeTagsFromBinaryDataByFilter(['tag1', 'tag2'], filter);
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual(5n);
     });
@@ -978,7 +933,7 @@ describe('DataClient tests', () => {
         0,
         1,
         1,
-        0.4
+        0.4,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual('bboxId');
@@ -1002,7 +957,7 @@ describe('DataClient tests', () => {
         0,
         1,
         1,
-        0.4
+        0.4,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise).toEqual('bboxId');
@@ -1068,16 +1023,7 @@ describe('DataClient tests', () => {
         confidence: 0.4,
       });
 
-      await subject().updateBoundingBox(
-        binaryDataId1,
-        boundingBoxId1,
-        'label',
-        0,
-        0,
-        1,
-        1,
-        0.4
-      );
+      await subject().updateBoundingBox(binaryDataId1, boundingBoxId1, 'label', 0, 0, 1, 1, 0.4);
       expect(capReq).toStrictEqual(expectedRequest);
     });
 
@@ -1093,16 +1039,7 @@ describe('DataClient tests', () => {
         confidence: 0.4,
       });
 
-      await subject().updateBoundingBox(
-        binaryId1,
-        boundingBoxId1,
-        'label',
-        0,
-        0,
-        1,
-        1,
-        0.4
-      );
+      await subject().updateBoundingBox(binaryId1, boundingBoxId1, 'label', 0, 0, 1, 1, 0.4);
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -1202,10 +1139,7 @@ describe('DataClient tests', () => {
         datasetId: 'datasetId',
       });
 
-      await subject().addBinaryDataToDatasetByIds(
-        [binaryDataId1, binaryDataId2],
-        'datasetId'
-      );
+      await subject().addBinaryDataToDatasetByIds([binaryDataId1, binaryDataId2], 'datasetId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
 
@@ -1215,10 +1149,7 @@ describe('DataClient tests', () => {
         datasetId: 'datasetId',
       });
 
-      await subject().addBinaryDataToDatasetByIds(
-        [binaryId1, binaryId2],
-        'datasetId'
-      );
+      await subject().addBinaryDataToDatasetByIds([binaryId1, binaryId2], 'datasetId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -1242,10 +1173,7 @@ describe('DataClient tests', () => {
         datasetId: 'datasetId',
       });
 
-      await subject().removeBinaryDataFromDatasetByIds(
-        [binaryDataId1, binaryDataId2],
-        'datasetId'
-      );
+      await subject().removeBinaryDataFromDatasetByIds([binaryDataId1, binaryDataId2], 'datasetId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
 
@@ -1255,10 +1183,7 @@ describe('DataClient tests', () => {
         datasetId: 'datasetId',
       });
 
-      await subject().removeBinaryDataFromDatasetByIds(
-        [binaryId1, binaryId2],
-        'datasetId'
-      );
+      await subject().removeBinaryDataFromDatasetByIds([binaryId1, binaryId2], 'datasetId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -1280,17 +1205,10 @@ describe('DataClient tests', () => {
       const collectionType = IndexableCollection.PIPELINE_SINK;
       const indexSpec = { keys: { field: 1 }, options: { priority: 1 } };
       const pipelineName = 'pipeline1';
-      await subject().createIndex(
-        organizationId,
-        collectionType,
-        indexSpec,
-        pipelineName
-      );
+      await subject().createIndex(organizationId, collectionType, indexSpec, pipelineName);
       expect(capReq.organizationId).toBe(organizationId);
       expect(capReq.collectionType).toBe(collectionType);
-      expect(
-        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
-      ).toStrictEqual(indexSpec);
+      expect(capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]).toStrictEqual(indexSpec);
       expect(capReq.pipelineName).toBe(pipelineName);
     });
     it('creates an index without pipeline name', async () => {
@@ -1300,9 +1218,7 @@ describe('DataClient tests', () => {
       await subject().createIndex(organizationId, collectionType, indexSpec);
       expect(capReq.organizationId).toBe(organizationId);
       expect(capReq.collectionType).toBe(collectionType);
-      expect(
-        capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]
-      ).toStrictEqual(indexSpec);
+      expect(capReq.indexSpec.map((spec) => BSON.deserialize(spec))[0]).toStrictEqual(indexSpec);
     });
   });
   describe('listIndexes tests', () => {
@@ -1317,9 +1233,7 @@ describe('DataClient tests', () => {
       collectionType: IndexableCollection.PIPELINE_SINK,
       pipelineName: 'pipeline1',
       indexName: 'index2',
-      indexSpec: [
-        new TextEncoder().encode(JSON.stringify({ another_field: -1 })),
-      ],
+      indexSpec: [new TextEncoder().encode(JSON.stringify({ another_field: -1 }))],
       createdBy: IndexCreator.VIAM,
     });
     const indexes = [index1, index2];
@@ -1344,11 +1258,7 @@ describe('DataClient tests', () => {
         collectionType,
         pipelineName,
       });
-      const result = await subject().listIndexes(
-        organizationId,
-        collectionType,
-        pipelineName
-      );
+      const result = await subject().listIndexes(organizationId, collectionType, pipelineName);
       expect(capReq).toStrictEqual(expectedRequest);
       expect(result).toEqual(indexes);
     });
@@ -1359,10 +1269,7 @@ describe('DataClient tests', () => {
         organizationId,
         collectionType,
       });
-      const result = await subject().listIndexes(
-        organizationId,
-        collectionType
-      );
+      const result = await subject().listIndexes(organizationId, collectionType);
       expect(capReq).toStrictEqual(expectedRequest);
       expect(result).toEqual(indexes);
     });
@@ -1390,12 +1297,7 @@ describe('DataClient tests', () => {
         indexName,
         pipelineName,
       });
-      await subject().deleteIndex(
-        organizationId,
-        collectionType,
-        indexName,
-        pipelineName
-      );
+      await subject().deleteIndex(organizationId, collectionType, indexName, pipelineName);
       expect(capReq).toStrictEqual(expectedRequest);
     });
     it('deletes an index without pipeline name', async () => {
@@ -1525,7 +1427,7 @@ describe('DataClient tests', () => {
         'testPartId',
         'testResource',
         'testSubtype',
-        'testMethod'
+        'testMethod',
       );
 
       expect(capReq).toStrictEqual(expectedRequest);
@@ -1545,7 +1447,7 @@ describe('DataClient tests', () => {
         'testPartId',
         'testResource',
         'testSubtype',
-        'testMethod'
+        'testMethod',
       );
 
       expect(result).toBeNull();
@@ -2080,7 +1982,7 @@ describe('DataSyncClient tests', () => {
         componentName,
         methodName,
         [dataRequestTimes1, dataRequestTimes2],
-        tags
+        tags,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toStrictEqual('fileId');
@@ -2135,7 +2037,7 @@ describe('DataSyncClient tests', () => {
         componentName,
         methodName,
         dataRequestTimes1,
-        { tags, datasetIds, mimeType }
+        { tags, datasetIds, mimeType },
       );
       expect(capReq).toStrictEqual(expectedReq);
       expect(response).toStrictEqual('fileId');
@@ -2270,7 +2172,7 @@ describe('DataPipelineClient tests', () => {
         mqlQuery,
         schedule,
         enableBackfill,
-        dataSourceTypeStandard
+        dataSourceTypeStandard,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
@@ -2291,7 +2193,7 @@ describe('DataPipelineClient tests', () => {
         pipelineName,
         mqlQuery,
         schedule,
-        enableBackfill
+        enableBackfill,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(response).toEqual(pipelineId);
@@ -2444,6 +2346,7 @@ describe('fileUpload tests', () => {
     expect(capturedRequests).toHaveLength(2);
 
     // Check metadata request
+
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
     const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
@@ -2458,6 +2361,7 @@ describe('fileUpload tests', () => {
     expect(metadata.datasetIds).toStrictEqual(options.datasetIds);
 
     // Check file contents request
+
     const fileContentsRequest = capturedRequests[1]!;
     expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
     const fileContents = fileContentsRequest.uploadPacket.value as FileData;
@@ -2471,6 +2375,7 @@ describe('fileUpload tests', () => {
     expect(capturedRequests).toHaveLength(2);
 
     // Check metadata request
+
     const metadataRequest = capturedRequests[0]!;
     expect(metadataRequest.uploadPacket.case).toBe('metadata');
     const metadata = metadataRequest.uploadPacket.value as UploadMetadata;
@@ -2485,6 +2390,7 @@ describe('fileUpload tests', () => {
     expect(metadata.datasetIds).toStrictEqual([]);
 
     // Check file contents request
+
     const fileContentsRequest = capturedRequests[1]!;
     expect(fileContentsRequest.uploadPacket.case).toBe('fileContents');
     const fileContents = fileContentsRequest.uploadPacket.value as FileData;
@@ -2494,10 +2400,8 @@ describe('fileUpload tests', () => {
   it('chunks file data', async () => {
     const numChunks = 3;
 
-    const data = Uint8Array.from(
-      { length: DataClient.UPLOAD_CHUNK_SIZE * numChunks },
-      // eslint-disable-next-line sonarjs/pseudo-random
-      () => Math.floor(Math.random() * 256)
+    const data = Uint8Array.from({ length: DataClient.UPLOAD_CHUNK_SIZE * numChunks }, () =>
+      Math.floor(Math.random() * 256),
     );
 
     const result = await subject().fileUpload(data, partId);
@@ -2512,7 +2416,7 @@ describe('fileUpload tests', () => {
 
     const receivedLength = contentRequests.reduce(
       (acc, val) => acc + (val.uploadPacket.value as FileData).data.length,
-      0
+      0,
     );
     expect(receivedLength).toEqual(numChunks * DataClient.UPLOAD_CHUNK_SIZE);
 

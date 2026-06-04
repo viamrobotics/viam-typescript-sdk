@@ -2,13 +2,12 @@ import type { Resource } from '../../types';
 import type { SlamPosition, SlamProperties } from './types';
 
 /**
- * A service that allows your robot to create a map of its surroundings and find
- * its location within that map.
+ * A service that allows your robot to create a map of its surroundings and find its location within
+ * that map.
  */
 export interface Slam extends Resource {
   /**
-   * Get the current position of the specified source component in the point
-   * cloud SLAM map.
+   * Get the current position of the specified source component in the point cloud SLAM map.
    *
    * @example
    *
@@ -46,8 +45,7 @@ export interface Slam extends Resource {
   getPointCloudMap: (returnEditedMap?: boolean) => Promise<Uint8Array>;
 
   /**
-   * Get the internal state of the SLAM algorithm required to continue
-   * mapping/localization.
+   * Get the internal state of the SLAM algorithm required to continue mapping/localization.
    *
    * @example
    *

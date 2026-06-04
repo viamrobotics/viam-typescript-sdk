@@ -17,14 +17,9 @@ export interface AudioOut extends Resource {
    * ```
    *
    * @param audioData - The audio data to play
-   * @param audioInfo - Information about the audio format (optional, required
-   *   for raw pcm data)
+   * @param audioInfo - Information about the audio format (optional, required for raw pcm data)
    */
-  play: (
-    audioData: Uint8Array,
-    audioInfo?: AudioInfo,
-    extra?: Struct
-  ) => Promise<void>;
+  play: (audioData: Uint8Array, audioInfo?: AudioInfo, extra?: Struct) => Promise<void>;
 
   /**
    * Stream audio chunks to the device for playback.

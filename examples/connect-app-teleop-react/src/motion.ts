@@ -18,7 +18,7 @@ export interface MoveRequest {
 export type RequestMotion = (request: MoveRequest) => void;
 
 export const useMotionControls = (
-  base: BaseClient | undefined
+  base: BaseClient | undefined,
 ): [state: MotionState, dispatch: RequestMotion] => {
   const [state, dispatch] = useReducer(reduceMoveRequest, {
     forward: false,
@@ -60,9 +60,7 @@ export const useMotionControls = (
   useEffect(() => {
     return () => {
       if (base) {
-        base
-          .stop()
-          .catch((error) => console.warn('Error stopping base', error));
+        base.stop().catch((error) => console.warn('Error stopping base', error));
       }
     };
   }, [base]);
@@ -70,18 +68,13 @@ export const useMotionControls = (
   return [state, dispatch];
 };
 
-const reduceMoveRequest = (
-  state: MotionState,
-  request: MoveRequest | undefined
-) => {
+const reduceMoveRequest = (state: MotionState, request: MoveRequest | undefined) => {
   return request && state[request.direction] !== request.state
     ? { ...state, [request.direction]: request.state }
     : state;
 };
 
-const mapKeyboardToMoveRequest = (
-  event: KeyboardEvent
-): MoveRequest | undefined => {
+const mapKeyboardToMoveRequest = (event: KeyboardEvent): MoveRequest | undefined => {
   const isPressed = event.type === 'keydown';
 
   switch (event.key) {

@@ -1,10 +1,9 @@
 // eslint.config.js
-'use strict';
-
 import js from '@eslint/js';
 import tsdoc from 'eslint-plugin-tsdoc';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import vitest from '@vitest/eslint-plugin';
 
 export default defineConfig([
   js.configs.recommended,
@@ -14,12 +13,20 @@ export default defineConfig([
   {
     plugins: {
       tsdoc,
+      vitest,
     },
 
     languageOptions: {
       parserOptions: {
-        projectService: true,
-        tsconfigRootDir: __dirname,
+        projectService: {
+          allowDefaultProject: [
+            'eslint.config.js',
+            'prettier.config.mjs',
+            'typedoc.config.mjs',
+            'vite.config.ts',
+          ],
+        },
+        tsconfigRootDir: import.meta.dirname,
       },
     },
 
@@ -29,8 +36,8 @@ export default defineConfig([
       'no-param-reassign': 'error',
       'no-void': ['error', { allowAsStatement: true }],
 
-      '@typescript-eslint/explicit-function-return-type': 'error',
-      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'warn',
+      '@typescript-eslint/explicit-module-boundary-types': 'warn',
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
@@ -49,6 +56,17 @@ export default defineConfig([
         {
           prefer: 'type-imports',
           fixStyle: 'inline-type-imports',
+        },
+      ],
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        {
+          allow: [{ name: ['Error', 'URL', 'URLSearchParams'], from: 'lib' }],
+          allowAny: true,
+          allowBoolean: true,
+          allowNullish: true,
+          allowNumber: true,
+          allowRegExp: true,
         },
       ],
       '@typescript-eslint/strict-boolean-expressions': [
@@ -74,17 +92,28 @@ export default defineConfig([
     '**/examples',
     '**/scripts',
   ]),
-
   {
-    files: ['src/**/*.test.*'],
-
+    files: [
+      'src/**/*.test.*',
+      'src/**/*.spec.*',
+      'src/**/__tests__/**/*.spec.*',
+      'src/**/__tests__/**/mocks/**',
+      'e2e/**/*.spec.*',
+    ],
     rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       'no-console': 'off',
       'vitest/no-restricted-vi-methods': 'warn',
-      'vitest/consistent-test-filename': 'warn',
+      'vitest/consistent-test-filename': [
+        'warn',
+        {
+          pattern: '.*\\.spec\\.[tj]s$',
+        },
+      ],
       'vitest/valid-expect': 'error',
       'vitest/require-top-level-describe': 'error',
     },

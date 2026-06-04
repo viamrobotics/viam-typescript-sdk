@@ -53,9 +53,7 @@ describe('PowerSensorClient tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createClient(PowerSensorService, mockTransport)
-      );
+      .mockImplementation(() => createClient(PowerSensorService, mockTransport));
 
     sensor = new PowerSensorClient(new RobotClient('host'), 'test-sensor');
   });
@@ -65,14 +63,8 @@ describe('PowerSensorClient tests', () => {
   });
 
   it('individual readings', async () => {
-    await expect(sensor.getVoltage()).resolves.toStrictEqual([
-      testVoltage,
-      testIsAc,
-    ]);
-    await expect(sensor.getCurrent()).resolves.toStrictEqual([
-      testCurrent,
-      testIsAc,
-    ]);
+    await expect(sensor.getVoltage()).resolves.toStrictEqual([testVoltage, testIsAc]);
+    await expect(sensor.getCurrent()).resolves.toStrictEqual([testCurrent, testIsAc]);
     await expect(sensor.getPower()).resolves.toStrictEqual(testPower);
   });
 

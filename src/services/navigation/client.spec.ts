@@ -16,10 +16,10 @@ const testLongitude = 75;
 const testCompassHeading = 90;
 
 describe('getLocation', () => {
-  let latitude: Mock<[], number>;
-  let longitude: Mock<[], number>;
-  let compassHeading: Mock<[], number>;
-  let location: Mock<[], { latitude: number; longitude: number }>;
+  let latitude: Mock<() => number>;
+  let longitude: Mock<() => number>;
+  let compassHeading: Mock<() => number>;
+  let location: Mock<() => { latitude: number; longitude: number }>;
 
   let navigation: NavigationClient;
 
@@ -43,19 +43,14 @@ describe('getLocation', () => {
       .fn()
       .mockImplementation(() => createClient(NavigationService, mockTransport));
 
-    navigation = new NavigationClient(
-      new RobotClient('host'),
-      navigationClientName
-    );
+    navigation = new NavigationClient(new RobotClient('host'), navigationClientName);
   });
 
   it('null location', async () => {
     location = vi.fn();
     compassHeading = vi.fn();
 
-    await expect(navigation.getLocation()).rejects.toThrow(
-      /^no location$/u
-    );
+    await expect(navigation.getLocation()).rejects.toThrow(/^no location$/u);
 
     expect(location).toHaveBeenCalledOnce();
     expect(compassHeading).toHaveBeenCalledOnce();
@@ -81,9 +76,7 @@ describe('getLocation', () => {
     latitude = vi.fn(() => Number.NaN);
     longitude = vi.fn(() => Number.NaN);
 
-    await expect(navigation.getLocation()).rejects.toThrow(
-      /^invalid location$/u
-    );
+    await expect(navigation.getLocation()).rejects.toThrow(/^invalid location$/u);
 
     expect(location).toHaveBeenCalledOnce();
     expect(compassHeading).toHaveBeenCalledOnce();

@@ -1,24 +1,14 @@
 import type { Message, PartialMessage } from '@bufbuild/protobuf';
-import type {
-  ContextValues,
-  StreamRequest,
-  StreamResponse,
-} from '@connectrpc/connect';
+import type { ContextValues, StreamRequest, StreamResponse } from '@connectrpc/connect';
 import { createContextValues } from '@connectrpc/connect';
-import {
-  createWritableIterable,
-  runStreamingCall,
-} from '@connectrpc/connect/protocol';
-import {
-  ResponseHeaders,
-  ResponseTrailers,
-} from '../gen/proto/rpc/webrtc/v1/grpc_pb';
+import { createWritableIterable, runStreamingCall } from '@connectrpc/connect/protocol';
+import { type ResponseHeaders, type ResponseTrailers } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { ClientStream, toGRPCMetadata } from './client-stream';
 
-export class StreamClientStream<
-  I extends Message<I>,
-  O extends Message<O>,
-> extends ClientStream<I, O> {
+export class StreamClientStream<I extends Message<I>, O extends Message<O>> extends ClientStream<
+  I,
+  O
+> {
   private awaitingHeadersResult?: {
     success: (value: Headers) => void;
     failure: (reason?: unknown) => void;
@@ -35,7 +25,7 @@ export class StreamClientStream<
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     input: AsyncIterable<PartialMessage<I>>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
     const req = {
       stream: true as const,
@@ -51,12 +41,10 @@ export class StreamClientStream<
     const opt: optParams = {
       req,
       /**
-       * Next is what actually kicks off the request. The run call below will
-       * ultimately call this for us.
+       * Next is what actually kicks off the request. The run call below will ultimately call this
+       * for us.
        */
-      next: async (
-        streamReq: StreamRequest<I, O>
-      ): Promise<StreamResponse<I, O>> => {
+      next: async (streamReq: StreamRequest<I, O>): Promise<StreamResponse<I, O>> => {
         const startRequest = new Promise<Headers>((resolve, reject) => {
           this.awaitingHeadersResult = {
             success: resolve,
@@ -136,10 +124,7 @@ export class StreamClientStream<
       : this.respStream.write(msg);
     this.respStreamQueue.catch((error: unknown) => {
       // eslint-disable-next-line no-console
-      console.error(
-        'error pushing received message into stream; failing:',
-        error
-      );
+      console.error('error pushing received message into stream; failing:', error);
       this.resetStream();
     });
   }

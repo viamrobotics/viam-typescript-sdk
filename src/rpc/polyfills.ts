@@ -1,7 +1,5 @@
-const chars =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
-/* eslint-disable no-bitwise, unicorn/prefer-code-point, no-plusplus, require-unicode-regexp, sonarjs/no-nested-assignment, sonarjs/slow-regex, sonarjs/misplaced-loop-counter, sonarjs/no-nested-conditional */
 export const btoa = (input = '') => {
   const str = input;
   let output = '';
@@ -13,9 +11,9 @@ export const btoa = (input = '') => {
   ) {
     charCode = str.charCodeAt((i += 3 / 4));
 
-    if (charCode > 0xFF) {
+    if (charCode > 0xff) {
       throw new Error(
-        "'btoa' failed: The string to be encoded contains characters outside of the Latin1 range."
+        "'btoa' failed: The string to be encoded contains characters outside of the Latin1 range.",
       );
     }
 
@@ -26,13 +24,11 @@ export const btoa = (input = '') => {
 };
 
 export const atob = (input = '') => {
-  const str = input.replace(/=+$/, ''); // eslint-disable-line no-div-regex
+  const str = input.replace(/=+$/, '');
   let output = '';
 
   if (str.length % 4 === 1) {
-    throw new Error(
-      "'atob' failed: The string to be decoded is not correctly encoded."
-    );
+    throw new Error("'atob' failed: The string to be decoded is not correctly encoded.");
   }
   for (
     let bc = 0, bs = 0, buffer, i = 0;
@@ -46,4 +42,3 @@ export const atob = (input = '') => {
 
   return output;
 };
-/* eslint-enable no-bitwise, unicorn/prefer-code-point, no-plusplus, require-unicode-regexp, sonarjs/no-nested-assignment, sonarjs/slow-regex, sonarjs/misplaced-loop-counter, sonarjs/no-nested-conditional */

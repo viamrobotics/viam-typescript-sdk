@@ -49,7 +49,7 @@ describe('VideoClient Tests', () => {
           new Date('2025-01-01T00:00:00Z'),
           new Date('2025-01-01T00:10:00Z'),
           'h264',
-          'mp4'
+          'mp4',
         )) {
           chunks.push(chunk);
         }
@@ -61,7 +61,7 @@ describe('VideoClient Tests', () => {
           videoData: chunk1,
           videoContainer: 'mp4',
           requestId: 'test-request-id',
-        })
+        }),
       );
 
       await testVideoStream.write(
@@ -69,7 +69,7 @@ describe('VideoClient Tests', () => {
           videoData: chunk2,
           videoContainer: 'mp4',
           requestId: 'test-request-id',
-        })
+        }),
       );
 
       testVideoStream.close();
@@ -101,9 +101,7 @@ describe('VideoClient Tests', () => {
 
   describe('doCommand Tests', () => {
     it('sends and receives arbitrary commands with a Struct', async () => {
-      const result = await video.doCommand(
-        Struct.fromJson({ command: 'test' })
-      );
+      const result = await video.doCommand(Struct.fromJson({ command: 'test' }));
       expect(result).toStrictEqual({});
     });
 

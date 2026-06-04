@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { RobotClient } from '../../robot';
+import { type RobotClient } from '../../robot';
 vi.mock('../../robot');
 
 vi.mock('../../gen/stream/v1/stream_pb_service');
@@ -64,11 +64,9 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
-      fakeStream
-    );
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(fakeStream);
     expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
@@ -84,11 +82,9 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(
-      error.message
-    );
+    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(error.message);
     expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
@@ -103,13 +99,11 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
     const promise = streamClient.getStream(fakeCamName);
     vi.runAllTimers();
-    await expect(promise).rejects.toThrow(
-      'Did not receive a stream after 5000 ms'
-    );
+    await expect(promise).rejects.toThrow('Did not receive a stream after 5000 ms');
     expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
@@ -126,14 +120,10 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
-      fakeStream
-    );
-    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
-      fakeStream
-    );
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(fakeStream);
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(fakeStream);
     expect(addStream).toHaveBeenCalledTimes(2);
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
@@ -179,9 +169,7 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(
-      streamClient.setOptions(fakeCamName, 1920, 1080)
-    ).resolves.toBeUndefined();
+    await expect(streamClient.setOptions(fakeCamName, 1920, 1080)).resolves.toBeUndefined();
   });
 
   it('setOptions throws error if SetStreamOptions fails', async () => {
@@ -196,9 +184,7 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(
-      streamClient.setOptions(fakeCamName, 1920, 1080)
-    ).rejects.toThrow(error.message);
+    await expect(streamClient.setOptions(fakeCamName, 1920, 1080)).rejects.toThrow(error.message);
   });
 
   it('resetOptions does not throw if SetStreamOptions succeeds', async () => {
@@ -212,9 +198,7 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(
-      streamClient.resetOptions(fakeCamName)
-    ).resolves.toBeUndefined();
+    await expect(streamClient.resetOptions(fakeCamName)).resolves.toBeUndefined();
   });
 
   it('resetOptions throws error if SetStreamOptions fails', async () => {
@@ -229,8 +213,6 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(
-      error.message
-    );
+    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(error.message);
   });
 });

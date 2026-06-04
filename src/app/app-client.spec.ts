@@ -10,8 +10,7 @@ import { LogEntry } from '../gen/common/v1/common_pb';
 import { AppClient, createAuth } from './app-client';
 vi.mock('../gen/app/v1/app_pb_service');
 
-let testLogStream =
-  createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
+let testLogStream = createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
 
 let mockTransport: Transport;
 const subject = () => new AppClient(mockTransport);
@@ -101,14 +100,7 @@ describe('AppClient tests', () => {
     robot: 'robot',
   });
 
-  const authorization = createAuth(
-    'orgId',
-    'entityId',
-    'role',
-    'resourceType',
-    '',
-    'resourceId'
-  );
+  const authorization = createAuth('orgId', 'entityId', 'role', 'resourceType', '', 'resourceId');
 
   const invite = new pb.OrganizationInvite({
     email: 'email',
@@ -219,8 +211,7 @@ describe('AppClient tests', () => {
     });
 
     it('getOrganizationsWithAccessToLocation', async () => {
-      const response =
-        await subject().getOrganizationsWithAccessToLocation('location-id');
+      const response = await subject().getOrganizationsWithAccessToLocation('location-id');
       expect(response).toEqual(orgIdentities);
     });
   });
@@ -282,8 +273,7 @@ describe('AppClient tests', () => {
     });
 
     it('getOrganizationNamespaceAvailability', async () => {
-      const response =
-        await subject().getOrganizationNamespaceAvailability('namespace');
+      const response = await subject().getOrganizationNamespaceAvailability('namespace');
       expect(response).toEqual(true);
     });
   });
@@ -307,7 +297,7 @@ describe('AppClient tests', () => {
         'name',
         'namespace',
         'region',
-        'cid'
+        'cid',
       );
       expect(response).toEqual(org);
     });
@@ -381,12 +371,7 @@ describe('AppClient tests', () => {
     });
 
     it('createOrganizationInvite', async () => {
-      const response = await subject().createOrganizationInvite(
-        'orgId',
-        'email',
-        [],
-        false
-      );
+      const response = await subject().createOrganizationInvite('orgId', 'email', [], false);
       expect(response).toEqual(invite);
     });
   });
@@ -409,7 +394,7 @@ describe('AppClient tests', () => {
         'orgId',
         'email',
         [authorization],
-        []
+        [],
       );
       expect(response).toEqual(invite);
     });
@@ -477,10 +462,7 @@ describe('AppClient tests', () => {
     });
 
     it('resendOrganizationInvite', async () => {
-      const response = await subject().resendOrganizationInvite(
-        'orgId',
-        'email'
-      );
+      const response = await subject().resendOrganizationInvite('orgId', 'email');
       expect(response).toEqual(invite);
     });
   });
@@ -499,11 +481,7 @@ describe('AppClient tests', () => {
     });
 
     it('createLocation', async () => {
-      const response = await subject().createLocation(
-        'orgId',
-        'name',
-        'parent'
-      );
+      const response = await subject().createLocation('orgId', 'name', 'parent');
       expect(response).toEqual(location);
     });
   });
@@ -553,7 +531,7 @@ describe('AppClient tests', () => {
         'newLoc',
         'newName',
         'newParent',
-        'newRegion'
+        'newRegion',
       );
       expect(response).toEqual(newLocation);
     });
@@ -809,10 +787,7 @@ describe('AppClient tests', () => {
     });
 
     it('getRobotPartByNameAndLocation', async () => {
-      const response = await subject().getRobotPartByNameAndLocation(
-        'name',
-        'locationId'
-      );
+      const response = await subject().getRobotPartByNameAndLocation('name', 'locationId');
       expect(response).toEqual(expectedResponse);
     });
   });
@@ -841,8 +816,7 @@ describe('AppClient tests', () => {
 
   describe('tailRobotPartLogs tests', () => {
     beforeEach(() => {
-      testLogStream =
-        createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
+      testLogStream = createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
           tailRobotPartLogs: () => {
@@ -853,8 +827,7 @@ describe('AppClient tests', () => {
     });
 
     afterEach(() => {
-      testLogStream =
-        createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
+      testLogStream = createWritableIterable<PartialMessage<pb.TailRobotPartLogsResponse>>();
     });
 
     it('tailRobotPartLogs', async () => {
@@ -925,11 +898,7 @@ describe('AppClient tests', () => {
     });
 
     it('updateRobotPart', async () => {
-      const response = await subject().updateRobotPart(
-        'id',
-        'name',
-        new Struct()
-      );
+      const response = await subject().updateRobotPart('id', 'name', new Struct());
       expect(response).toEqual(robotPart);
     });
   });
@@ -1138,7 +1107,7 @@ describe('AppClient tests', () => {
         'orgId',
         ['frag1', 'frag2'],
         ['loc1'],
-        5
+        5,
       );
       expect(response).toEqual(locationSummaries);
       expect(capturedReq?.organizationId).toEqual('orgId');
@@ -1181,11 +1150,7 @@ describe('AppClient tests', () => {
     });
 
     it('updateRobot', async () => {
-      const response = await subject().updateRobot(
-        'robotId',
-        'locationId',
-        'name'
-      );
+      const response = await subject().updateRobot('robotId', 'locationId', 'name');
       expect(response).toEqual(robot);
     });
   });
@@ -1267,11 +1232,7 @@ describe('AppClient tests', () => {
     });
 
     it('createFragment', async () => {
-      const response = await subject().createFragment(
-        'orgId',
-        'name',
-        new Struct()
-      );
+      const response = await subject().createFragment('orgId', 'name', new Struct());
       expect(response).toEqual(fragment);
     });
   });
@@ -1290,11 +1251,7 @@ describe('AppClient tests', () => {
     });
 
     it('updateFragment', async () => {
-      const response = await subject().updateFragment(
-        'id',
-        'name',
-        new Struct()
-      );
+      const response = await subject().updateFragment('id', 'name', new Struct());
       expect(response).toEqual(fragment);
     });
   });
@@ -1341,10 +1298,7 @@ describe('AppClient tests', () => {
     it('listMachineFragments', async () => {
       const machineId = 'MACHINE_ID';
       const additionalFragmentIds = ['FRAGMENT ID 1', 'FRAGMENT ID 2'];
-      const resp = await subject().listMachineFragments(
-        machineId,
-        additionalFragmentIds
-      );
+      const resp = await subject().listMachineFragments(machineId, additionalFragmentIds);
       expect(request.machineId).toEqual(machineId);
       expect(request.additionalFragmentIds).toEqual(additionalFragmentIds);
       expect(resp).toEqual(response);
@@ -1369,13 +1323,7 @@ describe('AppClient tests', () => {
     });
 
     it('addRole', async () => {
-      await subject().addRole(
-        'orgId',
-        'entityId',
-        'role',
-        'resourceType',
-        'resourceId'
-      );
+      await subject().addRole('orgId', 'entityId', 'role', 'resourceType', 'resourceId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -1398,13 +1346,7 @@ describe('AppClient tests', () => {
     });
 
     it('removeRole', async () => {
-      await subject().removeRole(
-        'orgId',
-        'entityId',
-        'role',
-        'resourceType',
-        'resourceId'
-      );
+      await subject().removeRole('orgId', 'entityId', 'role', 'resourceType', 'resourceId');
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
@@ -1548,7 +1490,7 @@ describe('AppClient tests', () => {
         'itemId',
         PackageType.ML_MODEL,
         'description',
-        pb.Visibility.PUBLIC
+        pb.Visibility.PUBLIC,
       );
       expect(capReq).toStrictEqual(expectedRequest);
     });
@@ -1577,7 +1519,7 @@ describe('AppClient tests', () => {
         ['mac', 'unix'],
         [pb.RegistryItemStatus.PUBLISHED],
         'search',
-        'token'
+        'token',
       );
       expect(response).toEqual(items);
     });
@@ -1647,7 +1589,7 @@ describe('AppClient tests', () => {
         'url',
         'newDescription',
         [],
-        'entrypoint'
+        'entrypoint',
       );
       expect(response).toEqual('url');
     });
@@ -1794,8 +1736,7 @@ describe('AppClient tests', () => {
     });
 
     it('createKeyFromExistingKeyAuthorizations', async () => {
-      const response =
-        await subject().createKeyFromExistingKeyAuthorizations('id');
+      const response = await subject().createKeyFromExistingKeyAuthorizations('id');
       expect(response.key).toEqual('key');
       expect(response.id).toEqual('id');
     });
@@ -1815,10 +1756,7 @@ describe('AppClient tests', () => {
     });
 
     it('getAppContent', async () => {
-      const response = await subject().getAppContent(
-        'publicNamespace',
-        'machineName'
-      );
+      const response = await subject().getAppContent('publicNamespace', 'machineName');
       expect(response.blobPath).toEqual('/path/to/blob');
       expect(response.entrypoint).toEqual('index.html');
     });
@@ -1828,8 +1766,7 @@ describe('AppClient tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getOrganizationMetadata: () =>
-            new pb.GetOrganizationMetadataResponse(),
+          getOrganizationMetadata: () => new pb.GetOrganizationMetadataResponse(),
         });
       });
     });
@@ -2101,17 +2038,12 @@ describe('AppClient tests', () => {
     });
 
     it('getAppBranding', async () => {
-      const response = await subject().getAppBranding(
-        'publicNamespace',
-        'appName'
-      );
+      const response = await subject().getAppBranding('publicNamespace', 'appName');
       expect(response.logoPath).toEqual('/branding/logo.png');
-      expect(response.textCustomizations.machinePicker!.fields.heading).toEqual(
-        'Welcome'
+      expect(response.textCustomizations.machinePicker!.fields.heading).toEqual('Welcome');
+      expect(response.textCustomizations.machinePicker!.fields.subheading).toEqual(
+        'Select your machine.',
       );
-      expect(
-        response.textCustomizations.machinePicker!.fields.subheading
-      ).toEqual('Select your machine.');
       expect(response.fragmentIds).toEqual(['frag1', 'frag2']);
     });
   });
@@ -2142,7 +2074,7 @@ describe('AppClient tests', () => {
         'user@example.com',
         'First',
         'Last',
-        'password123'
+        'password123',
       );
 
       expect(response.authToken).toEqual('auth-token');

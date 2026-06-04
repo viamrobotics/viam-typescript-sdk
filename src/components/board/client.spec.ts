@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { StreamTicksResponse } from '../../gen/component/board/v1/board_pb';
+import { type StreamTicksResponse } from '../../gen/component/board/v1/board_pb';
 import { RobotClient } from '../../robot';
 import { AnalogValue, type Tick } from './board';
 import { BoardClient } from './client';
@@ -9,10 +9,7 @@ vi.mock('../../robot');
 
 import type { PartialMessage } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import {
-  createWritableIterable,
-  type WritableIterable,
-} from '@connectrpc/connect/protocol';
+import { createWritableIterable, type WritableIterable } from '@connectrpc/connect/protocol';
 import { BoardService } from '../../gen/component/board/v1/board_connect';
 vi.mock('../../gen/component/board/v1/board_pb_service');
 
@@ -53,14 +50,11 @@ describe('BoardClient tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    testTickStream =
-      createWritableIterable<PartialMessage<StreamTicksResponse>>();
+    testTickStream = createWritableIterable<PartialMessage<StreamTicksResponse>>();
   });
 
   it('get analog reading', async () => {
-    await expect(board.readAnalogReader('test-reader')).resolves.toEqual(
-      testAnalogValue
-    );
+    await expect(board.readAnalogReader('test-reader')).resolves.toEqual(testAnalogValue);
   });
 
   describe('streamTicks tests', () => {

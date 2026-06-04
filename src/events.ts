@@ -1,8 +1,8 @@
 type Callback = (args: unknown) => void;
 
 /**
- * MachineConnectionEvent events are emitted by a Client's EventDispatcher when
- * connection events occur.
+ * MachineConnectionEvent events are emitted by a Client's EventDispatcher when connection events
+ * occur.
  */
 export enum MachineConnectionEvent {
   CONNECTING = 'connecting',

@@ -5,10 +5,7 @@ import type { Resource } from '../../types';
 export type InputControllerEvent = PlainMessage<pb.Event>;
 export const { Event: InputControllerEvent } = pb;
 
-/**
- * Represents a human interface device like a mouse or keyboard that emits
- * events for controls.
- */
+/** Represents a human interface device like a mouse or keyboard that emits events for controls. */
 export interface InputController extends Resource {
   /**
    * Returns a list of events representing the last event on each control.
@@ -16,10 +13,7 @@ export interface InputController extends Resource {
    * @example
    *
    * ```ts
-   * const controller = new VIAM.InputControllerClient(
-   *   machine,
-   *   'my_controller'
-   * );
+   * const controller = new VIAM.InputControllerClient(machine, 'my_controller');
    *
    * // Get the most recent Event for each Control
    * const recentEvents = await controller.getEvents();
@@ -32,17 +26,13 @@ export interface InputController extends Resource {
   getEvents(extra?: Struct): Promise<InputControllerEvent[]>;
 
   /**
-   * TriggerEvent, where supported, injects an InputControllerEvent into an
-   * input controller to (virtually) generate events like button presses or axis
-   * movements.
+   * TriggerEvent, where supported, injects an InputControllerEvent into an input controller to
+   * (virtually) generate events like button presses or axis movements.
    *
    * @example
    *
    * ```ts
-   * const controller = new VIAM.InputControllerClient(
-   *   machine,
-   *   'my_controller'
-   * );
+   * const controller = new VIAM.InputControllerClient(machine, 'my_controller');
    *
    * // Create a "Button is Pressed" event for the control BUTTON_START
    * const buttonPressEvent = new VIAM.InputControllerEvent({
