@@ -6,10 +6,7 @@
  * @example Log connection events to the browser console:
  *
  * ```ts
- * import {
- *   setDebugLogWriter,
- *   createConsoleLogWriter,
- * } from '@viamrobotics/sdk';
+ * import { setDebugLogWriter, createConsoleLogWriter } from '@viamrobotics/sdk';
  * setDebugLogWriter(createConsoleLogWriter());
  * ```
  *
@@ -19,9 +16,7 @@
  * import fs from 'node:fs';
  * import { setDebugLogWriter } from '@viamrobotics/sdk';
  * const logFile = fs.createWriteStream('viam-debug.log', { flags: 'a' });
- * setDebugLogWriter((entry) =>
- *   logFile.write(JSON.stringify(entry) + '\n')
- * );
+ * setDebugLogWriter((entry) => logFile.write(JSON.stringify(entry) + '\n'));
  * ```
  *
  * Logged events:
@@ -40,8 +35,8 @@ export interface DebugLogEntry {
   /** The time at which the event occurred. */
   timestamp: Date;
   /**
-   * The type of event. One of: `dial_started`, `dial_success`, `dial_failed`,
-   * `grpc_request`, `grpc_response`, `client_closed`, `ice_disconnected`.
+   * The type of event. One of: `dial_started`, `dial_success`, `dial_failed`, `grpc_request`,
+   * `grpc_response`, `client_closed`, `ice_disconnected`.
    */
   event: string;
   /** The ID of the connection this event relates to, when applicable. */
@@ -55,16 +50,13 @@ export type DebugLogWriter = (entry: DebugLogEntry) => void;
 let currentWriter: DebugLogWriter | undefined;
 
 /**
- * Set a writer function to receive structured debug log entries from the SDK.
- * Pass `undefined` to disable debug logging.
+ * Set a writer function to receive structured debug log entries from the SDK. Pass `undefined` to
+ * disable debug logging.
  *
  * @example
  *
  * ```ts
- * import {
- *   setDebugLogWriter,
- *   createConsoleLogWriter,
- * } from '@viamrobotics/sdk';
+ * import { setDebugLogWriter, createConsoleLogWriter } from '@viamrobotics/sdk';
  * // Enable:
  * setDebugLogWriter(createConsoleLogWriter());
  * // Disable:
@@ -87,10 +79,7 @@ export const isDebugLogEnabled = (): boolean => currentWriter !== undefined;
  *
  * @internal
  */
-export const writeDebugLog = (
-  event: string,
-  fields: Record<string, unknown> = {}
-): void => {
+export const writeDebugLog = (event: string, fields: Record<string, unknown> = {}): void => {
   if (!currentWriter) {
     return;
   }
@@ -102,8 +91,8 @@ export const writeDebugLog = (
 };
 
 /**
- * Returns a {@link DebugLogWriter} that prints each entry to the console as a
- * JSON string, prefixed with `[viam-sdk]`.
+ * Returns a {@link DebugLogWriter} that prints each entry to the console as a JSON string, prefixed
+ * with `[viam-sdk]`.
  */
 const consoleLogWriter: DebugLogWriter = (entry) => {
   // eslint-disable-next-line no-console

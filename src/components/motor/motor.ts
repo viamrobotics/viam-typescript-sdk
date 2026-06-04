@@ -23,15 +23,14 @@ export interface Motor extends Resource {
    * For more information, see [Motor
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#setpower).
    *
-   * @param power - A value between -1 and 1 where negative values indicate a
-   *   backwards direction and positive values a forward direction.
+   * @param power - A value between -1 and 1 where negative values indicate a backwards direction
+   *   and positive values a forward direction.
    */
   setPower(power: number, extra?: Struct): Promise<void>;
 
   /**
-   * Turn the motor at a specified speed for either a specified number of
-   * revolutions or indefinitely. Raise an error if position reporting is not
-   * supported.
+   * Turn the motor at a specified speed for either a specified number of revolutions or
+   * indefinitely. Raise an error if position reporting is not supported.
    *
    * @example
    *
@@ -46,16 +45,16 @@ export interface Motor extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#gofor).
    *
    * @param rpm - Speed in revolutions per minute.
-   * @param revolutions - Number of revolutions relative to the motor's starting
-   *   position. If this value is 0, this will run the motor at the given rpm
-   *   indefinitely. If this value is nonzero, this will block until the number
-   *   of revolutions has been completed or another operation comes in.
+   * @param revolutions - Number of revolutions relative to the motor's starting position. If this
+   *   value is 0, this will run the motor at the given rpm indefinitely. If this value is nonzero,
+   *   this will block until the number of revolutions has been completed or another operation comes
+   *   in.
    */
   goFor(rpm: number, revolutions: number, extra?: Struct): Promise<void>;
 
   /**
-   * Move the motor to a specific position relative to its home position at a
-   * specified speed. Raise an error if position reporting is not supported.
+   * Move the motor to a specific position relative to its home position at a specified speed. Raise
+   * an error if position reporting is not supported.
    *
    * @example
    *
@@ -70,14 +69,13 @@ export interface Motor extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/motor/#goto).
    *
    * @param rpm - Speed in revolutions per minute.
-   * @param positionRevolutions - Number of revolutions relative to the motor's
-   *   home position.
+   * @param positionRevolutions - Number of revolutions relative to the motor's home position.
    */
   goTo(rpm: number, positionRevolutions: number, extra?: Struct): Promise<void>;
 
   /**
-   * Move the motor indefinitely at a specified speed. Raise an error if
-   * position reporting is not supported.
+   * Move the motor indefinitely at a specified speed. Raise an error if position reporting is not
+   * supported.
    *
    * @example
    *
@@ -96,8 +94,8 @@ export interface Motor extends Resource {
   setRPM(rpm: number, extra?: Struct): Promise<void>;
 
   /**
-   * Set the current position of the motor as the new zero position, offset by a
-   * given position. Raise an error if position reporting is not supported.
+   * Set the current position of the motor as the new zero position, offset by a given position.
+   * Raise an error if position reporting is not supported.
    *
    * @example
    *
@@ -152,8 +150,8 @@ export interface Motor extends Resource {
   getProperties(extra?: Struct): Promise<Properties>;
 
   /**
-   * Return the position of the motor relative to its zero position. Raise an
-   * error if position reporting is not supported.
+   * Return the position of the motor relative to its zero position. Raise an error if position
+   * reporting is not supported.
    *
    * @example
    *

@@ -42,19 +42,16 @@ export class GantryClient implements Gantry {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 
-  async getKinematics(
-    extra = {},
-    callOptions = this.callOptions
-  ): Promise<GetKinematicsResult> {
+  async getKinematics(extra = {}, callOptions = this.callOptions): Promise<GetKinematicsResult> {
     return getKinematicsFromClient(
       this.client.getKinematics,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 
@@ -74,7 +71,7 @@ export class GantryClient implements Gantry {
     positionsMm: number[],
     speedsMmPerSec: number[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new MoveToPositionRequest({
       name: this.name,
@@ -135,24 +132,19 @@ export class GantryClient implements Gantry {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

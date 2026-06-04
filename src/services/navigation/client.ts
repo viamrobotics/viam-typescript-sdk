@@ -12,7 +12,7 @@ import {
   RemoveWaypointRequest,
   SetModeRequest,
 } from '../../gen/service/navigation/v1/navigation_pb';
-import { RobotClient } from '../../robot';
+import { type RobotClient } from '../../robot';
 import type { GeoPoint, Options } from '../../types';
 import { isValidGeoPoint } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
@@ -91,11 +91,7 @@ export class NavigationClient implements Navigation {
     return resp.waypoints;
   }
 
-  async addWayPoint(
-    location: GeoPoint,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async addWayPoint(location: GeoPoint, extra = {}, callOptions = this.callOptions) {
     const request = new AddWaypointRequest({
       name: this.name,
       location,
@@ -154,24 +150,19 @@ export class NavigationClient implements Navigation {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

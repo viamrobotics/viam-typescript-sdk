@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SLAMService } from '../../gen/service/slam/v1/slam_connect';
 import {
   GetInternalStateResponse,
-  GetPointCloudMapRequest,
+  type GetPointCloudMapRequest,
   GetPointCloudMapResponse,
 } from '../../gen/service/slam/v1/slam_pb';
 import { RobotClient } from '../../robot';
@@ -21,7 +21,7 @@ let testPcdStreamEdited = createWritableIterable<GetPointCloudMapResponse>();
 let testInternalStream = createWritableIterable<GetInternalStateResponse>();
 
 const pointCloudMapMockfn = (
-  requestMessage: GetPointCloudMapRequest
+  requestMessage: GetPointCloudMapRequest,
 ): AsyncIterable<GetPointCloudMapResponse> => {
   if (requestMessage.returnEditedMap) {
     return testPcdStreamEdited;
@@ -59,14 +59,14 @@ describe('SlamClient tests', () => {
       await testPcdStream.write(
         new GetPointCloudMapResponse({
           pointCloudPcdChunk: chunk1,
-        })
+        }),
       );
 
       const chunk2 = new Uint8Array([16, 25]);
       await testPcdStream.write(
         new GetPointCloudMapResponse({
           pointCloudPcdChunk: chunk2,
-        })
+        }),
       );
       testPcdStream.close();
 
@@ -79,7 +79,7 @@ describe('SlamClient tests', () => {
       await testPcdStreamEdited.write(
         new GetPointCloudMapResponse({
           pointCloudPcdChunk: chunk3Edited,
-        })
+        }),
       );
       testPcdStreamEdited.close();
 
@@ -96,14 +96,14 @@ describe('SlamClient tests', () => {
       await testInternalStream.write(
         new GetInternalStateResponse({
           internalStateChunk: chunk1,
-        })
+        }),
       );
 
       const chunk2 = new Uint8Array([16, 25]);
       await testInternalStream.write(
         new GetInternalStateResponse({
           internalStateChunk: chunk2,
-        })
+        }),
       );
       testInternalStream.close();
 

@@ -6,7 +6,7 @@ import type { ResourceName } from '../../../gen/common/v1/common_pb';
 
 export const createMockRobotServiceTransport = (
   resources: PartialMessage<ResourceName>[] = [],
-  operations: PartialMessage<Operation>[] = []
+  operations: PartialMessage<Operation>[] = [],
 ): Transport => {
   return createRouterTransport(({ service }) => {
     service(RobotService, {

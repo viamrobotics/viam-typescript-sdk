@@ -3,42 +3,36 @@ import { withRobot } from '../fixtures/robot-page';
 import type { RobotClient } from '../../src/robot/client';
 
 withRobot.describe('Robot Client API Tests', () => {
-  withRobot(
-    'should get robot information after connecting',
-    async ({ robotPage }) => {
-      // Arrange
-      await robotPage.connect();
+  withRobot('should get robot information after connecting', async ({ robotPage }) => {
+    // Arrange
+    await robotPage.connect();
 
-      // Act - Get resource names
-      await robotPage.getResourceNames();
-      const resources = await robotPage.getOutput<
-        RobotClient,
-        'resourceNames'
-      >();
+    // Act - Get resource names
+    await robotPage.getResourceNames();
+    const resources = await robotPage.getOutput<RobotClient, 'resourceNames'>();
 
-      // Assert - Verify we can discover the configured components
-      expect(resources).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ name: 'fake_arm', subtype: 'arm' }),
-          expect.objectContaining({ name: 'fake_camera', subtype: 'camera' }),
-          expect.objectContaining({ name: 'fake_vision', subtype: 'vision' }),
-        ])
-      );
+    // Assert - Verify we can discover the configured components
+    expect(resources).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'fake_arm', subtype: 'arm' }),
+        expect.objectContaining({ name: 'fake_camera', subtype: 'camera' }),
+        expect.objectContaining({ name: 'fake_vision', subtype: 'vision' }),
+      ]),
+    );
 
-      // Act - Get version info
-      await robotPage.getVersion();
-      const version = await robotPage.getOutput<RobotClient, 'getVersion'>();
+    // Act - Get version info
+    await robotPage.getVersion();
+    const version = await robotPage.getOutput<RobotClient, 'getVersion'>();
 
-      // Assert - Verify we get valid version information
-      expect(version).toEqual(
-        expect.objectContaining({
-          platform: 'rdk',
-          version: expect.stringMatching(/^v?\d+\.\d+\.\d+$/u),
-          apiVersion: expect.stringMatching(/^v\d+\.\d+\.\d+$/u),
-        })
-      );
-    }
-  );
+    // Assert - Verify we get valid version information
+    expect(version).toEqual(
+      expect.objectContaining({
+        platform: 'rdk',
+        version: expect.stringMatching(/^v?\d+\.\d+\.\d+$/u),
+        apiVersion: expect.stringMatching(/^v\d+\.\d+\.\d+$/u),
+      }),
+    );
+  });
 
   withRobot('should get machine status', async ({ robotPage }) => {
     // Arrange
@@ -54,7 +48,7 @@ withRobot.describe('Robot Client API Tests', () => {
         state: expect.any(String),
         resources: expect.any(Array),
         config: expect.any(Object),
-      })
+      }),
     );
     expect(status.resources.length).toBeGreaterThan(0);
   });

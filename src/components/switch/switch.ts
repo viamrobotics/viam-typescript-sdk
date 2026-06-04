@@ -50,9 +50,8 @@ export interface Switch extends Resource {
   getPosition: (extra?: Struct) => Promise<number>;
 
   /**
-   * Get the total number of positions available on the switch, along with their
-   * labels. Labels should either be null, undefined, empty, or the same length
-   * has the number of positions.
+   * Get the total number of positions available on the switch, along with their labels. Labels
+   * should either be null, undefined, empty, or the same length has the number of positions.
    *
    * @example
    *

@@ -1,11 +1,8 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetAudioResponse } from '../../gen/component/audioin/v1/audioin_pb';
-import {
-  GetPropertiesRequest,
-  GetPropertiesResponse,
-} from '../../gen/common/v1/common_pb';
+import { type GetAudioResponse } from '../../gen/component/audioin/v1/audioin_pb';
+import { type GetPropertiesRequest, GetPropertiesResponse } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { type AudioChunk } from './audio-in';
 import { AudioInClient } from './client';
@@ -14,10 +11,7 @@ vi.mock('../../robot');
 
 import { Struct, type PartialMessage } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import {
-  createWritableIterable,
-  type WritableIterable,
-} from '@connectrpc/connect/protocol';
+import { createWritableIterable, type WritableIterable } from '@connectrpc/connect/protocol';
 import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
 
 let audioin: AudioInClient;
@@ -33,8 +27,7 @@ const testProperties = new GetPropertiesResponse({
 
 describe('AudioInClient tests', () => {
   beforeEach(() => {
-    testAudioStream =
-      createWritableIterable<PartialMessage<GetAudioResponse>>();
+    testAudioStream = createWritableIterable<PartialMessage<GetAudioResponse>>();
 
     const mockTransport = createRouterTransport(({ service }) => {
       service(AudioInService, {
@@ -64,11 +57,7 @@ describe('AudioInClient tests', () => {
       const audioChunks: AudioChunk[] = [];
 
       const streamProm = (async () => {
-        for await (const chunk of audioin.getAudio(
-          AudioCodec.PCM16,
-          1.1,
-          0n
-        )) {
+        for await (const chunk of audioin.getAudio(AudioCodec.PCM16, 1.1, 0n)) {
           audioChunks.push(chunk);
         }
       })();
@@ -134,9 +123,7 @@ describe('AudioInClient tests', () => {
     it('getProperties passes extra to request', async () => {
       const extra = { key: 'value' };
       await audioin.getProperties(extra);
-      expect(capturedPropertiesReq?.extra).toStrictEqual(
-        Struct.fromJson(extra)
-      );
+      expect(capturedPropertiesReq?.extra).toStrictEqual(Struct.fromJson(extra));
     });
   });
 });

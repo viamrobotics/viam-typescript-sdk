@@ -3,9 +3,9 @@
 import { Struct } from '@bufbuild/protobuf';
 import { describe, expect, it, vi } from 'vitest';
 import {
-  DoCommandRequest,
+  type DoCommandRequest,
   DoCommandResponse,
-  GetStatusRequest,
+  type GetStatusRequest,
   GetStatusResponse,
 } from './gen/common/v1/common_pb';
 import { doCommandFromClient, getStatusFromClient } from './utils';
@@ -16,7 +16,7 @@ describe('doCommandFromClient', () => {
     const doCommander = vi.fn().mockResolvedValue(
       new DoCommandResponse({
         result: Struct.fromJson({ result: 'ok' }),
-      })
+      }),
     );
 
     const result = await doCommandFromClient(doCommander, 'test', command);
@@ -31,7 +31,7 @@ describe('doCommandFromClient', () => {
     const doCommander = vi.fn().mockResolvedValue(
       new DoCommandResponse({
         result: Struct.fromJson({ result: 'ok' }),
-      })
+      }),
     );
 
     const result = await doCommandFromClient(doCommander, 'test', {
@@ -47,11 +47,7 @@ describe('doCommandFromClient', () => {
   it('returns empty object when result is undefined', async () => {
     const doCommander = vi.fn().mockResolvedValue(new DoCommandResponse({}));
 
-    const result = await doCommandFromClient(
-      doCommander,
-      'test',
-      Struct.fromJson({})
-    );
+    const result = await doCommandFromClient(doCommander, 'test', Struct.fromJson({}));
 
     expect(result).toStrictEqual({});
   });
@@ -60,12 +56,7 @@ describe('doCommandFromClient', () => {
     const doCommander = vi.fn().mockResolvedValue(new DoCommandResponse({}));
     const requestLogger = vi.fn();
 
-    await doCommandFromClient(
-      doCommander,
-      'test',
-      { foo: 'bar' },
-      { requestLogger }
-    );
+    await doCommandFromClient(doCommander, 'test', { foo: 'bar' }, { requestLogger });
 
     expect(requestLogger).toHaveBeenCalledOnce();
     const [loggedRequest] = requestLogger.mock.calls[0] as [DoCommandRequest];
@@ -79,7 +70,7 @@ describe('getStatusFromClient', () => {
     const getStatusMethod = vi.fn().mockResolvedValue(
       new GetStatusResponse({
         result: Struct.fromJson({ state: 'running' }),
-      })
+      }),
     );
 
     const result = await getStatusFromClient(getStatusMethod, 'test');
@@ -90,9 +81,7 @@ describe('getStatusFromClient', () => {
   });
 
   it('returns empty object when result is undefined', async () => {
-    const getStatusMethod = vi
-      .fn()
-      .mockResolvedValue(new GetStatusResponse({}));
+    const getStatusMethod = vi.fn().mockResolvedValue(new GetStatusResponse({}));
 
     const result = await getStatusFromClient(getStatusMethod, 'test');
 
@@ -100,9 +89,7 @@ describe('getStatusFromClient', () => {
   });
 
   it('calls requestLogger when provided', async () => {
-    const getStatusMethod = vi
-      .fn()
-      .mockResolvedValue(new GetStatusResponse({}));
+    const getStatusMethod = vi.fn().mockResolvedValue(new GetStatusResponse({}));
     const requestLogger = vi.fn();
 
     await getStatusFromClient(getStatusMethod, 'test', { requestLogger });

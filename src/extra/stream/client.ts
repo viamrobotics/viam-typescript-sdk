@@ -6,7 +6,7 @@ import {
   RemoveStreamRequest,
   GetStreamOptionsRequest,
   SetStreamOptionsRequest,
-  Resolution,
+  type Resolution,
 } from '../../gen/stream/v1/stream_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
@@ -37,9 +37,8 @@ export class StreamClient extends EventDispatcher implements Stream {
     this.streams = new Set();
 
     /**
-     * Currently this is emitting events for every track that we receive. In the
-     * future we'll want to partition here and have individual events for each
-     * stream.
+     * Currently this is emitting events for every track that we receive. In the future we'll want
+     * to partition here and have individual events for each stream.
      */
     client.on('track', (args) => {
       this.emit('track', args);
@@ -87,9 +86,8 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   /**
-   * Get the available livestream resolutions for a camera component. If the
-   * stream client cannot find any available resolutions, an empty list will be
-   * returned.
+   * Get the available livestream resolutions for a camera component. If the stream client cannot
+   * find any available resolutions, an empty list will be returned.
    *
    * @param resourceName - The name of a camera component.
    * @returns A list of available resolutions for livestreaming.
@@ -117,8 +115,8 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   /**
-   * Set the livestream options for a camera component. This will change the
-   * resolution of the stream to the specified width and height.
+   * Set the livestream options for a camera component. This will change the resolution of the
+   * stream to the specified width and height.
    *
    * @param name - The name of a camera component.
    * @param width - The width of the resolution.
@@ -144,8 +142,8 @@ export class StreamClient extends EventDispatcher implements Stream {
   }
 
   /**
-   * Reset the livestream options for a camera component. This will reset the
-   * resolution to the default component attributes.
+   * Reset the livestream options for a camera component. This will reset the resolution to the
+   * default component attributes.
    *
    * @param name - The name of a camera component.
    */
@@ -167,8 +165,8 @@ export class StreamClient extends EventDispatcher implements Stream {
   private STREAM_TIMEOUT = 5000;
 
   /**
-   * Get a stream by name from a StreamClient. Will time out if stream is not
-   * received within 5 seconds.
+   * Get a stream by name from a StreamClient. Will time out if stream is not received within 5
+   * seconds.
    *
    * @param name - The name of a camera component.
    */
@@ -190,9 +188,7 @@ export class StreamClient extends EventDispatcher implements Stream {
 
       setTimeout(() => {
         this.off('track', handleTrack);
-        reject(
-          new Error(`Did not receive a stream after ${this.STREAM_TIMEOUT} ms`)
-        );
+        reject(new Error(`Did not receive a stream after ${this.STREAM_TIMEOUT} ms`));
       }, this.STREAM_TIMEOUT);
     });
 

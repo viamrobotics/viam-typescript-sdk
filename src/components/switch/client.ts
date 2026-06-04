@@ -28,11 +28,7 @@ export class SwitchClient implements Switch {
     this.options = options;
   }
 
-  async setPosition(
-    position: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async setPosition(position: number, extra = {}, callOptions = this.callOptions) {
     const request = new SetPositionRequest({
       name: this.name,
       position,
@@ -65,36 +61,26 @@ export class SwitchClient implements Switch {
     this.options.requestLogger?.(request);
 
     const resp = await this.client.getNumberOfPositions(request, callOptions);
-    if (
-      resp.labels.length > 0 &&
-      resp.labels.length !== resp.numberOfPositions
-    ) {
-      throw new Error(
-        'the number of labels does not match the number of positions'
-      );
+    if (resp.labels.length > 0 && resp.labels.length !== resp.numberOfPositions) {
+      throw new Error('the number of labels does not match the number of positions');
     }
     return [resp.numberOfPositions, resp.labels] as [number, string[]];
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

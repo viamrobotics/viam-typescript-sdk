@@ -27,8 +27,7 @@ export default defineConfig({
 
   use: {
     baseURL: 'http://localhost:5173',
-    trace:
-      process.env.CI === undefined ? 'retain-on-failure' : 'on-first-retry',
+    trace: process.env.CI === undefined ? 'retain-on-failure' : 'on-first-retry',
   },
 
   projects: [

@@ -48,8 +48,7 @@ describe('VisionClient Tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(VisionService, {
-        getDetections: () =>
-          new GetDetectionsResponse({ detections: [detection] }),
+        getDetections: () => new GetDetectionsResponse({ detections: [detection] }),
         getDetectionsFromCamera: () =>
           new GetDetectionsFromCameraResponse({ detections: [detection] }),
         getClassifications: () =>
@@ -58,8 +57,7 @@ describe('VisionClient Tests', () => {
           new GetClassificationsFromCameraResponse({
             classifications: [classification],
           }),
-        getObjectPointClouds: () =>
-          new GetObjectPointCloudsResponse({ objects: [pco] }),
+        getObjectPointClouds: () => new GetObjectPointCloudsResponse({ objects: [pco] }),
         getProperties: () =>
           new GetPropertiesResponse({
             classificationsSupported: true,
@@ -86,16 +84,14 @@ describe('VisionClient Tests', () => {
     it('returns detections from a camera', async () => {
       const expected = [detection];
 
-      await expect(
-        vision.getDetectionsFromCamera('camera')
-      ).resolves.toStrictEqual(expected);
+      await expect(vision.getDetectionsFromCamera('camera')).resolves.toStrictEqual(expected);
     });
 
     it('returns detections from an image', async () => {
       const expected = [detection];
 
       await expect(
-        vision.getDetections(new Uint8Array(), 1, 1, 'image/jpeg')
+        vision.getDetections(new Uint8Array(), 1, 1, 'image/jpeg'),
       ).resolves.toStrictEqual(expected);
     });
   });
@@ -104,16 +100,16 @@ describe('VisionClient Tests', () => {
     it('returns classifications from a camera', async () => {
       const expected = [classification];
 
-      await expect(
-        vision.getClassificationsFromCamera('camera', 1)
-      ).resolves.toStrictEqual(expected);
+      await expect(vision.getClassificationsFromCamera('camera', 1)).resolves.toStrictEqual(
+        expected,
+      );
     });
 
     it('returns classifications from an image', async () => {
       const expected = [classification];
 
       await expect(
-        vision.getClassifications(new Uint8Array(), 1, 1, 'image/jpeg', 1)
+        vision.getClassifications(new Uint8Array(), 1, 1, 'image/jpeg', 1),
       ).resolves.toStrictEqual(expected);
     });
   });
@@ -122,9 +118,7 @@ describe('VisionClient Tests', () => {
     it('returns a PointCloudObject from a camera', async () => {
       const expected = [pco];
 
-      await expect(
-        vision.getObjectPointClouds('camera')
-      ).resolves.toStrictEqual(expected);
+      await expect(vision.getObjectPointClouds('camera')).resolves.toStrictEqual(expected);
     });
   });
 
@@ -146,7 +140,7 @@ describe('VisionClient Tests', () => {
           returnClassifications: true,
           returnDetections: true,
           returnObjectPointClouds: true,
-        })
+        }),
       ).resolves.toStrictEqual({
         image: undefined,
         classifications: [classification],

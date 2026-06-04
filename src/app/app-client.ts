@@ -1,43 +1,43 @@
 import type { JsonValue } from '@bufbuild/protobuf';
 import { Struct, Timestamp } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
-import { PackageType } from '../gen/app/packages/v1/packages_pb';
+import { type PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
 import {
-  APIKeyWithAuthorizations,
+  type APIKeyWithAuthorizations,
   Authorization,
   AuthorizedPermissions,
-  CreateKeyFromExistingKeyAuthorizationsResponse,
-  CreateKeyResponse,
-  CreateModuleResponse,
-  CreateOAuthAppUserResponse,
-  Fragment,
-  FragmentImportList,
-  FragmentVisibility,
-  GetAppContentResponse,
-  GetAppBrandingResponse,
-  GetRobotPartLogsResponse,
-  GetRobotPartResponse,
-  GetRobotPartByNameAndLocationResponse,
-  ListOrganizationMembersResponse,
-  Location,
-  LocationAuth,
-  Model,
-  Module,
-  Organization,
-  OrganizationIdentity,
-  OrganizationInvite,
-  OrgDetails,
-  RegistryItem,
-  RegistryItemStatus,
-  Robot,
-  RobotPart,
-  RobotPartHistoryEntry,
-  RotateKeyResponse,
-  RoverRentalRobot,
-  Visibility,
+  type CreateKeyFromExistingKeyAuthorizationsResponse,
+  type CreateKeyResponse,
+  type CreateModuleResponse,
+  type CreateOAuthAppUserResponse,
+  type Fragment,
+  type FragmentImportList,
+  type FragmentVisibility,
+  type GetAppContentResponse,
+  type GetAppBrandingResponse,
+  type GetRobotPartLogsResponse,
+  type GetRobotPartResponse,
+  type GetRobotPartByNameAndLocationResponse,
+  type ListOrganizationMembersResponse,
+  type Location,
+  type LocationAuth,
+  type Model,
+  type Module,
+  type Organization,
+  type OrganizationIdentity,
+  type OrganizationInvite,
+  type OrgDetails,
+  type RegistryItem,
+  type RegistryItemStatus,
+  type Robot,
+  type RobotPart,
+  type RobotPartHistoryEntry,
+  type RotateKeyResponse,
+  type RoverRentalRobot,
+  type Visibility,
   ListMachineSummariesRequest,
-  LocationSummary,
+  type LocationSummary,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -45,13 +45,11 @@ import type { LogEntry } from '../gen/common/v1/common_pb';
  * Creates an Authorization object from auth details.
  *
  * @param organizationId The ID of the organization to create the role under
- * @param entityId The ID of the entity the role belongs to (for example a user
- *   ID)
+ * @param entityId The ID of the entity the role belongs to (for example a user ID)
  * @param role The role to add ("owner" or "operator")
- * @param resourceType The type of resource to create the role for ("robot",
- *   "location", or "organization")
- * @param identityType The type of identity that the identity ID is (for example
- *   an api-key)
+ * @param resourceType The type of resource to create the role for ("robot", "location", or
+ *   "organization")
+ * @param identityType The type of identity that the identity ID is (for example an api-key)
  * @param resourceId The ID of the resource the role is being created for
  */
 export const createAuth = (
@@ -60,7 +58,7 @@ export const createAuth = (
   role: string,
   resourceType: string,
   identityType: string,
-  resourceId: string
+  resourceId: string,
 ): Authorization => {
   return new Authorization({
     authorizationType: 'role',
@@ -78,24 +76,17 @@ export const createAuth = (
  *
  * @param organizationId The ID of the organization to create the role under
  * @param role The role to add ("owner" or "operator")
- * @param resourceType The type of resource to create the role for ("robot",
- *   "location", or "organization")
+ * @param resourceType The type of resource to create the role for ("robot", "location", or
+ *   "organization")
  * @param resourceId The ID of the resource the role is being created for
  */
 export const createAuthForNewAPIKey = (
   organizationId: string,
   role: string,
   resourceType: string,
-  resourceId: string
+  resourceId: string,
 ): Authorization => {
-  return createAuth(
-    organizationId,
-    '',
-    role,
-    resourceType,
-    'api-key',
-    resourceId
-  );
+  return createAuth(organizationId, '', role, resourceType, 'api-key', resourceId);
 };
 
 /**
@@ -109,7 +100,7 @@ export const createAuthForNewAPIKey = (
 export const createPermission = (
   resourceType: string,
   resourceId: string,
-  permissions: string[]
+  permissions: string[],
 ): AuthorizedPermissions => {
   return new AuthorizedPermissions({
     resourceType,
@@ -132,9 +123,7 @@ export class AppClient {
    *
    * ```ts
    * // This method is used internally only. To obtain a user's ID, use the listOrganizationsByUser method.
-   * const members = await appClient.listOrganizationMembers(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const members = await appClient.listOrganizationMembers('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -188,9 +177,7 @@ export class AppClient {
    *
    * ```ts
    * const organizations =
-   *   await appClient.getOrganizationsWithAccessToLocation(
-   *     '<YOUR-LOCATION-ID>'
-   *   );
+   *   await appClient.getOrganizationsWithAccessToLocation('<YOUR-LOCATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -199,9 +186,7 @@ export class AppClient {
    * @param locationId The ID of the location to query
    * @returns The list of locations with access to the requested location
    */
-  async getOrganizationsWithAccessToLocation(
-    locationId: string
-  ): Promise<OrganizationIdentity[]> {
+  async getOrganizationsWithAccessToLocation(locationId: string): Promise<OrganizationIdentity[]> {
     const resp = await this.client.getOrganizationsWithAccessToLocation({
       locationId,
     });
@@ -225,9 +210,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const organization = await appClient.getOrganization(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const organization = await appClient.getOrganization('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -236,9 +219,7 @@ export class AppClient {
    * @param organizationId The ID of the organization
    * @returns Details about the organization, if it exists
    */
-  async getOrganization(
-    organizationId: string
-  ): Promise<Organization | undefined> {
+  async getOrganization(organizationId: string): Promise<Organization | undefined> {
     const resp = await this.client.getOrganization({ organizationId });
     return resp.organization;
   }
@@ -249,8 +230,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const isAvailable =
-   *   await appClient.getOrganizationNamespaceAvailability('name');
+   * const isAvailable = await appClient.getOrganizationNamespaceAvailability('name');
    * ```
    *
    * For more information, see [App
@@ -259,9 +239,7 @@ export class AppClient {
    * @param namespace The namespace to query for availability
    * @returns A boolean indicating whether or not the namespace is available
    */
-  async getOrganizationNamespaceAvailability(
-    namespace: string
-  ): Promise<boolean> {
+  async getOrganizationNamespaceAvailability(namespace: string): Promise<boolean> {
     const resp = await this.client.getOrganizationNamespaceAvailability({
       publicNamespace: namespace,
     });
@@ -276,7 +254,7 @@ export class AppClient {
    * ```ts
    * const organization = await appClient.updateOrganization(
    *   '<YOUR-ORGANIZATION-ID>',
-   *   'newName'
+   *   'newName',
    * );
    * ```
    *
@@ -288,8 +266,7 @@ export class AppClient {
    * @param publicNamespace Optional namespace to update the organization with
    * @param region Optional region to update the organization with
    * @param cid Optional CRM ID to update the organization with
-   * @param defaultFragments Optional default fragments to set for the
-   *   organization
+   * @param defaultFragments Optional default fragments to set for the organization
    * @returns The updated organization details
    */
   async updateOrganization(
@@ -298,7 +275,7 @@ export class AppClient {
     publicNamespace?: string,
     region?: string,
     cid?: string,
-    defaultFragments?: FragmentImportList
+    defaultFragments?: FragmentImportList,
   ): Promise<Organization | undefined> {
     const resp = await this.client.updateOrganization({
       organizationId,
@@ -335,21 +312,16 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const members = await appClient.listOrganizationMembers(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const members = await appClient.listOrganizationMembers('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#listorganizationmembers).
    *
    * @param organizationId The id of the organization to query
-   * @returns An object containing organization members, pending invites, and
-   *   org ID
+   * @returns An object containing organization members, pending invites, and org ID
    */
-  async listOrganizationMembers(
-    organizationId: string
-  ): Promise<ListOrganizationMembersResponse> {
+  async listOrganizationMembers(organizationId: string): Promise<ListOrganizationMembersResponse> {
     return this.client.listOrganizationMembers({ organizationId });
   }
 
@@ -373,7 +345,7 @@ export class AppClient {
    * const invite = await appClient.createOrganizationInvite(
    *   '<YOUR-ORGANIZATION-ID>',
    *   'youremail@email.com',
-   *   [auth]
+   *   [auth],
    * );
    * ```
    *
@@ -383,15 +355,15 @@ export class AppClient {
    * @param organizationId The id of the organization to create the invite for
    * @param email The email address of the user to generate an invite for
    * @param authorizations The authorizations to associate with the new invite
-   * @param sendEmailInvite Bool of whether to send an email invite (true) or
-   *   automatically add a user. Defaults to true
+   * @param sendEmailInvite Bool of whether to send an email invite (true) or automatically add a
+   *   user. Defaults to true
    * @returns The organization invite
    */
   async createOrganizationInvite(
     organizationId: string,
     email: string,
     authorizations: Authorization[],
-    sendEmailInvite = true
+    sendEmailInvite = true,
   ): Promise<OrganizationInvite | undefined> {
     const resp = await this.client.createOrganizationInvite({
       organizationId,
@@ -422,7 +394,7 @@ export class AppClient {
    *   '<YOUR-ORGANIZATION-ID>',
    *   'youremail@email.com',
    *   [auth],
-   *   []
+   *   [],
    * );
    * ```
    *
@@ -439,7 +411,7 @@ export class AppClient {
     organizationId: string,
     email: string,
     addAuthsList: Authorization[],
-    removeAuthsList: Authorization[]
+    removeAuthsList: Authorization[],
   ): Promise<OrganizationInvite | undefined> {
     const resp = await this.client.updateOrganizationInviteAuthorizations({
       organizationId,
@@ -456,10 +428,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.deleteOrganizationMember(
-   *   '<YOUR-ORGANIZATION-ID>',
-   *   '<YOUR-USER-ID>'
-   * );
+   * await appClient.deleteOrganizationMember('<YOUR-ORGANIZATION-ID>', '<YOUR-USER-ID>');
    * ```
    *
    * For more information, see [App
@@ -478,10 +447,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.deleteOrganizationInvite(
-   *   '<YOUR-ORGANIZATION-ID>',
-   *   'youremail@email.com'
-   * );
+   * await appClient.deleteOrganizationInvite('<YOUR-ORGANIZATION-ID>', 'youremail@email.com');
    * ```
    *
    * For more information, see [App
@@ -502,7 +468,7 @@ export class AppClient {
    * ```ts
    * const invite = await appClient.resendOrganizationInvite(
    *   '<YOUR-ORGANIZATION-ID>',
-   *   'youremail@email.com'
+   *   'youremail@email.com',
    * );
    * ```
    *
@@ -515,7 +481,7 @@ export class AppClient {
    */
   async resendOrganizationInvite(
     organizationId: string,
-    email: string
+    email: string,
   ): Promise<OrganizationInvite | undefined> {
     const resp = await this.client.resendOrganizationInvite({
       organizationId,
@@ -530,26 +496,21 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const location = await appClient.createLocation(
-   *   '<YOUR-ORGANIZATION-ID>',
-   *   'name'
-   * );
+   * const location = await appClient.createLocation('<YOUR-ORGANIZATION-ID>', 'name');
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#createlocation).
    *
-   * @param organizationId The ID of the organization to create the location
-   *   under
+   * @param organizationId The ID of the organization to create the location under
    * @param name The name of the location to create
-   * @param parentLocationId Optional name of a parent location to create the
-   *   new location under
+   * @param parentLocationId Optional name of a parent location to create the new location under
    * @returns The location object
    */
   async createLocation(
     organizationId: string,
     name: string,
-    parentLocationId?: string
+    parentLocationId?: string,
   ): Promise<Location | undefined> {
     const resp = await this.client.createLocation({
       organizationId,
@@ -587,10 +548,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const location = await appClient.updateLocation(
-   *   '<YOUR-LOCATION-ID>',
-   *   'newName'
-   * );
+   * const location = await appClient.updateLocation('<YOUR-LOCATION-ID>', 'newName');
    * ```
    *
    * For more information, see [App
@@ -598,8 +556,7 @@ export class AppClient {
    *
    * @param locId The ID of the location to update
    * @param name Optional string to update the location's name to
-   * @param parentLocId Optional string to update the location's parent location
-   *   to
+   * @param parentLocId Optional string to update the location's parent location to
    * @param region Optional string to update the location's region to
    * @returns The location object
    */
@@ -607,7 +564,7 @@ export class AppClient {
     locId: string,
     name?: string,
     parentLocId?: string,
-    region?: string
+    region?: string,
   ): Promise<Location | undefined> {
     const resp = await this.client.updateLocation({
       locationId: locId,
@@ -642,9 +599,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const locations = await appClient.listLocations(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const locations = await appClient.listLocations('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -664,10 +619,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.shareLocation(
-   *   '<OTHER-ORGANIZATION-ID>',
-   *   '<YOUR-LOCATION-ID>'
-   * );
+   * await appClient.shareLocation('<OTHER-ORGANIZATION-ID>', '<YOUR-LOCATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -686,10 +638,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.unshareLocation(
-   *   '<OTHER-ORGANIZATION-ID>',
-   *   '<YOUR-LOCATION-ID>'
-   * );
+   * await appClient.unshareLocation('<OTHER-ORGANIZATION-ID>', '<YOUR-LOCATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -708,9 +657,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const locationAuth = await appClient.locationAuth(
-   *   '<YOUR-LOCATION-ID>'
-   * );
+   * const locationAuth = await appClient.locationAuth('<YOUR-LOCATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -730,9 +677,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const locationAuth = await appClient.createLocationSecret(
-   *   '<YOUR-LOCATION-ID>'
-   * );
+   * const locationAuth = await appClient.createLocationSecret('<YOUR-LOCATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -752,10 +697,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.deleteLocationSecret(
-   *   '<YOUR-LOCATION-ID>',
-   *   '<YOUR-SECRET-ID>'
-   * );
+   * await appClient.deleteLocationSecret('<YOUR-LOCATION-ID>', '<YOUR-SECRET-ID>');
    * ```
    *
    * For more information, see [App
@@ -777,8 +719,7 @@ export class AppClient {
    * const robot = await appClient.getRobot('<YOUR-ROBOT-ID>');
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobot).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#getrobot).
    *
    * @param id The ID of the robot
    * @returns The `Robot` object
@@ -794,9 +735,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const roverRentalRobots = await appClient.getRoverRentalRobots(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const roverRentalRobots = await appClient.getRoverRentalRobots('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -840,10 +779,7 @@ export class AppClient {
    * // Get the part's address
    * const address = robotPart.part.fqdn;
    * // Check if machine is live (last access time less than 10 sec ago)
-   * if (
-   *   Date.now() - Number(robotPart.part.lastAccess.seconds) * 1000 <=
-   *   10000
-   * ) {
+   * if (Date.now() - Number(robotPart.part.lastAccess.seconds) * 1000 <= 10000) {
    *   console.log('Machine is live');
    * }
    * ```
@@ -866,7 +802,7 @@ export class AppClient {
    * ```ts
    * const robotPart = await appClient.getRobotPartByNameAndLocation(
    *   '<YOUR-ROBOT-PART-NAME>',
-   *   '<YOUR-LOCATION-ID>'
+   *   '<YOUR-LOCATION-ID>',
    * );
    * ```
    *
@@ -879,21 +815,19 @@ export class AppClient {
    */
   async getRobotPartByNameAndLocation(
     name: string,
-    locationId: string
+    locationId: string,
   ): Promise<GetRobotPartByNameAndLocationResponse> {
     return this.client.getRobotPartByNameAndLocation({ name, locationId });
   }
 
   /**
-   * Get a page of log entries for a specific robot part. Logs are sorted by
-   * descending time (newest first).
+   * Get a page of log entries for a specific robot part. Logs are sorted by descending time (newest
+   * first).
    *
    * @example
    *
    * ```ts
-   * const robotPartLogs = await appClient.getRobotPartLogs(
-   *   '<YOUR-ROBOT-PART-ID>'
-   * );
+   * const robotPartLogs = await appClient.getRobotPartLogs('<YOUR-ROBOT-PART-ID>');
    * ```
    *
    * For more information, see [App
@@ -901,16 +835,14 @@ export class AppClient {
    *
    * @param id The ID of the requested robot part
    * @param filter Optional string to filter logs on
-   * @param levels Optional array of log levels to return. Defaults to returning
-   *   all log levels
-   * @param start Optional start time for log retrieval. Only logs created after
-   *   this time will be returned.
-   * @param end Optional end time for log retrieval. Only logs created before
-   *   this time will be returned.
-   * @param pageToken Optional string indicating which page of logs to query.
-   *   Defaults to the most recent
-   * @returns The robot requested logs and the page token for the next page of
-   *   logs
+   * @param levels Optional array of log levels to return. Defaults to returning all log levels
+   * @param start Optional start time for log retrieval. Only logs created after this time will be
+   *   returned.
+   * @param end Optional end time for log retrieval. Only logs created before this time will be
+   *   returned.
+   * @param pageToken Optional string indicating which page of logs to query. Defaults to the most
+   *   recent
+   * @returns The robot requested logs and the page token for the next page of logs
    */
   async getRobotPartLogs(
     id: string,
@@ -918,7 +850,7 @@ export class AppClient {
     levels?: string[],
     start?: Date,
     end?: Date,
-    pageToken = ''
+    pageToken = '',
   ): Promise<GetRobotPartLogsResponse> {
     return this.client.getRobotPartLogs({
       id,
@@ -931,15 +863,13 @@ export class AppClient {
   }
 
   /**
-   * Get a stream of log entries for a specific robot part. Logs are sorted by
-   * descending time (newest first).
+   * Get a stream of log entries for a specific robot part. Logs are sorted by descending time
+   * (newest first).
    *
    * @example
    *
    * ```ts
-   * const robotPartLogs = await appClient.tailRobotPartLogs(
-   *   '<YOUR-ROBOT-PART-ID>'
-   * );
+   * const robotPartLogs = await appClient.tailRobotPartLogs('<YOUR-ROBOT-PART-ID>');
    * ```
    *
    * For more information, see [App
@@ -948,15 +878,10 @@ export class AppClient {
    * @param id The ID of the requested robot part
    * @param queue A queue to put the log entries into
    * @param filter Optional string to filter logs on
-   * @param errorsOnly Optional bool to indicate whether or not only error-level
-   *   logs should be returned. Defaults to true
+   * @param errorsOnly Optional bool to indicate whether or not only error-level logs should be
+   *   returned. Defaults to true
    */
-  async tailRobotPartLogs(
-    id: string,
-    queue: LogEntry[],
-    filter?: string,
-    errorsOnly = true
-  ) {
+  async tailRobotPartLogs(id: string, queue: LogEntry[], filter?: string, errorsOnly = true) {
     const stream = this.client.tailRobotPartLogs({
       id,
       errorsOnly,
@@ -975,9 +900,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const robotPartHistory = await appClient.getRobotPartHistory(
-   *   '<YOUR-ROBOT-PART-ID>'
-   * );
+   * const robotPartHistory = await appClient.getRobotPartHistory('<YOUR-ROBOT-PART-ID>');
    * ```
    *
    * For more information, see [App
@@ -997,10 +920,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const robotPart = await appClient.updateRobotPart(
-   *   '<YOUR-ROBOT-PART-ID>',
-   *   'newName'
-   * );
+   * const robotPart = await appClient.updateRobotPart('<YOUR-ROBOT-PART-ID>', 'newName');
    * ```
    *
    * For more information, see [App
@@ -1014,7 +934,7 @@ export class AppClient {
   async updateRobotPart(
     id: string,
     name: string,
-    robotConfig: Struct
+    robotConfig: Struct,
   ): Promise<RobotPart | undefined> {
     const resp = await this.client.updateRobotPart({ id, name, robotConfig });
     return resp.part;
@@ -1026,10 +946,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const robotPartId = await appClient.newRobotPart(
-   *   '<YOUR-ROBOT-ID>',
-   *   'newPart'
-   * );
+   * const robotPartId = await appClient.newRobotPart('<YOUR-ROBOT-ID>', 'newPart');
    * ```
    *
    * For more information, see [App
@@ -1068,8 +985,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const robotAPIKeys =
-   *   await appClient.getRobotAPIKeys('<YOUR-ROBOT-ID>');
+   * const robotAPIKeys = await appClient.getRobotAPIKeys('<YOUR-ROBOT-ID>');
    * ```
    *
    * For more information, see [App
@@ -1125,9 +1041,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const robotPart = await appClient.createRobotPartSecret(
-   *   '<YOUR-ROBOT-PART-ID>'
-   * );
+   * const robotPart = await appClient.createRobotPartSecret('<YOUR-ROBOT-PART-ID>');
    * ```
    *
    * For more information, see [App
@@ -1147,10 +1061,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.deleteRobotPartSecret(
-   *   '<YOUR-ROBOT-PART-ID>',
-   *   '<YOUR-SECRET-ID>'
-   * );
+   * await appClient.deleteRobotPartSecret('<YOUR-ROBOT-PART-ID>', '<YOUR-SECRET-ID>');
    * ```
    *
    * For more information, see [App
@@ -1189,14 +1100,10 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const robotId = await appClient.newRobot(
-   *   '<YOUR-LOCATION-ID>',
-   *   'newRobot'
-   * );
+   * const robotId = await appClient.newRobot('<YOUR-LOCATION-ID>', 'newRobot');
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#newrobot).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#newrobot).
    *
    * @param locId The ID of the location to create the robot in
    * @param name The name of the new robot
@@ -1208,8 +1115,8 @@ export class AppClient {
   }
 
   /**
-   * Change the name of an existing machine. You can only change the name of the
-   * machine, not the location.
+   * Change the name of an existing machine. You can only change the name of the machine, not the
+   * location.
    *
    * @example
    *
@@ -1217,7 +1124,7 @@ export class AppClient {
    * const robot = await appClient.updateRobot(
    *   '<YOUR-ROBOT-ID>',
    *   '<YOUR-LOCATION-ID>',
-   *   'newName'
+   *   'newName',
    * );
    * ```
    *
@@ -1229,11 +1136,7 @@ export class AppClient {
    * @param name The name to update the robot to
    * @returns The newly-modified robot object
    */
-  async updateRobot(
-    robotId: string,
-    locId: string,
-    name: string
-  ): Promise<Robot | undefined> {
+  async updateRobot(robotId: string, locId: string, name: string): Promise<Robot | undefined> {
     const resp = await this.client.updateRobot({
       id: robotId,
       location: locId,
@@ -1266,29 +1169,25 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const fragments = await appClient.listFragments(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const fragments = await appClient.listFragments('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#listfragments).
    *
    * @param organizationId The ID of the organization to list fragments for
-   * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities
-   *   instead. If true then only public fragments will be listed. Defaults to
-   *   true
-   * @param fragmentVisibilities Optional list of fragment visibilities to
-   *   include in returned list. An empty fragmentVisibilities list defaults to
-   *   normal publicOnly behavior (discludes unlisted public fragments)
-   *   Otherwise, fragment visibilities should contain one of the three
+   * @param publicOnly Optional, deprecated boolean. Use fragmentVisibilities instead. If true then
+   *   only public fragments will be listed. Defaults to true
+   * @param fragmentVisibilities Optional list of fragment visibilities to include in returned list.
+   *   An empty fragmentVisibilities list defaults to normal publicOnly behavior (discludes unlisted
+   *   public fragments) Otherwise, fragment visibilities should contain one of the three
    *   visibilities and takes precendence over the publicOnly field
    * @returns The list of fragment objects
    */
   async listFragments(
     organizationId: string,
     publicOnly = true,
-    fragmentVisibility: FragmentVisibility[] = []
+    fragmentVisibility: FragmentVisibility[] = [],
   ): Promise<Fragment[]> {
     const resp = await this.client.listFragments({
       organizationId,
@@ -1304,9 +1203,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const fragment = await appClient.getFragment(
-   *   '12a12ab1-1234-5678-abcd-abcd01234567'
-   * );
+   * const fragment = await appClient.getFragment('12a12ab1-1234-5678-abcd-abcd01234567');
    * ```
    *
    * For more information, see [App
@@ -1326,17 +1223,13 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const fragment = await appClient.createFragment(
-   *   '<YOUR-ORGANIZATION-ID>',
-   *   'newFragment'
-   * );
+   * const fragment = await appClient.createFragment('<YOUR-ORGANIZATION-ID>', 'newFragment');
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#createfragment).
    *
-   * @param organizationId The ID of the organization to create the fragment
-   *   under
+   * @param organizationId The ID of the organization to create the fragment under
    * @param name The name of the new fragment
    * @param config The new fragment's config
    * @returns The newly created fragment
@@ -1344,7 +1237,7 @@ export class AppClient {
   async createFragment(
     organizationId: string,
     name: string,
-    config: Struct
+    config: Struct,
   ): Promise<Fragment | undefined> {
     const resp = await this.client.createFragment({
       organizationId,
@@ -1362,7 +1255,7 @@ export class AppClient {
    * ```ts
    * const fragment = await appClient.updateFragment(
    *   '12a12ab1-1234-5678-abcd-abcd01234567',
-   *   'better_name'
+   *   'better_name',
    * );
    * ```
    *
@@ -1372,14 +1265,13 @@ export class AppClient {
    * @param id The ID of the fragment to update
    * @param name The name to update the fragment to
    * @param config The config to update the fragment to
-   * @param makePublic Optional, deprecated boolean specifying whether the
-   *   fragment should be public or not. If not passed, the visibility will be
-   *   unchanged. Fragments are private by default when created
-   * @param visibility Optional FragmentVisibility specifying the updated
-   *   fragment visibility. If not passed, the visibility will be unchanged. If
-   *   visibility is not set and makePublic is set, makePublic takes effect. If
-   *   makePublic and visibility are set, they must not be conflicting. If
-   *   neither is set, the fragment visibility will remain unchanged.
+   * @param makePublic Optional, deprecated boolean specifying whether the fragment should be public
+   *   or not. If not passed, the visibility will be unchanged. Fragments are private by default
+   *   when created
+   * @param visibility Optional FragmentVisibility specifying the updated fragment visibility. If
+   *   not passed, the visibility will be unchanged. If visibility is not set and makePublic is set,
+   *   makePublic takes effect. If makePublic and visibility are set, they must not be conflicting.
+   *   If neither is set, the fragment visibility will remain unchanged.
    * @returns The updated fragment
    */
   async updateFragment(
@@ -1387,7 +1279,7 @@ export class AppClient {
     name: string,
     config: Struct,
     makePublic?: boolean,
-    visibility?: FragmentVisibility
+    visibility?: FragmentVisibility,
   ): Promise<Fragment | undefined> {
     const resp = await this.client.updateFragment({
       id,
@@ -1421,26 +1313,23 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const fragments = await appClient.listMachineFragments(
-   *   '<YOUR-MACHINE-ID>'
-   * );
+   * const fragments = await appClient.listMachineFragments('<YOUR-MACHINE-ID>');
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#listmachinefragments).
    *
-   * @param machineId The machine ID used to filter fragments defined in a
-   *   machine's parts. Also returns any fragments nested within the fragments
-   *   defined in parts.
-   * @param additionalFragmentIds Additional fragment IDs to append to the
-   *   response. Useful when needing to view fragments that will be
-   *   provisionally added to the machine alongside existing fragments.
-   * @returns The list of top level and nested fragments for a machine, as well
-   *   as additionally specified fragment IDs.
+   * @param machineId The machine ID used to filter fragments defined in a machine's parts. Also
+   *   returns any fragments nested within the fragments defined in parts.
+   * @param additionalFragmentIds Additional fragment IDs to append to the response. Useful when
+   *   needing to view fragments that will be provisionally added to the machine alongside existing
+   *   fragments.
+   * @returns The list of top level and nested fragments for a machine, as well as additionally
+   *   specified fragment IDs.
    */
   async listMachineFragments(
     machineId: string,
-    additionalFragmentIds?: string[]
+    additionalFragmentIds?: string[],
   ): Promise<Fragment[]> {
     const resp = await this.client.listMachineFragments({
       machineId,
@@ -1460,19 +1349,17 @@ export class AppClient {
    *   '<YOUR-USER-ID>',
    *   'owner',
    *   'robot',
-   *   '<YOUR-ROBOT-ID>'
+   *   '<YOUR-ROBOT-ID>',
    * );
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#addrole).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#addrole).
    *
    * @param organizationId The ID of the organization to create the role under
-   * @param entityId The ID of the entity the role belongs to (for example a
-   *   user ID)
+   * @param entityId The ID of the entity the role belongs to (for example a user ID)
    * @param role The role to add ("owner" or "operator")
-   * @param resourceType The type of resource to create the role for ("robot",
-   *   "location", or "organization")
+   * @param resourceType The type of resource to create the role for ("robot", "location", or
+   *   "organization")
    * @param resourceId The ID of the resource the role is being created for
    */
   async addRole(
@@ -1480,17 +1367,10 @@ export class AppClient {
     entityId: string,
     role: string,
     resourceType: string,
-    resourceId: string
+    resourceId: string,
   ) {
     await this.client.addRole({
-      authorization: createAuth(
-        organizationId,
-        entityId,
-        role,
-        resourceType,
-        '',
-        resourceId
-      ),
+      authorization: createAuth(organizationId, entityId, role, resourceType, '', resourceId),
     });
   }
 
@@ -1505,7 +1385,7 @@ export class AppClient {
    *   '<YOUR-USER-ID>',
    *   'owner',
    *   'robot',
-   *   '<YOUR-ROBOT-ID>'
+   *   '<YOUR-ROBOT-ID>',
    * );
    * ```
    *
@@ -1513,11 +1393,10 @@ export class AppClient {
    * API](https://docs.viam.com/dev/reference/apis/fleet/#removerole).
    *
    * @param organizationId The ID of the organization to remove the role from
-   * @param entityId The ID of the entity the role belongs to (for example a
-   *   user ID)
+   * @param entityId The ID of the entity the role belongs to (for example a user ID)
    * @param role The role to remove ("owner" or "operator")
-   * @param resourceType The type of resource to remove the role from ("robot",
-   *   "location", or "organization")
+   * @param resourceType The type of resource to remove the role from ("robot", "location", or
+   *   "organization")
    * @param resourceId The ID of the resource the role is being removes from
    */
   async removeRole(
@@ -1525,17 +1404,10 @@ export class AppClient {
     entityId: string,
     role: string,
     resourceType: string,
-    resourceId: string
+    resourceId: string,
   ) {
     await this.client.removeRole({
-      authorization: createAuth(
-        organizationId,
-        entityId,
-        role,
-        resourceType,
-        '',
-        resourceId
-      ),
+      authorization: createAuth(organizationId, entityId, role, resourceType, '', resourceId),
     });
   }
 
@@ -1574,10 +1446,7 @@ export class AppClient {
    * @param oldAuthorization The existing authorization
    * @param newAuthorization The new authorization to change to
    */
-  async changeRole(
-    oldAuthorization: Authorization,
-    newAuthorization: Authorization
-  ) {
+  async changeRole(oldAuthorization: Authorization, newAuthorization: Authorization) {
     await this.client.changeRole({ oldAuthorization, newAuthorization });
   }
 
@@ -1588,13 +1457,13 @@ export class AppClient {
    * API](https://docs.viam.com/dev/reference/apis/fleet/#listauthorizations).
    *
    * @param organizationId The ID of the organization to list authorizations for
-   * @param resourceIds Optional list of IDs of resources to list authorizations
-   *   for. If not provided, all resources will be included
+   * @param resourceIds Optional list of IDs of resources to list authorizations for. If not
+   *   provided, all resources will be included
    * @returns The list of authorizations
    */
   async listAuthorizations(
     organizationId: string,
-    resourceIds?: string[]
+    resourceIds?: string[],
   ): Promise<Authorization[]> {
     const resp = await this.client.listAuthorizations({
       organizationId,
@@ -1612,9 +1481,7 @@ export class AppClient {
    * @param permissions A list of permissions to check
    * @returns A filtered list of the authorized permissions
    */
-  async checkPermissions(
-    permissions: AuthorizedPermissions[]
-  ): Promise<AuthorizedPermissions[]> {
+  async checkPermissions(permissions: AuthorizedPermissions[]): Promise<AuthorizedPermissions[]> {
     const resp = await this.client.checkPermissions({ permissions });
     return resp.authorizedPermissions;
   }
@@ -1625,9 +1492,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const registryItem = await appClient.getRegistryItem(
-   *   '<YOUR-REGISTRY-ITEM-ID>'
-   * );
+   * const registryItem = await appClient.getRegistryItem('<YOUR-REGISTRY-ITEM-ID>');
    * ```
    *
    * For more information, see [App
@@ -1647,26 +1512,17 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.createRegistryItem(
-   *   '<YOUR-ORGANIZATION-ID>',
-   *   'newRegistryItemName',
-   *   5
-   * );
+   * await appClient.createRegistryItem('<YOUR-ORGANIZATION-ID>', 'newRegistryItemName', 5);
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#createregistryitem).
    *
-   * @param organizationId The ID of the organization to create the registry
-   *   item under
+   * @param organizationId The ID of the organization to create the registry item under
    * @param name The name of the registry item
    * @param type The type of the item in the registry.
    */
-  async createRegistryItem(
-    organizationId: string,
-    name: string,
-    type: PackageType
-  ) {
+  async createRegistryItem(organizationId: string, name: string, type: PackageType) {
     await this.client.createRegistryItem({
       organizationId,
       name,
@@ -1684,7 +1540,7 @@ export class AppClient {
    *   '<YOUR-REGISTRY-ITEM-ID>',
    *   5, // Package: ML Model
    *   'new description',
-   *   1 // Private
+   *   1, // Private
    * );
    * ```
    *
@@ -1700,7 +1556,7 @@ export class AppClient {
     itemId: string,
     type: PackageType,
     description: string,
-    visibility: Visibility
+    visibility: Visibility,
   ) {
     await this.client.updateRegistryItem({
       itemId,
@@ -1721,25 +1577,21 @@ export class AppClient {
    *   [], // All package types
    *   [1], // Private packages
    *   [],
-   *   [1] // Active packages
+   *   [1], // Active packages
    * );
    * ```
    *
    * For more information, see [App
    * API](https://docs.viam.com/dev/reference/apis/fleet/#listregistryitems).
    *
-   * @param organizationId The ID of the organization to query registry items
-   *   for
+   * @param organizationId The ID of the organization to query registry items for
    * @param types A list of types to query. If empty, will not filter on type
-   * @param visibilities A list of visibilities to query for. If empty, will not
-   *   filter on visibility
-   * @param platforms A list of platforms to query for. If empty, will not
-   *   filter on platform
-   * @param statuses A list of statuses to query for. If empty, will not filter
-   *   on status
+   * @param visibilities A list of visibilities to query for. If empty, will not filter on
+   *   visibility
+   * @param platforms A list of platforms to query for. If empty, will not filter on platform
+   * @param statuses A list of statuses to query for. If empty, will not filter on status
    * @param searchTerm Optional search term to filter on
-   * @param pageToken Optional page token for results. If not provided, will
-   *   return all results
+   * @param pageToken Optional page token for results. If not provided, will return all results
    * @returns The list of registry items
    */
   async listRegistryItems(
@@ -1749,7 +1601,7 @@ export class AppClient {
     platforms: string[],
     statuses: RegistryItemStatus[],
     searchTerm?: string,
-    pageToken?: string
+    pageToken?: string,
   ): Promise<RegistryItem[]> {
     const req = {
       organizationId,
@@ -1790,10 +1642,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const module = await appClient.createModule(
-   *   '<YOUR-ORGANIZATION-ID>',
-   *   'newModule'
-   * );
+   * const module = await appClient.createModule('<YOUR-ORGANIZATION-ID>', 'newModule');
    * ```
    *
    * For more information, see [App
@@ -1803,10 +1652,7 @@ export class AppClient {
    * @param name The name of the module
    * @returns The module ID and a URL to its detail page
    */
-  async createModule(
-    organizationId: string,
-    name: string
-  ): Promise<CreateModuleResponse> {
+  async createModule(organizationId: string, name: string): Promise<CreateModuleResponse> {
     return this.client.createModule({
       organizationId,
       name,
@@ -1825,7 +1671,7 @@ export class AppClient {
    *   'https://example.com',
    *   'new description',
    *   [{ model: 'namespace:group:model1', api: 'rdk:component:generic' }],
-   *   'entrypoint'
+   *   'entrypoint',
    * );
    * ```
    *
@@ -1846,7 +1692,7 @@ export class AppClient {
     url: string,
     description: string,
     models: Model[],
-    entrypoint: string
+    entrypoint: string,
   ): Promise<string> {
     const resp = await this.client.updateModule({
       moduleId,
@@ -1868,8 +1714,7 @@ export class AppClient {
    * const module = await appClient.getModule('<YOUR-MODULE-ID>');
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#getmodule).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#getmodule).
    *
    * @param moduleId The ID of the module
    * @returns The requested module
@@ -1902,18 +1747,13 @@ export class AppClient {
   /**
    * Creates a new API key.
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#createkey).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#createkey).
    *
    * @param authorizations The list of authorizations to provide for the API key
-   * @param name An optional name for the key. If none is passed, defaults to
-   *   present timestamp
+   * @param name An optional name for the key. If none is passed, defaults to present timestamp
    * @returns The new key and ID
    */
-  async createKey(
-    authorizations: Authorization[],
-    name?: string
-  ): Promise<CreateKeyResponse> {
+  async createKey(authorizations: Authorization[], name?: string): Promise<CreateKeyResponse> {
     return this.client.createKey({ name, authorizations });
   }
 
@@ -1926,8 +1766,7 @@ export class AppClient {
    * await appClient.deleteKey('<YOUR-KEY-ID>');
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#deletekey).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#deletekey).
    *
    * @param id The ID of the key to delete
    */
@@ -1944,8 +1783,7 @@ export class AppClient {
    * const keys = await appClient.listKeys('<YOUR-ORGANIZATION-ID>');
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#listkeys).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#listkeys).
    *
    * @param orgId The ID of the organization to query
    * @returns The list of API keys
@@ -1964,8 +1802,7 @@ export class AppClient {
    * const key = await appClient.rotateKey('<YOUR-KEY-ID>');
    * ```
    *
-   * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#rotatekey).
+   * For more information, see [App API](https://docs.viam.com/dev/reference/apis/fleet/#rotatekey).
    *
    * @param id The ID of the key to rotate
    * @returns The updated key and ID
@@ -1980,10 +1817,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const key =
-   *   await appClient.createKeyFromExistingKeyAuthorizations(
-   *     '<YOUR-KEY-ID>'
-   *   );
+   * const key = await appClient.createKeyFromExistingKeyAuthorizations('<YOUR-KEY-ID>');
    * ```
    *
    * For more information, see [App
@@ -1993,7 +1827,7 @@ export class AppClient {
    * @returns The new key and ID
    */
   async createKeyFromExistingKeyAuthorizations(
-    id: string
+    id: string,
   ): Promise<CreateKeyFromExistingKeyAuthorizationsResponse> {
     return this.client.createKeyFromExistingKeyAuthorizations({ id });
   }
@@ -2006,7 +1840,7 @@ export class AppClient {
    * ```ts
    * const appContent = await appClient.getAppContent(
    *   '<YOUR-PUBLIC-NAMESPACE>',
-   *   '<YOUR-APP-NAME>'
+   *   '<YOUR-APP-NAME>',
    * );
    * ```
    *
@@ -2017,10 +1851,7 @@ export class AppClient {
    * @param name The name of the app
    * @returns The blob path and entrypoint of the app content
    */
-  async getAppContent(
-    publicNamespace: string,
-    name: string
-  ): Promise<GetAppContentResponse> {
+  async getAppContent(publicNamespace: string, name: string): Promise<GetAppContentResponse> {
     return this.client.getAppContent({ publicNamespace, name });
   }
 
@@ -2030,9 +1861,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const metadata = await appClient.getOrganizationMetadata(
-   *   '<YOUR-ORGANIZATION-ID>'
-   * );
+   * const metadata = await appClient.getOrganizationMetadata('<YOUR-ORGANIZATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -2041,9 +1870,7 @@ export class AppClient {
    * @param id The ID of the organization
    * @returns The metadata associated with the organization
    */
-  async getOrganizationMetadata(
-    id: string
-  ): Promise<Record<string, JsonValue>> {
+  async getOrganizationMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getOrganizationMetadata({
       organizationId: id,
     });
@@ -2070,10 +1897,7 @@ export class AppClient {
    * @param id The ID of the organization
    * @param data The metadata to update
    */
-  async updateOrganizationMetadata(
-    id: string,
-    data: Record<string, JsonValue>
-  ): Promise<void> {
+  async updateOrganizationMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateOrganizationMetadata({
       organizationId: id,
       data: Struct.fromJson(data),
@@ -2086,9 +1910,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const metadata = await appClient.getLocationMetadata(
-   *   '<YOUR-LOCATION-ID>'
-   * );
+   * const metadata = await appClient.getLocationMetadata('<YOUR-LOCATION-ID>');
    * ```
    *
    * For more information, see [App
@@ -2122,10 +1944,7 @@ export class AppClient {
    * @param id The ID of the location
    * @param data The metadata to update
    */
-  async updateLocationMetadata(
-    id: string,
-    data: Record<string, JsonValue>
-  ): Promise<void> {
+  async updateLocationMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateLocationMetadata({
       locationId: id,
       data: Struct.fromJson(data),
@@ -2172,10 +1991,7 @@ export class AppClient {
    * @param id The ID of the robot
    * @param data The metadata to update
    */
-  async updateRobotMetadata(
-    id: string,
-    data: Record<string, JsonValue>
-  ): Promise<void> {
+  async updateRobotMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateRobotMetadata({ id, data: Struct.fromJson(data) });
   }
 
@@ -2185,9 +2001,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * const metadata = await appClient.getRobotPartMetadata(
-   *   '<YOUR-ROBOT-PART-ID>'
-   * );
+   * const metadata = await appClient.getRobotPartMetadata('<YOUR-ROBOT-PART-ID>');
    * ```
    *
    * For more information, see [App
@@ -2221,10 +2035,7 @@ export class AppClient {
    * @param id The ID of the robot part
    * @param data The metadata to update
    */
-  async updateRobotPartMetadata(
-    id: string,
-    data: Record<string, JsonValue>
-  ): Promise<void> {
+  async updateRobotPartMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateRobotPartMetadata({
       id,
       data: Struct.fromJson(data),
@@ -2239,7 +2050,7 @@ export class AppClient {
    * ```ts
    * const branding = await appClient.getAppBranding(
    *   '<YOUR-PUBLIC-NAMESPACE>',
-   *   '<YOUR-APP-NAME>'
+   *   '<YOUR-APP-NAME>',
    * );
    * ```
    *
@@ -2250,26 +2061,18 @@ export class AppClient {
    * @param name The name of the app
    * @returns The branding information for the app
    */
-  async getAppBranding(
-    publicNamespace: string,
-    name: string
-  ): Promise<GetAppBrandingResponse> {
+  async getAppBranding(publicNamespace: string, name: string): Promise<GetAppBrandingResponse> {
     return this.client.getAppBranding({ publicNamespace, name });
   }
 
   /**
-   * Lists machine summaries for an organization, optionally filtered by
-   * fragment IDs, location IDs, and limit.
+   * Lists machine summaries for an organization, optionally filtered by fragment IDs, location IDs,
+   * and limit.
    *
    * @example
    *
    * ```ts
-   * const summaries = await appClient.listMachineSummaries(
-   *   'orgId',
-   *   ['frag1'],
-   *   ['loc1'],
-   *   10
-   * );
+   * const summaries = await appClient.listMachineSummaries('orgId', ['frag1'], ['loc1'], 10);
    * ```
    *
    * @param organizationId The ID of the organization
@@ -2282,7 +2085,7 @@ export class AppClient {
     organizationId: string,
     fragmentIds?: string[],
     locationIds?: string[],
-    limit?: number
+    limit?: number,
   ): Promise<LocationSummary[]> {
     const req: ListMachineSummariesRequest = new ListMachineSummariesRequest({
       organizationId,
@@ -2306,7 +2109,7 @@ export class AppClient {
    *   'user@example.com',
    *   'First',
    *   'Last',
-   *   'password'
+   *   'password',
    * );
    * ```
    *
@@ -2324,7 +2127,7 @@ export class AppClient {
     email: string,
     firstName: string,
     lastName: string,
-    password: string
+    password: string,
   ): Promise<CreateOAuthAppUserResponse> {
     return this.client.createOAuthAppUser({
       orgId,

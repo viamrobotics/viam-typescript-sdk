@@ -47,7 +47,7 @@ export class BaseClient implements Base {
     distanceMm: number,
     mmPerSec: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new MoveStraightRequest({
       name: this.name,
@@ -61,12 +61,7 @@ export class BaseClient implements Base {
     await this.client.moveStraight(request, callOptions);
   }
 
-  async spin(
-    angleDeg: number,
-    degsPerSec: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async spin(angleDeg: number, degsPerSec: number, extra = {}, callOptions = this.callOptions) {
     const request = new SpinRequest({
       name: this.name,
       angleDeg,
@@ -79,12 +74,7 @@ export class BaseClient implements Base {
     await this.client.spin(request, callOptions);
   }
 
-  async setPower(
-    linear: Vector3,
-    angular: Vector3,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async setPower(linear: Vector3, angular: Vector3, extra = {}, callOptions = this.callOptions) {
     const request = new SetPowerRequest({
       name: this.name,
       linear,
@@ -97,12 +87,7 @@ export class BaseClient implements Base {
     await this.client.setPower(request, callOptions);
   }
 
-  async setVelocity(
-    linear: Vector3,
-    angular: Vector3,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async setVelocity(linear: Vector3, angular: Vector3, extra = {}, callOptions = this.callOptions) {
     const request = new SetVelocityRequest({
       name: this.name,
       linear,
@@ -138,24 +123,19 @@ export class BaseClient implements Base {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 

@@ -52,13 +52,13 @@ export interface Camera extends Resource {
    * const images = await camera.getImages();
    * ```
    *
-   * @param filterSourceNames - A list of source names to filter the images by.
-   *   If empty or undefined, all images will be returned.
+   * @param filterSourceNames - A list of source names to filter the images by. If empty or
+   *   undefined, all images will be returned.
    * @param extra - Extra parameters to pass to the camera.
    */
   getImages: (
     filterSourceNames?: string[],
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<{ images: NamedImage[]; metadata: ResponseMetadata }>;
 
   /**

@@ -20,10 +20,7 @@ export const getEnv = (): BuildEnvironment => {
     isDev: import.meta.env.DEV,
   } as BuildEnvironment;
 
-  if (
-    import.meta.env.VITE_APP_API_KEY_ID &&
-    import.meta.env.VITE_APP_API_KEY_SECRET
-  ) {
+  if (import.meta.env.VITE_APP_API_KEY_ID && import.meta.env.VITE_APP_API_KEY_SECRET) {
     buildEnv.auth = {
       case: 'api_key',
       apiKeyId: import.meta.env.VITE_APP_API_KEY_ID,
