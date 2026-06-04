@@ -1,6 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
+import { type MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
 import { DataManagerService } from '../../gen/service/datamanager/v1/data_manager_connect.js';
 import {
   SyncRequest,
@@ -29,10 +29,7 @@ export class DataManagerClient implements DataManager {
    * @example
    *
    * ```ts
-   * const dataManager = new VIAM.DataManagerClient(
-   *   machine,
-   *   'my_data_manager'
-   * );
+   * const dataManager = new VIAM.DataManagerClient(machine, 'my_data_manager');
    * await dataManager.sync();
    * ```
    *
@@ -59,10 +56,7 @@ export class DataManagerClient implements DataManager {
    * @example
    *
    * ```ts
-   * const dataManager = new VIAM.DataManagerClient(
-   *   machine,
-   *   'my_data_manager'
-   * );
+   * const dataManager = new VIAM.DataManagerClient(machine, 'my_data_manager');
    * await dataManager.doCommand(new Struct({ cmd: 'test', data1: 500 }));
    * ```
    *
@@ -73,24 +67,19 @@ export class DataManagerClient implements DataManager {
    * @param callOptions - Call options for the command.
    */
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 
@@ -100,15 +89,12 @@ export class DataManagerClient implements DataManager {
    * @example
    *
    * ```ts
-   * const dataManager = new VIAM.DataManagerClient(
-   *   machine,
-   *   'my_data_manager'
-   * );
+   * const dataManager = new VIAM.DataManagerClient(machine, 'my_data_manager');
    * await dataManager.uploadBinaryDataToDatasets(
    *   new Uint8Array([1, 2, 3]),
    *   ['tag1', 'tag2'],
    *   ['datasetId1', 'datasetId2'],
-   *   MimeType.MIME_TYPE_JPEG
+   *   MimeType.MIME_TYPE_JPEG,
    * );
    * ```
    *
@@ -125,7 +111,7 @@ export class DataManagerClient implements DataManager {
     datasetIds: string[],
     mimeType: MimeType,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new UploadBinaryDataToDatasetsRequest({
       name: this.name,

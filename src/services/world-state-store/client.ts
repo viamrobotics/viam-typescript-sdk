@@ -10,11 +10,7 @@ import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { WorldStateStore } from './world-state-store';
-import {
-  transformWithUUID,
-  uuidFromString,
-  uuidToString,
-} from './world-state-store';
+import { transformWithUUID, uuidFromString, uuidToString } from './world-state-store';
 import type { TransformChangeEvent } from './types';
 
 /**
@@ -65,7 +61,7 @@ export class WorldStateStoreClient implements WorldStateStore {
 
   async *streamTransformChanges(
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): AsyncGenerator<TransformChangeEvent, void> {
     const request = new StreamTransformChangesRequest({
       name: this.name,
@@ -90,24 +86,19 @@ export class WorldStateStoreClient implements WorldStateStore {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

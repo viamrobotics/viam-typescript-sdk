@@ -18,7 +18,7 @@ import {
  */
 export const getRobotClient = async (
   hostname: string,
-  credentials: Credential | AccessToken
+  credentials: Credential | AccessToken,
 ): Promise<RobotClient> => {
   return createRobotClient({
     host: hostname,
@@ -34,9 +34,7 @@ export const getRobotClient = async (
  * @param credentials To connect to app.viam.com
  * @returns A viam client
  */
-export const getViamClient = async (
-  credentials: Credentials
-): Promise<ViamClient> => {
+export const getViamClient = async (credentials: Credentials): Promise<ViamClient> => {
   return createViamClient({
     credentials,
   });

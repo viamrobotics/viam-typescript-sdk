@@ -1,4 +1,4 @@
-/* eslint-disable no-console, no-await-in-loop */
+/* eslint-disable no-console */
 import { spawn, type ChildProcess } from 'node:child_process';
 import path from 'node:path';
 import url from 'node:url';
@@ -12,11 +12,7 @@ const VIAM_SERVER_PORT = 9090;
 const VIAM_SERVER_HOST = 'localhost';
 const VIAM_SERVER_FQDN = 'e2e-ts-sdk';
 
-const waitForServer = async (
-  host: string,
-  port: number,
-  maxAttempts = 30
-): Promise<void> => {
+const waitForServer = async (host: string, port: number, maxAttempts = 30): Promise<void> => {
   for (let i = 0; i < maxAttempts; i += 1) {
     try {
       const response = await fetch(`http://${host}:${port}/`);
@@ -39,7 +35,7 @@ export const setup = async (): Promise<() => Promise<void>> => {
   const binaryPath = path.resolve(dirname, '../bin/viam-server');
   if (!fs.existsSync(binaryPath)) {
     throw new Error(
-      `viam-server binary not found at ${binaryPath}. Run 'cd e2e && ./setup.sh' to download it.`
+      `viam-server binary not found at ${binaryPath}. Run 'cd e2e && ./setup.sh' to download it.`,
     );
   }
 

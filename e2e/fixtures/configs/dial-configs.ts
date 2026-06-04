@@ -14,7 +14,6 @@ export const defaultConfig: DialConf = {
 
 export const invalidConfig: DialConf = {
   host: DEFAULT_HOST,
-  // eslint-disable-next-line sonarjs/no-clear-text-protocols
   serviceHost: 'http://invalid-host:9999',
   signalingAddress: DEFAULT_SIGNALING_ADDRESS,
   iceServers: DEFAULT_ICE_SERVERS,
@@ -27,7 +26,6 @@ export const defaultNodeConfig: DialConf = {
 } as const;
 
 export const invalidNodeConfig: DialConf = {
-  // eslint-disable-next-line sonarjs/no-clear-text-protocols
   host: 'http://invalid-host:9999',
   noReconnect: true,
 } as const;

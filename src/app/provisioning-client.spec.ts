@@ -9,9 +9,9 @@ import {
   GetNetworkListResponse,
   GetSmartMachineStatusResponse,
   NetworkInfo,
-  SetNetworkCredentialsRequest,
+  type SetNetworkCredentialsRequest,
   SetNetworkCredentialsResponse,
-  SetSmartMachineCredentialsRequest,
+  type SetSmartMachineCredentialsRequest,
   SetSmartMachineCredentialsResponse,
 } from '../gen/provisioning/v1/provisioning_pb';
 import { ProvisioningClient } from './provisioning-client';
@@ -78,30 +78,24 @@ describe('ProvisioningClient tests', () => {
   });
 
   it('getSmartMachineStatus', async () => {
-    await expect(subject().getSmartMachineStatus()).resolves.toStrictEqual(
-      testSmartMachineStatus
-    );
+    await expect(subject().getSmartMachineStatus()).resolves.toStrictEqual(testSmartMachineStatus);
   });
 
   it('getNetworkList', async () => {
-    await expect(subject().getNetworkList()).resolves.toStrictEqual([
-      testNetworkInfo,
-    ]);
+    await expect(subject().getNetworkList()).resolves.toStrictEqual([testNetworkInfo]);
   });
 
   it('setNetworkCredentials', async () => {
-    await expect(
-      subject().setNetworkCredentials(type, ssid, psk)
-    ).resolves.toStrictEqual(undefined);
+    await expect(subject().setNetworkCredentials(type, ssid, psk)).resolves.toStrictEqual(
+      undefined,
+    );
     expect(setNetworkCredentialsReq.type).toStrictEqual(type);
     expect(setNetworkCredentialsReq.ssid).toStrictEqual(ssid);
     expect(setNetworkCredentialsReq.psk).toStrictEqual(psk);
   });
 
   it('setSmartMachineCredentials', async () => {
-    await expect(
-      subject().setSmartMachineCredentials(cloud)
-    ).resolves.toStrictEqual(undefined);
+    await expect(subject().setSmartMachineCredentials(cloud)).resolves.toStrictEqual(undefined);
     expect(setSmartMachineCredentialsReq.cloud).toStrictEqual(cloud);
   });
 });

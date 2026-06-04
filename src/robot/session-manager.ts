@@ -1,28 +1,15 @@
-/* eslint-disable max-depth */
-import {
-  BinaryReader,
-  FileDescriptorProto,
-  MethodOptions,
-} from '@bufbuild/protobuf';
-import {
-  Code,
-  ConnectError,
-  createClient,
-  type Transport,
-} from '@connectrpc/connect';
+import { BinaryReader, FileDescriptorProto, type MethodOptions } from '@bufbuild/protobuf';
+import { Code, ConnectError, createClient, type Transport } from '@connectrpc/connect';
 import { createAsyncIterable } from '@connectrpc/connect/protocol';
 import { safety_heartbeat_monitored as safteyHeartbeatMonitored } from '../gen/common/v1/common_pb';
 import { ServerReflection } from '../gen/grpc/reflection/v1/reflection_connect';
 import {
-  FileDescriptorResponse,
-  ListServiceResponse,
+  type FileDescriptorResponse,
+  type ListServiceResponse,
   ServerReflectionRequest,
 } from '../gen/grpc/reflection/v1/reflection_pb';
 import { RobotService } from '../gen/robot/v1/robot_connect';
-import {
-  SendSessionHeartbeatRequest,
-  StartSessionRequest,
-} from '../gen/robot/v1/robot_pb';
+import { SendSessionHeartbeatRequest, StartSessionRequest } from '../gen/robot/v1/robot_pb';
 import { ConnectionClosedError } from '../rpc';
 import SessionTransport from './session-transport';
 
@@ -32,11 +19,10 @@ const timeoutBlob = new Blob(
   setTimeout(() => self.postMessage(""), e.data);
 };`,
   ],
-  { type: 'text/javascript' }
+  { type: 'text/javascript' },
 );
 
 export default class SessionManager {
-  // eslint-disable-next-line sonarjs/public-static-readonly
   public static heartbeatMonitoredMethods: Record<string, boolean> = {};
 
   public readonly transport: Transport;
@@ -55,7 +41,7 @@ export default class SessionManager {
 
   constructor(
     host: string | undefined,
-    private deferredTransport: () => Transport
+    private deferredTransport: () => Transport,
   ) {
     this.host = host ?? '';
     this.transport = new SessionTransport(this.deferredTransport, this);
@@ -92,7 +78,6 @@ export default class SessionManager {
       return;
     }
     while (this.starting) {
-      // eslint-disable-next-line no-await-in-loop
       await this.starting;
     }
 
@@ -104,10 +89,7 @@ export default class SessionManager {
       try {
         await this.client.sendSessionHeartbeat(sendHeartbeatReq);
       } catch (error) {
-        if (
-          error instanceof ConnectError &&
-          error.code === Code.Unimplemented
-        ) {
+        if (error instanceof ConnectError && error.code === Code.Unimplemented) {
           console.error('sessions unsupported; will not try again'); // eslint-disable-line no-console
           this.sessionsSupported = false;
           return;
@@ -117,8 +99,8 @@ export default class SessionManager {
           (error instanceof ConnectError && error.rawMessage === 'closed')
         ) {
           /**
-           * We assume the connection closing will cause getSessionMetadata to
-           * be called again by way of a reset.
+           * We assume the connection closing will cause getSessionMetadata to be called again by
+           * way of a reset.
            */
           this.reset();
           return;
@@ -137,7 +119,7 @@ export default class SessionManager {
      * This lint is correct but it makes our lives easier to refer to a boolean in
      * case in the future we make this toggleable (e.g. foreground).
      */
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.backgroundHeartbeat && globalThis.Worker !== undefined) {
       const url = globalThis.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
@@ -152,7 +134,6 @@ export default class SessionManager {
 
   public async getSessionMetadata(): Promise<Headers> {
     while (this.starting) {
-      // eslint-disable-next-line no-await-in-loop
       await this.starting;
     }
     if (this.sessionsSupported !== undefined) {
@@ -170,10 +151,7 @@ export default class SessionManager {
         try {
           resp = await this.client.startSession(startSessionReq);
         } catch (error) {
-          if (
-            error instanceof ConnectError &&
-            error.code === Code.Unimplemented
-          ) {
+          if (error instanceof ConnectError && error.code === Code.Unimplemented) {
             console.error('sessions unsupported; will not try again'); // eslint-disable-line no-console
             this.sessionsSupported = false;
             return;
@@ -183,16 +161,12 @@ export default class SessionManager {
 
         const { heartbeatWindow } = resp;
         if (!heartbeatWindow) {
-          throw new Error(
-            'expected heartbeat window in response to start session'
-          );
+          throw new Error('expected heartbeat window in response to start session');
         }
         this.sessionsSupported = true;
         this.currentSessionID = resp.id;
         this.heartbeatIntervalMs =
-          (Number(heartbeatWindow.seconds) * 1e3 +
-            heartbeatWindow.nanos / 1e6) /
-          5;
+          (Number(heartbeatWindow.seconds) * 1e3 + heartbeatWindow.nanos / 1e6) / 5;
         await this.applyHeartbeatMonitoredMethods();
         resolve();
         this.heartbeat().catch(console.error); // eslint-disable-line no-console
@@ -215,10 +189,9 @@ export default class SessionManager {
         host: this.host,
         messageRequest: { case: 'listServices', value: '' },
       });
-      const responseStream = client.serverReflectionInfo(
-        createAsyncIterable([request]),
-        { timeoutMs: 10_000 }
-      );
+      const responseStream = client.serverReflectionInfo(createAsyncIterable([request]), {
+        timeoutMs: 10_000,
+      });
       for await (const serviceResponse of responseStream) {
         const fdpRequests = (
           serviceResponse.messageResponse.value as ListServiceResponse
@@ -230,14 +203,12 @@ export default class SessionManager {
             },
           });
         });
-        const fdpResponseStream = client.serverReflectionInfo(
-          createAsyncIterable(fdpRequests),
-          { timeoutMs: 10_000 }
-        );
+        const fdpResponseStream = client.serverReflectionInfo(createAsyncIterable(fdpRequests), {
+          timeoutMs: 10_000,
+        });
         for await (const fdpResponse of fdpResponseStream) {
-          for (const fdp of (
-            fdpResponse.messageResponse.value as FileDescriptorResponse
-          ).fileDescriptorProto) {
+          for (const fdp of (fdpResponse.messageResponse.value as FileDescriptorResponse)
+            .fileDescriptorProto) {
             const protoFile = FileDescriptorProto.fromBinary(fdp);
             for (const service of protoFile.service) {
               for (const method of service.method) {

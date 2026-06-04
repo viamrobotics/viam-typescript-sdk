@@ -1,4 +1,4 @@
-import { Struct, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';
+import { type Struct, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';
 
 export { Code, ConnectError } from '@connectrpc/connect';
 export { ConnectionClosedError } from './rpc';
@@ -25,13 +25,11 @@ export interface Resource {
    * // Struct (still supported)
    * import { Struct } from '@viamrobotics/sdk';
    *
-   * const result = await resource.doCommand(
-   *   Struct.fromJson({ myCommand: { key: 'value' } })
-   * );
+   * const result = await resource.doCommand(Struct.fromJson({ myCommand: { key: 'value' } }));
    * ```
    *
-   * @param command - The command to execute. Accepts either a {@link Struct} or
-   *   a plain object, which will be converted automatically.
+   * @param command - The command to execute. Accepts either a {@link Struct} or a plain object,
+   *   which will be converted automatically.
    */
   doCommand(command: Struct | Record<string, JsonValue>): Promise<JsonValue>;
 
@@ -86,10 +84,4 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export {
-  Duration,
-  Struct,
-  Timestamp,
-  type JsonValue,
-  type PlainMessage,
-} from '@bufbuild/protobuf';
+export { Duration, Struct, Timestamp, type JsonValue, type PlainMessage } from '@bufbuild/protobuf';

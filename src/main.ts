@@ -22,11 +22,7 @@ export {
  */
 export * as robotApi from './gen/robot/v1/robot_pb';
 
-export {
-  createViamClient,
-  type ViamClient,
-  type ViamClientOptions,
-} from './app/viam-client';
+export { createViamClient, type ViamClient, type ViamClientOptions } from './app/viam-client';
 
 export {
   type AccessToken,
@@ -70,11 +66,7 @@ export { type AppClient } from './app/app-client';
 export * as appApi from './gen/app/v1/app_pb';
 export * as appRobotApi from './gen/app/v1/robot_pb';
 
-export {
-  ModelType,
-  TrainingStatus,
-  type MlTrainingClient,
-} from './app/ml-training-client';
+export { ModelType, TrainingStatus, type MlTrainingClient } from './app/ml-training-client';
 /**
  * Raw Protobuf interfaces for ML Training.
  *
@@ -85,10 +77,7 @@ export {
  */
 export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
 
-export {
-  CloudConfig,
-  type ProvisioningClient,
-} from './app/provisioning-client';
+export { CloudConfig, type ProvisioningClient } from './app/provisioning-client';
 /**
  * Raw Protobuf interfaces for Provisioning.
  *
@@ -111,17 +100,9 @@ export { type BillingClient } from './app/billing-client';
 export * as billingApi from './gen/app/v1/billing_pb';
 
 export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
-export {
-  AudioInClient,
-  type AudioIn,
-  type AudioChunk,
-} from './components/audioin';
+export { AudioInClient, type AudioIn, type AudioChunk } from './components/audioin';
 export { AudioOutClient, type AudioOut } from './components/audioout';
-export {
-  AudioCodec,
-  type AudioCodecType,
-  type AudioProperties,
-} from './audio-common';
+export { AudioCodec, type AudioCodecType, type AudioProperties } from './audio-common';
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
@@ -143,13 +124,7 @@ export { BaseClient, BaseProperties, type Base } from './components/base';
  */
 export * as baseApi from './gen/component/base/v1/base_pb';
 
-export {
-  AnalogValue,
-  BoardClient,
-  PowerMode,
-  type Board,
-  type Tick,
-} from './components/board';
+export { AnalogValue, BoardClient, PowerMode, type Board, type Tick } from './components/board';
 /**
  * Raw Protobuf interfaces for a Board component.
  *
@@ -269,8 +244,8 @@ export * as powerSensorApi from './gen/component/powersensor/v1/powersensor_pb';
 
 export { SensorClient, type Sensor } from './components/sensor';
 /**
- * Raw Protobuf interfaces generated with
- * https://github.com/connectrpc/connect-es for a Sensor component.
+ * Raw Protobuf interfaces generated with https://github.com/connectrpc/connect-es for a Sensor
+ * component.
  *
  * @deprecated Use {@link SensorClient} instead.
  * @group Raw Protobufs
@@ -412,12 +387,7 @@ export { SlamClient, SlamPosition, SlamProperties } from './services/slam';
  */
 export * as slamApi from './gen/service/slam/v1/slam_pb';
 
-export {
-  Classification,
-  Detection,
-  PointCloudObject,
-  VisionClient,
-} from './services/vision';
+export { Classification, Detection, PointCloudObject, VisionClient } from './services/vision';
 /**
  * Raw Protobuf interfaces for a Vision service.
  *
@@ -447,8 +417,7 @@ export {
 export * as genericServiceApi from './gen/service/generic/v1/generic_connect';
 
 /**
- * Raw Protobuf interfaces that are shared across multiple components and
- * services.
+ * Raw Protobuf interfaces that are shared across multiple components and services.
  *
  * Generated with https://github.com/connectrpc/connect-es
  *

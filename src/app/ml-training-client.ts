@@ -1,10 +1,7 @@
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { MLTrainingService } from '../gen/app/mltraining/v1/ml_training_connect';
 
-import {
-  ModelType,
-  TrainingStatus,
-} from '../gen/app/mltraining/v1/ml_training_pb';
+import { type ModelType, type TrainingStatus } from '../gen/app/mltraining/v1/ml_training_pb';
 
 export class MlTrainingClient {
   private client: Client<typeof MLTrainingService>;
@@ -25,7 +22,7 @@ export class MlTrainingClient {
    *   '<your-model-name>',
    *   '1.0.0',
    *   ModelType.SINGLE_LABEL_CLASSIFICATION,
-   *   ['tag1', 'tag2']
+   *   ['tag1', 'tag2'],
    * );
    * ```
    *
@@ -45,7 +42,7 @@ export class MlTrainingClient {
     modelName: string,
     modelVersion: string,
     modelType: ModelType,
-    tags: string[]
+    tags: string[],
   ) {
     const resp = await this.client.submitTrainingJob({
       organizationId,
@@ -70,7 +67,7 @@ export class MlTrainingClient {
    *   'viam:classification-tflite',
    *   '1.0.0',
    *   '<your-model-name>',
-   *   '1.0.0'
+   *   '1.0.0',
    * );
    * ```
    *
@@ -90,7 +87,7 @@ export class MlTrainingClient {
     registryItemId: string,
     registryItemVersion: string,
     modelName: string,
-    modelVersion: string
+    modelVersion: string,
   ) {
     const resp = await this.client.submitCustomTrainingJob({
       organizationId,
@@ -130,7 +127,7 @@ export class MlTrainingClient {
    * ```ts
    * const jobs = await mlTrainingClient.listTrainingJobs(
    *   '<organization-id>',
-   *   TrainingStatus.RUNNING
+   *   TrainingStatus.RUNNING,
    * );
    * ```
    *
@@ -184,7 +181,4 @@ export class MlTrainingClient {
   }
 }
 
-export {
-  ModelType,
-  TrainingStatus,
-} from '../gen/app/mltraining/v1/ml_training_pb';
+export { ModelType, TrainingStatus } from '../gen/app/mltraining/v1/ml_training_pb';

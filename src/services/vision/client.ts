@@ -34,11 +34,7 @@ export class VisionClient implements Vision {
     this.options = options;
   }
 
-  async getDetectionsFromCamera(
-    cameraName: string,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async getDetectionsFromCamera(cameraName: string, extra = {}, callOptions = this.callOptions) {
     const request = new GetDetectionsFromCameraRequest({
       name: this.name,
       cameraName,
@@ -47,10 +43,7 @@ export class VisionClient implements Vision {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getDetectionsFromCamera(
-      request,
-      callOptions
-    );
+    const resp = await this.client.getDetectionsFromCamera(request, callOptions);
     return resp.detections;
   }
 
@@ -60,7 +53,7 @@ export class VisionClient implements Vision {
     height: number,
     mimeType: MimeType,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new GetDetectionsRequest({
       name: this.name,
@@ -81,21 +74,18 @@ export class VisionClient implements Vision {
     cameraName: string,
     count: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new GetClassificationsFromCameraRequest({
       name: this.name,
       cameraName,
-      n: count, // eslint-disable-line id-length
+      n: count,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getClassificationsFromCamera(
-      request,
-      callOptions
-    );
+    const resp = await this.client.getClassificationsFromCamera(request, callOptions);
     return resp.classifications;
   }
 
@@ -106,7 +96,7 @@ export class VisionClient implements Vision {
     mimeType: MimeType,
     count: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new GetClassificationsRequest({
       name: this.name,
@@ -114,7 +104,7 @@ export class VisionClient implements Vision {
       width,
       height,
       mimeType,
-      n: count, // eslint-disable-line id-length
+      n: count,
       extra: Struct.fromJson(extra),
     });
 
@@ -124,11 +114,7 @@ export class VisionClient implements Vision {
     return resp.classifications;
   }
 
-  async getObjectPointClouds(
-    cameraName: string,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async getObjectPointClouds(cameraName: string, extra = {}, callOptions = this.callOptions) {
     const request = new GetObjectPointCloudsRequest({
       name: this.name,
       cameraName,
@@ -166,7 +152,7 @@ export class VisionClient implements Vision {
       returnObjectPointClouds,
     }: CaptureAllOptions,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new CaptureAllFromCameraRequest({
       name: this.name,
@@ -180,10 +166,7 @@ export class VisionClient implements Vision {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.captureAllFromCamera(
-      request,
-      callOptions
-    );
+    const response = await this.client.captureAllFromCamera(request, callOptions);
 
     return {
       image: response.image,
@@ -195,24 +178,19 @@ export class VisionClient implements Vision {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

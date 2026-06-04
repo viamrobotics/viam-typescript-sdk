@@ -44,8 +44,7 @@ describe('WorldStateStoreClient Tests', () => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(WorldStateStoreService, {
         listUUIDs: () => new ListUUIDsResponse({ uuids: mockUuids }),
-        getTransform: () =>
-          new GetTransformResponse({ transform: mockTransform }),
+        getTransform: () => new GetTransformResponse({ transform: mockTransform }),
         streamTransformChanges: async function* mockStream() {
           // Add await to satisfy linter
           await Promise.resolve();
@@ -65,22 +64,15 @@ describe('WorldStateStoreClient Tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createClient(WorldStateStoreService, mockTransport)
-      );
-    worldStateStore = new WorldStateStoreClient(
-      new RobotClient('host'),
-      worldStateStoreClientName
-    );
+      .mockImplementation(() => createClient(WorldStateStoreService, mockTransport));
+    worldStateStore = new WorldStateStoreClient(new RobotClient('host'), worldStateStoreClientName);
   });
 
   describe('listUUIDs', () => {
     it('returns all transform UUIDs', async () => {
       const expected = mockUuids.map((uuid) => uuidToString(uuid));
 
-      await expect(worldStateStore.listUUIDs()).resolves.toStrictEqual(
-        expected
-      );
+      await expect(worldStateStore.listUUIDs()).resolves.toStrictEqual(expected);
     });
   });
 
@@ -125,9 +117,7 @@ describe('WorldStateStoreClient Tests', () => {
       const command = Struct.fromJson({ test: 'value' });
       const expected = { success: true };
 
-      await expect(worldStateStore.doCommand(command)).resolves.toStrictEqual(
-        expected
-      );
+      await expect(worldStateStore.doCommand(command)).resolves.toStrictEqual(expected);
     });
   });
 });

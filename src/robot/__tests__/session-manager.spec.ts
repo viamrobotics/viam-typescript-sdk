@@ -5,10 +5,7 @@ import { ConnectError, createRouterTransport } from '@connectrpc/connect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionClosedError } from '../../rpc';
 import { RobotService } from '../../gen/robot/v1/robot_connect';
-import {
-  SendSessionHeartbeatResponse,
-  StartSessionResponse,
-} from '../../gen/robot/v1/robot_pb';
+import { SendSessionHeartbeatResponse, StartSessionResponse } from '../../gen/robot/v1/robot_pb';
 import SessionManager from '../session-manager';
 
 vi.mock('../gen/robot/v1/robot_pb_service');
@@ -18,10 +15,7 @@ const mockGetHeartBeatWindow = new Duration({
   nanos: 1,
 });
 
-const setupSessionManager = (
-  transport = createRouterTransport(() => ({})),
-  host = ''
-) => {
+const setupSessionManager = (transport = createRouterTransport(() => ({})), host = '') => {
   return new SessionManager(host, () => transport);
 };
 
@@ -46,9 +40,7 @@ describe('SessionManager', () => {
     const expected = new Headers();
 
     // Act & Assert
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sessionManager.sessionID).toBe('');
   });
 
@@ -67,7 +59,7 @@ describe('SessionManager', () => {
 
     // Act & Assert
     await expect(sessionManager.getSessionMetadata()).rejects.toStrictEqual(
-      new Error('expected heartbeat window in response to start session')
+      new Error('expected heartbeat window in response to start session'),
     );
     expect(sessionManager.sessionID).toBe('');
   });
@@ -80,7 +72,7 @@ describe('SessionManager', () => {
       new StartSessionResponse({
         id: expectedSID,
         heartbeatWindow: mockGetHeartBeatWindow,
-      })
+      }),
     );
 
     const transport = createRouterTransport(({ service }) => {
@@ -93,17 +85,13 @@ describe('SessionManager', () => {
 
     // Act
     const expected = new Headers({ 'viam-sid': expectedSID });
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
 
     // Assert
     expect(sessionManager.sessionID).toBe(expectedSID);
 
     // Act - call again to verify session is reused
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
 
     // Assert - session should still be the same
     expect(sessionManager.sessionID).toBe(expectedSID);
@@ -120,13 +108,13 @@ describe('SessionManager', () => {
         new StartSessionResponse({
           id: initialSID,
           heartbeatWindow: mockGetHeartBeatWindow,
-        })
+        }),
       )
       .mockReturnValueOnce(
         new StartSessionResponse({
           id: afterResetSID,
           heartbeatWindow: mockGetHeartBeatWindow,
-        })
+        }),
       );
 
     const transport = createRouterTransport(({ service }) => {
@@ -139,9 +127,7 @@ describe('SessionManager', () => {
 
     // Act - start initial session
     let expected = new Headers({ 'viam-sid': initialSID });
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
 
     // Assert
     expect(sessionManager.sessionID).toBe(initialSID);
@@ -149,9 +135,7 @@ describe('SessionManager', () => {
     // Act - reset and start new session
     sessionManager.reset();
     expected = new Headers({ 'viam-sid': afterResetSID });
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
 
     // Assert
     expect(sessionManager.sessionID).toBe(afterResetSID);
@@ -168,13 +152,13 @@ describe('SessionManager', () => {
         new StartSessionResponse({
           id: initialSID,
           heartbeatWindow: mockGetHeartBeatWindow,
-        })
+        }),
       )
       .mockReturnValueOnce(
         new StartSessionResponse({
           id: afterResetSID,
           heartbeatWindow: mockGetHeartBeatWindow,
-        })
+        }),
       );
 
     const sendHeartbeatMock = vi
@@ -191,14 +175,12 @@ describe('SessionManager', () => {
       });
     });
     const sessionManager = setupSessionManager(transport);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const resetSpy = vi.spyOn(sessionManager, 'reset');
 
     // Act - start initial session
     let expected = new Headers({ 'viam-sid': initialSID });
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
     expect(sessionManager.sessionID).toBe(initialSID);
 
     // Act - advance time to trigger heartbeat that detects disconnection
@@ -209,9 +191,7 @@ describe('SessionManager', () => {
 
     // Act - get session metadata again after reset
     expected = new Headers({ 'viam-sid': afterResetSID });
-    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(
-      expected
-    );
+    await expect(sessionManager.getSessionMetadata()).resolves.toStrictEqual(expected);
 
     // Assert
     expect(sessionManager.sessionID).toBe(afterResetSID);

@@ -2,11 +2,10 @@ import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { BillingService } from '../gen/app/v1/billing_connect';
 import type { GetCurrentMonthUsageResponse as PBGetCurrentMonthUsageResponse } from '../gen/app/v1/billing_pb';
 
-export type GetCurrentMonthUsageResponse =
-  Partial<PBGetCurrentMonthUsageResponse> & {
-    start?: Date;
-    end?: Date;
-  };
+export type GetCurrentMonthUsageResponse = Partial<PBGetCurrentMonthUsageResponse> & {
+  start?: Date;
+  end?: Date;
+};
 
 export class BillingClient {
   private client: Client<typeof BillingService>;
@@ -16,8 +15,7 @@ export class BillingClient {
   }
 
   /**
-   * Get the data usage information for the current month for a given
-   * organization.
+   * Get the data usage information for the current month for a given organization.
    *
    * @example
    *
@@ -31,25 +29,21 @@ export class BillingClient {
    * @param orgId - The organization ID.
    */
   async getCurrentMonthUsage(orgId: string) {
-    const result: GetCurrentMonthUsageResponse =
-      await this.client.getCurrentMonthUsage({
-        orgId,
-      });
+    const result: GetCurrentMonthUsageResponse = await this.client.getCurrentMonthUsage({
+      orgId,
+    });
     result.start = result.startDate?.toDate();
     result.end = result.endDate?.toDate();
     return result;
   }
 
   /**
-   * Get the billing information (payment method, billing tier, etc.) for a
-   * given org.
+   * Get the billing information (payment method, billing tier, etc.) for a given org.
    *
    * @example
    *
    * ```ts
-   * const billingInfo = await billing.getOrgBillingInformation(
-   *   '<organization-id>'
-   * );
+   * const billingInfo = await billing.getOrgBillingInformation('<organization-id>');
    * ```
    *
    * For more information, see [Billing
@@ -69,9 +63,7 @@ export class BillingClient {
    * @example
    *
    * ```ts
-   * const invoicesSummary = await billing.getInvoicesSummary(
-   *   '<organization-id>'
-   * );
+   * const invoicesSummary = await billing.getInvoicesSummary('<organization-id>');
    * ```
    *
    * For more information, see [Billing
@@ -91,10 +83,7 @@ export class BillingClient {
    * @example
    *
    * ```ts
-   * const invoicePdf = await billing.getInvoicePdf(
-   *   '<invoice-id>',
-   *   '<organization-id>'
-   * );
+   * const invoicePdf = await billing.getInvoicePdf('<invoice-id>', '<organization-id>');
    * ```
    *
    * For more information, see [Billing

@@ -28,7 +28,7 @@ export interface AudioIn extends Resource {
     codec: string,
     durationSeconds: number,
     previousTimestamp?: bigint,
-    extra?: Struct
+    extra?: Struct,
   ): AsyncIterable<AudioChunk>;
 
   /**
