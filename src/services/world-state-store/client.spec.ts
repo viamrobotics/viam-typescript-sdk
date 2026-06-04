@@ -90,6 +90,7 @@ describe('WorldStateStoreClient Tests', () => {
       const expected = mockTransform;
 
       await expect(worldStateStore.getTransform(uuid)).resolves.toStrictEqual({
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...expected,
         uuidString: uuid,
       });

@@ -53,7 +53,7 @@ describe('getLocation', () => {
     location = vi.fn();
     compassHeading = vi.fn();
 
-    await expect(navigation.getLocation()).rejects.toThrowError(
+    await expect(navigation.getLocation()).rejects.toThrow(
       /^no location$/u
     );
 
@@ -81,7 +81,7 @@ describe('getLocation', () => {
     latitude = vi.fn(() => Number.NaN);
     longitude = vi.fn(() => Number.NaN);
 
-    await expect(navigation.getLocation()).rejects.toThrowError(
+    await expect(navigation.getLocation()).rejects.toThrow(
       /^invalid location$/u
     );
 

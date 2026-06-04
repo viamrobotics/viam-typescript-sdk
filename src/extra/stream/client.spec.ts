@@ -107,7 +107,7 @@ describe('StreamClient', () => {
     const addStream = vi.spyOn(streamClient, 'add');
     const promise = streamClient.getStream(fakeCamName);
     vi.runAllTimers();
-    await expect(promise).rejects.toThrowError(
+    await expect(promise).rejects.toThrow(
       'Did not receive a stream after 5000 ms'
     );
     expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);

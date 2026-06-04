@@ -42,7 +42,7 @@ describe('ViamClient', () => {
     payload: 'testAccessToken',
   };
 
-  const subject = async () => createViamClient(options!);
+  const subject = async () => createViamClient(options);
 
   beforeEach(() => {
     options = undefined;
@@ -99,7 +99,7 @@ describe('ViamClient', () => {
       const client = await subject();
       await expect(async () =>
         client.connectToMachine({})
-      ).rejects.toThrowError('must be provided');
+      ).rejects.toThrow('must be provided');
     });
 
     it('errors if no main part found', async () => {
@@ -111,7 +111,7 @@ describe('ViamClient', () => {
 
       await expect(async () =>
         client.connectToMachine({ id: 'test-machine-uuid' })
-      ).rejects.toThrowError('not find a main part');
+      ).rejects.toThrow('not find a main part');
     });
 
     it('gets main part address', async () => {
@@ -128,6 +128,7 @@ describe('ViamClient', () => {
         });
         robotParts.push(part);
       }
+      // eslint-disable-next-line sonarjs/pseudo-random
       robotParts.sort(() => Math.random() - 0.5);
 
       const getRobotPartsMock = vi.fn().mockImplementation(() => robotParts);
@@ -156,7 +157,7 @@ describe('ViamClient', () => {
 
       await expect(async () =>
         client.connectToMachine({ id: 'test-machine-uuid' })
-      ).rejects.toThrowError('not provided and could not be obtained');
+      ).rejects.toThrow('not provided and could not be obtained');
     });
 
     it('gets robot secret if credential is access token -- host', async () => {

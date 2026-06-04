@@ -36,6 +36,7 @@ const timeoutBlob = new Blob(
 );
 
 export default class SessionManager {
+  // eslint-disable-next-line sonarjs/public-static-readonly
   public static heartbeatMonitoredMethods: Record<string, boolean> = {};
 
   public readonly transport: Transport;
@@ -136,7 +137,7 @@ export default class SessionManager {
      * This lint is correct but it makes our lives easier to refer to a boolean in
      * case in the future we make this toggleable (e.g. foreground).
      */
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
     if (this.backgroundHeartbeat && globalThis.Worker !== undefined) {
       const url = globalThis.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);

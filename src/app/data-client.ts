@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/deprecation, @typescript-eslint/no-deprecated */
 import {
   FieldMask,
   Struct,
@@ -404,22 +405,19 @@ export class DataClient {
     const response = await this.dataClient.tabularDataByFilter(req);
     const mdListLength = response.metadata.length;
 
-    const dataArray: TabularData[] = [];
-    dataArray.push(
-      ...response.data.map((data) => {
-        const mdIndex = data.metadataIndex;
-        const metadata =
-          mdListLength !== 0 && mdIndex >= mdListLength
-            ? new CaptureMetadata()
-            : response.metadata[mdIndex];
-        return {
-          data: data.data?.toJson(),
-          metadata,
-          timeRequested: data.timeRequested?.toDate(),
-          timeReceived: data.timeRequested?.toDate(),
-        };
-      })
-    );
+    const dataArray: TabularData[] = response.data.map((data) => {
+      const mdIndex = data.metadataIndex;
+      const metadata =
+        mdListLength !== 0 && mdIndex >= mdListLength
+          ? new CaptureMetadata()
+          : response.metadata[mdIndex];
+      return {
+        data: data.data?.toJson(),
+        metadata,
+        timeRequested: data.timeRequested?.toDate(),
+        timeReceived: data.timeRequested?.toDate(),
+      };
+    });
 
     return {
       data: dataArray,
@@ -1255,6 +1253,7 @@ export class DataClient {
     return resp.datasets.map((ds) => {
       return {
         created: ds.timeCreated?.toDate(),
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...ds,
       };
     });
@@ -1284,6 +1283,7 @@ export class DataClient {
     return resp.datasets.map((ds) => {
       return {
         created: ds.timeCreated?.toDate(),
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...ds,
       };
     });

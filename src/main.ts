@@ -37,6 +37,7 @@ export {
 
 export {
   type BinaryDataCaptureUploadOptions,
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   type BinaryID,
   type DataClient,
   DatasetType,

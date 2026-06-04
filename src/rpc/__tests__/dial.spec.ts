@@ -1,7 +1,5 @@
 // @vitest-environment happy-dom
 
-/* eslint-disable @typescript-eslint/unbound-method */
-
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Code, ConnectError } from '@connectrpc/connect';
 import type { StreamResponse, UnaryResponse } from '@connectrpc/connect';
@@ -542,10 +540,10 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_request then grpc_response on success', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
-      vi.mocked(transport.unary).mockResolvedValue({} as UnaryResponse);
+      vi.mocked(transport.unary).mockResolvedValue({});
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -574,7 +572,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error field and rethrows on failure', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.unary).mockRejectedValue(new Error('rpc failed'));
@@ -622,7 +620,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_request once and grpc_response per message', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{}, {}, {}] as AnyMessage[];
@@ -640,6 +638,7 @@ describe('wrapTransportWithDebugLogging', () => {
         undefined,
         makeEmptyInput()
       );
+      // eslint-disable-next-line sonarjs/no-unused-vars
       for await (const _ of resp.message) {
         /* consume */
       }
@@ -663,7 +662,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('yields all original messages unchanged', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{ a: 1 }, { a: 2 }] as unknown as AnyMessage[];
@@ -692,7 +691,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error when transport.stream rejects', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.stream).mockRejectedValue(
@@ -721,7 +720,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error on mid-stream failure', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const streamError = new Error('mid-stream error');
@@ -736,7 +735,7 @@ describe('wrapTransportWithDebugLogging', () => {
       vi.mocked(transport.stream).mockResolvedValue({
         stream: true,
         message: failingMessages(),
-      } as unknown as StreamResponse);
+      });
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -750,6 +749,7 @@ describe('wrapTransportWithDebugLogging', () => {
       );
 
       await expect(async () => {
+        // eslint-disable-next-line sonarjs/no-unused-vars
         for await (const _ of resp.message) {
           /* consume */
         }
