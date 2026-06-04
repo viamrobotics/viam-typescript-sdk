@@ -76,12 +76,7 @@ export abstract class ClientStream<
     this.service = service;
     this.method = method;
 
-    const { parse } = createClientMethodSerializers(
-      method,
-      true,
-      undefined,
-      undefined
-    );
+    const { parse } = createClientMethodSerializers(method, true);
     this.parseMessage = parse;
     const svcMethod = `/${service.typeName}/${method.name}`;
     this.requestHeaders = new RequestHeaders({
@@ -113,7 +108,7 @@ export abstract class ClientStream<
       this.writeMessage(false, msgBytes);
       return;
     }
-    this.writeMessage(false, undefined);
+    this.writeMessage(false);
   }
 
   protected resetStream() {

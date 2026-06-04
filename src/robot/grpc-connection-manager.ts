@@ -43,7 +43,7 @@ export default class GRPCConnectionManager {
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
     if (globalThis.Worker !== undefined) {
       const url = globalThis.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);

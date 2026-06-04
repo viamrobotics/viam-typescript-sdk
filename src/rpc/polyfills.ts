@@ -1,7 +1,7 @@
 const chars =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
-/* eslint-disable no-bitwise, unicorn/prefer-code-point, no-plusplus, require-unicode-regexp */
+/* eslint-disable no-bitwise, unicorn/prefer-code-point, no-plusplus, require-unicode-regexp, sonarjs/no-nested-assignment, sonarjs/slow-regex, sonarjs/misplaced-loop-counter, sonarjs/no-nested-conditional */
 export const btoa = (input = '') => {
   const str = input;
   let output = '';
@@ -36,7 +36,7 @@ export const atob = (input = '') => {
   }
   for (
     let bc = 0, bs = 0, buffer, i = 0;
-    (buffer = str.charAt(i++));  
+    (buffer = str.charAt(i++));
     ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4)
       ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6))))
       : 0
@@ -46,4 +46,4 @@ export const atob = (input = '') => {
 
   return output;
 };
-/* eslint-enable no-bitwise, unicorn/prefer-code-point, no-plusplus, require-unicode-regexp */
+/* eslint-enable no-bitwise, unicorn/prefer-code-point, no-plusplus, require-unicode-regexp, sonarjs/no-nested-assignment, sonarjs/slow-regex, sonarjs/misplaced-loop-counter, sonarjs/no-nested-conditional */

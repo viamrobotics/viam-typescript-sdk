@@ -85,15 +85,14 @@ describe('BoardClient tests', () => {
 
       expect(ticks.length).toEqual(2);
 
-      const tick1: Tick = ticks[0]!;
-      expect(tick1.pinName).toEqual('1');
-      expect(tick1.high).toBe(true);
-      expect(tick1.time).toEqual(1000);
+      const [tick1, tick2] = ticks;
+      expect(tick1!.pinName).toEqual('1');
+      expect(tick1!.high).toBe(true);
+      expect(tick1!.time).toEqual(1000);
 
-      const tick2: Tick = ticks[1]!;
-      expect(tick2.pinName).toEqual('2');
-      expect(tick2.high).toBe(false);
-      expect(tick2.time).toEqual(2000);
+      expect(tick2!.pinName).toEqual('2');
+      expect(tick2!.high).toBe(false);
+      expect(tick2!.time).toEqual(2000);
     });
   });
 });

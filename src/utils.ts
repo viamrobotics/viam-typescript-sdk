@@ -5,20 +5,20 @@ import {
 } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
 import { apiVersion } from './api-version';
+import type { Frame } from './gen/app/v1/robot_pb';
 import {
   DoCommandRequest,
   DoCommandResponse,
-  GetKinematicsRequest,
-  GetKinematicsResponse,
+  Geometry,
   GetGeometriesRequest,
   GetGeometriesResponse,
+  GetKinematicsRequest,
+  GetKinematicsResponse,
   GetStatusRequest,
   GetStatusResponse,
-  Geometry,
   Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
-import type { Frame } from './gen/app/v1/robot_pb';
 
 export const clientHeaders = new Headers({
   viam_client: `typescript;v${__VERSION__};${apiVersion}`,
@@ -82,7 +82,8 @@ export const enableDebugLogging = (
   if (key === undefined) {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     for (let i = 0; i < 6; i += 1) {
-      finalKey += letters[Math.floor(Math.random() * 26)];
+      // eslint-disable-next-line sonarjs/pseudo-random, @typescript-eslint/no-non-null-assertion
+      finalKey += letters[Math.floor(Math.random() * letters.length)]!;
     }
   } else {
     finalKey = key;
@@ -103,13 +104,13 @@ export const addMetadata = (
   value: string,
   opts?: CallOptions
 ): CallOptions => {
-  const finalOpts =
-    opts ?? ({ headers: {} });
+  const finalOpts = opts ?? { headers: {} };
   (finalOpts.headers as Record<string, string>)[key] = value;
   return finalOpts;
 };
 
 export const deleteMetadata = (opts: CallOptions, key: string): void => {
+  // eslint-disable-next-line sonarjs/no-unused-vars
   const { [key]: _, ...remainingHeaders } = opts.headers as Record<
     string,
     string
@@ -162,7 +163,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
   const response = await getKinematicsMethod(request, callOptions);
 
-  const decoder = new TextDecoder('utf8');
+  const decoder = new TextDecoder('utf-8');
   const jsonString = decoder.decode(response.kinematicsData);
   const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
 

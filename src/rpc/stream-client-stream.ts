@@ -63,7 +63,7 @@ export class StreamClientStream<
             failure: reject,
           };
           this.startRequest(signal);
-          this.sendMessages(streamReq.message).catch((error) => {
+          this.sendMessages(streamReq.message).catch((error: unknown) => {
             console.error('error sending streaming message', error); // eslint-disable-line no-console
             this.closeWithRecvError();
           });
@@ -94,7 +94,7 @@ export class StreamClientStream<
       this.sendMessage(msg.toBinary());
     }
     // end of messages
-    this.writeMessage(true, undefined);
+    this.writeMessage(true);
   }
 
   protected onHeaders(respHeaders: ResponseHeaders): void {
@@ -134,10 +134,11 @@ export class StreamClientStream<
     this.respStreamQueue = this.respStreamQueue
       ? this.respStreamQueue.then(async () => this.respStream.write(msg))
       : this.respStream.write(msg);
-    this.respStreamQueue.catch((error) => {
+    this.respStreamQueue.catch((error: unknown) => {
       // eslint-disable-next-line no-console
       console.error(
-        `error pushing received message into stream; failing: ${error}`
+        'error pushing received message into stream; failing:',
+        error
       );
       this.resetStream();
     });

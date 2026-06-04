@@ -82,6 +82,7 @@ export class WorldStateStoreClient implements WorldStateStore {
       }
 
       yield {
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...response,
         transform: transformWithUUID(response.transform),
       };

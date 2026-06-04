@@ -34,10 +34,10 @@ import { SignalingExchange } from './signaling-exchange';
 import { UuidTool } from 'uuid-tool';
 
 export interface DialOptions {
-  credentials?: Credentials | undefined;
+  credentials?: Credentials;
   webrtcOptions?: DialWebRTCOptions;
-  externalAuthAddress?: string | undefined;
-  externalAuthToEntity?: string | undefined;
+  externalAuthAddress?: string;
+  externalAuthToEntity?: string;
 
   /**
    * `accessToken` allows a pre-authenticated client to dial with an
@@ -49,17 +49,17 @@ export interface DialOptions {
    * externalAuthAddress, externalAuthToEntity,
    * webrtcOptions.signalingAccessToken
    */
-  accessToken?: string | undefined;
+  accessToken?: string;
 
   /**
    * Set timeout in milliseconds for dialing.
    *
    * @deprecated Use `dialTimeoutMs` instead.
    */
-  dialTimeout?: number | undefined;
+  dialTimeout?: number;
 
   /** Set timeout in milliseconds for dialing. */
-  dialTimeoutMs?: number | undefined;
+  dialTimeoutMs?: number;
 
   extraHeaders?: Headers;
 }
@@ -455,8 +455,6 @@ const makeAuthenticatedTransport = async (
     const extAuthHeaders = new Headers();
     extAuthHeaders.set('authorization', `Bearer ${accessToken}`);
 
-    accessToken = '';
-
     const request = new AuthenticateRequest({
       entity: opts.externalAuthToEntity,
     });
@@ -672,6 +670,7 @@ export const dialWebRTC = async (
   );
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation
   const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
   if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
     timeoutId = setTimeout(() => {
@@ -715,7 +714,6 @@ export const dialWebRTC = async (
   } finally {
     if (timeoutId !== undefined) {
       clearTimeout(timeoutId);
-      timeoutId = undefined;
     }
 
     if (!successful) {
@@ -826,8 +824,8 @@ const applyTurnFilterOptions = (
         return urls.length > 0;
       }),
   };
+  // eslint-disable-next-line no-console
   console.debug('TURN filter options set', {
-     
     turnUri: webrtcOpts.turnUri,
     turnScheme: webrtcOpts.turnScheme,
     turnPort: webrtcOpts.turnPort,
@@ -874,9 +872,7 @@ const processWebRTCOpts = async (
     };
   } else {
     // RSDK-8715: We deep copy here to avoid mutating the input config's `rtcConfig.iceServers` list.
-    webrtcOpts = JSON.parse(
-      JSON.stringify(usableDialOpts.webrtcOptions)
-    ) as DialWebRTCOptions;
+    webrtcOpts = structuredClone(usableDialOpts.webrtcOptions);
     if (webrtcOpts.rtcConfig === undefined) {
       webrtcOpts.rtcConfig = { iceServers: additionalIceServers };
     } else {
@@ -888,15 +884,17 @@ const processWebRTCOpts = async (
   }
 
   if (webrtcOpts.forceRelay && webrtcOpts.forceP2P) {
+    // eslint-disable-next-line no-console
     console.warn(
       'forceRelay and forceP2P are both set; forceP2P strips TURN servers that forceRelay requires so the connection will fail'
-    );  
+    );
   }
 
   if (webrtcOpts.forceP2P) {
+    // eslint-disable-next-line no-console
     console.debug(
       'force P2P enabled; stripping TURN servers and ignoring signaling server ICE config'
-    );  
+    );
     webrtcOpts.rtcConfig = {
       ...webrtcOpts.rtcConfig,
       iceServers: (webrtcOpts.rtcConfig?.iceServers ?? []).filter(
@@ -920,9 +918,10 @@ const processWebRTCOpts = async (
       webrtcOpts.turnTransport !== undefined ||
       webrtcOpts.turnPort !== undefined)
   ) {
+    // eslint-disable-next-line no-console
     console.warn(
       'forceP2P is set alongside TURN options; the TURN filter will have no effect since TURN servers were already stripped'
-    );  
+    );
   }
 
   if (

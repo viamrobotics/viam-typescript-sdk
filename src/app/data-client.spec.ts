@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/deprecation, @typescript-eslint/no-deprecated */
 import { Struct, Timestamp, type JsonValue } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
@@ -689,7 +690,7 @@ describe('DataClient tests', () => {
     });
 
     it('delete tabular data with undefined filter', async () => {
-      const promise = await subject().deleteTabularData('orgId', 20, undefined);
+      const promise = await subject().deleteTabularData('orgId', 20);
       expect(promise).toEqual(10n);
       expect(capturedRequest?.filter).toBeUndefined();
     });
@@ -706,9 +707,7 @@ describe('DataClient tests', () => {
             if (!once) {
               once = true;
               const response = new DeleteBinaryDataByFilterResponse();
-              response.deletedCount = req.includeInternalData
-                ? 20n
-                : 10n;
+              response.deletedCount = req.includeInternalData ? 20n : 10n;
               return response;
             }
             return new DeleteBinaryDataByFilterResponse({
@@ -2494,8 +2493,10 @@ describe('fileUpload tests', () => {
 
   it('chunks file data', async () => {
     const numChunks = 3;
+
     const data = Uint8Array.from(
       { length: DataClient.UPLOAD_CHUNK_SIZE * numChunks },
+      // eslint-disable-next-line sonarjs/pseudo-random
       () => Math.floor(Math.random() * 256)
     );
 

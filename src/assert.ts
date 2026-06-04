@@ -11,6 +11,7 @@ export const assertExists: <T>(
   value: T,
   message: string
 ) => asserts value is NonNullable<T> = (value, message) => {
+  // eslint-disable-next-line sonarjs/different-types-comparison
   if (value === null || value === undefined) {
     throw new Error(message);
   }

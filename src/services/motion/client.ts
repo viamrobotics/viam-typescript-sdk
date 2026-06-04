@@ -3,6 +3,7 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
+  // eslint-disable-next-line sonarjs/deprecation
   GetPoseRequest,
   ListPlanStatusesRequest,
   MoveOnGlobeRequest,
@@ -180,6 +181,7 @@ export class MotionClient implements Motion {
     extra = {},
     callOptions = this.callOptions
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation
     const request = new GetPoseRequest({
       name: this.name,
       componentName,
@@ -190,6 +192,7 @@ export class MotionClient implements Motion {
 
     this.options.requestLogger?.(request);
 
+    // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation
     const response = await this.client.getPose(request, callOptions);
 
     const result = response.pose;

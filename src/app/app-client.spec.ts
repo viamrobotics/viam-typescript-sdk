@@ -529,6 +529,7 @@ describe('AppClient tests', () => {
 
   describe('updateLocation tests', () => {
     const newLocation = new pb.Location({
+      // eslint-disable-next-line @typescript-eslint/no-misused-spread
       ...location,
       id: 'newId',
       name: 'newName',
@@ -865,6 +866,7 @@ describe('AppClient tests', () => {
       });
 
       const logEntry2 = new LogEntry({
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...logEntry,
         loggerName: 'newLoggerName',
         level: 'error',
@@ -1409,6 +1411,7 @@ describe('AppClient tests', () => {
 
   describe('changeRole tests', () => {
     const newAuthorization = new pb.Authorization({
+      // eslint-disable-next-line @typescript-eslint/no-misused-spread
       ...authorization,
       organizationId: 'newOrgId',
     });
