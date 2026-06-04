@@ -43,10 +43,10 @@ const setupClientMocks = () => {
 };
 
 const setupEventListenerMocks = () => {
-  const pcAddEventListener = vi.fn<[string, (event: unknown) => void]>();
-  const pcRemoveEventListener = vi.fn<[string, (event: unknown) => void]>();
-  const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>();
-  const dcRemoveEventListener = vi.fn<[string, (event: unknown) => void]>();
+  const pcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>();
+  const pcRemoveEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>();
+  const dcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>();
+  const dcRemoveEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>();
 
   const peerConnection = createMockPeerConnection(
     vi.fn(),
@@ -783,7 +783,7 @@ describe('RobotClient', () => {
         vi.useFakeTimers();
         let closeHandler: ((event: Event) => void) | undefined;
 
-        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+        const dcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
               closeHandler = handler;
@@ -842,7 +842,7 @@ describe('RobotClient', () => {
         let closeHandler: ((event: Event) => void) | undefined;
         const shouldRetry = true;
 
-        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+        const dcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
               closeHandler = handler;
@@ -896,7 +896,7 @@ describe('RobotClient', () => {
         let closeHandler: ((event: Event) => void) | undefined;
         const shouldRetry = false;
 
-        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+        const dcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
               closeHandler = handler;
@@ -961,7 +961,7 @@ describe('RobotClient', () => {
           vi.useFakeTimers();
           let closeHandler: ((event: Event) => void) | undefined;
 
-          const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+          const dcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>(
             (event: string, handler: (event: unknown) => void) => {
               if (event === 'close') {
                 closeHandler = handler;
@@ -1020,7 +1020,7 @@ describe('RobotClient', () => {
         vi.useFakeTimers();
         let closeHandler: ((event: Event) => void) | undefined;
 
-        const dcAddEventListener = vi.fn<[string, (event: unknown) => void]>(
+        const dcAddEventListener = vi.fn<(type: string, handler: (event: unknown) => void) => void>(
           (event: string, handler: (event: unknown) => void) => {
             if (event === 'close') {
               closeHandler = handler;
@@ -1166,7 +1166,7 @@ describe('RobotClient', () => {
 
     it('logs dial_started when a connection attempt begins', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
 
@@ -1186,7 +1186,7 @@ describe('RobotClient', () => {
 
     it('logs dial_success after a successful connection', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
 
@@ -1203,7 +1203,7 @@ describe('RobotClient', () => {
 
     it('dial_started and dial_success share the same connectionId', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
 
@@ -1224,7 +1224,7 @@ describe('RobotClient', () => {
 
     it('logs dial_failed when a connection attempt fails', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = new RobotClient();
       vi.mocked(rpcModule.dialWebRTC).mockRejectedValue(
@@ -1249,7 +1249,7 @@ describe('RobotClient', () => {
 
     it('logs client_closed when disconnect is called', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
       await client.dial({ ...baseDialConfig, noReconnect: true });
@@ -1266,7 +1266,7 @@ describe('RobotClient', () => {
 
     it('logs client_closed with the connectionId from the prior connection', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = setupClientMocks();
       await client.dial({ ...baseDialConfig, noReconnect: true });
@@ -1288,7 +1288,7 @@ describe('RobotClient', () => {
 
     it('logs client_closed with undefined connectionId when disconnecting before any connection', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const client = new RobotClient();
 
@@ -1305,7 +1305,7 @@ describe('RobotClient', () => {
 
     it('logs ice_disconnected when the ICE connection enters the disconnected state', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const mocks = setupEventListenerMocks();
       await mocks.client.dial({ ...baseDialConfig, noReconnect: true });

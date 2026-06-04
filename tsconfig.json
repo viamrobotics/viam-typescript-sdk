@@ -1,17 +1,14 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "jsx": "preserve",
-    "verbatimModuleSyntax": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "checkJs": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
     "types": ["vite/client", "node"],
-    "skipLibCheck": true,
+    "noEmit": true,
+    "rootDirs": ["src", "e2e"],
+    "outDir": "dist",
+
     "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
@@ -22,9 +19,10 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noEmit": true,
-    "rootDirs": ["src", "e2e"],
-    "outDir": "dist"
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
   },
-  "include": ["src/**/*.ts", "e2e/**/*.ts", "playwright.config.ts"]
+  "include": ["src/**/*.ts", "e2e/**/*.ts", "playwright.config.ts"],
 }

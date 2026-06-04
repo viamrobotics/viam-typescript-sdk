@@ -767,6 +767,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     await this.connect({
       priority: conf.priority,
+      // eslint-disable-next-line sonarjs/deprecation, @typescript-eslint/no-deprecated
       dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
       creds: conf.credentials,
       extraHeaders: conf.extraHeaders,
@@ -810,6 +811,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     await this.connect({
       creds: conf.credentials,
+      // eslint-disable-next-line sonarjs/deprecation, @typescript-eslint/no-deprecated
       dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
       extraHeaders: conf.extraHeaders,
     });
@@ -1064,6 +1066,7 @@ export class RobotClient extends EventDispatcher implements Robot {
   public async connect({
     creds = this.savedCreds,
     priority,
+    // eslint-disable-next-line sonarjs/deprecation, @typescript-eslint/no-deprecated
     dialTimeout,
     dialTimeoutMs,
     extraHeaders,
@@ -1075,7 +1078,7 @@ export class RobotClient extends EventDispatcher implements Robot {
 
     if (this.connecting) {
       // This lint is clearly wrong due to how the event loop works such that after an await, the condition may no longer be true.
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, sonarjs/different-types-comparison
       while (this.connecting !== undefined) {
         // eslint-disable-next-line no-await-in-loop
         await this.connecting;
@@ -1335,7 +1338,6 @@ export class RobotClient extends EventDispatcher implements Robot {
     );
     const result = response.pose;
     if (!result) {
-       
       // TODO: Can the response frame be undefined or null?
       throw new Error('no pose');
     }

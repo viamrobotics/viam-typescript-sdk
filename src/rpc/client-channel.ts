@@ -27,13 +27,13 @@ import { UnaryClientStream } from './unary-client-stream';
 // MaxStreamCount is the max number of streams a channel can have.
 const MaxStreamCount = 256;
 
-interface activeClienStream {
+interface ActiveClientStream {
   cs: ClientStream;
 }
 
 export class ClientChannel extends BaseChannel implements Transport {
   private streamIDCounter = 0;
-  private readonly streams = new Map<string, activeClienStream>();
+  private readonly streams = new Map<string, ActiveClientStream>();
 
   constructor(pc: RTCPeerConnection, dc: RTCDataChannel) {
     super(pc, dc);

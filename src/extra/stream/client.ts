@@ -178,18 +178,18 @@ export class StreamClient extends EventDispatcher implements Stream {
         const [stream] = event.streams;
 
         if (!stream) {
-          this.off('track', handleTrack as (args: unknown) => void);
+          this.off('track', handleTrack);
           reject(new Error('Received track event with no streams'));
         } else if (stream.id === name) {
-          this.off('track', handleTrack as (args: unknown) => void);
+          this.off('track', handleTrack);
           resolve(stream);
         }
       };
 
-      this.on('track', handleTrack as (args: unknown) => void);
+      this.on('track', handleTrack);
 
       setTimeout(() => {
-        this.off('track', handleTrack as (args: unknown) => void);
+        this.off('track', handleTrack);
         reject(
           new Error(`Did not receive a stream after ${this.STREAM_TIMEOUT} ms`)
         );

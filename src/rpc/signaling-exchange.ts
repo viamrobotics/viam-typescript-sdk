@@ -118,8 +118,8 @@ export class SignalingExchange {
       this.pc.addEventListener(
         'icecandidate',
         (event: { candidate: RTCIceCandidateInit | null }) => {
-          this.onLocalICECandidate(event).catch((error) => {
-            console.error(`error processing local ICE candidate ${error}`); // eslint-disable-line no-console
+          this.onLocalICECandidate(event).catch((error: unknown) => {
+            console.error('error processing local ICE candidate', error); // eslint-disable-line no-console
           });
         }
       );

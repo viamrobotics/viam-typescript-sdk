@@ -6,6 +6,6 @@
     "**/*.spec.ts",
     "**/*.test.ts",
     "playwright.config.ts",
-    "vitest.workspace.ts"
-  ]
+    "vitest.workspace.ts",
+  ],
 }

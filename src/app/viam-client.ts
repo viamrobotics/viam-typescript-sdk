@@ -8,7 +8,6 @@ import { ProvisioningClient } from './provisioning-client';
 import {
   createViamTransport,
   isCredential,
-  type Credential,
   type Credentials,
 } from './viam-transport';
 
@@ -105,9 +104,7 @@ export class ViamClient {
     // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
     if (!isCredential(creds)) {
-      if (robotSecret === undefined) {
-        robotSecret = await this.getRobotSecretFromHost(address);
-      }
+      robotSecret ??= await this.getRobotSecretFromHost(address);
       creds =
         robotSecret === undefined
           ? creds
