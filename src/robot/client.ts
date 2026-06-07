@@ -302,12 +302,24 @@ const throwOnAbortError = (error: unknown) => {
   }
 };
 
+type RobotClientDispatchTypes =
+  | MachineConnectionEvent
+  | RTCTrackEvent
+  | Event
+  | {
+      error?: unknown;
+      attempt?: number;
+      attempts?: number;
+      method?: string;
+      eventType?: MachineConnectionEvent;
+    };
+
 /**
  * A gRPC-web client for a Robot.
  *
  * @group Clients
  */
-export class RobotClient extends EventDispatcher implements Robot {
+export class RobotClient extends EventDispatcher<RobotClientDispatchTypes> implements Robot {
   private serviceHost = '';
 
   private readonly webrtcOptions: WebRTCOptions = {
@@ -481,7 +493,7 @@ export class RobotClient extends EventDispatcher implements Robot {
     }
 
     this.isReconnecting = true;
-    this.emit(MachineConnectionEvent.RECONNECTING, { event: event ?? {} });
+    this.emit(MachineConnectionEvent.RECONNECTING, event ?? {});
 
     // eslint-disable-next-line no-console
     console.debug('Connection closed, will try to reconnect');
