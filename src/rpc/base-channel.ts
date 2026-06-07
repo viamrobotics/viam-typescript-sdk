@@ -75,6 +75,6 @@ export class BaseChannel {
   }
 
   protected write(msg: Message) {
-    this.dataChannel.send(msg.toBinary());
+    this.dataChannel.send(msg.toBinary() as Uint8Array<ArrayBuffer>);
   }
 }

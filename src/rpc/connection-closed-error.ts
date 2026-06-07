@@ -8,7 +8,7 @@ export class ConnectionClosedError extends Error {
     Object.setPrototypeOf(this, ConnectionClosedError.prototype);
   }
 
-  static isError(error: unknown): boolean {
+  static override isError(error: unknown): error is Error {
     if (
       error instanceof ConnectionClosedError ||
       (error instanceof ConnectError && error.rawMessage === 'closed')

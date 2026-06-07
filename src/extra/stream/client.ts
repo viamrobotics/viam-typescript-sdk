@@ -25,7 +25,7 @@ const getValidSDPTrackName = (name: string) => {
  *
  * @group Clients
  */
-export class StreamClient extends EventDispatcher implements Stream {
+export class StreamClient extends EventDispatcher<RTCTrackEvent> implements Stream {
   private client: Client<typeof StreamService>;
   private readonly options: Options;
   private streams: Set<string>;
@@ -41,7 +41,7 @@ export class StreamClient extends EventDispatcher implements Stream {
      * to partition here and have individual events for each stream.
      */
     client.on('track', (args) => {
-      this.emit('track', args);
+      this.emit('track', args as RTCTrackEvent); // Track event from RobotClient always emits an RTCTrackEvent
     });
 
     client.on(MachineConnectionEvent.CONNECTED, () => {
