@@ -8,6 +8,8 @@ import {
   AddBinaryDataToDatasetByIDsResponse,
   AddBoundingBoxToImageByIDRequest,
   AddBoundingBoxToImageByIDResponse,
+  AddSequencesToDatasetRequest,
+  AddSequencesToDatasetResponse,
   AddTagsToBinaryDataByFilterRequest,
   AddTagsToBinaryDataByFilterResponse,
   AddTagsToBinaryDataByIDsRequest,
@@ -59,12 +61,16 @@ import {
   RemoveBinaryDataFromDatasetByIDsResponse,
   RemoveBoundingBoxFromImageByIDRequest,
   RemoveBoundingBoxFromImageByIDResponse,
+  RemoveSequencesFromDatasetRequest,
+  RemoveSequencesFromDatasetResponse,
   RemoveTagsFromBinaryDataByFilterRequest,
   RemoveTagsFromBinaryDataByFilterResponse,
   RemoveTagsFromBinaryDataByIDsRequest,
   RemoveTagsFromBinaryDataByIDsResponse,
   Sequence,
   SequenceResourceFilter,
+  SequencesByDatasetIDRequest,
+  SequencesByDatasetIDResponse,
   TabularData,
   TabularDataByFilterRequest,
   TabularDataByFilterResponse,
@@ -102,14 +108,20 @@ import {
   CreateDatasetRequest,
   CreateDatasetResponse,
   Dataset,
+  DatasetType,
   DeleteDatasetRequest,
   DeleteDatasetResponse,
+  GetSequenceDatasetExportRequest,
+  GetSequenceDatasetExportResponse,
   ListDatasetsByIDsRequest,
   ListDatasetsByIDsResponse,
   ListDatasetsByOrganizationIDRequest,
   ListDatasetsByOrganizationIDResponse,
   RenameDatasetRequest,
   RenameDatasetResponse,
+  SequenceDatasetExportStatus,
+  StartSequenceDatasetExportRequest,
+  StartSequenceDatasetExportResponse,
 } from '../gen/app/dataset/v1/dataset_pb';
 import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
 import {
@@ -1681,6 +1693,91 @@ describe('DataClient tests', () => {
       expect(result.nextPageToken).toEqual('next-token');
     });
   });
+
+  describe('addSequencesToDataset tests', () => {
+    let capReq: AddSequencesToDatasetRequest;
+    const sequenceIds = ['seq1', 'seq2'];
+    const datasetId = 'test-dataset-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          addSequencesToDataset: (req) => {
+            capReq = req;
+            return new AddSequencesToDatasetResponse();
+          },
+        });
+      });
+    });
+
+    it('adds sequences to dataset', async () => {
+      const expectedRequest = new AddSequencesToDatasetRequest({
+        sequenceIds,
+        datasetId,
+      });
+
+      await subject().addSequencesToDataset(sequenceIds, datasetId);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('removeSequencesFromDataset tests', () => {
+    let capReq: RemoveSequencesFromDatasetRequest;
+    const sequenceIds = ['seq1', 'seq2'];
+    const datasetId = 'test-dataset-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          removeSequencesFromDataset: (req) => {
+            capReq = req;
+            return new RemoveSequencesFromDatasetResponse();
+          },
+        });
+      });
+    });
+
+    it('removes sequences from dataset', async () => {
+      const expectedRequest = new RemoveSequencesFromDatasetRequest({
+        sequenceIds,
+        datasetId,
+      });
+
+      await subject().removeSequencesFromDataset(sequenceIds, datasetId);
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('sequencesByDatasetID tests', () => {
+    let capReq: SequencesByDatasetIDRequest;
+    const datasetId = 'test-dataset-id';
+    const sequence1 = new Sequence({ id: 'seq1', partId: 'part1' });
+    const sequence2 = new Sequence({ id: 'seq2', partId: 'part2' });
+    const sequences = [sequence1, sequence2];
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          sequencesByDatasetID: (req) => {
+            capReq = req;
+            return new SequencesByDatasetIDResponse({
+              sequences,
+              nextPageToken: 'next-token',
+            });
+          },
+        });
+      });
+    });
+
+    it('lists sequences by dataset ID', async () => {
+      const expectedRequest = new SequencesByDatasetIDRequest({ datasetId });
+
+      const result = await subject().sequencesByDatasetID(datasetId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result.sequences).toEqual(sequences);
+      expect(result.nextPageToken).toEqual('next-token');
+    });
+  });
 });
 
 describe('DatasetClient tests', () => {
@@ -1808,6 +1905,20 @@ describe('DatasetClient tests', () => {
       expect(set2?.organizationId).toEqual('orgId2');
       expect(set2?.created).toEqual(dataset2.timeCreated?.toDate());
     });
+
+    it('list datasets by organization ID with type filter', async () => {
+      const expectedRequest = new ListDatasetsByOrganizationIDRequest({
+        organizationId: 'orgId',
+        type: DatasetType.SEQUENCE_DATA,
+      });
+
+      const promise = await subject().listDatasetsByOrganizationID(
+        'orgId',
+        DatasetType.SEQUENCE_DATA
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(promise.length).toEqual(2);
+    });
   });
 
   describe('listDatasetsByIDs tests', () => {
@@ -1842,6 +1953,63 @@ describe('DatasetClient tests', () => {
       expect(set2?.name).toEqual('name2');
       expect(set2?.organizationId).toEqual('orgId2');
       expect(set2?.created).toEqual(dataset2.timeCreated?.toDate());
+    });
+  });
+
+  describe('startSequenceDatasetExport tests', () => {
+    let capReq: StartSequenceDatasetExportRequest;
+    const datasetId = 'test-dataset-id';
+    const jobId = 'test-job-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DatasetService, {
+          startSequenceDatasetExport: (req) => {
+            capReq = req;
+            return new StartSequenceDatasetExportResponse({ jobId });
+          },
+        });
+      });
+    });
+
+    it('starts a sequence dataset export', async () => {
+      const expectedRequest = new StartSequenceDatasetExportRequest({
+        datasetId,
+      });
+
+      const result = await subject().startSequenceDatasetExport(datasetId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result).toEqual(jobId);
+    });
+  });
+
+  describe('getSequenceDatasetExport tests', () => {
+    let capReq: GetSequenceDatasetExportRequest;
+    const jobId = 'test-job-id';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DatasetService, {
+          getSequenceDatasetExport: (req) => {
+            capReq = req;
+            return new GetSequenceDatasetExportResponse({
+              jobId,
+              status: SequenceDatasetExportStatus.COMPLETED,
+              downloadUrl: 'https://example.com/download',
+            });
+          },
+        });
+      });
+    });
+
+    it('gets a sequence dataset export status', async () => {
+      const expectedRequest = new GetSequenceDatasetExportRequest({ jobId });
+
+      const result = await subject().getSequenceDatasetExport(jobId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result.jobId).toEqual(jobId);
+      expect(result.status).toEqual(SequenceDatasetExportStatus.COMPLETED);
+      expect(result.downloadUrl).toEqual('https://example.com/download');
     });
   });
 });

@@ -37,9 +37,12 @@ export {
   type BinaryDataCaptureUploadOptions,
   type BinaryID,
   type DataClient,
+  DatasetType,
   type FilterOptions,
+  type GetSequenceDatasetExportResponse,
   type IndexableCollection,
   type Sequence,
+  SequenceDatasetExportStatus,
   type SequenceResourceFilter,
 } from './app/data-client';
 /**
