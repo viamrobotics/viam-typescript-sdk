@@ -530,7 +530,7 @@ describe('wrapTransportWithDebugLogging', () => {
       const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
-      vi.mocked(transport.unary).mockResolvedValue({});
+      vi.mocked(transport.unary).mockResolvedValue({} as unknown as UnaryResponse);
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
@@ -687,7 +687,7 @@ describe('wrapTransportWithDebugLogging', () => {
       vi.mocked(transport.stream).mockResolvedValue({
         stream: true,
         message: failingMessages(),
-      });
+      } as unknown as StreamResponse);
 
       // Act
       const wrapped = wrapTransportWithDebugLogging(transport, connectionId);
