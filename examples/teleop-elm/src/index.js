@@ -18,6 +18,8 @@ async function connectWebRTC() {
   });
 }
 
+// @ts-ignore -- ignoring because it's an implicit any
+// but can't add type annotations in JS files
 function injectMediaStream(eventStream) {
   console.debug('got media stream');
 
