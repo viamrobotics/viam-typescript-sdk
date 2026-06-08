@@ -29,7 +29,11 @@ import {
   DataPipelineRun,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
 import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
-import type { Dataset as PBDataset } from '../gen/app/dataset/v1/dataset_pb';
+import {
+  DatasetType,
+  type Dataset as PBDataset,
+  type GetSequenceDatasetExportResponse,
+} from '../gen/app/dataset/v1/dataset_pb';
 import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
 import {
   DataCaptureUploadRequest,
@@ -1237,13 +1241,16 @@ export class DataClient {
    * API](https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyorganizationid).
    *
    * @param organizationId The ID of the organization
+   * @param type Optional dataset type to filter on
    * @returns The list of datasets in the organization
    */
   async listDatasetsByOrganizationID(
-    organizationId: string
+    organizationId: string,
+    type?: DatasetType
   ): Promise<Dataset[]> {
     const resp = await this.datasetClient.listDatasetsByOrganizationID({
       organizationId,
+      type,
     });
     return resp.datasets.map((ds) => {
       return {
@@ -2040,6 +2047,118 @@ export class DataClient {
     });
     return { sequences: resp.sequences, nextPageToken: resp.nextPageToken };
   }
+
+  /**
+   * Add sequences to the provided dataset.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.addSequencesToDataset(
+   *   ['sequence-id-1', 'sequence-id-2'],
+   *   '12ab3de4f56a7bcd89ef0ab1'
+   * );
+   * ```
+   *
+   * @param sequenceIds The IDs of the sequences to add to the dataset
+   * @param datasetId The ID of the dataset to add the sequences to
+   */
+  async addSequencesToDataset(
+    sequenceIds: string[],
+    datasetId: string
+  ): Promise<void> {
+    await this.dataClient.addSequencesToDataset({ sequenceIds, datasetId });
+  }
+
+  /**
+   * Remove sequences from the provided dataset.
+   *
+   * @example
+   *
+   * ```ts
+   * await dataClient.removeSequencesFromDataset(
+   *   ['sequence-id-1', 'sequence-id-2'],
+   *   '12ab3de4f56a7bcd89ef0ab1'
+   * );
+   * ```
+   *
+   * @param sequenceIds The IDs of the sequences to remove from the dataset
+   * @param datasetId The ID of the dataset to remove the sequences from
+   */
+  async removeSequencesFromDataset(
+    sequenceIds: string[],
+    datasetId: string
+  ): Promise<void> {
+    await this.dataClient.removeSequencesFromDataset({ sequenceIds, datasetId });
+  }
+
+  /**
+   * List sequences that belong to the given dataset.
+   *
+   * @example
+   *
+   * ```ts
+   * const { sequences, nextPageToken } = await dataClient.sequencesByDatasetID(
+   *   '12ab3de4f56a7bcd89ef0ab1'
+   * );
+   * ```
+   *
+   * @param datasetId The ID of the dataset
+   * @param pageToken Optional page token for pagination
+   * @param pageSize Optional page size
+   * @returns The list of sequences and a next page token
+   */
+  async sequencesByDatasetID(
+    datasetId: string,
+    pageToken?: string,
+    pageSize?: number
+  ): Promise<{ sequences: Sequence[]; nextPageToken: string }> {
+    const resp = await this.dataClient.sequencesByDatasetID({
+      datasetId,
+      pageToken,
+      pageSize,
+    });
+    return { sequences: resp.sequences, nextPageToken: resp.nextPageToken };
+  }
+
+  /**
+   * Start an async export of all data for a sequence dataset.
+   *
+   * @example
+   *
+   * ```ts
+   * const jobId = await dataClient.startSequenceDatasetExport(
+   *   '12ab3de4f56a7bcd89ef0ab1'
+   * );
+   * ```
+   *
+   * @param datasetId The ID of the sequence dataset to export
+   * @returns The job ID of the export job
+   */
+  async startSequenceDatasetExport(datasetId: string): Promise<string> {
+    const resp = await this.datasetClient.startSequenceDatasetExport({
+      datasetId,
+    });
+    return resp.jobId;
+  }
+
+  /**
+   * Get the current status of a sequence dataset export job.
+   *
+   * @example
+   *
+   * ```ts
+   * const status = await dataClient.getSequenceDatasetExport('job-id');
+   * ```
+   *
+   * @param jobId The ID of the export job
+   * @returns The current status of the export job
+   */
+  async getSequenceDatasetExport(
+    jobId: string
+  ): Promise<GetSequenceDatasetExportResponse> {
+    return this.datasetClient.getSequenceDatasetExport({ jobId });
+  }
 }
 
 export class ListDataPipelineRunsPage {
@@ -2099,4 +2218,9 @@ export {
   type Sequence,
   type SequenceResourceFilter,
 } from '../gen/app/data/v1/data_pb';
+export {
+  DatasetType,
+  SequenceDatasetExportStatus,
+  type GetSequenceDatasetExportResponse,
+} from '../gen/app/dataset/v1/dataset_pb';
 export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
