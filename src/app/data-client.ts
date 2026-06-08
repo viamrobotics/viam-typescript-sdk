@@ -2089,7 +2089,10 @@ export class DataClient {
     sequenceIds: string[],
     datasetId: string
   ): Promise<void> {
-    await this.dataClient.removeSequencesFromDataset({ sequenceIds, datasetId });
+    await this.dataClient.removeSequencesFromDataset({
+      sequenceIds,
+      datasetId,
+    });
   }
 
   /**
@@ -2098,9 +2101,8 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const { sequences, nextPageToken } = await dataClient.sequencesByDatasetID(
-   *   '12ab3de4f56a7bcd89ef0ab1'
-   * );
+   * const { sequences, nextPageToken } =
+   *   await dataClient.sequencesByDatasetID('12ab3de4f56a7bcd89ef0ab1');
    * ```
    *
    * @param datasetId The ID of the dataset
