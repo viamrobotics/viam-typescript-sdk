@@ -302,24 +302,24 @@ const throwOnAbortError = (error: unknown) => {
   }
 };
 
-type RobotClientDispatchTypes =
-  | MachineConnectionEvent
-  | RTCTrackEvent
-  | Event
-  | {
-      error?: unknown;
-      attempt?: number;
-      attempts?: number;
-      method?: string;
-      eventType?: MachineConnectionEvent;
-    };
+interface RobotClientDispatchEvents {
+  track: RTCTrackEvent;
+  connectionstatechange: { eventType: MachineConnectionEvent };
+  [MachineConnectionEvent.CONNECTING]: Record<string, never>;
+  [MachineConnectionEvent.CONNECTED]: Record<string, never>;
+  [MachineConnectionEvent.DISCONNECTING]: Record<string, never>;
+  [MachineConnectionEvent.DISCONNECTED]: Event | { error?: Error };
+  [MachineConnectionEvent.DIALING]: { method: 'webrtc' | 'grpc'; attempt: number };
+  [MachineConnectionEvent.RECONNECTING]: Event | undefined;
+  [MachineConnectionEvent.RECONNECTION_FAILED]: { error: unknown; attempts: number };
+}
 
 /**
  * A gRPC-web client for a Robot.
  *
  * @group Clients
  */
-export class RobotClient extends EventDispatcher<RobotClientDispatchTypes> implements Robot {
+export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> implements Robot {
   private serviceHost = '';
 
   private readonly webrtcOptions: WebRTCOptions = {
@@ -493,7 +493,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchTypes> imple
     }
 
     this.isReconnecting = true;
-    this.emit(MachineConnectionEvent.RECONNECTING, event ?? {});
+    this.emit(MachineConnectionEvent.RECONNECTING, event);
 
     // eslint-disable-next-line no-console
     console.debug('Connection closed, will try to reconnect');
