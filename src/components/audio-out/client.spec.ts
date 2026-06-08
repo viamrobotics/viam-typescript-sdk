@@ -15,8 +15,8 @@ import { Struct } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
 import {
-  PlayStreamInit,
-  PlayStreamRequest,
+  type PlayStreamInit,
+  type PlayStreamRequest,
   PlayStreamResponse,
 } from '../../gen/component/audioout/v1/audioout_pb';
 
@@ -115,7 +115,7 @@ describe('AudioOutClient tests', () => {
         numChannels: 2,
       });
 
-      // eslint-disable-next-line @typescript-eslint/require-await
+       
       const empty = async function* emptyGen(): AsyncIterable<Uint8Array> {
         // no chunks
       };
