@@ -61,26 +61,27 @@ export class AudioOutClient implements AudioOut {
     const { name } = this;
     const extraStruct = Struct.fromJson(extra);
 
-    const requests = async function* requestGen(): AsyncGenerator<PlayStreamRequest> {
-      yield new PlayStreamRequest({
-        payload: {
-          case: 'init',
-          value: new PlayStreamInit({
-            name,
-            audioInfo,
-            extra: extraStruct,
-          }),
-        },
-      });
-      for await (const audioData of chunks) {
+    const requests =
+      async function* requestGen(): AsyncGenerator<PlayStreamRequest> {
         yield new PlayStreamRequest({
           payload: {
-            case: 'audioChunk',
-            value: new PlayStreamChunk({ audioData }),
+            case: 'init',
+            value: new PlayStreamInit({
+              name,
+              audioInfo,
+              extra: extraStruct,
+            }),
           },
         });
-      }
-    };
+        for await (const audioData of chunks) {
+          yield new PlayStreamRequest({
+            payload: {
+              case: 'audioChunk',
+              value: new PlayStreamChunk({ audioData }),
+            },
+          });
+        }
+      };
 
     await this.client.playStream(requests(), callOptions);
   }

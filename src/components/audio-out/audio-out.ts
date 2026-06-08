@@ -37,7 +37,11 @@ export interface AudioOut extends Resource {
    *
    * ```ts
    * const audioOut = new VIAM.AudioOutClient(machine, 'my_audio_out');
-   * const audioInfo = { codec: 'pcm16', sampleRateHz: 22050, numChannels: 1 };
+   * const audioInfo = {
+   *   codec: 'pcm16',
+   *   sampleRateHz: 22050,
+   *   numChannels: 1,
+   * };
    *
    * async function* chunks() {
    *   for (const chunk of pcmChunks) yield chunk;
@@ -46,8 +50,8 @@ export interface AudioOut extends Resource {
    * await audioOut.playStream(audioInfo, chunks());
    * ```
    *
-   * @param audioInfo - Information about the audio format (codec, sample
-   *   rate, channels) that applies to every chunk
+   * @param audioInfo - Information about the audio format (codec, sample rate,
+   *   channels) that applies to every chunk
    * @param chunks - Async iterable of audio byte chunks to play in order
    */
   playStream: (
