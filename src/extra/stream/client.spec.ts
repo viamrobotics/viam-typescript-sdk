@@ -41,15 +41,17 @@ describe('StreamClient', () => {
     vi.useRealTimers();
   });
 
-  it('webrtc track will cause the client to emit an event', async () =>
-    new Promise<void>((done) => {
+  it('webrtc track will cause the client to emit an event', async () => {
+    const event = new RTCTrackEvent('mock', {} as RTCTrackEventInit);
+    return new Promise<void>((done) => {
       streamClient.on('track', (data) => {
-        expect((data as { mock: true }).mock).eq(true);
+        expect(data).toMatchObject(event);
         done();
       });
 
-      robotClient.emit('track', { mock: true });
-    }));
+      robotClient.emit('track', event);
+    });
+  });
 
   it('getStream creates and returns a new stream', async () => {
     const fakeCamName = 'fakecam';
@@ -57,7 +59,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         addStream: () => {
-          streamClient.emit('track', { streams: [fakeStream] });
+          streamClient.emit('track', { streams: [fakeStream] } as unknown as RTCTrackEvent);
           return new AddStreamResponse();
         },
       });
@@ -113,7 +115,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         addStream: () => {
-          streamClient.emit('track', { streams: [fakeStream] });
+          streamClient.emit('track', { streams: [fakeStream] } as unknown as RTCTrackEvent);
           return new AddStreamResponse();
         },
       });
