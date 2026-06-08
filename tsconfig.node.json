@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "preserve",
     "verbatimModuleSyntax": true,
@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "checkJs": true,
-    "types": [],
+    "types": ["node"],
     "skipLibCheck": true,
     "strict": true,
     "allowUnreachableCode": false,
@@ -23,7 +23,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,
-    "ignoreDeprecations": "6.0",
   },
   "include": [
     "./vite.config.ts",
