@@ -27,6 +27,40 @@ export interface AudioOut extends Resource {
   ) => Promise<void>;
 
   /**
+   * Stream audio chunks to the device for playback.
+   *
+   * The caller provides an async iterable of raw audio bytes. Each chunk must
+   * match the codec and format described by `audioInfo`. Playback starts as
+   * chunks arrive on the server, before the iterable is exhausted.
+   *
+   * @example
+   *
+   * ```ts
+   * const audioOut = new VIAM.AudioOutClient(machine, 'my_audio_out');
+   * const audioInfo = {
+   *   codec: 'pcm16',
+   *   sampleRateHz: 22050,
+   *   numChannels: 1,
+   * };
+   *
+   * async function* chunks() {
+   *   for (const chunk of pcmChunks) yield chunk;
+   * }
+   *
+   * await audioOut.playStream(audioInfo, chunks());
+   * ```
+   *
+   * @param audioInfo - Information about the audio format (codec, sample rate,
+   *   channels) that applies to every chunk
+   * @param chunks - Async iterable of audio byte chunks to play in order
+   */
+  playStream: (
+    audioInfo: AudioInfo,
+    chunks: AsyncIterable<Uint8Array>,
+    extra?: Struct
+  ) => Promise<void>;
+
+  /**
    * Return the audio output properties.
    *
    * @example
