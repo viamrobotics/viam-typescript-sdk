@@ -42,14 +42,13 @@ describe('StreamClient', () => {
   });
 
   it('webrtc track will cause the client to emit an event', async () => {
-    const event = new RTCTrackEvent('mock', {} as RTCTrackEventInit);
     return new Promise<void>((done) => {
       streamClient.on('track', (data) => {
-        expect(data).toMatchObject(event);
+        expect((data as unknown as { mock: true }).mock).eq(true);
         done();
       });
 
-      robotClient.emit('track', event);
+      robotClient.emit('track', { mock: true } as unknown as RTCTrackEvent);
     });
   });
 
