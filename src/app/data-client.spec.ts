@@ -1547,7 +1547,6 @@ describe('DataClient tests', () => {
     const sequenceId = 'test-sequence-id';
     const resources = [
       new SequenceResourceFilter({
-        partId: 'part-id',
         resourceName: 'my-sensor',
         methodName: 'Readings',
       }),
@@ -1566,7 +1565,7 @@ describe('DataClient tests', () => {
 
     it('creates a sequence', async () => {
       const expectedRequest = new CreateSequenceRequest({
-        organizationId: orgId,
+        partId: orgId,
         resources,
       });
 
@@ -1579,7 +1578,7 @@ describe('DataClient tests', () => {
   describe('getSequence tests', () => {
     let capReq: GetSequenceRequest;
     const sequenceId = 'test-sequence-id';
-    const sequence = new Sequence({ id: sequenceId, organizationId: 'org-id' });
+    const sequence = new Sequence({ id: sequenceId, partId: 'part-id' });
 
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
@@ -1653,8 +1652,8 @@ describe('DataClient tests', () => {
   describe('listSequences tests', () => {
     let capReq: ListSequencesRequest;
     const orgId = 'test-org-id';
-    const sequence1 = new Sequence({ id: 'seq1', organizationId: orgId });
-    const sequence2 = new Sequence({ id: 'seq2', organizationId: orgId });
+    const sequence1 = new Sequence({ id: 'seq1', partId: orgId });
+    const sequence2 = new Sequence({ id: 'seq2', partId: orgId });
     const sequences = [sequence1, sequence2];
 
     beforeEach(() => {

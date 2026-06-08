@@ -1893,10 +1893,9 @@ export class DataClient {
    *
    * ```ts
    * const sequenceId = await dataClient.createSequence(
-   *   '123abc45-1234-5678-90ab-cdef12345678',
+   *   'part-id',
    *   [
    *     {
-   *       partId: 'part-id',
    *       resourceName: 'my-sensor',
    *       methodName: 'Readings',
    *     },
@@ -1907,7 +1906,7 @@ export class DataClient {
    * );
    * ```
    *
-   * @param organizationId The ID of the organization
+   * @param partId The ID of the part that owns the sequence
    * @param resources The resource filters for the sequence
    * @param sequenceTags Optional tags for the sequence
    * @param startTime Optional start time of the sequence
@@ -1915,14 +1914,14 @@ export class DataClient {
    * @returns The ID of the created sequence
    */
   async createSequence(
-    organizationId: string,
+    partId: string,
     resources: PartialMessage<SequenceResourceFilter>[],
     sequenceTags?: string[],
     startTime?: Date,
     endTime?: Date
   ): Promise<string> {
     const resp = await this.dataClient.createSequence({
-      organizationId,
+      partId,
       resources,
       sequenceTags,
       startTime: startTime ? Timestamp.fromDate(startTime) : undefined,
