@@ -223,7 +223,7 @@ describe('RobotClient', () => {
 
     const setupDisconnectedEventCapture = (client: RobotClient) => {
       const events: DisconnectedEvent[] = [];
-      client.on('disconnected', (event) => {
+      client.on(MachineConnectionEvent.DISCONNECTED, (event) => {
         events.push(event as DisconnectedEvent);
       });
       return events;

@@ -1,4 +1,4 @@
-type Callback<T> = (args: T) => void;
+type Callback<E> = (args: E) => void;
 
 /**
  * MachineConnectionEvent events are emitted by a Client's EventDispatcher when connection events
@@ -14,32 +14,34 @@ export enum MachineConnectionEvent {
   RECONNECTION_FAILED = 'reconnection_failed',
 }
 
-export class EventDispatcher<T> {
-  listeners: Partial<Record<string, Set<Callback<T>>>> = {};
+export class EventDispatcher<Events extends object> {
+  listeners: Partial<{ [K in keyof Events]: Set<Callback<Events[K]>> }> = {};
 
-  on(type: string, listener: Callback<T>) {
-    const { listeners } = this;
-    listeners[type] ??= new Set();
-    listeners[type].add(listener);
+  on<K extends keyof Events & string>(type: K, listener: Callback<Events[K]>): void {
+    this.listeners[type] ??= new Set<Callback<Events[K]>>();
+    this.listeners[type].add(listener);
   }
 
-  once(type: string, listener: Callback<T>) {
-    const fn = (args: T) => {
+  once<K extends keyof Events & string>(type: K, listener: Callback<Events[K]>): void {
+    const fn = (args: Events[K]) => {
       listener(args);
-      this.off(type, listener);
+      this.off(type, fn);
     };
     this.on(type, fn);
   }
 
-  has(type: string, listener: Callback<T>) {
+  has<K extends keyof Events & string>(
+    type: K,
+    listener: Callback<Events[K]>,
+  ): boolean | undefined {
     return this.listeners[type]?.has(listener);
   }
 
-  off(type: string, listener: Callback<T>) {
+  off<K extends keyof Events & string>(type: K, listener: Callback<Events[K]>): void {
     this.listeners[type]?.delete(listener);
   }
 
-  emit(type: string, args: T) {
+  emit<K extends keyof Events & string>(type: K, args: Events[K]): void {
     for (const callback of this.listeners[type] ?? []) {
       callback(args);
     }
