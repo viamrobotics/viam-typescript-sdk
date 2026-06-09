@@ -34,6 +34,8 @@ jobs:
         run: |
           if ${{ contains(github.event.release.tag_name, 'rc') }} ; then
             echo "tag=rc" >> $GITHUB_OUTPUT
+          elif ${{ contains(github.event.release.tag_name, '-b.') }} ; then
+            echo "tag=beta" >> $GITHUB_OUTPUT
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
@@ -45,7 +47,7 @@ jobs:
 
       - name: Publish
         id: publish
-        run: npm publish ${{ steps.release_file.outputs.path }}
+        run: npm publish --tag ${{ steps.which_tag.outputs.tag }} ${{ steps.release_file.outputs.path }}
 
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
