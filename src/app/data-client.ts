@@ -5,10 +5,10 @@ import {
   Timestamp,
   type JsonValue,
   type PartialMessage,
-} from "@bufbuild/protobuf";
-import { createClient, type Client, type Transport } from "@connectrpc/connect";
-import { BSON } from "bsonfy";
-import { DataService } from "../gen/app/data/v1/data_connect";
+} from '@bufbuild/protobuf';
+import { createClient, type Client, type Transport } from '@connectrpc/connect';
+import { BSON } from 'bsonfy';
+import { DataService } from '../gen/app/data/v1/data_connect';
 import {
   type BinaryID,
   CaptureInterval,
@@ -23,19 +23,19 @@ import {
   TabularDataSourceType,
   type DeleteTabularFilter,
   TagsFilter,
-} from "../gen/app/data/v1/data_pb";
-import { DataPipelinesService } from "../gen/app/datapipelines/v1/data_pipelines_connect";
+} from '../gen/app/data/v1/data_pb';
+import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
 import {
   type DataPipeline,
   type DataPipelineRun,
-} from "../gen/app/datapipelines/v1/data_pipelines_pb";
-import { DatasetService } from "../gen/app/dataset/v1/dataset_connect";
+} from '../gen/app/datapipelines/v1/data_pipelines_pb';
+import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
 import {
   type DatasetType,
   type Dataset as PBDataset,
   type GetSequenceDatasetExportResponse,
-} from "../gen/app/dataset/v1/dataset_pb";
-import { DataSyncService } from "../gen/app/datasync/v1/data_sync_connect";
+} from '../gen/app/dataset/v1/dataset_pb';
+import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
 import {
   DataCaptureUploadRequest,
   DataType,
@@ -44,7 +44,7 @@ import {
   SensorData,
   SensorMetadata,
   UploadMetadata,
-} from "../gen/app/datasync/v1/data_sync_pb";
+} from '../gen/app/datasync/v1/data_sync_pb';
 
 export type FilterOptions = Partial<Filter> & {
   endTime?: Date;
@@ -136,7 +136,7 @@ export type Dataset = Partial<PBDataset> & {
 const logDeprecationWarning = () => {
   // eslint-disable-next-line no-console
   console.warn(
-    "The BinaryID type is deprecated and will be removed in a future release. Please migrate to the BinaryDataId field instead.",
+    'The BinaryID type is deprecated and will be removed in a future release. Please migrate to the BinaryDataId field instead.',
   );
 };
 
@@ -313,10 +313,7 @@ export class DataClient {
 
     // Legacy support for useRecentData, which is now deprecated.
     let dataSource = tabularDataSource;
-    if (
-      useRecentData &&
-      (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)
-    ) {
+    if (useRecentData && (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)) {
       dataSource = new TabularDataSource({
         type: TabularDataSourceType.HOT_STORAGE,
       });
@@ -368,7 +365,7 @@ export class DataClient {
     filter?: Filter,
     limit?: number,
     sortOrder?: Order,
-    last = "",
+    last = '',
     countOnly = false,
     includeInternalData = false,
   ) {
@@ -447,7 +444,7 @@ export class DataClient {
     filter?: Filter,
     limit?: number,
     sortOrder?: Order,
-    last = "",
+    last = '',
     includeBinary = true,
     countOnly = false,
     includeInternalData = false,
@@ -493,7 +490,7 @@ export class DataClient {
    * @returns An array of data objects
    */
   async binaryDataByIds(ids: string[] | BinaryID[], includeBinary = true) {
-    if (Array.isArray(ids) && typeof ids[0] === "string") {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
       const resp = await this.dataClient.binaryDataByIDs({
         binaryDataIds: ids as string[],
         includeBinary,
@@ -632,7 +629,7 @@ export class DataClient {
    * @returns The number of items deleted
    */
   async deleteBinaryDataByIds(ids: string[] | BinaryID[]) {
-    if (Array.isArray(ids) && typeof ids[0] === "string") {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
       const resp = await this.dataClient.deleteBinaryDataByIDs({
         binaryDataIds: ids as string[],
       });
@@ -666,7 +663,7 @@ export class DataClient {
    * @param ids The IDs of the data to be tagged. Must be non-empty.
    */
   async addTagsToBinaryDataByIds(tags: string[], ids: string[] | BinaryID[]) {
-    if (Array.isArray(ids) && typeof ids[0] === "string") {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
       await this.dataClient.addTagsToBinaryDataByIDs({
         tags,
         binaryDataIds: ids as string[],
@@ -731,11 +728,8 @@ export class DataClient {
    * @param ids The IDs of the data to be edited. Must be non-empty.
    * @returns The number of items deleted
    */
-  async removeTagsFromBinaryDataByIds(
-    tags: string[],
-    ids: string[] | BinaryID[],
-  ) {
-    if (Array.isArray(ids) && typeof ids[0] === "string") {
+  async removeTagsFromBinaryDataByIds(tags: string[], ids: string[] | BinaryID[]) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
       const resp = await this.dataClient.removeTagsFromBinaryDataByIDs({
         tags,
         binaryDataIds: ids as string[],
@@ -843,7 +837,7 @@ export class DataClient {
     yMaxNormalized: number,
     confidence?: number,
   ) {
-    if (typeof binaryId === "string") {
+    if (typeof binaryId === 'string') {
       const resp = await this.dataClient.addBoundingBoxToImageByID({
         binaryDataId: binaryId,
         label,
@@ -886,11 +880,8 @@ export class DataClient {
    * @param binId The ID of the image to remove the bounding box from
    * @param bboxId The ID of the bounding box to remove
    */
-  async removeBoundingBoxFromImageById(
-    binId: string | BinaryID,
-    bboxId: string,
-  ) {
-    if (typeof binId === "string") {
+  async removeBoundingBoxFromImageById(binId: string | BinaryID, bboxId: string) {
+    if (typeof binId === 'string') {
       await this.dataClient.removeBoundingBoxFromImageByID({
         binaryDataId: binId,
         bboxId,
@@ -943,7 +934,7 @@ export class DataClient {
     yMaxNormalized: number,
     confidence?: number,
   ) {
-    if (typeof binaryId === "string") {
+    if (typeof binaryId === 'string') {
       await this.dataClient.updateBoundingBox({
         binaryDataId: binaryId,
         bboxId,
@@ -1061,11 +1052,8 @@ export class DataClient {
    * @param ids The IDs of binary data to add to dataset
    * @param datasetId The ID of the dataset to be added to
    */
-  async addBinaryDataToDatasetByIds(
-    ids: string[] | BinaryID[],
-    datasetId: string,
-  ) {
-    if (Array.isArray(ids) && typeof ids[0] === "string") {
+  async addBinaryDataToDatasetByIds(ids: string[] | BinaryID[], datasetId: string) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
       await this.dataClient.addBinaryDataToDatasetByIDs({
         binaryDataIds: ids as string[],
         datasetId,
@@ -1099,11 +1087,8 @@ export class DataClient {
    * @param ids The IDs of the binary data to remove from dataset
    * @param datasetId The ID of the dataset to be removed from
    */
-  async removeBinaryDataFromDatasetByIds(
-    ids: string[] | BinaryID[],
-    datasetId: string,
-  ) {
-    if (Array.isArray(ids) && typeof ids[0] === "string") {
+  async removeBinaryDataFromDatasetByIds(ids: string[] | BinaryID[], datasetId: string) {
+    if (Array.isArray(ids) && typeof ids[0] === 'string') {
       await this.dataClient.removeBinaryDataFromDatasetByIDs({
         binaryDataIds: ids as string[],
         datasetId,
@@ -1297,7 +1282,7 @@ export class DataClient {
     tags?: string[],
   ) {
     if (dataRequestTimes.length !== tabularData.length) {
-      throw new Error("dataRequestTimes and data lengths must be equal.");
+      throw new Error('dataRequestTimes and data lengths must be equal.');
     }
 
     const metadata = new UploadMetadata({
@@ -1321,7 +1306,7 @@ export class DataClient {
         new SensorData({
           metadata: sensorMetadata,
           data: {
-            case: "struct",
+            case: 'struct',
             value: Struct.fromJson(data),
           },
         }),
@@ -1389,9 +1374,9 @@ export class DataClient {
       methodName,
       type: DataType.BINARY_SENSOR,
       tags: options?.tags,
-      fileExtension: options?.fileExtension ?? "",
+      fileExtension: options?.fileExtension ?? '',
       datasetIds: options?.datasetIds,
-      mimeType: options?.mimeType ?? "",
+      mimeType: options?.mimeType ?? '',
     });
 
     const sensorData = new SensorData({
@@ -1400,7 +1385,7 @@ export class DataClient {
         timeReceived: Timestamp.fromDate(dataRequestTimes[1]),
       },
       data: {
-        case: "binary",
+        case: 'binary',
         value: binaryData,
       },
     });
@@ -1437,11 +1422,7 @@ export class DataClient {
    * @param options Options for the file upload
    * @returns The binary data ID of the uploaded data
    */
-  async fileUpload(
-    binaryData: Uint8Array,
-    partId: string,
-    options?: FileUploadOptions,
-  ) {
+  async fileUpload(binaryData: Uint8Array, partId: string, options?: FileUploadOptions) {
     const md = new UploadMetadata({
       partId,
       type: DataType.FILE,
@@ -1467,7 +1448,7 @@ export class DataClient {
   ): AsyncGenerator<PartialMessage<FileUploadRequest>> {
     yield new FileUploadRequest({
       uploadPacket: {
-        case: "metadata",
+        case: 'metadata',
         value: metadata,
       },
     });
@@ -1478,7 +1459,7 @@ export class DataClient {
       }
       yield new FileUploadRequest({
         uploadPacket: {
-          case: "fileContents",
+          case: 'fileContents',
           value: new FileData({ data: data.slice(i, end) }),
         },
       });
@@ -1654,8 +1635,7 @@ export class DataClient {
         ? (query as Uint8Array[])
         : query.map((value) => BSON.serialize(value));
 
-    const inputDataSourceType =
-      dataSourceType ?? TabularDataSourceType.STANDARD;
+    const inputDataSourceType = dataSourceType ?? TabularDataSourceType.STANDARD;
 
     const resp = await this.dataPipelinesClient.createDataPipeline({
       organizationId,
@@ -1878,7 +1858,7 @@ export class DataClient {
   async getSequence(id: string): Promise<Sequence> {
     const resp = await this.dataClient.getSequence({ id });
     if (!resp.sequence) {
-      throw new Error("no sequence returned");
+      throw new Error('no sequence returned');
     }
     return resp.sequence;
   }
@@ -1982,17 +1962,14 @@ export class DataClient {
    * ```ts
    * await dataClient.addSequencesToDataset(
    *   ['sequence-id-1', 'sequence-id-2'],
-   *   '12ab3de4f56a7bcd89ef0ab1'
+   *   '12ab3de4f56a7bcd89ef0ab1',
    * );
    * ```
    *
    * @param sequenceIds The IDs of the sequences to add to the dataset
    * @param datasetId The ID of the dataset to add the sequences to
    */
-  async addSequencesToDataset(
-    sequenceIds: string[],
-    datasetId: string,
-  ): Promise<void> {
+  async addSequencesToDataset(sequenceIds: string[], datasetId: string): Promise<void> {
     await this.dataClient.addSequencesToDataset({ sequenceIds, datasetId });
   }
 
@@ -2004,17 +1981,14 @@ export class DataClient {
    * ```ts
    * await dataClient.removeSequencesFromDataset(
    *   ['sequence-id-1', 'sequence-id-2'],
-   *   '12ab3de4f56a7bcd89ef0ab1'
+   *   '12ab3de4f56a7bcd89ef0ab1',
    * );
    * ```
    *
    * @param sequenceIds The IDs of the sequences to remove from the dataset
    * @param datasetId The ID of the dataset to remove the sequences from
    */
-  async removeSequencesFromDataset(
-    sequenceIds: string[],
-    datasetId: string,
-  ): Promise<void> {
+  async removeSequencesFromDataset(sequenceIds: string[], datasetId: string): Promise<void> {
     await this.dataClient.removeSequencesFromDataset({
       sequenceIds,
       datasetId,
@@ -2027,8 +2001,9 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const { sequences, nextPageToken } =
-   *   await dataClient.sequencesByDatasetID('12ab3de4f56a7bcd89ef0ab1');
+   * const { sequences, nextPageToken } = await dataClient.sequencesByDatasetID(
+   *   '12ab3de4f56a7bcd89ef0ab1',
+   * );
    * ```
    *
    * @param datasetId The ID of the dataset
@@ -2055,9 +2030,7 @@ export class DataClient {
    * @example
    *
    * ```ts
-   * const jobId = await dataClient.startSequenceDatasetExport(
-   *   '12ab3de4f56a7bcd89ef0ab1'
-   * );
+   * const jobId = await dataClient.startSequenceDatasetExport('12ab3de4f56a7bcd89ef0ab1');
    * ```
    *
    * @param datasetId The ID of the sequence dataset to export
@@ -2082,9 +2055,7 @@ export class DataClient {
    * @param jobId The ID of the export job
    * @returns The current status of the export job
    */
-  async getSequenceDatasetExport(
-    jobId: string,
-  ): Promise<GetSequenceDatasetExportResponse> {
+  async getSequenceDatasetExport(jobId: string): Promise<GetSequenceDatasetExportResponse> {
     return this.datasetClient.getSequenceDatasetExport({ jobId });
   }
 }
@@ -2111,14 +2082,14 @@ export class ListDataPipelineRunsPage {
    * @returns A page of data pipeline runs
    */
   async nextPage(): Promise<ListDataPipelineRunsPage> {
-    if (this.nextPageToken === undefined || this.nextPageToken === "") {
+    if (this.nextPageToken === undefined || this.nextPageToken === '') {
       // empty token means no more runs to list.
       return new ListDataPipelineRunsPage(
         this.dataPipelinesClient,
         this.pipelineId,
         [],
         this.pageSize,
-        "",
+        '',
       );
     }
 
@@ -2143,10 +2114,10 @@ export {
   type Order,
   type Sequence,
   type SequenceResourceFilter,
-} from "../gen/app/data/v1/data_pb";
+} from '../gen/app/data/v1/data_pb';
 export {
   DatasetType,
   SequenceDatasetExportStatus,
   type GetSequenceDatasetExportResponse,
-} from "../gen/app/dataset/v1/dataset_pb";
-export { type UploadMetadata } from "../gen/app/datasync/v1/data_sync_pb";
+} from '../gen/app/dataset/v1/dataset_pb';
+export { type UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';

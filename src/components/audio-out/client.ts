@@ -1,21 +1,18 @@
-import type { RobotClient } from "../../robot";
-import type { Options } from "../../types";
+import type { RobotClient } from '../../robot';
+import type { Options } from '../../types';
 
-import { Struct, type JsonValue } from "@bufbuild/protobuf";
-import type { CallOptions, Client } from "@connectrpc/connect";
-import {
-  GetPropertiesRequest,
-  type AudioInfo,
-} from "../../gen/common/v1/common_pb";
-import { AudioOutService } from "../../gen/component/audioout/v1/audioout_connect";
+import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import type { CallOptions, Client } from '@connectrpc/connect';
+import { GetPropertiesRequest, type AudioInfo } from '../../gen/common/v1/common_pb';
+import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
 import {
   PlayRequest,
   PlayStreamChunk,
   PlayStreamInit,
   PlayStreamRequest,
-} from "../../gen/component/audioout/v1/audioout_pb";
-import { doCommandFromClient, getStatusFromClient } from "../../utils";
-import { type AudioOut } from "./audio-out";
+} from '../../gen/component/audioout/v1/audioout_pb';
+import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import { type AudioOut } from './audio-out';
 
 /**
  * A gRPC-web client for the AudioOut component.
@@ -61,27 +58,26 @@ export class AudioOutClient implements AudioOut {
     const { name } = this;
     const extraStruct = Struct.fromJson(extra);
 
-    const requests =
-      async function* requestGen(): AsyncGenerator<PlayStreamRequest> {
+    const requests = async function* requestGen(): AsyncGenerator<PlayStreamRequest> {
+      yield new PlayStreamRequest({
+        payload: {
+          case: 'init',
+          value: new PlayStreamInit({
+            name,
+            audioInfo,
+            extra: extraStruct,
+          }),
+        },
+      });
+      for await (const audioData of chunks) {
         yield new PlayStreamRequest({
           payload: {
-            case: "init",
-            value: new PlayStreamInit({
-              name,
-              audioInfo,
-              extra: extraStruct,
-            }),
+            case: 'audioChunk',
+            value: new PlayStreamChunk({ audioData }),
           },
         });
-        for await (const audioData of chunks) {
-          yield new PlayStreamRequest({
-            payload: {
-              case: "audioChunk",
-              value: new PlayStreamChunk({ audioData }),
-            },
-          });
-        }
-      };
+      }
+    };
 
     await this.client.playStream(requests(), callOptions);
   }
@@ -104,12 +100,7 @@ export class AudioOutClient implements AudioOut {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions,
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(

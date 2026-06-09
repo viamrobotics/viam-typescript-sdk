@@ -100,9 +100,7 @@ describe('AudioOutClient tests', () => {
       await audioOut.playStream(audioInfo, source());
 
       expect(capturedPlayStreamInit?.name).toEqual('test-audio-out');
-      expect(capturedPlayStreamInit?.audioInfo?.codec).toEqual(
-        AudioCodec.PCM16
-      );
+      expect(capturedPlayStreamInit?.audioInfo?.codec).toEqual(AudioCodec.PCM16);
       expect(capturedPlayStreamInit?.audioInfo?.sampleRateHz).toEqual(22_050);
       expect(capturedPlayStreamInit?.audioInfo?.numChannels).toEqual(1);
       expect(capturedPlayStreamChunks).toEqual(chunks);
@@ -115,7 +113,6 @@ describe('AudioOutClient tests', () => {
         numChannels: 2,
       });
 
-       
       const empty = async function* emptyGen(): AsyncIterable<Uint8Array> {
         // no chunks
       };
