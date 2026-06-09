@@ -24,9 +24,9 @@ export interface AudioOut extends Resource {
   /**
    * Stream audio chunks to the device for playback.
    *
-   * The caller provides an async iterable of raw audio bytes. Each chunk must
-   * match the codec and format described by `audioInfo`. Playback starts as
-   * chunks arrive on the server, before the iterable is exhausted.
+   * The caller provides an async iterable of raw audio bytes. Each chunk must match the codec and
+   * format described by `audioInfo`. Playback starts as chunks arrive on the server, before the
+   * iterable is exhausted.
    *
    * @example
    *
@@ -45,14 +45,14 @@ export interface AudioOut extends Resource {
    * await audioOut.playStream(audioInfo, chunks());
    * ```
    *
-   * @param audioInfo - Information about the audio format (codec, sample rate,
-   *   channels) that applies to every chunk
+   * @param audioInfo - Information about the audio format (codec, sample rate, channels) that
+   *   applies to every chunk
    * @param chunks - Async iterable of audio byte chunks to play in order
    */
   playStream: (
     audioInfo: AudioInfo,
     chunks: AsyncIterable<Uint8Array>,
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<void>;
 
   /**

@@ -1815,7 +1815,7 @@ describe('DatasetClient tests', () => {
 
       const promise = await subject().listDatasetsByOrganizationID(
         'orgId',
-        DatasetType.SEQUENCE_DATA
+        DatasetType.SEQUENCE_DATA,
       );
       expect(capReq).toStrictEqual(expectedRequest);
       expect(promise.length).toEqual(2);
