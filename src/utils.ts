@@ -1,5 +1,6 @@
-import { Struct, type JsonValue, type PartialMessage } from '@bufbuild/protobuf';
+import { type JsonValue, type PartialMessage, Struct } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
+import { XMLParser } from 'fast-xml-parser';
 import { apiVersion } from './api-version';
 import type { Frame } from './gen/app/v1/robot_pb';
 import {
@@ -12,6 +13,7 @@ import {
   type GetKinematicsResponse,
   GetStatusRequest,
   type GetStatusResponse,
+  KinematicsFileFormat,
   type Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
@@ -143,12 +145,17 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
     name,
     extra,
   });
-
   const response = await getKinematicsMethod(request, callOptions);
 
   const decoder = new TextDecoder('utf-8');
-  const jsonString = decoder.decode(response.kinematicsData);
-  const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
+  const decodedString = decoder.decode(response.kinematicsData);
+  let parsedKinematicsData;
+  if (response.format === KinematicsFileFormat.URDF) {
+    const parser = new XMLParser();
+    parsedKinematicsData = parser.parse(decodedString);
+  } else {
+    parsedKinematicsData = JSON.parse(decodedString) as KinematicsData;
+  }
 
   return {
     ...parsedKinematicsData,

@@ -78,6 +78,8 @@ const disconnect = async () => {
 
 const logResources = async () => {
   console.log(machine?.isConnected() ? await machine.resourceNames() : 'Not connected');
+  const arm = new VIAM.ArmClient(machine!, 'arm');
+  console.log(await arm.getKinematics());
 };
 
 async function main() {
