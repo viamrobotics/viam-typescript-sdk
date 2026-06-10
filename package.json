@@ -64,7 +64,7 @@
     "@bufbuild/buf": "^1.15.0-1",
     "@connectrpc/connect-node": "1.6.1",
     "@playwright/test": "1.56.1",
-    "@types/node": "^20.11.10",
+    "@types/node": "^20.19.0",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
     "@viamrobotics/eslint-config": "^0.4.0",
