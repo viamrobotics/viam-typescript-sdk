@@ -18,13 +18,13 @@ describe('debug logging', () => {
 
   describe('writeDebugLog', () => {
     it('does nothing when no writer is set', () => {
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       writeDebugLog('test_event', { foo: 'bar' });
       expect(writer).not.toHaveBeenCalled();
     });
 
     it('calls the writer with event, fields, and a Date timestamp', () => {
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
 
       writeDebugLog('test_event', { connectionId: 'abc', extra: 123 });
@@ -38,7 +38,7 @@ describe('debug logging', () => {
     });
 
     it('stops calling the writer after it is cleared', () => {
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       writeDebugLog('first');
       setDebugLogWriter(undefined);
@@ -47,7 +47,7 @@ describe('debug logging', () => {
     });
 
     it('works with no extra fields', () => {
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       writeDebugLog('bare_event');
       const [entry] = writer.mock.calls[0]!;
@@ -75,7 +75,7 @@ describe('debug logging', () => {
 
   describe('createConsoleLogWriter', () => {
     it('calls console.debug with [viam-sdk] prefix and JSON-stringified entry', () => {
-      const debugSpy = vi.fn<[string, string]>();
+      const debugSpy = vi.fn<(a: string, b: string) => void>();
       vi.stubGlobal('console', { ...console, debug: debugSpy });
       const writer = createConsoleLogWriter();
       const entry = {

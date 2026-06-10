@@ -1,4 +1,3 @@
-import type { ArgumentsType } from 'vitest';
 import {
   RobotClient,
   ArmClient,
@@ -9,6 +8,8 @@ import {
 } from '../src/main';
 import { defaultConfig, invalidConfig } from './fixtures/configs/dial-configs';
 import type { ResolvedReturnType } from './helpers/api-types';
+
+type ArgumentsType<T> = T extends (...args: infer A) => unknown ? A : never;
 
 const client = new RobotClient();
 const armClient = new ArmClient(client, 'fake_arm');

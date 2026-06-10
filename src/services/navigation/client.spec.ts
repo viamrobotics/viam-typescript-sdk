@@ -16,10 +16,10 @@ const testLongitude = 75;
 const testCompassHeading = 90;
 
 describe('getLocation', () => {
-  let latitude: Mock<[], number>;
-  let longitude: Mock<[], number>;
-  let compassHeading: Mock<[], number>;
-  let location: Mock<[], { latitude: number; longitude: number }>;
+  let latitude: Mock<() => number>;
+  let longitude: Mock<() => number>;
+  let compassHeading: Mock<() => number>;
+  let location: Mock<() => { latitude: number; longitude: number }>;
 
   let navigation: NavigationClient;
 

@@ -38,7 +38,7 @@ let motion: MotionClient;
 const testExecutionId = 'some execution id';
 
 describe('moveOnGlobe', () => {
-  let executionId: Mock<[], string>;
+  let executionId: Mock<() => string>;
 
   it('return executionID', async () => {
     executionId = vi.fn(() => testExecutionId);

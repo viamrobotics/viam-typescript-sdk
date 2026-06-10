@@ -81,7 +81,12 @@ const setupDialWebRTCMocks = () => {
     terminate: vi.fn(),
   } as unknown as SignalingExchange;
 
-  vi.mocked(SignalingExchange).mockImplementation(() => signalingExchange);
+  vi.mocked(SignalingExchange).mockImplementation(
+    class {
+      doExchange = signalingExchange.doExchange;
+      terminate = signalingExchange.terminate;
+    } as unknown as typeof SignalingExchange
+  );
 
   return {
     peerConnection,
@@ -538,7 +543,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_request then grpc_response on success', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.unary).mockResolvedValue({} as UnaryResponse);
@@ -570,7 +575,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error field and rethrows on failure', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.unary).mockRejectedValue(new Error('rpc failed'));
@@ -618,7 +623,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_request once and grpc_response per message', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{}, {}, {}] as AnyMessage[];
@@ -659,7 +664,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('yields all original messages unchanged', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const messages = [{ a: 1 }, { a: 2 }] as unknown as AnyMessage[];
@@ -688,7 +693,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error when transport.stream rejects', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       vi.mocked(transport.stream).mockRejectedValue(
@@ -717,7 +722,7 @@ describe('wrapTransportWithDebugLogging', () => {
 
     it('logs grpc_response with error on mid-stream failure', async () => {
       // Arrange
-      const writer = vi.fn<[DebugLogEntry]>();
+      const writer = vi.fn<(entry: DebugLogEntry) => void>();
       setDebugLogWriter(writer);
       const transport = createMockTransport();
       const streamError = new Error('mid-stream error');
