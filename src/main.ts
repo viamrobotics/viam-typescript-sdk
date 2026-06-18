@@ -8,6 +8,8 @@ export {
   type DialConf,
   type DialDirectConf,
   type DialWebRTCConf,
+  type ModuleStatus,
+  type ModuleStatusState,
   type Robot,
 } from './robot';
 /**

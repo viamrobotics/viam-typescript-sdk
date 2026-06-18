@@ -1785,6 +1785,86 @@ export class AppClient {
   }
 
   /**
+   * Deprecates a registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.deprecateRegistryItem('<YOUR-REGISTRY-ITEM-ID>', 'reason for deprecation');
+   * ```
+   *
+   * @param itemId The ID of the item to deprecate
+   * @param message The reason for deprecation
+   */
+  async deprecateRegistryItem(itemId: string, message: string) {
+    await this.client.deprecateRegistryItem({
+      itemId,
+      message,
+    });
+  }
+
+  /**
+   * Undeprecates a registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.undeprecateRegistryItem('<YOUR-REGISTRY-ITEM-ID>');
+   * ```
+   *
+   * @param itemId The ID of the item to undeprecate
+   */
+  async undeprecateRegistryItem(itemId: string) {
+    await this.client.undeprecateRegistryItem({
+      itemId,
+    });
+  }
+
+  /**
+   * Deprecates a specific version of a registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.deprecateRegistryItemVersion('<YOUR-REGISTRY-ITEM-ID>', '1.2.3', 'reason for deprecation');
+   * ```
+   *
+   * @param itemId The ID of the registry item
+   * @param version The semver string of the version to deprecate
+   * @param message The reason for deprecation
+   */
+  async deprecateRegistryItemVersion(
+    itemId: string,
+    version: string,
+    message: string
+  ) {
+    await this.client.deprecateRegistryItemVersion({
+      itemId,
+      version,
+      message,
+    });
+  }
+
+  /**
+   * Undeprecates a specific version of a registry item.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.undeprecateRegistryItemVersion('<YOUR-REGISTRY-ITEM-ID>', '1.2.3');
+   * ```
+   *
+   * @param itemId The ID of the registry item
+   * @param version The semver string of the version to undeprecate
+   */
+  async undeprecateRegistryItemVersion(itemId: string, version: string) {
+    await this.client.undeprecateRegistryItemVersion({
+      itemId,
+      version,
+    });
+  }
+
+  /**
    * Creates a new module.
    *
    * @example

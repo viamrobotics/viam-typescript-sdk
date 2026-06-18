@@ -1603,6 +1603,106 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('deprecateRegistryItem tests', () => {
+    const expectedRequest = new pb.DeprecateRegistryItemRequest({
+      itemId: 'itemId',
+      message: 'reason for deprecation',
+    });
+
+    let capReq: pb.DeprecateRegistryItemRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          deprecateRegistryItem: (req) => {
+            capReq = req;
+            return new pb.DeprecateRegistryItemResponse();
+          },
+        });
+      });
+    });
+
+    it('deprecateRegistryItem', async () => {
+      await subject().deprecateRegistryItem('itemId', 'reason for deprecation');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('undeprecateRegistryItem tests', () => {
+    const expectedRequest = new pb.UndeprecateRegistryItemRequest({
+      itemId: 'itemId',
+    });
+
+    let capReq: pb.UndeprecateRegistryItemRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          undeprecateRegistryItem: (req) => {
+            capReq = req;
+            return new pb.UndeprecateRegistryItemResponse();
+          },
+        });
+      });
+    });
+
+    it('undeprecateRegistryItem', async () => {
+      await subject().undeprecateRegistryItem('itemId');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('deprecateRegistryItemVersion tests', () => {
+    const expectedRequest = new pb.DeprecateRegistryItemVersionRequest({
+      itemId: 'itemId',
+      version: '1.2.3',
+      message: 'reason for deprecation',
+    });
+
+    let capReq: pb.DeprecateRegistryItemVersionRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          deprecateRegistryItemVersion: (req) => {
+            capReq = req;
+            return new pb.DeprecateRegistryItemVersionResponse();
+          },
+        });
+      });
+    });
+
+    it('deprecateRegistryItemVersion', async () => {
+      await subject().deprecateRegistryItemVersion(
+        'itemId',
+        '1.2.3',
+        'reason for deprecation'
+      );
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('undeprecateRegistryItemVersion tests', () => {
+    const expectedRequest = new pb.UndeprecateRegistryItemVersionRequest({
+      itemId: 'itemId',
+      version: '1.2.3',
+    });
+
+    let capReq: pb.UndeprecateRegistryItemVersionRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          undeprecateRegistryItemVersion: (req) => {
+            capReq = req;
+            return new pb.UndeprecateRegistryItemVersionResponse();
+          },
+        });
+      });
+    });
+
+    it('undeprecateRegistryItemVersion', async () => {
+      await subject().undeprecateRegistryItemVersion('itemId', '1.2.3');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
   describe('createModule tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
