@@ -2,6 +2,7 @@ import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
@@ -13,6 +14,21 @@ export const {
 
 /** Represents a physical encoder. */
 export interface Encoder extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const encoder = new VIAM.EncoderClient(machine, 'my_encoder');
+   * const geometries = await encoder.getGeometries();
+   * ```
+   *
+   * For more information, see [Encoder
+   * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getgeometries).
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Set the current position of the encoder as the new zero position.
    *

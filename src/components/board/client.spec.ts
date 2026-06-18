@@ -2,6 +2,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { StreamTicksResponse } from '../../gen/component/board/v1/board_pb';
+import { Geometry, GetGeometriesResponse } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { AnalogValue, type Tick } from './board';
 import { BoardClient } from './client';
@@ -29,6 +30,8 @@ const testAnalogValue: AnalogValue = new AnalogValue({
   stepSize: testStepSize,
 });
 
+const testGeometries = [new Geometry({ label: 'test-geometry' })];
+
 let testTickStream: WritableIterable<PartialMessage<StreamTicksResponse>>;
 
 describe('BoardClient tests', () => {
@@ -40,6 +43,9 @@ describe('BoardClient tests', () => {
         },
         streamTicks: () => {
           return testTickStream;
+        },
+        getGeometries: () => {
+          return new GetGeometriesResponse({ geometries: testGeometries });
         },
       });
     });
@@ -61,6 +67,10 @@ describe('BoardClient tests', () => {
     await expect(board.readAnalogReader('test-reader')).resolves.toEqual(
       testAnalogValue
     );
+  });
+
+  it('get geometries', async () => {
+    await expect(board.getGeometries()).resolves.toEqual(testGeometries);
   });
 
   describe('streamTicks tests', () => {

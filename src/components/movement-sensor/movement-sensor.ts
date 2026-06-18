@@ -2,6 +2,7 @@ import type { JsonValue, Struct } from '@bufbuild/protobuf';
 import type { Orientation, Resource, Vector3 } from '../../types';
 
 import * as sensorApi from '../../gen/component/movementsensor/v1/movementsensor_pb';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 export type MovementSensorAccuracy = sensorApi.GetAccuracyResponse;
 export type MovementSensorPosition = sensorApi.GetPositionResponse;
@@ -18,6 +19,24 @@ export const {
  * position, and/or speed.
  */
 export interface MovementSensor extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const movementSensor = new VIAM.MovementSensorClient(
+   *   machine,
+   *   'my_movement_sensor'
+   * );
+   * const geometries = await movementSensor.getGeometries();
+   * ```
+   *
+   * For more information, see [Movement Sensor
+   * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getgeometries).
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Get linear velocity across x/y/z axes.
    *

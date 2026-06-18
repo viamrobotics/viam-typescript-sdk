@@ -4,12 +4,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Value } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { GetReadingsResponse } from '../../gen/common/v1/common_pb';
+import {
+  Geometry,
+  GetGeometriesResponse,
+  GetReadingsResponse,
+} from '../../gen/common/v1/common_pb';
 import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_connect';
 import { RobotClient } from '../../robot';
 import { MovementSensorClient } from './client';
 
 let sensor: MovementSensorClient;
+
+const testGeometries = [new Geometry({ label: 'test-geometry' })];
 
 describe('MovementSensorClient tests', () => {
   beforeEach(() => {
@@ -21,6 +27,9 @@ describe('MovementSensorClient tests', () => {
               readings: Value.fromJson('readings'),
             },
           });
+        },
+        getGeometries: () => {
+          return new GetGeometriesResponse({ geometries: testGeometries });
         },
       });
     });
@@ -42,5 +51,9 @@ describe('MovementSensorClient tests', () => {
     await expect(sensor.getReadings()).resolves.toStrictEqual({
       readings: 'readings',
     });
+  });
+
+  it('get geometries', async () => {
+    await expect(sensor.getGeometries()).resolves.toEqual(testGeometries);
   });
 });

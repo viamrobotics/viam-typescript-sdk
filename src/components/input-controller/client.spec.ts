@@ -8,6 +8,7 @@ import {
   TriggerEventRequest,
   TriggerEventResponse,
 } from '../../gen/component/inputcontroller/v1/input_controller_pb';
+import { Geometry, GetGeometriesResponse } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { InputControllerClient } from './client';
 import { InputControllerEvent } from './input-controller';
@@ -24,6 +25,8 @@ const event = new InputControllerEvent({
   control: 'some-control',
 });
 
+const testGeometries = [new Geometry({ label: 'test-geometry' })];
+
 describe('InputControllerClient Tests', () => {
   let capturedEvent: TriggerEventRequest;
   beforeEach(() => {
@@ -37,6 +40,9 @@ describe('InputControllerClient Tests', () => {
         triggerEvent: (req) => {
           capturedEvent = req;
           return new TriggerEventResponse();
+        },
+        getGeometries: () => {
+          return new GetGeometriesResponse({ geometries: testGeometries });
         },
       });
     });
@@ -64,5 +70,11 @@ describe('InputControllerClient Tests', () => {
     expect(capturedEvent.event?.event).toStrictEqual(event.event);
     expect(capturedEvent.event?.value).toStrictEqual(event.value);
     expect(capturedEvent.event?.control).toStrictEqual(event.control);
+  });
+
+  it('gets geometries', async () => {
+    await expect(inputController.getGeometries()).resolves.toEqual(
+      testGeometries
+    );
   });
 });

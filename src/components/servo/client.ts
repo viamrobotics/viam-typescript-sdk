@@ -9,7 +9,11 @@ import {
 } from '../../gen/component/servo/v1/servo_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getGeometriesFromClient,
+  getStatusFromClient,
+} from '../../utils';
 import type { Servo } from './servo';
 
 /**
@@ -27,6 +31,15 @@ export class ServoClient implements Servo {
     this.client = client.createServiceClient(ServoService);
     this.name = name;
     this.options = options;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
   }
 
   async move(angleDeg: number, extra = {}, callOptions = this.callOptions) {
