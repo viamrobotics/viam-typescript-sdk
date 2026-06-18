@@ -1,8 +1,24 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 /** Represents a physical servo. */
 export interface Servo extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const servo = new VIAM.ServoClient(machine, 'my_servo');
+   * const geometries = await servo.getGeometries();
+   * ```
+   *
+   * For more information, see [Servo
+   * API](https://docs.viam.com/dev/reference/apis/components/servo/#getgeometries).
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Move the servo by a given angle in degrees.
    *

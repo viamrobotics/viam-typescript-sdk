@@ -3,6 +3,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GetAudioResponse } from '../../gen/component/audioin/v1/audioin_pb';
 import {
+  Geometry,
+  GetGeometriesResponse,
   GetPropertiesRequest,
   GetPropertiesResponse,
 } from '../../gen/common/v1/common_pb';
@@ -31,6 +33,8 @@ const testProperties = new GetPropertiesResponse({
   numChannels: 2,
 });
 
+const testGeometries = [new Geometry({ label: 'test-geometry' })];
+
 describe('AudioInClient tests', () => {
   beforeEach(() => {
     testAudioStream =
@@ -44,6 +48,9 @@ describe('AudioInClient tests', () => {
         getProperties: (req: GetPropertiesRequest) => {
           capturedPropertiesReq = req;
           return testProperties;
+        },
+        getGeometries: () => {
+          return new GetGeometriesResponse({ geometries: testGeometries });
         },
       });
     });
@@ -138,5 +145,9 @@ describe('AudioInClient tests', () => {
         Struct.fromJson(extra)
       );
     });
+  });
+
+  it('get geometries', async () => {
+    await expect(audioin.getGeometries()).resolves.toEqual(testGeometries);
   });
 });

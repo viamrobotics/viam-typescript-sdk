@@ -1,6 +1,7 @@
 import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import * as pb from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import type { Resource } from '../../types';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 export type InputControllerEvent = PlainMessage<pb.Event>;
 export const { Event: InputControllerEvent } = pb;
@@ -10,6 +11,24 @@ export const { Event: InputControllerEvent } = pb;
  * events for controls.
  */
 export interface InputController extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const controller = new VIAM.InputControllerClient(
+   *   machine,
+   *   'my_controller'
+   * );
+   * const geometries = await controller.getGeometries();
+   * ```
+   *
+   * For more information, see [Input Controller
+   * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#getgeometries).
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Returns a list of events representing the last event on each control.
    *

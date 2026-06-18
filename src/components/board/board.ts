@@ -2,6 +2,7 @@ import type { Duration, Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 import * as boardApi from '../../gen/component/board/v1/board_pb';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 export type AnalogValue = boardApi.ReadAnalogReaderResponse;
 export type PowerMode = boardApi.PowerMode;
@@ -19,6 +20,21 @@ export interface Tick {
  * components such as analog readers, and digital interrupts.
  */
 export interface Board extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const board = new VIAM.BoardClient(machine, 'my_board');
+   * const geometries = await board.getGeometries();
+   * ```
+   *
+   * For more information, see [Board
+   * API](https://docs.viam.com/dev/reference/apis/components/board/#getgeometries).
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Get the high/low state of the given pin.
    *

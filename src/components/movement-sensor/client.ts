@@ -14,7 +14,11 @@ import {
 } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getGeometriesFromClient,
+  getStatusFromClient,
+} from '../../utils';
 import type { MovementSensor } from './movement-sensor';
 
 /**
@@ -32,6 +36,15 @@ export class MovementSensorClient implements MovementSensor {
     this.client = client.createServiceClient(MovementSensorService);
     this.name = name;
     this.options = options;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
   }
 
   async getLinearVelocity(extra = {}, callOptions = this.callOptions) {

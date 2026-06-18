@@ -17,7 +17,11 @@ import {
   StreamTicksRequest,
   WriteAnalogRequest,
 } from '../../gen/component/board/v1/board_pb';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getGeometriesFromClient,
+  getStatusFromClient,
+} from '../../utils';
 import { type Board, type PowerMode, type Tick } from './board';
 
 /**
@@ -35,6 +39,15 @@ export class BoardClient implements Board {
     this.client = client.createServiceClient(BoardService);
     this.name = name;
     this.options = options;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
   }
 
   async setGPIO(

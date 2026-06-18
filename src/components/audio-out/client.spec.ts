@@ -2,9 +2,11 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  AudioInfo,
+  Geometry,
+  GetGeometriesResponse,
   GetPropertiesRequest,
   GetPropertiesResponse,
-  AudioInfo,
 } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { AudioOutClient } from './client';
@@ -31,6 +33,8 @@ const testProperties = new GetPropertiesResponse({
   numChannels: 2,
 });
 
+const testGeometries = [new Geometry({ label: 'test-geometry' })];
+
 describe('AudioOutClient tests', () => {
   beforeEach(() => {
     capturedPlayStreamInit = undefined;
@@ -53,6 +57,9 @@ describe('AudioOutClient tests', () => {
         getProperties: (req: GetPropertiesRequest) => {
           capturedPropertiesReq = req;
           return testProperties;
+        },
+        getGeometries: () => {
+          return new GetGeometriesResponse({ geometries: testGeometries });
         },
       });
     });
@@ -147,5 +154,9 @@ describe('AudioOutClient tests', () => {
         Struct.fromJson(extra)
       );
     });
+  });
+
+  it('get geometries', async () => {
+    await expect(audioOut.getGeometries()).resolves.toEqual(testGeometries);
   });
 });

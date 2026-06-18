@@ -15,7 +15,11 @@ import {
   type AudioInfo,
 } from '../../gen/common/v1/common_pb';
 import { type AudioOut } from './audio-out';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getGeometriesFromClient,
+  getStatusFromClient,
+} from '../../utils';
 
 /**
  * A gRPC-web client for the AudioOut component.
@@ -32,6 +36,15 @@ export class AudioOutClient implements AudioOut {
     this.client = client.createServiceClient(AudioOutService);
     this.name = name;
     this.options = options;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions
+    );
   }
 
   async play(
