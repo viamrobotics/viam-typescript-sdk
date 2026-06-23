@@ -24,7 +24,12 @@ import {
   Credentials as PBCredentials,
 } from '../gen/proto/rpc/v1/auth_pb';
 import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
-import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+import {
+  ICECandidateType,
+  ReportConnectionMetadataRequest,
+  SDKType,
+  WebRTCConfig,
+} from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import { newPeerConnectionForClient } from './peer';
 
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -599,6 +604,104 @@ const getOptionalWebRTCConfig = async (
   }
 };
 
+interface CandidateClassification {
+  type: ICECandidateType;
+  relayAddress: string;
+}
+
+// classifyCandidate maps a single ICE candidate (by stats id) to a transport-level type and,
+// for relay candidates, its relayed transport address. The relay provider (Viam coturn vs
+// Twilio) is resolved server-side from that address, so the SDK does no DNS resolution.
+const classifyCandidate = (
+  stats: RTCStatsReport,
+  candidateId: string
+): CandidateClassification => {
+  const unspecified = {
+    type: ICECandidateType.ICE_CANDIDATE_TYPE_UNSPECIFIED,
+    relayAddress: '',
+  };
+  if (!candidateId) {
+    return unspecified;
+  }
+  const cand = stats.get(candidateId) as
+    | { candidateType?: string; address?: string }
+    | undefined;
+  switch (cand?.candidateType) {
+    case 'host':
+      return {
+        type: ICECandidateType.ICE_CANDIDATE_TYPE_HOST,
+        relayAddress: '',
+      };
+    case 'srflx':
+    case 'prflx':
+      return {
+        type: ICECandidateType.ICE_CANDIDATE_TYPE_STUN,
+        relayAddress: '',
+      };
+    case 'relay':
+      return {
+        type: ICECandidateType.ICE_CANDIDATE_TYPE_RELAY,
+        relayAddress: cand.address ?? '',
+      };
+    default:
+      return unspecified;
+  }
+};
+
+// classifyConnection inspects the nominated ICE candidate pair and classifies each side
+// independently: the client side is the local candidate (this SDK), the server side is the
+// remote candidate (the peer).
+const classifyConnection = async (
+  pc: RTCPeerConnection
+): Promise<{
+  client: CandidateClassification;
+  server: CandidateClassification;
+}> => {
+  const stats = await pc.getStats();
+
+  let localCandidateId = '';
+  let remoteCandidateId = '';
+  stats.forEach((stat) => {
+    if (stat.type === 'candidate-pair') {
+      const pair = stat as RTCIceCandidatePairStats;
+      if (pair.nominated) {
+        localCandidateId = pair.localCandidateId;
+        remoteCandidateId = pair.remoteCandidateId;
+      }
+    }
+  });
+
+  return {
+    client: classifyCandidate(stats, localCandidateId),
+    server: classifyCandidate(stats, remoteCandidateId),
+  };
+};
+
+// reportConnectionMetadata reports per-side WebRTC connection metadata to the signaling
+// server as a best-effort fire-and-forget operation.
+const reportConnectionMetadata = (
+  signalingClient: ReturnType<typeof createClient<typeof SignalingService>>,
+  callOpts: CallOptions,
+  pc: RTCPeerConnection
+): void => {
+  classifyConnection(pc)
+    .then(async ({ client, server }) => {
+      await signalingClient.reportConnectionMetadata(
+        new ReportConnectionMetadataRequest({
+          clientCandidateType: client.type,
+          serverCandidateType: server.type,
+          clientRelayAddress: client.relayAddress,
+          serverRelayAddress: server.relayAddress,
+          sdkType: SDKType.SDK_TYPE_TYPESCRIPT,
+        }),
+        { ...callOpts, timeoutMs: 5000 }
+      );
+    })
+    .catch(() => {
+      // best-effort, ignore errors
+    });
+};
+
 /**
  * DialWebRTC makes a connection to given host by signaling with the address
  * provided. A Promise is returned upon successful connection that contains a
@@ -683,6 +786,8 @@ export const dialWebRTC = async (
 
   try {
     const cc = await exchange.doExchange();
+
+    reportConnectionMetadata(signalingClient, callOpts, pc);
 
     if (
       dialOpts?.externalAuthAddress !== undefined &&
