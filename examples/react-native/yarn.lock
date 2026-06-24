@@ -1685,9 +1685,9 @@
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
 "@viamrobotics/sdk@file:viamrobotics-sdk.tgz":
-  version "0.71.0"
+  version "0.73.0"
   resolved "file:viamrobotics-sdk.tgz"
-  integrity sha512-BvTLcEwpd10O/oa05j4HTRyjF32Cyfpaw/AivZrlD03Eym8UQnQMSo4utxCTcyWlx4gUqgsHP+KrGDI+PVdglA==
+  integrity sha512-guktxqTXvKn2+xcjAHF2lT/NIytodmdICkH41XJluhir1oUG2qgTvWqJsATvKQFD9ta3BJKG5EUrXPq7jY7KDA==
   dependencies:
     "@bufbuild/protobuf" "^1.10.1"
     "@connectrpc/connect" "^1.7.0"
