@@ -1642,10 +1642,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.deprecateRegistryItem(
-   *   '<YOUR-REGISTRY-ITEM-ID>',
-   *   'reason for deprecation'
-   * );
+   * await appClient.deprecateRegistryItem('<YOUR-REGISTRY-ITEM-ID>', 'reason for deprecation');
    * ```
    *
    * @param itemId The ID of the item to deprecate
@@ -1684,7 +1681,7 @@ export class AppClient {
    * await appClient.deprecateRegistryItemVersion(
    *   '<YOUR-REGISTRY-ITEM-ID>',
    *   '1.2.3',
-   *   'reason for deprecation'
+   *   'reason for deprecation',
    * );
    * ```
    *
@@ -1692,11 +1689,7 @@ export class AppClient {
    * @param version The semver string of the version to deprecate
    * @param message The reason for deprecation
    */
-  async deprecateRegistryItemVersion(
-    itemId: string,
-    version: string,
-    message: string
-  ) {
+  async deprecateRegistryItemVersion(itemId: string, version: string, message: string) {
     await this.client.deprecateRegistryItemVersion({
       itemId,
       version,
@@ -1710,10 +1703,7 @@ export class AppClient {
    * @example
    *
    * ```ts
-   * await appClient.undeprecateRegistryItemVersion(
-   *   '<YOUR-REGISTRY-ITEM-ID>',
-   *   '1.2.3'
-   * );
+   * await appClient.undeprecateRegistryItemVersion('<YOUR-REGISTRY-ITEM-ID>', '1.2.3');
    * ```
    *
    * @param itemId The ID of the registry item

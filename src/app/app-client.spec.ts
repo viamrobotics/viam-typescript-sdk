@@ -1615,11 +1615,7 @@ describe('AppClient tests', () => {
     });
 
     it('deprecateRegistryItemVersion', async () => {
-      await subject().deprecateRegistryItemVersion(
-        'itemId',
-        '1.2.3',
-        'reason for deprecation'
-      );
+      await subject().deprecateRegistryItemVersion('itemId', '1.2.3', 'reason for deprecation');
       expect(capReq).toStrictEqual(expectedRequest);
     });
   });
