@@ -18,13 +18,13 @@ async function connectWebRTC() {
   });
 }
 
+// @ts-ignore -- ignoring because it's an implicit any
+// but can't add type annotations in JS files
 function injectMediaStream(eventStream) {
   console.debug('got media stream');
 
   const streamName = eventStream.id;
-  const streamContainers = document.querySelectorAll(
-    `[data-stream="${streamName}"]`
-  );
+  const streamContainers = document.querySelectorAll(`[data-stream="${streamName}"]`);
 
   // Most of this logic is a hack that to inject a WebRTC stream into the DOM.
   // Elm does not support media elements so we have to do it here.

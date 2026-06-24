@@ -1,7 +1,7 @@
 import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
-import { MachineConnectionEvent } from '../events';
-import * as proto from '../gen/robot/v1/robot_pb';
+import { type MachineConnectionEvent } from '../events';
+import type * as proto from '../gen/robot/v1/robot_pb';
 import type { PoseInFrame, ResourceName, Transform } from '../types';
 
 export type CloudMetadata = PlainMessage<proto.GetCloudMetadataResponse>;
@@ -65,8 +65,8 @@ export interface Robot {
   cancelOperation(id: string): Promise<void>;
 
   /**
-   * Blocks on the specified operation on the machine. This function will only
-   * return when the specific operation has finished or has been cancelled.
+   * Blocks on the specified operation on the machine. This function will only return when the
+   * specific operation has finished or has been cancelled.
    *
    * @example
    *
@@ -81,8 +81,8 @@ export interface Robot {
   blockForOperation(id: string): Promise<void>;
 
   /**
-   * Cancel all current and outstanding operations for the robot and stop all
-   * actuators and movement.
+   * Cancel all current and outstanding operations for the robot and stop all actuators and
+   * movement.
    *
    * @example
    *
@@ -90,8 +90,8 @@ export interface Robot {
    * await machine.stopAll();
    * ```
    *
-   * @param extra - Any extra parameters to pass to the components' `stop`
-   *   methods, keyed on the component's resource name.
+   * @param extra - Any extra parameters to pass to the components' `stop` methods, keyed on the
+   *   component's resource name.
    * @group Operations
    * @alpha
    */
@@ -112,13 +112,13 @@ export interface Robot {
   frameSystemConfig(transform: Transform[]): Promise<FrameSystemConfig[]>;
 
   /**
-   * Transform a given source Pose from the reference frame to a new specified
-   * destination which is a reference frame.
+   * Transform a given source Pose from the reference frame to a new specified destination which is
+   * a reference frame.
    *
    * @param query - The pose that should be transformed
    * @param destination - The name of the reference frame to transform the given
-   * @param supplementalTransforms - Pose information on any additional
-   *   reference frames that are needed to perform the transform
+   * @param supplementalTransforms - Pose information on any additional reference frames that are
+   *   needed to perform the transform
    * @group Frame System
    * @alpha
    */
@@ -126,29 +126,24 @@ export interface Robot {
     source: PoseInFrame,
     destination: string,
     supplementalTransforms: Transform[],
-    callOptions?: CallOptions
+    callOptions?: CallOptions,
   ): Promise<PoseInFrame>;
 
   /**
-   * Transform a given source point cloud from the reference frame to a new
-   * specified destination which is a reference frame.
+   * Transform a given source point cloud from the reference frame to a new specified destination
+   * which is a reference frame.
    *
    * @param pointCloudPCD - The point clouds to transform. This should be in the
    *   {@link https://pointclouds.org/documentation/tutorials/pcd_file_format.html PCD format encoded into bytes}
    * @param source - The reference frame of the point cloud.
-   * @param destination - The reference frame into which the source data should
-   *   be transformed, if unset this defaults to the "world" reference frame. Do
-   *   not move the robot between the generation of the initial pointcloud and
-   *   the receipt of the transformed pointcloud because that will make the
-   *   transformations inaccurate.
+   * @param destination - The reference frame into which the source data should be transformed, if
+   *   unset this defaults to the "world" reference frame. Do not move the robot between the
+   *   generation of the initial pointcloud and the receipt of the transformed pointcloud because
+   *   that will make the transformations inaccurate.
    * @group Frame System
    * @alpha
    */
-  transformPCD(
-    pointCloudPCD: Uint8Array,
-    source: string,
-    destination: string
-  ): Promise<Uint8Array>;
+  transformPCD(pointCloudPCD: Uint8Array, source: string, destination: string): Promise<Uint8Array>;
 
   /**
    * Get the list of models provided by modules on the machine.
@@ -195,20 +190,16 @@ export interface Robot {
   /**
    * Call a function when a connection event occurs.
    *
-   * Note that direct gRPC connections that disconnect will not emit a
-   * disconnect event. WebRTC connections that disconnect will emit a disconnect
-   * event. All connections emit events during manual calls of `connect` and
-   * `disconnect`.
+   * Note that direct gRPC connections that disconnect will not emit a disconnect event. WebRTC
+   * connections that disconnect will emit a disconnect event. All connections emit events during
+   * manual calls of `connect` and `disconnect`.
    *
-   * @param type - The event MachineConnectionEvent that was triggered, or all
-   *   connection events with 'connectionstatechange'.
+   * @param type - The event MachineConnectionEvent that was triggered, or all connection events
+   *   with 'connectionstatechange'.
    * @param listener - The function to call
    * @alpha
    */
-  on: (
-    type: MachineConnectionEvent | 'connectionstatechange',
-    listener: Callback
-  ) => void;
+  on: (type: MachineConnectionEvent | 'connectionstatechange', listener: Callback) => void;
 
   /**
    * Get app-related information about the machine.
@@ -246,10 +237,10 @@ export interface Robot {
    * await machine.restartModule('namespace:module:model', 'my_model_name');
    * ```
    *
-   * @param moduleId - The id matching the module_id field of the registry
-   *   module in your part configuration
-   * @param moduleName - The name matching the name field of the local/registry
-   *   module in your part configuration
+   * @param moduleId - The id matching the module_id field of the registry module in your part
+   *   configuration
+   * @param moduleName - The name matching the name field of the local/registry module in your part
+   *   configuration
    * @group Modules
    * @alpha
    */

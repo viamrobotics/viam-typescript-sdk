@@ -5,16 +5,11 @@ import type {
   PartialMessage,
   ServiceType,
 } from '@bufbuild/protobuf';
-import type {
-  ContextValues,
-  StreamResponse,
-  Transport,
-  UnaryResponse,
-} from '@connectrpc/connect';
+import type { ContextValues, StreamResponse, Transport, UnaryResponse } from '@connectrpc/connect';
 import {
   Request,
-  RequestHeaders,
-  RequestMessage,
+  type RequestHeaders,
+  type RequestMessage,
   Response,
   Stream,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
@@ -27,13 +22,13 @@ import { UnaryClientStream } from './unary-client-stream';
 // MaxStreamCount is the max number of streams a channel can have.
 const MaxStreamCount = 256;
 
-interface activeClienStream {
+interface ActiveClientStream {
   cs: ClientStream;
 }
 
 export class ClientChannel extends BaseChannel implements Transport {
   private streamIDCounter = 0;
-  private readonly streams = new Map<string, activeClienStream>();
+  private readonly streams = new Map<string, ActiveClientStream>();
 
   constructor(pc: RTCPeerConnection, dc: RTCDataChannel) {
     super(pc, dc);
@@ -42,14 +37,14 @@ export class ClientChannel extends BaseChannel implements Transport {
     });
     pc.addEventListener('iceconnectionstatechange', () => {
       const state = pc.iceConnectionState;
-      if (
-        !(state === 'failed' || state === 'disconnected' || state === 'closed')
-      ) {
+      if (!(state === 'failed' || state === 'disconnected' || state === 'closed')) {
         return;
       }
       this.onConnectionTerminated();
     });
-    dc.addEventListener('close', () => this.onConnectionTerminated());
+    dc.addEventListener('close', () => {
+      this.onConnectionTerminated();
+    });
   }
 
   private onConnectionTerminated() {
@@ -86,16 +81,12 @@ export class ClientChannel extends BaseChannel implements Transport {
     });
   }
 
-  private newStream<
-    T extends ClientStream<I, O>,
-    I extends Message<I>,
-    O extends Message<O>,
-  >(
+  private newStream<T extends ClientStream<I, O>, I extends Message<I>, O extends Message<O>>(
     ClientCtor: ClientStreamConstructor<T, I, O>,
     stream: Stream,
     service: ServiceType,
     method: MethodInfo<I, O>,
-    header: HeadersInit | undefined
+    header: HeadersInit | undefined,
   ): T {
     if (this.isClosed()) {
       throw new ConnectionClosedError('connection closed');
@@ -110,10 +101,12 @@ export class ClientChannel extends BaseChannel implements Transport {
     const clientStream = new ClientCtor(
       this,
       stream,
-      (id: bigint) => this.removeStreamByID(id),
+      (id: bigint) => {
+        this.removeStreamByID(id);
+      },
       service,
       method,
-      header
+      header,
     );
     activeStream = { cs: clientStream };
     this.streams.set(stream.id.toString(), activeStream);
@@ -132,7 +125,7 @@ export class ClientChannel extends BaseChannel implements Transport {
           case: 'headers',
           value: headers,
         },
-      })
+      }),
     );
   }
 
@@ -144,7 +137,7 @@ export class ClientChannel extends BaseChannel implements Transport {
           case: 'message',
           value: msg,
         },
-      })
+      }),
     );
   }
 
@@ -156,49 +149,43 @@ export class ClientChannel extends BaseChannel implements Transport {
           case: 'rstStream',
           value: true,
         },
-      })
+      }),
     );
   }
 
-  public async unary<
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
-  >(
+  public async unary<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
     service: ServiceType,
     method: MethodInfo<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     message: PartialMessage<I>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     return this.newStream<UnaryClientStream<I, O>, I, O>(
       UnaryClientStream<I, O>,
       this.nextStreamID(),
       service,
       method,
-      header
+      header,
     ).run(signal, timeoutMs, message, contextValues);
   }
 
-  public async stream<
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
-  >(
+  public async stream<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
     service: ServiceType,
     method: MethodInfo<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
     input: AsyncIterable<PartialMessage<I>>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
     return this.newStream<StreamClientStream<I, O>, I, O>(
       StreamClientStream<I, O>,
       this.nextStreamID(),
       service,
       method,
-      header
+      header,
     ).run(signal, timeoutMs, input, contextValues);
   }
 }

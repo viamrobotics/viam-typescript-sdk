@@ -7,7 +7,7 @@ const timeoutBlob = new Blob(
     setTimeout(() => self.postMessage(""), e.data);
   };`,
   ],
-  { type: 'text/javascript' }
+  { type: 'text/javascript' },
 );
 
 export default class GRPCConnectionManager {
@@ -16,7 +16,7 @@ export default class GRPCConnectionManager {
   constructor(
     private deferredTransport: () => Transport,
     private onDisconnect: () => void,
-    private heartbeatIntervalMs = 10_000
+    private heartbeatIntervalMs = 10_000,
   ) {}
 
   private get client() {
@@ -45,7 +45,7 @@ export default class GRPCConnectionManager {
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (globalThis.Worker !== undefined) {
-      const url = window.URL.createObjectURL(timeoutBlob);
+      const url = globalThis.URL.createObjectURL(timeoutBlob);
       worker = new Worker(url);
       URL.revokeObjectURL(url);
       worker.addEventListener('message', () => {

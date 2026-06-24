@@ -5,12 +5,7 @@ import { BillingClient } from './billing-client';
 import { DataClient } from './data-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
-import {
-  createViamTransport,
-  isCredential,
-  type Credential,
-  type Credentials,
-} from './viam-transport';
+import { createViamTransport, isCredential, type Credentials } from './viam-transport';
 
 export interface ViamClientOptions {
   serviceHost?: string;
@@ -63,20 +58,14 @@ export class ViamClient {
       }
       const name = host.split('.').at(0);
       if (name !== undefined) {
-        const resp = await this.appClient.getRobotPartByNameAndLocation(
-          name,
-          locationId
-        );
+        const resp = await this.appClient.getRobotPartByNameAndLocation(name, locationId);
         return resp.part?.secret;
       }
     }
     return undefined;
   }
 
-  public async connectToMachine({
-    host = undefined,
-    id = undefined,
-  }: ViamClientMachineConnectionOpts) {
+  public async connectToMachine({ host, id }: ViamClientMachineConnectionOpts) {
     if (host === undefined && id === undefined) {
       throw new Error('Either a machine address or ID must be provided');
     }
@@ -88,34 +77,28 @@ export class ViamClient {
       const parts = await this.appClient.getRobotParts(id);
       const mainPart = parts.find((part) => part.mainPart);
       if (!mainPart) {
-        throw new Error(
-          `Could not find a main part for the machine with UUID: ${id}`
-        );
+        throw new Error(`Could not find a main part for the machine with UUID: ${id}`);
       }
       address = mainPart.fqdn;
       robotSecret = mainPart.secret;
     }
 
     if (address === undefined || address === '') {
-      throw new Error(
-        'Host was not provided and could not be obtained from the machine ID'
-      );
+      throw new Error('Host was not provided and could not be obtained from the machine ID');
     }
 
     // If credentials is AccessToken, then attempt to use the robot part secret
     let creds = this.credentials;
     if (!isCredential(creds)) {
-      if (robotSecret === undefined) {
-        robotSecret = await this.getRobotSecretFromHost(address);
-      }
+      robotSecret ??= await this.getRobotSecretFromHost(address);
       creds =
         robotSecret === undefined
           ? creds
-          : ({
+          : {
               type: 'robot-secret',
               payload: robotSecret,
               authEntity: address,
-            } as Credential);
+            };
     }
 
     return createRobotClient({

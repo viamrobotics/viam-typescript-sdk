@@ -1,11 +1,11 @@
-import type { ArgumentsType } from 'vitest';
+import type { ArgumentsType } from '@vitest/utils';
 import {
-  RobotClient,
   ArmClient,
   CameraClient,
+  MachineConnectionEvent,
+  RobotClient,
   VisionClient,
   type DialConf,
-  MachineConnectionEvent,
 } from '../src/main';
 import { defaultConfig, invalidConfig } from './fixtures/configs/dial-configs';
 import type { ResolvedReturnType } from './helpers/api-types';
@@ -15,7 +15,8 @@ const armClient = new ArmClient(client, 'fake_arm');
 const cameraClient = new CameraClient(client, 'fake_camera');
 const visionClient = new VisionClient(client, 'fake_vision');
 
-const getElement = <T extends HTMLElement>(id: string) =>
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+const getElement = <T extends HTMLElement>(id: string): T | null =>
   document.querySelector<T>(`[data-${id}]`);
 
 const getElements = <T extends HTMLElement>(id: string) =>
@@ -141,19 +142,13 @@ disconnectBtn?.addEventListener('click', () => {
   void disconnect();
 });
 
-const callAPI = async <T, K extends keyof T>(
-  apiClient: T,
-  api: K,
-  args: ArgumentsType<T[K]>
-) => {
+const callAPI = async <T, K extends keyof T>(apiClient: T, api: K, args: ArgumentsType<T[K]>) => {
   const clientFunc = apiClient[api] as (
     ...args: ArgumentsType<T[K]>
   ) => Promise<ResolvedReturnType<T[K]>>;
 
   if (typeof clientFunc !== 'function') {
-    throw new TypeError(
-      `${String(api)} is not a method on the resource client.`
-    );
+    throw new TypeError(`${String(api)} is not a method on the resource client.`);
   }
 
   try {
@@ -176,7 +171,9 @@ for (const button of robotAPIButtons) {
 for (const button of armAPIButtons) {
   button.addEventListener('click', () => {
     clearOutput();
+
     const api = button.dataset.armApi as keyof ArmClient;
+
     const args = JSON.parse(button.dataset.armApiArgs ?? '[]') as ArgumentsType<
       ArmClient[typeof api]
     >;
@@ -195,10 +192,12 @@ for (const button of cameraAPIButtons) {
 for (const button of visionAPIButtons) {
   button.addEventListener('click', () => {
     clearOutput();
+
     const api = button.dataset.visionApi as keyof VisionClient;
-    const args = JSON.parse(
-      button.dataset.visionApiArgs ?? '[]'
-    ) as ArgumentsType<VisionClient[typeof api]>;
+
+    const args = JSON.parse(button.dataset.visionApiArgs ?? '[]') as ArgumentsType<
+      VisionClient[typeof api]
+    >;
     void callAPI(visionClient, api, args);
   });
 }

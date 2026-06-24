@@ -28,11 +28,10 @@
     :versions: []
     :when: 2023-05-01 18:09:18.081521457 Z
 - - :approve
-  - "@bufbuild/protobuf"
-  - :who: 
-    :why: 
-    :versions:
-    - 1.10.0
+  - '@bufbuild/protobuf'
+  - :who:
+    :why:
+    :versions: []
     :when: 2024-09-30 14:52:13.805002459 Z
 - - :license
   - '@typescript-eslint/parser'

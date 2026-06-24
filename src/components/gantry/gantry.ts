@@ -37,14 +37,13 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getkinematics).
    *
-   * @returns The legacy kinematics data shape or the newer object containing
-   *   kinematics data plus a map of URDF mesh file paths to mesh data.
+   * @returns The legacy kinematics data shape or the newer object containing kinematics data plus a
+   *   map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 
   /**
-   * Move each axis of the gantry to the positionsMm at the speeds in
-   * speedsMmPerSec.
+   * Move each axis of the gantry to the positionsMm at the speeds in speedsMmPerSec.
    *
    * @example
    *
@@ -63,13 +62,13 @@ export interface Gantry extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#movetoposition).
    *
    * @param positionsMm - The goal positions for each axis of the gantry.
-   * @param speedsMmPerSec - The desired speed for each axis to move to the
-   *   respective position in positionsMm.
+   * @param speedsMmPerSec - The desired speed for each axis to move to the respective position in
+   *   positionsMm.
    */
   moveToPosition: (
     positionsMm: number[],
     speedsMmPerSec: number[],
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<void>;
 
   /**
@@ -92,8 +91,7 @@ export interface Gantry extends Resource {
   getPosition: (extra?: Struct) => Promise<number[]>;
 
   /**
-   * Runs the homing sequence to find the start and end positions of the gantry
-   * axis.
+   * Runs the homing sequence to find the start and end positions of the gantry axis.
    *
    * @example
    *
@@ -107,8 +105,7 @@ export interface Gantry extends Resource {
    * For more information, see [Gantry
    * API](https://docs.viam.com/dev/reference/apis/components/gantry/#home).
    *
-   * @returns A bool representing whether the gantry has run the homing sequence
-   *   successfully.
+   * @returns A bool representing whether the gantry has run the homing sequence successfully.
    */
   home: (extra?: Struct) => Promise<boolean>;
 

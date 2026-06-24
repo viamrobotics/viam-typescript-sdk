@@ -6,10 +6,8 @@ import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
 export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
 
-export const {
-  GetPropertiesResponse: EncoderProperties,
-  PositionType: EncoderPositionType,
-} = encoderApi;
+export const { GetPropertiesResponse: EncoderProperties, PositionType: EncoderPositionType } =
+  encoderApi;
 
 /** Represents a physical encoder. */
 export interface Encoder extends Resource {
@@ -48,8 +46,8 @@ export interface Encoder extends Resource {
   getProperties(extra?: Struct): Promise<EncoderProperties>;
 
   /**
-   * Return the current position either in relative units (ticks away from a
-   * zero position) or absolute units (degrees along a circle).
+   * Return the current position either in relative units (ticks away from a zero position) or
+   * absolute units (degrees along a circle).
    *
    * @example
    *
@@ -58,7 +56,7 @@ export interface Encoder extends Resource {
    *
    * // Get the position of the encoder in ticks
    * const [position, posType] = await encoder.getPosition(
-   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT
+   *   EncoderPositionType.POSITION_TYPE_TICKS_COUNT,
    * );
    * console.log('The encoder position is currently', position, posType);
    * ```
@@ -66,11 +64,10 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getposition).
    *
-   * @param positionType - The type of position the encoder returns (ticks or
-   *   degrees)
+   * @param positionType - The type of position the encoder returns (ticks or degrees)
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: Struct
+    extra?: Struct,
   ): Promise<readonly [number, EncoderPositionType]>;
 }

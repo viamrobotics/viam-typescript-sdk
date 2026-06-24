@@ -1,12 +1,12 @@
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { Code, ConnectError } from '@connectrpc/connect';
 import { Status } from '../gen/google/rpc/status_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
+import { type SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
 import {
   CallRequest,
-  CallResponse,
-  CallResponseInitStage,
-  CallResponseUpdateStage,
+  type CallResponse,
+  type CallResponseInitStage,
+  type CallResponseUpdateStage,
   CallUpdateRequest,
   ICECandidate,
 } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
@@ -43,7 +43,7 @@ export class SignalingExchange {
     private readonly callOpts: CallOptions,
     private readonly pc: RTCPeerConnection,
     private readonly dc: RTCDataChannel,
-    private readonly dialOpts?: DialWebRTCOptions
+    private readonly dialOpts?: DialWebRTCOptions,
   ) {
     this.clientChannel = new ClientChannel(this.pc, this.dc);
   }
@@ -52,22 +52,19 @@ export class SignalingExchange {
     // Setup our handlers before starting the signaling call.
     await this.setup();
 
-    const description = addSdpFields(
-      this.pc.localDescription,
-      this.dialOpts?.additionalSdpFields
-    );
+    const description = addSdpFields(this.pc.localDescription, this.dialOpts?.additionalSdpFields);
     const encodedSDP = btoa(JSON.stringify(description));
     const callRequest = new CallRequest({
       sdp: encodedSDP,
     });
-    if (this.dialOpts && this.dialOpts.disableTrickleICE) {
+    if (this.dialOpts?.disableTrickleICE) {
       callRequest.disableTrickle = this.dialOpts.disableTrickleICE;
     }
 
     /**
-     * As long as we establish a connection (i.e. we are ready), then we will
-     * make it clear across the exchange that we are done and no more work
-     * should be done nor should any errors be emitted.
+     * As long as we establish a connection (i.e. we are ready), then we will make it clear across
+     * the exchange that we are done and no more work should be done nor should any errors be
+     * emitted.
      */
     this.clientChannel.ready
       .then(async () => {
@@ -98,14 +95,10 @@ export class SignalingExchange {
       const offerDesc = await this.pc.createOffer({});
 
       this.pc.addEventListener('iceconnectionstatechange', () => {
-        if (
-          this.pc.iceConnectionState !== 'completed' ||
-          this.numCallUpdates === 0
-        ) {
+        if (this.pc.iceConnectionState !== 'completed' || this.numCallUpdates === 0) {
           return;
         }
-        const averageCallUpdateDuration =
-          this.totalCallUpdateDuration / this.numCallUpdates;
+        const averageCallUpdateDuration = this.totalCallUpdateDuration / this.numCallUpdates;
         console.groupCollapsed('Caller update statistics'); // eslint-disable-line no-console
         // eslint-disable-next-line no-console
         console.table({
@@ -118,10 +111,10 @@ export class SignalingExchange {
       this.pc.addEventListener(
         'icecandidate',
         (event: { candidate: RTCIceCandidateInit | null }) => {
-          this.onLocalICECandidate(event).catch((error) => {
-            console.error(`error processing local ICE candidate ${error}`); // eslint-disable-line no-console
+          this.onLocalICECandidate(event).catch((error: unknown) => {
+            console.error('error processing local ICE candidate', error); // eslint-disable-line no-console
           });
-        }
+        },
       );
 
       await this.pc.setLocalDescription(offerDesc);
@@ -132,30 +125,18 @@ export class SignalingExchange {
     this.clientChannel.closeWithReason(err);
   }
 
-  private async processCallResponses(
-    callResponses: AsyncIterable<CallResponse>
-  ) {
+  private async processCallResponses(callResponses: AsyncIterable<CallResponse>) {
     try {
       for await (const response of callResponses) {
         switch (response.stage.case) {
           case 'init': {
-            if (
-              !(await this.handleInitResponse(
-                response.uuid,
-                response.stage.value
-              ))
-            ) {
+            if (!(await this.handleInitResponse(response.uuid, response.stage.value))) {
               return;
             }
             break;
           }
           case 'update': {
-            if (
-              !(await this.handleUpdateResponse(
-                response.uuid,
-                response.stage.value
-              ))
-            ) {
+            if (!(await this.handleUpdateResponse(response.uuid, response.stage.value))) {
               return;
             }
             break;
@@ -190,7 +171,7 @@ export class SignalingExchange {
 
   private async handleInitResponse(
     uuid: string,
-    response: CallResponseInitStage
+    response: CallResponseInitStage,
   ): Promise<boolean> {
     if (this.haveInitResponse) {
       await this.sendError('got init stage more than once');
@@ -201,7 +182,7 @@ export class SignalingExchange {
     this.callUuid = uuid;
 
     const remoteSDP = new RTCSessionDescription(
-      JSON.parse(atob(response.sdp)) as RTCSessionDescriptionInit
+      JSON.parse(atob(response.sdp)) as RTCSessionDescriptionInit,
     );
     if (this.clientChannel.isClosed()) {
       await this.sendError('client channel is closed');
@@ -221,7 +202,7 @@ export class SignalingExchange {
 
   private async handleUpdateResponse(
     uuid: string,
-    response: CallResponseUpdateStage
+    response: CallResponseUpdateStage,
   ): Promise<boolean> {
     if (!this.haveInitResponse) {
       await this.sendError('got update stage before init stage');
@@ -251,22 +232,17 @@ export class SignalingExchange {
     return true;
   }
 
-  private async onLocalICECandidate(event: {
-    candidate: RTCIceCandidateInit | null;
-  }) {
+  private async onLocalICECandidate(event: { candidate: RTCIceCandidateInit | null }) {
     await this.remoteDescriptionSet;
 
     if (this.exchangeDone || this.pc.iceConnectionState === 'connected') {
       if (event.candidate !== null) {
         // eslint-disable-next-line no-console
-        console.info(
-          'Dropping ICE candidate - exchange done or already connected',
-          {
-            exchangeDone: this.exchangeDone,
-            iceConnectionState: this.pc.iceConnectionState,
-            candidate: event.candidate.candidate,
-          }
-        );
+        console.info('Dropping ICE candidate - exchange done or already connected', {
+          exchangeDone: this.exchangeDone,
+          iceConnectionState: this.pc.iceConnectionState,
+          candidate: event.candidate.candidate,
+        });
       }
       return;
     }
@@ -304,8 +280,7 @@ export class SignalingExchange {
       await this.signalingClient.callUpdate(callRequestUpdate, this.callOpts);
       this.numCallUpdates += 1;
       const callUpdateEnd = new Date();
-      const callUpdateDuration =
-        callUpdateEnd.getTime() - callUpdateStart.getTime();
+      const callUpdateDuration = callUpdateEnd.getTime() - callUpdateStart.getTime();
       if (callUpdateDuration > this.maxCallUpdateDuration) {
         this.maxCallUpdateDuration = callUpdateDuration;
       }
@@ -346,9 +321,9 @@ export class SignalingExchange {
       await this.signalingClient.callUpdate(callRequestUpdate, this.callOpts);
     } catch (error) {
       /**
-       * Even though this call update fails, there's a chance another attempt
-       * with another ICE candidate(s) will make the connection work. In the
-       * future it may be better to figure out if this error is fatal or not.
+       * Even though this call update fails, there's a chance another attempt with another ICE
+       * candidate(s) will make the connection work. In the future it may be better to figure out if
+       * this error is fatal or not.
        */
       console.error('failed to send call update; continuing', error); // eslint-disable-line no-console
     }
@@ -373,9 +348,9 @@ export class SignalingExchange {
       await this.signalingClient.callUpdate(callRequestUpdate, this.callOpts);
     } catch (error) {
       /**
-       * Even though this call update fails, there's a chance another attempt
-       * with another ICE candidate(s) will make the connection work. In the
-       * future it may be better to figure out if this error is fatal or not.
+       * Even though this call update fails, there's a chance another attempt with another ICE
+       * candidate(s) will make the connection work. In the future it may be better to figure out if
+       * this error is fatal or not.
        */
       console.error(error); // eslint-disable-line no-console
     }

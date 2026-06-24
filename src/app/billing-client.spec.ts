@@ -1,9 +1,6 @@
 import { Timestamp } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
-import {
-  createWritableIterable,
-  type WritableIterable,
-} from '@connectrpc/connect/protocol';
+import { createWritableIterable, type WritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { BillingService } from '../gen/app/v1/billing_connect';
 import {
@@ -16,10 +13,7 @@ import {
   UsageCost,
   UsageCostType,
 } from '../gen/app/v1/billing_pb';
-import {
-  BillingClient,
-  type GetCurrentMonthUsageResponse,
-} from './billing-client';
+import { BillingClient, type GetCurrentMonthUsageResponse } from './billing-client';
 
 const SECONDS = 1;
 const NANOS = 2_000_000;
@@ -48,9 +42,7 @@ const testMonthUsage: GetCurrentMonthUsageResponse = {
     new ResourceUsageCostsBySource({
       sourceType: SourceType.ORG,
       resourceUsageCosts: new ResourceUsageCosts({
-        usageCosts: [
-          new UsageCost({ resourceType: UsageCostType.UNSPECIFIED, cost: 13 }),
-        ],
+        usageCosts: [new UsageCost({ resourceType: UsageCostType.UNSPECIFIED, cost: 13 })],
       }),
     }),
   ],
@@ -113,7 +105,7 @@ describe('BillingClient tests', () => {
             ],
             startDate: testStartDate,
             endDate: testEndDate,
-          } as GetCurrentMonthUsageResponse;
+          };
         },
         getOrgBillingInformation: () => testBillingInfo,
         getInvoicesSummary: () => testInvoiceSummary,
@@ -148,14 +140,14 @@ describe('BillingClient tests', () => {
     await testGetInvoicePdfStream.write(
       new GetInvoicePdfResponse({
         chunk: chunk1,
-      })
+      }),
     );
 
     const chunk2 = new Uint8Array([3, 4]);
     await testGetInvoicePdfStream.write(
       new GetInvoicePdfResponse({
         chunk: chunk2,
-      })
+      }),
     );
     testGetInvoicePdfStream.close();
 

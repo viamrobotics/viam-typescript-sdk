@@ -1,13 +1,35 @@
 {
-  "extends": "@viamrobotics/typescript-config/base.json",
   "compilerOptions": {
-    "noEmit": true
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true,
+    "types": ["node"],
+    "skipLibCheck": true,
+    "strict": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": true,
   },
   "include": [
     "./vite.config.ts",
     "./playwright.config.ts",
+    "./eslint.config.js",
     "./*.cjs",
-    "./.*.cjs"
+    "./.*.cjs",
   ],
-  "exclude": ["**/src/**", "**/e2e/**", "**/examples/**", "**/scripts/**"]
+  "exclude": ["**/src/**", "**/e2e/**", "**/examples/**", "**/scripts/**"],
 }

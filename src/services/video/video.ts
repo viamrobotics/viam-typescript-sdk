@@ -15,15 +15,11 @@ export interface Video extends Resource {
    *   new Date('2025-01-01T00:00:00Z'),
    *   new Date('2025-01-01T00:10:00Z'),
    *   'h264',
-   *   'mp4'
+   *   'mp4',
    * );
    *
    * for await (const chunk of videoStream) {
-   *   console.log(
-   *     'Received video chunk:',
-   *     chunk.videoData.length,
-   *     'bytes'
-   *   );
+   *   console.log('Received video chunk:', chunk.videoData.length, 'bytes');
    * }
    * ```
    *
@@ -39,7 +35,7 @@ export interface Video extends Resource {
     endTimestamp?: Date,
     videoCodec?: string,
     videoContainer?: string,
-    extra?: Struct
+    extra?: Struct,
   ) => AsyncIterable<VideoChunk>;
 
   /**
@@ -48,7 +44,5 @@ export interface Video extends Resource {
    * @param command - The command to execute.
    * @returns The result of the command.
    */
-  doCommand: (
-    command: Struct | Record<string, JsonValue>
-  ) => Promise<JsonValue>;
+  doCommand: (command: Struct | Record<string, JsonValue>) => Promise<JsonValue>;
 }

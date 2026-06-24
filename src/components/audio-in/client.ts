@@ -18,7 +18,7 @@ export class AudioInClient implements AudioIn {
   private client: Client<typeof AudioInService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(AudioInService);
@@ -31,7 +31,7 @@ export class AudioInClient implements AudioIn {
     durationSeconds: number,
     previousTimestamp = 0n,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): AsyncIterable<AudioChunk> {
     const request = new GetAudioRequest({
       name: this.name,
@@ -79,24 +79,19 @@ export class AudioInClient implements AudioIn {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

@@ -23,17 +23,19 @@ export class BaseChannel {
       this.pReject = reject;
     });
 
-    dataChannel.addEventListener('open', () => this.onChannelOpen());
-    dataChannel.addEventListener('close', () => this.onChannelClose());
+    dataChannel.addEventListener('open', () => {
+      this.onChannelOpen();
+    });
+    dataChannel.addEventListener('close', () => {
+      this.onChannelClose();
+    });
     dataChannel.addEventListener('error', (ev) => {
       this.onChannelError(ev);
     });
 
     peerConn.addEventListener('iceconnectionstatechange', () => {
       const state = peerConn.iceConnectionState;
-      if (
-        !(state === 'failed' || state === 'disconnected' || state === 'closed')
-      ) {
+      if (!(state === 'failed' || state === 'disconnected' || state === 'closed')) {
         return;
       }
       this.pReject?.(new Error(`ICE connection failed with state: ${state}`));
@@ -73,6 +75,6 @@ export class BaseChannel {
   }
 
   protected write(msg: Message) {
-    this.dataChannel.send(msg.toBinary());
+    this.dataChannel.send(msg.toBinary() as Uint8Array<ArrayBuffer>);
   }
 }

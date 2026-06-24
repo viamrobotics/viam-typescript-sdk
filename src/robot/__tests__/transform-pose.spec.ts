@@ -7,10 +7,7 @@ import { createRouterTransport } from '@connectrpc/connect';
 import { RobotService } from '../../gen/robot/v1/robot_connect';
 import { TransformPoseResponse } from '../../gen/robot/v1/robot_pb';
 import { PoseInFrame } from '../../types';
-import {
-  createMockDataChannel,
-  createMockPeerConnection,
-} from '../../__tests__/mocks/webrtc';
+import { createMockDataChannel, createMockPeerConnection } from '../../__tests__/mocks/webrtc';
 import { withNoReconnect } from './fixtures/dial-configs';
 
 vi.mock('../../rpc', async () => {
@@ -36,12 +33,7 @@ describe('transformPose', () => {
 
     vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
       transport: mockTransport,
-      peerConnection: createMockPeerConnection(
-        vi.fn(),
-        vi.fn(),
-        vi.fn(),
-        'connected'
-      ),
+      peerConnection: createMockPeerConnection(vi.fn(), vi.fn(), vi.fn(), 'connected'),
       dataChannel: createMockDataChannel(vi.fn(), vi.fn(), vi.fn(), 'open'),
     });
 
@@ -71,12 +63,7 @@ describe('transformPose', () => {
 
     vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
       transport: mockTransport,
-      peerConnection: createMockPeerConnection(
-        vi.fn(),
-        vi.fn(),
-        vi.fn(),
-        'connected'
-      ),
+      peerConnection: createMockPeerConnection(vi.fn(), vi.fn(), vi.fn(), 'connected'),
       dataChannel: createMockDataChannel(vi.fn(), vi.fn(), vi.fn(), 'open'),
     });
 
@@ -104,12 +91,7 @@ describe('transformPose', () => {
 
     vi.mocked(rpcModule.dialWebRTC).mockResolvedValue({
       transport: mockTransport,
-      peerConnection: createMockPeerConnection(
-        vi.fn(),
-        vi.fn(),
-        vi.fn(),
-        'connected'
-      ),
+      peerConnection: createMockPeerConnection(vi.fn(), vi.fn(), vi.fn(), 'connected'),
       dataChannel: createMockDataChannel(vi.fn(), vi.fn(), vi.fn(), 'open'),
     });
 
@@ -119,7 +101,7 @@ describe('transformPose', () => {
     await expect(
       client.transformPose(new PoseInFrame(), 'world', [], {
         signal: controller.signal,
-      })
+      }),
     ).rejects.toThrow();
   });
 });

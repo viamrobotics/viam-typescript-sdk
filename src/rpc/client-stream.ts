@@ -1,20 +1,15 @@
-import type {
-  AnyMessage,
-  Message,
-  MethodInfo,
-  ServiceType,
-} from '@bufbuild/protobuf';
+import type { AnyMessage, Message, MethodInfo, ServiceType } from '@bufbuild/protobuf';
 import { createClientMethodSerializers } from '@connectrpc/connect/protocol';
 import {
   Metadata,
   PacketMessage,
   RequestHeaders,
   RequestMessage,
-  Response,
-  ResponseHeaders,
-  ResponseMessage,
-  ResponseTrailers,
-  Stream,
+  type Response,
+  type ResponseHeaders,
+  type ResponseMessage,
+  type ResponseTrailers,
+  type Stream,
   Strings,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { BaseStream } from './base-stream';
@@ -36,15 +31,14 @@ export interface ClientStreamConstructor<
     onDone: (id: bigint) => void,
     service: ServiceType,
     method: MethodInfo<I, O>,
-    header: HeadersInit | undefined
+    header: HeadersInit | undefined,
   ): T;
 }
 
 /**
- * A ClientStream provides all the facilities needed to invoke and manage a gRPC
- * stream at a low-level. Implementors like UnaryClientStream and
- * StreamClientStream handle the method specific flow of unary/stream
- * operations.
+ * A ClientStream provides all the facilities needed to invoke and manage a gRPC stream at a
+ * low-level. Implementors like UnaryClientStream and StreamClientStream handle the method specific
+ * flow of unary/stream operations.
  */
 export abstract class ClientStream<
   I extends Message<I> = AnyMessage,
@@ -69,19 +63,14 @@ export abstract class ClientStream<
     onDone: (id: bigint) => void,
     service: ServiceType,
     method: MethodInfo<I, O>,
-    header: HeadersInit | undefined
+    header: HeadersInit | undefined,
   ) {
     super(stream, onDone);
     this.channel = channel;
     this.service = service;
     this.method = method;
 
-    const { parse } = createClientMethodSerializers(
-      method,
-      true,
-      undefined,
-      undefined
-    );
+    const { parse } = createClientMethodSerializers(method, true);
     this.parseMessage = parse;
     const svcMethod = `/${service.typeName}/${method.name}`;
     this.requestHeaders = new RequestHeaders({
@@ -113,7 +102,7 @@ export abstract class ClientStream<
       this.writeMessage(false, msgBytes);
       return;
     }
-    this.writeMessage(false, undefined);
+    this.writeMessage(false);
   }
 
   protected resetStream() {
@@ -145,10 +134,7 @@ export abstract class ClientStream<
 
       let remMsgBytes = msgBytes;
       while (remMsgBytes.length > 0) {
-        const amountToSend = Math.min(
-          remMsgBytes.length,
-          maxRequestMessagePacketDataSize
-        );
+        const amountToSend = Math.min(remMsgBytes.length, maxRequestMessagePacketDataSize);
         const packetMessage = new PacketMessage();
         packetMessage.data = remMsgBytes.slice(0, amountToSend);
         remMsgBytes = remMsgBytes.slice(amountToSend);
@@ -173,16 +159,12 @@ export abstract class ClientStream<
       case 'headers': {
         if (this.headersReceived) {
           // eslint-disable-next-line no-console
-          console.error(
-            `invariant: headers already received for ${this.grpcStream.id}`
-          );
+          console.error(`invariant: headers already received for ${this.grpcStream.id}`);
           return;
         }
         if (this.trailersReceived) {
           // eslint-disable-next-line no-console
-          console.error(
-            `invariant: headers received after trailers for ${this.grpcStream.id}`
-          );
+          console.error(`invariant: headers received after trailers for ${this.grpcStream.id}`);
           return;
         }
         this.processHeaders(resp.type.value);
@@ -191,16 +173,12 @@ export abstract class ClientStream<
       case 'message': {
         if (!this.headersReceived) {
           // eslint-disable-next-line no-console
-          console.error(
-            `invariant: headers not yet received for ${this.grpcStream.id}`
-          );
+          console.error(`invariant: headers not yet received for ${this.grpcStream.id}`);
           return;
         }
         if (this.trailersReceived) {
           // eslint-disable-next-line no-console
-          console.error(
-            `invariant: headers received after trailers for ${this.grpcStream.id}`
-          );
+          console.error(`invariant: headers received after trailers for ${this.grpcStream.id}`);
           return;
         }
         this.processMessage(resp.type.value);
@@ -256,10 +234,7 @@ const fromGRPCMetadata = (headers?: Headers): Metadata | undefined => {
   }
   const result = new Metadata({
     md: Object.fromEntries(
-      [...headers.entries()].map(([key, value]) => [
-        key,
-        new Strings({ values: [value] }),
-      ])
+      [...headers.entries()].map(([key, value]) => [key, new Strings({ values: [value] })]),
     ),
   });
 
@@ -268,8 +243,8 @@ const fromGRPCMetadata = (headers?: Headers): Metadata | undefined => {
 
 // Needs testing
 export const toGRPCMetadata = (metadata?: Metadata): Headers => {
-  const headers = Object.entries(metadata?.md ?? {}).flatMap(
-    ([key, { values }]) => values.map<[string, string]>((value) => [key, value])
+  const headers = Object.entries(metadata?.md ?? {}).flatMap(([key, { values }]) =>
+    values.map<[string, string]>((value) => [key, value]),
   );
   return new Headers(headers);
 };

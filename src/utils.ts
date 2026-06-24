@@ -1,24 +1,20 @@
-import {
-  Struct,
-  type JsonValue,
-  type PartialMessage,
-} from '@bufbuild/protobuf';
+import { Struct, type JsonValue, type PartialMessage } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
 import { apiVersion } from './api-version';
+import type { Frame } from './gen/app/v1/robot_pb';
 import {
   DoCommandRequest,
-  DoCommandResponse,
-  GetKinematicsRequest,
-  GetKinematicsResponse,
+  type DoCommandResponse,
+  type Geometry,
   GetGeometriesRequest,
-  GetGeometriesResponse,
+  type GetGeometriesResponse,
+  GetKinematicsRequest,
+  type GetKinematicsResponse,
   GetStatusRequest,
-  GetStatusResponse,
-  Geometry,
-  Mesh,
+  type GetStatusResponse,
+  type Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
-import type { Frame } from './gen/app/v1/robot_pb';
 
 export const clientHeaders = new Headers({
   viam_client: `typescript;v${__VERSION__};${apiVersion}`,
@@ -26,7 +22,7 @@ export const clientHeaders = new Headers({
 
 type doCommand = (
   request: PartialMessage<DoCommandRequest>,
-  options?: CallOptions
+  options?: CallOptions,
 ) => Promise<DoCommandResponse>;
 
 /**
@@ -44,19 +40,19 @@ type doCommand = (
  * const result = await doCommandFromClient(
  *   doFn,
  *   name,
- *   Struct.fromJson({ myCommand: { key: 'value' } })
+ *   Struct.fromJson({ myCommand: { key: 'value' } }),
  * );
  * ```
  *
- * @param command - The command to execute. Accepts either a {@link Struct} or a
- *   plain object, which will be converted automatically.
+ * @param command - The command to execute. Accepts either a {@link Struct} or a plain object, which
+ *   will be converted automatically.
  */
 export const doCommandFromClient = async function doCommandFromClient(
   doCommander: doCommand,
   name: string,
   command: Struct | Record<string, JsonValue>,
   options: Options = {},
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<JsonValue> {
   const request = new DoCommandRequest({
     name,
@@ -73,16 +69,14 @@ export const doCommandFromClient = async function doCommandFromClient(
   return result;
 };
 
-export const enableDebugLogging = (
-  key?: string,
-  opts?: CallOptions
-): CallOptions => {
+export const enableDebugLogging = (key?: string, opts?: CallOptions): CallOptions => {
   const finalOpts = opts ?? { headers: {} as Record<string, string> };
   let finalKey = '';
   if (key === undefined) {
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     for (let i = 0; i < 6; i += 1) {
-      finalKey += letters[Math.floor(Math.random() * 26)];
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      finalKey += letters[Math.floor(Math.random() * letters.length)]!;
     }
   } else {
     finalKey = key;
@@ -98,22 +92,14 @@ export const disableDebugLogging = (opts: CallOptions): void => {
   }
 };
 
-export const addMetadata = (
-  key: string,
-  value: string,
-  opts?: CallOptions
-): CallOptions => {
-  const finalOpts =
-    opts ?? ({ headers: {} as Record<string, string> } as CallOptions);
+export const addMetadata = (key: string, value: string, opts?: CallOptions): CallOptions => {
+  const finalOpts = opts ?? { headers: {} };
   (finalOpts.headers as Record<string, string>)[key] = value;
   return finalOpts;
 };
 
 export const deleteMetadata = (opts: CallOptions, key: string): void => {
-  const { [key]: _, ...remainingHeaders } = opts.headers as Record<
-    string,
-    string
-  >;
+  const { [key]: _, ...remainingHeaders } = opts.headers as Record<string, string>;
   opts.headers = remainingHeaders;
 };
 
@@ -139,13 +125,11 @@ export interface GetKinematicsResultWithMeshes {
 }
 
 /** Shared type for kinematics return value (legacy or with meshes) */
-export type GetKinematicsResult =
-  | KinematicsData
-  | GetKinematicsResultWithMeshes;
+export type GetKinematicsResult = KinematicsData | GetKinematicsResultWithMeshes;
 
 type getKinematics = (
   request: PartialMessage<GetKinematicsRequest>,
-  options?: CallOptions
+  options?: CallOptions,
 ) => Promise<GetKinematicsResponse>;
 
 /** Get kinematics information using a resource client */
@@ -153,7 +137,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   getKinematicsMethod: getKinematics,
   name: string,
   extra: Struct = Struct.fromJson({}),
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<GetKinematicsResult> {
   const request = new GetKinematicsRequest({
     name,
@@ -162,7 +146,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
   const response = await getKinematicsMethod(request, callOptions);
 
-  const decoder = new TextDecoder('utf8');
+  const decoder = new TextDecoder('utf-8');
   const jsonString = decoder.decode(response.kinematicsData);
   const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
 
@@ -175,7 +159,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
 type getGeometries = (
   request: PartialMessage<GetGeometriesRequest>,
-  options?: CallOptions
+  options?: CallOptions,
 ) => Promise<GetGeometriesResponse>;
 
 /** Get geometries information using a resource client */
@@ -183,7 +167,7 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
   getGeometriesMethod: getGeometries,
   name: string,
   extra: Struct = Struct.fromJson({}),
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<Geometry[]> {
   const request = new GetGeometriesRequest({
     name,
@@ -196,7 +180,7 @@ export const getGeometriesFromClient = async function getGeometriesFromClient(
 
 type getStatus = (
   request: PartialMessage<GetStatusRequest>,
-  options?: CallOptions
+  options?: CallOptions,
 ) => Promise<GetStatusResponse>;
 
 /** Get the status of a resource using a resource client */
@@ -204,7 +188,7 @@ export const getStatusFromClient = async function getStatusFromClient(
   getStatusMethod: getStatus,
   name: string,
   options: Options = {},
-  callOptions: CallOptions = {}
+  callOptions: CallOptions = {},
 ): Promise<JsonValue> {
   const request = new GetStatusRequest({ name });
   options.requestLogger?.(request);

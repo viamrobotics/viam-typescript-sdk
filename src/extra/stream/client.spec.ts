@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { RobotClient } from '../../robot';
+import { type RobotClient } from '../../robot';
 vi.mock('../../robot');
 
 vi.mock('../../gen/stream/v1/stream_pb_service');
@@ -41,15 +41,16 @@ describe('StreamClient', () => {
     vi.useRealTimers();
   });
 
-  it('webrtc track will cause the client to emit an event', async () =>
-    new Promise<void>((done) => {
+  it('webrtc track will cause the client to emit an event', async () => {
+    return new Promise<void>((done) => {
       streamClient.on('track', (data) => {
-        expect((data as { mock: true }).mock).eq(true);
+        expect((data as unknown as { mock: true }).mock).eq(true);
         done();
       });
 
-      robotClient.emit('track', { mock: true });
-    }));
+      robotClient.emit('track', { mock: true } as unknown as RTCTrackEvent);
+    });
+  });
 
   it('getStream creates and returns a new stream', async () => {
     const fakeCamName = 'fakecam';
@@ -57,20 +58,17 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         addStream: () => {
-          streamClient.emit('track', { streams: [fakeStream] });
+          streamClient.emit('track', { streams: [fakeStream] } as unknown as RTCTrackEvent);
           return new AddStreamResponse();
         },
       });
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
-      fakeStream
-    );
-    expect(addStream).toHaveBeenCalledOnce();
-    expect(addStream).toHaveBeenCalledWith(fakeCamName);
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(fakeStream);
+    expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
   it('getStream fails when add stream fails', async () => {
@@ -85,13 +83,10 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(
-      ConnectError.from(error)
-    );
-    expect(addStream).toHaveBeenCalledOnce();
-    expect(addStream).toHaveBeenCalledWith(fakeCamName);
+    await expect(streamClient.getStream(fakeCamName)).rejects.toThrow(error.message);
+    expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
   it('getStream fails when timeout exceeded', async () => {
@@ -105,15 +100,12 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
     const promise = streamClient.getStream(fakeCamName);
     vi.runAllTimers();
-    await expect(promise).rejects.toThrowError(
-      'Did not receive a stream after 5000 ms'
-    );
-    expect(addStream).toHaveBeenCalledOnce();
-    expect(addStream).toHaveBeenCalledWith(fakeCamName);
+    await expect(promise).rejects.toThrow('Did not receive a stream after 5000 ms');
+    expect(addStream).toHaveBeenCalledExactlyOnceWith(fakeCamName);
   });
 
   it('getStream can add the same stream twice', async () => {
@@ -122,21 +114,17 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         addStream: () => {
-          streamClient.emit('track', { streams: [fakeStream] });
+          streamClient.emit('track', { streams: [fakeStream] } as unknown as RTCTrackEvent);
           return new AddStreamResponse();
         },
       });
     });
 
     streamClient = new StreamClient(robotClient);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const addStream = vi.spyOn(streamClient, 'add');
-    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
-      fakeStream
-    );
-    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(
-      fakeStream
-    );
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(fakeStream);
+    await expect(streamClient.getStream(fakeCamName)).resolves.toStrictEqual(fakeStream);
     expect(addStream).toHaveBeenCalledTimes(2);
     expect(addStream).toHaveBeenCalledWith(fakeCamName);
   });
@@ -182,9 +170,7 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(
-      streamClient.setOptions(fakeCamName, 1920, 1080)
-    ).resolves.toBeUndefined();
+    await expect(streamClient.setOptions(fakeCamName, 1920, 1080)).resolves.toBeUndefined();
   });
 
   it('setOptions throws error if SetStreamOptions fails', async () => {
@@ -199,9 +185,7 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(
-      streamClient.setOptions(fakeCamName, 1920, 1080)
-    ).rejects.toThrow(ConnectError.from(error));
+    await expect(streamClient.setOptions(fakeCamName, 1920, 1080)).rejects.toThrow(error.message);
   });
 
   it('resetOptions does not throw if SetStreamOptions succeeds', async () => {
@@ -215,9 +199,7 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(
-      streamClient.resetOptions(fakeCamName)
-    ).resolves.toBeUndefined();
+    await expect(streamClient.resetOptions(fakeCamName)).resolves.toBeUndefined();
   });
 
   it('resetOptions throws error if SetStreamOptions fails', async () => {
@@ -232,8 +214,6 @@ describe('StreamClient', () => {
     });
 
     streamClient = new StreamClient(robotClient);
-    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(
-      ConnectError.from(error)
-    );
+    await expect(streamClient.resetOptions(fakeCamName)).rejects.toThrow(error.message);
   });
 });

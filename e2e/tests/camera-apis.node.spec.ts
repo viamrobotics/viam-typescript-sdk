@@ -24,7 +24,7 @@ describe('Camera API Tests', () => {
     expect(properties).toEqual(
       expect.objectContaining({
         supportsPcd: expect.any(Boolean),
-      })
+      }),
     );
   });
 
