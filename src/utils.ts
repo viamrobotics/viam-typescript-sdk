@@ -1,6 +1,5 @@
 import { type JsonValue, type PartialMessage, Struct } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
-import { XMLParser } from 'fast-xml-parser';
 import { apiVersion } from './api-version';
 import type { Frame } from './gen/app/v1/robot_pb';
 import {
@@ -17,6 +16,7 @@ import {
   type Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
+import { parseUrdf } from './urdf';
 
 export const clientHeaders = new Headers({
   viam_client: `typescript;v${__VERSION__};${apiVersion}`,
@@ -149,13 +149,10 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
   const decoder = new TextDecoder('utf-8');
   const decodedString = decoder.decode(response.kinematicsData);
-  let parsedKinematicsData;
-  if (response.format === KinematicsFileFormat.URDF) {
-    const parser = new XMLParser();
-    parsedKinematicsData = parser.parse(decodedString);
-  } else {
-    parsedKinematicsData = JSON.parse(decodedString) as KinematicsData;
-  }
+  const parsedKinematicsData =
+    response.format === KinematicsFileFormat.URDF
+      ? parseUrdf(decodedString)
+      : (JSON.parse(decodedString) as KinematicsData);
 
   return {
     ...parsedKinematicsData,
