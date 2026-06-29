@@ -249,8 +249,7 @@ export interface Robot {
   restartModule(moduleId?: string, moduleName?: string): Promise<void>;
 
   /**
-   * Upload a file or directory from the robot to the cloud via the configured data manager
-   * service.
+   * Upload a file or directory from the robot to the cloud via the configured data manager service.
    *
    * @example
    *
