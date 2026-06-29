@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { JSX, useRef } from 'react';
 import type { Direction, MotionState, RequestMotion } from '../motion.js';
 
 const DIRECTION_TO_TEXT = {
@@ -19,28 +19,12 @@ export function MotionArrows(props: MovementControlsProps): JSX.Element {
 
   return (
     <div className='absolute right-8 bottom-8 inline-flex px-2 py-1 rounded-xl bg-white/50'>
-      <ArrowButton
-        direction='left'
-        active={left}
-        requestMotion={requestMotion}
-      />
+      <ArrowButton direction='left' active={left} requestMotion={requestMotion} />
       <div className='flex flex-col'>
-        <ArrowButton
-          direction='forward'
-          active={forward}
-          requestMotion={requestMotion}
-        />
-        <ArrowButton
-          direction='backward'
-          active={backward}
-          requestMotion={requestMotion}
-        />
+        <ArrowButton direction='forward' active={forward} requestMotion={requestMotion} />
+        <ArrowButton direction='backward' active={backward} requestMotion={requestMotion} />
       </div>
-      <ArrowButton
-        direction='right'
-        active={right}
-        requestMotion={requestMotion}
-      />
+      <ArrowButton direction='right' active={right} requestMotion={requestMotion} />
     </div>
   );
 }

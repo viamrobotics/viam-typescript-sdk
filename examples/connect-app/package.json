@@ -10,8 +10,8 @@
   },
   "devDependencies": {
     "rollup": "^3.30.0",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0"
   },
   "dependencies": {
     "@viamrobotics/sdk": "file:../.."
