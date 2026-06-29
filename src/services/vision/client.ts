@@ -140,6 +140,7 @@ export class VisionClient implements Vision {
       classificationsSupported: response.classificationsSupported,
       detectionsSupported: response.detectionsSupported,
       objectPointCloudsSupported: response.objectPointCloudsSupported,
+      defaultCamera: response.defaultCamera,
     };
   }
 
