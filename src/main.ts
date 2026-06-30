@@ -11,6 +11,7 @@ export {
   type ModuleStatus,
   type ModuleStatusState,
   type Robot,
+  type UploadDataFromPathResponse,
 } from './robot';
 /**
  * Raw Protobuf interfaces for a Robot component.

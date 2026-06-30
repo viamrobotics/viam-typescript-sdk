@@ -1,4 +1,4 @@
-import { type ServiceType } from '@bufbuild/protobuf';
+import { Struct, type ServiceType } from '@bufbuild/protobuf';
 import {
   Code,
   ConnectError,
@@ -32,6 +32,7 @@ import {
   RestartModuleRequest,
   TransformPCDRequest,
   TransformPoseRequest,
+  UploadDataFromPathRequest,
 } from '../gen/robot/v1/robot_pb';
 import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
 import { MotionService } from '../gen/service/motion/v1/motion_connect';
@@ -48,6 +49,7 @@ import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import type { AccessToken, Credential } from '../main';
 import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { assertExists } from '../assert';
+import type { UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
 
 const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';
 
@@ -1341,5 +1343,16 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
       throw new Error('no pose');
     }
     return result;
+  }
+
+  // UPLOAD DATA FROM PATH
+
+  async uploadDataFromPath(path: string, uploadMetadata?: UploadMetadata, extra = {}) {
+    const request = new UploadDataFromPathRequest({
+      path,
+      uploadMetadata,
+      extra: Struct.fromJson(extra),
+    });
+    return this.robotService.uploadDataFromPath(request);
   }
 }
