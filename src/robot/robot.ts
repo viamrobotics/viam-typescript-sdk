@@ -2,9 +2,11 @@ import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { CallOptions } from '@connectrpc/connect';
 import { type MachineConnectionEvent } from '../events';
 import type * as proto from '../gen/robot/v1/robot_pb';
+import type { UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
 import type { PoseInFrame, ResourceName, Transform } from '../types';
 
 export type CloudMetadata = PlainMessage<proto.GetCloudMetadataResponse>;
+export type UploadDataFromPathResponse = PlainMessage<proto.UploadDataFromPathResponse>;
 export type ConfigStatus = PlainMessage<proto.ConfigStatus>;
 export type FrameSystemConfig = PlainMessage<proto.FrameSystemConfig>;
 export type JobStatus = PlainMessage<proto.JobStatus>;
@@ -245,4 +247,24 @@ export interface Robot {
    * @alpha
    */
   restartModule(moduleId?: string, moduleName?: string): Promise<void>;
+
+  /**
+   * Upload a file or directory from the robot to the cloud via the configured data manager service.
+   *
+   * @example
+   *
+   * ```ts
+   * const result = await machine.uploadDataFromPath('/data/logs');
+   * ```
+   *
+   * @param path - File or folder path on the robot to upload.
+   * @param uploadMetadata - Optional metadata to apply to uploaded files.
+   * @group Data
+   * @alpha
+   */
+  uploadDataFromPath(
+    path: string,
+    uploadMetadata?: UploadMetadata,
+    extra?: Record<string, unknown>,
+  ): Promise<UploadDataFromPathResponse>;
 }

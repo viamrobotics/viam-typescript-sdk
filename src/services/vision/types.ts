@@ -20,6 +20,8 @@ export interface Properties {
   detectionsSupported: boolean;
   /** Whether or not 3d segmentation is supported by the vision service */
   objectPointCloudsSupported: boolean;
+  /** The default camera used for *FromCamera and GetObjectPointClouds calls */
+  defaultCamera?: string;
 }
 
 export interface CaptureAllOptions {

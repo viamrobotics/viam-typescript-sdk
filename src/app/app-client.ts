@@ -29,6 +29,7 @@ import {
   type OrganizationInvite,
   type OrgDetails,
   type RegistryItem,
+  type RegistryItemBilling,
   type RegistryItemStatus,
   type Robot,
   type RobotPart,
@@ -1551,18 +1552,22 @@ export class AppClient {
    * @param type The PackageType to update the item to
    * @param description A description of the item
    * @param visibility A visibility value to update to
+   * @param billing Optional usage cost information to store on the item. When unset, the existing
+   *   billing configuration is left unchanged.
    */
   async updateRegistryItem(
     itemId: string,
     type: PackageType,
     description: string,
     visibility: Visibility,
+    billing?: RegistryItemBilling,
   ) {
     await this.client.updateRegistryItem({
       itemId,
       type,
       description,
       visibility,
+      billing,
     });
   }
 
