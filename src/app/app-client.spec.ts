@@ -301,6 +301,22 @@ describe('AppClient tests', () => {
       );
       expect(response).toEqual(org);
     });
+
+    it('updateOrganization with allowedLoginMethods', async () => {
+      const allowedLoginMethods = new pb.AllowedLoginMethods({
+        methods: [pb.LoginMethod.PASSWORD, pb.LoginMethod.GOOGLE],
+      });
+      const response = await subject().updateOrganization(
+        'id',
+        'name',
+        'namespace',
+        'region',
+        'cid',
+        undefined,
+        allowedLoginMethods,
+      );
+      expect(response).toEqual(org);
+    });
   });
 
   describe('deleteOrganization tests', () => {

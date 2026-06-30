@@ -5,6 +5,7 @@ import { type PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
 import {
   type APIKeyWithAuthorizations,
+  AllowedLoginMethods,
   Authorization,
   AuthorizedPermissions,
   type CreateKeyFromExistingKeyAuthorizationsResponse,
@@ -268,6 +269,7 @@ export class AppClient {
    * @param region Optional region to update the organization with
    * @param cid Optional CRM ID to update the organization with
    * @param defaultFragments Optional default fragments to set for the organization
+   * @param allowedLoginMethods Optional allowed login methods to set for the organization
    * @returns The updated organization details
    */
   async updateOrganization(
@@ -277,6 +279,7 @@ export class AppClient {
     region?: string,
     cid?: string,
     defaultFragments?: FragmentImportList,
+    allowedLoginMethods?: AllowedLoginMethods,
   ): Promise<Organization | undefined> {
     const resp = await this.client.updateOrganization({
       organizationId,
@@ -285,6 +288,7 @@ export class AppClient {
       region,
       cid,
       defaultFragments,
+      allowedLoginMethods,
     });
     return resp.organization;
   }
