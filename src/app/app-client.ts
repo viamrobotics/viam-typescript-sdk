@@ -5,7 +5,7 @@ import { type PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
 import {
   type APIKeyWithAuthorizations,
-  AllowedLoginMethods,
+  type AllowedLoginMethods,
   Authorization,
   AuthorizedPermissions,
   type CreateKeyFromExistingKeyAuthorizationsResponse,
