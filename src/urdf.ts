@@ -1,18 +1,11 @@
 import { XMLParser } from 'fast-xml-parser';
 import { Frame } from './gen/app/v1/robot_pb';
-import {
-  Capsule,
-  Geometry,
-  Mesh,
-  RectangularPrism,
-  Sphere,
-} from './gen/common/v1/common_pb';
+import { Capsule, Geometry, Mesh, RectangularPrism, Sphere } from './gen/common/v1/common_pb';
 import type { Vector3 } from './types';
 import type { KinematicsData } from './utils';
 
 /*
- * A URDF (Unified Robot Description Format) parser, modeled after
- * https://github.com/syundo0730/urdf-parser-ts but emitting the SDK's shared
+ * A URDF (Unified Robot Description Format) parser, emitting the SDK's shared
  * {@link KinematicsData} type so URDF kinematics can be consumed identically to
  * the native (JSON) kinematics format.
  *
@@ -25,20 +18,18 @@ import type { KinematicsData } from './utils';
 const ATTRIBUTE_PREFIX = '@_';
 
 /** The raw, attribute-bearing object produced by {@link XMLParser}. */
-type XmlNode = Record<string, unknown>;
+type XMLNode = Record<string, unknown>;
 
 /** A parsed URDF `<origin>` element. */
-type UrdfOrigin = XmlNode;
+type UrdfOrigin = XMLNode;
 
 /** Read an XML attribute (e.g. `name="foo"`) off a parsed node. */
-const getAttribute = (
-  node: unknown,
-  attribute: string
-): string | undefined => {
+const getAttribute = (node: unknown, attribute: string): string | undefined => {
   if (node === null || typeof node !== 'object') {
     return undefined;
   }
-  const value = (node as XmlNode)[`${ATTRIBUTE_PREFIX}${attribute}`];
+  const value = (node as XMLNode)[`${ATTRIBUTE_PREFIX}${attribute}`];
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
   return value === undefined ? undefined : String(value);
 };
 
@@ -52,10 +43,7 @@ const parseNumber = (value: string | undefined, defaultValue = 0): number => {
 };
 
 /** Parse a space-separated `"x y z"` string into a {@link Vector3}. */
-const parseVector3 = (
-  value: string | undefined,
-  defaultValue?: Vector3
-): Vector3 => {
+const parseVector3 = (value: string | undefined, defaultValue?: Vector3): Vector3 => {
   const fallback = defaultValue ?? { x: 0, y: 0, z: 0 };
   if (value === undefined) {
     return fallback;
@@ -91,7 +79,7 @@ const vector3MetersToMm = (vector: Vector3): Vector3 => ({
 const radToDeg = (radians: number): number => (radians * 180) / Math.PI;
 
 /** XML elements that repeat are arrays; singletons are not. Normalize to array. */
-const ensureArray = <T,>(element: T | T[] | undefined): T[] => {
+const ensureArray = <T>(element: T | T[] | undefined): T[] => {
   if (element === undefined) {
     return [];
   }
@@ -99,7 +87,9 @@ const ensureArray = <T,>(element: T | T[] | undefined): T[] => {
 };
 
 /** Convert a URDF `<origin rpy="...">` into a Frame orientation. */
-const orientationFromRpy = (origin: UrdfOrigin | undefined) => {
+const orientationFromRpy = (
+  origin: UrdfOrigin | undefined,
+): { type: { case: string; value: { roll: number; pitch: number; yaw: number } } } | undefined => {
   const rpy = getAttribute(origin, 'rpy');
   if (rpy === undefined) {
     return undefined;
@@ -111,14 +101,9 @@ const orientationFromRpy = (origin: UrdfOrigin | undefined) => {
 };
 
 /** Convert a URDF `<geometry>` element into a common Geometry message. */
-const processGeometry = (
-  link: XmlNode,
-  label: string
-): Geometry | undefined => {
-  const source = ensureArray(link.collision ?? link.visual)[0] as
-    | XmlNode
-    | undefined;
-  const geometry = source?.geometry as XmlNode | undefined;
+const processGeometry = (link: XMLNode, label: string): Geometry | undefined => {
+  const source = ensureArray(link.collision ?? link.visual)[0] as XMLNode | undefined;
+  const geometry = source?.geometry as XMLNode | undefined;
   if (geometry === undefined) {
     return undefined;
   }
@@ -137,9 +122,7 @@ const processGeometry = (
       geometryType: {
         case: 'box',
         value: new RectangularPrism({
-          dimsMm: vector3MetersToMm(
-            parseVector3(getAttribute(geometry.box, 'size'))
-          ),
+          dimsMm: vector3MetersToMm(parseVector3(getAttribute(geometry.box, 'size'))),
         }),
       },
     });
@@ -150,9 +133,7 @@ const processGeometry = (
       geometryType: {
         case: 'sphere',
         value: new Sphere({
-          radiusMm: metersToMm(
-            parseNumber(getAttribute(geometry.sphere, 'radius'))
-          ),
+          radiusMm: metersToMm(parseNumber(getAttribute(geometry.sphere, 'radius'))),
         }),
       },
     });
@@ -164,12 +145,8 @@ const processGeometry = (
       geometryType: {
         case: 'capsule',
         value: new Capsule({
-          radiusMm: metersToMm(
-            parseNumber(getAttribute(geometry.cylinder, 'radius'))
-          ),
-          lengthMm: metersToMm(
-            parseNumber(getAttribute(geometry.cylinder, 'length'))
-          ),
+          radiusMm: metersToMm(parseNumber(getAttribute(geometry.cylinder, 'radius'))),
+          lengthMm: metersToMm(parseNumber(getAttribute(geometry.cylinder, 'length'))),
         }),
       },
     });
@@ -178,11 +155,11 @@ const processGeometry = (
 };
 
 /**
- * Convert a URDF `<joint>` element into a KinematicsData joint, applying RDK's
- * limit conventions: revolute limits are degrees, prismatic limits are
- * millimeters, and a continuous joint is an unbounded revolute joint.
+ * Convert a URDF `<joint>` element into a KinematicsData joint, applying RDK's limit conventions:
+ * revolute limits are degrees, prismatic limits are millimeters, and a continuous joint is an
+ * unbounded revolute joint.
  */
-const processJoint = (joint: XmlNode): KinematicsData['joints'][number] => {
+const processJoint = (joint: XMLNode): KinematicsData['joints'][number] => {
   const type = getAttribute(joint, 'type') ?? '';
   const lower = parseNumber(getAttribute(joint.limit, 'lower'));
   const upper = parseNumber(getAttribute(joint.limit, 'upper'));
@@ -224,11 +201,11 @@ const processJoint = (joint: XmlNode): KinematicsData['joints'][number] => {
 };
 
 /**
- * Convert a URDF `<link>` into a Frame. The link's pose comes from the joint
- * for which it is the child (its parent link and `<origin>` transform); a link
- * with no such joint (e.g. the root) is parented to the world frame.
+ * Convert a URDF `<link>` into a Frame. The link's pose comes from the joint for which it is the
+ * child (its parent link and `<origin>` transform); a link with no such joint (e.g. the root) is
+ * parented to the world frame.
  */
-const processLink = (link: XmlNode, joint: XmlNode | undefined): Frame => {
+const processLink = (link: XMLNode, joint: XMLNode | undefined): Frame => {
   const origin = joint?.origin as UrdfOrigin | undefined;
   return new Frame({
     parent: joint ? (getAttribute(joint.parent, 'link') ?? 'world') : 'world',
@@ -249,16 +226,16 @@ export const parseUrdf = (urdf: string): KinematicsData => {
     attributeNamePrefix: ATTRIBUTE_PREFIX,
     allowBooleanAttributes: true,
   });
-  const robot = (parser.parse(urdf) as XmlNode).robot as XmlNode | undefined;
+  const robot = (parser.parse(urdf) as XMLNode).robot as XMLNode | undefined;
   if (robot === undefined) {
     throw new Error('Invalid URDF: missing <robot> element');
   }
 
-  const jointElements = ensureArray(robot.joint) as XmlNode[];
-  const linkElements = ensureArray(robot.link) as XmlNode[];
+  const jointElements = ensureArray(robot.joint) as XMLNode[];
+  const linkElements = ensureArray(robot.link) as XMLNode[];
 
   // Index each joint by the child link it positions.
-  const jointByChild = new Map<string, XmlNode>();
+  const jointByChild = new Map<string, XMLNode>();
   for (const joint of jointElements) {
     const child = getAttribute(joint.child, 'link');
     if (child !== undefined) {
@@ -277,7 +254,7 @@ export const parseUrdf = (urdf: string): KinematicsData => {
       .filter((joint) => getAttribute(joint, 'type') !== 'fixed')
       .map((joint) => processJoint(joint)),
     links: linkElements.map((link) =>
-      processLink(link, jointByChild.get(getAttribute(link, 'name') ?? ''))
+      processLink(link, jointByChild.get(getAttribute(link, 'name') ?? '')),
     ),
   };
 };
