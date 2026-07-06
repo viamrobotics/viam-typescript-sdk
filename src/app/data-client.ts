@@ -10,6 +10,7 @@ import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
 import { DataService } from '../gen/app/data/v1/data_connect';
 import {
+  type BinaryData,
   type BinaryID,
   CaptureInterval,
   CaptureMetadata,
@@ -1861,6 +1862,36 @@ export class DataClient {
       throw new Error('no sequence returned');
     }
     return resp.sequence;
+  }
+
+  /**
+   * Retrieve paginated binary data records matching a sequence's time range and
+   * binary resources.
+   *
+   * @example
+   *
+   * ```ts
+   * const { data, nextPageToken } = await dataClient.getSequenceBinaryData(
+   *   'sequence-id',
+   * );
+   * ```
+   *
+   * @param sequenceId The ID of the sequence
+   * @param pageToken Optional page token for pagination
+   * @param pageSize Optional page size
+   * @returns The binary data records and a next page token
+   */
+  async getSequenceBinaryData(
+    sequenceId: string,
+    pageToken?: string,
+    pageSize?: number,
+  ): Promise<{ data: BinaryData[]; nextPageToken: string }> {
+    const resp = await this.dataClient.getSequenceBinaryData({
+      sequenceId,
+      pageToken,
+      pageSize,
+    });
+    return { data: resp.data, nextPageToken: resp.nextPageToken };
   }
 
   /**
