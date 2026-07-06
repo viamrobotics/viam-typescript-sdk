@@ -1865,15 +1865,12 @@ export class DataClient {
   }
 
   /**
-   * Retrieve paginated binary data records matching a sequence's time range and
-   * binary resources.
+   * Retrieve paginated binary data records matching a sequence's time range and binary resources.
    *
    * @example
    *
    * ```ts
-   * const { data, nextPageToken } = await dataClient.getSequenceBinaryData(
-   *   'sequence-id',
-   * );
+   * const { data, nextPageToken } = await dataClient.getSequenceBinaryData('sequence-id');
    * ```
    *
    * @param sequenceId The ID of the sequence
