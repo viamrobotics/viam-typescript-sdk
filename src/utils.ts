@@ -10,6 +10,7 @@ import {
   type GetGeometriesResponse,
   GetKinematicsRequest,
   type GetKinematicsResponse,
+  KinematicsFileFormat,
   GetStatusRequest,
   type GetStatusResponse,
   type Mesh,
@@ -116,6 +117,7 @@ export interface KinematicsData {
     min: number;
   }[];
   links: Frame[];
+  urdf?: string;
 }
 
 /** Newer kinematics return shape that includes meshes */
@@ -147,8 +149,27 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   const response = await getKinematicsMethod(request, callOptions);
 
   const decoder = new TextDecoder('utf-8');
-  const jsonString = decoder.decode(response.kinematicsData);
-  const parsedKinematicsData = JSON.parse(jsonString) as KinematicsData;
+  const rawData = decoder.decode(response.kinematicsData);
+
+  let parsedKinematicsData: KinematicsData;
+  if (response.format === KinematicsFileFormat.URDF) {
+    parsedKinematicsData = {
+      name,
+      kinematic_param_type: 'URDF',
+      joints: [],
+      links: [],
+      urdf: rawData,
+    };
+  } else if (rawData.length > 0) {
+    parsedKinematicsData = JSON.parse(rawData) as KinematicsData;
+  } else {
+    parsedKinematicsData = {
+      name,
+      kinematic_param_type: 'UNSPECIFIED',
+      joints: [],
+      links: [],
+    };
+  }
 
   return {
     ...parsedKinematicsData,
