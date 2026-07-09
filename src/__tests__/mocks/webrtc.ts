@@ -5,12 +5,14 @@ export const createMockPeerConnection = (
   addEventListenerFn = vi.fn(),
   removeEventListenerFn = vi.fn(),
   iceConnectionState: RTCIceConnectionState = 'connected',
+  getStatsFn = vi.fn().mockResolvedValue(new Map()),
 ): RTCPeerConnection => {
   return {
     close: closeFn,
     addEventListener: addEventListenerFn,
     removeEventListener: removeEventListenerFn,
     iceConnectionState,
+    getStats: getStatsFn,
   } as unknown as RTCPeerConnection;
 };
 

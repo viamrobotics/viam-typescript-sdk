@@ -13,6 +13,8 @@ import {
   wrapTransportWithDebugLogging,
 } from '../dial';
 import { setDebugLogWriter, type DebugLogEntry } from '../../debug';
+import { DialStage } from '../../gen/proto/rpc/webrtc/v1/signaling_pb';
+import { DialStageTracker } from '../dial-report';
 
 import {
   TEST_URL,
@@ -64,8 +66,11 @@ const setupDialWebRTCMocks = () => {
     },
   });
 
+  const reportConnectionMetadataFn = vi.fn().mockResolvedValue({});
+
   const mockClient = {
     optionalWebRTCConfig: optionalWebRTCConfigFn,
+    reportConnectionMetadata: reportConnectionMetadataFn,
   } as unknown as ReturnType<typeof createClient>;
 
   vi.mocked(createClient).mockReturnValue(mockClient);
@@ -87,6 +92,7 @@ const setupDialWebRTCMocks = () => {
     dataChannel,
     transport,
     signalingExchange,
+    reportConnectionMetadataFn,
   };
 };
 
@@ -238,6 +244,64 @@ describe('dialWebRTC', () => {
     });
   });
 
+  describe('connection metadata reporting', () => {
+    it('reports the dial outcome exactly once on success', async () => {
+      // Arrange
+      const { reportConnectionMetadataFn } = setupDialWebRTCMocks();
+
+      // Act
+      await dialWebRTC(TEST_URL, TEST_HOST);
+
+      // Assert
+      await vi.waitFor(() => {
+        expect(reportConnectionMetadataFn).toHaveBeenCalledOnce();
+      });
+      const [request] = reportConnectionMetadataFn.mock.calls[0] as [
+        { reachedStage: number; failureCode: number },
+      ];
+      expect(request.reachedStage).toBe(DialStage.READY);
+      expect(request.failureCode).toBe(0);
+    });
+
+    it('reports a failed dial exactly once with its failure code', async () => {
+      // Arrange
+      const { signalingExchange, reportConnectionMetadataFn } = setupDialWebRTCMocks();
+      vi.mocked(signalingExchange.doExchange).mockRejectedValueOnce(
+        new ConnectError('robot offline', Code.NotFound),
+      );
+
+      // Act
+      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow('robot offline');
+
+      // Assert
+      await vi.waitFor(() => {
+        expect(reportConnectionMetadataFn).toHaveBeenCalledOnce();
+      });
+      const [request] = reportConnectionMetadataFn.mock.calls[0] as [
+        { reachedStage: number; failureCode: number },
+      ];
+      expect(request.failureCode).toBe(Code.NotFound);
+      expect(request.reachedStage).toBe(DialStage.CONFIG_FETCHED);
+    });
+
+    it('never reports an unimplemented failure (no WebRTC signaler)', async () => {
+      // Arrange
+      const { signalingExchange, reportConnectionMetadataFn } = setupDialWebRTCMocks();
+      vi.mocked(signalingExchange.doExchange).mockRejectedValueOnce(
+        new ConnectError('not implemented', Code.Unimplemented),
+      );
+
+      // Act
+      await expect(dialWebRTC(TEST_URL, TEST_HOST)).rejects.toThrow('not implemented');
+
+      // Assert
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10);
+      });
+      expect(reportConnectionMetadataFn).not.toHaveBeenCalled();
+    });
+  });
+
   describe('configuration', () => {
     it('should pass webrtc options to peer connection', async () => {
       // Arrange
@@ -274,6 +338,7 @@ describe('dialWebRTC', () => {
         peerConnection,
         dataChannel,
         { additionalSdpFields, disableTrickleICE: true, rtcConfig },
+        expect.any(DialStageTracker),
       );
     });
   });

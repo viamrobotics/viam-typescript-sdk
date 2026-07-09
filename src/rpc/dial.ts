@@ -13,7 +13,8 @@ import { Code, ConnectError, createClient } from '@connectrpc/connect';
 import { AuthService, ExternalAuthService } from '../gen/proto/rpc/v1/auth_connect';
 import { AuthenticateRequest, Credentials as PBCredentials } from '../gen/proto/rpc/v1/auth_pb';
 import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
-import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+import { DialStage, WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+import { classifySignalingPath, DialStageTracker, reportDialOutcome } from './dial-report';
 import { newPeerConnectionForClient } from './peer';
 
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -549,6 +550,7 @@ export const dialWebRTC = async (
   dialOpts?: DialOptions,
   transportCredentialsInclude = false,
 ): Promise<WebRTCConnection> => {
+  const dialStart = Date.now();
   let usableSignalingAddress = signalingAddress.replace(/\/$/u, '');
   if (dialOpts?.webrtcOptions?.signalingInsecure) {
     // TLS for the signaling connection is determined by the URL scheme passed
@@ -581,29 +583,67 @@ export const dialWebRTC = async (
     transportCredentialsInclude,
   );
 
-  const webrtcOpts = await processWebRTCOpts(signalingClient, callOpts, dialOpts);
+  /**
+   * From here on the dial outcome — success or failure — is reported best-effort to the signaling
+   * server (see dial-report.ts), tracking the furthest stage the dial reached. Failures before the
+   * signaling client exists cannot be reported: there is nothing to report over.
+   */
+  const stage = new DialStageTracker();
+  stage.advance(DialStage.SIGNALING_CONNECTED);
+  const signalingPath = classifySignalingPath(usableSignalingAddress);
 
-  const { pc, dc } = await newPeerConnectionForClient(
-    webrtcOpts.disableTrickleICE,
-    webrtcOpts.rtcConfig,
-    webrtcOpts.additionalSdpFields,
-  );
+  let pc: RTCPeerConnection | undefined;
+  let dc: RTCDataChannel | undefined;
   let successful = false;
-
-  const exchange = new SignalingExchange(signalingClient, callOpts, pc, dc, webrtcOpts);
-
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
-  if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
-    timeoutId = setTimeout(() => {
-      if (!successful) {
-        exchange.terminate(new Error('timed out'));
-      }
-    }, dialTimeoutMs);
-  }
 
   try {
+    const webrtcOpts = await processWebRTCOpts(signalingClient, callOpts, dialOpts);
+    stage.advance(DialStage.CONFIG_FETCHED);
+
+    const { pc: newPc, dc: newDc } = await newPeerConnectionForClient(
+      webrtcOpts.disableTrickleICE,
+      webrtcOpts.rtcConfig,
+      webrtcOpts.additionalSdpFields,
+    );
+    pc = newPc;
+    dc = newDc;
+
+    newPc.addEventListener('iceconnectionstatechange', () => {
+      if (newPc.iceConnectionState === 'connected' || newPc.iceConnectionState === 'completed') {
+        stage.advance(DialStage.ICE_CONNECTED);
+      }
+    });
+    /**
+     * Advance to DTLS_CONNECTED when the peer connection reaches connected (ICE + DTLS complete),
+     * so a failure between ICE connectivity and data-channel-open can be attributed to DTLS vs the
+     * data channel.
+     */
+    newPc.addEventListener('connectionstatechange', () => {
+      if (newPc.connectionState === 'connected') {
+        stage.advance(DialStage.DTLS_CONNECTED);
+      }
+    });
+
+    const exchange = new SignalingExchange(
+      signalingClient,
+      callOpts,
+      newPc,
+      newDc,
+      webrtcOpts,
+      stage,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
+    if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
+      timeoutId = setTimeout(() => {
+        if (!successful) {
+          exchange.terminate(new Error('timed out'));
+        }
+      }, dialTimeoutMs);
+    }
+
     const cc = await exchange.doExchange();
 
     if (dialOpts?.externalAuthAddress !== undefined && dialOpts.externalAuthAddress !== '') {
@@ -613,6 +653,8 @@ export const dialWebRTC = async (
     }
 
     successful = true;
+    stage.advance(DialStage.READY);
+    reportDialOutcome(signalingClient, callOpts, newPc, stage, dialStart, signalingPath);
 
     // Wrap the transport with AuthenticatedTransport to inject extraHeaders
     const headers = new Headers(dialOpts?.extraHeaders ?? {});
@@ -620,11 +662,12 @@ export const dialWebRTC = async (
 
     return {
       transport: enableGRPCTraceLogging(wrappedTransport, host),
-      peerConnection: pc,
-      dataChannel: dc,
+      peerConnection: newPc,
+      dataChannel: newDc,
     };
   } catch (error) {
     console.error('error dialing', error); // eslint-disable-line no-console
+    reportDialOutcome(signalingClient, callOpts, pc, stage, dialStart, signalingPath, error);
     throw error;
   } finally {
     if (timeoutId !== undefined) {
@@ -632,8 +675,8 @@ export const dialWebRTC = async (
     }
 
     if (!successful) {
-      pc.close();
-      dc.close();
+      pc?.close();
+      dc?.close();
     }
   }
 };

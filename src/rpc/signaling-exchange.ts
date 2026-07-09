@@ -8,10 +8,12 @@ import {
   type CallResponseInitStage,
   type CallResponseUpdateStage,
   CallUpdateRequest,
+  DialStage,
   ICECandidate,
 } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
 import { ClientChannel } from './client-channel';
 import { ConnectionClosedError } from './connection-closed-error';
+import type { DialStageTracker } from './dial-report';
 import type { DialWebRTCOptions } from './dial';
 import { addSdpFields } from './peer';
 import { atob, btoa } from './polyfills';
@@ -44,6 +46,7 @@ export class SignalingExchange {
     private readonly pc: RTCPeerConnection,
     private readonly dc: RTCDataChannel,
     private readonly dialOpts?: DialWebRTCOptions,
+    private readonly dialStage?: DialStageTracker,
   ) {
     this.clientChannel = new ClientChannel(this.pc, this.dc);
   }
@@ -75,6 +78,7 @@ export class SignalingExchange {
 
     // Initiate now the call now that all of our handlers are setup.
     const callResponses = this.signalingClient.call(callRequest, this.callOpts);
+    this.dialStage?.advance(DialStage.OFFER_SENT);
 
     // Start processing the responses asynchronously.
     const responsesProcessed = this.processCallResponses(callResponses);
@@ -189,6 +193,7 @@ export class SignalingExchange {
       return false;
     }
     await this.pc.setRemoteDescription(remoteSDP);
+    this.dialStage?.advance(DialStage.ANSWER_RECEIVED);
     this.awaitingRemoteDescription?.success(true);
 
     if (this.dialOpts?.disableTrickleICE) {
