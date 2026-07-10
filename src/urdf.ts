@@ -89,7 +89,9 @@ const ensureArray = <T>(element: T | T[] | undefined): T[] => {
 /** Convert a URDF `<origin rpy="...">` into a Frame orientation. */
 const orientationFromRpy = (
   origin: UrdfOrigin | undefined,
-): { type: { case: string; value: { roll: number; pitch: number; yaw: number } } } | undefined => {
+):
+  | { type: { case: 'eulerAngles'; value: { roll: number; pitch: number; yaw: number } } }
+  | undefined => {
   const rpy = getAttribute(origin, 'rpy');
   if (rpy === undefined) {
     return undefined;
