@@ -49,6 +49,8 @@ import {
   GetDatabaseConnectionResponse,
   GetLatestTabularDataRequest,
   GetLatestTabularDataResponse,
+  GetSequenceBinaryDataRequest,
+  GetSequenceBinaryDataResponse,
   GetSequenceRequest,
   GetSequenceResponse,
   Index,
@@ -1510,6 +1512,36 @@ describe('DataClient tests', () => {
       const result = await subject().getSequence(sequenceId);
       expect(capReq).toStrictEqual(expectedRequest);
       expect(result).toEqual(sequence);
+    });
+  });
+
+  describe('getSequenceBinaryData tests', () => {
+    let capReq: GetSequenceBinaryDataRequest;
+    const sequenceId = 'test-sequence-id';
+    const binaryData = [new BinaryData({ binary: new Uint8Array([1, 2, 3]) })];
+    const nextPageToken = 'next-token';
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(DataService, {
+          getSequenceBinaryData: (req) => {
+            capReq = req;
+            return new GetSequenceBinaryDataResponse({
+              data: binaryData,
+              nextPageToken,
+            });
+          },
+        });
+      });
+    });
+
+    it('gets sequence binary data', async () => {
+      const expectedRequest = new GetSequenceBinaryDataRequest({ sequenceId });
+
+      const result = await subject().getSequenceBinaryData(sequenceId);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(result.data).toEqual(binaryData);
+      expect(result.nextPageToken).toEqual(nextPageToken);
     });
   });
 
