@@ -127,8 +127,42 @@ describe('getKinematicsFromClient', () => {
     });
   });
 
-  it('does not JSON.parse URDF (XML) kinematics data', async () => {
-    const urdf = '<?xml version="1.0"?>\n<robot name="test"></robot>';
+  it('parses URDF (XML) kinematics data into SVA joints/links', async () => {
+    const urdf = `<?xml version="1.0"?>
+<robot name="test">
+  <link name="base"/>
+  <link name="link1"/>
+  <joint name="joint1" type="revolute">
+    <parent link="base"/>
+    <child link="link1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.1"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14"/>
+  </joint>
+</robot>`;
+    const getKinematicsMethod = vi.fn().mockResolvedValue(
+      new GetKinematicsResponse({
+        format: KinematicsFileFormat.URDF,
+        kinematicsData: encode(urdf),
+      }),
+    );
+
+    const result = await getKinematicsFromClient(getKinematicsMethod, 'test');
+
+    expect(result).toMatchObject({
+      name: 'test',
+      // Parsed URDF is reported as SVA (converted units) so downstream
+      // consumers gated on 'SVA' pick up the joint limits.
+      kinematic_param_type: 'SVA',
+      joints: [{ id: 'joint1', type: 'revolute' }],
+      urdf,
+    });
+    expect((result as { links: unknown[] }).links).toHaveLength(2);
+    expect((result as { joints: unknown[] }).joints).toHaveLength(1);
+  });
+
+  it('falls back to a raw-XML result when URDF cannot be parsed', async () => {
+    const urdf = '<nope/>'; // no <robot> element -> parseUrdf throws
     const getKinematicsMethod = vi.fn().mockResolvedValue(
       new GetKinematicsResponse({
         format: KinematicsFileFormat.URDF,
