@@ -5,10 +5,14 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   type DoCommandRequest,
   DoCommandResponse,
+  GetKinematicsResponse,
   type GetStatusRequest,
   GetStatusResponse,
+  KinematicsFileFormat,
 } from './gen/common/v1/common_pb';
-import { doCommandFromClient, getStatusFromClient } from './utils';
+import { doCommandFromClient, getKinematicsFromClient, getStatusFromClient } from './utils';
+
+const encode = (value: string) => new TextEncoder().encode(value);
 
 describe('doCommandFromClient', () => {
   it('accepts a Struct command', async () => {
@@ -97,5 +101,66 @@ describe('getStatusFromClient', () => {
     expect(requestLogger).toHaveBeenCalledOnce();
     const [loggedRequest] = requestLogger.mock.calls[0] as [GetStatusRequest];
     expect(loggedRequest.name).toBe('test');
+  });
+});
+
+describe('getKinematicsFromClient', () => {
+  it('parses SVA (JSON) kinematics data', async () => {
+    const sva = {
+      name: 'test',
+      kinematic_param_type: 'SVA',
+      joints: [{ id: 'j0', type: 'revolute', parent: 'world', max: 90, min: -90 }],
+      links: [],
+    };
+    const getKinematicsMethod = vi.fn().mockResolvedValue(
+      new GetKinematicsResponse({
+        format: KinematicsFileFormat.SVA,
+        kinematicsData: encode(JSON.stringify(sva)),
+      }),
+    );
+
+    const result = await getKinematicsFromClient(getKinematicsMethod, 'test');
+
+    expect(result).toMatchObject({
+      kinematic_param_type: 'SVA',
+      joints: [{ id: 'j0', max: 90, min: -90 }],
+    });
+  });
+
+  it('does not JSON.parse URDF (XML) kinematics data', async () => {
+    const urdf = '<?xml version="1.0"?>\n<robot name="test"></robot>';
+    const getKinematicsMethod = vi.fn().mockResolvedValue(
+      new GetKinematicsResponse({
+        format: KinematicsFileFormat.URDF,
+        kinematicsData: encode(urdf),
+      }),
+    );
+
+    const result = await getKinematicsFromClient(getKinematicsMethod, 'test');
+
+    expect(result).toMatchObject({
+      name: 'test',
+      kinematic_param_type: 'URDF',
+      joints: [],
+      links: [],
+      urdf,
+    });
+  });
+
+  it('returns an empty UNSPECIFIED result when there is no kinematics data', async () => {
+    const getKinematicsMethod = vi.fn().mockResolvedValue(
+      new GetKinematicsResponse({
+        format: KinematicsFileFormat.UNSPECIFIED,
+      }),
+    );
+
+    const result = await getKinematicsFromClient(getKinematicsMethod, 'test');
+
+    expect(result).toMatchObject({
+      name: 'test',
+      kinematic_param_type: 'UNSPECIFIED',
+      joints: [],
+      links: [],
+    });
   });
 });
