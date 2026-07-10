@@ -435,7 +435,12 @@ export {
   doCommandFromClient,
   enableDebugLogging,
   getStatusFromClient,
+  type GetKinematicsResult,
+  type GetKinematicsResultWithMeshes,
+  type KinematicsData,
 } from './utils';
+
+export { parseUrdf } from './urdf';
 
 export {
   createConsoleLogWriter,
