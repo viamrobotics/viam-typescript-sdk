@@ -159,6 +159,11 @@ describe('getKinematicsFromClient', () => {
     });
     expect((result as { links: unknown[] }).links).toHaveLength(2);
     expect((result as { joints: unknown[] }).joints).toHaveLength(1);
+
+    const [joint] = (result as { joints: { min: number; max: number }[] }).joints;
+    // -3.14/3.14 rad -> degrees
+    expect(joint?.max).toBeCloseTo(179.909, 3);
+    expect(joint?.min).toBeCloseTo(-179.909, 3);
   });
 
   it('falls back to a raw-XML result when URDF cannot be parsed', async () => {
