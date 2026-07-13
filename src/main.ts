@@ -440,8 +440,6 @@ export {
   type KinematicsData,
 } from './utils';
 
-export { parseUrdf } from './urdf';
-
 export {
   createConsoleLogWriter,
   setDebugLogWriter,
