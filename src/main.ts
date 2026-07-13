@@ -435,6 +435,9 @@ export {
   doCommandFromClient,
   enableDebugLogging,
   getStatusFromClient,
+  type GetKinematicsResult,
+  type GetKinematicsResultWithMeshes,
+  type KinematicsData,
 } from './utils';
 
 export {
