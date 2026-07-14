@@ -16,6 +16,7 @@ import {
   type Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
+import { parseUrdf } from './urdf';
 
 export const clientHeaders = new Headers({
   viam_client: `typescript;v${__VERSION__};${apiVersion}`,
@@ -153,13 +154,20 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
 
   let parsedKinematicsData: KinematicsData;
   if (response.format === KinematicsFileFormat.URDF) {
-    parsedKinematicsData = {
-      name,
-      kinematic_param_type: 'URDF',
-      joints: [],
-      links: [],
-      urdf: rawData,
-    };
+    try {
+      // parseUrdf yields SVA-unit joints/links and kinematic_param_type: 'SVA';
+      // retain the raw XML so URDF origin is still knowable via `urdf`.
+      parsedKinematicsData = { ...parseUrdf(rawData), urdf: rawData };
+    } catch {
+      // #978 never-throw fallback: unparseable URDF still returns safely.
+      parsedKinematicsData = {
+        name,
+        kinematic_param_type: 'URDF',
+        joints: [],
+        links: [],
+        urdf: rawData,
+      };
+    }
   } else if (rawData.length > 0) {
     parsedKinematicsData = JSON.parse(rawData) as KinematicsData;
   } else {
