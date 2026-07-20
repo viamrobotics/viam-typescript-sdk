@@ -10,6 +10,8 @@ export {
   type DialWebRTCConf,
   type ModuleStatus,
   type ModuleStatusState,
+  type PackageStatus,
+  type PackageStatusState,
   type Robot,
   type UploadDataFromPathResponse,
 } from './robot';
