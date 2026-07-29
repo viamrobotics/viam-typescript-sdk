@@ -1,9 +1,21 @@
 import type { Resource, Struct } from '../../types';
-import type { AudioInfo } from '../../gen/common/v1/common_pb';
+import type { AudioInfo, Geometry } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
 
 /** Represents a device that outputs audio. */
 export interface AudioOut extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const audioOut = new VIAM.AudioOutClient(machine, 'my_audio_out');
+   * const geometries = await audioOut.getGeometries();
+   * ```
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Play audio on the device.
    *

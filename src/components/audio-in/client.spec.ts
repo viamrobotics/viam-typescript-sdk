@@ -2,7 +2,12 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type GetAudioResponse } from '../../gen/component/audioin/v1/audioin_pb';
-import { type GetPropertiesRequest, GetPropertiesResponse } from '../../gen/common/v1/common_pb';
+import {
+  Geometry,
+  GetGeometriesResponse,
+  type GetPropertiesRequest,
+  GetPropertiesResponse,
+} from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { type AudioChunk } from './audio-in';
 import { AudioInClient } from './client';
@@ -25,6 +30,8 @@ const testProperties = new GetPropertiesResponse({
   numChannels: 2,
 });
 
+const testGeometries = [new Geometry({ label: 'test-geometry' })];
+
 describe('AudioInClient tests', () => {
   beforeEach(() => {
     testAudioStream = createWritableIterable<PartialMessage<GetAudioResponse>>();
@@ -37,6 +44,9 @@ describe('AudioInClient tests', () => {
         getProperties: (req: GetPropertiesRequest) => {
           capturedPropertiesReq = req;
           return testProperties;
+        },
+        getGeometries: () => {
+          return new GetGeometriesResponse({ geometries: testGeometries });
         },
       });
     });
@@ -125,5 +135,9 @@ describe('AudioInClient tests', () => {
       await audioin.getProperties(extra);
       expect(capturedPropertiesReq?.extra).toStrictEqual(Struct.fromJson(extra));
     });
+  });
+
+  it('get geometries', async () => {
+    await expect(audioin.getGeometries()).resolves.toEqual(testGeometries);
   });
 });

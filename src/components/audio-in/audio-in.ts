@@ -1,5 +1,5 @@
 import type { Resource, Struct } from '../../types';
-import type { AudioInfo } from '../../gen/common/v1/common_pb';
+import type { AudioInfo, Geometry } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
 
 export interface AudioChunk {
@@ -14,6 +14,18 @@ export interface AudioChunk {
 /** Represents a device that takes audio input. */
 
 export interface AudioIn extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const audioIn = new VIAM.AudioInClient(machine, 'my_audio_in');
+   * const geometries = await audioIn.getGeometries();
+   * ```
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Stream audio from the device.
    *

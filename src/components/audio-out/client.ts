@@ -11,7 +11,7 @@ import {
   PlayStreamInit,
   PlayStreamRequest,
 } from '../../gen/component/audioout/v1/audioout_pb';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import { type AudioOut } from './audio-out';
 
 /**
@@ -29,6 +29,15 @@ export class AudioOutClient implements AudioOut {
     this.client = client.createServiceClient(AudioOutService);
     this.name = name;
     this.options = options;
+  }
+
+  async getGeometries(extra = {}, callOptions = this.callOptions) {
+    return getGeometriesFromClient(
+      this.client.getGeometries,
+      this.name,
+      Struct.fromJson(extra),
+      callOptions,
+    );
   }
 
   async play(

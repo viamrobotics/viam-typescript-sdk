@@ -1,5 +1,6 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
+import type { Geometry } from '../../gen/common/v1/common_pb';
 
 export interface Properties {
   /** Whether a motor supports position reporting. */
@@ -8,6 +9,21 @@ export interface Properties {
 
 /** Represents a physical motor. */
 export interface Motor extends Resource {
+  /**
+   * Get the geometries of the component in their current configuration.
+   *
+   * @example
+   *
+   * ```ts
+   * const motor = new VIAM.MotorClient(machine, 'my_motor');
+   * const geometries = await motor.getGeometries();
+   * ```
+   *
+   * For more information, see [Motor
+   * API](https://docs.viam.com/dev/reference/apis/components/motor/#getgeometries).
+   */
+  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
   /**
    * Set the percentage of the motor's total power that should be employed.
    *
