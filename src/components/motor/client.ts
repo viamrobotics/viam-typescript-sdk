@@ -15,11 +15,7 @@ import {
 } from '../../gen/component/motor/v1/motor_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import {
-  doCommandFromClient,
-  getGeometriesFromClient,
-  getStatusFromClient,
-} from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import type { Motor } from './motor';
 
 /**
@@ -44,7 +40,7 @@ export class MotorClient implements Motor {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 

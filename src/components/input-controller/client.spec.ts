@@ -68,8 +68,6 @@ describe('InputControllerClient Tests', () => {
   });
 
   it('gets geometries', async () => {
-    await expect(inputController.getGeometries()).resolves.toEqual(
-      testGeometries
-    );
+    await expect(inputController.getGeometries()).resolves.toEqual(testGeometries);
   });
 });

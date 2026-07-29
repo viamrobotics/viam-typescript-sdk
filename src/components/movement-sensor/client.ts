@@ -14,11 +14,7 @@ import {
 } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import {
-  doCommandFromClient,
-  getGeometriesFromClient,
-  getStatusFromClient,
-} from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import type { MovementSensor } from './movement-sensor';
 
 /**
@@ -43,7 +39,7 @@ export class MovementSensorClient implements MovementSensor {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 

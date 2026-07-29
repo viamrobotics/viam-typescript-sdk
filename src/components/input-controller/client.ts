@@ -8,11 +8,7 @@ import {
   GetEventsRequest,
   TriggerEventRequest,
 } from '../../gen/component/inputcontroller/v1/input_controller_pb';
-import {
-  doCommandFromClient,
-  getGeometriesFromClient,
-  getStatusFromClient,
-} from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import type { InputController, InputControllerEvent } from './input-controller';
 
 /**
@@ -37,7 +33,7 @@ export class InputControllerClient implements InputController {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 

@@ -7,11 +7,7 @@ import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
 import { GetAudioRequest } from '../../gen/component/audioin/v1/audioin_pb';
 import { GetPropertiesRequest } from '../../gen/common/v1/common_pb';
 import { type AudioIn, type AudioChunk } from './audio-in';
-import {
-  doCommandFromClient,
-  getGeometriesFromClient,
-  getStatusFromClient,
-} from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 
 /*
  * A gRPC-web client for the AudioIn component.
@@ -35,7 +31,7 @@ export class AudioInClient implements AudioIn {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 

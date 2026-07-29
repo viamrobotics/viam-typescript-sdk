@@ -25,10 +25,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const geometries = await movementSensor.getGeometries();
    * ```
    *

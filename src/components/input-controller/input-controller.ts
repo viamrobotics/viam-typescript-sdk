@@ -14,10 +14,7 @@ export interface InputController extends Resource {
    * @example
    *
    * ```ts
-   * const controller = new VIAM.InputControllerClient(
-   *   machine,
-   *   'my_controller'
-   * );
+   * const controller = new VIAM.InputControllerClient(machine, 'my_controller');
    * const geometries = await controller.getGeometries();
    * ```
    *

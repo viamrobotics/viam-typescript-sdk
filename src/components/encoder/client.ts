@@ -8,11 +8,7 @@ import {
 } from '../../gen/component/encoder/v1/encoder_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import {
-  doCommandFromClient,
-  getGeometriesFromClient,
-  getStatusFromClient,
-} from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import { EncoderPositionType, type Encoder } from './encoder';
 
 /**
@@ -37,7 +33,7 @@ export class EncoderClient implements Encoder {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 
