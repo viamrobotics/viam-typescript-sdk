@@ -8,12 +8,7 @@ import type {
   appApi,
 } from '@viamrobotics/sdk';
 import { useEffect, useRef, useState } from 'react';
-import {
-  getBaseClient,
-  getRobotClient,
-  getStreamClient,
-  getViamClient,
-} from './client.js';
+import { getBaseClient, getRobotClient, getStreamClient, getViamClient } from './client.js';
 
 export const DISCONNECTED = 'disconnected';
 export const CONNECTING = 'connecting';
@@ -36,10 +31,7 @@ interface ClientStateConnected {
   streamClient: StreamClient;
 }
 
-type ClientState =
-  | ClientStateDisconnected
-  | ClientStateTransitioning
-  | ClientStateConnected;
+type ClientState = ClientStateDisconnected | ClientStateTransitioning | ClientStateConnected;
 
 export type ClientStatus = ClientState['status'];
 
@@ -48,10 +40,7 @@ export interface RobotClientStore {
   client?: RobotClient;
   streamClient?: StreamClient;
   baseClient?: BaseClient;
-  connectOrDisconnect: (
-    hostname: string,
-    credentials: Credential | AccessToken
-  ) => unknown;
+  connectOrDisconnect: (hostname: string, credentials: Credential | AccessToken) => unknown;
 }
 
 export const useRobotClientStore = (): RobotClientStore => {
@@ -61,10 +50,7 @@ export const useRobotClientStore = (): RobotClientStore => {
     console.warn('Connection error', state.error);
   }
 
-  const connectOrDisconnect = (
-    hostname: string,
-    credentials: Credential | AccessToken
-  ): void => {
+  const connectOrDisconnect = (hostname: string, credentials: Credential | AccessToken): void => {
     if (state.status === DISCONNECTED) {
       setState({ status: CONNECTING });
 
@@ -96,7 +82,7 @@ export const useRobotClientStore = (): RobotClientStore => {
 
 export const useStream = (
   streamClient: StreamClient | undefined,
-  cameraName: string
+  cameraName: string,
 ): MediaStream | undefined => {
   const okToConnectRef = useRef(true);
   const [stream, setStream] = useState<MediaStream | undefined>();
@@ -191,7 +177,7 @@ export interface Breadcrumb {
 export class BrowserStateStore {
   constructor(
     public readonly state: BrowserState,
-    private readonly onNewState: (newState: BrowserState) => void
+    private readonly onNewState: (newState: BrowserState) => void,
   ) {}
 
   public breadcrumbs(): Breadcrumb[] {
@@ -221,10 +207,7 @@ export class BrowserStateStore {
           },
           {
             name: currentState.organization.name,
-            onClick: () =>
-              this.onOrganizationSelected(currentState)(
-                currentState.organization
-              ),
+            onClick: () => this.onOrganizationSelected(currentState)(currentState.organization),
           },
           { name: currentState.location.name },
           { name: 'Machines' },
@@ -238,15 +221,11 @@ export class BrowserStateStore {
           },
           {
             name: currentState.organization.name,
-            onClick: () =>
-              this.onOrganizationSelected(currentState)(
-                currentState.organization
-              ),
+            onClick: () => this.onOrganizationSelected(currentState)(currentState.organization),
           },
           {
             name: currentState.location.name,
-            onClick: () =>
-              this.onLocationSelected(currentState)(currentState.location),
+            onClick: () => this.onLocationSelected(currentState)(currentState.location),
           },
           { name: currentState.machine.name },
         ];
@@ -259,20 +238,15 @@ export class BrowserStateStore {
           },
           {
             name: currentState.organization.name,
-            onClick: () =>
-              this.onOrganizationSelected(currentState)(
-                currentState.organization
-              ),
+            onClick: () => this.onOrganizationSelected(currentState)(currentState.organization),
           },
           {
             name: currentState.location.name,
-            onClick: () =>
-              this.onLocationSelected(currentState)(currentState.location),
+            onClick: () => this.onLocationSelected(currentState)(currentState.location),
           },
           {
             name: currentState.machine.name,
-            onClick: () =>
-              this.onMachineSelected(currentState)(currentState.machine),
+            onClick: () => this.onMachineSelected(currentState)(currentState.machine),
           },
           { name: currentState.machinePart.name },
         ];
@@ -291,7 +265,7 @@ export class BrowserStateStore {
       | BrowserStateLocations
       | BrowserStateMachines
       | BrowserStateMachineParts
-      | BrowserStateControlMachinePart
+      | BrowserStateControlMachinePart,
   ): () => void {
     this.validateState(currentState);
     return () => {
@@ -308,7 +282,7 @@ export class BrowserStateStore {
       | BrowserStateLocations
       | BrowserStateMachines
       | BrowserStateMachineParts
-      | BrowserStateControlMachinePart
+      | BrowserStateControlMachinePart,
   ): (organization: appApi.Organization) => void {
     this.validateState(currentState);
     return (organization: appApi.Organization) => {
@@ -325,7 +299,7 @@ export class BrowserStateStore {
       | BrowserStateLocations
       | BrowserStateMachines
       | BrowserStateMachineParts
-      | BrowserStateControlMachinePart
+      | BrowserStateControlMachinePart,
   ): (location: appApi.Location) => void {
     this.validateState(currentState);
     return (location: appApi.Location) => {
@@ -339,10 +313,7 @@ export class BrowserStateStore {
   }
 
   public onMachineSelected(
-    currentState:
-      | BrowserStateMachines
-      | BrowserStateMachineParts
-      | BrowserStateControlMachinePart
+    currentState: BrowserStateMachines | BrowserStateMachineParts | BrowserStateControlMachinePart,
   ): (machine: appApi.Robot) => void {
     this.validateState(currentState);
     return (machine: appApi.Robot) => {
@@ -357,7 +328,7 @@ export class BrowserStateStore {
   }
 
   public onMachinePartSelected(
-    currentState: BrowserStateMachineParts | BrowserStateControlMachinePart
+    currentState: BrowserStateMachineParts | BrowserStateControlMachinePart,
   ): (part: appApi.RobotPart) => void {
     this.validateState(currentState);
     return (part: appApi.RobotPart) => {
@@ -374,7 +345,7 @@ export class BrowserStateStore {
 }
 
 export const useBrowserStateStore = (
-  creds: Credential | AccessToken | undefined
+  creds: Credential | AccessToken | undefined,
 ): BrowserStateStore => {
   const [browserState, setBrowserState] = useState<BrowserState>({
     key: BrowserStateKey.Loading,

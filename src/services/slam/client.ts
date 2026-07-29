@@ -7,7 +7,7 @@ import {
   GetPositionRequest,
   GetPropertiesRequest,
 } from '../../gen/service/slam/v1/slam_pb';
-import { RobotClient } from '../../robot';
+import { type RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Slam } from './slam';
@@ -21,7 +21,7 @@ export class SlamClient implements Slam {
   private client: Client<typeof SLAMService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(SLAMService);
@@ -41,7 +41,7 @@ export class SlamClient implements Slam {
 
   async getPointCloudMap(
     returnEditedMap?: boolean,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<Uint8Array> {
     const request = new GetPointCloudMapRequest({
       name: this.name,
@@ -82,24 +82,19 @@ export class SlamClient implements Slam {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

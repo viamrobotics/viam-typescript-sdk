@@ -2,9 +2,9 @@ import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MLTrainingService } from '../gen/app/mltraining/v1/ml_training_connect';
 import {
-  CancelTrainingJobRequest,
+  type CancelTrainingJobRequest,
   CancelTrainingJobResponse,
-  DeleteCompletedTrainingJobRequest,
+  type DeleteCompletedTrainingJobRequest,
   DeleteCompletedTrainingJobResponse,
   GetTrainingJobResponse,
   ListTrainingJobsResponse,
@@ -42,7 +42,7 @@ describe('MlTrainingClient tests', () => {
         'model_name',
         'model_version',
         type,
-        ['tag1']
+        ['tag1'],
       );
       expect(response).toEqual('fakeId');
     });
@@ -68,7 +68,7 @@ describe('MlTrainingClient tests', () => {
         'registry_item_id',
         'registry_item_version',
         'model_name',
-        'model_version'
+        'model_version',
       );
       expect(response).toEqual('fakeId');
     });

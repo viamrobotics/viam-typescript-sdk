@@ -8,8 +8,5 @@ export type FlatTensors = mlModelAPI.FlatTensors;
 export interface MLModel {
   metadata: (extra?: Struct) => Promise<mlModelAPI.MetadataResponse>;
 
-  infer: (
-    inputTensors: FlatTensors,
-    extra?: Struct
-  ) => Promise<mlModelAPI.InferResponse>;
+  infer: (inputTensors: FlatTensors, extra?: Struct) => Promise<mlModelAPI.InferResponse>;
 }

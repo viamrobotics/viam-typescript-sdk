@@ -28,10 +28,7 @@ export interface Vision extends Resource {
    * @param cameraName - The name of the camera to use for detection.
    * @returns - The list of Detections.
    */
-  getDetectionsFromCamera: (
-    cameraName: string,
-    extra?: Struct
-  ) => Promise<Detection[]>;
+  getDetectionsFromCamera: (cameraName: string, extra?: Struct) => Promise<Detection[]>;
 
   /**
    * Get a list of detections in the given image.
@@ -47,7 +44,7 @@ export interface Vision extends Resource {
    *   images[0].image,
    *   600,
    *   600,
-   *   images[0].mimeType
+   *   images[0].mimeType,
    * );
    * ```
    *
@@ -65,7 +62,7 @@ export interface Vision extends Resource {
     width: number,
     height: number,
     mimeType: MimeType,
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<Detection[]>;
 
   /**
@@ -75,10 +72,7 @@ export interface Vision extends Resource {
    *
    * ```ts
    * const vision = new VIAM.VisionClient(machine, 'my_vision');
-   * const classifications = await vision.getClassificationsFromCamera(
-   *   'my_camera',
-   *   10
-   * );
+   * const classifications = await vision.getClassificationsFromCamera('my_camera', 10);
    * ```
    *
    * For more information, see [Vision
@@ -91,7 +85,7 @@ export interface Vision extends Resource {
   getClassificationsFromCamera: (
     cameraName: string,
     count: number,
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<Classification[]>;
 
   /**
@@ -109,7 +103,7 @@ export interface Vision extends Resource {
    *   600,
    *   600,
    *   images[0].mimeType,
-   *   10
+   *   10,
    * );
    * ```
    *
@@ -129,19 +123,18 @@ export interface Vision extends Resource {
     height: number,
     mimeType: MimeType,
     count: number,
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<Classification[]>;
 
   /**
-   * Returns a list of the 3D point cloud objects and associated metadata in the
-   * latest picture obtained from the specified 3D camera.
+   * Returns a list of the 3D point cloud objects and associated metadata in the latest picture
+   * obtained from the specified 3D camera.
    *
    * @example
    *
    * ```ts
    * const vision = new VIAM.VisionClient(machine, 'my_vision');
-   * const pointCloudObjects =
-   *   await vision.getObjectPointClouds('my_camera');
+   * const pointCloudObjects = await vision.getObjectPointClouds('my_camera');
    * ```
    *
    * For more information, see [Vision
@@ -150,15 +143,11 @@ export interface Vision extends Resource {
    * @param cameraName - The name of the camera.
    * @returns - The list of PointCloudObjects
    */
-  getObjectPointClouds: (
-    cameraName: string,
-    extra?: Struct
-  ) => Promise<PointCloudObject[]>;
+  getObjectPointClouds: (cameraName: string, extra?: Struct) => Promise<PointCloudObject[]>;
 
   /**
-   * Returns an object describing the properties of the vision service, namely
-   * booleans indicating whether classifications, detections, and 3d
-   * segmentation are supported.
+   * Returns an object describing the properties of the vision service, namely booleans indicating
+   * whether classifications, detections, and 3d segmentation are supported.
    *
    * @example
    *
@@ -175,8 +164,8 @@ export interface Vision extends Resource {
   getProperties: (extra?: Struct) => Promise<Properties>;
 
   /**
-   * Returns the requested image, classifications, detections, and 3d point
-   * cloud objects in the next image given a camera.
+   * Returns the requested image, classifications, detections, and 3d point cloud objects in the
+   * next image given a camera.
    *
    * @example
    *
@@ -193,15 +182,14 @@ export interface Vision extends Resource {
    * For more information, see [Vision
    * API](https://docs.viam.com/dev/reference/apis/services/vision/#captureallfromcamera).
    *
-   * @param cameraName - The name of the camera to use for classification,
-   *   detection, and segmentation.
+   * @param cameraName - The name of the camera to use for classification, detection, and
+   *   segmentation.
    * @param opts - The fields desired in the response.
-   * @returns - The requested image, classifications, detections, and 3d point
-   *   cloud objects.
+   * @returns - The requested image, classifications, detections, and 3d point cloud objects.
    */
   captureAllFromCamera: (
     cameraName: string,
     opts: CaptureAllOptions,
-    extra?: Struct
+    extra?: Struct,
   ) => Promise<CaptureAllResponse>;
 }

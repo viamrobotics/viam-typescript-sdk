@@ -14,25 +14,20 @@ export class RobotPage {
   async connect(): Promise<void> {
     await this.ensureReady();
     await this.page.click('[data-connect]');
-    await this.page.waitForSelector(
-      '[data-connection-status]:is(:text("Connected"))',
-      { timeout: 10_000 }
-    );
+    await this.page.waitForSelector('[data-connection-status]:is(:text("Connected"))', {
+      timeout: 10_000,
+    });
   }
 
   async connectInvalid(): Promise<void> {
     await this.ensureReady();
     await this.page.click('[data-connect-invalid]');
-    await this.page.waitForSelector(
-      '[data-connection-status]:is(:text("Disconnected"))'
-    );
+    await this.page.waitForSelector('[data-connection-status]:is(:text("Disconnected"))');
   }
 
   async disconnect(): Promise<void> {
     await this.page.click('[data-disconnect]');
-    await this.page.waitForSelector(
-      '[data-connection-status]:is(:text("Disconnected"))'
-    );
+    await this.page.waitForSelector('[data-connection-status]:is(:text("Disconnected"))');
   }
 
   async getConnectionStatus(): Promise<string> {
@@ -62,9 +57,7 @@ export class RobotPage {
     await locator.waitFor({ timeout: 10_000 });
   }
 
-  async getOutput<T, K extends keyof T>(): Promise<
-    OutputType<ResolvedReturnType<T[K]>>
-  > {
+  async getOutput<T, K extends keyof T>(): Promise<OutputType<ResolvedReturnType<T[K]>>> {
     // Wait for output to be updated (not the default "No output yet" text)
     const outputEl = this.page.locator('[data-output]');
     await outputEl.filter({ hasNotText: 'No output yet' }).waitFor({

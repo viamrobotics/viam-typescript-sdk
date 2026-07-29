@@ -1,5 +1,5 @@
 import { appApi, type AppClient } from '@viamrobotics/sdk';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 
 export interface MachinesListProps {
   appClient: AppClient;
@@ -7,7 +7,11 @@ export interface MachinesListProps {
   onMachineSelected: (machine: appApi.Robot) => unknown;
 }
 
-export const MachinesList = ({ appClient, location, onMachineSelected }: MachinesListProps): JSX.Element => {
+export const MachinesList = ({
+  appClient,
+  location,
+  onMachineSelected,
+}: MachinesListProps): JSX.Element => {
   const [machines, setMachines] = useState<appApi.Robot[]>([]);
   useEffect(() => {
     async function getMachines() {
@@ -19,16 +23,21 @@ export const MachinesList = ({ appClient, location, onMachineSelected }: Machine
 
   return (
     <div>
-      {
-        machines?.map((machine) => {
-          return <div key={machine.id}>
-            <a href="#" onClick={(e) => {
-              e.preventDefault();
-              onMachineSelected(machine);
-            }}>{machine.name}</a>
+      {machines?.map((machine) => {
+        return (
+          <div key={machine.id}>
+            <a
+              href='#'
+              onClick={(e) => {
+                e.preventDefault();
+                onMachineSelected(machine);
+              }}
+            >
+              {machine.name}
+            </a>
           </div>
-        })
-      }
-    </div >
+        );
+      })}
+    </div>
   );
 };

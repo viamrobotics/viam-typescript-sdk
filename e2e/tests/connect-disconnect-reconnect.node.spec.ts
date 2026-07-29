@@ -1,12 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { RobotClient, MachineConnectionEvent } from '../../src/main';
-import {
-  defaultNodeConfig,
-  invalidNodeConfig,
-} from '../fixtures/configs/dial-configs';
+import { defaultNodeConfig, invalidNodeConfig } from '../fixtures/configs/dial-configs';
 
 const waitForDialingEvent = async (
-  client: RobotClient
+  client: RobotClient,
 ): Promise<{ method: string; attempt: number }> => {
   return new Promise((resolve) => {
     const handler = (args: unknown) => {

@@ -3,10 +3,7 @@ import { dialDirect } from '../rpc';
 import type { Transport } from '@connectrpc/connect';
 import { clientHeaders } from '../utils';
 
-/**
- * Credentials are either used to obtain an access token or provide an existing
- * one
- */
+/** Credentials are either used to obtain an access token or provide an existing one */
 export type Credentials = Credential | AccessToken;
 
 /** A credential that can be exchanged to obtain an access token */
@@ -24,16 +21,14 @@ export interface AccessToken {
   payload: string;
 }
 
-export const isCredential = (
-  object: Credentials | undefined
-): object is Credential => {
+export const isCredential = (object: Credentials | undefined): object is Credential => {
   return object !== undefined && 'authEntity' in object;
 };
 
 /** Initialize an authenticated transport that can access protected resources. */
 export const createViamTransport = async (
   serviceHost: string,
-  credential: Credential | AccessToken
+  credential: Credential | AccessToken,
 ): Promise<Transport> => {
   if (credential.type === 'access-token') {
     return dialDirect(serviceHost, {

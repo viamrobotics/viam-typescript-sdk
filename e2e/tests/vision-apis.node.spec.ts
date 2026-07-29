@@ -26,7 +26,7 @@ describe('Vision API Tests', () => {
         classificationsSupported: expect.any(Boolean),
         detectionsSupported: expect.any(Boolean),
         objectPointCloudsSupported: expect.any(Boolean),
-      })
+      }),
     );
   });
 
@@ -54,7 +54,7 @@ describe('Vision API Tests', () => {
         classifications: expect.any(Array),
         detections: expect.any(Array),
         objectPointClouds: expect.any(Array),
-      })
+      }),
     );
   });
 });

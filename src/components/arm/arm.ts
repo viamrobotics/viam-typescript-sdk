@@ -69,8 +69,8 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getkinematics).
    * ```
    *
-   * @returns The legacy kinematics data shape or the newer object containing
-   *   kinematics data plus a map of URDF mesh file paths to mesh data.
+   * @returns The legacy kinematics data shape or the newer object containing kinematics data plus a
+   *   map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
 
@@ -121,10 +121,7 @@ export interface Arm extends Resource {
    *
    * @param jointPositionsList - List of angles (0-360) to move each joint to.
    */
-  moveToJointPositions: (
-    jointPositionsList: number[],
-    extra?: Struct
-  ) => Promise<void>;
+  moveToJointPositions: (jointPositionsList: number[], extra?: Struct) => Promise<void>;
 
   /**
    * Gets the current position of each joint.

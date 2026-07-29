@@ -5,7 +5,7 @@ import {
   AudioInfo,
   Geometry,
   GetGeometriesResponse,
-  GetPropertiesRequest,
+  type GetPropertiesRequest,
   GetPropertiesResponse,
 } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
@@ -17,8 +17,8 @@ import { Struct } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
 import {
-  PlayStreamInit,
-  PlayStreamRequest,
+  type PlayStreamInit,
+  type PlayStreamRequest,
   PlayStreamResponse,
 } from '../../gen/component/audioout/v1/audioout_pb';
 
@@ -107,9 +107,7 @@ describe('AudioOutClient tests', () => {
       await audioOut.playStream(audioInfo, source());
 
       expect(capturedPlayStreamInit?.name).toEqual('test-audio-out');
-      expect(capturedPlayStreamInit?.audioInfo?.codec).toEqual(
-        AudioCodec.PCM16
-      );
+      expect(capturedPlayStreamInit?.audioInfo?.codec).toEqual(AudioCodec.PCM16);
       expect(capturedPlayStreamInit?.audioInfo?.sampleRateHz).toEqual(22_050);
       expect(capturedPlayStreamInit?.audioInfo?.numChannels).toEqual(1);
       expect(capturedPlayStreamChunks).toEqual(chunks);
@@ -122,7 +120,6 @@ describe('AudioOutClient tests', () => {
         numChannels: 2,
       });
 
-      // eslint-disable-next-line @typescript-eslint/require-await
       const empty = async function* emptyGen(): AsyncIterable<Uint8Array> {
         // no chunks
       };
@@ -150,9 +147,7 @@ describe('AudioOutClient tests', () => {
     it('getProperties passes extra to request', async () => {
       const extra = { key: 'value' };
       await audioOut.getProperties(extra);
-      expect(capturedPropertiesReq?.extra).toStrictEqual(
-        Struct.fromJson(extra)
-      );
+      expect(capturedPropertiesReq?.extra).toStrictEqual(Struct.fromJson(extra));
     });
   });
 

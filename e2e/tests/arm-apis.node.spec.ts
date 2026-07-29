@@ -26,7 +26,7 @@ describe('Arm API Tests', () => {
         x: expect.any(Number),
         y: expect.any(Number),
         z: expect.any(Number),
-      })
+      }),
     );
 
     // Act - Get joint positions

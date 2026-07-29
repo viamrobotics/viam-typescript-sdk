@@ -20,27 +20,21 @@ describe('DiscoveryClient Tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(DiscoveryService, {
-        discoverResources: () =>
-          new DiscoverResourcesResponse({ discoveries: [discoveries] }),
+        discoverResources: () => new DiscoverResourcesResponse({ discoveries: [discoveries] }),
       });
     });
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
       .mockImplementation(() => createClient(DiscoveryService, mockTransport));
-    discovery = new DiscoveryClient(
-      new RobotClient('host'),
-      discoveryClientName
-    );
+    discovery = new DiscoveryClient(new RobotClient('host'), discoveryClientName);
   });
 
   describe('Discovery Resources Tests', () => {
     it('returns resources from a machine', async () => {
       const expected = [discoveries];
 
-      await expect(discovery.discoverResources()).resolves.toStrictEqual(
-        expected
-      );
+      await expect(discovery.discoverResources()).resolves.toStrictEqual(expected);
     });
   });
 });

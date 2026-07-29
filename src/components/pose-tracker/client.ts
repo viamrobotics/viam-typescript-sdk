@@ -16,7 +16,7 @@ export class PoseTrackerClient implements PoseTracker {
   private client: Client<typeof PoseTrackerService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(PoseTrackerService);
@@ -35,24 +35,19 @@ export class PoseTrackerClient implements PoseTracker {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

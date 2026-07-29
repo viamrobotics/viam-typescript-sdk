@@ -26,8 +26,8 @@ export interface Base extends Resource {
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
   /**
-   * Move a base in a straight line by a given distance at a given speed. This
-   * method blocks until completed or cancelled.
+   * Move a base in a straight line by a given distance at a given speed. This method blocks until
+   * completed or cancelled.
    *
    * @example
    *
@@ -47,15 +47,11 @@ export interface Base extends Resource {
    * @param distanceMm - Distance to move, in millimeters.
    * @param mmPerSec - Movement speed, in millimeters per second.
    */
-  moveStraight(
-    distanceMm: number,
-    mmPerSec: number,
-    extra?: Struct
-  ): Promise<void>;
+  moveStraight(distanceMm: number, mmPerSec: number, extra?: Struct): Promise<void>;
 
   /**
-   * Spin a base by a given angle at a given angular speed. This method blocks
-   * until completed or cancelled.
+   * Spin a base by a given angle at a given angular speed. This method blocks until completed or
+   * cancelled.
    *
    * @example
    *
@@ -78,8 +74,7 @@ export interface Base extends Resource {
   spin(angleDeg: number, degsPerSec: number, extra?: Struct): Promise<void>;
 
   /**
-   * Set the linear and angular power of a base from -1 to 1 in terms of power
-   * for each direction.
+   * Set the linear and angular power of a base from -1 to 1 in terms of power for each direction.
    *
    * @example
    *
@@ -89,25 +84,25 @@ export interface Base extends Resource {
    * // Move forward at 75% power
    * await base.setPower(
    *   { x: 0, y: 0.75, z: 0 }, // linear power
-   *   { x: 0, y: 0, z: 0 } // no rotation
+   *   { x: 0, y: 0, z: 0 }, // no rotation
    * );
    *
    * // Move straight back at 100% power
    * await base.setPower(
    *   { x: 0, y: -1, z: 0 }, // linear power
-   *   { x: 0, y: 0, z: 0 } // no rotation
+   *   { x: 0, y: 0, z: 0 }, // no rotation
    * );
    *
    * // Turn counter-clockwise at 50% power
    * await base.setPower(
    *   { x: 0, y: 0, z: 0 }, // no linear movement
-   *   { x: 0, y: 0, z: 0.5 } // rotate around z-axis
+   *   { x: 0, y: 0, z: 0.5 }, // rotate around z-axis
    * );
    *
    * // Turn clockwise at 60% power
    * await base.setPower(
    *   { x: 0, y: 0, z: 0 }, // no linear movement
-   *   { x: 0, y: 0, z: -0.6 } // rotate around z-axis
+   *   { x: 0, y: 0, z: -0.6 }, // rotate around z-axis
    * );
    * ```
    *
@@ -130,7 +125,7 @@ export interface Base extends Resource {
    * // Move forward at 50mm/s while spinning 15 degrees per second to the left
    * await base.setVelocity(
    *   { x: 0, y: 50, z: 0 }, // linear velocity in mm/s
-   *   { x: 0, y: 0, z: 15 } // 15 degrees per second counter-clockwise
+   *   { x: 0, y: 0, z: 15 }, // 15 degrees per second counter-clockwise
    * );
    * ```
    *

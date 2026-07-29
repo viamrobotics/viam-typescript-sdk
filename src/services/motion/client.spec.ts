@@ -11,12 +11,12 @@ import { Struct, Timestamp } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
-  GetPlanRequest,
-  ListPlanStatusesRequest,
-  MoveOnGlobeRequest,
+  type GetPlanRequest,
+  type ListPlanStatusesRequest,
+  type MoveOnGlobeRequest,
   MoveOnGlobeResponse,
-  MoveRequest,
-  StopPlanRequest,
+  type MoveRequest,
+  type StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
 import { GeoGeometry, GeoPoint, Pose, PoseInFrame } from '../../types';
 import { MotionClient } from './client';
@@ -25,7 +25,7 @@ import {
   GetPlanResponse,
   ListPlanStatusesResponse,
   MotionConfiguration,
-  ObstacleDetector,
+  type ObstacleDetector,
   PlanState,
   PseudolinearConstraint,
 } from './types';
@@ -38,7 +38,7 @@ let motion: MotionClient;
 const testExecutionId = 'some execution id';
 
 describe('moveOnGlobe', () => {
-  let executionId: Mock<[], string>;
+  let executionId: Mock<() => string>;
 
   it('return executionID', async () => {
     executionId = vi.fn(() => testExecutionId);
@@ -71,24 +71,16 @@ describe('moveOnGlobe', () => {
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
     await expect(
-      motion.moveOnGlobe(
-        { latitude: 1, longitude: 2 },
-        'myBase',
-        'myMovementsensor'
-      )
+      motion.moveOnGlobe({ latitude: 1, longitude: 2 }, 'myBase', 'myMovementsensor'),
     ).resolves.toStrictEqual(testExecutionId);
 
     expect(capturedReq?.name).toStrictEqual(expectedMotionName);
     expect(capturedReq?.destination).toStrictEqual(expectedDestination);
     expect(capturedReq?.heading).toStrictEqual(expectedHeading);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
-    expect(capturedReq?.movementSensorName).toStrictEqual(
-      expectedMovementSensorName
-    );
+    expect(capturedReq?.movementSensorName).toStrictEqual(expectedMovementSensorName);
     expect(capturedReq?.obstacles).toEqual(expectedObstaclesList);
-    expect(capturedReq?.motionConfiguration).toStrictEqual(
-      expectedMotionConfiguration
-    );
+    expect(capturedReq?.motionConfiguration).toStrictEqual(expectedMotionConfiguration);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
 
     expect(executionId).toHaveBeenCalledOnce();
@@ -193,22 +185,18 @@ describe('moveOnGlobe', () => {
         expectedObstaclesList,
         expectedMotionConfiguration,
         expectedBoundingRegionsList,
-        expectedExtra
-      )
+        expectedExtra,
+      ),
     ).resolves.toStrictEqual(testExecutionId);
     expect(capturedReq).not.toBeUndefined();
     expect(capturedReq?.name).toStrictEqual(expectedMotionName);
     expect(capturedReq?.destination).toStrictEqual(expectedDestination);
     expect(capturedReq?.heading).toStrictEqual(expectedHeading);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
-    expect(capturedReq?.movementSensorName).toStrictEqual(
-      expectedMovementSensorName
-    );
+    expect(capturedReq?.movementSensorName).toStrictEqual(expectedMovementSensorName);
     expect(capturedReq?.obstacles).toEqual(expectedObstaclesList);
     expect(capturedReq?.boundingRegions).toEqual(expectedBoundingRegionsList);
-    expect(capturedReq?.motionConfiguration).toStrictEqual(
-      expectedMotionConfiguration
-    );
+    expect(capturedReq?.motionConfiguration).toStrictEqual(expectedMotionConfiguration);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
 
     expect(executionId).toHaveBeenCalledOnce();
@@ -257,8 +245,8 @@ describe('move', () => {
         expectedComponentName,
         undefined,
         expectedConstraints,
-        expectedExtra
-      )
+        expectedExtra,
+      ),
     ).resolves.toStrictEqual(true);
     expect(capturedReq?.name).toStrictEqual(motionClientName);
     expect(capturedReq?.destination).toStrictEqual(expectedDestination);
@@ -289,9 +277,7 @@ describe('stopPlan', () => {
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
-    await expect(motion.stopPlan(expectedComponentName)).resolves.toStrictEqual(
-      null
-    );
+    await expect(motion.stopPlan(expectedComponentName)).resolves.toStrictEqual(null);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
   });
@@ -315,9 +301,9 @@ describe('stopPlan', () => {
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
-    await expect(
-      motion.stopPlan(expectedComponentName, expectedExtra)
-    ).resolves.toStrictEqual(null);
+    await expect(motion.stopPlan(expectedComponentName, expectedExtra)).resolves.toStrictEqual(
+      null,
+    );
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
   });
@@ -378,9 +364,7 @@ describe('getPlan', () => {
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
-    await expect(motion.getPlan(expectedComponentName)).resolves.toStrictEqual(
-      expectedResponse
-    );
+    await expect(motion.getPlan(expectedComponentName)).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.lastPlanOnly).toStrictEqual(expectedLastPlanOnly);
     expect(capturedReq?.executionId).toStrictEqual(expectedExecutionID);
@@ -413,8 +397,8 @@ describe('getPlan', () => {
         expectedComponentName,
         expectedLastPlanOnly,
         expectedExecutionID,
-        expectedExtra
-      )
+        expectedExtra,
+      ),
     ).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.lastPlanOnly).toStrictEqual(expectedLastPlanOnly);
@@ -456,9 +440,7 @@ describe('listPlanStatuses', () => {
 
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
-    await expect(motion.listPlanStatuses()).resolves.toStrictEqual(
-      expectedResponse
-    );
+    await expect(motion.listPlanStatuses()).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.onlyActivePlans).toStrictEqual(expectedOnlyActivePlans);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
   });
@@ -483,7 +465,7 @@ describe('listPlanStatuses', () => {
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
     await expect(
-      motion.listPlanStatuses(expectedOnlyActivePlans, expectedExtra)
+      motion.listPlanStatuses(expectedOnlyActivePlans, expectedExtra),
     ).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.onlyActivePlans).toStrictEqual(expectedOnlyActivePlans);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));

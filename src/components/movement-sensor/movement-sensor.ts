@@ -15,8 +15,8 @@ export const {
 } = sensorApi;
 
 /**
- * Represents any sensor that reports information about the robot's direction,
- * position, and/or speed.
+ * Represents any sensor that reports information about the robot's direction, position, and/or
+ * speed.
  */
 export interface MovementSensor extends Resource {
   /**
@@ -43,10 +43,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const linearVelocity = await movementSensor.getLinearVelocity();
    * ```
    *
@@ -61,10 +58,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const angularVelocity = await movementSensor.getAngularVelocity();
    * ```
    *
@@ -74,16 +68,13 @@ export interface MovementSensor extends Resource {
   getAngularVelocity(extra?: Struct): Promise<Vector3>;
 
   /**
-   * Get the compass heading, which is a number from 0-359 where 0 is North, 90
-   * is East, 180 is South, and 270 is West.
+   * Get the compass heading, which is a number from 0-359 where 0 is North, 90 is East, 180 is
+   * South, and 270 is West.
    *
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const compassHeading = await movementSensor.getCompassHeading();
    * ```
    *
@@ -98,10 +89,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const orientation = await movementSensor.getOrientation();
    * ```
    *
@@ -116,10 +104,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const position = await movementSensor.getPosition();
    * ```
    *
@@ -134,10 +119,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const properties = await movementSensor.getProperties();
    * ```
    *
@@ -152,10 +134,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const accuracy = await movementSensor.getAccuracy();
    * ```
    *
@@ -170,12 +149,8 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
-   * const linearAcceleration =
-   *   await movementSensor.getLinearAcceleration();
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
+   * const linearAcceleration = await movementSensor.getLinearAcceleration();
    * ```
    *
    * For more information, see [Movement Sensor
@@ -189,10 +164,7 @@ export interface MovementSensor extends Resource {
    * @example
    *
    * ```ts
-   * const movementSensor = new VIAM.MovementSensorClient(
-   *   machine,
-   *   'my_movement_sensor'
-   * );
+   * const movementSensor = new VIAM.MovementSensorClient(machine, 'my_movement_sensor');
    * const readings = await movementSensor.getReadings();
    * ```
    *

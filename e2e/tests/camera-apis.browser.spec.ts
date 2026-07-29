@@ -3,24 +3,21 @@ import { withRobot } from '../fixtures/robot-page';
 import type { Camera, CameraClient } from '../../src/components/camera';
 
 withRobot.describe('Camera API Tests', () => {
-  withRobot(
-    'should get camera properties after connecting',
-    async ({ robotPage }) => {
-      // Arrange
-      await robotPage.connect();
+  withRobot('should get camera properties after connecting', async ({ robotPage }) => {
+    // Arrange
+    await robotPage.connect();
 
-      // Act
-      await robotPage.getCameraProperties();
-      const properties = await robotPage.getOutput<Camera, 'getProperties'>();
+    // Act
+    await robotPage.getCameraProperties();
+    const properties = await robotPage.getOutput<Camera, 'getProperties'>();
 
-      // Assert - Verify properties structure
-      expect(properties).toEqual(
-        expect.objectContaining({
-          supportsPcd: expect.any(Boolean),
-        })
-      );
-    }
-  );
+    // Assert - Verify properties structure
+    expect(properties).toEqual(
+      expect.objectContaining({
+        supportsPcd: expect.any(Boolean),
+      }),
+    );
+  });
 
   withRobot('should get images from camera', async ({ robotPage }) => {
     // Arrange

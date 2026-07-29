@@ -1,21 +1,14 @@
 import type { Message, PartialMessage } from '@bufbuild/protobuf';
-import type {
-  ContextValues,
-  UnaryRequest,
-  UnaryResponse,
-} from '@connectrpc/connect';
+import type { ContextValues, UnaryRequest, UnaryResponse } from '@connectrpc/connect';
 import { createContextValues } from '@connectrpc/connect';
 import { runUnaryCall } from '@connectrpc/connect/protocol';
-import {
-  ResponseHeaders,
-  ResponseTrailers,
-} from '../gen/proto/rpc/webrtc/v1/grpc_pb';
+import { type ResponseHeaders, type ResponseTrailers } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { ClientStream, toGRPCMetadata } from './client-stream';
 
-export class UnaryClientStream<
-  I extends Message<I>,
-  O extends Message<O>,
-> extends ClientStream<I, O> {
+export class UnaryClientStream<I extends Message<I>, O extends Message<O>> extends ClientStream<
+  I,
+  O
+> {
   private result?: {
     success: (value: UnaryResponse<I, O>) => void;
     failure: (reason?: unknown) => void;
@@ -28,7 +21,7 @@ export class UnaryClientStream<
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     message: PartialMessage<I>,
-    contextValues?: ContextValues
+    contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     const req = {
       stream: false as const,
@@ -44,12 +37,10 @@ export class UnaryClientStream<
     const opt: optParams = {
       req,
       /**
-       * Next is what actually kicks off the request. The run call below will
-       * ultimately call this for us.
+       * Next is what actually kicks off the request. The run call below will ultimately call this
+       * for us.
        */
-      next: async (
-        unaryReq: UnaryRequest<I, O>
-      ): Promise<UnaryResponse<I, O>> => {
+      next: async (unaryReq: UnaryRequest<I, O>): Promise<UnaryResponse<I, O>> => {
         return new Promise((resolve, reject) => {
           this.result = { success: resolve, failure: reject };
           this.startRequest();
@@ -68,9 +59,7 @@ export class UnaryClientStream<
 
   protected onHeaders(headers: ResponseHeaders): void {
     if (this.headers !== undefined) {
-      this.result?.failure(
-        new Error('invariant: received headers more than once')
-      );
+      this.result?.failure(new Error('invariant: received headers more than once'));
       return;
     }
     this.headers = toGRPCMetadata(headers.metadata);
@@ -81,17 +70,13 @@ export class UnaryClientStream<
     if (!respTrailers.status || respTrailers.status.code === 0) {
       if (!this.headers) {
         this.result?.failure(
-          new Error(
-            'invariant: received trailers for successful unary request without headers'
-          )
+          new Error('invariant: received trailers for successful unary request without headers'),
         );
         return;
       }
       if (this.message === undefined) {
         this.result?.failure(
-          new Error(
-            'invariant: received trailers for successful unary request without message'
-          )
+          new Error('invariant: received trailers for successful unary request without message'),
         );
         return;
       }
@@ -111,7 +96,7 @@ export class UnaryClientStream<
   protected onMessage(msgBytes: Uint8Array): void {
     if (this.message !== undefined) {
       this.result?.failure(
-        new Error('invariant: received two response messages for unary request')
+        new Error('invariant: received two response messages for unary request'),
       );
       return;
     }

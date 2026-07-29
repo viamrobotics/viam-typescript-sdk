@@ -1,16 +1,6 @@
-import {
-  useState,
-  type ChangeEventHandler,
-  type FormEventHandler,
-} from 'react';
+import { JSX, useState, type ChangeEventHandler, type FormEventHandler } from 'react';
 
-import {
-  CONNECTED,
-  CONNECTING,
-  DISCONNECTED,
-  DISCONNECTING,
-  type ClientStatus,
-} from '../state.js';
+import { CONNECTED, CONNECTING, DISCONNECTED, DISCONNECTING, type ClientStatus } from '../state.js';
 
 import type { RobotCredentials } from '../client.js';
 
@@ -60,41 +50,41 @@ export const ConnectForm = (props: ConnectFormProps): JSX.Element => {
   };
 
   return (
-    <form className="flex flex-col p-4 w-96" onSubmit={handleSubmit}>
-      <label className="flex flex-col mb-1">
+    <form className='flex flex-col p-4 w-96' onSubmit={handleSubmit}>
+      <label className='flex flex-col mb-1'>
         Remote Address
         <input
-          type="text"
-          className="px-1 border-solid border-2 border-black"
+          type='text'
+          className='px-1 border-solid border-2 border-black'
           value={hostname}
           onChange={handleHost}
           disabled={disabled}
         />
       </label>
-      <label className="flex flex-col mb-6">
+      <label className='flex flex-col mb-6'>
         API Key ID
         <input
-          type="text"
-          className="px-1 border-solid border-2 border-black"
+          type='text'
+          className='px-1 border-solid border-2 border-black'
           value={apiKeyId}
           onChange={handleApiKeyId}
           disabled={disabled}
         />
       </label>
-      <label className="flex flex-col mb-6">
+      <label className='flex flex-col mb-6'>
         API Key
         <input
-          type="password"
-          className="px-1 border-solid border-2 border-black"
+          type='password'
+          className='px-1 border-solid border-2 border-black'
           value={apiKey}
           onChange={handleApiKey}
           disabled={disabled}
         />
       </label>
       <button
-        type="submit"
+        type='submit'
         disabled={disabled}
-        className=" w-32 border-solid border-2 border-black"
+        className=' w-32 border-solid border-2 border-black'
       >
         {buttonText}
       </button>

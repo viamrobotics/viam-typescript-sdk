@@ -29,9 +29,7 @@ export class BaseStream {
       this.packetBuf.length = 0;
       this.packetBufSize = 0;
       // eslint-disable-next-line no-console
-      console.error(
-        `message size larger than max ${MaxMessageSize}; discarding`
-      );
+      console.error(`message size larger than max ${MaxMessageSize}; discarding`);
       return undefined;
     }
     this.packetBuf.push(data);

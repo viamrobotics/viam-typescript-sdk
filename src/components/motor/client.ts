@@ -31,7 +31,7 @@ export class MotorClient implements Motor {
   private client: Client<typeof MotorService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(MotorService);
@@ -60,12 +60,7 @@ export class MotorClient implements Motor {
     await this.client.setPower(request, callOptions);
   }
 
-  async goFor(
-    rpm: number,
-    revolutions: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async goFor(rpm: number, revolutions: number, extra = {}, callOptions = this.callOptions) {
     const request = new GoForRequest({
       name: this.name,
       rpm,
@@ -78,12 +73,7 @@ export class MotorClient implements Motor {
     await this.client.goFor(request, callOptions);
   }
 
-  async goTo(
-    rpm: number,
-    positionRevolutions: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async goTo(rpm: number, positionRevolutions: number, extra = {}, callOptions = this.callOptions) {
     const request = new GoToRequest({
       name: this.name,
       rpm,
@@ -108,11 +98,7 @@ export class MotorClient implements Motor {
     await this.client.setRPM(request, callOptions);
   }
 
-  async resetZeroPosition(
-    offset: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async resetZeroPosition(offset: number, extra = {}, callOptions = this.callOptions) {
     const request = new ResetZeroPositionRequest({
       name: this.name,
       offset,
@@ -185,24 +171,19 @@ export class MotorClient implements Motor {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

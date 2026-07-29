@@ -1,7 +1,7 @@
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import { Duration, Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type Duration, Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { BoardService } from '../../gen/component/board/v1/board_connect';
 import {
@@ -17,11 +17,7 @@ import {
   StreamTicksRequest,
   WriteAnalogRequest,
 } from '../../gen/component/board/v1/board_pb';
-import {
-  doCommandFromClient,
-  getGeometriesFromClient,
-  getStatusFromClient,
-} from '../../utils';
+import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import { type Board, type PowerMode, type Tick } from './board';
 
 /**
@@ -33,7 +29,7 @@ export class BoardClient implements Board {
   private client: Client<typeof BoardService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(BoardService);
@@ -46,16 +42,11 @@ export class BoardClient implements Board {
       this.client.getGeometries,
       this.name,
       Struct.fromJson(extra),
-      callOptions
+      callOptions,
     );
   }
 
-  async setGPIO(
-    pin: string,
-    high: boolean,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async setGPIO(pin: string, high: boolean, extra = {}, callOptions = this.callOptions) {
     const request = new SetGPIORequest({
       name: this.name,
       pin,
@@ -94,12 +85,7 @@ export class BoardClient implements Board {
     return resp.dutyCyclePct;
   }
 
-  async setPWM(
-    pin: string,
-    dutyCyle: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async setPWM(pin: string, dutyCyle: number, extra = {}, callOptions = this.callOptions) {
     const request = new SetPWMRequest({
       name: this.name,
       pin,
@@ -112,11 +98,7 @@ export class BoardClient implements Board {
     await this.client.setPWM(request, callOptions);
   }
 
-  async getPWMFrequency(
-    pin: string,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async getPWMFrequency(pin: string, extra = {}, callOptions = this.callOptions) {
     const request = new PWMFrequencyRequest({
       name: this.name,
       pin,
@@ -133,7 +115,7 @@ export class BoardClient implements Board {
     pin: string,
     frequencyHz: number,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new SetPWMFrequencyRequest({
       name: this.name,
@@ -147,11 +129,7 @@ export class BoardClient implements Board {
     await this.client.setPWMFrequency(request, callOptions);
   }
 
-  async readAnalogReader(
-    analogReader: string,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async readAnalogReader(analogReader: string, extra = {}, callOptions = this.callOptions) {
     const request = new ReadAnalogReaderRequest({
       boardName: this.name,
       analogReaderName: analogReader,
@@ -163,12 +141,7 @@ export class BoardClient implements Board {
     return this.client.readAnalogReader(request, callOptions);
   }
 
-  async writeAnalog(
-    pin: string,
-    value: number,
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async writeAnalog(pin: string, value: number, extra = {}, callOptions = this.callOptions) {
     const request = new WriteAnalogRequest({
       name: this.name,
       pin,
@@ -184,7 +157,7 @@ export class BoardClient implements Board {
   async getDigitalInterruptValue(
     digitalInterruptName: string,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new GetDigitalInterruptValueRequest({
       boardName: this.name,
@@ -194,10 +167,7 @@ export class BoardClient implements Board {
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getDigitalInterruptValue(
-      request,
-      callOptions
-    );
+    const resp = await this.client.getDigitalInterruptValue(request, callOptions);
     return Number(resp.value);
   }
 
@@ -205,7 +175,7 @@ export class BoardClient implements Board {
     interrupts: string[],
     queue: Tick[],
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new StreamTicksRequest({
       name: this.name,
@@ -228,7 +198,7 @@ export class BoardClient implements Board {
     powerMode: PowerMode,
     duration?: Duration,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ) {
     const request = new SetPowerModeRequest({
       name: this.name,
@@ -243,24 +213,19 @@ export class BoardClient implements Board {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

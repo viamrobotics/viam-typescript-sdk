@@ -2,10 +2,7 @@ import { type JsonValue, Struct, Timestamp } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetPropertiesRequest } from '../../gen/component/base/v1/base_pb';
 import { CameraService } from '../../gen/component/camera/v1/camera_connect';
-import {
-  GetImagesRequest,
-  GetPointCloudRequest,
-} from '../../gen/component/camera/v1/camera_pb';
+import { GetImagesRequest, GetPointCloudRequest } from '../../gen/component/camera/v1/camera_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
@@ -23,7 +20,7 @@ export class CameraClient implements Camera {
   private client: Client<typeof CameraService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(CameraService);
@@ -41,11 +38,7 @@ export class CameraClient implements Camera {
     return response.geometries;
   }
 
-  async getImages(
-    filterSourceNames: string[] = [],
-    extra = {},
-    callOptions = this.callOptions
-  ) {
+  async getImages(filterSourceNames: string[] = [], extra = {}, callOptions = this.callOptions) {
     const request = new GetImagesRequest({
       name: this.name,
       filterSourceNames,
@@ -91,24 +84,19 @@ export class CameraClient implements Camera {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

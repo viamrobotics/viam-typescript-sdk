@@ -9,10 +9,7 @@ export interface PoseTracker extends Resource {
    * @example
    *
    * ```ts
-   * const generic = new VIAM.GenericComponentClient(
-   *   machine,
-   *   'my_generic_component'
-   * );
+   * const generic = new VIAM.GenericComponentClient(machine, 'my_generic_component');
    *
    * // Get the geometries of this component
    * const geometries = await generic.getGeometries();

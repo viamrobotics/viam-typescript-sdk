@@ -24,7 +24,7 @@ export class InputControllerClient implements InputController {
   private client: Client<typeof InputControllerService>;
   public readonly name: string;
   private readonly options: Options;
-  public callOptions: CallOptions = { headers: {} as Record<string, string> };
+  public callOptions: CallOptions = { headers: {} };
 
   constructor(client: RobotClient, name: string, options: Options = {}) {
     this.client = client.createServiceClient(InputControllerService);
@@ -56,7 +56,7 @@ export class InputControllerClient implements InputController {
   async triggerEvent(
     event: InputControllerEvent,
     extra = {},
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<void> {
     const request = new TriggerEventRequest({
       controller: this.name,
@@ -70,24 +70,19 @@ export class InputControllerClient implements InputController {
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {
-    return getStatusFromClient(
-      this.client.getStatus,
-      this.name,
-      this.options,
-      callOptions
-    );
+    return getStatusFromClient(this.client.getStatus, this.name, this.options, callOptions);
   }
 
   async doCommand(
     command: Struct | Record<string, JsonValue>,
-    callOptions = this.callOptions
+    callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
       this.client.doCommand,
       this.name,
       command,
       this.options,
-      callOptions
+      callOptions,
     );
   }
 }

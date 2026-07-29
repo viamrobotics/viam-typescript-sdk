@@ -7,7 +7,7 @@ interface ReadyPeer {
 
 export const addSdpFields = (
   localDescription?: RTCSessionDescription | null,
-  sdpFields?: Record<string, string | number>
+  sdpFields?: Record<string, string | number>,
 ) => {
   const description = {
     sdp: localDescription?.sdp,
@@ -24,7 +24,7 @@ export const addSdpFields = (
 export const newPeerConnectionForClient = async (
   disableTrickle: boolean,
   rtcConfig?: RTCConfiguration,
-  additionalSdpFields?: Record<string, string | number>
+  additionalSdpFields?: Record<string, string | number>,
 ): Promise<ReadyPeer> => {
   const usableRTCConfig = rtcConfig ?? {
     iceServers: [
@@ -57,29 +57,23 @@ export const newPeerConnectionForClient = async (
   negotiationChannel.addEventListener('open', () => {
     negOpen = true;
   });
-  negotiationChannel.addEventListener(
-    'message',
-    (event: MessageEvent<string>) => {
-      (async () => {
-        const description = new RTCSessionDescription(
-          JSON.parse(atob(event.data)) as RTCSessionDescriptionInit
-        );
+  negotiationChannel.addEventListener('message', (event: MessageEvent<string>) => {
+    (async () => {
+      const description = new RTCSessionDescription(
+        JSON.parse(atob(event.data)) as RTCSessionDescriptionInit,
+      );
 
-        // we are always polite and will never ignore an offer
+      // we are always polite and will never ignore an offer
 
-        await peerConnection.setRemoteDescription(description);
+      await peerConnection.setRemoteDescription(description);
 
-        if (description.type === 'offer') {
-          await peerConnection.setLocalDescription();
-          const newDescription = addSdpFields(
-            peerConnection.localDescription,
-            additionalSdpFields
-          );
-          negotiationChannel.send(btoa(JSON.stringify(newDescription)));
-        }
-      })().catch(console.error); // eslint-disable-line no-console
-    }
-  );
+      if (description.type === 'offer') {
+        await peerConnection.setLocalDescription();
+        const newDescription = addSdpFields(peerConnection.localDescription, additionalSdpFields);
+        negotiationChannel.send(btoa(JSON.stringify(newDescription)));
+      }
+    })().catch(console.error); // eslint-disable-line no-console
+  });
 
   peerConnection.addEventListener('negotiationneeded', () => {
     (async () => {
@@ -87,10 +81,7 @@ export const newPeerConnectionForClient = async (
         return;
       }
       await peerConnection.setLocalDescription();
-      const newDescription = addSdpFields(
-        peerConnection.localDescription,
-        additionalSdpFields
-      );
+      const newDescription = addSdpFields(peerConnection.localDescription, additionalSdpFields);
       negotiationChannel.send(btoa(JSON.stringify(newDescription)));
     })().catch(console.error); // eslint-disable-line no-console
   });

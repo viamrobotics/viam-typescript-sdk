@@ -16,7 +16,7 @@ const setupConnectionManager = (
       },
     });
   }),
-  onDisconnect = vi.fn()
+  onDisconnect = vi.fn(),
 ) => {
   return new GRPCConnectionManager(() => transport, onDisconnect);
 };
@@ -38,7 +38,7 @@ describe('GRPCConnectionManager', () => {
   it('should connect successfully', async () => {
     // Arrange
     const connectionManager = setupConnectionManager();
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const heartbeat = vi.spyOn(connectionManager, 'heartbeat');
 
     // Act
@@ -58,13 +58,11 @@ describe('GRPCConnectionManager', () => {
       });
     });
     const connectionManager = setupConnectionManager(transport);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const heartbeat = vi.spyOn(connectionManager, 'heartbeat');
 
     // Act & Assert
-    await expect(connectionManager.start()).rejects.toThrow(
-      ConnectError.from(new Error('not connected'))
-    );
+    await expect(connectionManager.start()).rejects.toThrow('not connected');
     expect(heartbeat).not.toHaveBeenCalled();
   });
 
@@ -85,7 +83,7 @@ describe('GRPCConnectionManager', () => {
     });
     const onDisconnect = vi.fn();
     const connectionManager = setupConnectionManager(transport, onDisconnect);
-    // eslint-disable-next-line vitest/no-restricted-vi-methods
+
     const heartbeat = vi.spyOn(connectionManager, 'heartbeat');
 
     // Act

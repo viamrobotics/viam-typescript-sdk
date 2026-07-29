@@ -24,7 +24,7 @@ describe('Robot Client API Tests', () => {
         expect.objectContaining({ name: 'fake_arm', subtype: 'arm' }),
         expect.objectContaining({ name: 'fake_camera', subtype: 'camera' }),
         expect.objectContaining({ name: 'fake_vision', subtype: 'vision' }),
-      ])
+      ]),
     );
 
     // Act - Get version info

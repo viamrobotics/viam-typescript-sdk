@@ -1,7 +1,5 @@
-'use strict';
-
 /** @type {import('typedoc').TypeDocOptions} */
-module.exports = {
+export default {
   entryPoints: ['./src/main.ts'],
   out: 'docs/dist',
   name: 'Viam SDK',

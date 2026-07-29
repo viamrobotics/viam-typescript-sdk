@@ -1,4 +1,4 @@
-import { useRef, useEffect, type ReactNode } from 'react';
+import { useRef, useEffect, type ReactNode, JSX } from 'react';
 
 export interface VideoStreamProps {
   stream?: MediaStream;

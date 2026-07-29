@@ -36,9 +36,7 @@ describe('MovementSensorClient tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createClient(MovementSensorService, mockTransport)
-      );
+      .mockImplementation(() => createClient(MovementSensorService, mockTransport));
 
     sensor = new MovementSensorClient(new RobotClient('host'), 'test-sensor');
   });

@@ -80,15 +80,11 @@ describe('GripperClient tests', () => {
   });
 
   it('isHoldingSomething', async () => {
-    await expect(gripper.isHoldingSomething()).resolves.toBe(
-      testIsHoldingSomething
-    );
+    await expect(gripper.isHoldingSomething()).resolves.toBe(testIsHoldingSomething);
   });
 
   it('getCurrentInputs', async () => {
-    await expect(gripper.getCurrentInputs()).resolves.toStrictEqual(
-      testCurrentInputs
-    );
+    await expect(gripper.getCurrentInputs()).resolves.toStrictEqual(testCurrentInputs);
   });
 
   it('goToInputs', async () => {

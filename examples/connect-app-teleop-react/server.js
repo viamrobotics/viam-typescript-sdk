@@ -23,7 +23,7 @@ app.use(
   cors({
     origin: true,
     credentials: true,
-  })
+  }),
 );
 
 app.use(nocache());
@@ -40,17 +40,14 @@ app.use(
       maxAge: 3600000,
       sameSite: 'lax',
     },
-  })
+  }),
 );
 
 // use routesr
 app.use(express.static('./dist'));
 
 if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
-  console.log(
-    'running with FusionAuth for client',
-    process.env.VITE_AUTH_CLIENT_ID
-  );
+  console.log('running with FusionAuth for client', process.env.VITE_AUTH_CLIENT_ID);
 
   const config = {
     clientId: process.env.VITE_AUTH_CLIENT_ID,
@@ -81,8 +78,7 @@ if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
         }),
       });
 
-      const { access_token, id_token, refresh_token, expires_in } =
-        fusionAuthResponse;
+      const { access_token, id_token, refresh_token, expires_in } = fusionAuthResponse;
       if (!(access_token && refresh_token)) {
         console.log('Either refresh token or access token is missing.');
         res.sendStatus(503);
@@ -114,10 +110,7 @@ if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
     console.log('accepting request for login');
 
     console.log(`client_id is ${req.query.client_id}`);
-    const newState = pushRedirectUrlToState(
-      req.query.redirect_uri,
-      req.query.state
-    );
+    const newState = pushRedirectUrlToState(req.query.redirect_uri, req.query.state);
     console.log(`newState is ${newState}`);
     const code = await generatePKCE();
     setSecureCookie(res, 'codeVerifier', code.code_verifier);
@@ -215,8 +208,7 @@ if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
         }),
       });
 
-      const { access_token, id_token, refresh_token, expires_in } =
-        fusionAuthResponse;
+      const { access_token, id_token, refresh_token, expires_in } = fusionAuthResponse;
       if (!(access_token && refresh_token)) {
         res.sendStatus(503);
         return;
@@ -239,10 +231,7 @@ if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
     console.log('accepting request for register');
 
     console.log(`client_id is ${req.query.client_id}`);
-    const newState = pushRedirectUrlToState(
-      req.query.redirect_uri,
-      req.query.state
-    );
+    const newState = pushRedirectUrlToState(req.query.redirect_uri, req.query.state);
 
     const code = await generatePKCE();
     setSecureCookie(res, 'codeVerifier', code.code_verifier);
@@ -300,10 +289,7 @@ if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
       str += String.fromCharCode(bytes[i]);
     }
 
-    const code_challenge = btoa(str)
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+    const code_challenge = btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     return { code_verifier: code_verifier, code_challenge: code_challenge };
   }
 
@@ -389,5 +375,5 @@ if (process.env.VITE_AUTH_CLIENT_ID && process.env.VITE_AUTH_CLIENT_SECRET) {
 
 // start server
 app.listen(serverPort, () =>
-  console.log(`FusionAuth example server listening on port ${serverPort}.`)
+  console.log(`FusionAuth example server listening on port ${serverPort}.`),
 );

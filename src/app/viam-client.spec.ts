@@ -1,10 +1,7 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  GetRobotPartByNameAndLocationResponse,
-  RobotPart,
-} from '../gen/app/v1/app_pb';
+import { GetRobotPartByNameAndLocationResponse, RobotPart } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -12,12 +9,9 @@ import { DataClient } from './data-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
 import { createViamClient, type ViamClientOptions } from './viam-client';
-import {
-  createViamTransport,
-  type AccessToken,
-  type Credential,
-} from './viam-transport';
+import { createViamTransport, type AccessToken, type Credential } from './viam-transport';
 vi.mock('./viam-transport', async (actualImport) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const actual = await actualImport<typeof import('./viam-transport')>();
   return {
     ...actual,
@@ -51,10 +45,7 @@ describe('ViamClient', () => {
   it('create client with an api key credential', async () => {
     options = { credentials: testCredential };
     const client = await subject();
-    expect(createViamTransport).toHaveBeenCalledWith(
-      defaultServiceHost,
-      testCredential
-    );
+    expect(createViamTransport).toHaveBeenCalledWith(defaultServiceHost, testCredential);
     expect(client.appClient).toBeInstanceOf(AppClient);
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
@@ -67,10 +58,7 @@ describe('ViamClient', () => {
     options = { serviceHost, credentials: testCredential };
     const client = await subject();
 
-    expect(createViamTransport).toHaveBeenCalledWith(
-      serviceHost,
-      testCredential
-    );
+    expect(createViamTransport).toHaveBeenCalledWith(serviceHost, testCredential);
     expect(client.appClient).toBeInstanceOf(AppClient);
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
@@ -82,10 +70,7 @@ describe('ViamClient', () => {
     options = { credentials: testAccessToken };
     const client = await subject();
 
-    expect(createViamTransport).toHaveBeenCalledWith(
-      defaultServiceHost,
-      testAccessToken
-    );
+    expect(createViamTransport).toHaveBeenCalledWith(defaultServiceHost, testAccessToken);
     expect(client.appClient).toBeInstanceOf(AppClient);
     expect(client.dataClient).toBeInstanceOf(DataClient);
     expect(client.mlTrainingClient).toBeInstanceOf(MlTrainingClient);
@@ -97,9 +82,7 @@ describe('ViamClient', () => {
     it('errors if neither host nor id are provided', async () => {
       options = { credentials: testCredential };
       const client = await subject();
-      await expect(async () =>
-        client.connectToMachine({})
-      ).rejects.toThrowError('must be provided');
+      await expect(async () => client.connectToMachine({})).rejects.toThrow('must be provided');
     });
 
     it('errors if no main part found', async () => {
@@ -110,8 +93,8 @@ describe('ViamClient', () => {
       AppClient.prototype.getRobotParts = getRobotPartsMock;
 
       await expect(async () =>
-        client.connectToMachine({ id: 'test-machine-uuid' })
-      ).rejects.toThrowError('not find a main part');
+        client.connectToMachine({ id: 'test-machine-uuid' }),
+      ).rejects.toThrow('not find a main part');
     });
 
     it('gets main part address', async () => {
@@ -121,7 +104,7 @@ describe('ViamClient', () => {
       });
 
       const robotParts = [MAIN_PART];
-      // eslint-disable-next-line no-plusplus
+
       for (let i = 0; i < 1000; i++) {
         const part = new RobotPart({
           mainPart: false,
@@ -139,7 +122,7 @@ describe('ViamClient', () => {
 
       expect(getRobotPartsMock).toHaveBeenCalledWith('test-machine-uuid');
       expect(createRobotClient).toHaveBeenCalledWith(
-        expect.objectContaining({ host: MAIN_PART.fqdn })
+        expect.objectContaining({ host: MAIN_PART.fqdn }),
       );
     });
 
@@ -155,8 +138,8 @@ describe('ViamClient', () => {
       AppClient.prototype.getRobotParts = getRobotPartsMock;
 
       await expect(async () =>
-        client.connectToMachine({ id: 'test-machine-uuid' })
-      ).rejects.toThrowError('not provided and could not be obtained');
+        client.connectToMachine({ id: 'test-machine-uuid' }),
+      ).rejects.toThrow('not provided and could not be obtained');
     });
 
     it('gets robot secret if credential is access token -- host', async () => {
@@ -168,30 +151,25 @@ describe('ViamClient', () => {
         name: 'main-part',
         secret: 'fake-robot-secret',
       });
-      const partByNameAndLocationResponse =
-        new GetRobotPartByNameAndLocationResponse({
-          part: MAIN_PART,
-        });
+      const partByNameAndLocationResponse = new GetRobotPartByNameAndLocationResponse({
+        part: MAIN_PART,
+      });
       const getRobotPartByNameAndLocationMock = vi
         .fn()
         .mockImplementation(() => partByNameAndLocationResponse);
-      AppClient.prototype.getRobotPartByNameAndLocation =
-        getRobotPartByNameAndLocationMock;
+      AppClient.prototype.getRobotPartByNameAndLocation = getRobotPartByNameAndLocationMock;
 
       await client.connectToMachine({
         host: 'main-part.location.viam.cloud',
       });
-      expect(getRobotPartByNameAndLocationMock).toHaveBeenCalledWith(
-        'main-part',
-        'location'
-      );
+      expect(getRobotPartByNameAndLocationMock).toHaveBeenCalledWith('main-part', 'location');
       expect(createRobotClient).toHaveBeenCalledWith(
         expect.objectContaining({
           credentials: expect.objectContaining({
             type: 'robot-secret',
             payload: 'fake-robot-secret',
           }),
-        })
+        }),
       );
     });
 
@@ -218,7 +196,7 @@ describe('ViamClient', () => {
             type: 'robot-secret',
             payload: 'fake-robot-secret',
           }),
-        })
+        }),
       );
     });
   });

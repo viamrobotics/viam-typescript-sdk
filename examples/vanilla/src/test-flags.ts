@@ -20,9 +20,7 @@ const log = (msg: string) => {
   console.log(msg);
 };
 
-async function activeCandidateType(
-  pc: RTCPeerConnection
-): Promise<string | undefined> {
+async function activeCandidateType(pc: RTCPeerConnection): Promise<string | undefined> {
   const stats = await pc.getStats();
   let activePairId: string | undefined;
   for (const report of stats.values()) {
@@ -38,10 +36,7 @@ async function activeCandidateType(
   return local?.candidateType;
 }
 
-async function dial(
-  testName: string,
-  extra: Partial<VIAM.DialWebRTCConf> = {}
-) {
+async function dial(testName: string, extra: Partial<VIAM.DialWebRTCConf> = {}) {
   log(`\n=== ${testName} ===`);
   try {
     const client = await VIAM.createRobotClient({

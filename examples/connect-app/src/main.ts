@@ -28,7 +28,7 @@ async function run(client: VIAM.ViamClient) {
 
     const dataList = await client.dataClient.tabularDataBySQL(
       ORG_ID,
-      'select * from readings limit 5'
+      'select * from readings limit 5',
     );
     textElement.innerHTML = JSON.stringify(dataList, null, 2);
   } finally {

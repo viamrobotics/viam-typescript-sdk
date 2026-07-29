@@ -1,6 +1,5 @@
-/// <reference types="vitest" />
 import path from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 import pkg from './package.json';
 
@@ -14,8 +13,9 @@ export default defineConfig({
     minify: true,
     target: 'esnext',
     lib: {
-      entry: path.resolve(__dirname, 'src/main.ts'),
+      entry: path.resolve(import.meta.dirname, 'src/main.ts'),
       name: 'sdk',
+
       fileName: (format) => `main.${format}.js`,
     },
     rollupOptions: {
@@ -23,15 +23,13 @@ export default defineConfig({
         if (warning.code === 'EVAL') {
           return;
         }
+
         warn(warning);
       },
     },
   },
   test: {
-    reporters: [
-      'verbose',
-      ['html', { outputFile: './vitest-report/index.html' }],
-    ],
+    reporters: ['verbose', ['html', { outputFile: './vitest-report/index.html' }]],
     include: ['src/**/*.spec.ts'],
     environment: 'happy-dom',
     mockReset: true,

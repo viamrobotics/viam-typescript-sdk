@@ -3,6 +3,7 @@ import { ConnectForm } from './components/connect-form.js';
 import { MotionArrows } from './components/motion-arrows.js';
 import { useStore, useStream } from './state.js';
 import { useMotionControls } from './motion.js';
+import { JSX } from 'react';
 
 export const App = (): JSX.Element => {
   const { status, connectOrDisconnect, streamClient, baseClient } = useStore();
@@ -16,10 +17,7 @@ export const App = (): JSX.Element => {
       <ConnectForm status={status} onSubmit={connectOrDisconnect} />
       <VideoStream stream={stream}>
         {baseClient ? (
-          <MotionArrows
-            motionState={motionState}
-            requestMotion={requestMotion}
-          />
+          <MotionArrows motionState={motionState} requestMotion={requestMotion} />
         ) : null}
       </VideoStream>
     </>

@@ -1,9 +1,4 @@
-import {
-  BaseClient,
-  StreamClient,
-  createRobotClient,
-  type RobotClient,
-} from '@viamrobotics/sdk';
+import { BaseClient, StreamClient, createRobotClient, type RobotClient } from '@viamrobotics/sdk';
 
 export interface RobotCredentials {
   hostname: string;
@@ -17,9 +12,7 @@ export interface RobotCredentials {
  * @param credentials Robot URL and location secret
  * @returns A connected client
  */
-export const getRobotClient = async (
-  credentials: RobotCredentials
-): Promise<RobotClient> => {
+export const getRobotClient = async (credentials: RobotCredentials): Promise<RobotClient> => {
   const { hostname, apiKey, apiKeyId } = credentials;
 
   return createRobotClient({

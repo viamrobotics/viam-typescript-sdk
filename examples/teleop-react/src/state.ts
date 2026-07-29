@@ -1,11 +1,6 @@
 import type { BaseClient, RobotClient, StreamClient } from '@viamrobotics/sdk';
 import { useEffect, useRef, useState } from 'react';
-import {
-  getBaseClient,
-  getRobotClient,
-  getStreamClient,
-  type RobotCredentials,
-} from './client.js';
+import { getBaseClient, getRobotClient, getStreamClient, type RobotCredentials } from './client.js';
 
 export const DISCONNECTED = 'disconnected';
 export const CONNECTING = 'connecting';
@@ -28,10 +23,7 @@ interface ClientStateConnected {
   streamClient: StreamClient;
 }
 
-type ClientState =
-  | ClientStateDisconnected
-  | ClientStateTransitioning
-  | ClientStateConnected;
+type ClientState = ClientStateDisconnected | ClientStateTransitioning | ClientStateConnected;
 
 export type ClientStatus = ClientState['status'];
 
@@ -82,7 +74,7 @@ export const useStore = (): Store => {
 
 export const useStream = (
   streamClient: StreamClient | undefined,
-  cameraName: string
+  cameraName: string,
 ): MediaStream | undefined => {
   const okToConnectRef = useRef(true);
   const [stream, setStream] = useState<MediaStream | undefined>();

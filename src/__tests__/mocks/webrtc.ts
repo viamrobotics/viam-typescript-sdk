@@ -4,7 +4,7 @@ export const createMockPeerConnection = (
   closeFn = vi.fn(),
   addEventListenerFn = vi.fn(),
   removeEventListenerFn = vi.fn(),
-  iceConnectionState: RTCIceConnectionState = 'connected'
+  iceConnectionState: RTCIceConnectionState = 'connected',
 ): RTCPeerConnection => {
   return {
     close: closeFn,
@@ -18,7 +18,7 @@ export const createMockDataChannel = (
   closeFn = vi.fn(),
   addEventListenerFn = vi.fn(),
   removeEventListenerFn = vi.fn(),
-  readyState: RTCDataChannelState = 'open'
+  readyState: RTCDataChannelState = 'open',
 ): RTCDataChannel => {
   return {
     close: closeFn,

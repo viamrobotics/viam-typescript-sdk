@@ -1,14 +1,17 @@
 import { appApi, type AppClient } from '@viamrobotics/sdk';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 
 export interface LocationsListProps {
   appClient: AppClient;
-  organization: appApi.Organization
+  organization: appApi.Organization;
   onLocationSelected: (location: appApi.Location) => unknown;
 }
 
-export const LocationsList = ({ appClient, organization, onLocationSelected }: LocationsListProps): JSX.Element => {
-
+export const LocationsList = ({
+  appClient,
+  organization,
+  onLocationSelected,
+}: LocationsListProps): JSX.Element => {
   const [locations, setLocations] = useState<appApi.Location[]>([]);
   useEffect(() => {
     async function getLocations() {
@@ -21,13 +24,20 @@ export const LocationsList = ({ appClient, organization, onLocationSelected }: L
   return (
     <div>
       {locations?.map((location) => {
-        return <div key={location.id}>
-          <a href="#" onClick={(e) => {
-            e.preventDefault();
-            onLocationSelected(location);
-          }}>{location.name}</a>
-        </div>
+        return (
+          <div key={location.id}>
+            <a
+              href='#'
+              onClick={(e) => {
+                e.preventDefault();
+                onLocationSelected(location);
+              }}
+            >
+              {location.name}
+            </a>
+          </div>
+        );
       })}
-    </div >
+    </div>
   );
 };

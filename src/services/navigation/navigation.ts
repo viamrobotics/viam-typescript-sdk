@@ -1,16 +1,9 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { GeoGeometry, GeoPoint, Resource } from '../../types';
-import type {
-  Mode,
-  NavigationPosition,
-  NavigationProperties,
-  Path,
-  Waypoint,
-} from './types';
+import type { Mode, NavigationPosition, NavigationProperties, Path, Waypoint } from './types';
 
 /**
- * A service that uses GPS to automatically navigate a robot to user defined
- * endpoints.
+ * A service that uses GPS to automatically navigate a robot to user defined endpoints.
  *
  * @example
  *
@@ -132,8 +125,7 @@ export interface Navigation extends Resource {
    * For more information, see [Navigation
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#removewaypoint).
    *
-   * @param id - The MongoDB ObjectID of the waypoint to remove from the
-   *   service's data storage.
+   * @param id - The MongoDB ObjectID of the waypoint to remove from the service's data storage.
    */
   removeWayPoint: (id: string, extra?: Struct) => Promise<void>;
 

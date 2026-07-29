@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_connect';
 import {
   GetEventsResponse,
-  TriggerEventRequest,
+  type TriggerEventRequest,
   TriggerEventResponse,
 } from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import { Geometry, GetGeometriesResponse } from '../../gen/common/v1/common_pb';
@@ -49,14 +49,9 @@ describe('InputControllerClient Tests', () => {
 
     RobotClient.prototype.createServiceClient = vi
       .fn()
-      .mockImplementation(() =>
-        createClient(InputControllerService, mockTransport)
-      );
+      .mockImplementation(() => createClient(InputControllerService, mockTransport));
 
-    inputController = new InputControllerClient(
-      new RobotClient('host'),
-      inputControllerClientName
-    );
+    inputController = new InputControllerClient(new RobotClient('host'), inputControllerClientName);
   });
 
   it('gets events', async () => {

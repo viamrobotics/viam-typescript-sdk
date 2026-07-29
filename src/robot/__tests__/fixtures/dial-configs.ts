@@ -1,7 +1,4 @@
-import {
-  TEST_HOST,
-  TEST_SIGNALING_ADDRESS,
-} from '../../../__tests__/fixtures/test-constants';
+import { TEST_HOST, TEST_SIGNALING_ADDRESS } from '../../../__tests__/fixtures/test-constants';
 import type { DialConf } from '../../../main';
 
 export const baseDialConfig: DialConf = {
