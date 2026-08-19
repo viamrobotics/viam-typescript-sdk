@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.70.0",
-    "@connectrpc/connect-node": "^1.7.0",
+    "@connectrpc/connect-node": "^2.1.2",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.60.0",
     "@types/node": "^26.0.0",
