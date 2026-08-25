@@ -16,6 +16,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Generate API Version
+        run: node ./scripts/write-versions.js
+
       - name: Build Docs
         run: make build-docs
 
