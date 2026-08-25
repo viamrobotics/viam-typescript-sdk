@@ -21,7 +21,7 @@
     "@viamrobotics/typescript-config": "^0.1.1",
     "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.4.14",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.23",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "rollup": "^3.30.0",
