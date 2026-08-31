@@ -4,10 +4,13 @@ import { ArmService } from '../../gen/component/arm/v1/arm_connect';
 import {
   GetEndPositionRequest,
   GetJointPositionsRequest,
+  GetManualModeRequest,
+  GetPropertiesRequest,
   IsMovingRequest,
   JointPositions,
   MoveToJointPositionsRequest,
   MoveToPositionRequest,
+  SetManualModeRequest,
   StopRequest,
 } from '../../gen/component/arm/v1/arm_pb';
 import type { RobotClient } from '../../robot';
@@ -141,6 +144,51 @@ export class ArmClient implements Arm {
     this.options.requestLogger?.(request);
 
     await this.client.stop(request, callOptions);
+  }
+
+  async getProperties(extra = {}, callOptions = this.callOptions) {
+    const request = new GetPropertiesRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const response = await this.client.getProperties(request, callOptions);
+    return {
+      supportManualMode: response.supportManualMode,
+      supportCartesianCommands: response.supportCartesianCommands,
+    };
+  }
+
+  async setManualMode(
+    manualMode: boolean,
+    enabledFor = 0,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new SetManualModeRequest({
+      name: this.name,
+      manualMode,
+      enabledFor,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    await this.client.setManualMode(request, callOptions);
+  }
+
+  async getManualMode(extra = {}, callOptions = this.callOptions) {
+    const request = new GetManualModeRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const response = await this.client.getManualMode(request, callOptions);
+    return response.manualMode;
   }
 
   async isMoving(callOptions = this.callOptions) {
