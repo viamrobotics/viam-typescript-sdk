@@ -9,6 +9,13 @@ export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
 export const { JointPositions: ArmJointPositions } = armApi;
 
+export interface Properties {
+  /** Whether the arm supports manual mode. */
+  supportManualMode: boolean;
+  /** Whether the arm supports cartesian commands. */
+  supportCartesianCommands: boolean;
+}
+
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {
   /**
@@ -168,4 +175,48 @@ export interface Arm extends Resource {
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#ismoving).
    */
   isMoving: () => Promise<boolean>;
+
+  /**
+   * Get the optional features the arm supports.
+   *
+   * @example
+   *
+   * ```ts
+   * const arm = new VIAM.ArmClient(machine, 'my_arm');
+   * const properties = await arm.getProperties();
+   * console.log(properties);
+   * ```
+   */
+  getProperties: (extra?: Struct) => Promise<Properties>;
+
+  /**
+   * Enter or exit manual mode for an arm that supports it.
+   *
+   * @example
+   *
+   * ```ts
+   * const arm = new VIAM.ArmClient(machine, 'my_arm');
+   *
+   * // Enter manual mode for 60 seconds
+   * await arm.setManualMode(true, 60);
+   * ```
+   *
+   * @param manualMode - Whether to enter (true) or exit (false) manual mode.
+   * @param enabledFor - How long to stay in manual mode, in seconds. 0 or undefined means no time
+   *   limit.
+   */
+  setManualMode: (manualMode: boolean, enabledFor?: number, extra?: Struct) => Promise<void>;
+
+  /**
+   * Get whether the arm is currently in manual mode.
+   *
+   * @example
+   *
+   * ```ts
+   * const arm = new VIAM.ArmClient(machine, 'my_arm');
+   * const manualMode = await arm.getManualMode();
+   * console.log(manualMode);
+   * ```
+   */
+  getManualMode: (extra?: Struct) => Promise<boolean>;
 }
