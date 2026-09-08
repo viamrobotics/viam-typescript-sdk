@@ -35,9 +35,7 @@ const validateName = (value: string, paramName: string, resource: string): strin
   if (typeof value === 'string') {
     return value;
   }
-  throw new TypeError(
-    `${paramName} must be the ${resource}'s name as a string, e.g. 'pick-grip' (got ${typeof value})`,
-  );
+  throw new TypeError(`${paramName} must be the ${resource}'s name as a string, e.g. 'pick-grip'`);
 };
 
 /**
