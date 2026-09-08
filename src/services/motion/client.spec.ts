@@ -18,7 +18,7 @@ import {
   type MoveRequest,
   type StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
-import { GeoGeometry, GeoPoint, Pose, PoseInFrame } from '../../types';
+import { GeoGeometry, GeoPoint, Pose, PoseInFrame, ResourceName } from '../../types';
 import { MotionClient } from './client';
 import {
   Constraints,
@@ -200,6 +200,63 @@ describe('moveOnGlobe', () => {
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
 
     expect(executionId).toHaveBeenCalledOnce();
+  });
+});
+
+describe('resource names', () => {
+  const gripperResourceName = new ResourceName({
+    namespace: 'rdk',
+    type: 'component',
+    subtype: 'gripper',
+    name: 'pick-grip',
+  });
+
+  const mockMotionClient = (): MotionClient => {
+    RobotClient.prototype.createServiceClient = vi.fn().mockImplementation(() =>
+      createClient(
+        MotionService,
+        createRouterTransport(({ service }) => {
+          service(MotionService, {
+            move: () => ({ success: true }),
+            getPose: () => ({ pose: new PoseInFrame({ referenceFrame: 'world' }) }),
+            moveOnGlobe: () => new MoveOnGlobeResponse({ executionId: testExecutionId }),
+          });
+        }),
+      ),
+    );
+    return new MotionClient(new RobotClient('host'), motionClientName);
+  };
+
+  it('rejects a ResourceName for move', async () => {
+    await expect(
+      mockMotionClient().move(
+        new PoseInFrame({ referenceFrame: 'world' }),
+        gripperResourceName as unknown as string,
+      ),
+    ).rejects.toThrow("componentName must be the component's name as a string, e.g. 'pick-grip'");
+  });
+
+  it('rejects a ResourceName for getPose', async () => {
+    await expect(
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      mockMotionClient().getPose(gripperResourceName as unknown as string, 'world', []),
+    ).rejects.toThrow("componentName must be the component's name as a string, e.g. 'pick-grip'");
+  });
+
+  it('names the rejected parameter for moveOnGlobe', async () => {
+    await expect(
+      mockMotionClient().moveOnGlobe(
+        { latitude: 1, longitude: 2 },
+        'my-base',
+        gripperResourceName as unknown as string,
+      ),
+    ).rejects.toThrow("movementSensorName must be the movement sensor's name as a string");
+  });
+
+  it('still accepts a plain string name', async () => {
+    await expect(
+      mockMotionClient().move(new PoseInFrame({ referenceFrame: 'world' }), 'pick-grip'),
+    ).resolves.toStrictEqual(true);
   });
 });
 
