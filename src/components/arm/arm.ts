@@ -9,12 +9,7 @@ export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
 export const { JointPositions: ArmJointPositions } = armApi;
 
-export interface Properties {
-  /** Whether the arm supports manual mode. */
-  supportManualMode: boolean;
-  /** Whether the arm supports cartesian commands. */
-  supportCartesianCommands: boolean;
-}
+export type Properties = armApi.GetPropertiesResponse;
 
 /** Represents a physical robot arm that exists in three-dimensional space. */
 export interface Arm extends Resource {

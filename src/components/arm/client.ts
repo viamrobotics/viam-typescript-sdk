@@ -154,11 +154,7 @@ export class ArmClient implements Arm {
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getProperties(request, callOptions);
-    return {
-      supportManualMode: response.supportManualMode,
-      supportCartesianCommands: response.supportCartesianCommands,
-    };
+    return this.client.getProperties(request, callOptions);
   }
 
   async setManualMode(

@@ -63,10 +63,12 @@ describe('ArmClient tests', () => {
   });
 
   it('getProperties', async () => {
-    await expect(arm.getProperties()).resolves.toStrictEqual({
-      supportManualMode: testSupportManualMode,
-      supportCartesianCommands: testSupportCartesianCommands,
-    });
+    await expect(arm.getProperties()).resolves.toStrictEqual(
+      new GetPropertiesResponse({
+        supportManualMode: testSupportManualMode,
+        supportCartesianCommands: testSupportCartesianCommands,
+      }),
+    );
     expect(capturedGetPropertiesRequest?.name).toBe('test-arm');
   });
 
