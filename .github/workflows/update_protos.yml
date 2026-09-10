@@ -11,6 +11,10 @@ on:
     types:
       - protos-updated
 
+env:
+  PROTO_BRANCH: workflow/update-protos
+  WRAPPER_BRANCH: workflow/update-protos-ai
+
 jobs:
   update-protos:
     if: github.repository_owner == 'viamrobotics'
@@ -43,11 +47,13 @@ jobs:
       - name: prune origin
         run: git remote prune origin
 
-      - name: Create branch
+      # --- Bottom of the stack: API version bump ---
+
+      - name: Create proto branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b workflow/update-protos
+          git checkout -b ${{ env.PROTO_BRANCH }}
 
       - name: Generate old protos for comparison
         run: |
@@ -65,16 +71,40 @@ jobs:
           git add api_version.lock
           git diff --cached --quiet || git commit -m "[WORKFLOW] Update API version to ${{ env.API_VERSION }}"
 
-      - name: Install OpenCode CLI
-        run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-
-      - name: Update TypeScript Wrappers with OpenCode CLI
+      - name: Push proto branch and open PR
+        id: proto_pr
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
         run: |
-          cat > /tmp/opencode_prompt.txt << 'PROMPT_EOF'
+          git push --force origin ${{ env.PROTO_BRANCH }}
+          BODY="This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes.
+
+          This is the **bottom** of a stack: the generated wrapper updates are in a follow-up PR based on this branch."
+          gh pr create \
+            --base main \
+            --head ${{ env.PROTO_BRANCH }} \
+            --title "Automated Protos Update" \
+            --body "$BODY" \
+            --reviewer viamrobotics/sdk \
+            || gh pr edit ${{ env.PROTO_BRANCH }} \
+              --title "Automated Protos Update" \
+              --body "$BODY"
+          echo "url=$(gh pr view ${{ env.PROTO_BRANCH }} --json url -q .url)" >> "$GITHUB_OUTPUT"
+
+      # --- Top of the stack: AI-generated wrapper updates ---
+
+      - name: Create wrapper branch
+        run: git checkout -b ${{ env.WRAPPER_BRANCH }}
+
+      - name: Update TypeScript wrappers with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          settings: .claude/settings.ci.json
+          claude_args: |
+            --model claude-sonnet-5
+            --allowed-tools "Edit,Read,Write,Glob,Grep,Bash(diff*),Bash(git diff*),Bash(git status*),Bash(git log*),Bash(git show*),Bash(npm run typecheck*),Bash(npm run lint*),Bash(npm run test*),Bash(npx vitest*)"
+          prompt: |
             The protobuf definitions have been updated and compiled into TypeScript files in `src/gen/`.
 
             ## IMPORTANT: Use diff to identify changes
@@ -285,15 +315,12 @@ jobs:
             - Update `src/main.ts` if new public types or clients are added.
 
             ## Verification
-            After making changes, verify that:
+            Run `npm run typecheck` and `npm run lint` and fix any errors you introduced. Then verify that:
             - All new RPC methods from the diff have corresponding TypeScript wrappers
             - All updated RPC methods from the diff reflect the new message structure
             - All removed RPC methods from the diff are deleted from wrappers
             - Tests are added/updated/removed for all wrapper changes
             - `src/main.ts` exports are up to date
-          PROMPT_EOF
-
-          opencode run --model anthropic/claude-sonnet-4-6 --agent build "$(cat /tmp/opencode_prompt.txt)"
 
       - name: Commit TypeScript wrapper updates
         run: |
@@ -308,20 +335,29 @@ jobs:
           git add -A
           git diff --cached --quiet || git commit -m "[WORKFLOW] Apply formatting"
 
-      - name: Push branch and open PR
+      - name: Push wrapper branch and open stacked PR
         env:
           GH_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+          PROTO_PR_URL: ${{ steps.proto_pr.outputs.url }}
         run: |
-          git push --force origin workflow/update-protos
+          if git diff --quiet ${{ env.PROTO_BRANCH }}..${{ env.WRAPPER_BRANCH }}; then
+            echo "Claude made no wrapper changes; skipping the stacked PR."
+            exit 0
+          fi
+          git push --force origin ${{ env.WRAPPER_BRANCH }}
+          BODY="This is an auto-generated PR updating the TypeScript wrappers for the proto changes in $PROTO_PR_URL.
+
+          This PR is **stacked on top of** \`${{ env.PROTO_BRANCH }}\`. Review and merge $PROTO_PR_URL first; this PR will retarget to \`main\` automatically."
           gh pr create \
-            --base main \
-            --head workflow/update-protos \
-            --title "Automated Protos Update" \
-            --body "This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes" \
-            --reviewer njooma \
-            || gh pr edit workflow/update-protos \
-              --title "Automated Protos Update" \
-              --body "This is an auto-generated PR to update proto definitions. Check the commits to see which repos and commits are responsible for the changes"
+            --base ${{ env.PROTO_BRANCH }} \
+            --head ${{ env.WRAPPER_BRANCH }} \
+            --title "Automated Protos Update: TypeScript wrappers" \
+            --body "$BODY" \
+            --reviewer viamrobotics/sdk \
+            || gh pr edit ${{ env.WRAPPER_BRANCH }} \
+              --base ${{ env.PROTO_BRANCH }} \
+              --title "Automated Protos Update: TypeScript wrappers" \
+              --body "$BODY"
 
       - name: Notify slack of failure
         uses: slackapi/slack-github-action@v3
