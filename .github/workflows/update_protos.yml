@@ -355,7 +355,6 @@ jobs:
             --body "$BODY" \
             --reviewer viamrobotics/sdk \
             || gh pr edit ${{ env.WRAPPER_BRANCH }} \
-              --base ${{ env.PROTO_BRANCH }} \
               --title "Automated Protos Update: TypeScript wrappers" \
               --body "$BODY"
 
