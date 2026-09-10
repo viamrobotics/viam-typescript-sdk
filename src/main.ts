@@ -69,7 +69,7 @@ export { type AppClient } from './app/app-client';
 export * as appApi from './gen/app/v1/app_pb';
 export * as appRobotApi from './gen/app/v1/robot_pb';
 
-export { ModelType, TrainingStatus, type MlTrainingClient } from './app/ml-training-client';
+export { ModelType, TrainingStatus, Visibility, type MlTrainingClient } from './app/ml-training-client';
 /**
  * Raw Protobuf interfaces for ML Training.
  *
