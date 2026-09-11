@@ -26,6 +26,19 @@ import type { Motion } from './motion';
 import { type Constraints, type MotionConfiguration } from './types';
 
 /**
+ * Reject non-string names here, where the field and the expected type can be named.
+ *
+ * Passing a `ResourceName`, as older SDK releases required, is otherwise serialized as the string
+ * `'[object Object]'` and sent to the machine as the component name.
+ */
+const validateName = (value: string, paramName: string, resource: string): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+  throw new TypeError(`${paramName} must be the ${resource}'s name as a string, e.g. 'pick-grip'`);
+};
+
+/**
  * A gRPC-web client for a Motion service.
  *
  * @group Clients
@@ -53,7 +66,7 @@ export class MotionClient implements Motion {
     const request = new MoveRequest({
       name: this.name,
       destination,
-      componentName,
+      componentName: validateName(componentName, 'componentName', 'component'),
       worldState,
       constraints,
       extra: Struct.fromJson(extra),
@@ -77,8 +90,8 @@ export class MotionClient implements Motion {
     const request = new MoveOnMapRequest({
       name: this.name,
       destination,
-      componentName,
-      slamServiceName,
+      componentName: validateName(componentName, 'componentName', 'component'),
+      slamServiceName: validateName(slamServiceName, 'slamServiceName', 'SLAM service'),
       motionConfiguration: motionConfig,
       obstacles,
       extra: Struct.fromJson(extra),
@@ -104,8 +117,8 @@ export class MotionClient implements Motion {
     const request = new MoveOnGlobeRequest({
       name: this.name,
       destination,
-      componentName,
-      movementSensorName,
+      componentName: validateName(componentName, 'componentName', 'component'),
+      movementSensorName: validateName(movementSensorName, 'movementSensorName', 'movement sensor'),
       heading,
       obstacles: obstaclesList,
       boundingRegions: boundingRegionsList,
@@ -122,7 +135,7 @@ export class MotionClient implements Motion {
   async stopPlan(componentName: string, extra = {}, callOptions = this.callOptions) {
     const request = new StopPlanRequest({
       name: this.name,
-      componentName,
+      componentName: validateName(componentName, 'componentName', 'component'),
       extra: Struct.fromJson(extra),
     });
 
@@ -141,7 +154,7 @@ export class MotionClient implements Motion {
   ) {
     const request = new GetPlanRequest({
       name: this.name,
-      componentName,
+      componentName: validateName(componentName, 'componentName', 'component'),
       lastPlanOnly,
       executionId,
       extra: Struct.fromJson(extra),
@@ -175,7 +188,7 @@ export class MotionClient implements Motion {
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const request = new GetPoseRequest({
       name: this.name,
-      componentName,
+      componentName: validateName(componentName, 'componentName', 'component'),
       destinationFrame,
       supplementalTransforms,
       extra: Struct.fromJson(extra),
