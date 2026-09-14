@@ -181,4 +181,4 @@ export class MlTrainingClient {
   }
 }
 
-export { ModelType, TrainingStatus } from '../gen/app/mltraining/v1/ml_training_pb';
+export { ModelType, TrainingStatus, Visibility } from '../gen/app/mltraining/v1/ml_training_pb';
