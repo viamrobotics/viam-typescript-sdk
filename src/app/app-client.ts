@@ -1100,6 +1100,29 @@ export class AppClient {
   }
 
   /**
+   * Lists all robots across multiple locations in a single request.
+   *
+   * @example
+   *
+   * ```ts
+   * const robots = await appClient.listRobotsForLocations([
+   *   '<YOUR-LOCATION-ID-1>',
+   *   '<YOUR-LOCATION-ID-2>',
+   * ]);
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listrobotsforlocations).
+   *
+   * @param locationIds The IDs of the locations to list robots for
+   * @returns The list of robot objects across all the given locations
+   */
+  async listRobotsForLocations(locationIds: string[]): Promise<Robot[]> {
+    const resp = await this.client.listRobotsForLocations({ locationIds });
+    return resp.robots;
+  }
+
+  /**
    * Creates a new robot.
    *
    * @example
