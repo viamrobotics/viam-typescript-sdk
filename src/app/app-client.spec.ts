@@ -1076,6 +1076,37 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('listRobotsForLocations tests', () => {
+    const robots = [robot];
+    let capturedReq: pb.ListRobotsForLocationsRequest | undefined;
+
+    beforeEach(() => {
+      capturedReq = undefined;
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          listRobotsForLocations: (req: pb.ListRobotsForLocationsRequest) => {
+            capturedReq = req;
+            return new pb.ListRobotsForLocationsResponse({
+              robots,
+            });
+          },
+        });
+      });
+    });
+
+    it('listRobotsForLocations', async () => {
+      const response = await subject().listRobotsForLocations(['locId1', 'locId2']);
+      expect(capturedReq?.locationIds).toEqual(['locId1', 'locId2']);
+      expect(response).toEqual(robots);
+    });
+
+    it('listRobotsForLocations with no locations', async () => {
+      const response = await subject().listRobotsForLocations([]);
+      expect(capturedReq?.locationIds).toEqual([]);
+      expect(response).toEqual(robots);
+    });
+  });
+
   describe('listMachineSummaries tests', () => {
     const locSummary1 = new pb.LocationSummary({});
     const locSummary2 = new pb.LocationSummary({});
