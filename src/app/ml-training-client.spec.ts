@@ -4,11 +4,18 @@ import { MLTrainingService } from '../gen/app/mltraining/v1/ml_training_connect'
 import {
   type CancelTrainingJobRequest,
   CancelTrainingJobResponse,
+  Container,
   type DeleteCompletedTrainingJobRequest,
   DeleteCompletedTrainingJobResponse,
+  type DeleteCustomTrainingContainerRequest,
+  DeleteCustomTrainingContainerResponse,
   GetTrainingJobResponse,
+  type ListContainersRequest,
+  ListContainersResponse,
   ListTrainingJobsResponse,
   ModelType,
+  type RegisterCustomTrainingContainerRequest,
+  RegisterCustomTrainingContainerResponse,
   SubmitCustomTrainingJobResponse,
   SubmitTrainingJobResponse,
   TrainingJobMetadata,
@@ -178,6 +185,75 @@ describe('MlTrainingClient tests', () => {
     });
     it('delete completed training job', async () => {
       expect(await subject().deleteCompletedTrainingJob(id)).toEqual(null);
+      expect(capReq.id).toStrictEqual(id);
+    });
+  });
+
+  describe('listContainers tests', () => {
+    const containers = [
+      new Container({ key: 'tf:2.15', uri: 'us-docker.pkg.dev/tf-gpu.2-15.py310:latest' }),
+    ];
+    let capReq: ListContainersRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          listContainers: (req) => {
+            capReq = req;
+            return new ListContainersResponse({ containers });
+          },
+        });
+      });
+    });
+
+    it('list containers', async () => {
+      const response = await subject().listContainers('org_id');
+      expect(response).toEqual(containers);
+      expect(capReq.organizationId).toStrictEqual('org_id');
+    });
+  });
+
+  describe('registerCustomTrainingContainer tests', () => {
+    let capReq: RegisterCustomTrainingContainerRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          registerCustomTrainingContainer: (req) => {
+            capReq = req;
+            return new RegisterCustomTrainingContainerResponse({ id: 'fakeId' });
+          },
+        });
+      });
+    });
+
+    it('registers a custom training container', async () => {
+      const response = await subject().registerCustomTrainingContainer(
+        'org_id',
+        'image_uri',
+        'description',
+      );
+      expect(response).toStrictEqual('fakeId');
+      expect(capReq.organizationId).toStrictEqual('org_id');
+      expect(capReq.imageUri).toStrictEqual('image_uri');
+      expect(capReq.description).toStrictEqual('description');
+    });
+  });
+
+  describe('deleteCustomTrainingContainer tests', () => {
+    const id = 'id';
+    let capReq: DeleteCustomTrainingContainerRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          deleteCustomTrainingContainer: (req) => {
+            capReq = req;
+            return new DeleteCustomTrainingContainerResponse();
+          },
+        });
+      });
+    });
+
+    it('delete custom training container', async () => {
+      expect(await subject().deleteCustomTrainingContainer(id)).toEqual(null);
       expect(capReq.id).toStrictEqual(id);
     });
   });

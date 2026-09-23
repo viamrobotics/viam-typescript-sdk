@@ -8,6 +8,7 @@ export {
   MotionConfiguration,
   ObstacleDetector,
   OrientationConstraint,
+  TempStreamOptions,
   type GetPlanResponse,
   type PlanState,
 } from './motion/types';

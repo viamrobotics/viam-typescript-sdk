@@ -1,4 +1,5 @@
 import type { Struct } from '@bufbuild/protobuf';
+import type { ArmJointPositions } from '../../components/arm/arm';
 import type {
   GeoGeometry,
   GeoPoint,
@@ -14,6 +15,7 @@ import type {
   GetPlanResponse,
   ListPlanStatusesResponse,
   MotionConfiguration,
+  TempStreamOptions,
 } from './types';
 
 /** A service that coordinates motion planning across all of the components in a given robot. */
@@ -287,4 +289,34 @@ export interface Motion extends Resource {
     supplementalTransforms: Transform[],
     extra?: Struct,
   ) => Promise<PoseInFrame>;
+
+  /**
+   * Streams joint-space waypoints to an arm.
+   *
+   * This method and its associated types are named as "Temp" because this API is under active
+   * development, and its current shape should not be depended on.
+   *
+   * @example
+   *
+   * ```ts
+   * const motion = new VIAM.MotionClient(machine, 'builtin');
+   *
+   * async function* targets() {
+   *   yield [{ values: [0, 0, 0, 0, 0, 0] }];
+   * }
+   *
+   * await motion.tempStreamArmJointPositions('my_arm', targets());
+   * ```
+   *
+   * @param componentName - Name of the arm to stream joint positions to.
+   * @param targets - Async iterable of batches of target joint positions to append to the session,
+   *   sent in order after the session is initiated.
+   * @param options - Configuration for the streaming session.
+   */
+  tempStreamArmJointPositions: (
+    componentName: string,
+    targets: AsyncIterable<ArmJointPositions[]>,
+    options?: TempStreamOptions,
+    extra?: Struct,
+  ) => Promise<void>;
 }
