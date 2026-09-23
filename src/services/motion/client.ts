@@ -1,5 +1,6 @@
 import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
+import type { ArmJointPositions } from '../../components/arm/arm';
 import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
   GetPlanRequest,
@@ -9,6 +10,9 @@ import {
   MoveOnMapRequest,
   MoveRequest,
   StopPlanRequest,
+  TempStreamArmJointPositionsRequest,
+  TempStreamArmJointPositionsRequest_Init,
+  TempStreamArmJointPositionsRequest_Targets,
 } from '../../gen/service/motion/v1/motion_pb';
 import type { RobotClient } from '../../robot';
 import type {
@@ -23,7 +27,7 @@ import type {
 } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Motion } from './motion';
-import { type Constraints, type MotionConfiguration } from './types';
+import { type Constraints, type MotionConfiguration, type TempStreamOptions } from './types';
 
 /**
  * A gRPC-web client for a Motion service.
@@ -193,6 +197,44 @@ export class MotionClient implements Motion {
     }
 
     return result;
+  }
+
+  async tempStreamArmJointPositions(
+    componentName: string,
+    targets: AsyncIterable<ArmJointPositions[]>,
+    options?: TempStreamOptions,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const { name } = this;
+    const extraStruct = Struct.fromJson(extra);
+
+    const requests = async function* requestGen() {
+      yield new TempStreamArmJointPositionsRequest({
+        name,
+        message: {
+          case: 'init',
+          value: new TempStreamArmJointPositionsRequest_Init({
+            componentName,
+            options,
+            extra: extraStruct,
+          }),
+        },
+      });
+      for await (const positions of targets) {
+        yield new TempStreamArmJointPositionsRequest({
+          name,
+          message: {
+            case: 'targets',
+            value: new TempStreamArmJointPositionsRequest_Targets({ positions }),
+          },
+        });
+      }
+    };
+
+    for await (const _ of this.client.tempStreamArmJointPositions(requests(), callOptions)) {
+      // Responses carry no data; the stream is drained to completion.
+    }
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {

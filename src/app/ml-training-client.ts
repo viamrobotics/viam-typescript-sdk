@@ -179,6 +179,77 @@ export class MlTrainingClient {
     await this.client.deleteCompletedTrainingJob({ id });
     return null;
   }
+
+  /**
+   * List the containers available for a custom training job for a given organization.
+   *
+   * @example
+   *
+   * ```ts
+   * const containers = await mlTrainingClient.listContainers('<organization-id>');
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#listcontainers).
+   *
+   * @param organizationId - The organization ID.
+   */
+  async listContainers(organizationId: string) {
+    const resp = await this.client.listContainers({ organizationId });
+    return resp.containers;
+  }
+
+  /**
+   * Register a custom container for custom training jobs.
+   *
+   * @example
+   *
+   * ```ts
+   * const id = await mlTrainingClient.registerCustomTrainingContainer(
+   *   '<organization-id>',
+   *   '<image-uri>',
+   *   '<description>',
+   * );
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#registercustomtrainingcontainer).
+   *
+   * @param organizationId - The organization ID.
+   * @param imageUri - The Docker Hub reference for the container image.
+   * @param description - A description of the container, used as its display name.
+   */
+  async registerCustomTrainingContainer(
+    organizationId: string,
+    imageUri: string,
+    description: string,
+  ) {
+    const resp = await this.client.registerCustomTrainingContainer({
+      organizationId,
+      imageUri,
+      description,
+    });
+    return resp.id;
+  }
+
+  /**
+   * Delete a custom training container.
+   *
+   * @example
+   *
+   * ```ts
+   * await mlTrainingClient.deleteCustomTrainingContainer('<container-id>');
+   * ```
+   *
+   * For more information, see [ML Training
+   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#deletecustomtrainingcontainer).
+   *
+   * @param id - The container ID.
+   */
+  async deleteCustomTrainingContainer(id: string) {
+    await this.client.deleteCustomTrainingContainer({ id });
+    return null;
+  }
 }
 
 export { ModelType, TrainingStatus, Visibility } from '../gen/app/mltraining/v1/ml_training_pb';

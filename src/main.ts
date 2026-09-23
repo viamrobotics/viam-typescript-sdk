@@ -330,6 +330,7 @@ export {
   MotionConfiguration,
   ObstacleDetector,
   OrientationConstraint,
+  TempStreamOptions,
   type GetPlanResponse,
   type Motion,
   type PlanState,

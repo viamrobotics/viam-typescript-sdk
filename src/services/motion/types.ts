@@ -11,6 +11,7 @@ export type MotionConfiguration = PlainMessage<motionApi.MotionConfiguration>;
 export type ObstacleDetector = PlainMessage<motionApi.ObstacleDetector>;
 export type OrientationConstraint = PlainMessage<motionApi.OrientationConstraint>;
 export type PlanState = motionApi.PlanState;
+export type TempStreamOptions = PlainMessage<motionApi.TempStreamOptions>;
 
 export const {
   CollisionSpecification,
@@ -23,4 +24,5 @@ export const {
   ObstacleDetector,
   OrientationConstraint,
   PlanState,
+  TempStreamOptions,
 } = motionApi;

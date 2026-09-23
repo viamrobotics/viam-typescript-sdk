@@ -17,6 +17,8 @@ import {
   MoveOnGlobeResponse,
   type MoveRequest,
   type StopPlanRequest,
+  type TempStreamArmJointPositionsRequest,
+  TempStreamArmJointPositionsResponse,
 } from '../../gen/service/motion/v1/motion_pb';
 import { GeoGeometry, GeoPoint, Pose, PoseInFrame } from '../../types';
 import { MotionClient } from './client';
@@ -469,5 +471,55 @@ describe('listPlanStatuses', () => {
     ).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.onlyActivePlans).toStrictEqual(expectedOnlyActivePlans);
     expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+  });
+});
+
+describe('tempStreamArmJointPositions', () => {
+  it('streams an init message followed by target batches', async () => {
+    const expectedComponentName = 'myArm';
+    const expectedExtra = { some: 'extra' };
+    const capturedReqs: TempStreamArmJointPositionsRequest[] = [];
+
+    const mockTransport = createRouterTransport(({ service }) => {
+      service(MotionService, {
+        tempStreamArmJointPositions: async function* (reqs) {
+          for await (const req of reqs) {
+            capturedReqs.push(req);
+          }
+          yield new TempStreamArmJointPositionsResponse({});
+        },
+      });
+    });
+
+    RobotClient.prototype.createServiceClient = vi
+      .fn()
+      .mockImplementation(() => createClient(MotionService, mockTransport));
+
+    motion = new MotionClient(new RobotClient('host'), motionClientName);
+
+    const targets = async function* targetGen() {
+      await Promise.resolve();
+      yield [{ values: [1, 2, 3, 4, 5, 6] }];
+    };
+
+    await expect(
+      motion.tempStreamArmJointPositions(
+        expectedComponentName,
+        targets(),
+        undefined,
+        expectedExtra,
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(capturedReqs).toHaveLength(2);
+    expect(capturedReqs[0]?.name).toStrictEqual(motionClientName);
+    expect(capturedReqs[0]?.message.case).toStrictEqual('init');
+    expect(capturedReqs[0]?.message.value).toMatchObject({
+      componentName: expectedComponentName,
+    });
+    expect(capturedReqs[1]?.message.case).toStrictEqual('targets');
+    expect(capturedReqs[1]?.message.value).toMatchObject({
+      positions: [{ values: [1, 2, 3, 4, 5, 6] }],
+    });
   });
 });
