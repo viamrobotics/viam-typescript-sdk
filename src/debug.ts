@@ -90,13 +90,13 @@ export const writeDebugLog = (event: string, fields: Record<string, unknown> = {
   });
 };
 
-/**
- * Returns a {@link DebugLogWriter} that prints each entry to the console as a JSON string, prefixed
- * with `[viam-sdk]`.
- */
 const consoleLogWriter: DebugLogWriter = (entry) => {
   // eslint-disable-next-line no-console
   console.debug('[viam-sdk]', JSON.stringify(entry));
 };
 
+/**
+ * Returns a {@link DebugLogWriter} that prints each entry to the console as a JSON string, prefixed
+ * with `[viam-sdk]`.
+ */
 export const createConsoleLogWriter = (): DebugLogWriter => consoleLogWriter;
