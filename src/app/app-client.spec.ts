@@ -1209,6 +1209,51 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('favorite machine tests', () => {
+    const favorite = new pb.FavoriteMachine({
+      machineId: 'machineId',
+      organizationId: 'orgId',
+      createdOn: Timestamp.fromDate(new Date()),
+    });
+    let capturedAddReq: pb.AddFavoriteMachineRequest | undefined;
+    let capturedRemoveReq: pb.RemoveFavoriteMachineRequest | undefined;
+
+    beforeEach(() => {
+      capturedAddReq = undefined;
+      capturedRemoveReq = undefined;
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          addFavoriteMachine: (req: pb.AddFavoriteMachineRequest) => {
+            capturedAddReq = req;
+            return new pb.AddFavoriteMachineResponse({ favorite });
+          },
+          removeFavoriteMachine: (req: pb.RemoveFavoriteMachineRequest) => {
+            capturedRemoveReq = req;
+            return new pb.RemoveFavoriteMachineResponse();
+          },
+          listFavoriteMachines: () =>
+            new pb.ListFavoriteMachinesResponse({ favorites: [favorite] }),
+        });
+      });
+    });
+
+    it('addFavoriteMachine', async () => {
+      const response = await subject().addFavoriteMachine('machineId');
+      expect(capturedAddReq?.machineId).toEqual('machineId');
+      expect(response).toEqual(favorite);
+    });
+
+    it('removeFavoriteMachine', async () => {
+      await subject().removeFavoriteMachine('machineId');
+      expect(capturedRemoveReq?.machineId).toEqual('machineId');
+    });
+
+    it('listFavoriteMachines', async () => {
+      const response = await subject().listFavoriteMachines();
+      expect(response).toEqual([favorite]);
+    });
+  });
+
   describe('listFragments tests', () => {
     const fragments = [fragment];
 

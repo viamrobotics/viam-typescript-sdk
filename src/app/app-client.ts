@@ -12,6 +12,7 @@ import {
   type CreateKeyResponse,
   type CreateModuleResponse,
   type CreateOAuthAppUserResponse,
+  type FavoriteMachine,
   type Fragment,
   type FragmentImportList,
   type FragmentVisibility,
@@ -1189,6 +1190,54 @@ export class AppClient {
    */
   async deleteRobot(id: string) {
     await this.client.deleteRobot({ id });
+  }
+
+  /**
+   * Marks a machine as a favorite for the current user.
+   *
+   * @example
+   *
+   * ```ts
+   * const favorite = await appClient.addFavoriteMachine('<YOUR-MACHINE-ID>');
+   * ```
+   *
+   * @param machineId The ID of the machine to favorite
+   * @returns The newly-created favorite machine object
+   */
+  async addFavoriteMachine(machineId: string): Promise<FavoriteMachine | undefined> {
+    const resp = await this.client.addFavoriteMachine({ machineId });
+    return resp.favorite;
+  }
+
+  /**
+   * Removes a machine from the current user's favorites.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.removeFavoriteMachine('<YOUR-MACHINE-ID>');
+   * ```
+   *
+   * @param machineId The ID of the machine to unfavorite
+   */
+  async removeFavoriteMachine(machineId: string) {
+    await this.client.removeFavoriteMachine({ machineId });
+  }
+
+  /**
+   * Lists the current user's favorite machines.
+   *
+   * @example
+   *
+   * ```ts
+   * const favorites = await appClient.listFavoriteMachines();
+   * ```
+   *
+   * @returns The list of favorite machine objects
+   */
+  async listFavoriteMachines(): Promise<FavoriteMachine[]> {
+    const resp = await this.client.listFavoriteMachines({});
+    return resp.favorites;
   }
 
   /**
