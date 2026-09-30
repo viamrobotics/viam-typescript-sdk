@@ -16,6 +16,11 @@ export interface Properties {
   distortionParameters?: DistortionParameters;
   /** Camera frame rate parameters, if available. */
   frameRate?: number;
+  /**
+   * Name of the reference frame that points returned by `getPointCloud` are expressed in. An empty
+   * string means the frame is unknown; the frame is not guaranteed to exist in the frame system.
+   */
+  defaultReferenceFrame: string;
 }
 
 export interface NamedImage {
