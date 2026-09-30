@@ -4,11 +4,17 @@ import { MLTrainingService } from '../gen/app/mltraining/v1/ml_training_connect'
 import {
   type CancelTrainingJobRequest,
   CancelTrainingJobResponse,
+  Container,
   type DeleteCompletedTrainingJobRequest,
   DeleteCompletedTrainingJobResponse,
+  type DeleteCustomTrainingContainerRequest,
+  DeleteCustomTrainingContainerResponse,
+  GetContainerResponse,
   GetTrainingJobResponse,
+  ListContainersResponse,
   ListTrainingJobsResponse,
   ModelType,
+  RegisterCustomTrainingContainerResponse,
   SubmitCustomTrainingJobResponse,
   SubmitTrainingJobResponse,
   TrainingJobMetadata,
@@ -178,6 +184,90 @@ describe('MlTrainingClient tests', () => {
     });
     it('delete completed training job', async () => {
       expect(await subject().deleteCompletedTrainingJob(id)).toEqual(null);
+      expect(capReq.id).toStrictEqual(id);
+    });
+  });
+
+  describe('listContainers tests', () => {
+    const containers = [
+      new Container({ key: 'tf:2.15', uri: 'docker.io/library/tf:2.15', description: 'TF 2.15' }),
+    ];
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          listContainers: () => {
+            return new ListContainersResponse({ containers });
+          },
+        });
+      });
+    });
+
+    it('list containers', async () => {
+      const response = await subject().listContainers('org_id');
+      expect(response).toEqual(containers);
+    });
+  });
+
+  describe('getContainer tests', () => {
+    const container = new Container({
+      key: 'tf:2.15',
+      uri: 'docker.io/library/tf:2.15',
+      description: 'TF 2.15',
+    });
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          getContainer: () => {
+            return new GetContainerResponse({ container });
+          },
+        });
+      });
+    });
+
+    it('get container', async () => {
+      const response = await subject().getContainer('id');
+      expect(response).toEqual(container);
+    });
+  });
+
+  describe('registerCustomTrainingContainer tests', () => {
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          registerCustomTrainingContainer: () => {
+            return new RegisterCustomTrainingContainerResponse({ id: 'fakeId' });
+          },
+        });
+      });
+    });
+
+    it('register custom training container', async () => {
+      const response = await subject().registerCustomTrainingContainer(
+        'org_id',
+        'docker.io/library/image:tag',
+        'description',
+      );
+      expect(response).toEqual('fakeId');
+    });
+  });
+
+  describe('deleteCustomTrainingContainer tests', () => {
+    const id = 'id';
+    let capReq: DeleteCustomTrainingContainerRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(MLTrainingService, {
+          deleteCustomTrainingContainer: (req) => {
+            capReq = req;
+            return new DeleteCustomTrainingContainerResponse();
+          },
+        });
+      });
+    });
+    it('delete custom training container', async () => {
+      expect(await subject().deleteCustomTrainingContainer(id)).toEqual(null);
       expect(capReq.id).toStrictEqual(id);
     });
   });
