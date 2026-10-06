@@ -395,7 +395,13 @@ export { SlamClient, SlamPosition, SlamProperties } from './services/slam';
  */
 export * as slamApi from './gen/service/slam/v1/slam_pb';
 
-export { Classification, Detection, PointCloudObject, VisionClient } from './services/vision';
+export {
+  Classification,
+  Detection,
+  Detection3D,
+  PointCloudObject,
+  VisionClient,
+} from './services/vision';
 /**
  * Raw Protobuf interfaces for a Vision service.
  *

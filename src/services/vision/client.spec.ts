@@ -3,11 +3,14 @@
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { Struct } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Pose, PoseInFrame, Transform } from '../../gen/common/v1/common_pb';
 import { VisionService } from '../../gen/service/vision/v1/vision_connect';
 import {
+  type CaptureAllFromCameraRequest,
   CaptureAllFromCameraResponse,
   GetClassificationsFromCameraResponse,
   GetClassificationsResponse,
+  GetDetections3DResponse,
   GetDetectionsFromCameraResponse,
   GetDetectionsResponse,
   GetObjectPointCloudsResponse,
@@ -15,7 +18,7 @@ import {
 } from '../../gen/service/vision/v1/vision_pb';
 import { RobotClient } from '../../robot';
 import { VisionClient } from './client';
-import { Classification, Detection, PointCloudObject } from './types';
+import { Classification, Detection, Detection3D, PointCloudObject } from './types';
 vi.mock('../../robot');
 vi.mock('../../gen/service/vision/v1/vision_pb_service');
 
@@ -42,7 +45,29 @@ const pco: PointCloudObject = new PointCloudObject({
   geometries: undefined,
 });
 
+const detection3d: Detection3D = new Detection3D({
+  transforms: [
+    new Transform({
+      referenceFrame: 'vision/mug',
+      poseInObserverFrame: new PoseInFrame({
+        referenceFrame: 'my_camera',
+        pose: new Pose({ x: 412, oZ: 1 }),
+      }),
+    }),
+    new Transform({
+      referenceFrame: 'vision/mug/handle',
+      poseInObserverFrame: new PoseInFrame({
+        referenceFrame: 'vision/mug',
+        pose: new Pose({ x: 52, oZ: 1 }),
+      }),
+    }),
+  ],
+  classifications: [classification],
+});
+
 const extra: Struct = Struct.fromJson({ key: 'value' });
+
+let captureAllRequest: CaptureAllFromCameraRequest | undefined;
 
 describe('VisionClient Tests', () => {
   beforeEach(() => {
@@ -58,20 +83,25 @@ describe('VisionClient Tests', () => {
             classifications: [classification],
           }),
         getObjectPointClouds: () => new GetObjectPointCloudsResponse({ objects: [pco] }),
+        getDetections3D: () => new GetDetections3DResponse({ detections3d: [detection3d] }),
         getProperties: () =>
           new GetPropertiesResponse({
             classificationsSupported: true,
             detectionsSupported: true,
             objectPointCloudsSupported: true,
             defaultCamera: 'my_camera',
+            detections3dSupported: true,
           }),
-        captureAllFromCamera: () =>
-          new CaptureAllFromCameraResponse({
+        captureAllFromCamera: (req) => {
+          captureAllRequest = req;
+          return new CaptureAllFromCameraResponse({
             classifications: [classification],
             detections: [detection],
             objects: [pco],
+            detections3d: [detection3d],
             extra,
-          }),
+          });
+        },
       });
     });
 
@@ -123,6 +153,12 @@ describe('VisionClient Tests', () => {
     });
   });
 
+  describe('3D Detection Tests', () => {
+    it('returns 3D detections from a camera', async () => {
+      await expect(vision.getDetections3D('camera')).resolves.toStrictEqual([detection3d]);
+    });
+  });
+
   describe('Properties', () => {
     it('returns properties', async () => {
       await expect(vision.getProperties()).resolves.toStrictEqual({
@@ -130,6 +166,7 @@ describe('VisionClient Tests', () => {
         detectionsSupported: true,
         objectPointCloudsSupported: true,
         defaultCamera: 'my_camera',
+        detections3dSupported: true,
       });
     });
   });
@@ -142,14 +179,27 @@ describe('VisionClient Tests', () => {
           returnClassifications: true,
           returnDetections: true,
           returnObjectPointClouds: true,
+          returnDetections3d: true,
         }),
       ).resolves.toStrictEqual({
         image: undefined,
         classifications: [classification],
         detections: [detection],
         objectPointClouds: [pco],
+        detections3d: [detection3d],
         extra,
       });
+      expect(captureAllRequest?.returnDetections3d).toBe(true);
+    });
+
+    it('does not request 3D detections unless asked', async () => {
+      await vision.captureAllFromCamera('camera', {
+        returnImage: false,
+        returnClassifications: false,
+        returnDetections: false,
+        returnObjectPointClouds: false,
+      });
+      expect(captureAllRequest?.returnDetections3d).toBe(false);
     });
   });
 });

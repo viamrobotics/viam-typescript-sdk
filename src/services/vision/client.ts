@@ -5,6 +5,7 @@ import {
   CaptureAllFromCameraRequest,
   GetClassificationsFromCameraRequest,
   GetClassificationsRequest,
+  GetDetections3DRequest,
   GetDetectionsFromCameraRequest,
   GetDetectionsRequest,
   GetObjectPointCloudsRequest,
@@ -127,6 +128,19 @@ export class VisionClient implements Vision {
     return resp.objects;
   }
 
+  async getDetections3D(cameraName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new GetDetections3DRequest({
+      name: this.name,
+      cameraName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getDetections3D(request, callOptions);
+    return resp.detections3d;
+  }
+
   async getProperties(extra = {}, callOptions = this.callOptions) {
     const request = new GetPropertiesRequest({
       name: this.name,
@@ -141,6 +155,7 @@ export class VisionClient implements Vision {
       detectionsSupported: response.detectionsSupported,
       objectPointCloudsSupported: response.objectPointCloudsSupported,
       defaultCamera: response.defaultCamera,
+      detections3dSupported: response.detections3dSupported,
     };
   }
 
@@ -151,6 +166,7 @@ export class VisionClient implements Vision {
       returnClassifications,
       returnDetections,
       returnObjectPointClouds,
+      returnDetections3d = false,
     }: CaptureAllOptions,
     extra = {},
     callOptions = this.callOptions,
@@ -162,6 +178,7 @@ export class VisionClient implements Vision {
       returnClassifications,
       returnDetections,
       returnObjectPointClouds,
+      returnDetections3d,
       extra: Struct.fromJson(extra),
     });
 
@@ -174,6 +191,7 @@ export class VisionClient implements Vision {
       classifications: response.classifications,
       detections: response.detections,
       objectPointClouds: response.objects,
+      detections3d: response.detections3d,
       extra: response.extra,
     };
   }
