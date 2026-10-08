@@ -64,6 +64,8 @@ describe('VisionClient Tests', () => {
             detectionsSupported: true,
             objectPointCloudsSupported: true,
             defaultCamera: 'my_camera',
+            detections3dSupported: true,
+            cameras: ['my_camera', 'other_camera'],
           }),
         captureAllFromCamera: () =>
           new CaptureAllFromCameraResponse({
@@ -130,6 +132,8 @@ describe('VisionClient Tests', () => {
         detectionsSupported: true,
         objectPointCloudsSupported: true,
         defaultCamera: 'my_camera',
+        detections3dSupported: true,
+        cameras: ['my_camera', 'other_camera'],
       });
     });
   });
