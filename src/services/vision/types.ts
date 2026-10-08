@@ -25,6 +25,11 @@ export interface Properties {
   defaultCamera?: string;
   /** Whether or not GetDetections3D is supported by the vision service */
   detections3dSupported: boolean;
+  /**
+   * List of cameras the vision service works with. If empty, the vision service works with any
+   * camera resource.
+   */
+  cameras: string[];
 }
 
 export interface CaptureAllOptions {
