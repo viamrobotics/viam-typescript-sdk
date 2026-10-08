@@ -9,6 +9,7 @@ import {
   GetTrainingJobResponse,
   ListTrainingJobsResponse,
   ModelType,
+  type SubmitCustomTrainingJobRequest,
   SubmitCustomTrainingJobResponse,
   SubmitTrainingJobResponse,
   TrainingJobMetadata,
@@ -49,10 +50,13 @@ describe('MlTrainingClient tests', () => {
   });
 
   describe('submitCustomTrainingJob tests', () => {
+    let capturedReq: SubmitCustomTrainingJobRequest | undefined;
     beforeEach(() => {
+      capturedReq = undefined;
       mockTransport = createRouterTransport(({ service }) => {
         service(MLTrainingService, {
-          submitCustomTrainingJob: () => {
+          submitCustomTrainingJob: (req) => {
+            capturedReq = req;
             return new SubmitCustomTrainingJobResponse({
               id: 'fakeId',
             });
@@ -71,6 +75,21 @@ describe('MlTrainingClient tests', () => {
         'model_version',
       );
       expect(response).toEqual('fakeId');
+      expect(capturedReq?.refreshDatasetCache).toBe(false);
+    });
+
+    it('submit custom training job with refreshDatasetCache', async () => {
+      const response = await subject().submitCustomTrainingJob(
+        'org_id',
+        'dataset_id',
+        'registry_item_id',
+        'registry_item_version',
+        'model_name',
+        'model_version',
+        true,
+      );
+      expect(response).toEqual('fakeId');
+      expect(capturedReq?.refreshDatasetCache).toBe(true);
     });
   });
 

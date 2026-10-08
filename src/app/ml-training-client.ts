@@ -80,6 +80,8 @@ export class MlTrainingClient {
    * @param registryItemVersion - The registry item version.
    * @param modelName - The model name.
    * @param modelVersion - The model version.
+   * @param refreshDatasetCache - Whether to export the dataset fresh instead of reusing a cached
+   *   export, replacing the cached export. Defaults to false.
    */
   async submitCustomTrainingJob(
     organizationId: string,
@@ -88,6 +90,7 @@ export class MlTrainingClient {
     registryItemVersion: string,
     modelName: string,
     modelVersion: string,
+    refreshDatasetCache = false,
   ) {
     const resp = await this.client.submitCustomTrainingJob({
       organizationId,
@@ -96,6 +99,7 @@ export class MlTrainingClient {
       registryItemVersion,
       modelName,
       modelVersion,
+      refreshDatasetCache,
     });
     return resp.id;
   }
