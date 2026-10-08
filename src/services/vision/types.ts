@@ -22,6 +22,13 @@ export interface Properties {
   objectPointCloudsSupported: boolean;
   /** The default camera used for *FromCamera and GetObjectPointClouds calls */
   defaultCamera?: string;
+  /** Whether or not GetDetections3D is supported by the vision service */
+  detections3dSupported: boolean;
+  /**
+   * List of cameras the vision service works with. If empty, the vision
+   * service works with any camera resource.
+   */
+  cameras: string[];
 }
 
 export interface CaptureAllOptions {
