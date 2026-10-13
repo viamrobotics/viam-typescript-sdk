@@ -865,11 +865,13 @@ describe('AppClient tests', () => {
 
   describe('getRobotPartHistory tests', () => {
     const histories = [partHistory];
+    let capReq: pb.GetRobotPartHistoryRequest | undefined;
 
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          getRobotPartHistory: () => {
+          getRobotPartHistory: (req) => {
+            capReq = req;
             return new pb.GetRobotPartHistoryResponse({
               history: histories,
             });
@@ -881,6 +883,16 @@ describe('AppClient tests', () => {
     it('getRobotPartHistory', async () => {
       const response = await subject().getRobotPartHistory('email');
       expect(response).toEqual(histories);
+      expect(capReq?.pageLimit).toBeUndefined();
+    });
+
+    it('getRobotPartHistory with start, end, and pageLimit', async () => {
+      const start = new Date(1000);
+      const end = new Date(2000);
+      await subject().getRobotPartHistory('email', start, end, 50);
+      expect(capReq?.start).toEqual(Timestamp.fromDate(start));
+      expect(capReq?.end).toEqual(Timestamp.fromDate(end));
+      expect(capReq?.pageLimit).toEqual(BigInt(50));
     });
   });
 
