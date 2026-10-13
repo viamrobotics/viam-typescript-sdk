@@ -46,7 +46,7 @@ withRobot.describe('Arm API Tests', () => {
       const initialJoints = await robotPage.getOutput<ArmClient, 'getJointPositions'>();
 
       // Assert - Verify initial joint positions (fake arm starts at 0)
-      expect(initialJoints).toEqual({
+      expect(initialJoints).toMatchObject({
         values: [0],
       });
 
@@ -62,7 +62,7 @@ withRobot.describe('Arm API Tests', () => {
       const movedJoints = await robotPage.getOutput<ArmClient, 'getJointPositions'>();
 
       // Assert - Verify joint position changed to 45 degrees
-      expect(movedJoints).toEqual({
+      expect(movedJoints).toMatchObject({
         values: [45],
       });
     },

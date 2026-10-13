@@ -69,12 +69,19 @@ const setButtonsDisabled = (disabled: boolean) => {
   }
 };
 
+const jsonReplacer = (_key: string, value: unknown): unknown => {
+  if (typeof value === 'bigint') {
+    return Number.isSafeInteger(Number(value)) ? Number(value) : value.toString();
+  }
+  return value;
+};
+
 const setOutput = (data: unknown) => {
   if (!outputEl) {
     return;
   }
 
-  outputEl.textContent = JSON.stringify(data, null, 2);
+  outputEl.textContent = JSON.stringify(data, jsonReplacer, 2);
 };
 
 const clearOutput = () => {
@@ -117,6 +124,7 @@ const connect = async (config: DialConf = defaultConfig) => {
     await client.dial(config);
     setDialingStatus('');
   } catch (error) {
+    setConnectionStatus('Disconnected');
     setError(error as Error);
   }
 };
