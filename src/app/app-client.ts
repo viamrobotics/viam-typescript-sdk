@@ -912,10 +912,24 @@ export class AppClient {
    * API](https://docs.viam.com/dev/reference/apis/fleet/#getrobotparthistory).
    *
    * @param id The ID of the requested robot part
+   * @param start Optional start time. Only history entries created after this time will be
+   *   returned.
+   * @param end Optional end time. Only history entries created before this time will be returned.
+   * @param pageLimit Optional maximum number of history entries to return, newest first.
    * @returns The list of the robot part's history
    */
-  async getRobotPartHistory(id: string): Promise<RobotPartHistoryEntry[]> {
-    const resp = await this.client.getRobotPartHistory({ id });
+  async getRobotPartHistory(
+    id: string,
+    start?: Date,
+    end?: Date,
+    pageLimit?: number,
+  ): Promise<RobotPartHistoryEntry[]> {
+    const resp = await this.client.getRobotPartHistory({
+      id,
+      start: start ? Timestamp.fromDate(start) : undefined,
+      end: end ? Timestamp.fromDate(end) : undefined,
+      pageLimit: pageLimit === undefined ? undefined : BigInt(pageLimit),
+    });
     return resp.history;
   }
 
