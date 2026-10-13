@@ -1,5 +1,6 @@
 import type { JsonObject } from '@bufbuild/protobuf';
-import type { Transform, Resource } from '../../types';
+import type { Transform } from '../../gen/common/v1/common_pb';
+import type { Resource } from '../../types';
 import type { TransformChangeEvent, TransformWithUUID } from './types';
 import { UuidTool } from 'uuid-tool';
 

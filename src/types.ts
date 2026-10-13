@@ -1,4 +1,4 @@
-import { type JsonObject, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, type MessageInitShape } from '@bufbuild/protobuf';
 
 export { Code, ConnectError } from '@connectrpc/connect';
 export { ConnectionClosedError } from './rpc';
@@ -37,23 +37,39 @@ export interface Resource {
   getStatus(): Promise<JsonValue>;
 }
 
-import type * as commonApi from './gen/common/v1/common_pb';
+import {
+  CapsuleSchema,
+  GeoGeometrySchema,
+  GeoPointSchema,
+  GeometriesInFrameSchema,
+  GeometrySchema,
+  OrientationSchema,
+  PointCloudSchema,
+  PoseSchema,
+  PoseInFrameSchema,
+  RectangularPrismSchema,
+  ResourceNameSchema,
+  SphereSchema,
+  TransformSchema,
+  Vector3Schema,
+  WorldStateSchema,
+} from './gen/common/v1/common_pb';
 
-export type Capsule = commonApi.Capsule;
-export type GeoGeometry = commonApi.GeoGeometry;
-export type GeoPoint = commonApi.GeoPoint;
-export type GeometriesInFrame = commonApi.GeometriesInFrame;
-export type Geometry = commonApi.Geometry;
-export type Orientation = commonApi.Orientation;
-export type PointCloud = commonApi.PointCloud;
-export type Pose = commonApi.Pose;
-export type PoseInFrame = commonApi.PoseInFrame;
-export type RectangularPrism = commonApi.RectangularPrism;
-export type ResourceName = commonApi.ResourceName;
-export type Sphere = commonApi.Sphere;
-export type Transform = commonApi.Transform;
-export type Vector3 = commonApi.Vector3;
-export type WorldState = commonApi.WorldState;
+export type Capsule = MessageInitShape<typeof CapsuleSchema>;
+export type GeoGeometry = MessageInitShape<typeof GeoGeometrySchema>;
+export type GeoPoint = MessageInitShape<typeof GeoPointSchema>;
+export type GeometriesInFrame = MessageInitShape<typeof GeometriesInFrameSchema>;
+export type Geometry = MessageInitShape<typeof GeometrySchema>;
+export type Orientation = MessageInitShape<typeof OrientationSchema>;
+export type PointCloud = MessageInitShape<typeof PointCloudSchema>;
+export type Pose = MessageInitShape<typeof PoseSchema>;
+export type PoseInFrame = MessageInitShape<typeof PoseInFrameSchema>;
+export type RectangularPrism = MessageInitShape<typeof RectangularPrismSchema>;
+export type ResourceName = MessageInitShape<typeof ResourceNameSchema>;
+export type Sphere = MessageInitShape<typeof SphereSchema>;
+export type Transform = MessageInitShape<typeof TransformSchema>;
+export type Vector3 = MessageInitShape<typeof Vector3Schema>;
+export type WorldState = MessageInitShape<typeof WorldStateSchema>;
 
 export {
   CapsuleSchema,
@@ -71,7 +87,7 @@ export {
   TransformSchema,
   Vector3Schema,
   WorldStateSchema,
-} from './gen/common/v1/common_pb';
+};
 
 export const isValidGeoPoint = (value: GeoPoint) => {
   const { latitude, longitude } = value;
