@@ -1,4 +1,4 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { JsonObject, JsonValue } from '@bufbuild/protobuf';
 import type { Orientation, Resource, Vector3 } from '../../types';
 
 import * as sensorApi from '../../gen/component/movementsensor/v1/movementsensor_pb';
@@ -9,9 +9,9 @@ export type MovementSensorPosition = sensorApi.GetPositionResponse;
 export type MovementSensorProperties = sensorApi.GetPropertiesResponse;
 
 export const {
-  GetAccuracyResponse: MovementSensorAccuracy,
-  GetPositionResponse: MovementSensorPosition,
-  GetPropertiesResponse: MovementSensorProperties,
+  GetAccuracyResponseSchema: MovementSensorAccuracy,
+  GetPositionResponseSchema: MovementSensorPosition,
+  GetPropertiesResponseSchema: MovementSensorProperties,
 } = sensorApi;
 
 /**
@@ -32,7 +32,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Get linear velocity across x/y/z axes.
@@ -47,7 +47,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getlinearvelocity).
    */
-  getLinearVelocity(extra?: Struct): Promise<Vector3>;
+  getLinearVelocity(extra?: JsonObject): Promise<Vector3>;
 
   /**
    * Get the angular velocity across x/y/z axes.
@@ -62,7 +62,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getangularvelocity).
    */
-  getAngularVelocity(extra?: Struct): Promise<Vector3>;
+  getAngularVelocity(extra?: JsonObject): Promise<Vector3>;
 
   /**
    * Get the compass heading, which is a number from 0-359 where 0 is North, 90 is East, 180 is
@@ -78,7 +78,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getcompassheading).
    */
-  getCompassHeading(extra?: Struct): Promise<number>;
+  getCompassHeading(extra?: JsonObject): Promise<number>;
 
   /**
    * Get the current orientation of the sensor.
@@ -93,7 +93,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getorientation).
    */
-  getOrientation(extra?: Struct): Promise<Orientation>;
+  getOrientation(extra?: JsonObject): Promise<Orientation>;
 
   /**
    * Get the current position latitude, longitude, and altitude.
@@ -108,7 +108,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getposition).
    */
-  getPosition(extra?: Struct): Promise<MovementSensorPosition>;
+  getPosition(extra?: JsonObject): Promise<MovementSensorPosition>;
 
   /**
    * Get the properties of this movement sensor.
@@ -123,7 +123,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getproperties).
    */
-  getProperties(extra?: Struct): Promise<MovementSensorProperties>;
+  getProperties(extra?: JsonObject): Promise<MovementSensorProperties>;
 
   /**
    * Get the accuracy of various sensors.
@@ -138,7 +138,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getaccuracy).
    */
-  getAccuracy(extra?: Struct): Promise<MovementSensorAccuracy>;
+  getAccuracy(extra?: JsonObject): Promise<MovementSensorAccuracy>;
 
   /**
    * Get linear acceleration across x/y/z axes.
@@ -153,7 +153,7 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getlinearacceleration).
    */
-  getLinearAcceleration(extra?: Struct): Promise<Vector3>;
+  getLinearAcceleration(extra?: JsonObject): Promise<Vector3>;
 
   /**
    * Return the readings of a sensor.
@@ -168,5 +168,5 @@ export interface MovementSensor extends Resource {
    * For more information, see [Movement Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/movement-sensor/#getreadings).
    */
-  getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
+  getReadings(extra?: JsonObject): Promise<Record<string, JsonValue>>;
 }

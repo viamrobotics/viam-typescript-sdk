@@ -1,13 +1,17 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { create } from '@bufbuild/protobuf';
 import { RobotClient } from '../../robot';
 vi.mock('../../gen/service/navigation/v1/navigation_pb_service');
 vi.mock('../../robot');
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
-import { GetLocationResponse } from '../../gen/service/navigation/v1/navigation_pb';
+import {
+  NavigationService,
+  GetLocationResponseSchema,
+} from '../../gen/service/navigation/v1/navigation_pb';
+
 import { NavigationClient } from './client';
 
 const navigationClientName = 'test-navigation';
@@ -32,7 +36,7 @@ describe('getLocation', () => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(NavigationService, {
         getLocation: () =>
-          new GetLocationResponse({
+          create(GetLocationResponseSchema, {
             compassHeading: compassHeading(),
             location: location(),
           }),
@@ -61,7 +65,7 @@ describe('getLocation', () => {
     longitude = vi.fn(() => testLongitude);
     compassHeading = vi.fn(() => testCompassHeading);
 
-    const expected = new GetLocationResponse({
+    const expected = create(GetLocationResponseSchema, {
       location: { latitude: testLatitude, longitude: testLongitude },
       compassHeading: testCompassHeading,
     });

@@ -52,7 +52,7 @@ describe('parseUrdf', () => {
     expect(joint1?.id).toBe('joint1');
     expect(joint1?.type).toBe('revolute');
     expect(joint1?.parent).toBe('link_base');
-    expect(joint1?.axis).toStrictEqual({ x: 0, y: 0, z: 1 });
+    expect(joint1?.axis).toMatchObject({ x: 0, y: 0, z: 1 });
     // ±6.28 rad -> degrees.
     expect(joint1?.max).toBeCloseTo(359.817, 3);
     expect(joint1?.min).toBeCloseTo(-359.817, 3);
@@ -66,12 +66,12 @@ describe('parseUrdf', () => {
 
     // link_base is positioned by the fixed world_joint.
     expect(linkBase?.parent).toBe('world');
-    expect(linkBase?.translation).toEqual({ x: 0, y: 0, z: 0 });
+    expect(linkBase?.translation).toMatchObject({ x: 0, y: 0, z: 0 });
 
     // link1 is positioned by joint1's origin; 0.267 m -> 267 mm.
     expect(link1?.parent).toBe('link_base');
-    expect(link1?.translation).toEqual({ x: 0, y: 0, z: 267 });
-    expect(link1?.orientation?.type).toEqual({
+    expect(link1?.translation).toMatchObject({ x: 0, y: 0, z: 267 });
+    expect(link1?.orientation?.type).toMatchObject({
       case: 'eulerAngles',
       value: { roll: 0, pitch: 0, yaw: 1.5708 },
     });
@@ -86,7 +86,7 @@ describe('parseUrdf', () => {
     expect(link1?.geometry?.geometryType.case).toBe('box');
     const box = link1?.geometry?.geometryType.value;
     // "0.1 0.2 0.3" m -> mm.
-    expect(box && 'dimsMm' in box ? box.dimsMm : undefined).toEqual({
+    expect(box && 'dimsMm' in box ? box.dimsMm : undefined).toMatchObject({
       x: 100,
       y: 200,
       z: 300,

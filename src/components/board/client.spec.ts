@@ -1,17 +1,23 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { type StreamTicksResponse } from '../../gen/component/board/v1/board_pb';
-import { Geometry, GetGeometriesResponse } from '../../gen/common/v1/common_pb';
+import { create } from '@bufbuild/protobuf';
+
+import {
+  BoardService,
+  StreamTicksResponseSchema,
+  type StreamTicksResponse,
+} from '../../gen/component/board/v1/board_pb';
+
+import { GeometrySchema, GetGeometriesResponseSchema } from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { AnalogValue, type Tick } from './board';
 import { BoardClient } from './client';
 vi.mock('../../robot');
 
-import type { PartialMessage } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable, type WritableIterable } from '@connectrpc/connect/protocol';
-import { BoardService } from '../../gen/component/board/v1/board_connect';
+
 vi.mock('../../gen/component/board/v1/board_pb_service');
 
 let board: BoardClient;
@@ -20,16 +26,16 @@ const testAnalogMax = 5;
 const testStepSize = 0.5;
 const testValue = 2;
 
-const testAnalogValue: AnalogValue = new AnalogValue({
+const testAnalogValue: AnalogValue = create(AnalogValue, {
   value: testValue,
   minRange: testAnalogMin,
   maxRange: testAnalogMax,
   stepSize: testStepSize,
 });
 
-const testGeometries = [new Geometry({ label: 'test-geometry' })];
+const testGeometries = [create(GeometrySchema, { label: 'test-geometry' })];
 
-let testTickStream: WritableIterable<PartialMessage<StreamTicksResponse>>;
+let testTickStream: WritableIterable<StreamTicksResponse>;
 
 describe('BoardClient tests', () => {
   beforeEach(() => {
@@ -42,7 +48,7 @@ describe('BoardClient tests', () => {
           return testTickStream;
         },
         getGeometries: () => {
-          return new GetGeometriesResponse({ geometries: testGeometries });
+          return create(GetGeometriesResponseSchema, { geometries: testGeometries });
         },
       });
     });
@@ -56,7 +62,7 @@ describe('BoardClient tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    testTickStream = createWritableIterable<PartialMessage<StreamTicksResponse>>();
+    testTickStream = createWritableIterable<StreamTicksResponse>();
   });
 
   it('get analog reading', async () => {
@@ -72,17 +78,21 @@ describe('BoardClient tests', () => {
       const ticks: Tick[] = [];
       const streamProm = board.streamTicks(['1', '2'], ticks);
 
-      await testTickStream.write({
-        pinName: '1',
-        high: true,
-        time: 1000n,
-      });
+      await testTickStream.write(
+        create(StreamTicksResponseSchema, {
+          pinName: '1',
+          high: true,
+          time: 1000n,
+        }),
+      );
 
-      await testTickStream.write({
-        pinName: '2',
-        high: false,
-        time: 2000n,
-      });
+      await testTickStream.write(
+        create(StreamTicksResponseSchema, {
+          pinName: '2',
+          high: false,
+          time: 2000n,
+        }),
+      );
 
       testTickStream.close();
       await streamProm;

@@ -1,7 +1,7 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { ButtonService } from '../../gen/component/button/v1/button_connect';
-import { PushRequest } from '../../gen/component/button/v1/button_pb';
+import { ButtonService, PushRequestSchema } from '../../gen/component/button/v1/button_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
@@ -25,9 +25,9 @@ export class ButtonClient implements Button {
   }
 
   async push(extra = {}, callOptions = this.callOptions) {
-    const request = new PushRequest({
+    const request = create(PushRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -40,7 +40,7 @@ export class ButtonClient implements Button {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

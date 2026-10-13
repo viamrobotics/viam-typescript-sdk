@@ -1,27 +1,30 @@
-import { Timestamp } from '@bufbuild/protobuf';
+import { TimestampSchema } from '@bufbuild/protobuf/wkt';
+import { create } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable, type WritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { BillingService } from '../gen/app/v1/billing_connect';
 import {
-  GetInvoicePdfResponse,
-  GetInvoicesSummaryResponse,
+  BillingService,
+  GetInvoicePdfResponseSchema,
+  GetInvoicesSummaryResponseSchema,
   PaymentMethodType,
-  ResourceUsageCosts,
-  ResourceUsageCostsBySource,
+  ResourceUsageCostsSchema,
+  ResourceUsageCostsBySourceSchema,
   SourceType,
-  UsageCost,
+  UsageCostSchema,
   UsageCostType,
+  type GetInvoicePdfResponse,
 } from '../gen/app/v1/billing_pb';
+
 import { BillingClient, type GetCurrentMonthUsageResponse } from './billing-client';
 
 const SECONDS = 1;
 const NANOS = 2_000_000;
-const testStartDate = new Timestamp({
+const testStartDate = create(TimestampSchema, {
   seconds: BigInt(SECONDS),
   nanos: NANOS,
 });
-const testEndDate = new Timestamp({
+const testEndDate = create(TimestampSchema, {
   seconds: BigInt(SECONDS * 2),
   nanos: NANOS,
 });
@@ -39,10 +42,12 @@ const testMonthUsage: GetCurrentMonthUsageResponse = {
   perMachineUsageCost: 11,
   subtotal: 12,
   resourceUsageCostsBySource: [
-    new ResourceUsageCostsBySource({
+    create(ResourceUsageCostsBySourceSchema, {
       sourceType: SourceType.ORG,
-      resourceUsageCosts: new ResourceUsageCosts({
-        usageCosts: [new UsageCost({ resourceType: UsageCostType.UNSPECIFIED, cost: 13 })],
+      resourceUsageCosts: create(ResourceUsageCostsSchema, {
+        usageCosts: [
+          create(UsageCostSchema, { resourceType: UsageCostType.UNSPECIFIED, cost: 13 }),
+        ],
       }),
     }),
   ],
@@ -51,7 +56,7 @@ const testMonthUsage: GetCurrentMonthUsageResponse = {
   start: new Date(SECONDS * 1000 + NANOS / 1_000_000),
   end: new Date(SECONDS * 2000 + NANOS / 1_000_000),
 };
-const testInvoiceSummary = new GetInvoicesSummaryResponse({
+const testInvoiceSummary = create(GetInvoicesSummaryResponseSchema, {
   invoices: [
     {
       id: 'id',
@@ -91,11 +96,11 @@ describe('BillingClient tests', () => {
             perMachineUsageCost: 11,
             subtotal: 12,
             resourceUsageCostsBySource: [
-              new ResourceUsageCostsBySource({
+              create(ResourceUsageCostsBySourceSchema, {
                 sourceType: SourceType.ORG,
-                resourceUsageCosts: new ResourceUsageCosts({
+                resourceUsageCosts: create(ResourceUsageCostsSchema, {
                   usageCosts: [
-                    new UsageCost({
+                    create(UsageCostSchema, {
                       resourceType: UsageCostType.UNSPECIFIED,
                       cost: 13,
                     }),
@@ -120,12 +125,12 @@ describe('BillingClient tests', () => {
 
   it('getCurrentMonthUsage', async () => {
     const response = await subject().getCurrentMonthUsage('orgId');
-    expect(response).toEqual(testMonthUsage);
+    expect(response).toMatchObject(testMonthUsage);
   });
 
   it('getOrgBillingInformation', async () => {
     const response = await subject().getOrgBillingInformation('orgId');
-    expect(response).toEqual(testBillingInfo);
+    expect(response).toMatchObject(testBillingInfo);
   });
 
   it('getInvoicesSummary', async () => {
@@ -138,14 +143,14 @@ describe('BillingClient tests', () => {
 
     const chunk1 = new Uint8Array([1, 2]);
     await testGetInvoicePdfStream.write(
-      new GetInvoicePdfResponse({
+      create(GetInvoicePdfResponseSchema, {
         chunk: chunk1,
       }),
     );
 
     const chunk2 = new Uint8Array([3, 4]);
     await testGetInvoicePdfStream.write(
-      new GetInvoicePdfResponse({
+      create(GetInvoicePdfResponseSchema, {
         chunk: chunk2,
       }),
     );

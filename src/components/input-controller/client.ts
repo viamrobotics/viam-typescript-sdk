@@ -1,13 +1,14 @@
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { InputControllerService } from '../../gen/component/inputcontroller/v1/input_controller_connect';
 import {
-  GetEventsRequest,
-  TriggerEventRequest,
+  InputControllerService,
+  GetEventsRequestSchema,
+  TriggerEventRequestSchema,
 } from '../../gen/component/inputcontroller/v1/input_controller_pb';
+
 import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import type { InputController, InputControllerEvent } from './input-controller';
 
@@ -29,18 +30,13 @@ export class InputControllerClient implements InputController {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    return getGeometriesFromClient(
-      this.client.getGeometries,
-      this.name,
-      Struct.fromJson(extra),
-      callOptions,
-    );
+    return getGeometriesFromClient(this.client.getGeometries, this.name, extra, callOptions);
   }
 
   async getEvents(extra = {}, callOptions = this.callOptions) {
-    const request = new GetEventsRequest({
+    const request = create(GetEventsRequestSchema, {
       controller: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -54,10 +50,10 @@ export class InputControllerClient implements InputController {
     extra = {},
     callOptions = this.callOptions,
   ): Promise<void> {
-    const request = new TriggerEventRequest({
+    const request = create(TriggerEventRequestSchema, {
       controller: this.name,
       event,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -70,7 +66,7 @@ export class InputControllerClient implements InputController {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

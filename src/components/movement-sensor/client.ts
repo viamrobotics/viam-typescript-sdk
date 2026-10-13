@@ -1,17 +1,20 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create, toJson } from '@bufbuild/protobuf';
+import { ValueSchema } from '@bufbuild/protobuf/wkt';
+
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
-import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_connect';
+import { GetReadingsRequestSchema } from '../../gen/common/v1/common_pb';
 import {
-  GetAccuracyRequest,
-  GetAngularVelocityRequest,
-  GetCompassHeadingRequest,
-  GetLinearAccelerationRequest,
-  GetLinearVelocityRequest,
-  GetOrientationRequest,
-  GetPositionRequest,
-  GetPropertiesRequest,
+  MovementSensorService,
+  GetAccuracyRequestSchema,
+  GetAngularVelocityRequestSchema,
+  GetCompassHeadingRequestSchema,
+  GetLinearAccelerationRequestSchema,
+  GetLinearVelocityRequestSchema,
+  GetOrientationRequestSchema,
+  GetPositionRequestSchema,
+  GetPropertiesRequestSchema,
 } from '../../gen/component/movementsensor/v1/movementsensor_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
@@ -35,18 +38,13 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    return getGeometriesFromClient(
-      this.client.getGeometries,
-      this.name,
-      Struct.fromJson(extra),
-      callOptions,
-    );
+    return getGeometriesFromClient(this.client.getGeometries, this.name, extra, callOptions);
   }
 
   async getLinearVelocity(extra = {}, callOptions = this.callOptions) {
-    const request = new GetLinearVelocityRequest({
+    const request = create(GetLinearVelocityRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -62,9 +60,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getAngularVelocity(extra = {}, callOptions = this.callOptions) {
-    const request = new GetAngularVelocityRequest({
+    const request = create(GetAngularVelocityRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -80,9 +78,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getCompassHeading(extra = {}, callOptions = this.callOptions) {
-    const request = new GetCompassHeadingRequest({
+    const request = create(GetCompassHeadingRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -92,9 +90,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getOrientation(extra = {}, callOptions = this.callOptions) {
-    const request = new GetOrientationRequest({
+    const request = create(GetOrientationRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -110,9 +108,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getPosition(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPositionRequest({
+    const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -121,9 +119,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -132,9 +130,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getAccuracy(extra = {}, callOptions = this.callOptions) {
-    const request = new GetAccuracyRequest({
+    const request = create(GetAccuracyRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -143,9 +141,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getLinearAcceleration(extra = {}, callOptions = this.callOptions) {
-    const request = new GetLinearAccelerationRequest({
+    const request = create(GetLinearAccelerationRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -161,9 +159,9 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async getReadings(extra = {}, callOptions = this.callOptions) {
-    const request = new GetReadingsRequest({
+    const request = create(GetReadingsRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -176,7 +174,7 @@ export class MovementSensorClient implements MovementSensor {
       if (!value) {
         continue;
       }
-      result[key] = value.toJson();
+      result[key] = toJson(ValueSchema, value);
     }
     return result;
   }
@@ -186,7 +184,7 @@ export class MovementSensorClient implements MovementSensor {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

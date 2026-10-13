@@ -1,4 +1,5 @@
-import type { Resource, Struct } from '../../types';
+import type { Resource } from '../../types';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { AudioInfo, Geometry } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
 
@@ -24,7 +25,7 @@ export interface AudioIn extends Resource {
    * const geometries = await audioIn.getGeometries();
    * ```
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Stream audio from the device.
@@ -40,7 +41,7 @@ export interface AudioIn extends Resource {
     codec: string,
     durationSeconds: number,
     previousTimestamp?: bigint,
-    extra?: Struct,
+    extra?: JsonObject,
   ): AsyncIterable<AudioChunk>;
 
   /**
@@ -53,5 +54,5 @@ export interface AudioIn extends Resource {
    * const properties = await audioIn.getProperties();
    * ```
    */
-  getProperties: (extra?: Struct) => Promise<AudioProperties>;
+  getProperties: (extra?: JsonObject) => Promise<AudioProperties>;
 }

@@ -1,19 +1,37 @@
-import { type Message } from '@bufbuild/protobuf';
+import {
+  create,
+  type DescMessage,
+  type DescMethodStreaming,
+  type DescMethodUnary,
+  type MessageInitShape,
+  type MessageShape,
+} from '@bufbuild/protobuf';
 
-import type { AnyMessage, MethodInfo, PartialMessage, ServiceType } from '@bufbuild/protobuf';
-
-import type {
-  CallOptions,
-  ContextValues,
-  StreamResponse,
-  Transport,
-  UnaryResponse,
+import {
+  Code,
+  ConnectError,
+  createClient,
+  type CallOptions,
+  type ContextValues,
+  type StreamResponse,
+  type Transport,
+  type UnaryResponse,
 } from '@connectrpc/connect';
-import { Code, ConnectError, createClient } from '@connectrpc/connect';
-import { AuthService, ExternalAuthService } from '../gen/proto/rpc/v1/auth_connect';
-import { AuthenticateRequest, Credentials as PBCredentials } from '../gen/proto/rpc/v1/auth_pb';
-import { SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
-import { WebRTCConfig } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+
+import {
+  AuthService,
+  ExternalAuthService,
+  AuthenticateRequestSchema,
+  AuthenticateToRequestSchema,
+  CredentialsSchema as PBCredentialsSchema,
+} from '../gen/proto/rpc/v1/auth_pb';
+
+import {
+  SignalingService,
+  WebRTCConfigSchema,
+  type WebRTCConfig,
+} from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+
 import { newPeerConnectionForClient } from './peer';
 
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
@@ -132,58 +150,40 @@ interface TransportInitOptions {
 const enableGRPCTraceLogging = <T extends Transport>(transport: T, address: string): T => {
   if (globalThis.VIAM?.GRPC_TRACE_LOGGING === true) {
     const patchedUnary: typeof transport.unary = async <
-      I extends Message<I> = AnyMessage,
-      O extends Message<O> = AnyMessage,
+      I extends DescMessage,
+      O extends DescMessage,
     >(
-      service: ServiceType,
-      method: MethodInfo<I, O>,
+      method: DescMethodUnary<I, O>,
       signal: AbortSignal | undefined,
       timeoutMs: number | undefined,
       header: HeadersInit | undefined,
-      message: PartialMessage<I>,
+      message: MessageInitShape<I>,
       contextValues?: ContextValues,
     ): Promise<UnaryResponse<I, O>> => {
       const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
-      console.trace(`Unary request ${id} : ${address}/${service.typeName}.${method.name}`);
-      const resp = await transport.unary(
-        service,
-        method,
-        signal,
-        timeoutMs,
-        header,
-        message,
-        contextValues,
-      );
+      console.trace(`Unary request ${id} : ${address}/${method.parent.typeName}.${method.name}`);
+      const resp = await transport.unary(method, signal, timeoutMs, header, message, contextValues);
       // eslint-disable-next-line no-console
       console.debug(`Unary response received: ${id}`);
       return resp;
     };
 
     const patchedStream: typeof transport.stream = async <
-      I extends Message<I> = AnyMessage,
-      O extends Message<O> = AnyMessage,
+      I extends DescMessage,
+      O extends DescMessage,
     >(
-      service: ServiceType,
-      method: MethodInfo<I, O>,
+      method: DescMethodStreaming<I, O>,
       signal: AbortSignal | undefined,
       timeoutMs: number | undefined,
       header: HeadersInit | undefined,
-      input: AsyncIterable<PartialMessage<I>>,
+      input: AsyncIterable<MessageInitShape<I>>,
       contextValues?: ContextValues,
     ): Promise<StreamResponse<I, O>> => {
       const id = UuidTool.newUuid();
       // eslint-disable-next-line no-console
-      console.trace(`Stream request ${id} : ${address}/${service.typeName}.${method.name}`);
-      const resp = await transport.stream(
-        service,
-        method,
-        signal,
-        timeoutMs,
-        header,
-        input,
-        contextValues,
-      );
+      console.trace(`Stream request ${id} : ${address}/${method.parent.typeName}.${method.name}`);
+      const resp = await transport.stream(method, signal, timeoutMs, header, input, contextValues);
 
       // eslint-disable-next-line no-console
       console.debug(`Stream response received: ${id}`);
@@ -200,34 +200,22 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
   transport: T,
   connectionId: string,
 ): T => {
-  const patchedUnary: typeof transport.unary = async <
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
-  >(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  const patchedUnary: typeof transport.unary = async <I extends DescMessage, O extends DescMessage>(
+    method: DescMethodUnary<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    message: PartialMessage<I>,
+    message: MessageInitShape<I>,
     contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> => {
-    const rpcMethod = `${service.typeName}/${method.name}`;
+    const rpcMethod = `${method.parent.typeName}/${method.name}`;
     writeDebugLog('grpc_request', {
       connectionId,
       type: 'unary',
       method: rpcMethod,
     });
     try {
-      const resp = await transport.unary(
-        service,
-        method,
-        signal,
-        timeoutMs,
-        header,
-        message,
-        contextValues,
-      );
+      const resp = await transport.unary(method, signal, timeoutMs, header, message, contextValues);
       writeDebugLog('grpc_response', {
         connectionId,
         type: 'unary',
@@ -246,22 +234,21 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
   };
 
   const patchedStream: typeof transport.stream = async <
-    I extends Message<I> = AnyMessage,
-    O extends Message<O> = AnyMessage,
+    I extends DescMessage,
+    O extends DescMessage,
   >(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+    method: DescMethodStreaming<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageInitShape<I>>,
     contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> => {
     // Skip wrapping entirely when logging is disabled — avoids generator overhead per message.
     if (!isDebugLogEnabled()) {
-      return transport.stream(service, method, signal, timeoutMs, header, input, contextValues);
+      return transport.stream(method, signal, timeoutMs, header, input, contextValues);
     }
-    const rpcMethod = `${service.typeName}/${method.name}`;
+    const rpcMethod = `${method.parent.typeName}/${method.name}`;
     writeDebugLog('grpc_request', {
       connectionId,
       type: 'stream',
@@ -271,15 +258,7 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
     // distinguish a failure to open the stream from a mid-stream error.
     let resp: StreamResponse<I, O>;
     try {
-      resp = await transport.stream(
-        service,
-        method,
-        signal,
-        timeoutMs,
-        header,
-        input,
-        contextValues,
-      );
+      resp = await transport.stream(method, signal, timeoutMs, header, input, contextValues);
     } catch (error) {
       writeDebugLog('grpc_response', {
         connectionId,
@@ -291,7 +270,7 @@ export const wrapTransportWithDebugLogging = <T extends Transport>(
     }
     // Wrap resp.message in a generator so we can log each individual message.
     // The caller receives a normal StreamResponse and iterates it as usual.
-    const wrappedMessages = async function* wrappedMessages(): AsyncIterable<O> {
+    const wrappedMessages = async function* wrappedMessages(): AsyncIterable<MessageShape<O>> {
       try {
         for await (const msg of resp.message) {
           writeDebugLog('grpc_response', {
@@ -374,14 +353,14 @@ const makeAuthenticatedTransport = async (
 
   let accessToken;
   if (opts.accessToken === undefined || opts.accessToken === '') {
-    const request = new AuthenticateRequest({
+    const request = create(AuthenticateRequestSchema, {
       entity:
         isCredential(opts.credentials) && opts.credentials.authEntity
           ? opts.credentials.authEntity
           : address.replace(addressCleanupRegex, ''),
     });
     if (opts.credentials) {
-      request.credentials = new PBCredentials({
+      request.credentials = create(PBCredentialsSchema, {
         type: opts.credentials.type,
         payload: opts.credentials.payload,
       });
@@ -405,7 +384,7 @@ const makeAuthenticatedTransport = async (
     const extAuthHeaders = new Headers();
     extAuthHeaders.set('authorization', `Bearer ${accessToken}`);
 
-    const request = new AuthenticateRequest({
+    const request = create(AuthenticateToRequestSchema, {
       entity: opts.externalAuthToEntity,
     });
     const transport = defaultFactory({
@@ -430,52 +409,34 @@ export class AuthenticatedTransport implements Transport {
     this.transport = defaultFactory(opts);
   }
 
-  public unary = async <I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  public unary = async <I extends DescMessage, O extends DescMessage>(
+    method: DescMethodUnary<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    message: PartialMessage<I>,
+    message: MessageInitShape<I>,
     contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
     for (const [key, value] of this.extraHeaders) {
       newHeaders.set(key, value);
     }
-    return this.transport.unary(
-      service,
-      method,
-      signal,
-      timeoutMs,
-      newHeaders,
-      message,
-      contextValues,
-    );
+    return this.transport.unary(method, signal, timeoutMs, newHeaders, message, contextValues);
   };
 
-  public stream = async <I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  public stream = async <I extends DescMessage, O extends DescMessage>(
+    method: DescMethodStreaming<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageInitShape<I>>,
     contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> => {
     const newHeaders = cloneHeaders(header);
     for (const [key, value] of this.extraHeaders) {
       newHeaders.set(key, value);
     }
-    return this.transport.stream(
-      service,
-      method,
-      signal,
-      timeoutMs,
-      newHeaders,
-      input,
-      contextValues,
-    );
+    return this.transport.stream(method, signal, timeoutMs, newHeaders, input, contextValues);
   };
 }
 
@@ -527,10 +488,10 @@ const getOptionalWebRTCConfig = async (
 ): Promise<WebRTCConfig> => {
   try {
     const resp = await signalingClient.optionalWebRTCConfig({}, callOpts);
-    return resp.config ?? new WebRTCConfig();
+    return resp.config ?? create(WebRTCConfigSchema);
   } catch (error) {
     if (error instanceof ConnectError && error.code === Code.Unimplemented) {
-      return new WebRTCConfig();
+      return create(WebRTCConfigSchema);
     }
     throw error;
   }

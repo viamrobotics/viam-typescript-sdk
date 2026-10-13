@@ -1,15 +1,16 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { VisionService } from '../../gen/service/vision/v1/vision_connect';
 import {
-  CaptureAllFromCameraRequest,
-  GetClassificationsFromCameraRequest,
-  GetClassificationsRequest,
-  GetDetectionsFromCameraRequest,
-  GetDetectionsRequest,
-  GetObjectPointCloudsRequest,
-  GetPropertiesRequest,
+  VisionService,
+  CaptureAllFromCameraRequestSchema,
+  GetClassificationsFromCameraRequestSchema,
+  GetClassificationsRequestSchema,
+  GetDetectionsFromCameraRequestSchema,
+  GetDetectionsRequestSchema,
+  GetObjectPointCloudsRequestSchema,
+  GetPropertiesRequestSchema,
 } from '../../gen/service/vision/v1/vision_pb';
+
 import type { MimeType } from '../../main';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
@@ -35,10 +36,10 @@ export class VisionClient implements Vision {
   }
 
   async getDetectionsFromCamera(cameraName: string, extra = {}, callOptions = this.callOptions) {
-    const request = new GetDetectionsFromCameraRequest({
+    const request = create(GetDetectionsFromCameraRequestSchema, {
       name: this.name,
       cameraName,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -55,13 +56,13 @@ export class VisionClient implements Vision {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new GetDetectionsRequest({
+    const request = create(GetDetectionsRequestSchema, {
       name: this.name,
       image,
       width: width ? BigInt(width) : undefined,
       height: height ? BigInt(height) : undefined,
       mimeType,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -76,11 +77,11 @@ export class VisionClient implements Vision {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new GetClassificationsFromCameraRequest({
+    const request = create(GetClassificationsFromCameraRequestSchema, {
       name: this.name,
       cameraName,
       n: count,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -98,14 +99,14 @@ export class VisionClient implements Vision {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new GetClassificationsRequest({
+    const request = create(GetClassificationsRequestSchema, {
       name: this.name,
       image,
       width,
       height,
       mimeType,
       n: count,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -115,10 +116,10 @@ export class VisionClient implements Vision {
   }
 
   async getObjectPointClouds(cameraName: string, extra = {}, callOptions = this.callOptions) {
-    const request = new GetObjectPointCloudsRequest({
+    const request = create(GetObjectPointCloudsRequestSchema, {
       name: this.name,
       cameraName,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -128,9 +129,9 @@ export class VisionClient implements Vision {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -155,14 +156,14 @@ export class VisionClient implements Vision {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new CaptureAllFromCameraRequest({
+    const request = create(CaptureAllFromCameraRequestSchema, {
       name: this.name,
       cameraName,
       returnImage,
       returnClassifications,
       returnDetections,
       returnObjectPointClouds,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -183,7 +184,7 @@ export class VisionClient implements Vision {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

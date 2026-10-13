@@ -1,11 +1,12 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { SwitchService } from '../../gen/component/switch/v1/switch_connect';
 import {
-  SetPositionRequest,
-  GetPositionRequest,
-  GetNumberOfPositionsRequest,
+  SwitchService,
+  SetPositionRequestSchema,
+  GetPositionRequestSchema,
+  GetNumberOfPositionsRequestSchema,
 } from '../../gen/component/switch/v1/switch_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
@@ -29,10 +30,10 @@ export class SwitchClient implements Switch {
   }
 
   async setPosition(position: number, extra = {}, callOptions = this.callOptions) {
-    const request = new SetPositionRequest({
+    const request = create(SetPositionRequestSchema, {
       name: this.name,
       position,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -41,9 +42,9 @@ export class SwitchClient implements Switch {
   }
 
   async getPosition(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPositionRequest({
+    const request = create(GetPositionRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -53,9 +54,9 @@ export class SwitchClient implements Switch {
   }
 
   async getNumberOfPositions(extra = {}, callOptions = this.callOptions) {
-    const request = new GetNumberOfPositionsRequest({
+    const request = create(GetNumberOfPositionsRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -72,7 +73,7 @@ export class SwitchClient implements Switch {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

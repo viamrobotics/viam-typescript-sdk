@@ -3,22 +3,24 @@
  */
 
 import { describe, expect, it, vi, type Mock } from 'vitest';
+import { create } from '@bufbuild/protobuf';
 import { RobotClient } from '../../robot';
 vi.mock('../../gen/service/motion/v1/motion_pb_service');
 vi.mock('../../robot');
 
-import { Struct, Timestamp } from '@bufbuild/protobuf';
+import { timestampFromDate } from '@bufbuild/protobuf/wkt';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { MotionService } from '../../gen/service/motion/v1/motion_connect';
 import {
+  MotionService,
+  MoveOnGlobeResponseSchema,
   type GetPlanRequest,
   type ListPlanStatusesRequest,
   type MoveOnGlobeRequest,
-  MoveOnGlobeResponse,
   type MoveRequest,
   type StopPlanRequest,
 } from '../../gen/service/motion/v1/motion_pb';
-import { GeoGeometry, GeoPoint, Pose, PoseInFrame } from '../../types';
+
+import { GeoGeometrySchema, GeoPointSchema, PoseSchema, PoseInFrameSchema } from '../../types';
 import { MotionClient } from './client';
 import {
   Constraints,
@@ -44,7 +46,7 @@ describe('moveOnGlobe', () => {
     executionId = vi.fn(() => testExecutionId);
 
     const expectedMotionName = motionClientName;
-    const expectedDestination = new GeoPoint({ latitude: 1, longitude: 2 });
+    const expectedDestination = create(GeoPointSchema, { latitude: 1, longitude: 2 });
     const expectedObstaclesList: ObstacleDetector[] = [];
     const expectedHeading = undefined;
     const expectedComponentName = 'myBase';
@@ -57,7 +59,7 @@ describe('moveOnGlobe', () => {
       service(MotionService, {
         moveOnGlobe: (req) => {
           capturedReq = req;
-          return new MoveOnGlobeResponse({
+          return create(MoveOnGlobeResponseSchema, {
             executionId: executionId(),
           });
         },
@@ -71,7 +73,11 @@ describe('moveOnGlobe', () => {
     motion = new MotionClient(new RobotClient('host'), motionClientName);
 
     await expect(
-      motion.moveOnGlobe({ latitude: 1, longitude: 2 }, 'myBase', 'myMovementsensor'),
+      motion.moveOnGlobe(
+        create(GeoPointSchema, { latitude: 1, longitude: 2 }),
+        'myBase',
+        'myMovementsensor',
+      ),
     ).resolves.toStrictEqual(testExecutionId);
 
     expect(capturedReq?.name).toStrictEqual(expectedMotionName);
@@ -81,7 +87,7 @@ describe('moveOnGlobe', () => {
     expect(capturedReq?.movementSensorName).toStrictEqual(expectedMovementSensorName);
     expect(capturedReq?.obstacles).toEqual(expectedObstaclesList);
     expect(capturedReq?.motionConfiguration).toStrictEqual(expectedMotionConfiguration);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
 
     expect(executionId).toHaveBeenCalledOnce();
   });
@@ -89,9 +95,9 @@ describe('moveOnGlobe', () => {
   it('allows optionally specifying heading, obstacles, motionConfig & extra', async () => {
     executionId = vi.fn(() => testExecutionId);
     const expectedMotionName = motionClientName;
-    const expectedDestination = new GeoPoint({ latitude: 1, longitude: 2 });
+    const expectedDestination = create(GeoPointSchema, { latitude: 1, longitude: 2 });
     const expectedObstaclesList = [
-      new GeoGeometry({
+      create(GeoGeometrySchema, {
         location: { latitude: 3, longitude: 5 },
         geometries: [
           {
@@ -116,7 +122,7 @@ describe('moveOnGlobe', () => {
       }),
     ];
     const expectedBoundingRegionsList = [
-      new GeoGeometry({
+      create(GeoGeometrySchema, {
         location: { latitude: 1, longitude: 2 },
         geometries: [
           {
@@ -143,7 +149,7 @@ describe('moveOnGlobe', () => {
     const expectedHeading = 60;
     const expectedComponentName = 'myBase';
     const expectedMovementSensorName = 'myMovementsensor';
-    const expectedMotionConfiguration = new MotionConfiguration({
+    const expectedMotionConfiguration = create(MotionConfiguration, {
       obstacleDetectors: [
         {
           visionService: 'myVisionService',
@@ -163,7 +169,7 @@ describe('moveOnGlobe', () => {
       service(MotionService, {
         moveOnGlobe: (req) => {
           capturedReq = req;
-          return new MoveOnGlobeResponse({
+          return create(MoveOnGlobeResponseSchema, {
             executionId: executionId(),
           });
         },
@@ -197,7 +203,7 @@ describe('moveOnGlobe', () => {
     expect(capturedReq?.obstacles).toEqual(expectedObstaclesList);
     expect(capturedReq?.boundingRegions).toEqual(expectedBoundingRegionsList);
     expect(capturedReq?.motionConfiguration).toStrictEqual(expectedMotionConfiguration);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
 
     expect(executionId).toHaveBeenCalledOnce();
   });
@@ -206,9 +212,9 @@ describe('moveOnGlobe', () => {
 describe('move', () => {
   it('sends a move request with pseudolinear constraints', async () => {
     const expectedComponentName = 'myBase';
-    const expectedDestination = new PoseInFrame({
+    const expectedDestination = create(PoseInFrameSchema, {
       referenceFrame: 'world',
-      pose: new Pose({
+      pose: create(PoseSchema, {
         x: 1,
         y: 2,
         z: 3,
@@ -218,11 +224,11 @@ describe('move', () => {
         theta: 90,
       }),
     });
-    const expectedPseudolinearConstraint = new PseudolinearConstraint({
+    const expectedPseudolinearConstraint = create(PseudolinearConstraint, {
       lineToleranceFactor: 5,
       orientationToleranceFactor: 10,
     });
-    const expectedConstraints = new Constraints({
+    const expectedConstraints = create(Constraints, {
       pseudolinearConstraint: [expectedPseudolinearConstraint],
     });
     const expectedExtra = { some: 'extra' };
@@ -252,7 +258,7 @@ describe('move', () => {
     expect(capturedReq?.destination).toStrictEqual(expectedDestination);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.constraints).toStrictEqual(expectedConstraints);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 });
 
@@ -279,7 +285,7 @@ describe('stopPlan', () => {
 
     await expect(motion.stopPlan(expectedComponentName)).resolves.toStrictEqual(null);
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 
   it('allows optionally specifying extra', async () => {
@@ -305,12 +311,12 @@ describe('stopPlan', () => {
       null,
     );
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 });
 
 describe('getPlan', () => {
-  const expectedResponse = new GetPlanResponse({
+  const expectedResponse = create(GetPlanResponse, {
     currentPlanWithStatus: {
       plan: {
         id: 'planId',
@@ -336,7 +342,7 @@ describe('getPlan', () => {
       },
       status: {
         state: PlanState.IN_PROGRESS,
-        timestamp: Timestamp.fromDate(date),
+        timestamp: timestampFromDate(date),
       },
       statusHistory: [],
     },
@@ -368,7 +374,7 @@ describe('getPlan', () => {
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.lastPlanOnly).toStrictEqual(expectedLastPlanOnly);
     expect(capturedReq?.executionId).toStrictEqual(expectedExecutionID);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 
   it('allows optionally specifying lastPlanOnly, executionID, and extra', async () => {
@@ -403,12 +409,12 @@ describe('getPlan', () => {
     expect(capturedReq?.componentName).toStrictEqual(expectedComponentName);
     expect(capturedReq?.lastPlanOnly).toStrictEqual(expectedLastPlanOnly);
     expect(capturedReq?.executionId).toStrictEqual(expectedExecutionID);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 });
 
 describe('listPlanStatuses', () => {
-  const expectedResponse = new ListPlanStatusesResponse({
+  const expectedResponse = create(ListPlanStatusesResponse, {
     planStatusesWithIds: [
       {
         planId: 'some plan id',
@@ -442,7 +448,7 @@ describe('listPlanStatuses', () => {
 
     await expect(motion.listPlanStatuses()).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.onlyActivePlans).toStrictEqual(expectedOnlyActivePlans);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 
   it('allows optionally specifying onlyActivePlans and extra', async () => {
@@ -468,6 +474,6 @@ describe('listPlanStatuses', () => {
       motion.listPlanStatuses(expectedOnlyActivePlans, expectedExtra),
     ).resolves.toStrictEqual(expectedResponse);
     expect(capturedReq?.onlyActivePlans).toStrictEqual(expectedOnlyActivePlans);
-    expect(capturedReq?.extra).toStrictEqual(Struct.fromJson(expectedExtra));
+    expect(capturedReq?.extra).toStrictEqual(expectedExtra);
   });
 });

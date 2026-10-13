@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { MimeType } from '../../main';
 import type { Resource } from '../../types';
 import type {
@@ -28,7 +28,7 @@ export interface Vision extends Resource {
    * @param cameraName - The name of the camera to use for detection.
    * @returns - The list of Detections.
    */
-  getDetectionsFromCamera: (cameraName: string, extra?: Struct) => Promise<Detection[]>;
+  getDetectionsFromCamera: (cameraName: string, extra?: JsonObject) => Promise<Detection[]>;
 
   /**
    * Get a list of detections in the given image.
@@ -62,7 +62,7 @@ export interface Vision extends Resource {
     width: number,
     height: number,
     mimeType: MimeType,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<Detection[]>;
 
   /**
@@ -85,7 +85,7 @@ export interface Vision extends Resource {
   getClassificationsFromCamera: (
     cameraName: string,
     count: number,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<Classification[]>;
 
   /**
@@ -123,7 +123,7 @@ export interface Vision extends Resource {
     height: number,
     mimeType: MimeType,
     count: number,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<Classification[]>;
 
   /**
@@ -143,7 +143,7 @@ export interface Vision extends Resource {
    * @param cameraName - The name of the camera.
    * @returns - The list of PointCloudObjects
    */
-  getObjectPointClouds: (cameraName: string, extra?: Struct) => Promise<PointCloudObject[]>;
+  getObjectPointClouds: (cameraName: string, extra?: JsonObject) => Promise<PointCloudObject[]>;
 
   /**
    * Returns an object describing the properties of the vision service, namely booleans indicating
@@ -161,7 +161,7 @@ export interface Vision extends Resource {
    *
    * @returns - The properties of the vision service
    */
-  getProperties: (extra?: Struct) => Promise<Properties>;
+  getProperties: (extra?: JsonObject) => Promise<Properties>;
 
   /**
    * Returns the requested image, classifications, detections, and 3d point cloud objects in the
@@ -190,6 +190,6 @@ export interface Vision extends Resource {
   captureAllFromCamera: (
     cameraName: string,
     opts: CaptureAllOptions,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<CaptureAllResponse>;
 }

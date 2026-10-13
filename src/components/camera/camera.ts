@@ -1,5 +1,6 @@
-import type { Struct } from '@bufbuild/protobuf';
-import type { Timestamp } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+
 import type {
   DistortionParameters,
   IntrinsicParameters,
@@ -40,7 +41,7 @@ export type MimeType =
 /** Represents any physical hardware that can capture frames. */
 export interface Camera extends Resource {
   /** Get the geometries of the component in their current configuration */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Return a frame from a camera.
@@ -58,7 +59,7 @@ export interface Camera extends Resource {
    */
   getImages: (
     filterSourceNames?: string[],
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<{ images: NamedImage[]; metadata: ResponseMetadata }>;
 
   /**
@@ -74,7 +75,7 @@ export interface Camera extends Resource {
    * For more information, see [Camera
    * API](https://docs.viam.com/dev/reference/apis/components/camera/#getpointcloud).
    */
-  getPointCloud: (extra?: Struct) => Promise<Uint8Array>;
+  getPointCloud: (extra?: JsonObject) => Promise<Uint8Array>;
 
   /**
    * Return the camera properties.

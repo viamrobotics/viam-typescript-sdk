@@ -1,4 +1,5 @@
-import type { Resource, Struct } from '../../types';
+import type { Resource } from '../../types';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { AudioInfo, Geometry } from '../../gen/common/v1/common_pb';
 import type { AudioProperties } from '../../audio-common';
 
@@ -14,7 +15,7 @@ export interface AudioOut extends Resource {
    * const geometries = await audioOut.getGeometries();
    * ```
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Play audio on the device.
@@ -31,7 +32,7 @@ export interface AudioOut extends Resource {
    * @param audioData - The audio data to play
    * @param audioInfo - Information about the audio format (optional, required for raw pcm data)
    */
-  play: (audioData: Uint8Array, audioInfo?: AudioInfo, extra?: Struct) => Promise<void>;
+  play: (audioData: Uint8Array, audioInfo?: AudioInfo, extra?: JsonObject) => Promise<void>;
 
   /**
    * Stream audio chunks to the device for playback.
@@ -64,7 +65,7 @@ export interface AudioOut extends Resource {
   playStream: (
     audioInfo: AudioInfo,
     chunks: AsyncIterable<Uint8Array>,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<void>;
 
   /**
@@ -77,5 +78,5 @@ export interface AudioOut extends Resource {
    * const properties = await audioOut.getProperties();
    * ```
    */
-  getProperties: (extra?: Struct) => Promise<AudioProperties>;
+  getProperties: (extra?: JsonObject) => Promise<AudioProperties>;
 }

@@ -1,18 +1,25 @@
-import type {
-  AnyMessage,
-  Message,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
-} from '@bufbuild/protobuf';
-import type { ContextValues, StreamResponse, Transport, UnaryResponse } from '@connectrpc/connect';
 import {
-  Request,
+  create,
+  fromBinary,
+  toBinary,
+  type DescMessage,
+  type DescMethodStreaming,
+  type DescMethodUnary,
+  type DescService,
+  type MessageInitShape,
+} from '@bufbuild/protobuf';
+
+import type { ContextValues, StreamResponse, Transport, UnaryResponse } from '@connectrpc/connect';
+
+import {
+  RequestSchema,
+  ResponseSchema,
+  StreamSchema,
   type RequestHeaders,
   type RequestMessage,
-  Response,
-  Stream,
+  type Stream,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
+
 import { BaseChannel } from './base-channel';
 import type { ClientStream, ClientStreamConstructor } from './client-stream';
 import { ConnectionClosedError } from './connection-closed-error';
@@ -23,7 +30,7 @@ import { UnaryClientStream } from './unary-client-stream';
 const MaxStreamCount = 256;
 
 interface ActiveClientStream {
-  cs: ClientStream;
+  cs: ClientStream<DescMessage, DescMessage>;
 }
 
 export class ClientChannel extends BaseChannel implements Transport {
@@ -56,7 +63,7 @@ export class ClientChannel extends BaseChannel implements Transport {
   }
 
   private onChannelMessage(event: MessageEvent<ArrayBuffer>) {
-    const resp = Response.fromBinary(new Uint8Array(event.data));
+    const resp = fromBinary(ResponseSchema, new Uint8Array(event.data));
 
     const { stream } = resp;
     if (stream === undefined) {
@@ -76,16 +83,16 @@ export class ClientChannel extends BaseChannel implements Transport {
   private nextStreamID(): Stream {
     const thisId = this.streamIDCounter;
     this.streamIDCounter += 1;
-    return new Stream({
+    return create(StreamSchema, {
       id: BigInt(thisId),
     });
   }
 
-  private newStream<T extends ClientStream<I, O>, I extends Message<I>, O extends Message<O>>(
+  private newStream<T extends ClientStream<I, O>, I extends DescMessage, O extends DescMessage>(
     ClientCtor: ClientStreamConstructor<T, I, O>,
     stream: Stream,
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+    service: DescService,
+    method: DescMethodUnary<I, O> | DescMethodStreaming<I, O>,
     header: HeadersInit | undefined,
   ): T {
     if (this.isClosed()) {
@@ -119,71 +126,78 @@ export class ClientChannel extends BaseChannel implements Transport {
 
   public writeHeaders(stream: Stream, headers: RequestHeaders) {
     this.write(
-      new Request({
-        stream,
-        type: {
-          case: 'headers',
-          value: headers,
-        },
-      }),
+      toBinary(
+        RequestSchema,
+        create(RequestSchema, {
+          stream,
+          type: {
+            case: 'headers',
+            value: headers,
+          },
+        }),
+      ),
     );
   }
 
   public writeMessage(stream: Stream, msg: RequestMessage) {
     this.write(
-      new Request({
-        stream,
-        type: {
-          case: 'message',
-          value: msg,
-        },
-      }),
+      toBinary(
+        RequestSchema,
+        create(RequestSchema, {
+          stream,
+          type: {
+            case: 'message',
+            value: msg,
+          },
+        }),
+      ),
     );
   }
 
   public writeReset(stream: Stream) {
     this.write(
-      new Request({
-        stream,
-        type: {
-          case: 'rstStream',
-          value: true,
-        },
-      }),
+      toBinary(
+        RequestSchema,
+        create(RequestSchema, {
+          stream,
+          type: {
+            case: 'rstStream',
+            value: true,
+          },
+        }),
+      ),
     );
   }
 
-  public async unary<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  public async unary<I extends DescMessage, O extends DescMessage>(
+    method: DescMethodUnary<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    message: PartialMessage<I>,
+    message: MessageInitShape<I>,
     contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     return this.newStream<UnaryClientStream<I, O>, I, O>(
       UnaryClientStream<I, O>,
       this.nextStreamID(),
-      service,
+      method.parent,
       method,
       header,
     ).run(signal, timeoutMs, message, contextValues);
   }
 
-  public async stream<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  public async stream<I extends DescMessage, O extends DescMessage>(
+    method: DescMethodStreaming<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageInitShape<I>>,
     contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
     return this.newStream<StreamClientStream<I, O>, I, O>(
       StreamClientStream<I, O>,
       this.nextStreamID(),
-      service,
+      method.parent,
       method,
       header,
     ).run(signal, timeoutMs, input, contextValues);

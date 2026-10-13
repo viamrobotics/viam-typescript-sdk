@@ -1,26 +1,26 @@
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { Struct } from '@bufbuild/protobuf/wkt';
 import type { CallOptions } from '@connectrpc/connect';
 import { type MachineConnectionEvent } from '../events';
 import type * as proto from '../gen/robot/v1/robot_pb';
 import type { UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
 import type { PoseInFrame, ResourceName, Transform } from '../types';
 
-export type CloudMetadata = PlainMessage<proto.GetCloudMetadataResponse>;
-export type UploadDataFromPathResponse = PlainMessage<proto.UploadDataFromPathResponse>;
-export type ConfigStatus = PlainMessage<proto.ConfigStatus>;
-export type FrameSystemConfig = PlainMessage<proto.FrameSystemConfig>;
-export type JobStatus = PlainMessage<proto.JobStatus>;
-export type MachineStatus = PlainMessage<proto.GetMachineStatusResponse>;
+export type CloudMetadata = proto.GetCloudMetadataResponse;
+export type UploadDataFromPathResponse = proto.UploadDataFromPathResponse;
+export type ConfigStatus = proto.ConfigStatus;
+export type FrameSystemConfig = proto.FrameSystemConfig;
+export type JobStatus = proto.JobStatus;
+export type MachineStatus = proto.GetMachineStatusResponse;
 export type MachineStatusState = proto.GetMachineStatusResponse_State;
-export type ModuleModel = PlainMessage<proto.ModuleModel>;
-export type ModuleStatus = PlainMessage<proto.ModuleStatus>;
+export type ModuleModel = proto.ModuleModel;
+export type ModuleStatus = proto.ModuleStatus;
 export type ModuleStatusState = proto.ModuleStatus_State;
-export type PackageStatus = PlainMessage<proto.PackageStatus>;
+export type PackageStatus = proto.PackageStatus;
 export type PackageStatusState = proto.PackageStatus_State;
-export type ResourceRPCSubtype = PlainMessage<proto.ResourceRPCSubtype>;
-export type ResourceStatus = PlainMessage<proto.ResourceStatus>;
-export type Session = PlainMessage<proto.Session>;
-export type Operation = PlainMessage<proto.Operation>;
+export type ResourceRPCSubtype = proto.ResourceRPCSubtype;
+export type ResourceStatus = proto.ResourceStatus;
+export type Session = proto.Session;
+export type Operation = proto.Operation;
 
 type Callback = (args: unknown) => void;
 

@@ -54,6 +54,6 @@ The `main.ts` file was updated to include the following polyfills and updates:
   globalThis.VIAM = {
     // @ts-ignore
     GRPC_TRANSPORT_FACTORY: (opts: any) =>
-      connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
+      connectNode.createGrpcTransport({ ...opts }),
   };
   ```

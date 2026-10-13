@@ -1,13 +1,15 @@
 import type { Client } from '@connectrpc/connect';
+import { create } from '@bufbuild/protobuf';
 import { EventDispatcher, MachineConnectionEvent } from '../../events';
-import { StreamService } from '../../gen/stream/v1/stream_connect';
 import {
-  AddStreamRequest,
-  RemoveStreamRequest,
-  GetStreamOptionsRequest,
-  SetStreamOptionsRequest,
+  StreamService,
+  AddStreamRequestSchema,
+  RemoveStreamRequestSchema,
+  GetStreamOptionsRequestSchema,
+  SetStreamOptionsRequestSchema,
   type Resolution,
 } from '../../gen/stream/v1/stream_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import type { Stream } from './stream';
@@ -52,7 +54,7 @@ export class StreamClient extends EventDispatcher<{ track: RTCTrackEvent }> impl
   }
 
   async add(name: string) {
-    const request = new AddStreamRequest({
+    const request = create(AddStreamRequestSchema, {
       name: getValidSDPTrackName(name),
     });
     this.options.requestLogger?.(request);
@@ -69,7 +71,7 @@ export class StreamClient extends EventDispatcher<{ track: RTCTrackEvent }> impl
   }
 
   async remove(name: string) {
-    const request = new RemoveStreamRequest({
+    const request = create(RemoveStreamRequestSchema, {
       name: getValidSDPTrackName(name),
     });
     this.options.requestLogger?.(request);
@@ -94,7 +96,7 @@ export class StreamClient extends EventDispatcher<{ track: RTCTrackEvent }> impl
    */
   async getOptions(resourceName: string): Promise<Resolution[]> {
     const fetchOptions = async (name: string): Promise<Resolution[]> => {
-      const request = new GetStreamOptionsRequest({ name });
+      const request = create(GetStreamOptionsRequestSchema, { name });
       this.options.requestLogger?.(request);
       try {
         const response = await this.client.getStreamOptions(request);
@@ -123,7 +125,7 @@ export class StreamClient extends EventDispatcher<{ track: RTCTrackEvent }> impl
    * @param height - The height of the resolution.
    */
   async setOptions(name: string, width: number, height: number) {
-    const request = new SetStreamOptionsRequest({
+    const request = create(SetStreamOptionsRequestSchema, {
       name: getValidSDPTrackName(name),
       resolution: {
         width,
@@ -148,7 +150,7 @@ export class StreamClient extends EventDispatcher<{ track: RTCTrackEvent }> impl
    * @param name - The name of a camera component.
    */
   async resetOptions(name: string) {
-    const request = new SetStreamOptionsRequest({
+    const request = create(SetStreamOptionsRequestSchema, {
       name: getValidSDPTrackName(name),
     });
     this.options.requestLogger?.(request);

@@ -1,13 +1,16 @@
-import type { JsonValue } from '@bufbuild/protobuf';
-import { Struct, Timestamp } from '@bufbuild/protobuf';
+import { create, type JsonObject, type JsonValue } from '@bufbuild/protobuf';
+
+import { timestampFromDate } from '@bufbuild/protobuf/wkt';
+
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { type PackageType } from '../gen/app/packages/v1/packages_pb';
-import { AppService } from '../gen/app/v1/app_connect';
 import {
+  AppService,
+  AuthorizationSchema,
+  AuthorizedPermissionsSchema,
+  ListMachineSummariesRequestSchema,
   type APIKeyWithAuthorizations,
   type AllowedLoginMethods,
-  Authorization,
-  AuthorizedPermissions,
   type CreateKeyFromExistingKeyAuthorizationsResponse,
   type CreateKeyResponse,
   type CreateModuleResponse,
@@ -38,9 +41,12 @@ import {
   type RotateKeyResponse,
   type RoverRentalRobot,
   type Visibility,
-  ListMachineSummariesRequest,
   type LocationSummary,
+  type Authorization,
+  type AuthorizedPermissions,
+  type ListMachineSummariesRequest,
 } from '../gen/app/v1/app_pb';
+
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
 /**
@@ -62,7 +68,7 @@ export const createAuth = (
   identityType: string,
   resourceId: string,
 ): Authorization => {
-  return new Authorization({
+  return create(AuthorizationSchema, {
     authorizationType: 'role',
     identityId: entityId,
     identityType,
@@ -104,7 +110,7 @@ export const createPermission = (
   resourceId: string,
   permissions: string[],
 ): AuthorizedPermissions => {
-  return new AuthorizedPermissions({
+  return create(AuthorizedPermissionsSchema, {
     resourceType,
     resourceId,
     permissions,
@@ -862,8 +868,8 @@ export class AppClient {
       filter,
       levels,
       pageToken,
-      start: start ? Timestamp.fromDate(start) : undefined,
-      end: end ? Timestamp.fromDate(end) : undefined,
+      start: start ? timestampFromDate(start) : undefined,
+      end: end ? timestampFromDate(end) : undefined,
     });
   }
 
@@ -939,7 +945,7 @@ export class AppClient {
   async updateRobotPart(
     id: string,
     name: string,
-    robotConfig: Struct,
+    robotConfig: JsonObject,
   ): Promise<RobotPart | undefined> {
     const resp = await this.client.updateRobotPart({ id, name, robotConfig });
     return resp.part;
@@ -1265,7 +1271,7 @@ export class AppClient {
   async createFragment(
     organizationId: string,
     name: string,
-    config: Struct,
+    config: JsonObject,
   ): Promise<Fragment | undefined> {
     const resp = await this.client.createFragment({
       organizationId,
@@ -1305,7 +1311,7 @@ export class AppClient {
   async updateFragment(
     id: string,
     name: string,
-    config: Struct,
+    config: JsonObject,
     makePublic?: boolean,
     visibility?: FragmentVisibility,
   ): Promise<Fragment | undefined> {
@@ -1986,10 +1992,7 @@ export class AppClient {
     const response = await this.client.getOrganizationMetadata({
       organizationId: id,
     });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2012,7 +2015,7 @@ export class AppClient {
   async updateOrganizationMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateOrganizationMetadata({
       organizationId: id,
-      data: Struct.fromJson(data),
+      data: data,
     });
   }
 
@@ -2033,10 +2036,7 @@ export class AppClient {
    */
   async getLocationMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getLocationMetadata({ locationId: id });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2059,7 +2059,7 @@ export class AppClient {
   async updateLocationMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateLocationMetadata({
       locationId: id,
-      data: Struct.fromJson(data),
+      data: data,
     });
   }
 
@@ -2080,10 +2080,7 @@ export class AppClient {
    */
   async getRobotMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotMetadata({ id });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2104,7 +2101,7 @@ export class AppClient {
    * @param data The metadata to update
    */
   async updateRobotMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
-    await this.client.updateRobotMetadata({ id, data: Struct.fromJson(data) });
+    await this.client.updateRobotMetadata({ id, data: data });
   }
 
   /**
@@ -2124,10 +2121,7 @@ export class AppClient {
    */
   async getRobotPartMetadata(id: string): Promise<Record<string, JsonValue>> {
     const response = await this.client.getRobotPartMetadata({ id });
-    const jsonResponse = response.toJson() as {
-      data?: Record<string, JsonValue>;
-    };
-    return jsonResponse.data ?? {};
+    return response.data ?? {};
   }
 
   /**
@@ -2150,7 +2144,7 @@ export class AppClient {
   async updateRobotPartMetadata(id: string, data: Record<string, JsonValue>): Promise<void> {
     await this.client.updateRobotPartMetadata({
       id,
-      data: Struct.fromJson(data),
+      data: data,
     });
   }
 
@@ -2199,7 +2193,7 @@ export class AppClient {
     locationIds?: string[],
     limit?: number,
   ): Promise<LocationSummary[]> {
-    const req: ListMachineSummariesRequest = new ListMachineSummariesRequest({
+    const req: ListMachineSummariesRequest = create(ListMachineSummariesRequestSchema, {
       organizationId,
       fragmentIds,
       locationIds,

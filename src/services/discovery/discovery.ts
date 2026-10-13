@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 import type { ComponentConfig } from '../../gen/app/v1/robot_pb';
 
@@ -10,5 +10,5 @@ export interface Discovery extends Resource {
    * @param discoveryName - The name of the discovery service.
    * @returns - The list of ComponentConfigs.
    */
-  discoverResources: (extra?: Struct) => Promise<ComponentConfig[]>;
+  discoverResources: (extra?: JsonObject) => Promise<ComponentConfig[]>;
 }

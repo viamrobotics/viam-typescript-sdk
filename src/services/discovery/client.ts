@@ -1,7 +1,10 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { DiscoveryService } from '../../gen/service/discovery/v1/discovery_connect';
-import { DiscoverResourcesRequest } from '../../gen/service/discovery/v1/discovery_pb';
+import {
+  DiscoveryService,
+  DiscoverResourcesRequestSchema,
+} from '../../gen/service/discovery/v1/discovery_pb';
+
 import type { RobotClient } from '../../robot';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Options } from '../../types';
@@ -25,9 +28,9 @@ export class DiscoveryClient implements Discovery {
   }
 
   async discoverResources(extra = {}, callOptions = this.callOptions) {
-    const request = new DiscoverResourcesRequest({
+    const request = create(DiscoverResourcesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -41,7 +44,7 @@ export class DiscoveryClient implements Discovery {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

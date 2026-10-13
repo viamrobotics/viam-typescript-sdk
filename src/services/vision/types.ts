@@ -1,17 +1,17 @@
 import type { Image } from '../../gen/component/camera/v1/camera_pb';
+import type { JsonObject } from '@bufbuild/protobuf';
 
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import * as commonApi from '../../gen/common/v1/common_pb';
 import * as visionApi from '../../gen/service/vision/v1/vision_pb';
 
-export type Classification = PlainMessage<visionApi.Classification>;
-export type Detection = PlainMessage<visionApi.Detection>;
+export type Classification = visionApi.Classification;
+export type Detection = visionApi.Detection;
 
-export const { Classification, Detection } = visionApi;
+export const { ClassificationSchema: Classification, DetectionSchema: Detection } = visionApi;
 
-export type PointCloudObject = PlainMessage<commonApi.PointCloudObject>;
+export type PointCloudObject = commonApi.PointCloudObject;
 
-export const { PointCloudObject } = commonApi;
+export const { PointCloudObjectSchema: PointCloudObject } = commonApi;
 
 export interface Properties {
   /** Whether or not classifactions are supported by the vision service */
@@ -36,5 +36,5 @@ export interface CaptureAllResponse {
   classifications: Classification[];
   detections: Detection[];
   objectPointClouds: PointCloudObject[];
-  extra: Struct | undefined;
+  extra: JsonObject | undefined;
 }

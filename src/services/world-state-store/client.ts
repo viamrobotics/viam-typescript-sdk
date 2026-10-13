@@ -1,16 +1,22 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_connect';
 import {
-  GetTransformRequest,
-  ListUUIDsRequest,
-  StreamTransformChangesRequest,
+  WorldStateStoreService,
+  GetTransformRequestSchema,
+  ListUUIDsRequestSchema,
+  StreamTransformChangesRequestSchema,
 } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
-import type { WorldStateStore } from './world-state-store';
-import { transformWithUUID, uuidFromString, uuidToString } from './world-state-store';
+import {
+  transformWithUUID,
+  uuidFromString,
+  uuidToString,
+  type WorldStateStore,
+} from './world-state-store';
+
 import type { TransformChangeEvent } from './types';
 
 /**
@@ -31,9 +37,9 @@ export class WorldStateStoreClient implements WorldStateStore {
   }
 
   async listUUIDs(extra = {}, callOptions = this.callOptions) {
-    const request = new ListUUIDsRequest({
+    const request = create(ListUUIDsRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -43,10 +49,10 @@ export class WorldStateStoreClient implements WorldStateStore {
   }
 
   async getTransform(uuid: string, extra = {}, callOptions = this.callOptions) {
-    const request = new GetTransformRequest({
+    const request = create(GetTransformRequestSchema, {
       name: this.name,
       uuid: uuidFromString(uuid),
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -63,9 +69,9 @@ export class WorldStateStoreClient implements WorldStateStore {
     extra = {},
     callOptions = this.callOptions,
   ): AsyncGenerator<TransformChangeEvent, void> {
-    const request = new StreamTransformChangesRequest({
+    const request = create(StreamTransformChangesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -78,7 +84,6 @@ export class WorldStateStoreClient implements WorldStateStore {
       }
 
       yield {
-        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...response,
         transform: transformWithUUID(response.transform),
       };
@@ -90,7 +95,7 @@ export class WorldStateStoreClient implements WorldStateStore {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { create } from '@bufbuild/protobuf';
 import { type RobotClient } from '../../robot';
 vi.mock('../../robot');
 
@@ -13,12 +14,13 @@ import {
   type Transport,
 } from '@connectrpc/connect';
 import { EventDispatcher } from '../../events';
-import { StreamService } from '../../gen/stream/v1/stream_connect';
 import {
-  AddStreamResponse,
-  GetStreamOptionsResponse,
-  SetStreamOptionsResponse,
+  StreamService,
+  AddStreamResponseSchema,
+  GetStreamOptionsResponseSchema,
+  SetStreamOptionsResponseSchema,
 } from '../../gen/stream/v1/stream_pb';
+
 import { StreamClient } from './client';
 
 let mockTransport: Transport;
@@ -59,7 +61,7 @@ describe('StreamClient', () => {
       service(StreamService, {
         addStream: () => {
           streamClient.emit('track', { streams: [fakeStream] } as unknown as RTCTrackEvent);
-          return new AddStreamResponse();
+          return create(AddStreamResponseSchema);
         },
       });
     });
@@ -94,7 +96,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         addStream: () => {
-          return new AddStreamResponse();
+          return create(AddStreamResponseSchema);
         },
       });
     });
@@ -115,7 +117,7 @@ describe('StreamClient', () => {
       service(StreamService, {
         addStream: () => {
           streamClient.emit('track', { streams: [fakeStream] } as unknown as RTCTrackEvent);
-          return new AddStreamResponse();
+          return create(AddStreamResponseSchema);
         },
       });
     });
@@ -134,7 +136,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         getStreamOptions: () => {
-          return new GetStreamOptionsResponse({
+          return create(GetStreamOptionsResponseSchema, {
             resolutions: Array.from({ length: 5 }, () => ({})),
           });
         },
@@ -164,7 +166,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         setStreamOptions: () => {
-          return new SetStreamOptionsResponse();
+          return create(SetStreamOptionsResponseSchema);
         },
       });
     });
@@ -193,7 +195,7 @@ describe('StreamClient', () => {
     mockTransport = createRouterTransport(({ service }) => {
       service(StreamService, {
         setStreamOptions: () => {
-          return new SetStreamOptionsResponse();
+          return create(SetStreamOptionsResponseSchema);
         },
       });
     });

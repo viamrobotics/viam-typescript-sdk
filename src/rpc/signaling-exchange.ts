@@ -1,15 +1,19 @@
-import type { CallOptions, Client } from '@connectrpc/connect';
-import { Code, ConnectError } from '@connectrpc/connect';
-import { Status } from '../gen/google/rpc/status_pb';
-import { type SignalingService } from '../gen/proto/rpc/webrtc/v1/signaling_connect';
+import { Code, ConnectError, type CallOptions, type Client } from '@connectrpc/connect';
+
+import { create } from '@bufbuild/protobuf';
+
+import { StatusSchema } from '../gen/google/rpc/status_pb';
 import {
-  CallRequest,
+  CallRequestSchema,
+  CallUpdateRequestSchema,
+  ICECandidateSchema,
+  type SignalingService,
   type CallResponse,
   type CallResponseInitStage,
   type CallResponseUpdateStage,
-  CallUpdateRequest,
-  ICECandidate,
+  type ICECandidate,
 } from '../gen/proto/rpc/webrtc/v1/signaling_pb';
+
 import { ClientChannel } from './client-channel';
 import { ConnectionClosedError } from './connection-closed-error';
 import type { DialWebRTCOptions } from './dial';
@@ -54,7 +58,7 @@ export class SignalingExchange {
 
     const description = addSdpFields(this.pc.localDescription, this.dialOpts?.additionalSdpFields);
     const encodedSDP = btoa(JSON.stringify(description));
-    const callRequest = new CallRequest({
+    const callRequest = create(CallRequestSchema, {
       sdp: encodedSDP,
     });
     if (this.dialOpts?.disableTrickleICE) {
@@ -267,7 +271,7 @@ export class SignalingExchange {
     }
 
     const iProto = iceCandidateToProto(event.candidate);
-    const callRequestUpdate = new CallUpdateRequest({
+    const callRequestUpdate = create(CallUpdateRequestSchema, {
       uuid: this.callUuid,
       update: {
         case: 'candidate',
@@ -307,11 +311,11 @@ export class SignalingExchange {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
-    const callRequestUpdate = new CallUpdateRequest({
+    const callRequestUpdate = create(CallUpdateRequestSchema, {
       uuid: this.callUuid,
       update: {
         case: 'error',
-        value: new Status({
+        value: create(StatusSchema, {
           code: Code.Unknown,
           message: err,
         }),
@@ -337,7 +341,7 @@ export class SignalingExchange {
       throw new Error(callUUIDUnset);
     }
     this.sentDoneOrErrorOnce = true;
-    const callRequestUpdate = new CallUpdateRequest({
+    const callRequestUpdate = create(CallUpdateRequestSchema, {
       uuid: this.callUuid,
       update: {
         case: 'done',
@@ -374,7 +378,7 @@ const iceCandidateFromProto = (i: ICECandidate) => {
 };
 
 const iceCandidateToProto = (i: RTCIceCandidateInit) => {
-  const candidate = new ICECandidate();
+  const candidate = create(ICECandidateSchema);
   if (i.candidate !== undefined) {
     candidate.candidate = i.candidate;
   }

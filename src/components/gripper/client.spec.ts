@@ -2,17 +2,20 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { create } from '@bufbuild/protobuf';
+
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
 import {
-  GetCurrentInputsResponse,
-  GoToInputsResponse,
-  GrabResponse,
-  IsHoldingSomethingResponse,
-  IsMovingResponse,
-  OpenResponse,
-  StopResponse,
+  GripperService,
+  GetCurrentInputsResponseSchema,
+  GoToInputsResponseSchema,
+  GrabResponseSchema,
+  IsHoldingSomethingResponseSchema,
+  IsMovingResponseSchema,
+  OpenResponseSchema,
+  StopResponseSchema,
 } from '../../gen/component/gripper/v1/gripper_pb';
+
 import { RobotClient } from '../../robot';
 import { GripperClient } from './client';
 vi.mock('../../robot');
@@ -27,27 +30,27 @@ describe('GripperClient tests', () => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(GripperService, {
         open: () => {
-          return new OpenResponse();
+          return create(OpenResponseSchema);
         },
         grab: () => {
-          return new GrabResponse({ success: true });
+          return create(GrabResponseSchema, { success: true });
         },
         stop: () => {
-          return new StopResponse();
+          return create(StopResponseSchema);
         },
         isMoving: () => {
-          return new IsMovingResponse({ isMoving: testIsMoving });
+          return create(IsMovingResponseSchema, { isMoving: testIsMoving });
         },
         isHoldingSomething: () => {
-          return new IsHoldingSomethingResponse({
+          return create(IsHoldingSomethingResponseSchema, {
             isHoldingSomething: testIsHoldingSomething,
           });
         },
         getCurrentInputs: () => {
-          return new GetCurrentInputsResponse({ values: testCurrentInputs });
+          return create(GetCurrentInputsResponseSchema, { values: testCurrentInputs });
         },
         goToInputs: () => {
-          return new GoToInputsResponse();
+          return create(GoToInputsResponseSchema);
         },
       });
     });

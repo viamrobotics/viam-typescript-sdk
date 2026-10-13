@@ -1,4 +1,4 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { JsonObject, JsonValue } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 /** Represents a physical sensing device that can provide measurement readings. */
@@ -18,5 +18,5 @@ export interface Sensor extends Resource {
    * For more information, see [Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/sensor/#getreadings).
    */
-  getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
+  getReadings(extra?: JsonObject): Promise<Record<string, JsonValue>>;
 }

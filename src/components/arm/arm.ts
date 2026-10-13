@@ -1,13 +1,13 @@
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
 import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
 import type { GetKinematicsResult } from '../../utils';
 
-export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
+export type ArmJointPositions = armApi.JointPositions;
 
-export const { JointPositions: ArmJointPositions } = armApi;
+export const { JointPositionsSchema: ArmJointPositions } = armApi;
 
 export type Properties = armApi.GetPropertiesResponse;
 
@@ -26,7 +26,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getendposition).
    */
-  getEndPosition: (extra?: Struct) => Promise<Pose>;
+  getEndPosition: (extra?: JsonObject) => Promise<Pose>;
 
   /**
    * Get the geometries of the component in their current configuration
@@ -42,7 +42,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Get the 3D models of the component
@@ -55,7 +55,7 @@ export interface Arm extends Resource {
    * console.log(models);
    * ```
    */
-  get3DModels: (extra?: Struct) => Promise<Record<string, Mesh>>;
+  get3DModels: (extra?: JsonObject) => Promise<Record<string, Mesh>>;
 
   /**
    * Get the kinematics information associated with the arm.
@@ -74,7 +74,7 @@ export interface Arm extends Resource {
    * @returns The legacy kinematics data shape or the newer object containing kinematics data plus a
    *   map of URDF mesh file paths to mesh data.
    */
-  getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
+  getKinematics: (extra?: JsonObject) => Promise<GetKinematicsResult>;
 
   /**
    * Move the end of the arm to the pose.
@@ -104,7 +104,7 @@ export interface Arm extends Resource {
    *
    * @param pose - The destination pose for the arm.
    */
-  moveToPosition: (pose: Pose, extra?: Struct) => Promise<void>;
+  moveToPosition: (pose: Pose, extra?: JsonObject) => Promise<void>;
 
   /**
    * Move each joint of the arm based on the angles on the joint positions.
@@ -123,7 +123,7 @@ export interface Arm extends Resource {
    *
    * @param jointPositionsList - List of angles (0-360) to move each joint to.
    */
-  moveToJointPositions: (jointPositionsList: number[], extra?: Struct) => Promise<void>;
+  moveToJointPositions: (jointPositionsList: number[], extra?: JsonObject) => Promise<void>;
 
   /**
    * Gets the current position of each joint.
@@ -138,7 +138,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#getjointpositions).
    */
-  getJointPositions: (extra?: Struct) => Promise<ArmJointPositions>;
+  getJointPositions: (extra?: JsonObject) => Promise<ArmJointPositions>;
 
   /**
    * Stop the motion of the arm.
@@ -153,7 +153,7 @@ export interface Arm extends Resource {
    * For more information, see [Arm
    * API](https://docs.viam.com/dev/reference/apis/components/arm/#stop).
    */
-  stop: (extra?: Struct) => Promise<void>;
+  stop: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Get if the arm is currently moving.
@@ -182,7 +182,7 @@ export interface Arm extends Resource {
    * console.log(properties);
    * ```
    */
-  getProperties: (extra?: Struct) => Promise<Properties>;
+  getProperties: (extra?: JsonObject) => Promise<Properties>;
 
   /**
    * Enter or exit manual mode for an arm that supports it.
@@ -200,7 +200,7 @@ export interface Arm extends Resource {
    * @param enabledFor - How long to stay in manual mode, in seconds. 0 or undefined means no time
    *   limit.
    */
-  setManualMode: (manualMode: boolean, enabledFor?: number, extra?: Struct) => Promise<void>;
+  setManualMode: (manualMode: boolean, enabledFor?: number, extra?: JsonObject) => Promise<void>;
 
   /**
    * Get whether the arm is currently in manual mode.
@@ -213,5 +213,5 @@ export interface Arm extends Resource {
    * console.log(manualMode);
    * ```
    */
-  getManualMode: (extra?: Struct) => Promise<boolean>;
+  getManualMode: (extra?: JsonObject) => Promise<boolean>;
 }

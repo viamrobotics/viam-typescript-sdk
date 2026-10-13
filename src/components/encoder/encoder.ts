@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 import * as encoderApi from '../../gen/component/encoder/v1/encoder_pb';
@@ -7,7 +7,7 @@ import type { Geometry } from '../../gen/common/v1/common_pb';
 export type EncoderProperties = encoderApi.GetPropertiesResponse;
 export type EncoderPositionType = encoderApi.PositionType;
 
-export const { GetPropertiesResponse: EncoderProperties, PositionType: EncoderPositionType } =
+export const { GetPropertiesResponseSchema: EncoderProperties, PositionType: EncoderPositionType } =
   encoderApi;
 
 /** Represents a physical encoder. */
@@ -25,7 +25,7 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Set the current position of the encoder as the new zero position.
@@ -42,7 +42,7 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#resetposition).
    */
-  resetPosition(extra?: Struct): Promise<void>;
+  resetPosition(extra?: JsonObject): Promise<void>;
 
   /**
    * Return the encoder's properties.
@@ -59,7 +59,7 @@ export interface Encoder extends Resource {
    * For more information, see [Encoder
    * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getproperties).
    */
-  getProperties(extra?: Struct): Promise<EncoderProperties>;
+  getProperties(extra?: JsonObject): Promise<EncoderProperties>;
 
   /**
    * Return the current position either in relative units (ticks away from a zero position) or
@@ -84,6 +84,6 @@ export interface Encoder extends Resource {
    */
   getPosition(
     positionType?: EncoderPositionType,
-    extra?: Struct,
+    extra?: JsonObject,
   ): Promise<readonly [number, EncoderPositionType]>;
 }

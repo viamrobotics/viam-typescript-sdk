@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 import type { Geometry } from '../../gen/common/v1/common_pb';
 
@@ -17,7 +17,7 @@ export interface Servo extends Resource {
    * For more information, see [Servo
    * API](https://docs.viam.com/dev/reference/apis/components/servo/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Move the servo by a given angle in degrees.
@@ -37,7 +37,7 @@ export interface Servo extends Resource {
    * For more information, see [Servo
    * API](https://docs.viam.com/dev/reference/apis/components/servo/#move).
    */
-  move(angleDeg: number, extra?: Struct): Promise<void>;
+  move(angleDeg: number, extra?: JsonObject): Promise<void>;
 
   /**
    * Return the current set angle of the servo in degrees.
@@ -54,7 +54,7 @@ export interface Servo extends Resource {
    * For more information, see [Servo
    * API](https://docs.viam.com/dev/reference/apis/components/servo/#getposition).
    */
-  getPosition(extra?: Struct): Promise<number>;
+  getPosition(extra?: JsonObject): Promise<number>;
 
   /**
    * Stop the servo.
@@ -74,7 +74,7 @@ export interface Servo extends Resource {
    * For more information, see [Servo
    * API](https://docs.viam.com/dev/reference/apis/components/servo/#stop).
    */
-  stop(extra?: Struct): Promise<void>;
+  stop(extra?: JsonObject): Promise<void>;
 
   /**
    * Return true if the servo is in motion.

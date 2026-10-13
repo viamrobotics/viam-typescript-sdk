@@ -1,16 +1,18 @@
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { GetPropertiesRequest, type AudioInfo } from '../../gen/common/v1/common_pb';
-import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
+import { GetPropertiesRequestSchema, type AudioInfo } from '../../gen/common/v1/common_pb';
 import {
-  PlayRequest,
-  PlayStreamChunk,
-  PlayStreamInit,
-  PlayStreamRequest,
+  AudioOutService,
+  PlayRequestSchema,
+  PlayStreamChunkSchema,
+  PlayStreamInitSchema,
+  PlayStreamRequestSchema,
+  type PlayStreamRequest,
 } from '../../gen/component/audioout/v1/audioout_pb';
+
 import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 import { type AudioOut } from './audio-out';
 
@@ -32,12 +34,7 @@ export class AudioOutClient implements AudioOut {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    return getGeometriesFromClient(
-      this.client.getGeometries,
-      this.name,
-      Struct.fromJson(extra),
-      callOptions,
-    );
+    return getGeometriesFromClient(this.client.getGeometries, this.name, extra, callOptions);
   }
 
   async play(
@@ -46,11 +43,11 @@ export class AudioOutClient implements AudioOut {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new PlayRequest({
+    const request = create(PlayRequestSchema, {
       name: this.name,
       audioData,
       audioInfo,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -65,13 +62,13 @@ export class AudioOutClient implements AudioOut {
     callOptions = this.callOptions,
   ) {
     const { name } = this;
-    const extraStruct = Struct.fromJson(extra);
+    const extraStruct = extra;
 
     const requests = async function* requestGen(): AsyncGenerator<PlayStreamRequest> {
-      yield new PlayStreamRequest({
+      yield create(PlayStreamRequestSchema, {
         payload: {
           case: 'init',
-          value: new PlayStreamInit({
+          value: create(PlayStreamInitSchema, {
             name,
             audioInfo,
             extra: extraStruct,
@@ -79,10 +76,10 @@ export class AudioOutClient implements AudioOut {
         },
       });
       for await (const audioData of chunks) {
-        yield new PlayStreamRequest({
+        yield create(PlayStreamRequestSchema, {
           payload: {
             case: 'audioChunk',
-            value: new PlayStreamChunk({ audioData }),
+            value: create(PlayStreamChunkSchema, { audioData }),
           },
         });
       }
@@ -92,9 +89,9 @@ export class AudioOutClient implements AudioOut {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -113,7 +110,7 @@ export class AudioOutClient implements AudioOut {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

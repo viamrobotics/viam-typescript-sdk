@@ -1,20 +1,21 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { GripperService } from '../../gen/component/gripper/v1/gripper_connect';
 import {
-  GetCurrentInputsRequest,
-  GoToInputsRequest,
-  GrabRequest,
-  IsHoldingSomethingRequest,
-  IsMovingRequest,
-  OpenRequest,
-  StopRequest,
+  GripperService,
+  GetCurrentInputsRequestSchema,
+  GoToInputsRequestSchema,
+  GrabRequestSchema,
+  IsHoldingSomethingRequestSchema,
+  IsMovingRequestSchema,
+  OpenRequestSchema,
+  StopRequestSchema,
 } from '../../gen/component/gripper/v1/gripper_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Gripper } from './gripper';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
+import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Gripper component.
@@ -34,9 +35,9 @@ export class GripperClient implements Gripper {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    const request = new GetGeometriesRequest({
+    const request = create(GetGeometriesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     const response = await this.client.getGeometries(request, callOptions);
@@ -44,9 +45,9 @@ export class GripperClient implements Gripper {
   }
 
   async open(extra = {}, callOptions = this.callOptions) {
-    const request = new OpenRequest({
+    const request = create(OpenRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -55,9 +56,9 @@ export class GripperClient implements Gripper {
   }
 
   async grab(extra = {}, callOptions = this.callOptions) {
-    const request = new GrabRequest({
+    const request = create(GrabRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -66,9 +67,9 @@ export class GripperClient implements Gripper {
   }
 
   async stop(extra = {}, callOptions = this.callOptions) {
-    const request = new StopRequest({
+    const request = create(StopRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -77,7 +78,7 @@ export class GripperClient implements Gripper {
   }
 
   async isMoving(callOptions = this.callOptions) {
-    const request = new IsMovingRequest({
+    const request = create(IsMovingRequestSchema, {
       name: this.name,
     });
 
@@ -88,9 +89,9 @@ export class GripperClient implements Gripper {
   }
 
   async isHoldingSomething(extra = {}, callOptions = this.callOptions) {
-    const request = new IsHoldingSomethingRequest({
+    const request = create(IsHoldingSomethingRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -100,9 +101,9 @@ export class GripperClient implements Gripper {
   }
 
   async getCurrentInputs(extra = {}, callOptions = this.callOptions) {
-    const request = new GetCurrentInputsRequest({
+    const request = create(GetCurrentInputsRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -112,10 +113,10 @@ export class GripperClient implements Gripper {
   }
 
   async goToInputs(values: number[], extra = {}, callOptions = this.callOptions) {
-    const request = new GoToInputsRequest({
+    const request = create(GoToInputsRequestSchema, {
       name: this.name,
       values,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -128,7 +129,7 @@ export class GripperClient implements Gripper {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

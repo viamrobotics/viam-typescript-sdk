@@ -1,11 +1,11 @@
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
-import { GetAudioRequest } from '../../gen/component/audioin/v1/audioin_pb';
-import { GetPropertiesRequest } from '../../gen/common/v1/common_pb';
+import { AudioInService, GetAudioRequestSchema } from '../../gen/component/audioin/v1/audioin_pb';
+
+import { GetPropertiesRequestSchema } from '../../gen/common/v1/common_pb';
 import { type AudioIn, type AudioChunk } from './audio-in';
 import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
 
@@ -27,12 +27,7 @@ export class AudioInClient implements AudioIn {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    return getGeometriesFromClient(
-      this.client.getGeometries,
-      this.name,
-      Struct.fromJson(extra),
-      callOptions,
-    );
+    return getGeometriesFromClient(this.client.getGeometries, this.name, extra, callOptions);
   }
 
   async *getAudio(
@@ -42,12 +37,12 @@ export class AudioInClient implements AudioIn {
     extra = {},
     callOptions = this.callOptions,
   ): AsyncIterable<AudioChunk> {
-    const request = new GetAudioRequest({
+    const request = create(GetAudioRequestSchema, {
       name: this.name,
       codec,
       durationSeconds,
       previousTimestampNanoseconds: previousTimestamp,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -71,9 +66,9 @@ export class AudioInClient implements AudioIn {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -92,7 +87,7 @@ export class AudioInClient implements AudioIn {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

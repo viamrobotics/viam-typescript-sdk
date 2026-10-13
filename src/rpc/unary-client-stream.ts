@@ -1,11 +1,23 @@
-import type { Message, PartialMessage } from '@bufbuild/protobuf';
-import type { ContextValues, UnaryRequest, UnaryResponse } from '@connectrpc/connect';
-import { createContextValues } from '@connectrpc/connect';
+import {
+  toBinary,
+  type DescMessage,
+  type DescMethodUnary,
+  type MessageInitShape,
+  type MessageShape,
+} from '@bufbuild/protobuf';
+
+import {
+  createContextValues,
+  type ContextValues,
+  type UnaryRequest,
+  type UnaryResponse,
+} from '@connectrpc/connect';
+
 import { runUnaryCall } from '@connectrpc/connect/protocol';
 import { type ResponseHeaders, type ResponseTrailers } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { ClientStream, toGRPCMetadata } from './client-stream';
 
-export class UnaryClientStream<I extends Message<I>, O extends Message<O>> extends ClientStream<
+export class UnaryClientStream<I extends DescMessage, O extends DescMessage> extends ClientStream<
   I,
   O
 > {
@@ -15,20 +27,20 @@ export class UnaryClientStream<I extends Message<I>, O extends Message<O>> exten
   };
 
   private headers?: Headers;
-  private message?: O;
+  private message?: MessageShape<O>;
 
   public async run(
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
-    message: PartialMessage<I>,
+    message: MessageInitShape<I>,
     contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     const req = {
       stream: false as const,
       url: '',
-      init: {},
+      requestMethod: 'POST',
       service: this.service,
-      method: this.method,
+      method: this.method as DescMethodUnary<I, O>,
       header: new Headers(),
       contextValues: contextValues ?? createContextValues(),
       message,
@@ -44,7 +56,7 @@ export class UnaryClientStream<I extends Message<I>, O extends Message<O>> exten
         return new Promise((resolve, reject) => {
           this.result = { success: resolve, failure: reject };
           this.startRequest();
-          this.sendMessage(unaryReq.message.toBinary());
+          this.sendMessage(toBinary(this.method.input, unaryReq.message));
         });
       },
     };
@@ -86,7 +98,7 @@ export class UnaryClientStream<I extends Message<I>, O extends Message<O>> exten
         message: this.message,
         trailer: trailers,
         service: this.service,
-        method: this.method,
+        method: this.method as DescMethodUnary<I, O>,
       } satisfies UnaryResponse<I, O>);
       return;
     }

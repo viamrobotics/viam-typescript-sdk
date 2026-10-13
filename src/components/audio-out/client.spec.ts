@@ -1,25 +1,27 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { create } from '@bufbuild/protobuf';
+
 import {
-  AudioInfo,
-  Geometry,
-  GetGeometriesResponse,
+  AudioInfoSchema,
+  GeometrySchema,
+  GetGeometriesResponseSchema,
   type GetPropertiesRequest,
-  GetPropertiesResponse,
+  GetPropertiesResponseSchema,
 } from '../../gen/common/v1/common_pb';
+
 import { RobotClient } from '../../robot';
 import { AudioOutClient } from './client';
 import { AudioCodec } from '../../audio-common';
 vi.mock('../../robot');
 
-import { Struct } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { AudioOutService } from '../../gen/component/audioout/v1/audioout_connect';
 import {
+  AudioOutService,
+  PlayStreamResponseSchema,
   type PlayStreamInit,
   type PlayStreamRequest,
-  PlayStreamResponse,
 } from '../../gen/component/audioout/v1/audioout_pb';
 
 let audioOut: AudioOutClient;
@@ -27,13 +29,13 @@ let capturedPropertiesReq: GetPropertiesRequest | undefined;
 let capturedPlayStreamInit: PlayStreamInit | undefined;
 let capturedPlayStreamChunks: Uint8Array[] = [];
 
-const testProperties = new GetPropertiesResponse({
+const testProperties = create(GetPropertiesResponseSchema, {
   supportedCodecs: [AudioCodec.PCM16, AudioCodec.MP3, AudioCodec.PCM32_FLOAT],
   sampleRateHz: 48_000,
   numChannels: 2,
 });
 
-const testGeometries = [new Geometry({ label: 'test-geometry' })];
+const testGeometries = [create(GeometrySchema, { label: 'test-geometry' })];
 
 describe('AudioOutClient tests', () => {
   beforeEach(() => {
@@ -52,14 +54,14 @@ describe('AudioOutClient tests', () => {
               capturedPlayStreamChunks.push(req.payload.value.audioData);
             }
           }
-          return new PlayStreamResponse();
+          return create(PlayStreamResponseSchema);
         },
         getProperties: (req: GetPropertiesRequest) => {
           capturedPropertiesReq = req;
           return testProperties;
         },
         getGeometries: () => {
-          return new GetGeometriesResponse({ geometries: testGeometries });
+          return create(GetGeometriesResponseSchema, { geometries: testGeometries });
         },
       });
     });
@@ -74,7 +76,7 @@ describe('AudioOutClient tests', () => {
   describe('play tests', () => {
     it('play sends audio data', async () => {
       const audioData = new Uint8Array([1, 2, 3, 4, 5]);
-      const audioInfo = new AudioInfo({
+      const audioInfo = create(AudioInfoSchema, {
         codec: AudioCodec.PCM16,
         sampleRateHz: 48_000,
         numChannels: 2,
@@ -86,7 +88,7 @@ describe('AudioOutClient tests', () => {
 
   describe('playStream tests', () => {
     it('playStream sends init followed by chunks', async () => {
-      const audioInfo = new AudioInfo({
+      const audioInfo = create(AudioInfoSchema, {
         codec: AudioCodec.PCM16,
         sampleRateHz: 22_050,
         numChannels: 1,
@@ -114,7 +116,7 @@ describe('AudioOutClient tests', () => {
     });
 
     it('playStream with no chunks still sends init', async () => {
-      const audioInfo = new AudioInfo({
+      const audioInfo = create(AudioInfoSchema, {
         codec: AudioCodec.PCM16,
         sampleRateHz: 48_000,
         numChannels: 2,
@@ -147,7 +149,7 @@ describe('AudioOutClient tests', () => {
     it('getProperties passes extra to request', async () => {
       const extra = { key: 'value' };
       await audioOut.getProperties(extra);
-      expect(capturedPropertiesReq?.extra).toStrictEqual(Struct.fromJson(extra));
+      expect(capturedPropertiesReq?.extra).toStrictEqual(extra);
     });
   });
 

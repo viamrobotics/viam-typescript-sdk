@@ -1,20 +1,21 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { BaseService } from '../../gen/component/base/v1/base_connect';
 import {
-  GetPropertiesRequest,
-  IsMovingRequest,
-  MoveStraightRequest,
-  SetPowerRequest,
-  SetVelocityRequest,
-  SpinRequest,
-  StopRequest,
+  BaseService,
+  GetPropertiesRequestSchema,
+  IsMovingRequestSchema,
+  MoveStraightRequestSchema,
+  SetPowerRequestSchema,
+  SetVelocityRequestSchema,
+  SpinRequestSchema,
+  StopRequestSchema,
 } from '../../gen/component/base/v1/base_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options, Vector3 } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Base } from './base';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
+import { GetGeometriesRequestSchema } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Base component.
@@ -34,9 +35,9 @@ export class BaseClient implements Base {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    const request = new GetGeometriesRequest({
+    const request = create(GetGeometriesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     const response = await this.client.getGeometries(request, callOptions);
@@ -49,11 +50,11 @@ export class BaseClient implements Base {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new MoveStraightRequest({
+    const request = create(MoveStraightRequestSchema, {
       name: this.name,
       mmPerSec,
       distanceMm: distanceMm ? BigInt(distanceMm) : undefined,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -62,11 +63,11 @@ export class BaseClient implements Base {
   }
 
   async spin(angleDeg: number, degsPerSec: number, extra = {}, callOptions = this.callOptions) {
-    const request = new SpinRequest({
+    const request = create(SpinRequestSchema, {
       name: this.name,
       angleDeg,
       degsPerSec,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -75,11 +76,11 @@ export class BaseClient implements Base {
   }
 
   async setPower(linear: Vector3, angular: Vector3, extra = {}, callOptions = this.callOptions) {
-    const request = new SetPowerRequest({
+    const request = create(SetPowerRequestSchema, {
       name: this.name,
       linear,
       angular,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -88,11 +89,11 @@ export class BaseClient implements Base {
   }
 
   async setVelocity(linear: Vector3, angular: Vector3, extra = {}, callOptions = this.callOptions) {
-    const request = new SetVelocityRequest({
+    const request = create(SetVelocityRequestSchema, {
       name: this.name,
       linear,
       angular,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -101,9 +102,9 @@ export class BaseClient implements Base {
   }
 
   async stop(extra = {}, callOptions = this.callOptions) {
-    const request = new StopRequest({
+    const request = create(StopRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -112,7 +113,7 @@ export class BaseClient implements Base {
   }
 
   async isMoving(callOptions = this.callOptions) {
-    const request = new IsMovingRequest({
+    const request = create(IsMovingRequestSchema, {
       name: this.name,
     });
 
@@ -127,7 +128,7 @@ export class BaseClient implements Base {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
@@ -140,9 +141,9 @@ export class BaseClient implements Base {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);

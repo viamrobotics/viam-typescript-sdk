@@ -1,11 +1,12 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { EncoderService } from '../../gen/component/encoder/v1/encoder_connect';
 import {
-  GetPositionRequest,
-  GetPropertiesRequest,
-  ResetPositionRequest,
+  EncoderService,
+  GetPositionRequestSchema,
+  GetPropertiesRequestSchema,
+  ResetPositionRequestSchema,
 } from '../../gen/component/encoder/v1/encoder_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getGeometriesFromClient, getStatusFromClient } from '../../utils';
@@ -29,18 +30,13 @@ export class EncoderClient implements Encoder {
   }
 
   async getGeometries(extra = {}, callOptions = this.callOptions) {
-    return getGeometriesFromClient(
-      this.client.getGeometries,
-      this.name,
-      Struct.fromJson(extra),
-      callOptions,
-    );
+    return getGeometriesFromClient(this.client.getGeometries, this.name, extra, callOptions);
   }
 
   async resetPosition(extra = {}, callOptions = this.callOptions) {
-    const request = new ResetPositionRequest({
+    const request = create(ResetPositionRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -49,9 +45,9 @@ export class EncoderClient implements Encoder {
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPropertiesRequest({
+    const request = create(GetPropertiesRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -64,10 +60,10 @@ export class EncoderClient implements Encoder {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new GetPositionRequest({
+    const request = create(GetPositionRequestSchema, {
       name: this.name,
       positionType,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -81,7 +77,7 @@ export class EncoderClient implements Encoder {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

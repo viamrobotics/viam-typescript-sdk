@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 import type { Geometry } from '../../gen/common/v1/common_pb';
 
@@ -20,7 +20,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Open a gripper of the underlying robot.
@@ -37,7 +37,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#open).
    */
-  open: (extra?: Struct) => Promise<void>;
+  open: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Request a gripper of the underlying robot to grab.
@@ -54,7 +54,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#grab).
    */
-  grab: (extra?: Struct) => Promise<void>;
+  grab: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Stop a robot's gripper.
@@ -71,7 +71,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#stop).
    */
-  stop: (extra?: Struct) => Promise<void>;
+  stop: (extra?: JsonObject) => Promise<void>;
 
   /**
    * Report if the gripper is in motion.
@@ -107,7 +107,7 @@ export interface Gripper extends Resource {
    * For more information, see [Gripper
    * API](https://docs.viam.com/dev/reference/apis/components/gripper/#isholdingsomething).
    */
-  isHoldingSomething: (extra?: Struct) => Promise<boolean>;
+  isHoldingSomething: (extra?: JsonObject) => Promise<boolean>;
 
   /**
    * Get the current input values of the gripper.
@@ -122,7 +122,7 @@ export interface Gripper extends Resource {
    * console.log('Current inputs:', inputs);
    * ```
    */
-  getCurrentInputs: (extra?: Struct) => Promise<number[]>;
+  getCurrentInputs: (extra?: JsonObject) => Promise<number[]>;
 
   /**
    * Move the gripper to the given input values.
@@ -138,5 +138,5 @@ export interface Gripper extends Resource {
    *
    * @param values - The input values to move the gripper to.
    */
-  goToInputs: (values: number[], extra?: Struct) => Promise<void>;
+  goToInputs: (values: number[], extra?: JsonObject) => Promise<void>;
 }

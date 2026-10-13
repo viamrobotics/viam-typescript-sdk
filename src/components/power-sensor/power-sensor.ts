@@ -1,4 +1,4 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { JsonObject, JsonValue } from '@bufbuild/protobuf';
 import type { Sensor } from '../sensor';
 
 /** Represents any sensor that reports voltage, current, and/or power */
@@ -16,7 +16,7 @@ export interface PowerSensor extends Sensor {
    * For more information, see [Power Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/power-sensor/#getvoltage).
    */
-  getVoltage(extra?: Struct): Promise<readonly [number, boolean]>;
+  getVoltage(extra?: JsonObject): Promise<readonly [number, boolean]>;
   /**
    * Get Current in amps and a boolean indicating whether the voltage is AC (true) or DC (false).
    *
@@ -30,7 +30,7 @@ export interface PowerSensor extends Sensor {
    * For more information, see [Power Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/power-sensor/#getcurrent).
    */
-  getCurrent(extra?: Struct): Promise<readonly [number, boolean]>;
+  getCurrent(extra?: JsonObject): Promise<readonly [number, boolean]>;
   /**
    * Get power in watts.
    *
@@ -44,7 +44,7 @@ export interface PowerSensor extends Sensor {
    * For more information, see [Power Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/power-sensor/#getpower).
    */
-  getPower(extra?: Struct): Promise<number>;
+  getPower(extra?: JsonObject): Promise<number>;
   /**
    * Return the readings of a sensor.
    *
@@ -58,5 +58,5 @@ export interface PowerSensor extends Sensor {
    * For more information, see [Power Sensor
    * API](https://docs.viam.com/dev/reference/apis/components/power-sensor/#getreadings).
    */
-  getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
+  getReadings(extra?: JsonObject): Promise<Record<string, JsonValue>>;
 }

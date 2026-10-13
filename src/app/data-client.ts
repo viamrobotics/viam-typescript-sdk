@@ -1,50 +1,55 @@
 /* eslint-disable @typescript-eslint/no-deprecated */
-import {
-  type FieldMask,
-  Struct,
-  Timestamp,
-  type JsonValue,
-  type PartialMessage,
-} from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create, type MessageInitShape } from '@bufbuild/protobuf';
+import { timestampDate, timestampFromDate, type FieldMask } from '@bufbuild/protobuf/wkt';
+
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { BSON } from 'bsonfy';
-import { DataService } from '../gen/app/data/v1/data_connect';
 import {
+  DataService,
+  CaptureIntervalSchema,
+  CaptureMetadataSchema,
+  FilterSchema,
+  TabularDataSourceSchema,
+  TabularDataSourceType,
+  TagsFilterSchema,
   type BinaryData,
   type BinaryID,
-  CaptureInterval,
-  CaptureMetadata,
-  Filter,
   type Index,
   type IndexableCollection,
   type Order,
   type Sequence,
   type SequenceResourceFilter,
-  TabularDataSource,
-  TabularDataSourceType,
   type DeleteTabularFilter,
-  TagsFilter,
+  type CaptureMetadata,
+  type Filter,
+  type TabularDataSource,
 } from '../gen/app/data/v1/data_pb';
-import { DataPipelinesService } from '../gen/app/datapipelines/v1/data_pipelines_connect';
+
 import {
+  DataPipelinesService,
   type DataPipeline,
   type DataPipelineRun,
 } from '../gen/app/datapipelines/v1/data_pipelines_pb';
-import { DatasetService } from '../gen/app/dataset/v1/dataset_connect';
+
 import {
+  DatasetService,
   type DatasetType,
   type Dataset as PBDataset,
   type GetSequenceDatasetExportResponse,
 } from '../gen/app/dataset/v1/dataset_pb';
-import { DataSyncService } from '../gen/app/datasync/v1/data_sync_connect';
+
 import {
-  DataCaptureUploadRequest,
+  DataSyncService,
+  DataCaptureUploadRequestSchema,
   DataType,
-  FileData,
-  FileUploadRequest,
-  SensorData,
-  SensorMetadata,
-  UploadMetadata,
+  FileDataSchema,
+  FileUploadRequestSchema,
+  SensorDataSchema,
+  SensorMetadataSchema,
+  UploadMetadataSchema,
+  type FileUploadRequest,
+  type SensorData,
+  type UploadMetadata,
 } from '../gen/app/datasync/v1/data_sync_pb';
 
 export type FilterOptions = Partial<Filter> & {
@@ -191,17 +196,17 @@ export class DataClient {
     endTime?: Date,
     additionalParams?: Record<string, JsonValue>,
   ) {
-    const interval = new CaptureInterval();
+    const interval = create(CaptureIntervalSchema);
     if (startTime) {
-      interval.start = Timestamp.fromDate(startTime);
+      interval.start = timestampFromDate(startTime);
     }
     if (endTime) {
-      interval.end = Timestamp.fromDate(endTime);
+      interval.end = timestampFromDate(endTime);
     }
 
-    let additionalParameters: Struct | undefined;
+    let additionalParameters: JsonObject | undefined;
     if (additionalParams) {
-      additionalParameters = Struct.fromJson(additionalParams);
+      additionalParameters = additionalParams;
     }
 
     const req = {
@@ -223,15 +228,15 @@ export class DataClient {
         resourceName: response.resourceName,
         resourceSubtype: response.resourceSubtype,
         methodName: response.methodName,
-        timeCaptured: response.timeCaptured!.toDate(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        timeCaptured: timestampDate(response.timeCaptured!), // eslint-disable-line @typescript-eslint/no-non-null-assertion
         organizationId: response.organizationId,
         locationId: response.locationId,
         robotName: response.robotName,
         robotId: response.robotId,
         partName: response.partName,
-        methodParameters: response.methodParameters!.toJson(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        methodParameters: response.methodParameters ?? {},
         tags: response.tags,
-        payload: response.payload!.toJson(), // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        payload: response.payload ?? {},
       });
     }
 
@@ -315,7 +320,7 @@ export class DataClient {
     // Legacy support for useRecentData, which is now deprecated.
     let dataSource = tabularDataSource;
     if (useRecentData && (!dataSource || dataSource.type === TabularDataSourceType.UNSPECIFIED)) {
-      dataSource = new TabularDataSource({
+      dataSource = create(TabularDataSourceSchema, {
         type: TabularDataSourceType.HOT_STORAGE,
       });
     }
@@ -390,13 +395,13 @@ export class DataClient {
       const mdIndex = data.metadataIndex;
       const metadata =
         mdListLength !== 0 && mdIndex >= mdListLength
-          ? new CaptureMetadata()
+          ? create(CaptureMetadataSchema)
           : response.metadata[mdIndex];
       return {
-        data: data.data?.toJson(),
+        data: data.data,
         metadata,
-        timeRequested: data.timeRequested?.toDate(),
-        timeReceived: data.timeRequested?.toDate(),
+        timeRequested: data.timeRequested ? timestampDate(data.timeRequested) : undefined,
+        timeReceived: data.timeRequested ? timestampDate(data.timeRequested) : undefined,
       };
     });
 
@@ -571,7 +576,7 @@ export class DataClient {
   async deleteTabularData(
     organizationId: string,
     deleteOlderThanDays: number,
-    filter?: PartialMessage<DeleteTabularFilter>,
+    filter?: DeleteTabularFilter,
   ) {
     const resp = await this.dataClient.deleteTabularData({
       organizationId,
@@ -1195,8 +1200,8 @@ export class DataClient {
     });
     return resp.datasets.map((ds) => {
       return {
-        created: ds.timeCreated?.toDate(),
-        // eslint-disable-next-line @typescript-eslint/no-misused-spread
+        created: ds.timeCreated ? timestampDate(ds.timeCreated) : undefined,
+
         ...ds,
       };
     });
@@ -1223,8 +1228,8 @@ export class DataClient {
     });
     return resp.datasets.map((ds) => {
       return {
-        created: ds.timeCreated?.toDate(),
-        // eslint-disable-next-line @typescript-eslint/no-misused-spread
+        created: ds.timeCreated ? timestampDate(ds.timeCreated) : undefined,
+
         ...ds,
       };
     });
@@ -1286,7 +1291,7 @@ export class DataClient {
       throw new Error('dataRequestTimes and data lengths must be equal.');
     }
 
-    const metadata = new UploadMetadata({
+    const metadata = create(UploadMetadataSchema, {
       partId,
       componentType,
       componentName,
@@ -1297,24 +1302,24 @@ export class DataClient {
 
     const sensorContents: SensorData[] = [];
     for (const [i, data] of tabularData.entries()) {
-      const sensorMetadata = new SensorMetadata();
+      const sensorMetadata = create(SensorMetadataSchema);
       const dates = dataRequestTimes[i];
       if (dates) {
-        sensorMetadata.timeRequested = Timestamp.fromDate(dates[0]);
-        sensorMetadata.timeReceived = Timestamp.fromDate(dates[1]);
+        sensorMetadata.timeRequested = timestampFromDate(dates[0]);
+        sensorMetadata.timeReceived = timestampFromDate(dates[1]);
       }
       sensorContents.push(
-        new SensorData({
+        create(SensorDataSchema, {
           metadata: sensorMetadata,
           data: {
             case: 'struct',
-            value: Struct.fromJson(data),
+            value: data,
           },
         }),
       );
     }
 
-    const req = new DataCaptureUploadRequest({
+    const req = create(DataCaptureUploadRequestSchema, {
       metadata,
       sensorContents,
     });
@@ -1368,7 +1373,7 @@ export class DataClient {
     dataRequestTimes: [Date, Date],
     options?: BinaryDataCaptureUploadOptions,
   ): Promise<string> {
-    const metadata = new UploadMetadata({
+    const metadata = create(UploadMetadataSchema, {
       partId,
       componentType,
       componentName,
@@ -1380,10 +1385,10 @@ export class DataClient {
       mimeType: options?.mimeType ?? '',
     });
 
-    const sensorData = new SensorData({
+    const sensorData = create(SensorDataSchema, {
       metadata: {
-        timeRequested: Timestamp.fromDate(dataRequestTimes[0]),
-        timeReceived: Timestamp.fromDate(dataRequestTimes[1]),
+        timeRequested: timestampFromDate(dataRequestTimes[0]),
+        timeReceived: timestampFromDate(dataRequestTimes[1]),
       },
       data: {
         case: 'binary',
@@ -1391,7 +1396,7 @@ export class DataClient {
       },
     });
 
-    const req = new DataCaptureUploadRequest({
+    const req = create(DataCaptureUploadRequestSchema, {
       metadata,
       sensorContents: [sensorData],
     });
@@ -1424,7 +1429,7 @@ export class DataClient {
    * @returns The binary data ID of the uploaded data
    */
   async fileUpload(binaryData: Uint8Array, partId: string, options?: FileUploadOptions) {
-    const md = new UploadMetadata({
+    const md = create(UploadMetadataSchema, {
       partId,
       type: DataType.FILE,
       ...options,
@@ -1446,8 +1451,8 @@ export class DataClient {
   private static async *fileUploadRequests(
     metadata: UploadMetadata,
     data: Uint8Array,
-  ): AsyncGenerator<PartialMessage<FileUploadRequest>> {
-    yield new FileUploadRequest({
+  ): AsyncGenerator<FileUploadRequest> {
+    yield create(FileUploadRequestSchema, {
       uploadPacket: {
         case: 'metadata',
         value: metadata,
@@ -1458,30 +1463,31 @@ export class DataClient {
       if (end > data.length) {
         end = data.length;
       }
-      yield new FileUploadRequest({
+      yield create(FileUploadRequestSchema, {
         uploadPacket: {
           case: 'fileContents',
-          value: new FileData({ data: data.slice(i, end) }),
+          value: create(FileDataSchema, { data: data.slice(i, end) }),
         },
       });
     }
   }
 
   static createFilter(options: FilterOptions): Filter {
-    const filter = new Filter(options);
+    const { startTime: _startTime, endTime: _endTime, tags: _tags, ...filterInit } = options;
+    const filter = create(FilterSchema, filterInit as MessageInitShape<typeof FilterSchema>);
 
     if (options.startTime ?? options.endTime) {
-      const interval = new CaptureInterval();
+      const interval = create(CaptureIntervalSchema);
       if (options.startTime) {
-        interval.start = Timestamp.fromDate(options.startTime);
+        interval.start = timestampFromDate(options.startTime);
       }
       if (options.endTime) {
-        interval.end = Timestamp.fromDate(options.endTime);
+        interval.end = timestampFromDate(options.endTime);
       }
       filter.interval = interval;
     }
 
-    const tagsFilter = new TagsFilter();
+    const tagsFilter = create(TagsFilterSchema);
     if (options.tags) {
       tagsFilter.tags = options.tags;
       filter.tagsFilter = tagsFilter;
@@ -1523,9 +1529,9 @@ export class DataClient {
     methodName: string,
     additionalParams?: Record<string, JsonValue>,
   ): Promise<[Date, Date, Record<string, JsonValue>] | null> {
-    let additionalParameters: Struct | undefined;
+    let additionalParameters: JsonObject | undefined;
     if (additionalParams) {
-      additionalParameters = Struct.fromJson(additionalParams);
+      additionalParameters = additionalParams;
     }
 
     const resp = await this.dataClient.getLatestTabularData({
@@ -1540,11 +1546,7 @@ export class DataClient {
       return null;
     }
 
-    return [
-      resp.timeCaptured.toDate(),
-      resp.timeSynced.toDate(),
-      resp.payload.toJson() as Record<string, JsonValue>,
-    ];
+    return [timestampDate(resp.timeCaptured), timestampDate(resp.timeSynced), resp.payload];
   }
 
   /**
@@ -1829,7 +1831,7 @@ export class DataClient {
    */
   async createSequence(
     partId: string,
-    resources: PartialMessage<SequenceResourceFilter>[],
+    resources: SequenceResourceFilter[],
     sequenceTags?: string[],
     startTime?: Date,
     endTime?: Date,
@@ -1838,8 +1840,8 @@ export class DataClient {
       partId,
       resources,
       sequenceTags,
-      startTime: startTime ? Timestamp.fromDate(startTime) : undefined,
-      endTime: endTime ? Timestamp.fromDate(endTime) : undefined,
+      startTime: startTime ? timestampFromDate(startTime) : undefined,
+      endTime: endTime ? timestampFromDate(endTime) : undefined,
     });
     return resp.id;
   }
@@ -1922,18 +1924,18 @@ export class DataClient {
    */
   async updateSequence(
     id: string,
-    resources?: PartialMessage<SequenceResourceFilter>[],
+    resources?: SequenceResourceFilter[],
     sequenceTags?: string[],
     startTime?: Date,
     endTime?: Date,
-    fieldMask?: PartialMessage<FieldMask>,
+    fieldMask?: FieldMask,
   ): Promise<void> {
     await this.dataClient.updateSequence({
       id,
       resources,
       sequenceTags,
-      startTime: startTime ? Timestamp.fromDate(startTime) : undefined,
-      endTime: endTime ? Timestamp.fromDate(endTime) : undefined,
+      startTime: startTime ? timestampFromDate(startTime) : undefined,
+      endTime: endTime ? timestampFromDate(endTime) : undefined,
       fieldMask,
     });
   }

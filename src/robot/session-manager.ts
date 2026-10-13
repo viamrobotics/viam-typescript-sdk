@@ -1,15 +1,21 @@
-import { BinaryReader, FileDescriptorProto, type MethodOptions } from '@bufbuild/protobuf';
+import { create, fromBinary, hasExtension } from '@bufbuild/protobuf';
+import { FileDescriptorProtoSchema, type MethodOptions } from '@bufbuild/protobuf/wkt';
 import { Code, ConnectError, createClient, type Transport } from '@connectrpc/connect';
 import { createAsyncIterable } from '@connectrpc/connect/protocol';
 import { safety_heartbeat_monitored as safteyHeartbeatMonitored } from '../gen/common/v1/common_pb';
-import { ServerReflection } from '../gen/grpc/reflection/v1/reflection_connect';
 import {
+  ServerReflection,
+  ServerReflectionRequestSchema,
   type FileDescriptorResponse,
   type ListServiceResponse,
-  ServerReflectionRequest,
 } from '../gen/grpc/reflection/v1/reflection_pb';
-import { RobotService } from '../gen/robot/v1/robot_connect';
-import { SendSessionHeartbeatRequest, StartSessionRequest } from '../gen/robot/v1/robot_pb';
+
+import {
+  RobotService,
+  SendSessionHeartbeatRequestSchema,
+  StartSessionRequestSchema,
+} from '../gen/robot/v1/robot_pb';
+
 import { ConnectionClosedError } from '../rpc';
 import SessionTransport from './session-transport';
 
@@ -83,7 +89,7 @@ export default class SessionManager {
 
     let worker: Worker | undefined;
     const doHeartbeat = async () => {
-      const sendHeartbeatReq = new SendSessionHeartbeatRequest({
+      const sendHeartbeatReq = create(SendSessionHeartbeatRequestSchema, {
         id: this.currentSessionID,
       });
       try {
@@ -142,7 +148,7 @@ export default class SessionManager {
 
     this.starting = new Promise<void>((resolve, reject) => {
       (async () => {
-        const startSessionReq = new StartSessionRequest();
+        const startSessionReq = create(StartSessionRequestSchema);
         if (this.currentSessionID !== '') {
           startSessionReq.resume = this.currentSessionID;
         }
@@ -185,7 +191,7 @@ export default class SessionManager {
   private async applyHeartbeatMonitoredMethods(): Promise<void> {
     try {
       const client = createClient(ServerReflection, this.transport);
-      const request = new ServerReflectionRequest({
+      const request = create(ServerReflectionRequestSchema, {
         host: this.host,
         messageRequest: { case: 'listServices', value: '' },
       });
@@ -196,7 +202,7 @@ export default class SessionManager {
         const fdpRequests = (
           serviceResponse.messageResponse.value as ListServiceResponse
         ).service.map((service) => {
-          return new ServerReflectionRequest({
+          return create(ServerReflectionRequestSchema, {
             messageRequest: {
               case: 'fileContainingSymbol',
               value: service.name,
@@ -209,7 +215,7 @@ export default class SessionManager {
         for await (const fdpResponse of fdpResponseStream) {
           for (const fdp of (fdpResponse.messageResponse.value as FileDescriptorResponse)
             .fileDescriptorProto) {
-            const protoFile = FileDescriptorProto.fromBinary(fdp);
+            const protoFile = fromBinary(FileDescriptorProtoSchema, fdp);
             for (const service of protoFile.service) {
               for (const method of service.method) {
                 SessionManager.heartbeatMonitoredMethods[
@@ -246,15 +252,6 @@ export default class SessionManager {
     if (!options) {
       return false;
     }
-    const reader = new BinaryReader(options.toBinary());
-    while (reader.pos < reader.len) {
-      const tag = reader.tag();
-      const [fieldNumber] = tag;
-      if (fieldNumber === safteyHeartbeatMonitored.field.no) {
-        return true;
-      }
-      reader.string();
-    }
-    return false;
+    return hasExtension(options, safteyHeartbeatMonitored);
   }
 }

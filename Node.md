@@ -40,7 +40,7 @@ Communicating with your Viam machine in Node.js requires the use of a custom tra
 const connectNode = require('@connectrpc/connect-node');
 globalThis.VIAM = {
   GRPC_TRANSPORT_FACTORY: (opts: any) =>
-    connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
+    connectNode.createGrpcTransport({ ...opts }),
 };
 ```
 
@@ -56,7 +56,7 @@ const wrtc = require('node-datachannel/polyfill');
 const connectNode = require('@connectrpc/connect-node');
 globalThis.VIAM = {
   GRPC_TRANSPORT_FACTORY: (opts: any) =>
-    connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
+    connectNode.createGrpcTransport({ ...opts }),
 };
 for (const key in wrtc) {
   (global as any)[key] = (wrtc as any)[key];

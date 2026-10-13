@@ -1,4 +1,3 @@
-import type { Message } from '@bufbuild/protobuf';
 import { ConnectionClosedError } from './connection-closed-error';
 
 export class BaseChannel {
@@ -74,7 +73,7 @@ export class BaseChannel {
     this.closeWithReason(new Error(JSON.stringify(ev)));
   }
 
-  protected write(msg: Message) {
-    this.dataChannel.send(msg.toBinary() as Uint8Array<ArrayBuffer>);
+  protected write(bytes: Uint8Array) {
+    this.dataChannel.send(bytes as Uint8Array<ArrayBuffer>);
   }
 }

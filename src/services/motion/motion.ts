@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type {
   GeoGeometry,
   GeoPoint,
@@ -64,7 +64,7 @@ export interface Motion extends Resource {
     componentName: string,
     worldState?: WorldState,
     constraints?: Constraints,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<boolean>;
 
   /**
@@ -114,7 +114,7 @@ export interface Motion extends Resource {
     slamServiceName: string,
     motionConfiguration?: MotionConfiguration,
     obstacles?: Geometry[],
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<string>;
 
   /**
@@ -167,7 +167,7 @@ export interface Motion extends Resource {
     obstaclesList?: GeoGeometry[],
     motionConfiguration?: MotionConfiguration,
     boundingRegion?: GeoGeometry[],
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<string>;
 
   /**
@@ -188,7 +188,7 @@ export interface Motion extends Resource {
    *
    * @param componentName - The component to stop
    */
-  stopPlan: (componentName: string, extra?: Struct) => Promise<null>;
+  stopPlan: (componentName: string, extra?: JsonObject) => Promise<null>;
 
   /**
    * By default: returns the plan history of the most recent `moveOnGlobe()` or `moveOnMap()` call
@@ -226,7 +226,7 @@ export interface Motion extends Resource {
     componentName: string,
     lastPlanOnly?: boolean,
     executionId?: string,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<GetPlanResponse>;
 
   /**
@@ -254,7 +254,7 @@ export interface Motion extends Resource {
    */
   listPlanStatuses: (
     onlyActivePlans?: boolean,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<ListPlanStatusesResponse>;
 
   /**
@@ -285,6 +285,6 @@ export interface Motion extends Resource {
     componentName: string,
     destinationFrame: string,
     supplementalTransforms: Transform[],
-    extra?: Struct,
+    extra?: JsonObject,
   ) => Promise<PoseInFrame>;
 }

@@ -1,7 +1,9 @@
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
-import { MLTrainingService } from '../gen/app/mltraining/v1/ml_training_connect';
-
-import { type ModelType, type TrainingStatus } from '../gen/app/mltraining/v1/ml_training_pb';
+import {
+  MLTrainingService,
+  type ModelType,
+  type TrainingStatus,
+} from '../gen/app/mltraining/v1/ml_training_pb';
 
 export class MlTrainingClient {
   private client: Client<typeof MLTrainingService>;

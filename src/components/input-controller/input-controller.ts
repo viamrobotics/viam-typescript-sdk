@@ -1,10 +1,10 @@
-import type { PlainMessage, Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import * as pb from '../../gen/component/inputcontroller/v1/input_controller_pb';
 import type { Resource } from '../../types';
 import type { Geometry } from '../../gen/common/v1/common_pb';
 
-export type InputControllerEvent = PlainMessage<pb.Event>;
-export const { Event: InputControllerEvent } = pb;
+export type InputControllerEvent = pb.Event;
+export const { EventSchema: InputControllerEvent } = pb;
 
 /** Represents a human interface device like a mouse or keyboard that emits events for controls. */
 export interface InputController extends Resource {
@@ -21,7 +21,7 @@ export interface InputController extends Resource {
    * For more information, see [Input Controller
    * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#getgeometries).
    */
-  getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+  getGeometries: (extra?: JsonObject) => Promise<Geometry[]>;
 
   /**
    * Returns a list of events representing the last event on each control.
@@ -39,7 +39,7 @@ export interface InputController extends Resource {
    * For more information, see [Input Controller
    * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#getevents).
    */
-  getEvents(extra?: Struct): Promise<InputControllerEvent[]>;
+  getEvents(extra?: JsonObject): Promise<InputControllerEvent[]>;
 
   /**
    * TriggerEvent, where supported, injects an InputControllerEvent into an input controller to
@@ -64,5 +64,5 @@ export interface InputController extends Resource {
    * For more information, see [Input Controller
    * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#triggerevent).
    */
-  triggerEvent(event: InputControllerEvent, extra?: Struct): Promise<void>;
+  triggerEvent(event: InputControllerEvent, extra?: JsonObject): Promise<void>;
 }

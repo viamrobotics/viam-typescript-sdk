@@ -1,6 +1,5 @@
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
-import { ProvisioningService } from '../gen/provisioning/v1/provisioning_connect';
-import type { CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+import { ProvisioningService, type CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
 
 export class ProvisioningClient {
   private client: Client<typeof ProvisioningService>;

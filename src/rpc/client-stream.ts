@@ -1,17 +1,29 @@
-import type { AnyMessage, Message, MethodInfo, ServiceType } from '@bufbuild/protobuf';
-import { createClientMethodSerializers } from '@connectrpc/connect/protocol';
 import {
-  Metadata,
-  PacketMessage,
-  RequestHeaders,
-  RequestMessage,
+  create,
+  type DescMessage,
+  type DescMethodStreaming,
+  type DescMethodUnary,
+  type DescService,
+  type MessageShape,
+} from '@bufbuild/protobuf';
+
+import { createClientMethodSerializers } from '@connectrpc/connect/protocol';
+
+import {
+  MetadataSchema,
+  PacketMessageSchema,
+  RequestHeadersSchema,
+  RequestMessageSchema,
+  StringsSchema,
   type Response,
   type ResponseHeaders,
   type ResponseMessage,
   type ResponseTrailers,
   type Stream,
-  Strings,
+  type Metadata,
+  type RequestHeaders,
 } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
+
 import { BaseStream } from './base-stream';
 import type { ClientChannel } from './client-channel';
 import { cloneHeaders } from './dial';
@@ -21,16 +33,16 @@ const maxRequestMessagePacketDataSize = 16_373;
 
 export interface ClientStreamConstructor<
   T extends ClientStream<I, O>,
-  I extends Message<I> = AnyMessage,
-  O extends Message<O> = AnyMessage,
+  I extends DescMessage,
+  O extends DescMessage,
 > {
   // eslint-disable-next-line @typescript-eslint/prefer-function-type -- this works better with ClientChannel
   new (
     channel: ClientChannel,
     stream: Stream,
     onDone: (id: bigint) => void,
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+    service: DescService,
+    method: DescMethodUnary<I, O> | DescMethodStreaming<I, O>,
     header: HeadersInit | undefined,
   ): T;
 }
@@ -41,13 +53,13 @@ export interface ClientStreamConstructor<
  * flow of unary/stream operations.
  */
 export abstract class ClientStream<
-  I extends Message<I> = AnyMessage,
-  O extends Message<O> = AnyMessage,
+  I extends DescMessage,
+  O extends DescMessage,
 > extends BaseStream {
   protected readonly channel: ClientChannel;
-  protected readonly service: ServiceType;
-  protected readonly method: MethodInfo<I, O>;
-  protected readonly parseMessage: (data: Uint8Array) => O;
+  protected readonly service: DescService;
+  protected readonly method: DescMethodUnary<I, O> | DescMethodStreaming<I, O>;
+  protected readonly parseMessage: (data: Uint8Array) => MessageShape<O>;
   protected readonly requestHeaders: RequestHeaders;
 
   private headersReceived = false;
@@ -61,8 +73,8 @@ export abstract class ClientStream<
     channel: ClientChannel,
     stream: Stream,
     onDone: (id: bigint) => void,
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+    service: DescService,
+    method: DescMethodUnary<I, O> | DescMethodStreaming<I, O>,
     header: HeadersInit | undefined,
   ) {
     super(stream, onDone);
@@ -72,8 +84,8 @@ export abstract class ClientStream<
 
     const { parse } = createClientMethodSerializers(method, true);
     this.parseMessage = parse;
-    const svcMethod = `/${service.typeName}/${method.name}`;
-    this.requestHeaders = new RequestHeaders({
+    const svcMethod = `/${method.parent.typeName}/${method.name}`;
+    this.requestHeaders = create(RequestHeadersSchema, {
       method: svcMethod,
     });
     const metadataProto = fromGRPCMetadata(cloneHeaders(header));
@@ -120,10 +132,10 @@ export abstract class ClientStream<
   protected writeMessage(eos: boolean, msgBytes?: Uint8Array) {
     try {
       if (!msgBytes || msgBytes.length === 0) {
-        const packetMessage = new PacketMessage({
+        const packetMessage = create(PacketMessageSchema, {
           eom: true,
         });
-        const requestMessage = new RequestMessage({
+        const requestMessage = create(RequestMessageSchema, {
           hasMessage: Boolean(msgBytes),
           packetMessage,
           eos,
@@ -135,13 +147,13 @@ export abstract class ClientStream<
       let remMsgBytes = msgBytes;
       while (remMsgBytes.length > 0) {
         const amountToSend = Math.min(remMsgBytes.length, maxRequestMessagePacketDataSize);
-        const packetMessage = new PacketMessage();
+        const packetMessage = create(PacketMessageSchema);
         packetMessage.data = remMsgBytes.slice(0, amountToSend);
         remMsgBytes = remMsgBytes.slice(amountToSend);
         if (remMsgBytes.length === 0) {
           packetMessage.eom = true;
         }
-        const requestMessage = new RequestMessage({
+        const requestMessage = create(RequestMessageSchema, {
           hasMessage: Boolean(remMsgBytes),
           packetMessage,
           eos,
@@ -232,9 +244,12 @@ const fromGRPCMetadata = (headers?: Headers): Metadata | undefined => {
   if (!headers) {
     return undefined;
   }
-  const result = new Metadata({
+  const result = create(MetadataSchema, {
     md: Object.fromEntries(
-      [...headers.entries()].map(([key, value]) => [key, new Strings({ values: [value] })]),
+      [...headers.entries()].map(([key, value]) => [
+        key,
+        create(StringsSchema, { values: [value] }),
+      ]),
     ),
   });
 

@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 
 /** Represents a physical switch with multiple positions. */
@@ -21,7 +21,7 @@ export interface Switch extends Resource {
    * For more information, see [Switch
    * API](https://docs.viam.com/dev/reference/apis/components/switch/#setposition).
    */
-  setPosition: (position: number, extra?: Struct) => Promise<void>;
+  setPosition: (position: number, extra?: JsonObject) => Promise<void>;
 
   /**
    * Get the current position of the switch.
@@ -47,7 +47,7 @@ export interface Switch extends Resource {
    * For more information, see [Switch
    * API](https://docs.viam.com/dev/reference/apis/components/switch/#getposition).
    */
-  getPosition: (extra?: Struct) => Promise<number>;
+  getPosition: (extra?: JsonObject) => Promise<number>;
 
   /**
    * Get the total number of positions available on the switch, along with their labels. Labels
@@ -66,5 +66,5 @@ export interface Switch extends Resource {
    * For more information, see [Switch
    * API](https://docs.viam.com/dev/reference/apis/components/switch/#getnumberofpositions).
    */
-  getNumberOfPositions: (extra?: Struct) => Promise<[number, string[]]>;
+  getNumberOfPositions: (extra?: JsonObject) => Promise<[number, string[]]>;
 }

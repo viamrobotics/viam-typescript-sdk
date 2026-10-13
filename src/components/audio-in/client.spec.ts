@@ -1,40 +1,45 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { type GetAudioResponse } from '../../gen/component/audioin/v1/audioin_pb';
 import {
-  Geometry,
-  GetGeometriesResponse,
+  AudioInService,
+  GetAudioResponseSchema,
+  type GetAudioResponse,
+} from '../../gen/component/audioin/v1/audioin_pb';
+
+import {
+  GeometrySchema,
+  GetGeometriesResponseSchema,
   type GetPropertiesRequest,
-  GetPropertiesResponse,
+  GetPropertiesResponseSchema,
 } from '../../gen/common/v1/common_pb';
+
 import { RobotClient } from '../../robot';
 import { type AudioChunk } from './audio-in';
 import { AudioInClient } from './client';
 import { AudioCodec } from '../../audio-common';
 vi.mock('../../robot');
 
-import { Struct, type PartialMessage } from '@bufbuild/protobuf';
+import { create } from '@bufbuild/protobuf';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { createWritableIterable, type WritableIterable } from '@connectrpc/connect/protocol';
-import { AudioInService } from '../../gen/component/audioin/v1/audioin_connect';
 
 let audioin: AudioInClient;
 let capturedPropertiesReq: GetPropertiesRequest | undefined;
 
-let testAudioStream: WritableIterable<PartialMessage<GetAudioResponse>>;
+let testAudioStream: WritableIterable<GetAudioResponse>;
 
-const testProperties = new GetPropertiesResponse({
+const testProperties = create(GetPropertiesResponseSchema, {
   supportedCodecs: [AudioCodec.PCM16, AudioCodec.MP3, AudioCodec.PCM32_FLOAT],
   sampleRateHz: 48_000,
   numChannels: 2,
 });
 
-const testGeometries = [new Geometry({ label: 'test-geometry' })];
+const testGeometries = [create(GeometrySchema, { label: 'test-geometry' })];
 
 describe('AudioInClient tests', () => {
   beforeEach(() => {
-    testAudioStream = createWritableIterable<PartialMessage<GetAudioResponse>>();
+    testAudioStream = createWritableIterable<GetAudioResponse>();
 
     const mockTransport = createRouterTransport(({ service }) => {
       service(AudioInService, {
@@ -46,7 +51,7 @@ describe('AudioInClient tests', () => {
           return testProperties;
         },
         getGeometries: () => {
-          return new GetGeometriesResponse({ geometries: testGeometries });
+          return create(GetGeometriesResponseSchema, { geometries: testGeometries });
         },
       });
     });
@@ -72,35 +77,39 @@ describe('AudioInClient tests', () => {
         }
       })();
 
-      await testAudioStream.write({
-        audio: {
-          audioData: new Uint8Array([4, 5, 6]),
-          audioInfo: {
-            codec: AudioCodec.PCM16,
-            sampleRateHz: 48_000,
-            numChannels: 2,
+      await testAudioStream.write(
+        create(GetAudioResponseSchema, {
+          audio: {
+            audioData: new Uint8Array([4, 5, 6]),
+            audioInfo: {
+              codec: AudioCodec.PCM16,
+              sampleRateHz: 48_000,
+              numChannels: 2,
+            },
+            startTimestampNanoseconds: 1000n,
+            endTimestampNanoseconds: 2000n,
+            sequence: 1,
           },
-          startTimestampNanoseconds: 1000n,
-          endTimestampNanoseconds: 2000n,
-          sequence: 1,
-        },
-        requestId: 'test-request-1',
-      });
+          requestId: 'test-request-1',
+        }),
+      );
 
-      await testAudioStream.write({
-        audio: {
-          audioData: new Uint8Array([7, 8, 9]),
-          audioInfo: {
-            codec: AudioCodec.PCM16,
-            sampleRateHz: 48_000,
-            numChannels: 2,
+      await testAudioStream.write(
+        create(GetAudioResponseSchema, {
+          audio: {
+            audioData: new Uint8Array([7, 8, 9]),
+            audioInfo: {
+              codec: AudioCodec.PCM16,
+              sampleRateHz: 48_000,
+              numChannels: 2,
+            },
+            startTimestampNanoseconds: 2000n,
+            endTimestampNanoseconds: 3000n,
+            sequence: 2,
           },
-          startTimestampNanoseconds: 2000n,
-          endTimestampNanoseconds: 3000n,
-          sequence: 2,
-        },
-        requestId: 'test-request-1',
-      });
+          requestId: 'test-request-1',
+        }),
+      );
 
       testAudioStream.close();
       await streamProm;
@@ -133,7 +142,7 @@ describe('AudioInClient tests', () => {
     it('getProperties passes extra to request', async () => {
       const extra = { key: 'value' };
       await audioin.getProperties(extra);
-      expect(capturedPropertiesReq?.extra).toStrictEqual(Struct.fromJson(extra));
+      expect(capturedPropertiesReq?.extra).toStrictEqual(extra);
     });
   });
 

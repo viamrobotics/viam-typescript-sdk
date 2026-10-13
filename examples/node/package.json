@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "dependencies": {
-    "@connectrpc/connect-node": "^1.5.0",
+    "@connectrpc/connect-node": "^2.2.0",
     "@viamrobotics/sdk": "file:../..",
     "node-datachannel": "^0.29.0"
   },

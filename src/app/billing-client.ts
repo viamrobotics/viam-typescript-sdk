@@ -1,6 +1,10 @@
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
-import { BillingService } from '../gen/app/v1/billing_connect';
-import type { GetCurrentMonthUsageResponse as PBGetCurrentMonthUsageResponse } from '../gen/app/v1/billing_pb';
+import { timestampDate } from '@bufbuild/protobuf/wkt';
+
+import {
+  BillingService,
+  type GetCurrentMonthUsageResponse as PBGetCurrentMonthUsageResponse,
+} from '../gen/app/v1/billing_pb';
 
 export type GetCurrentMonthUsageResponse = Partial<PBGetCurrentMonthUsageResponse> & {
   start?: Date;
@@ -32,8 +36,8 @@ export class BillingClient {
     const result: GetCurrentMonthUsageResponse = await this.client.getCurrentMonthUsage({
       orgId,
     });
-    result.start = result.startDate?.toDate();
-    result.end = result.endDate?.toDate();
+    result.start = result.startDate ? timestampDate(result.startDate) : undefined;
+    result.end = result.endDate ? timestampDate(result.endDate) : undefined;
     return result;
   }
 

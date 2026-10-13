@@ -1,4 +1,4 @@
-import type { Struct } from '@bufbuild/protobuf';
+import type { JsonObject } from '@bufbuild/protobuf';
 import type { GeoGeometry, GeoPoint, Resource } from '../../types';
 import type { Mode, NavigationPosition, NavigationProperties, Path, Waypoint } from './types';
 
@@ -31,7 +31,7 @@ export interface Navigation extends Resource {
    * For more information, see [Navigation
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#getmode).
    */
-  getMode: (extra?: Struct) => Promise<Mode>;
+  getMode: (extra?: JsonObject) => Promise<Mode>;
 
   /**
    * Set the mode the robot is operating in.
@@ -55,7 +55,7 @@ export interface Navigation extends Resource {
    *   - 2: MODE_WAYPOINT
    *   - 3: MODE_EXPLORE
    */
-  setMode: (mode: Mode, extra?: Struct) => Promise<void>;
+  setMode: (mode: Mode, extra?: JsonObject) => Promise<void>;
 
   /**
    * Get the current location of the robot.
@@ -71,7 +71,7 @@ export interface Navigation extends Resource {
    * For more information, see [Navigation
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#getlocation).
    */
-  getLocation: (extra?: Struct) => Promise<NavigationPosition>;
+  getLocation: (extra?: JsonObject) => Promise<NavigationPosition>;
 
   /**
    * Get an array of waypoints currently in the service's data storage.
@@ -87,7 +87,7 @@ export interface Navigation extends Resource {
    * For more information, see [Navigation
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#getwaypoints).
    */
-  getWayPoints: (extra?: Struct) => Promise<Waypoint[]>;
+  getWayPoints: (extra?: JsonObject) => Promise<Waypoint[]>;
 
   /**
    * Add a waypoint to the service's data storage.
@@ -106,7 +106,7 @@ export interface Navigation extends Resource {
    *
    * @param location - A waypoint described by latitude and longitude values.
    */
-  addWayPoint: (location: GeoPoint, extra?: Struct) => Promise<void>;
+  addWayPoint: (location: GeoPoint, extra?: JsonObject) => Promise<void>;
 
   /**
    * Remove a waypoint from the service's data storage.
@@ -127,7 +127,7 @@ export interface Navigation extends Resource {
    *
    * @param id - The MongoDB ObjectID of the waypoint to remove from the service's data storage.
    */
-  removeWayPoint: (id: string, extra?: Struct) => Promise<void>;
+  removeWayPoint: (id: string, extra?: JsonObject) => Promise<void>;
 
   /**
    * Get a list of obstacles.
@@ -143,7 +143,7 @@ export interface Navigation extends Resource {
    * For more information, see [Navigation
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#getobstacles).
    */
-  getObstacles: (extra?: Struct) => Promise<GeoGeometry[]>;
+  getObstacles: (extra?: JsonObject) => Promise<GeoGeometry[]>;
 
   /**
    * Gets the list of paths known to the navigation service.
@@ -159,7 +159,7 @@ export interface Navigation extends Resource {
    * For more information, see [Navigation
    * API](https://docs.viam.com/dev/reference/apis/services/navigation/#getpaths).
    */
-  getPaths: (extra?: Struct) => Promise<Path[]>;
+  getPaths: (extra?: JsonObject) => Promise<Path[]>;
 
   /**
    * Gets information on the properties of the current navigation service.

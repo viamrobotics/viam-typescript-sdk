@@ -1,11 +1,23 @@
-import type { Message, PartialMessage } from '@bufbuild/protobuf';
-import type { ContextValues, StreamRequest, StreamResponse } from '@connectrpc/connect';
-import { createContextValues } from '@connectrpc/connect';
+import {
+  toBinary,
+  type DescMessage,
+  type DescMethodStreaming,
+  type MessageInitShape,
+  type MessageShape,
+} from '@bufbuild/protobuf';
+
+import {
+  createContextValues,
+  type ContextValues,
+  type StreamRequest,
+  type StreamResponse,
+} from '@connectrpc/connect';
+
 import { createWritableIterable, runStreamingCall } from '@connectrpc/connect/protocol';
 import { type ResponseHeaders, type ResponseTrailers } from '../gen/proto/rpc/webrtc/v1/grpc_pb';
 import { ClientStream, toGRPCMetadata } from './client-stream';
 
-export class StreamClientStream<I extends Message<I>, O extends Message<O>> extends ClientStream<
+export class StreamClientStream<I extends DescMessage, O extends DescMessage> extends ClientStream<
   I,
   O
 > {
@@ -17,22 +29,22 @@ export class StreamClientStream<I extends Message<I>, O extends Message<O>> exte
   private gotHeaders = false;
 
   // trailers will be written to later
-  private readonly respStream = createWritableIterable<O>();
+  private readonly respStream = createWritableIterable<MessageShape<O>>();
   private readonly trailers: Headers = new Headers();
   private respStreamQueue?: Promise<void>;
 
   public async run(
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageInitShape<I>>,
     contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
     const req = {
       stream: true as const,
       url: '',
-      init: {},
+      requestMethod: 'POST',
       service: this.service,
-      method: this.method,
+      method: this.method as DescMethodStreaming<I, O>,
       header: new Headers(),
       contextValues: contextValues ?? createContextValues(),
       message: input,
@@ -77,9 +89,9 @@ export class StreamClientStream<I extends Message<I>, O extends Message<O>> exte
     return runStreamingCall<I, O>(opt);
   }
 
-  protected async sendMessages(messages: AsyncIterable<I>) {
+  protected async sendMessages(messages: AsyncIterable<MessageShape<I>>) {
     for await (const msg of messages) {
-      this.sendMessage(msg.toBinary());
+      this.sendMessage(toBinary(this.method.input, msg));
     }
     // end of messages
     this.writeMessage(true);

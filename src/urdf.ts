@@ -1,8 +1,24 @@
 import { XMLParser } from 'fast-xml-parser';
-import { Frame } from './gen/app/v1/robot_pb';
-import { Capsule, Geometry, Mesh, RectangularPrism, Sphere } from './gen/common/v1/common_pb';
-import type { Vector3 } from './types';
+import { create } from '@bufbuild/protobuf';
+import { FrameSchema, TranslationSchema, type Frame } from './gen/app/v1/robot_pb';
+
+import {
+  CapsuleSchema,
+  GeometrySchema,
+  MeshSchema,
+  RectangularPrismSchema,
+  SphereSchema,
+  Vector3Schema,
+  type Geometry,
+} from './gen/common/v1/common_pb';
+
 import type { KinematicsData } from './utils';
+
+interface XYZ {
+  x: number;
+  y: number;
+  z: number;
+}
 
 /*
  * A URDF (Unified Robot Description Format) parser, emitting the SDK's shared
@@ -42,8 +58,8 @@ const parseNumber = (value: string | undefined, defaultValue = 0): number => {
   return Number.isNaN(num) ? defaultValue : num;
 };
 
-/** Parse a space-separated `"x y z"` string into a {@link Vector3}. */
-const parseVector3 = (value: string | undefined, defaultValue?: Vector3): Vector3 => {
+/** Parse a space-separated `"x y z"` string into xyz components. */
+const parseVector3 = (value: string | undefined, defaultValue?: XYZ): XYZ => {
   const fallback = defaultValue ?? { x: 0, y: 0, z: 0 };
   if (value === undefined) {
     return fallback;
@@ -69,7 +85,7 @@ const parseVector3 = (value: string | undefined, defaultValue?: Vector3): Vector
 const metersToMm = (meters: number): number => meters * 1000;
 
 /** Convert each component of a meter-valued vector to millimeters. */
-const vector3MetersToMm = (vector: Vector3): Vector3 => ({
+const vector3MetersToMm = (vector: XYZ): XYZ => ({
   x: metersToMm(vector.x),
   y: metersToMm(vector.y),
   z: metersToMm(vector.z),
@@ -113,28 +129,28 @@ const processGeometry = (link: XMLNode, label: string): Geometry | undefined => 
   if (geometry.mesh !== undefined) {
     // The mesh bytes themselves arrive separately (keyed by filepath); the
     // filename is preserved on the label so callers can resolve them.
-    return new Geometry({
+    return create(GeometrySchema, {
       label: getAttribute(geometry.mesh, 'filename') ?? label,
-      geometryType: { case: 'mesh', value: new Mesh() },
+      geometryType: { case: 'mesh', value: create(MeshSchema) },
     });
   }
   if (geometry.box !== undefined) {
-    return new Geometry({
+    return create(GeometrySchema, {
       label,
       geometryType: {
         case: 'box',
-        value: new RectangularPrism({
+        value: create(RectangularPrismSchema, {
           dimsMm: vector3MetersToMm(parseVector3(getAttribute(geometry.box, 'size'))),
         }),
       },
     });
   }
   if (geometry.sphere !== undefined) {
-    return new Geometry({
+    return create(GeometrySchema, {
       label,
       geometryType: {
         case: 'sphere',
-        value: new Sphere({
+        value: create(SphereSchema, {
           radiusMm: metersToMm(parseNumber(getAttribute(geometry.sphere, 'radius'))),
         }),
       },
@@ -142,11 +158,11 @@ const processGeometry = (link: XMLNode, label: string): Geometry | undefined => 
   }
   if (geometry.cylinder !== undefined) {
     // Viam has no cylinder primitive; a capsule is the closest approximation.
-    return new Geometry({
+    return create(GeometrySchema, {
       label,
       geometryType: {
         case: 'capsule',
-        value: new Capsule({
+        value: create(CapsuleSchema, {
           radiusMm: metersToMm(parseNumber(getAttribute(geometry.cylinder, 'radius'))),
           lengthMm: metersToMm(parseNumber(getAttribute(geometry.cylinder, 'length'))),
         }),
@@ -196,7 +212,10 @@ const processJoint = (joint: XMLNode): KinematicsData['joints'][number] => {
     id: getAttribute(joint, 'name') ?? '',
     type: resolvedType,
     parent: getAttribute(joint.parent, 'link') ?? '',
-    axis: parseVector3(getAttribute(joint.axis, 'xyz'), { x: 1, y: 0, z: 0 }),
+    axis: create(
+      Vector3Schema,
+      parseVector3(getAttribute(joint.axis, 'xyz'), { x: 1, y: 0, z: 0 }),
+    ),
     max,
     min,
   };
@@ -209,9 +228,12 @@ const processJoint = (joint: XMLNode): KinematicsData['joints'][number] => {
  */
 const processLink = (link: XMLNode, joint: XMLNode | undefined): Frame => {
   const origin = joint?.origin as UrdfOrigin | undefined;
-  return new Frame({
+  return create(FrameSchema, {
     parent: joint ? (getAttribute(joint.parent, 'link') ?? 'world') : 'world',
-    translation: vector3MetersToMm(parseVector3(getAttribute(origin, 'xyz'))),
+    translation: create(
+      TranslationSchema,
+      vector3MetersToMm(parseVector3(getAttribute(origin, 'xyz'))),
+    ),
     orientation: orientationFromRpy(origin),
     geometry: processGeometry(link, getAttribute(link, 'name') ?? ''),
   });

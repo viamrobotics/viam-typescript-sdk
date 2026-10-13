@@ -1,7 +1,9 @@
-import { Struct, type JsonValue, Timestamp } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
+import { timestampFromDate, type Timestamp } from '@bufbuild/protobuf/wkt';
+
 import type { CallOptions, Client } from '@connectrpc/connect';
-import { VideoService } from '../../gen/service/video/v1/video_connect';
-import { GetVideoRequest } from '../../gen/service/video/v1/video_pb';
+import { VideoService, GetVideoRequestSchema } from '../../gen/service/video/v1/video_pb';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
@@ -10,7 +12,7 @@ import type { Video } from './video';
 
 /** Convert a Date to a protobuf Timestamp. */
 const dateToTimestamp = (date: Date): Timestamp => {
-  return Timestamp.fromDate(date);
+  return timestampFromDate(date);
 };
 
 /** Generate a UUID v4. */
@@ -43,14 +45,14 @@ export class VideoClient implements Video {
     extra = {},
     callOptions = this.callOptions,
   ): AsyncIterable<VideoChunk> {
-    const request = new GetVideoRequest({
+    const request = create(GetVideoRequestSchema, {
       name: this.name,
       startTimestamp: startTimestamp ? dateToTimestamp(startTimestamp) : undefined,
       endTimestamp: endTimestamp ? dateToTimestamp(endTimestamp) : undefined,
       videoCodec,
       videoContainer,
       requestId: generateUUID(),
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -68,7 +70,7 @@ export class VideoClient implements Video {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(

@@ -4,8 +4,7 @@ const connectNode = require('@connectrpc/connect-node');
 
 // @ts-expect-error
 globalThis.VIAM = {
-  GRPC_TRANSPORT_FACTORY: (opts: any) =>
-    connectNode.createGrpcTransport({ httpVersion: '2', ...opts }),
+  GRPC_TRANSPORT_FACTORY: (opts: any) => connectNode.createGrpcTransport({ ...opts }),
 };
 for (const key in wrtc) {
   (global as any)[key] = (wrtc as any)[key];

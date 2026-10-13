@@ -1,4 +1,4 @@
-import type { JsonValue, Struct } from '@bufbuild/protobuf';
+import type { JsonObject, JsonValue } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
 import type { VideoChunk } from './types';
 
@@ -35,7 +35,7 @@ export interface Video extends Resource {
     endTimestamp?: Date,
     videoCodec?: string,
     videoContainer?: string,
-    extra?: Struct,
+    extra?: JsonObject,
   ) => AsyncIterable<VideoChunk>;
 
   /**
@@ -44,5 +44,5 @@ export interface Video extends Resource {
    * @param command - The command to execute.
    * @returns The result of the command.
    */
-  doCommand: (command: Struct | Record<string, JsonValue>) => Promise<JsonValue>;
+  doCommand: (command: JsonObject | Record<string, JsonValue>) => Promise<JsonValue>;
 }

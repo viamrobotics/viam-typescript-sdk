@@ -2,34 +2,35 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Value } from '@bufbuild/protobuf';
+import { create, fromJson } from '@bufbuild/protobuf';
+import { ValueSchema } from '@bufbuild/protobuf/wkt';
 import { createClient, createRouterTransport } from '@connectrpc/connect';
 import {
-  Geometry,
-  GetGeometriesResponse,
-  GetReadingsResponse,
+  GeometrySchema,
+  GetGeometriesResponseSchema,
+  GetReadingsResponseSchema,
 } from '../../gen/common/v1/common_pb';
-import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_connect';
+import { MovementSensorService } from '../../gen/component/movementsensor/v1/movementsensor_pb';
 import { RobotClient } from '../../robot';
 import { MovementSensorClient } from './client';
 
 let sensor: MovementSensorClient;
 
-const testGeometries = [new Geometry({ label: 'test-geometry' })];
+const testGeometries = [create(GeometrySchema, { label: 'test-geometry' })];
 
 describe('MovementSensorClient tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(MovementSensorService, {
         getReadings: () => {
-          return new GetReadingsResponse({
+          return create(GetReadingsResponseSchema, {
             readings: {
-              readings: Value.fromJson('readings'),
+              readings: fromJson(ValueSchema, 'readings'),
             },
           });
         },
         getGeometries: () => {
-          return new GetGeometriesResponse({ geometries: testGeometries });
+          return create(GetGeometriesResponseSchema, { geometries: testGeometries });
         },
       });
     });

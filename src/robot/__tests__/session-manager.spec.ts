@@ -1,16 +1,19 @@
-// @vitest-environment happy-dom
-
-import { Duration } from '@bufbuild/protobuf';
+import { DurationSchema } from '@bufbuild/protobuf/wkt';
+import { create } from '@bufbuild/protobuf';
 import { ConnectError, createRouterTransport } from '@connectrpc/connect';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionClosedError } from '../../rpc';
-import { RobotService } from '../../gen/robot/v1/robot_connect';
-import { SendSessionHeartbeatResponse, StartSessionResponse } from '../../gen/robot/v1/robot_pb';
+import {
+  RobotService,
+  SendSessionHeartbeatResponseSchema,
+  StartSessionResponseSchema,
+} from '../../gen/robot/v1/robot_pb';
+
 import SessionManager from '../session-manager';
 
 vi.mock('../gen/robot/v1/robot_pb_service');
 
-const mockGetHeartBeatWindow = new Duration({
+const mockGetHeartBeatWindow = create(DurationSchema, {
   seconds: 1n,
   nanos: 1,
 });
@@ -49,7 +52,7 @@ describe('SessionManager', () => {
     const transport = createRouterTransport(({ service }) => {
       service(RobotService, {
         startSession: () => {
-          return new StartSessionResponse({
+          return create(StartSessionResponseSchema, {
             id: 'some-sid',
           });
         },
@@ -69,7 +72,7 @@ describe('SessionManager', () => {
     const expectedSID = 'expected-sid';
     const startSessionMock = vi.fn();
     startSessionMock.mockReturnValueOnce(
-      new StartSessionResponse({
+      create(StartSessionResponseSchema, {
         id: expectedSID,
         heartbeatWindow: mockGetHeartBeatWindow,
       }),
@@ -78,7 +81,7 @@ describe('SessionManager', () => {
     const transport = createRouterTransport(({ service }) => {
       service(RobotService, {
         startSession: startSessionMock,
-        sendSessionHeartbeat: () => new SendSessionHeartbeatResponse(),
+        sendSessionHeartbeat: () => create(SendSessionHeartbeatResponseSchema),
       });
     });
     const sessionManager = setupSessionManager(transport);
@@ -105,13 +108,13 @@ describe('SessionManager', () => {
     const startSessionMock = vi
       .fn()
       .mockReturnValueOnce(
-        new StartSessionResponse({
+        create(StartSessionResponseSchema, {
           id: initialSID,
           heartbeatWindow: mockGetHeartBeatWindow,
         }),
       )
       .mockReturnValueOnce(
-        new StartSessionResponse({
+        create(StartSessionResponseSchema, {
           id: afterResetSID,
           heartbeatWindow: mockGetHeartBeatWindow,
         }),
@@ -120,7 +123,7 @@ describe('SessionManager', () => {
     const transport = createRouterTransport(({ service }) => {
       service(RobotService, {
         startSession: startSessionMock,
-        sendSessionHeartbeat: () => new SendSessionHeartbeatResponse(),
+        sendSessionHeartbeat: () => create(SendSessionHeartbeatResponseSchema),
       });
     });
     const sessionManager = setupSessionManager(transport);
@@ -149,13 +152,13 @@ describe('SessionManager', () => {
     const startSessionMock = vi
       .fn()
       .mockReturnValueOnce(
-        new StartSessionResponse({
+        create(StartSessionResponseSchema, {
           id: initialSID,
           heartbeatWindow: mockGetHeartBeatWindow,
         }),
       )
       .mockReturnValueOnce(
-        new StartSessionResponse({
+        create(StartSessionResponseSchema, {
           id: afterResetSID,
           heartbeatWindow: mockGetHeartBeatWindow,
         }),
@@ -166,7 +169,7 @@ describe('SessionManager', () => {
       .mockImplementationOnce(() => {
         throw ConnectError.from(new ConnectionClosedError('closed'));
       })
-      .mockReturnValue(new SendSessionHeartbeatResponse());
+      .mockReturnValue(create(SendSessionHeartbeatResponseSchema));
 
     const transport = createRouterTransport(({ service }) => {
       service(RobotService, {

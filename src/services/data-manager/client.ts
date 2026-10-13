@@ -1,11 +1,12 @@
-import { Struct, type JsonValue } from '@bufbuild/protobuf';
+import { type JsonObject, type JsonValue, create } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { type MimeType } from '../../gen/app/datasync/v1/data_sync_pb.js';
-import { DataManagerService } from '../../gen/service/datamanager/v1/data_manager_connect.js';
 import {
-  SyncRequest,
-  UploadBinaryDataToDatasetsRequest,
+  DataManagerService,
+  SyncRequestSchema,
+  UploadBinaryDataToDatasetsRequestSchema,
 } from '../../gen/service/datamanager/v1/data_manager_pb.js';
+
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
@@ -40,9 +41,9 @@ export class DataManagerClient implements DataManager {
    * @param callOptions - Call options for the sync request.
    */
   async sync(extra = {}, callOptions = this.callOptions) {
-    const request = new SyncRequest({
+    const request = create(SyncRequestSchema, {
       name: this.name,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
 
     this.options.requestLogger?.(request);
@@ -71,7 +72,7 @@ export class DataManagerClient implements DataManager {
   }
 
   async doCommand(
-    command: Struct | Record<string, JsonValue>,
+    command: JsonObject | Record<string, JsonValue>,
     callOptions = this.callOptions,
   ): Promise<JsonValue> {
     return doCommandFromClient(
@@ -113,13 +114,13 @@ export class DataManagerClient implements DataManager {
     extra = {},
     callOptions = this.callOptions,
   ) {
-    const request = new UploadBinaryDataToDatasetsRequest({
+    const request = create(UploadBinaryDataToDatasetsRequestSchema, {
       name: this.name,
       binaryData,
       tags,
       datasetIds,
       mimeType,
-      extra: Struct.fromJson(extra),
+      extra: extra,
     });
     this.options.requestLogger?.(request);
     await this.client.uploadBinaryDataToDatasets(request, callOptions);

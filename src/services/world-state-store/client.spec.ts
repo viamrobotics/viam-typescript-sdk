@@ -1,18 +1,20 @@
 // @vitest-environment happy-dom
 
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { Struct } from '@bufbuild/protobuf';
+import { create } from '@bufbuild/protobuf';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { WorldStateStoreService } from '../../gen/service/worldstatestore/v1/world_state_store_connect';
 import {
-  GetTransformResponse,
-  ListUUIDsResponse,
-  StreamTransformChangesResponse,
+  WorldStateStoreService,
+  GetTransformResponseSchema,
+  ListUUIDsResponseSchema,
+  StreamTransformChangesResponseSchema,
+  TransformChangeType,
 } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
+
 import { RobotClient } from '../../robot';
 import { WorldStateStoreClient } from './client';
-import { TransformChangeType } from '../../gen/service/worldstatestore/v1/world_state_store_pb';
-import { Transform, PoseInFrame, Pose } from '../../gen/common/v1/common_pb';
+
+import { TransformSchema, PoseInFrameSchema, PoseSchema } from '../../gen/common/v1/common_pb';
 import { transformWithUUID, uuidToString } from './world-state-store';
 
 vi.mock('../../robot');
@@ -22,11 +24,11 @@ const worldStateStoreClientName = 'test-world-state-store';
 let worldStateStore: WorldStateStoreClient;
 
 const mockUuids = [new Uint8Array([1, 2, 3, 4]), new Uint8Array([5, 6, 7, 8])];
-const mockTransform = new Transform({
+const mockTransform = create(TransformSchema, {
   referenceFrame: 'test-frame',
-  poseInObserverFrame: new PoseInFrame({
+  poseInObserverFrame: create(PoseInFrameSchema, {
     referenceFrame: 'observer-frame',
-    pose: new Pose({
+    pose: create(PoseSchema, {
       x: 10,
       y: 20,
       z: 30,
@@ -43,22 +45,22 @@ describe('WorldStateStoreClient Tests', () => {
   beforeEach(() => {
     const mockTransport = createRouterTransport(({ service }) => {
       service(WorldStateStoreService, {
-        listUUIDs: () => new ListUUIDsResponse({ uuids: mockUuids }),
-        getTransform: () => new GetTransformResponse({ transform: mockTransform }),
+        listUUIDs: () => create(ListUUIDsResponseSchema, { uuids: mockUuids }),
+        getTransform: () => create(GetTransformResponseSchema, { transform: mockTransform }),
         streamTransformChanges: async function* mockStream() {
           // Add await to satisfy linter
           await Promise.resolve();
-          yield new StreamTransformChangesResponse({
+          yield create(StreamTransformChangesResponseSchema, {
             changeType: TransformChangeType.ADDED,
             transform: mockTransform,
           });
-          yield new StreamTransformChangesResponse({
+          yield create(StreamTransformChangesResponseSchema, {
             changeType: TransformChangeType.UPDATED,
             transform: mockTransform,
             updatedFields: { paths: ['pose_in_observer_frame'] },
           });
         },
-        doCommand: () => ({ result: Struct.fromJson({ success: true }) }),
+        doCommand: () => ({ result: { success: true } }),
       });
     });
 
@@ -82,7 +84,6 @@ describe('WorldStateStoreClient Tests', () => {
       const expected = mockTransform;
 
       await expect(worldStateStore.getTransform(uuid)).resolves.toStrictEqual({
-        // eslint-disable-next-line @typescript-eslint/no-misused-spread
         ...expected,
         uuidString: uuid,
       });
@@ -99,12 +100,11 @@ describe('WorldStateStoreClient Tests', () => {
       }
 
       expect(results).toHaveLength(2);
-      expect(results[0]).toEqual({
+      expect(results[0]).toMatchObject({
         changeType: TransformChangeType.ADDED,
         transform: transformWithUUID(mockTransform),
-        updatedFields: undefined,
       });
-      expect(results[1]).toEqual({
+      expect(results[1]).toMatchObject({
         changeType: TransformChangeType.UPDATED,
         transform: transformWithUUID(mockTransform),
         updatedFields: { paths: ['pose_in_observer_frame'] },
@@ -114,7 +114,7 @@ describe('WorldStateStoreClient Tests', () => {
 
   describe('doCommand', () => {
     it('executes arbitrary commands', async () => {
-      const command = Struct.fromJson({ test: 'value' });
+      const command = { test: 'value' };
       const expected = { success: true };
 
       await expect(worldStateStore.doCommand(command)).resolves.toStrictEqual(expected);

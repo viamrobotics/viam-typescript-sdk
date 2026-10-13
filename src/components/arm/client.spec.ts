@@ -2,16 +2,19 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { create } from '@bufbuild/protobuf';
+
 import { createClient, createRouterTransport } from '@connectrpc/connect';
-import { ArmService } from '../../gen/component/arm/v1/arm_connect';
 import {
+  ArmService,
+  GetManualModeResponseSchema,
+  GetPropertiesResponseSchema,
+  SetManualModeResponseSchema,
   type GetManualModeRequest,
-  GetManualModeResponse,
   type GetPropertiesRequest,
-  GetPropertiesResponse,
   type SetManualModeRequest,
-  SetManualModeResponse,
 } from '../../gen/component/arm/v1/arm_pb';
+
 import { RobotClient } from '../../robot';
 import { ArmClient } from './client';
 vi.mock('../../robot');
@@ -35,18 +38,18 @@ describe('ArmClient tests', () => {
       service(ArmService, {
         getProperties: (request) => {
           capturedGetPropertiesRequest = request;
-          return new GetPropertiesResponse({
+          return create(GetPropertiesResponseSchema, {
             supportManualMode: testSupportManualMode,
             supportCartesianCommands: testSupportCartesianCommands,
           });
         },
         setManualMode: (request) => {
           capturedSetManualModeRequest = request;
-          return new SetManualModeResponse();
+          return create(SetManualModeResponseSchema);
         },
         getManualMode: (request) => {
           capturedGetManualModeRequest = request;
-          return new GetManualModeResponse({ manualMode: testManualMode });
+          return create(GetManualModeResponseSchema, { manualMode: testManualMode });
         },
       });
     });
@@ -64,7 +67,7 @@ describe('ArmClient tests', () => {
 
   it('getProperties', async () => {
     await expect(arm.getProperties()).resolves.toStrictEqual(
-      new GetPropertiesResponse({
+      create(GetPropertiesResponseSchema, {
         supportManualMode: testSupportManualMode,
         supportCartesianCommands: testSupportCartesianCommands,
       }),

@@ -1,9 +1,8 @@
 import type {
-  AnyMessage,
-  Message,
-  MethodInfo,
-  PartialMessage,
-  ServiceType,
+  DescMessage,
+  DescMethodStreaming,
+  DescMethodUnary,
+  MessageInitShape,
 } from '@bufbuild/protobuf';
 import {
   Code,
@@ -38,17 +37,16 @@ export default class SessionTransport implements Transport {
     }
   }
 
-  public async unary<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  public async unary<I extends DescMessage, O extends DescMessage>(
+    method: DescMethodUnary<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    message: PartialMessage<I>,
+    message: MessageInitShape<I>,
     contextValues?: ContextValues,
   ): Promise<UnaryResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
-    const methodPath = `/${service.typeName}/${method.name}`;
+    const methodPath = `/${method.parent.typeName}/${method.name}`;
 
     for (const [key, value] of clientHeaders) {
       newHeaders.set(key, value);
@@ -61,7 +59,6 @@ export default class SessionTransport implements Transport {
       }
     }
     return this.deferredTransport().unary(
-      service,
       method,
       signal,
       timeoutMs,
@@ -71,17 +68,16 @@ export default class SessionTransport implements Transport {
     );
   }
 
-  public async stream<I extends Message<I> = AnyMessage, O extends Message<O> = AnyMessage>(
-    service: ServiceType,
-    method: MethodInfo<I, O>,
+  public async stream<I extends DescMessage, O extends DescMessage>(
+    method: DescMethodStreaming<I, O>,
     signal: AbortSignal | undefined,
     timeoutMs: number | undefined,
     header: HeadersInit | undefined,
-    input: AsyncIterable<PartialMessage<I>>,
+    input: AsyncIterable<MessageInitShape<I>>,
     contextValues?: ContextValues,
   ): Promise<StreamResponse<I, O>> {
     const newHeaders = cloneHeaders(header);
-    const methodPath = `/${service.typeName}/${method.name}`;
+    const methodPath = `/${method.parent.typeName}/${method.name}`;
 
     for (const [key, value] of clientHeaders) {
       newHeaders.set(key, value);
@@ -94,7 +90,6 @@ export default class SessionTransport implements Transport {
       }
     }
     return this.deferredTransport().stream(
-      service,
       method,
       signal,
       timeoutMs,

@@ -258,7 +258,7 @@ export { SensorClient, type Sensor } from './components/sensor';
  * @deprecated Use {@link SensorClient} instead.
  * @group Raw Protobufs
  */
-export * as sensorApi from './gen/component/sensor/v1/sensor_connect';
+export * as sensorApi from './gen/component/sensor/v1/sensor_pb';
 
 export { StreamClient, type Stream } from './extra/stream';
 /**
@@ -297,7 +297,7 @@ export { PoseTrackerClient, type PoseTracker } from './components/posetracker';
  * @deprecated Use {@link GenericComponentClient} instead.
  * @group Raw Protobufs
  */
-export * as genericComponentApi from './gen/component/generic/v1/generic_connect';
+export * as genericComponentApi from './gen/component/generic/v1/generic_pb';
 
 export { GripperClient, type Gripper } from './components/gripper';
 /**
@@ -422,7 +422,7 @@ export {
  * @deprecated Use {@link GenericServiceClient} instead.
  * @group Raw Protobufs
  */
-export * as genericServiceApi from './gen/service/generic/v1/generic_connect';
+export * as genericServiceApi from './gen/service/generic/v1/generic_pb';
 
 /**
  * Raw Protobuf interfaces that are shared across multiple components and services.

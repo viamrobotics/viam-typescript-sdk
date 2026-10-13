@@ -1,5 +1,5 @@
 import { createClient, type Transport } from '@connectrpc/connect';
-import { RobotService } from '../gen/robot/v1/robot_connect';
+import { RobotService } from '../gen/robot/v1/robot_pb';
 
 const timeoutBlob = new Blob(
   [

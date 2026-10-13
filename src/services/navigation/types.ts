@@ -1,16 +1,15 @@
-import type { PlainMessage } from '@bufbuild/protobuf';
 import * as navigationApi from '../../gen/service/navigation/v1/navigation_pb';
 
 export type NavigationPosition = navigationApi.GetLocationResponse;
 export type NavigationProperties = navigationApi.GetPropertiesResponse;
 export type Mode = navigationApi.Mode;
-export type Path = PlainMessage<navigationApi.Path>;
-export type Waypoint = PlainMessage<navigationApi.Waypoint>;
+export type Path = navigationApi.Path;
+export type Waypoint = navigationApi.Waypoint;
 
 export const {
-  GetLocationResponse: NavigationPosition,
-  GetPropertiesResponse: NavigationProperties,
+  GetLocationResponseSchema: NavigationPosition,
+  GetPropertiesResponseSchema: NavigationProperties,
   Mode,
-  Path,
-  Waypoint,
+  PathSchema: Path,
+  WaypointSchema: Waypoint,
 } = navigationApi;
