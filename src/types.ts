@@ -84,7 +84,8 @@ export const isValidGeoPoint = (value: GeoPoint) => {
   );
 };
 
-export { Duration, Struct, Timestamp } from '@bufbuild/protobuf/wkt';
+export type { Duration, Struct, Timestamp } from '@bufbuild/protobuf/wkt';
+export { DurationSchema, StructSchema, TimestampSchema } from '@bufbuild/protobuf/wkt';
 export type { JsonValue } from '@bufbuild/protobuf';
 export { create, fromBinary, fromJson, toBinary, toJson, isMessage } from '@bufbuild/protobuf';
 export { timestampDate, timestampFromDate } from '@bufbuild/protobuf/wkt';

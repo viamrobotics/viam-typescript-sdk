@@ -52,4 +52,5 @@ export class ProvisioningClient {
   }
 }
 
-export { APIKey, CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+export type { APIKey, CloudConfig } from '../gen/provisioning/v1/provisioning_pb';
+export { APIKeySchema, CloudConfigSchema } from '../gen/provisioning/v1/provisioning_pb';

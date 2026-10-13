@@ -85,7 +85,11 @@ export {
  */
 export * as mlTrainingApi from './gen/app/mltraining/v1/ml_training_pb';
 
-export { CloudConfig, type ProvisioningClient } from './app/provisioning-client';
+export {
+  CloudConfigSchema,
+  type CloudConfig,
+  type ProvisioningClient,
+} from './app/provisioning-client';
 /**
  * Raw Protobuf interfaces for Provisioning.
  *
