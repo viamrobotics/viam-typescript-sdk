@@ -45,7 +45,7 @@ withRobot.describe('Robot Client API Tests', () => {
     // Assert - Verify basic machine status structure
     expect(status).toEqual(
       expect.objectContaining({
-        state: expect.any(String),
+        state: expect.any(Number),
         resources: expect.any(Array),
         config: expect.any(Object),
       }),

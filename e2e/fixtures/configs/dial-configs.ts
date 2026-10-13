@@ -14,8 +14,9 @@ export const defaultConfig: DialConf = {
 
 export const invalidConfig: DialConf = {
   host: DEFAULT_HOST,
-  serviceHost: 'http://invalid-host:9999',
-  signalingAddress: DEFAULT_SIGNALING_ADDRESS,
+  // Port 1 refuses immediately so the dial cannot succeed via local signaling.
+  serviceHost: 'http://127.0.0.1:1',
+  signalingAddress: 'http://127.0.0.1:1',
   iceServers: DEFAULT_ICE_SERVERS,
   dialTimeoutMs: 2000,
 } as const;

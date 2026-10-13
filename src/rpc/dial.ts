@@ -523,11 +523,18 @@ export const dialWebRTC = async (
    * TODO(RSDK-2836): In general, this logic should be in parity with the golang implementation.
    * https://github.com/viamrobotics/goutils/blob/main/rpc/wrtc_client.go#L160-L175
    */
-  const callOpts = {
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
+  const callOpts: CallOptions = {
     headers: {
       'rpc-host': host,
     },
   };
+  // Connect-ES v2 will not cancel a signaling stream unless timeoutMs is set.
+  // Closing the peer connection alone leaves doExchange hung on the RPC.
+  if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
+    callOpts.timeoutMs = dialTimeoutMs;
+  }
 
   /**
    * First, derive options specifically for signaling against our target. Then complete our WebRTC
@@ -554,8 +561,6 @@ export const dialWebRTC = async (
   const exchange = new SignalingExchange(signalingClient, callOpts, pc, dc, webrtcOpts);
 
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  const dialTimeoutMs = dialOpts?.dialTimeoutMs ?? dialOpts?.dialTimeout;
   if (dialTimeoutMs !== undefined && dialTimeoutMs > 0) {
     timeoutId = setTimeout(() => {
       if (!successful) {
