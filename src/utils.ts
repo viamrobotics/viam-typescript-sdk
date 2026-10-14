@@ -150,9 +150,11 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   const response = await getKinematicsMethod(request, callOptions);
 
   const decoder = new TextDecoder('utf-8');
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- superseded by `model`; still read for older servers
   const rawData = decoder.decode(response.kinematicsData);
 
   let parsedKinematicsData: KinematicsData;
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- superseded by `model`; still read for older servers
   if (response.format === KinematicsFileFormat.URDF) {
     try {
       // parseUrdf yields SVA-unit joints/links and kinematic_param_type: 'SVA';
@@ -182,6 +184,7 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
   return {
     ...parsedKinematicsData,
     kinematicsData: parsedKinematicsData,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- superseded by `model`; still read for older servers
     meshesByUrdfFilepath: response.meshesByUrdfFilepath,
   };
 };
