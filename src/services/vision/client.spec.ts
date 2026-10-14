@@ -8,6 +8,7 @@ import {
   CaptureAllFromCameraResponse,
   GetClassificationsFromCameraResponse,
   GetClassificationsResponse,
+  GetDetections3DResponse,
   GetDetectionsFromCameraResponse,
   GetDetectionsResponse,
   GetObjectPointCloudsResponse,
@@ -15,7 +16,7 @@ import {
 } from '../../gen/service/vision/v1/vision_pb';
 import { RobotClient } from '../../robot';
 import { VisionClient } from './client';
-import { Classification, Detection, PointCloudObject } from './types';
+import { Classification, Detection, Detection3D, PointCloudObject } from './types';
 vi.mock('../../robot');
 vi.mock('../../gen/service/vision/v1/vision_pb_service');
 
@@ -42,6 +43,11 @@ const pco: PointCloudObject = new PointCloudObject({
   geometries: undefined,
 });
 
+const detection3d: Detection3D = new Detection3D({
+  transforms: [],
+  classifications: [classification],
+});
+
 const extra: Struct = Struct.fromJson({ key: 'value' });
 
 describe('VisionClient Tests', () => {
@@ -51,6 +57,7 @@ describe('VisionClient Tests', () => {
         getDetections: () => new GetDetectionsResponse({ detections: [detection] }),
         getDetectionsFromCamera: () =>
           new GetDetectionsFromCameraResponse({ detections: [detection] }),
+        getDetections3D: () => new GetDetections3DResponse({ detections3d: [detection3d] }),
         getClassifications: () =>
           new GetClassificationsResponse({ classifications: [classification] }),
         getClassificationsFromCamera: () =>
@@ -94,6 +101,12 @@ describe('VisionClient Tests', () => {
       await expect(
         vision.getDetections(new Uint8Array(), 1, 1, 'image/jpeg'),
       ).resolves.toStrictEqual(expected);
+    });
+
+    it('returns 3D detections from a camera', async () => {
+      const expected = [detection3d];
+
+      await expect(vision.getDetections3D('camera')).resolves.toStrictEqual(expected);
     });
   });
 

@@ -1,5 +1,5 @@
 import type { JsonValue } from '@bufbuild/protobuf';
-import { Struct, Timestamp } from '@bufbuild/protobuf';
+import { Struct, Timestamp, Value } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { type PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -8,10 +8,12 @@ import {
   type AllowedLoginMethods,
   Authorization,
   AuthorizedPermissions,
+  type ConfigPropertyChangeResult,
   type CreateKeyFromExistingKeyAuthorizationsResponse,
   type CreateKeyResponse,
   type CreateModuleResponse,
   type CreateOAuthAppUserResponse,
+  type FavoriteMachine,
   type Fragment,
   type FragmentImportList,
   type FragmentVisibility,
@@ -960,6 +962,38 @@ export class AppClient {
   }
 
   /**
+   * Updates individual configuration properties on a robot part.
+   *
+   * @example
+   *
+   * ```ts
+   * const results = await appClient.setConfigProperty('<YOUR-ROBOT-PART-ID>', [
+   *   { path: 'cloud.pollInterval', value: '15s' },
+   * ]);
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#setconfigproperty).
+   *
+   * @param robotPartId The ID of the robot part to update
+   * @param propertyChanges The path and new value of each property to change
+   * @returns The result of each requested property change
+   */
+  async setConfigProperty(
+    robotPartId: string,
+    propertyChanges: { path: string; value: JsonValue }[],
+  ): Promise<ConfigPropertyChangeResult[]> {
+    const resp = await this.client.setConfigProperty({
+      robotPartId,
+      propertyChanges: propertyChanges.map(({ path, value }) => ({
+        path,
+        value: Value.fromJson(value),
+      })),
+    });
+    return resp.propertyChanges;
+  }
+
+  /**
    * Creates a new robot part.
    *
    * @example
@@ -1203,6 +1237,61 @@ export class AppClient {
    */
   async deleteRobot(id: string) {
     await this.client.deleteRobot({ id });
+  }
+
+  /**
+   * Adds a machine to the current user's list of favorite machines.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.addFavoriteMachine('<YOUR-MACHINE-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#addfavoritemachine).
+   *
+   * @param machineId The ID of the machine to favorite
+   */
+  async addFavoriteMachine(machineId: string) {
+    await this.client.addFavoriteMachine({ machineId });
+  }
+
+  /**
+   * Removes a machine from the current user's list of favorite machines.
+   *
+   * @example
+   *
+   * ```ts
+   * await appClient.removeFavoriteMachine('<YOUR-MACHINE-ID>');
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#removefavoritemachine).
+   *
+   * @param machineId The ID of the machine to unfavorite
+   */
+  async removeFavoriteMachine(machineId: string) {
+    await this.client.removeFavoriteMachine({ machineId });
+  }
+
+  /**
+   * Lists the current user's favorite machines.
+   *
+   * @example
+   *
+   * ```ts
+   * const favorites = await appClient.listFavoriteMachines();
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/dev/reference/apis/fleet/#listfavoritemachines).
+   *
+   * @returns The list of favorite machines
+   */
+  async listFavoriteMachines(): Promise<FavoriteMachine[]> {
+    const resp = await this.client.listFavoriteMachines({});
+    return resp.favorites;
   }
 
   /**

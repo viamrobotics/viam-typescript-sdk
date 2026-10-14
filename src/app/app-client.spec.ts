@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 
-import { Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
+import { Struct, Timestamp, Value, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -915,6 +915,47 @@ describe('AppClient tests', () => {
     });
   });
 
+  describe('setConfigProperty tests', () => {
+    const expectedRequest = new pb.SetConfigPropertyRequest({
+      robotPartId: 'partId',
+      propertyChanges: [
+        new pb.ConfigPropertyChange({
+          path: 'cloud.pollInterval',
+          value: Value.fromJson('15s'),
+        }),
+      ],
+    });
+
+    let capReq: pb.SetConfigPropertyRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          setConfigProperty: (req) => {
+            capReq = req;
+            return new pb.SetConfigPropertyResponse({
+              propertyChanges: [
+                new pb.ConfigPropertyChangeResult({
+                  path: 'cloud.pollInterval',
+                  success: true,
+                }),
+              ],
+            });
+          },
+        });
+      });
+    });
+
+    it('setConfigProperty', async () => {
+      const response = await subject().setConfigProperty('partId', [
+        { path: 'cloud.pollInterval', value: '15s' },
+      ]);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(response).toEqual([
+        new pb.ConfigPropertyChangeResult({ path: 'cloud.pollInterval', success: true }),
+      ]);
+    });
+  });
+
   describe('newRobotPart tests', () => {
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
@@ -1218,6 +1259,77 @@ describe('AppClient tests', () => {
     it('deleteRobot', async () => {
       await subject().deleteRobot('deleteRobotId');
       expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('addFavoriteMachine tests', () => {
+    const expectedRequest = new pb.AddFavoriteMachineRequest({
+      machineId: 'machineId',
+    });
+
+    let capReq: pb.AddFavoriteMachineRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          addFavoriteMachine: (req) => {
+            capReq = req;
+            return new pb.AddFavoriteMachineResponse();
+          },
+        });
+      });
+    });
+
+    it('addFavoriteMachine', async () => {
+      await subject().addFavoriteMachine('machineId');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('removeFavoriteMachine tests', () => {
+    const expectedRequest = new pb.RemoveFavoriteMachineRequest({
+      machineId: 'machineId',
+    });
+
+    let capReq: pb.RemoveFavoriteMachineRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          removeFavoriteMachine: (req) => {
+            capReq = req;
+            return new pb.RemoveFavoriteMachineResponse();
+          },
+        });
+      });
+    });
+
+    it('removeFavoriteMachine', async () => {
+      await subject().removeFavoriteMachine('machineId');
+      expect(capReq).toStrictEqual(expectedRequest);
+    });
+  });
+
+  describe('listFavoriteMachines tests', () => {
+    const favorite = new pb.FavoriteMachine({
+      machine: robot,
+      organizationId: 'orgId',
+      createdOn: new Timestamp(),
+    });
+
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          listFavoriteMachines: () => {
+            return new pb.ListFavoriteMachinesResponse({
+              favorites: [favorite],
+            });
+          },
+        });
+      });
+    });
+
+    it('listFavoriteMachines', async () => {
+      const response = await subject().listFavoriteMachines();
+      expect(response).toEqual([favorite]);
     });
   });
 

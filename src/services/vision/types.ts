@@ -6,8 +6,9 @@ import * as visionApi from '../../gen/service/vision/v1/vision_pb';
 
 export type Classification = PlainMessage<visionApi.Classification>;
 export type Detection = PlainMessage<visionApi.Detection>;
+export type Detection3D = PlainMessage<visionApi.Detection3D>;
 
-export const { Classification, Detection } = visionApi;
+export const { Classification, Detection, Detection3D } = visionApi;
 
 export type PointCloudObject = PlainMessage<commonApi.PointCloudObject>;
 

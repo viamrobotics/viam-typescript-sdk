@@ -5,6 +5,7 @@ import {
   CaptureAllFromCameraRequest,
   GetClassificationsFromCameraRequest,
   GetClassificationsRequest,
+  GetDetections3DRequest,
   GetDetectionsFromCameraRequest,
   GetDetectionsRequest,
   GetObjectPointCloudsRequest,
@@ -112,6 +113,19 @@ export class VisionClient implements Vision {
 
     const resp = await this.client.getClassifications(request, callOptions);
     return resp.classifications;
+  }
+
+  async getDetections3D(cameraName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new GetDetections3DRequest({
+      name: this.name,
+      cameraName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getDetections3D(request, callOptions);
+    return resp.detections3d;
   }
 
   async getObjectPointClouds(cameraName: string, extra = {}, callOptions = this.callOptions) {

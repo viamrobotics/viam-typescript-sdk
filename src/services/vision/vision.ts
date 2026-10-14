@@ -6,6 +6,7 @@ import type {
   CaptureAllResponse,
   Classification,
   Detection,
+  Detection3D,
   PointCloudObject,
   Properties,
 } from './types';
@@ -125,6 +126,24 @@ export interface Vision extends Resource {
     count: number,
     extra?: Struct,
   ) => Promise<Classification[]>;
+
+  /**
+   * Get a list of 3D detections (as transform trees) in the next image given a camera.
+   *
+   * @example
+   *
+   * ```ts
+   * const vision = new VIAM.VisionClient(machine, 'my_vision');
+   * const detections = await vision.getDetections3D('my_camera');
+   * ```
+   *
+   * For more information, see [Vision
+   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetections3d).
+   *
+   * @param cameraName - The name of the camera to use for detection.
+   * @returns - The list of 3D Detections.
+   */
+  getDetections3D: (cameraName: string, extra?: Struct) => Promise<Detection3D[]>;
 
   /**
    * Returns a list of the 3D point cloud objects and associated metadata in the latest picture
