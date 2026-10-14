@@ -2,22 +2,63 @@ import { Struct, type JsonValue } from '@bufbuild/protobuf';
 import type { CallOptions, Client } from '@connectrpc/connect';
 import { NavigationService } from '../../gen/service/navigation/v1/navigation_connect';
 import {
-  AddWaypointRequest,
+  AddLocationRequest,
+  AddRouteRequest,
+  AddZoneRequest,
+  CancelRequest,
+  DeleteLocationRequest,
+  DeleteRouteRequest,
+  DeleteZoneRequest,
+  ExecutePlanRequest,
+  GetCostmapRequest,
   GetLocationRequest,
-  GetModeRequest,
-  GetObstaclesRequest,
-  GetPathsRequest,
+  GetNavigationStatusRequest,
+  GetPositionRequest,
   GetPropertiesRequest,
-  GetWaypointsRequest,
-  RemoveWaypointRequest,
-  SetModeRequest,
+  GetRouteRequest,
+  GetZoneRequest,
+  GoToLocationRequest,
+  GoToPointRequest,
+  ListLocationsRequest,
+  ListRoutesRequest,
+  ListZonesRequest,
+  NavigateRouteRequest,
+  NavigateToLocationRequest,
+  NavigateToPointRequest,
+  PlanToLocationRequest,
+  PlanToPointRequest,
+  ResumeRequest,
+  SuspendRequest,
+  UpdateLocationRequest,
+  UpdateRouteRequest,
+  UpdateZoneRequest,
+  WaypointList,
 } from '../../gen/service/navigation/v1/navigation_pb';
 import { type RobotClient } from '../../robot';
-import type { GeoPoint, Options } from '../../types';
+import type { Options } from '../../types';
 import { isValidGeoPoint } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Navigation } from './navigation';
-import type { Mode } from './types';
+import type {
+  CostmapOptions,
+  GoToOptions,
+  NavigateRouteOptions,
+  NavigationPlan,
+  NavigationPosition,
+  UpdateLocationOptions,
+  UpdateRouteOptions,
+  UpdateZoneOptions,
+  Waypoint,
+  ZoneType,
+} from './types';
+
+/** Throw if a response is missing a field the API always sets. */
+const required = <T>(value: T | undefined, field: string): T => {
+  if (value === undefined) {
+    throw new Error(`no ${field}`);
+  }
+  return value;
+};
 
 /**
  * A gRPC-web client for a Navigation service.
@@ -36,107 +77,458 @@ export class NavigationClient implements Navigation {
     this.options = options;
   }
 
-  async getMode(extra = {}, callOptions = this.callOptions) {
-    const request = new GetModeRequest({
+  // Locations
+
+  async addLocation(
+    locationName: string,
+    position?: NavigationPosition,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new AddLocationRequest({
       name: this.name,
+      locationName,
+      position,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getMode(request, callOptions);
-    return resp.mode;
+    const resp = await this.client.addLocation(request, callOptions);
+    return required(resp.location, 'location');
   }
 
-  async setMode(mode: Mode, extra = {}, callOptions = this.callOptions) {
-    const request = new SetModeRequest({
-      name: this.name,
-      mode,
-      extra: Struct.fromJson(extra),
-    });
-
-    this.options.requestLogger?.(request);
-
-    await this.client.setMode(request, callOptions);
-  }
-
-  async getLocation(extra = {}, callOptions = this.callOptions) {
+  async getLocation(locationName: string, extra = {}, callOptions = this.callOptions) {
     const request = new GetLocationRequest({
       name: this.name,
+      locationName,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const response = await this.client.getLocation(request, callOptions);
+    const resp = await this.client.getLocation(request, callOptions);
+    const location = required(resp.location, 'location');
 
-    if (!response.location) {
-      throw new Error('no location');
-    }
-    if (!isValidGeoPoint(response.location)) {
+    const { position } = location;
+    if (
+      position?.value.case === 'geoPose' &&
+      (!position.value.value.location || !isValidGeoPoint(position.value.value.location))
+    ) {
       throw new Error('invalid location');
     }
-    return response;
+    return location;
   }
 
-  async getWayPoints(extra = {}, callOptions = this.callOptions) {
-    const request = new GetWaypointsRequest({
+  async listLocations(extra = {}, callOptions = this.callOptions) {
+    const request = new ListLocationsRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getWaypoints(request, callOptions);
-    return resp.waypoints;
+    const resp = await this.client.listLocations(request, callOptions);
+    return resp.locations;
   }
 
-  async addWayPoint(location: GeoPoint, extra = {}, callOptions = this.callOptions) {
-    const request = new AddWaypointRequest({
+  async updateLocation(
+    locationName: string,
+    { position, newName }: UpdateLocationOptions,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new UpdateLocationRequest({
       name: this.name,
-      location,
+      locationName,
+      position,
+      newName,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    await this.client.addWaypoint(request, callOptions);
+    const resp = await this.client.updateLocation(request, callOptions);
+    return required(resp.location, 'location');
   }
 
-  async removeWayPoint(id: string, extra = {}, callOptions = this.callOptions) {
-    const request = new RemoveWaypointRequest({
+  async deleteLocation(locationName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new DeleteLocationRequest({
       name: this.name,
-      id,
+      locationName,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    await this.client.removeWaypoint(request, callOptions);
+    await this.client.deleteLocation(request, callOptions);
   }
 
-  async getObstacles(extra = {}, callOptions = this.callOptions) {
-    const request = new GetObstaclesRequest({
+  // Routes
+
+  async addRoute(
+    routeName: string,
+    waypoints: Waypoint[],
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new AddRouteRequest({
+      name: this.name,
+      routeName,
+      waypoints,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.addRoute(request, callOptions);
+    return required(resp.route, 'route');
+  }
+
+  async getRoute(routeName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new GetRouteRequest({
+      name: this.name,
+      routeName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getRoute(request, callOptions);
+    return required(resp.route, 'route');
+  }
+
+  async listRoutes(extra = {}, callOptions = this.callOptions) {
+    const request = new ListRoutesRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getObstacles(request, callOptions);
-    return resp.obstacles;
+    const resp = await this.client.listRoutes(request, callOptions);
+    return resp.routes;
   }
 
-  async getPaths(extra = {}, callOptions = this.callOptions) {
-    const request = new GetPathsRequest({
+  async updateRoute(
+    routeName: string,
+    { newName, waypoints }: UpdateRouteOptions,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new UpdateRouteRequest({
+      name: this.name,
+      routeName,
+      newName,
+      // Wrapped so an empty list (clear waypoints) is distinct from unset.
+      waypoints: waypoints === undefined ? undefined : new WaypointList({ waypoints }),
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.updateRoute(request, callOptions);
+    return required(resp.route, 'route');
+  }
+
+  async deleteRoute(routeName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new DeleteRouteRequest({
+      name: this.name,
+      routeName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    await this.client.deleteRoute(request, callOptions);
+  }
+
+  // Zones
+
+  async addZone(
+    zoneName: string,
+    type: ZoneType,
+    geometry: Record<string, JsonValue>,
+    maxSpeed?: number,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new AddZoneRequest({
+      name: this.name,
+      zoneName,
+      type,
+      geometry: Struct.fromJson(geometry),
+      maxSpeed,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.addZone(request, callOptions);
+    return required(resp.zone, 'zone');
+  }
+
+  async getZone(zoneName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new GetZoneRequest({
+      name: this.name,
+      zoneName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getZone(request, callOptions);
+    return required(resp.zone, 'zone');
+  }
+
+  async listZones(type?: ZoneType, extra = {}, callOptions = this.callOptions) {
+    const request = new ListZonesRequest({
+      name: this.name,
+      type,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.listZones(request, callOptions);
+    return resp.zones;
+  }
+
+  async updateZone(
+    zoneName: string,
+    { type, geometry, maxSpeed, newName }: UpdateZoneOptions,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new UpdateZoneRequest({
+      name: this.name,
+      zoneName,
+      type,
+      geometry: geometry === undefined ? undefined : Struct.fromJson(geometry),
+      maxSpeed,
+      newName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.updateZone(request, callOptions);
+    return required(resp.zone, 'zone');
+  }
+
+  async deleteZone(zoneName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new DeleteZoneRequest({
+      name: this.name,
+      zoneName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    await this.client.deleteZone(request, callOptions);
+  }
+
+  // Planned navigation
+
+  async navigateToLocation(locationName: string, extra = {}, callOptions = this.callOptions) {
+    const request = new NavigateToLocationRequest({
+      name: this.name,
+      locationName,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.navigateToLocation(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  async navigateToPoint(
+    destination: NavigationPosition,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new NavigateToPointRequest({
+      name: this.name,
+      destination,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.navigateToPoint(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  async navigateRoute(route: NavigateRouteOptions, extra = {}, callOptions = this.callOptions) {
+    const request = new NavigateRouteRequest({
+      name: this.name,
+      ...route,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.navigateRoute(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  async planToPoint(
+    destination: NavigationPosition,
+    start?: NavigationPosition,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new PlanToPointRequest({
+      name: this.name,
+      destination,
+      start,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.planToPoint(request, callOptions);
+    return required(resp.plan, 'plan');
+  }
+
+  async planToLocation(
+    locationName: string,
+    start?: NavigationPosition,
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new PlanToLocationRequest({
+      name: this.name,
+      locationName,
+      start,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.planToLocation(request, callOptions);
+    return required(resp.plan, 'plan');
+  }
+
+  async executePlan(plan: NavigationPlan, extra = {}, callOptions = this.callOptions) {
+    const request = new ExecutePlanRequest({
+      name: this.name,
+      plan,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.executePlan(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  // Direct navigation
+
+  async goToLocation(
+    locationName: string,
+    { wait, linearMPerSec }: GoToOptions = {},
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new GoToLocationRequest({
+      name: this.name,
+      locationName,
+      wait,
+      linearMPerSec,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.goToLocation(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  async goToPoint(
+    destination: NavigationPosition,
+    { wait, linearMPerSec }: GoToOptions = {},
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new GoToPointRequest({
+      name: this.name,
+      destination,
+      wait,
+      linearMPerSec,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.goToPoint(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  // Goal control
+
+  async suspend(reason = '', extra = {}, callOptions = this.callOptions) {
+    const request = new SuspendRequest({
+      name: this.name,
+      reason,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.suspend(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  async resume(extra = {}, callOptions = this.callOptions) {
+    const request = new ResumeRequest({
       name: this.name,
       extra: Struct.fromJson(extra),
     });
 
     this.options.requestLogger?.(request);
 
-    const resp = await this.client.getPaths(request, callOptions);
-    return resp.paths;
+    const resp = await this.client.resume(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  async cancel(extra = {}, callOptions = this.callOptions) {
+    const request = new CancelRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.cancel(request, callOptions);
+    return required(resp.status, 'status');
+  }
+
+  // State
+
+  async getPosition(extra = {}, callOptions = this.callOptions) {
+    const request = new GetPositionRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getPosition(request, callOptions);
+    return required(resp.position, 'position');
+  }
+
+  async getNavigationStatus(extra = {}, callOptions = this.callOptions) {
+    const request = new GetNavigationStatusRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getNavigationStatus(request, callOptions);
+    return required(resp.status, 'status');
   }
 
   async getProperties(callOptions = this.callOptions) {
@@ -146,7 +538,25 @@ export class NavigationClient implements Navigation {
 
     this.options.requestLogger?.(request);
 
-    return this.client.getProperties(request, callOptions);
+    const resp = await this.client.getProperties(request, callOptions);
+    return required(resp.properties, 'properties');
+  }
+
+  async getCostmap(
+    { layer, stride }: CostmapOptions = {},
+    extra = {},
+    callOptions = this.callOptions,
+  ) {
+    const request = new GetCostmapRequest({
+      name: this.name,
+      layer,
+      stride,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    return this.client.getCostmap(request, callOptions);
   }
 
   async getStatus(callOptions = this.callOptions): Promise<JsonValue> {

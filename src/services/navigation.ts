@@ -1,9 +1,25 @@
 export { NavigationClient } from './navigation/client';
 export type { Navigation } from './navigation/navigation';
 export {
+  GoalState,
+  GoalStatus,
+  MapType,
+  NavErrorCode,
+  NavMode,
+  NavigationCostmap,
+  NavigationLocation,
+  NavigationPlan,
   NavigationPosition,
   NavigationProperties,
-  Path,
+  NavigationStatus,
+  Route,
   Waypoint,
-  type Mode,
+  Zone,
+  type CostmapOptions,
+  type GoToOptions,
+  type NavigateRouteOptions,
+  type UpdateLocationOptions,
+  type UpdateRouteOptions,
+  type UpdateZoneOptions,
+  type ZoneType,
 } from './navigation/types';

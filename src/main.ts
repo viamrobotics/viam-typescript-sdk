@@ -356,12 +356,29 @@ export { DataManagerClient, type DataManager } from './services/data-manager';
 export * as dataManagerApi from './gen/service/datamanager/v1/data_manager_pb';
 
 export {
+  GoalState,
+  GoalStatus,
+  MapType,
+  NavErrorCode,
+  NavMode,
   NavigationClient,
+  NavigationCostmap,
+  NavigationLocation,
+  NavigationPlan,
   NavigationPosition,
   NavigationProperties,
-  Path,
+  NavigationStatus,
+  Route,
   Waypoint,
-  type Mode,
+  Zone,
+  type CostmapOptions,
+  type GoToOptions,
+  type Navigation,
+  type NavigateRouteOptions,
+  type UpdateLocationOptions,
+  type UpdateRouteOptions,
+  type UpdateZoneOptions,
+  type ZoneType,
 } from './services/navigation';
 /**
  * Raw Protobuf interfaces for a Navigation service.
