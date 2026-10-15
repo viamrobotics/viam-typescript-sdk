@@ -1314,6 +1314,8 @@ export class AppClient {
    *   not passed, the visibility will be unchanged. If visibility is not set and makePublic is set,
    *   makePublic takes effect. If makePublic and visibility are set, they must not be conflicting.
    *   If neither is set, the fragment visibility will remain unchanged.
+   * @param fragmentConfigJson Optional fragment config as a JSON string that preserves key order.
+   *   Takes precedence over config if both are passed.
    * @returns The updated fragment
    */
   async updateFragment(
@@ -1322,6 +1324,7 @@ export class AppClient {
     config: Struct,
     makePublic?: boolean,
     visibility?: FragmentVisibility,
+    fragmentConfigJson?: string,
   ): Promise<Fragment | undefined> {
     const resp = await this.client.updateFragment({
       id,
@@ -1329,6 +1332,7 @@ export class AppClient {
       config,
       public: makePublic,
       visibility,
+      fragmentConfigJson,
     });
     return resp.fragment;
   }
