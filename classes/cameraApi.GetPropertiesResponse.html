@@ -16,7 +16,7 @@
 <div class="tsd-tag-generated">
 <h4 class="tsd-anchor-link" id="generated">Generated<a href="#generated" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from message viam.component.camera.v1.GetPropertiesResponse</p>
 </div></div></section>
-<section class="tsd-panel tsd-hierarchy" data-refl="40695">
+<section class="tsd-panel tsd-hierarchy" data-refl="41763">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-signature-type">Message</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/cameraApi.html" class="tsd-signature-type tsd-kind-namespace">cameraApi</a><span class="tsd-signature-symbol">.</span><a href="" class="tsd-signature-type tsd-kind-class">GetPropertiesResponse</a><span class="tsd-signature-symbol">&gt;</span>
@@ -33,7 +33,8 @@
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<div class="tsd-index-list"><a href="#distortionparameters" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>distortion<wbr/>Parameters?</span></a>
+<div class="tsd-index-list"><a href="#defaultreferenceframe" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Reference<wbr/>Frame</span></a>
+<a href="#distortionparameters" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>distortion<wbr/>Parameters?</span></a>
 <a href="#extrinsicparameters" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>extrinsic<wbr/>Parameters?</span></a>
 <a href="#framerate" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>frame<wbr/>Rate?</span></a>
 <a href="#intrinsicparameters" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>intrinsic<wbr/>Parameters?</span></a>
@@ -79,6 +80,16 @@
 <h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
 <section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="defaultreferenceframe"><span class="deprecated">default<wbr/>Reference<wbr/>Frame</span><a href="#defaultreferenceframe" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">defaultReferenceFrame</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+<div class="tsd-comment tsd-typography"><p>Name of the reference frame that points returned by GetPointCloud are expressed in
+An empty string means the frame is unknown; the frame is not guaranteed to exist in the frame system</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-generated">
+<h4 class="tsd-anchor-link" id="generated-1">Generated<a href="#generated-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: string default_reference_frame = 7;</p>
+</div></div></section>
+<section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="distortionparameters"><code class="tsd-tag">Optional</code><span class="deprecated">distortion<wbr/>Parameters</span><a href="#distortionparameters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">distortionParameters</span><span class="tsd-signature-symbol">?:</span> <a href="cameraApi.DistortionParameters.html" class="tsd-signature-type tsd-kind-class">DistortionParameters</a></div>
 <div class="tsd-comment tsd-typography"><p>Parameters for modeling lens distortion in cameras
@@ -87,7 +98,7 @@ Initializing the parameters with 0-values is considered an error</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-1">Generated<a href="#generated-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.component.camera.v1.DistortionParameters distortion_parameters = 3;</p>
+<h4 class="tsd-anchor-link" id="generated-2">Generated<a href="#generated-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.component.camera.v1.DistortionParameters distortion_parameters = 3;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="extrinsicparameters"><code class="tsd-tag">Optional</code><span class="deprecated">extrinsic<wbr/>Parameters</span><a href="#extrinsicparameters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -97,7 +108,7 @@ If camera does not provide extrinsic parameters, leave the field empty</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-2">Generated<a href="#generated-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.component.camera.v1.ExtrinsicParameters extrinsic_parameters = 6;</p>
+<h4 class="tsd-anchor-link" id="generated-3">Generated<a href="#generated-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.component.camera.v1.ExtrinsicParameters extrinsic_parameters = 6;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="framerate"><code class="tsd-tag">Optional</code><span class="deprecated">frame<wbr/>Rate</span><a href="#framerate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -106,7 +117,7 @@ If camera does not provide extrinsic parameters, leave the field empty</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-3">Generated<a href="#generated-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: optional float frame_rate = 5;</p>
+<h4 class="tsd-anchor-link" id="generated-4">Generated<a href="#generated-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: optional float frame_rate = 5;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="intrinsicparameters"><code class="tsd-tag">Optional</code><span class="deprecated">intrinsic<wbr/>Parameters</span><a href="#intrinsicparameters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -117,7 +128,7 @@ Initializing the parameters with 0-values is considered an error</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-4">Generated<a href="#generated-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.component.camera.v1.IntrinsicParameters intrinsic_parameters = 2;</p>
+<h4 class="tsd-anchor-link" id="generated-5">Generated<a href="#generated-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.component.camera.v1.IntrinsicParameters intrinsic_parameters = 2;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="mimetypes"><span class="deprecated">mime<wbr/>Types</span><a href="#mimetypes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -126,7 +137,7 @@ Initializing the parameters with 0-values is considered an error</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-5">Generated<a href="#generated-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: repeated string mime_types = 4;</p>
+<h4 class="tsd-anchor-link" id="generated-6">Generated<a href="#generated-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: repeated string mime_types = 4;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="supportspcd"><span class="deprecated">supports<wbr/>Pcd</span><a href="#supportspcd" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -135,7 +146,7 @@ Initializing the parameters with 0-values is considered an error</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-6">Generated<a href="#generated-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: bool supports_pcd = 1;</p>
+<h4 class="tsd-anchor-link" id="generated-7">Generated<a href="#generated-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: bool supports_pcd = 1;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="fields"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span class="deprecated">fields</span><a href="#fields" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -364,7 +375,7 @@ use toJson.</p>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
 <div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
-<div><a href="#distortionparameters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>distortion<wbr/>Parameters</span></a><a href="#extrinsicparameters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>extrinsic<wbr/>Parameters</span></a><a href="#framerate"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>frame<wbr/>Rate</span></a><a href="#intrinsicparameters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>intrinsic<wbr/>Parameters</span></a><a href="#mimetypes"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>mime<wbr/>Types</span></a><a href="#supportspcd"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>supports<wbr/>Pcd</span></a><a href="#fields"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fields</span></a><a href="#runtime"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>runtime</span></a><a href="#typename"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>type<wbr/>Name</span></a></div></details>
+<div><a href="#defaultreferenceframe"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>default<wbr/>Reference<wbr/>Frame</span></a><a href="#distortionparameters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>distortion<wbr/>Parameters</span></a><a href="#extrinsicparameters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>extrinsic<wbr/>Parameters</span></a><a href="#framerate"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>frame<wbr/>Rate</span></a><a href="#intrinsicparameters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>intrinsic<wbr/>Parameters</span></a><a href="#mimetypes"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>mime<wbr/>Types</span></a><a href="#supportspcd"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>supports<wbr/>Pcd</span></a><a href="#fields"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fields</span></a><a href="#runtime"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>runtime</span></a><a href="#typename"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>type<wbr/>Name</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
 <div><a href="#clone" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone</span></a><a href="#equals" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>equals</span></a><a href="#frombinary" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Binary</span></a><a href="#fromjson" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json</span></a><a href="#fromjsonstring" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json<wbr/>String</span></a><a href="#gettype" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Type</span></a><a href="#tobinary" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>Binary</span></a><a href="#tojson" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>Json</span></a><a href="#tojson-2" class="tsd-is-protected tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>JSON</span></a><a href="#tojsonstring" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>Json<wbr/>String</span></a><a href="#equals-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>equals</span></a><a href="#frombinary-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Binary</span></a><a href="#fromjson-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json</span></a><a href="#fromjsonstring-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json<wbr/>String</span></a></div></details></div></details></div>
 <div class="site-menu">
