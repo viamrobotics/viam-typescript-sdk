@@ -106,8 +106,8 @@
   "motion": {
     "importName": "MotionClient",
     "func": "getPose",
-    "args": [],
-    "comment": "Note this function requires additional arguments. Please provide valid arguments for function to work properly.",
+    "args": ["'world'", "'world'", "[]"],
+    "comment": "Note that this gets the pose of the world frame itself, which is always zero. Change the component name from \"world\" to one of your components to get its pose.",
     "packagePath": "@viamrobotics/sdk",
     "packageName": "VIAM"
   },
