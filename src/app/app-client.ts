@@ -1,13 +1,14 @@
-import type { JsonValue } from '@bufbuild/protobuf';
+import type { JsonObject, JsonValue } from '@bufbuild/protobuf';
 import { Struct, Timestamp } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { type PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
 import {
-  type APIKeyWithAuthorizations,
-  type AllowedLoginMethods,
   Authorization,
   AuthorizedPermissions,
+  ListMachineSummariesRequest,
+  type AllowedLoginMethods,
+  type APIKeyWithAuthorizations,
   type CreateKeyFromExistingKeyAuthorizationsResponse,
   type CreateKeyResponse,
   type CreateModuleResponse,
@@ -15,14 +16,15 @@ import {
   type Fragment,
   type FragmentImportList,
   type FragmentVisibility,
-  type GetAppContentResponse,
   type GetAppBrandingResponse,
+  type GetAppContentResponse,
+  type GetRobotPartByNameAndLocationResponse,
   type GetRobotPartLogsResponse,
   type GetRobotPartResponse,
-  type GetRobotPartByNameAndLocationResponse,
   type ListOrganizationMembersResponse,
   type Location,
   type LocationAuth,
+  type LocationSummary,
   type Model,
   type Module,
   type Organization,
@@ -38,8 +40,6 @@ import {
   type RotateKeyResponse,
   type RoverRentalRobot,
   type Visibility,
-  ListMachineSummariesRequest,
-  type LocationSummary,
 } from '../gen/app/v1/app_pb';
 import type { LogEntry } from '../gen/common/v1/common_pb';
 
@@ -1314,8 +1314,8 @@ export class AppClient {
    *   not passed, the visibility will be unchanged. If visibility is not set and makePublic is set,
    *   makePublic takes effect. If makePublic and visibility are set, they must not be conflicting.
    *   If neither is set, the fragment visibility will remain unchanged.
-   * @param fragmentConfigJson Optional fragment config as a JSON string that preserves key order.
-   *   Takes precedence over config if both are passed.
+   * @param fragmentConfigJson Optional fragment config as a JSON object. Takes precedence over
+   *   config if both are passed.
    * @returns The updated fragment
    */
   async updateFragment(
@@ -1324,7 +1324,7 @@ export class AppClient {
     config: Struct,
     makePublic?: boolean,
     visibility?: FragmentVisibility,
-    fragmentConfigJson?: string,
+    fragmentConfigJson?: JsonObject,
   ): Promise<Fragment | undefined> {
     const resp = await this.client.updateFragment({
       id,
@@ -1332,7 +1332,7 @@ export class AppClient {
       config,
       public: makePublic,
       visibility,
-      fragmentConfigJson,
+      fragmentConfigJson: JSON.stringify(fragmentConfigJson),
     });
     return resp.fragment;
   }
