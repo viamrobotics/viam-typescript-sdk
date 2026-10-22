@@ -1305,7 +1305,7 @@ describe('AppClient tests', () => {
       await subject().updateFragment('id', 'name', new Struct(), undefined, undefined, {
         foo: 'bar',
       });
-      expect(capReq.fragmentConfigJson).toBe({ foo: 'bar' });
+      expect(capReq.fragmentConfigJson).toBe('{"foo":"bar"}');
     });
   });
 

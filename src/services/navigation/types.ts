@@ -22,3 +22,22 @@ export type NavMode = navigationApi.NavMode;
 export type NavErrorCode = navigationApi.NavErrorCode;
 
 export const { MapType, GoalState, NavMode, NavErrorCode } = navigationApi;
+
+/**
+ * Options for {@link Navigation.navigateRoute}. Set either routeName (a saved route) or waypoints
+ * (an inline list).
+ */
+export interface NavigateRouteOptions {
+  /** The name of a saved route. */
+  routeName?: string;
+  /** An inline list of waypoints. */
+  waypoints?: Waypoint[];
+  /** The index to start from. Defaults to 0. */
+  startIndex?: number;
+  /** Start from the nearest waypoint instead, overriding startIndex. */
+  startNearest?: boolean;
+  /** Loop the route. Defaults to false. */
+  loop?: boolean;
+  /** With loop, only return once stopped. Defaults to false. */
+  wait?: boolean;
+}

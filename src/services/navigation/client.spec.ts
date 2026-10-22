@@ -22,12 +22,14 @@ import {
   GetRouteResponse,
   GetZoneResponse,
   GoToLocationResponse,
+  type GoToPointRequest,
   GoToPointResponse,
   ListLocationsResponse,
   ListRoutesResponse,
   ListZonesResponse,
   Location,
   MapType,
+  type NavigateRouteRequest,
   NavigateRouteResponse,
   NavigateToLocationResponse,
   NavigateToPointResponse,
@@ -39,6 +41,7 @@ import {
   Route,
   SuspendResponse,
   UpdateLocationResponse,
+  type UpdateRouteRequest,
   UpdateRouteResponse,
   UpdateZoneResponse,
   Waypoint,
@@ -60,8 +63,15 @@ const testZone = new Zone({ name: 'blocked', type: 'keepout' });
 
 describe('NavigationClient', () => {
   let navigation: NavigationClient;
+  let capturedUpdateRoute: UpdateRouteRequest | undefined;
+  let capturedNavigateRoute: NavigateRouteRequest | undefined;
+  let capturedGoToPoint: GoToPointRequest | undefined;
 
   beforeEach(() => {
+    capturedUpdateRoute = undefined;
+    capturedNavigateRoute = undefined;
+    capturedGoToPoint = undefined;
+
     const mockTransport = createRouterTransport(({ service }) => {
       service(NavigationService, {
         addLocation: () => new AddLocationResponse({ location: testLocation }),
@@ -72,7 +82,10 @@ describe('NavigationClient', () => {
         addRoute: () => new AddRouteResponse({ route: testRoute }),
         getRoute: () => new GetRouteResponse({ route: testRoute }),
         listRoutes: () => new ListRoutesResponse({ routes: [testRoute] }),
-        updateRoute: () => new UpdateRouteResponse({ route: testRoute }),
+        updateRoute: (req) => {
+          capturedUpdateRoute = req;
+          return new UpdateRouteResponse({ route: testRoute });
+        },
         deleteRoute: () => new DeleteRouteResponse({}),
         addZone: () => new AddZoneResponse({ zone: testZone }),
         getZone: () => new GetZoneResponse({ zone: testZone }),
@@ -83,8 +96,10 @@ describe('NavigationClient', () => {
           new NavigateToLocationResponse({ status: { position: testPosition, localized: true } }),
         navigateToPoint: () =>
           new NavigateToPointResponse({ status: { position: testPosition, localized: true } }),
-        navigateRoute: () =>
-          new NavigateRouteResponse({ status: { position: testPosition, localized: true } }),
+        navigateRoute: (req) => {
+          capturedNavigateRoute = req;
+          return new NavigateRouteResponse({ status: { position: testPosition, localized: true } });
+        },
         planToPoint: () =>
           new PlanToPointResponse({ plan: { path: [testPosition], lengthM: 1.5 } }),
         planToLocation: () =>
@@ -93,8 +108,10 @@ describe('NavigationClient', () => {
           new ExecutePlanResponse({ status: { position: testPosition, localized: true } }),
         goToLocation: () =>
           new GoToLocationResponse({ status: { position: testPosition, localized: true } }),
-        goToPoint: () =>
-          new GoToPointResponse({ status: { position: testPosition, localized: true } }),
+        goToPoint: (req) => {
+          capturedGoToPoint = req;
+          return new GoToPointResponse({ status: { position: testPosition, localized: true } });
+        },
         suspend: () => new SuspendResponse({ status: { position: testPosition, localized: true } }),
         resume: () => new ResumeResponse({ status: { position: testPosition, localized: true } }),
         cancel: () => new CancelResponse({ status: { position: testPosition, localized: true } }),
@@ -161,6 +178,13 @@ describe('NavigationClient', () => {
 
   it('updates a route leaving waypoints unchanged', async () => {
     await expect(navigation.updateRoute('loop', 'new-loop')).resolves.toStrictEqual(testRoute);
+    expect(capturedUpdateRoute?.waypoints).toBeUndefined();
+  });
+
+  it('updates a route clearing its waypoints', async () => {
+    await navigation.updateRoute('loop', undefined, []);
+    expect(capturedUpdateRoute?.newName).toBeUndefined();
+    expect(capturedUpdateRoute?.waypoints?.waypoints).toStrictEqual([]);
   });
 
   it('deletes a route', async () => {
@@ -199,9 +223,22 @@ describe('NavigationClient', () => {
     expect(status.position).toStrictEqual(testPosition);
   });
 
-  it('navigates a route', async () => {
-    const status = await navigation.navigateRoute('loop', []);
+  it('navigates a saved route', async () => {
+    const status = await navigation.navigateRoute({ routeName: 'loop', loop: true });
     expect(status.position).toStrictEqual(testPosition);
+    expect(capturedNavigateRoute?.routeName).toBe('loop');
+    expect(capturedNavigateRoute?.waypoints).toStrictEqual([]);
+    expect(capturedNavigateRoute?.loop).toBe(true);
+    expect(capturedNavigateRoute?.wait).toBe(false);
+  });
+
+  it('navigates an inline route', async () => {
+    await navigation.navigateRoute({ waypoints: [testWaypoint], startIndex: 1, wait: true });
+    expect(capturedNavigateRoute?.routeName).toBe('');
+    expect(capturedNavigateRoute?.waypoints).toStrictEqual([testWaypoint]);
+    expect(capturedNavigateRoute?.startIndex).toBe(1);
+    expect(capturedNavigateRoute?.startNearest).toBe(false);
+    expect(capturedNavigateRoute?.wait).toBe(true);
   });
 
   it('plans to a point', async () => {
@@ -227,6 +264,14 @@ describe('NavigationClient', () => {
   it('goes to a point', async () => {
     const status = await navigation.goToPoint(testPosition);
     expect(status.position).toStrictEqual(testPosition);
+    expect(capturedGoToPoint?.wait).toBe(true);
+    expect(capturedGoToPoint?.linearMPerSec).toBeUndefined();
+  });
+
+  it('goes to a point without waiting', async () => {
+    await navigation.goToPoint(testPosition, false, 0.5);
+    expect(capturedGoToPoint?.wait).toBe(false);
+    expect(capturedGoToPoint?.linearMPerSec).toBe(0.5);
   });
 
   it('suspends the current goal', async () => {

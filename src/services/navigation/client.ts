@@ -38,7 +38,7 @@ import { type RobotClient } from '../../robot';
 import type { Options } from '../../types';
 import { doCommandFromClient, getStatusFromClient } from '../../utils';
 import type { Navigation } from './navigation';
-import type { Plan, Position, Waypoint } from './types';
+import type { NavigateRouteOptions, Plan, Position, Waypoint } from './types';
 
 /**
  * A gRPC-web client for a Navigation service.
@@ -357,12 +357,14 @@ export class NavigationClient implements Navigation {
   }
 
   async navigateRoute(
-    routeName: string,
-    waypoints: Waypoint[],
-    startIndex = 0,
-    startNearest = false,
-    loop = false,
-    wait = false,
+    {
+      routeName = '',
+      waypoints = [],
+      startIndex = 0,
+      startNearest = false,
+      loop = false,
+      wait = false,
+    }: NavigateRouteOptions,
     extra = {},
     callOptions = this.callOptions,
   ) {
@@ -448,7 +450,7 @@ export class NavigationClient implements Navigation {
 
   async goToLocation(
     locationName: string,
-    wait?: boolean,
+    wait = true,
     linearMPerSec?: number,
     extra = {},
     callOptions = this.callOptions,
@@ -472,7 +474,7 @@ export class NavigationClient implements Navigation {
 
   async goToPoint(
     destination: Position,
-    wait?: boolean,
+    wait = true,
     linearMPerSec?: number,
     extra = {},
     callOptions = this.callOptions,

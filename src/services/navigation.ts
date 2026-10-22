@@ -9,6 +9,7 @@ export {
   type NavError,
   NavErrorCode,
   NavMode,
+  type NavigateRouteOptions,
   type Plan,
   type Position,
   type Progress,

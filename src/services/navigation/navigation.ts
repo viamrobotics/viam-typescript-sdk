@@ -3,6 +3,7 @@ import type { Resource } from '../../types';
 import type {
   Costmap,
   Location,
+  NavigateRouteOptions,
   Plan,
   Position,
   Properties,
@@ -187,22 +188,15 @@ export interface Navigation extends Resource {
    * Drive a route one waypoint at a time using the obstacle-aware planner. Provide either routeName
    * (a saved route) or waypoints (an inline list).
    *
-   * @param routeName - Optional; the name of a saved route.
-   * @param waypoints - Optional; an inline list of waypoints.
-   * @param startIndex - Optional; the index to start from. Defaults to 0.
-   * @param startNearest - Optional; start from the nearest waypoint instead, overriding startIndex.
-   * @param loop - Optional; loop the route. Defaults to false.
-   * @param wait - Optional; with loop, only return once stopped. Defaults to false.
+   * @example
+   *
+   * ```ts
+   * const status = await navigation.navigateRoute({ routeName: 'patrol', loop: true });
+   * ```
+   *
+   * @param options - The route, and how to drive it. See {@link NavigateRouteOptions}.
    */
-  navigateRoute: (
-    routeName: string,
-    waypoints: Waypoint[],
-    startIndex?: number,
-    startNearest?: boolean,
-    loop?: boolean,
-    wait?: boolean,
-    extra?: Struct,
-  ) => Promise<Status>;
+  navigateRoute: (options: NavigateRouteOptions, extra?: Struct) => Promise<Status>;
 
   /**
    * Compute a path from the robot (or a given start) to a Position without moving. Pass a feasible
@@ -235,7 +229,7 @@ export interface Navigation extends Resource {
    * Intended for short hops and docking.
    *
    * @param locationName - The name of the saved location to go to.
-   * @param wait - Optional; default true. With false, returns immediately while navigating.
+   * @param wait - Optional; defaults to true. With false, returns immediately while navigating.
    * @param linearMPerSec - Optional; the linear speed to drive at.
    */
   goToLocation: (
@@ -250,7 +244,7 @@ export interface Navigation extends Resource {
    * Intended for short hops and docking.
    *
    * @param destination - The destination to go to.
-   * @param wait - Optional; default true. With false, returns immediately while navigating.
+   * @param wait - Optional; defaults to true. With false, returns immediately while navigating.
    * @param linearMPerSec - Optional; the linear speed to drive at.
    */
   goToPoint: (
