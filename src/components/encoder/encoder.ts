@@ -23,7 +23,7 @@ export interface Encoder extends Resource {
    * ```
    *
    * For more information, see [Encoder
-   * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/encoder/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -40,7 +40,7 @@ export interface Encoder extends Resource {
    * ```
    *
    * For more information, see [Encoder
-   * API](https://docs.viam.com/dev/reference/apis/components/encoder/#resetposition).
+   * API](https://docs.viam.com/reference/apis/components/encoder/#resetposition).
    */
   resetPosition(extra?: Struct): Promise<void>;
 
@@ -57,7 +57,7 @@ export interface Encoder extends Resource {
    * ```
    *
    * For more information, see [Encoder
-   * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getproperties).
+   * API](https://docs.viam.com/reference/apis/components/encoder/#getproperties).
    */
   getProperties(extra?: Struct): Promise<EncoderProperties>;
 
@@ -78,7 +78,7 @@ export interface Encoder extends Resource {
    * ```
    *
    * For more information, see [Encoder
-   * API](https://docs.viam.com/dev/reference/apis/components/encoder/#getposition).
+   * API](https://docs.viam.com/reference/apis/components/encoder/#getposition).
    *
    * @param positionType - The type of position the encoder returns (ticks or degrees)
    */

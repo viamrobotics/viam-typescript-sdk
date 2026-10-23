@@ -20,7 +20,7 @@ export interface Slam extends Resource {
    * ```
    *
    * For more information, see [SLAM
-   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getposition).
+   * API](https://docs.viam.com/reference/apis/services/slam/#getposition).
    */
   getPosition: () => Promise<SlamPosition>;
 
@@ -40,7 +40,7 @@ export interface Slam extends Resource {
    * ```
    *
    * For more information, see [SLAM
-   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getpointcloudmap).
+   * API](https://docs.viam.com/reference/apis/services/slam/#getpointcloudmap).
    */
   getPointCloudMap: (returnEditedMap?: boolean) => Promise<Uint8Array>;
 
@@ -57,7 +57,7 @@ export interface Slam extends Resource {
    * ```
    *
    * For more information, see [SLAM
-   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getinternalstate).
+   * API](https://docs.viam.com/reference/apis/services/slam/#getinternalstate).
    */
   getInternalState: () => Promise<Uint8Array>;
 
@@ -75,7 +75,7 @@ export interface Slam extends Resource {
    * ```
    *
    * For more information, see [SLAM
-   * API](https://docs.viam.com/dev/reference/apis/services/slam/#getproperties).
+   * API](https://docs.viam.com/reference/apis/services/slam/#getproperties).
    */
   getProperties: () => Promise<SlamProperties>;
 }

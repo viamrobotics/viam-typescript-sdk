@@ -72,7 +72,7 @@ export interface Camera extends Resource {
    * ```
    *
    * For more information, see [Camera
-   * API](https://docs.viam.com/dev/reference/apis/components/camera/#getpointcloud).
+   * API](https://docs.viam.com/reference/apis/components/camera/#getpointcloud).
    */
   getPointCloud: (extra?: Struct) => Promise<Uint8Array>;
 
@@ -87,7 +87,7 @@ export interface Camera extends Resource {
    * ```
    *
    * For more information, see [Camera
-   * API](https://docs.viam.com/dev/reference/apis/components/camera/#getproperties).
+   * API](https://docs.viam.com/reference/apis/components/camera/#getproperties).
    */
   getProperties: () => Promise<Properties>;
 }

@@ -19,7 +19,7 @@ export interface InputController extends Resource {
    * ```
    *
    * For more information, see [Input Controller
-   * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/input-controller/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -37,7 +37,7 @@ export interface InputController extends Resource {
    * ```
    *
    * For more information, see [Input Controller
-   * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#getevents).
+   * API](https://docs.viam.com/reference/apis/components/input-controller/#getevents).
    */
   getEvents(extra?: Struct): Promise<InputControllerEvent[]>;
 
@@ -62,7 +62,7 @@ export interface InputController extends Resource {
    * ```
    *
    * For more information, see [Input Controller
-   * API](https://docs.viam.com/dev/reference/apis/components/input-controller/#triggerevent).
+   * API](https://docs.viam.com/reference/apis/components/input-controller/#triggerevent).
    */
   triggerEvent(event: InputControllerEvent, extra?: Struct): Promise<void>;
 }

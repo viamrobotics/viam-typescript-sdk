@@ -32,7 +32,7 @@ To use this SDK with React Native, read the [documentation](https://github.com/v
 
 ## Offline Mode
 
-To run the TypeScript SDK in offline mode, see [Connect over local network or offline](https://docs.viam.com/dev/reference/sdks/connectivity/#connect-over-local-network-or-offline).
+To run the TypeScript SDK in offline mode, see [Connect over local network or offline](https://docs.viam.com/reference/sdks/connectivity/#connect-over-local-network-or-offline).
 
 ## License
 

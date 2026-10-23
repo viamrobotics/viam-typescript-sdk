@@ -16,7 +16,7 @@ export interface Sensor extends Resource {
    * ```
    *
    * For more information, see [Sensor
-   * API](https://docs.viam.com/dev/reference/apis/components/sensor/#getreadings).
+   * API](https://docs.viam.com/reference/apis/components/sensor/#getreadings).
    */
   getReadings(extra?: Struct): Promise<Record<string, JsonValue>>;
 }
