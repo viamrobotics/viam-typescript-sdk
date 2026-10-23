@@ -1,5 +1,5 @@
 import type { JsonValue } from '@bufbuild/protobuf';
-import { Struct, Timestamp } from '@bufbuild/protobuf';
+import { Struct, Timestamp, Value } from '@bufbuild/protobuf';
 import { createClient, type Client, type Transport } from '@connectrpc/connect';
 import { type PackageType } from '../gen/app/packages/v1/packages_pb';
 import { AppService } from '../gen/app/v1/app_connect';
@@ -8,6 +8,7 @@ import {
   type AllowedLoginMethods,
   Authorization,
   AuthorizedPermissions,
+  type ConfigPropertyChangeResult,
   type CreateKeyFromExistingKeyAuthorizationsResponse,
   type CreateKeyResponse,
   type CreateModuleResponse,
@@ -957,6 +958,40 @@ export class AppClient {
   ): Promise<RobotPart | undefined> {
     const resp = await this.client.updateRobotPart({ id, name, robotConfig });
     return resp.part;
+  }
+
+  /**
+   * Sets individual properties in a robot part's config. Each change is written where the property
+   * comes from: the part config, a fragment mod or variable, or a new fragment mod.
+   *
+   * @example
+   *
+   * ```ts
+   * const results = await appClient.setConfigProperty('<YOUR-ROBOT-PART-ID>', [
+   *   { path: 'components.my-arm.attributes.speed', value: 50 },
+   * ]);
+   * ```
+   *
+   * For more information, see [App
+   * API](https://docs.viam.com/reference/apis/fleet/#setconfigproperty).
+   *
+   * @param robotPartId The ID of the robot part to update
+   * @param propertyChanges The properties to set, each a path into the config (for example
+   *   "components.my-arm.frame") and the value to set it to. Changes are applied in order.
+   * @returns The result of each change, in the same order as the requested changes
+   */
+  async setConfigProperty(
+    robotPartId: string,
+    propertyChanges: { path: string; value: JsonValue }[],
+  ): Promise<ConfigPropertyChangeResult[]> {
+    const resp = await this.client.setConfigProperty({
+      robotPartId,
+      propertyChanges: propertyChanges.map(({ path, value }) => ({
+        path,
+        value: Value.fromJson(value),
+      })),
+    });
+    return resp.propertyChanges;
   }
 
   /**
