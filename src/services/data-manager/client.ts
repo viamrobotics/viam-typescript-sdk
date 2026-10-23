@@ -34,7 +34,7 @@ export class DataManagerClient implements DataManager {
    * ```
    *
    * For more information, see [Data Manager
-   * API](https://docs.viam.com/dev/reference/apis/services/data/#sync).
+   * API](https://docs.viam.com/reference/apis/services/data/#sync).
    *
    * @param extra - Extra arguments to pass to the sync request.
    * @param callOptions - Call options for the sync request.
@@ -61,7 +61,7 @@ export class DataManagerClient implements DataManager {
    * ```
    *
    * For more information, see [Data Manager
-   * API](https://docs.viam.com/dev/reference/apis/services/data/#docommand).
+   * API](https://docs.viam.com/reference/apis/services/data/#docommand).
    *
    * @param command - The command to do.
    * @param callOptions - Call options for the command.

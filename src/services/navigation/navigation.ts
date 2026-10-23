@@ -26,7 +26,7 @@ import type {
  * ```
  *
  * For more information, see [Navigation
- * API](https://docs.viam.com/dev/reference/apis/services/navigation/).
+ * API](https://docs.viam.com/reference/apis/services/navigation/).
  */
 export interface Navigation extends Resource {
   /**

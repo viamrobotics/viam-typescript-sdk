@@ -15,7 +15,7 @@ export interface Servo extends Resource {
    * ```
    *
    * For more information, see [Servo
-   * API](https://docs.viam.com/dev/reference/apis/components/servo/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/servo/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -35,7 +35,7 @@ export interface Servo extends Resource {
    * ```
    *
    * For more information, see [Servo
-   * API](https://docs.viam.com/dev/reference/apis/components/servo/#move).
+   * API](https://docs.viam.com/reference/apis/components/servo/#move).
    */
   move(angleDeg: number, extra?: Struct): Promise<void>;
 
@@ -52,7 +52,7 @@ export interface Servo extends Resource {
    * ```
    *
    * For more information, see [Servo
-   * API](https://docs.viam.com/dev/reference/apis/components/servo/#getposition).
+   * API](https://docs.viam.com/reference/apis/components/servo/#getposition).
    */
   getPosition(extra?: Struct): Promise<number>;
 
@@ -72,7 +72,7 @@ export interface Servo extends Resource {
    * ```
    *
    * For more information, see [Servo
-   * API](https://docs.viam.com/dev/reference/apis/components/servo/#stop).
+   * API](https://docs.viam.com/reference/apis/components/servo/#stop).
    */
   stop(extra?: Struct): Promise<void>;
 
@@ -89,7 +89,7 @@ export interface Servo extends Resource {
    * ```
    *
    * For more information, see [Servo
-   * API](https://docs.viam.com/dev/reference/apis/components/servo/#ismoving).
+   * API](https://docs.viam.com/reference/apis/components/servo/#ismoving).
    */
   isMoving(): Promise<boolean>;
 }

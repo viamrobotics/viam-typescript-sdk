@@ -172,7 +172,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#exporttabulardata).
+   * API](https://docs.viam.com/reference/apis/data-client/#exporttabulardata).
    *
    * @param partId The ID of the part that owns the data
    * @param resourceName The name of the requested resource that captured the data
@@ -251,7 +251,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#exporttabulardata).
+   * API](https://docs.viam.com/reference/apis/data-client/#exporttabulardata).
    *
    * @param organizationId The ID of the organization that owns the data
    * @param query The SQL query to run
@@ -290,7 +290,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabymql).
+   * API](https://docs.viam.com/reference/apis/data-client/#tabulardatabymql).
    *
    * @param organizationId The ID of the organization that owns the data
    * @param query The MQL query to run as a list of BSON documents
@@ -348,7 +348,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#tabulardatabyfilter).
    *
    * @param filter Optional `pb.Filter` specifying tabular data to retrieve. No `filter` implies all
    *   tabular data.
@@ -426,7 +426,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#binarydatabyfilter).
    *
    * @param filter Optional `pb.Filter` specifying binary data to retrieve. No `filter` implies all
    *   binary data.
@@ -484,7 +484,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#binarydatabyids).
    *
    * @param ids The IDs of the requested binary data
    * @param includeBinary Whether to include binary file data with each retrieved file
@@ -518,7 +518,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#createbinarydatasignedurl).
+   * API](https://docs.viam.com/reference/apis/data-client/#createbinarydatasignedurl).
    *
    * @param binaryDataId The ID of the binary data
    * @returns A signed URL string for accessing the binary data
@@ -557,7 +557,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletetabulardata).
+   * API](https://docs.viam.com/reference/apis/data-client/#deletetabulardata).
    *
    * @param organizationId The ID of organization to delete data from
    * @param deleteOlderThanDays Delete data that was captured more than this many days ago. For
@@ -597,7 +597,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletebinarydatabyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#deletebinarydatabyfilter).
    *
    * @param filter Optional `pb.Filter` specifying binary data to delete. No `filter` implies all
    *   binary data.
@@ -624,7 +624,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletebinarydatabyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#deletebinarydatabyids).
    *
    * @param ids The IDs of the data to be deleted. Must be non-empty.
    * @returns The number of items deleted
@@ -658,7 +658,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#addtagstobinarydatabyids).
    *
    * @param tags The list of tags to add to specified binary data. Must be non-empty.
    * @param ids The IDs of the data to be tagged. Must be non-empty.
@@ -695,7 +695,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#addtagstobinarydatabyfilter).
    *
    * @param tags The tags to add to the data
    * @param filter Optional `pb.Filter` specifying binary data to add tags to. No `filter` implies
@@ -723,7 +723,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#removetagsfrombinarydatabyids).
    *
    * @param tags List of tags to remove from specified binary data. Must be non-empty.
    * @param ids The IDs of the data to be edited. Must be non-empty.
@@ -761,7 +761,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#removetagsfrombinarydatabyfilter).
    *
    * @param tags List of tags to remove from specified binary data. Must be non-empty.
    * @param filter Optional `pb.Filter` specifying binary data to add tags to. No `filter` implies
@@ -788,7 +788,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#tagsbyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#tagsbyfilter).
    *
    * @param filter Optional `pb.Filter` specifying what data to get tags from. No `filter` implies
    *   all data.
@@ -817,7 +817,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#addboundingboxtoimagebyid).
+   * API](https://docs.viam.com/reference/apis/data-client/#addboundingboxtoimagebyid).
    *
    * @param {string | BinaryID} binaryId The ID of the image to add the bounding box to
    * @param {string} label A label for the bounding box
@@ -876,7 +876,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#removeboundingboxfromimagebyid).
+   * API](https://docs.viam.com/reference/apis/data-client/#removeboundingboxfromimagebyid).
    *
    * @param binId The ID of the image to remove the bounding box from
    * @param bboxId The ID of the bounding box to remove
@@ -973,7 +973,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#boundingboxlabelsbyfilter).
+   * API](https://docs.viam.com/reference/apis/data-client/#boundingboxlabelsbyfilter).
    *
    * @param filter Optional `pb.Filter` specifying what data to get tags from. No `filter` implies
    *   all labels.
@@ -1000,7 +1000,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#configuredatabaseuser).
+   * API](https://docs.viam.com/reference/apis/data-client/#configuredatabaseuser).
    *
    * @param organizationId The ID of the organization
    * @param password The password of the user
@@ -1021,7 +1021,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#getdatabaseconnection).
+   * API](https://docs.viam.com/reference/apis/data-client/#getdatabaseconnection).
    *
    * @param organizationId Organization to retrieve connection for
    * @returns Hostname of the federated database
@@ -1048,7 +1048,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#addbinarydatatodatasetbyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#addbinarydatatodatasetbyids).
    *
    * @param ids The IDs of binary data to add to dataset
    * @param datasetId The ID of the dataset to be added to
@@ -1083,7 +1083,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#removebinarydatafromdatasetbyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#removebinarydatafromdatasetbyids).
    *
    * @param ids The IDs of the binary data to remove from dataset
    * @param datasetId The ID of the dataset to be removed from
@@ -1116,7 +1116,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#createdataset).
+   * API](https://docs.viam.com/reference/apis/data-client/#createdataset).
    *
    * @param name The name of the new dataset
    * @param organizationId The ID of the organization the dataset is being created in
@@ -1140,7 +1140,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#deletedataset).
+   * API](https://docs.viam.com/reference/apis/data-client/#deletedataset).
    *
    * @param id The ID of the dataset.
    */
@@ -1158,7 +1158,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#renamedataset).
+   * API](https://docs.viam.com/reference/apis/data-client/#renamedataset).
    *
    * @param id The ID of the dataset
    * @param name The new name of the dataset
@@ -1179,7 +1179,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyorganizationid).
+   * API](https://docs.viam.com/reference/apis/data-client/#listdatasetsbyorganizationid).
    *
    * @param organizationId The ID of the organization
    * @param type Optional dataset type to filter on
@@ -1212,7 +1212,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyids).
+   * API](https://docs.viam.com/reference/apis/data-client/#listdatasetsbyids).
    *
    * @param ids The list of IDs of the datasets
    * @returns The list of datasets
@@ -1258,7 +1258,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#tabulardatacaptureupload).
+   * API](https://docs.viam.com/reference/apis/data-client/#tabulardatacaptureupload).
    *
    * @param tabularData The list of data to be uploaded, represented tabularly as an array.
    * @param partId The part ID of the component used to capture the data
@@ -1345,7 +1345,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#binarydatacaptureupload).
+   * API](https://docs.viam.com/reference/apis/data-client/#binarydatacaptureupload).
    *
    * @param binaryData The data to be uploaded, represented in bytes
    * @param partId The part ID of the component used to capture the data
@@ -1416,7 +1416,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#fileupload).
+   * API](https://docs.viam.com/reference/apis/data-client/#fileupload).
    *
    * @param binaryData The data to be uploaded
    * @param partId The part ID of the machine that captured the data
@@ -1506,7 +1506,7 @@ export class DataClient {
    * ```
    *
    * For more information, see [Data
-   * API](https://docs.viam.com/dev/reference/apis/data-client/#getlatesttabulardata).
+   * API](https://docs.viam.com/reference/apis/data-client/#getlatesttabulardata).
    *
    * @param partId The ID of the part that owns the data
    * @param resourceName The name of the requested resource that captured the data. Ex: "my-sensor"
