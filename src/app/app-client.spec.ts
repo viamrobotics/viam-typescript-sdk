@@ -1281,10 +1281,13 @@ describe('AppClient tests', () => {
   });
 
   describe('updateFragment tests', () => {
+    let capReq: pb.UpdateFragmentRequest;
+
     beforeEach(() => {
       mockTransport = createRouterTransport(({ service }) => {
         service(AppService, {
-          updateFragment: () => {
+          updateFragment: (req) => {
+            capReq = req;
             return new pb.UpdateFragmentResponse({
               fragment,
             });
@@ -1296,6 +1299,13 @@ describe('AppClient tests', () => {
     it('updateFragment', async () => {
       const response = await subject().updateFragment('id', 'name', new Struct());
       expect(response).toEqual(fragment);
+    });
+
+    it('updateFragment with fragmentConfigJson', async () => {
+      await subject().updateFragment('id', 'name', new Struct(), undefined, undefined, {
+        foo: 'bar',
+      });
+      expect(capReq.fragmentConfigJson).toBe('{"foo":"bar"}');
     });
   });
 
