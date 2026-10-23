@@ -973,7 +973,7 @@ export class AppClient {
    * ```
    *
    * For more information, see [App
-   * API](https://docs.viam.com/dev/reference/apis/fleet/#setconfigproperty).
+   * API](https://docs.viam.com/reference/apis/fleet/#setconfigproperty).
    *
    * @param robotPartId The ID of the robot part to update
    * @param propertyChanges The properties to set, each a path into the config (for example
