@@ -27,7 +27,7 @@ export class MlTrainingClient {
    * ```
    *
    * For more information, see [ML Training
-   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#submittrainingjob).
+   * API](https://docs.viam.com/reference/apis/ml-training-client/#submittrainingjob).
    *
    * @param organizationId - The organization ID.
    * @param datasetId - The dataset ID.
@@ -72,7 +72,7 @@ export class MlTrainingClient {
    * ```
    *
    * For more information, see [ML Training
-   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#submitcustomtrainingjob).
+   * API](https://docs.viam.com/reference/apis/ml-training-client/#submitcustomtrainingjob).
    *
    * @param organizationId - The organization ID.
    * @param datasetId - The dataset ID.
@@ -110,7 +110,7 @@ export class MlTrainingClient {
    * ```
    *
    * For more information, see [ML Training
-   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#gettrainingjob).
+   * API](https://docs.viam.com/reference/apis/ml-training-client/#gettrainingjob).
    *
    * @param id - The training job ID.
    */
@@ -132,7 +132,7 @@ export class MlTrainingClient {
    * ```
    *
    * For more information, see [ML Training
-   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#listtrainingjobs).
+   * API](https://docs.viam.com/reference/apis/ml-training-client/#listtrainingjobs).
    *
    * @param organizationId - The organization ID.
    * @param status - The training job status.
@@ -152,7 +152,7 @@ export class MlTrainingClient {
    * ```
    *
    * For more information, see [ML Training
-   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#canceltrainingjob).
+   * API](https://docs.viam.com/reference/apis/ml-training-client/#canceltrainingjob).
    *
    * @param id - The training job ID.
    */
@@ -171,7 +171,7 @@ export class MlTrainingClient {
    * ```
    *
    * For more information, see [ML Training
-   * API](https://docs.viam.com/dev/reference/apis/ml-training-client/#deletecompletedtrainingjob).
+   * API](https://docs.viam.com/reference/apis/ml-training-client/#deletecompletedtrainingjob).
    *
    * @param id - The training job ID.
    */

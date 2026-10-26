@@ -16,7 +16,7 @@ export interface Button extends Resource {
    * ```
    *
    * For more information, see [Button
-   * API](https://docs.viam.com/dev/reference/apis/components/button/#push).
+   * API](https://docs.viam.com/reference/apis/components/button/#push).
    */
   push: (extra?: Struct) => Promise<void>;
 }

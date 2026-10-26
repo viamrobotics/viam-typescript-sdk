@@ -18,7 +18,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -35,7 +35,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getkinematics).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#getkinematics).
    *
    * @returns The legacy kinematics data shape or the newer object containing kinematics data plus a
    *   map of URDF mesh file paths to mesh data.
@@ -59,7 +59,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#movetoposition).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#movetoposition).
    *
    * @param positionsMm - The goal positions for each axis of the gantry.
    * @param speedsMmPerSec - The desired speed for each axis to move to the respective position in
@@ -84,7 +84,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getposition).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#getposition).
    *
    * @returns A list of the current position of each axis in millimeters.
    */
@@ -103,7 +103,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#home).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#home).
    *
    * @returns A bool representing whether the gantry has run the homing sequence successfully.
    */
@@ -122,7 +122,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#getlengths).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#getlengths).
    *
    * @returns A list of the length of each axis in millimeters.
    */
@@ -141,7 +141,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#stop).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#stop).
    */
   stop: (extra?: Struct) => Promise<void>;
 
@@ -159,7 +159,7 @@ export interface Gantry extends Resource {
    * ```
    *
    * For more information, see [Gantry
-   * API](https://docs.viam.com/dev/reference/apis/components/gantry/#ismoving).
+   * API](https://docs.viam.com/reference/apis/components/gantry/#ismoving).
    */
   isMoving: () => Promise<boolean>;
 }

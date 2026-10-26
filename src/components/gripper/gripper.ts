@@ -18,7 +18,7 @@ export interface Gripper extends Resource {
    * ```
    *
    * For more information, see [Gripper
-   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/gripper/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -35,7 +35,7 @@ export interface Gripper extends Resource {
    * ```
    *
    * For more information, see [Gripper
-   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#open).
+   * API](https://docs.viam.com/reference/apis/components/gripper/#open).
    */
   open: (extra?: Struct) => Promise<void>;
 
@@ -52,7 +52,7 @@ export interface Gripper extends Resource {
    * ```
    *
    * For more information, see [Gripper
-   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#grab).
+   * API](https://docs.viam.com/reference/apis/components/gripper/#grab).
    */
   grab: (extra?: Struct) => Promise<void>;
 
@@ -69,7 +69,7 @@ export interface Gripper extends Resource {
    * ```
    *
    * For more information, see [Gripper
-   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#stop).
+   * API](https://docs.viam.com/reference/apis/components/gripper/#stop).
    */
   stop: (extra?: Struct) => Promise<void>;
 
@@ -87,7 +87,7 @@ export interface Gripper extends Resource {
    * ```
    *
    * For more information, see [Gripper
-   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#ismoving).
+   * API](https://docs.viam.com/reference/apis/components/gripper/#ismoving).
    */
   isMoving: () => Promise<boolean>;
 
@@ -105,7 +105,7 @@ export interface Gripper extends Resource {
    * ```
    *
    * For more information, see [Gripper
-   * API](https://docs.viam.com/dev/reference/apis/components/gripper/#isholdingsomething).
+   * API](https://docs.viam.com/reference/apis/components/gripper/#isholdingsomething).
    */
   isHoldingSomething: (extra?: Struct) => Promise<boolean>;
 

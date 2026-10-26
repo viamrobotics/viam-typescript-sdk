@@ -31,7 +31,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/board/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -48,7 +48,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#getgpio).
+   * API](https://docs.viam.com/reference/apis/components/board/#getgpio).
    *
    * @param pin - The pin number.
    */
@@ -66,7 +66,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#setgpio).
+   * API](https://docs.viam.com/reference/apis/components/board/#setgpio).
    *
    * @param pin - The pin number.
    * @param high - When true, set the given pin to high. When false, set the given pin to low.
@@ -85,7 +85,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#getpwm).
+   * API](https://docs.viam.com/reference/apis/components/board/#getpwm).
    *
    * @param pin - The pin number.
    * @returns The duty cycle, which is a value from 0 to 1.
@@ -105,7 +105,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#setpwm).
+   * API](https://docs.viam.com/reference/apis/components/board/#setpwm).
    *
    * @param pin - The pin.
    * @param dutyCyclePct - A value from 0 to 1.
@@ -123,8 +123,7 @@ export interface Board extends Resource {
    * const freq = await board.getPWMFrequency('15');
    * ```
    *
-   * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#getpwmfrequency).
+   * For more information, see [Board API](https://docs.viam.com/reference/apis/components/board/).
    *
    * @param pin - The pin.
    */
@@ -142,7 +141,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#setpwmfrequency).
+   * API](https://docs.viam.com/reference/apis/components/board/#setpwmfrequency).
    *
    * @param pin - The pin.
    * @param frequencyHz - The PWM frequency, in hertz. 0 will use the board's default PWM frequency.
@@ -162,7 +161,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#readanalogreader).
+   * API](https://docs.viam.com/reference/apis/components/board/#readanalogreader).
    *
    * @param analogReader - The name of the analog reader.
    */
@@ -180,7 +179,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#writeanalog).
+   * API](https://docs.viam.com/reference/apis/components/board/#writeanalog).
    *
    * @param pin - The pin name.
    * @param value - An integer value to write.
@@ -199,7 +198,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#getdigitalinterruptvalue).
+   * API](https://docs.viam.com/reference/apis/components/board/#getdigitalinterruptvalue).
    *
    * @param digitalInterruptName - The name of the digital interrupt.
    */
@@ -223,7 +222,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#streamticks).
+   * API](https://docs.viam.com/reference/apis/components/board/#streamticks).
    *
    * @param interrupts - Names of the interrupts to stream.
    * @param queue - Array to put the ticks in.
@@ -243,7 +242,7 @@ export interface Board extends Resource {
    * ```
    *
    * For more information, see [Board
-   * API](https://docs.viam.com/dev/reference/apis/components/board/#setpowermode).
+   * API](https://docs.viam.com/reference/apis/components/board/#setpowermode).
    *
    * @param powerMode - The requested power mode.
    * @param duration - The requested duration to stay in power mode.
