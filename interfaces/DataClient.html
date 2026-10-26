@@ -96,7 +96,7 @@
 <h4 class="tsd-anchor-link" id="example">Example<a href="#example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">addBinaryDataToDatasetByIds</span><span class="hl-1">(</span><br/><span class="hl-1">  [</span><br/><span class="hl-1">    </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;12ab3de4f56a7bcd89ef0ab1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#addbinarydatatodatasetbyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#addbinarydatatodatasetbyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -139,7 +139,7 @@ normalized value from 0 to 1</p>
 <h4 class="tsd-anchor-link" id="example-1">Example<a href="#example-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">bboxId</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">addBoundingBoxToImageById</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;label1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">0.3</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">0.3</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">0.6</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">0.6</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">0.4</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#addboundingboxtoimagebyid">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#addboundingboxtoimagebyid">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -190,7 +190,7 @@ all binary data.</p>
 <h4 class="tsd-anchor-link" id="example-3">Example<a href="#example-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">addTagsToBinaryDataByFilter</span><span class="hl-1">(</span><br/><span class="hl-1">  [</span><span class="hl-7">&#39;tag1&#39;</span><span class="hl-1">, </span><span class="hl-7">&#39;tag2&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  [</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    } </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">,</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#addtagstobinarydatabyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -216,7 +216,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-4">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">addTagsToBinaryDataByIds</span><span class="hl-1">(</span><br/><span class="hl-1">  [</span><span class="hl-7">&#39;tag1&#39;</span><span class="hl-1">, </span><span class="hl-7">&#39;tag2&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  [</span><br/><span class="hl-1">    </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#addtagstobinarydatabyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#addtagstobinarydatabyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -265,7 +265,7 @@ ID.</p>
 <h4 class="tsd-anchor-link" id="example-5">Example<a href="#example-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">binaryDataByFilter</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">componentType:</span><span class="hl-1"> </span><span class="hl-7">&#39;rdk:component:camera&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  } </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">1</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#binarydatabyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -292,7 +292,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-6">Example<a href="#example-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">binaryDataByIds</span><span class="hl-1">([</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">]);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#binarydatabyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#binarydatabyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -340,7 +340,7 @@ requested[0] by the robot and received[1] from the appropriate sensor.</p>
 <h4 class="tsd-anchor-link" id="example-7">Example<a href="#example-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">binaryDataId</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">binaryDataCaptureUpload</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-0">binaryData</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;rdk:component:camera&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;my-camera&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;ReadImage&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  [</span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-19&#39;</span><span class="hl-1">), </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-19&#39;</span><span class="hl-1">)],</span><br/><span class="hl-1">  { </span><span class="hl-0">mimeType:</span><span class="hl-1"> </span><span class="hl-7">&#39;image/jpeg&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#binarydatacaptureupload">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#binarydatacaptureupload">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -365,7 +365,7 @@ all labels.</p>
 <h4 class="tsd-anchor-link" id="example-8">Example<a href="#example-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">boundingBoxLabelsByFilter</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#boundingboxlabelsbyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#boundingboxlabelsbyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -392,7 +392,7 @@ It can also be used to reset the password of the existing database user.</p>
 <h4 class="tsd-anchor-link" id="example-9">Example<a href="#example-9" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">configureDatabaseUser</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;Password01!&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#configuredatabaseuser">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#configuredatabaseuser">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -417,7 +417,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-10">Example<a href="#example-10" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">signedUrl</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">createBinaryDataSignedURL</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#createbinarydatasignedurl">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#createbinarydatasignedurl">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -481,7 +481,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-12">Example<a href="#example-12" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">datasetId</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">createDataset</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;my-new-dataset&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#createdataset">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#createdataset">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -573,7 +573,7 @@ binary data.</p>
 <h4 class="tsd-anchor-link" id="example-15">Example<a href="#example-15" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">deleteBinaryDataByFilter</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">componentType:</span><span class="hl-1"> </span><span class="hl-7">&#39;rdk:component:camera&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">organizationIds:</span><span class="hl-1"> [</span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-0">startTime:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-19&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">  </span><span class="hl-0">endTime:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-20&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">} </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#deletebinarydatabyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#deletebinarydatabyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -597,7 +597,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-16">Example<a href="#example-16" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">deleteBinaryDataByIds</span><span class="hl-1">([</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">]);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#deletebinarydatabyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#deletebinarydatabyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -641,7 +641,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-18">Example<a href="#example-18" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">deleteDataset</span><span class="hl-1">(</span><span class="hl-7">&#39;12ab3de4f56a7bcd89ef0ab1&#39;</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#deletedataset">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#deletedataset">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -726,7 +726,7 @@ organization_id and delete_older_than_days.</p>
 <h4 class="tsd-anchor-link" id="example-21">Example<a href="#example-21" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">deleteTabularData</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">10</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-2">// Delete with additional filter constraints</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">deleteTabularData</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">10</span><span class="hl-1">,</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-0">locationIds:</span><span class="hl-1"> [</span><span class="hl-7">&#39;location-id&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">    </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#deletetabulardata">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#deletetabulardata">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -766,7 +766,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-22">Example<a href="#example-22" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">exportTabularData</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;my-sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;rdk:component:sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;Readings&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-25&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">  </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2024-03-27&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#exporttabulardata">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#exporttabulardata">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -798,7 +798,7 @@ be found in the <strong>Files</strong> tab of the <strong>DATA</strong> page.</p
 <h4 class="tsd-anchor-link" id="example-23">Example<a href="#example-23" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">binaryDataId</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">fileUpload</span><span class="hl-1">(</span><span class="hl-0">binaryData</span><span class="hl-1">, </span><span class="hl-7">&#39;INSERT YOUR PART ID&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-0">fileExtension:</span><span class="hl-1"> </span><span class="hl-7">&#39;.jpeg&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">tags:</span><span class="hl-1"> [</span><span class="hl-7">&#39;tag_1&#39;</span><span class="hl-1">, </span><span class="hl-7">&#39;tag_2&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">});</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#fileupload">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#fileupload">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -822,7 +822,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-24">Example<a href="#example-24" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">hostname</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">getDatabaseConnection</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#getdatabaseconnection">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#getdatabaseconnection">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -881,7 +881,7 @@ synced for the specified resource OR the most recently captured data was over a 
 <h4 class="tsd-anchor-link" id="example-26">Example<a href="#example-26" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">getLatestTabularData</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;my-sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;rdk:component:sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;Readings&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#getlatesttabulardata">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#getlatesttabulardata">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1024,7 +1024,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-32">Example<a href="#example-32" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">datasets</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">listDatasetsByIds</span><span class="hl-1">([</span><span class="hl-7">&#39;12ab3de4f56a7bcd89ef0ab1&#39;</span><span class="hl-1">]);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#listdatasetsbyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1051,7 +1051,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-33">Example<a href="#example-33" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">datasets</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">listDatasetsByOrganizationID</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#listdatasetsbyorganizationid">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#listdatasetsbyorganizationid">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1133,7 +1133,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-36">Example<a href="#example-36" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">removeBinaryDataFromDatasetByIds</span><span class="hl-1">(</span><br/><span class="hl-1">  [</span><br/><span class="hl-1">    </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;12ab3de4f56a7bcd89ef0ab1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#removebinarydatafromdatasetbyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#removebinarydatafromdatasetbyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1159,7 +1159,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-37">Example<a href="#example-37" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">removeBoundingBoxFromImageById</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;5Z9ryhkW7ULaXROjJO6ghPYulNllnH20QImda1iZFroZpQbjahK6igQ1WbYigXED&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#removeboundingboxfromimagebyid">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#removeboundingboxfromimagebyid">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1211,7 +1211,7 @@ all binary data.</p>
 <h4 class="tsd-anchor-link" id="example-39">Example<a href="#example-39" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">removeTagsFromBinaryDataByFilter</span><span class="hl-1">([</span><span class="hl-7">&#39;tag1&#39;</span><span class="hl-1">, </span><span class="hl-7">&#39;tag2&#39;</span><span class="hl-1">], {</span><br/><span class="hl-1">  </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">componentType:</span><span class="hl-1"> </span><span class="hl-7">&#39;rdk:component:camera&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">organizationIds:</span><span class="hl-1"> [</span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-0">startTime:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-19&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">  </span><span class="hl-0">endTime:</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-20&#39;</span><span class="hl-1">),</span><br/><span class="hl-1">} </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#removetagsfrombinarydatabyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1238,7 +1238,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-40">Example<a href="#example-40" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">removeTagsFromBinaryDataByIds</span><span class="hl-1">(</span><br/><span class="hl-1">  [</span><span class="hl-7">&#39;tag1&#39;</span><span class="hl-1">, </span><span class="hl-7">&#39;tag2&#39;</span><span class="hl-1">],</span><br/><span class="hl-1">  [</span><br/><span class="hl-1">    </span><span class="hl-7">&#39;ccb74b53-1235-4328-a4b9-91dff1915a50/x5vur1fmps/YAEzj5I1kTwtYsDdf4a7ctaJpGgKRHmnM9bJNVyblk52UpqmrnMVTITaBKZctKEh&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#removetagsfrombinarydatabyids">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#removetagsfrombinarydatabyids">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1264,7 +1264,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-41">Example<a href="#example-41" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">renameDataset</span><span class="hl-1">(</span><span class="hl-7">&#39;12ab3de4f56a7bcd89ef0ab1&#39;</span><span class="hl-1">, </span><span class="hl-7">&#39;my-new-dataset&#39;</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#renamedataset">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#renamedataset">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1360,7 +1360,7 @@ ID.</p>
 <h4 class="tsd-anchor-link" id="example-44">Example<a href="#example-44" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">tabularDataByFilter</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;sensor-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">componentType:</span><span class="hl-1"> </span><span class="hl-7">&#39;rdk:component:sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  } </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-8">5</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#tabulardatabyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1395,7 +1395,7 @@ false. Deprecated - use dataSource instead.</p>
 <h4 class="tsd-anchor-link" id="example-45">Example<a href="#example-45" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-2">// {@link JsonValue} is imported from @bufbuild/protobuf</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">mqlQuery</span><span class="hl-1">: </span><span class="hl-9">Record</span><span class="hl-1">&lt;</span><span class="hl-9">string</span><span class="hl-1">, </span><span class="hl-9">JsonValue</span><span class="hl-1">&gt;[] = [</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-0">$match:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-0">component_name:</span><span class="hl-1"> </span><span class="hl-7">&#39;sensor-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-0">$limit:</span><span class="hl-1"> </span><span class="hl-8">5</span><span class="hl-1">,</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">];</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">tabularDataByMQL</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-0">mqlQuery</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#tabulardatabymql">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#tabulardatabymql">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1422,7 +1422,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-46">Example<a href="#example-46" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">tabularDataBySQL</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;SELECT * FROM readings LIMIT 5&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#exporttabulardata">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#exporttabulardata">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1471,7 +1471,7 @@ being uploaded, all tied to the same metadata.</p>
 <h4 class="tsd-anchor-link" id="example-47">Example<a href="#example-47" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">fileId</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">tabularDataCaptureUpload</span><span class="hl-1">(</span><br/><span class="hl-1">  [</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-0">readings:</span><span class="hl-1"> {</span><br/><span class="hl-1">        </span><span class="hl-0">timestamp:</span><span class="hl-1"> </span><span class="hl-7">&#39;2025-03-26T10:00:00Z&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-0">value:</span><span class="hl-1"> </span><span class="hl-8">10</span><span class="hl-1">,</span><br/><span class="hl-1">      },</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  ],</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;123abc45-1234-5678-90ab-cdef12345678&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;rdk:component:sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;my-sensor&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-7">&#39;Readings&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  [[</span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-26T10:00:00Z&#39;</span><span class="hl-1">), </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">(</span><span class="hl-7">&#39;2025-03-26T10:00:00Z&#39;</span><span class="hl-1">)]],</span><br/><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#tabulardatacaptureupload">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#tabulardatacaptureupload">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">
@@ -1496,7 +1496,7 @@ all data.</p>
 <h4 class="tsd-anchor-link" id="example-48">Example<a href="#example-48" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">dataClient</span><span class="hl-1">.</span><span class="hl-6">tagsByFilter</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-0">componentName:</span><span class="hl-1"> </span><span class="hl-7">&#39;camera-1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-9">Filter</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/data-client/#tagsbyfilter">Data
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/data-client/#tagsbyfilter">Data
 API</a>.</p>
 </div></div></div></li></ul></section>
 <section class="tsd-panel tsd-member">

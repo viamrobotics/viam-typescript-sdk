@@ -16,7 +16,7 @@
 <div class="tsd-tag-generated">
 <h4 class="tsd-anchor-link" id="generated">Generated<a href="#generated" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from message viam.common.v1.GetKinematicsResponse</p>
 </div></div></section>
-<section class="tsd-panel tsd-hierarchy" data-refl="56061">
+<section class="tsd-panel tsd-hierarchy" data-refl="59621">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
 <li class="tsd-hierarchy-item"><span class="tsd-signature-type">Message</span><span class="tsd-signature-symbol">&lt;</span><a href="" class="tsd-signature-type tsd-kind-class">GetKinematicsResponse</a><span class="tsd-signature-symbol">&gt;</span>
@@ -33,9 +33,10 @@
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading tsd-anchor-link" id="properties">Properties<a href="#properties" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
-<div class="tsd-index-list"><a href="#format" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>format</span></a>
-<a href="#kinematicsdata" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kinematics<wbr/>Data</span></a>
-<a href="#meshesbyurdffilepath" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>meshes<wbr/>By<wbr/>Urdf<wbr/>Filepath</span></a>
+<div class="tsd-index-list"><a href="#format" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>format</span></a>
+<a href="#kinematicsdata" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kinematics<wbr/>Data</span></a>
+<a href="#meshesbyurdffilepath" class="tsd-index-link deprecated"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>meshes<wbr/>By<wbr/>Urdf<wbr/>Filepath</span></a>
+<a href="#model" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>model?</span></a>
 <a href="#fields" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fields</span></a>
 <a href="#runtime" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>runtime</span></a>
 <a href="#typename" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>type<wbr/>Name</span></a>
@@ -76,32 +77,47 @@
 <h2 class="tsd-anchor-link" id="properties-1">Properties<a href="#properties-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
 <section class="tsd-panel tsd-member">
-<h3 class="tsd-anchor-link" id="format"><span>format</span><a href="#format" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<h3 class="tsd-anchor-link" id="format"><span class="deprecated">format</span><a href="#format" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">format</span><span class="tsd-signature-symbol">:</span> <a href="../enums/commonApi.KinematicsFileFormat.html" class="tsd-signature-type tsd-kind-enum">KinematicsFileFormat</a></div>
-<div class="tsd-comment tsd-typography"><p>The kinematics of the component, in either URDF format or in Viam’s kinematic parameter format (spatial vector algebra)
+<div class="tsd-comment tsd-typography"><p>Deprecated: use model. The kinematics of the component, in either URDF format or in Viam’s kinematic parameter format (spatial vector algebra)
 <a href="https://docs.viam.com/internals/kinematic-chain-config/#kinematic-parameters">https://docs.viam.com/internals/kinematic-chain-config/#kinematic-parameters</a></p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-1">Generated<a href="#generated-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.common.v1.KinematicsFileFormat format = 1;</p>
-</div></div></section>
+<h4 class="tsd-anchor-link" id="generated-1">Generated<a href="#generated-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.common.v1.KinematicsFileFormat format = 1 [deprecated = true];</p>
+</div>
+<div class="tsd-tag-deprecated">
+<h4 class="tsd-anchor-link" id="deprecated">Deprecated<a href="#deprecated" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4></div></div></section>
 <section class="tsd-panel tsd-member">
-<h3 class="tsd-anchor-link" id="kinematicsdata"><span>kinematics<wbr/>Data</span><a href="#kinematicsdata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<h3 class="tsd-anchor-link" id="kinematicsdata"><span class="deprecated">kinematics<wbr/>Data</span><a href="#kinematicsdata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">kinematicsData</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Uint8Array</span></div>
-<div class="tsd-comment tsd-typography"><p>The byte contents of the file</p>
+<div class="tsd-comment tsd-typography"><p>Deprecated: use model. The byte contents of the file</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-2">Generated<a href="#generated-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: bytes kinematics_data = 2;</p>
-</div></div></section>
+<h4 class="tsd-anchor-link" id="generated-2">Generated<a href="#generated-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: bytes kinematics_data = 2 [deprecated = true];</p>
+</div>
+<div class="tsd-tag-deprecated">
+<h4 class="tsd-anchor-link" id="deprecated-1">Deprecated<a href="#deprecated-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4></div></div></section>
 <section class="tsd-panel tsd-member">
-<h3 class="tsd-anchor-link" id="meshesbyurdffilepath"><span>meshes<wbr/>By<wbr/>Urdf<wbr/>Filepath</span><a href="#meshesbyurdffilepath" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<h3 class="tsd-anchor-link" id="meshesbyurdffilepath"><span class="deprecated">meshes<wbr/>By<wbr/>Urdf<wbr/>Filepath</span><a href="#meshesbyurdffilepath" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">meshesByUrdfFilepath</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-signature-symbol">[</span><span class="tsd-kind-index-signature">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]:</span> <a href="commonApi.Mesh.html" class="tsd-signature-type tsd-kind-class">Mesh</a> <span class="tsd-signature-symbol">}</span></div>
-<div class="tsd-comment tsd-typography"><p>Map of URDF mesh file paths to mesh data</p>
+<div class="tsd-comment tsd-typography"><p>Deprecated: use model. Map of URDF mesh file paths to mesh data</p>
 </div>
 <div class="tsd-comment tsd-typography">
 <div class="tsd-tag-generated">
-<h4 class="tsd-anchor-link" id="generated-3">Generated<a href="#generated-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: map&lt;string, viam.common.v1.Mesh&gt; meshes_by_urdf_filepath = 3;</p>
+<h4 class="tsd-anchor-link" id="generated-3">Generated<a href="#generated-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: map&lt;string, viam.common.v1.Mesh&gt; meshes_by_urdf_filepath = 3 [deprecated = true];</p>
+</div>
+<div class="tsd-tag-deprecated">
+<h4 class="tsd-anchor-link" id="deprecated-2">Deprecated<a href="#deprecated-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4></div></div></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="model"><code class="tsd-tag">Optional</code><span>model</span><a href="#model" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<div class="tsd-signature"><span class="tsd-kind-property">model</span><span class="tsd-signature-symbol">?:</span> <a href="commonApi.KinematicModel.html" class="tsd-signature-type tsd-kind-class">KinematicModel</a></div>
+<div class="tsd-comment tsd-typography"><p>The kinematic model of the component</p>
+</div>
+<div class="tsd-comment tsd-typography">
+<div class="tsd-tag-generated">
+<h4 class="tsd-anchor-link" id="generated-4">Generated<a href="#generated-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>from field: viam.common.v1.KinematicModel model = 4;</p>
 </div></div></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="fields"><code class="tsd-tag">Static</code> <code class="tsd-tag">Readonly</code><span>fields</span><a href="#fields" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
@@ -330,7 +346,7 @@ use toJson.</p>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary>
 <div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary>
-<div><a href="#format"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>format</span></a><a href="#kinematicsdata"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kinematics<wbr/>Data</span></a><a href="#meshesbyurdffilepath"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>meshes<wbr/>By<wbr/>Urdf<wbr/>Filepath</span></a><a href="#fields"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fields</span></a><a href="#runtime"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>runtime</span></a><a href="#typename"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>type<wbr/>Name</span></a></div></details>
+<div><a href="#format"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>format</span></a><a href="#kinematicsdata"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>kinematics<wbr/>Data</span></a><a href="#meshesbyurdffilepath"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>meshes<wbr/>By<wbr/>Urdf<wbr/>Filepath</span></a><a href="#model"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>model</span></a><a href="#fields"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>fields</span></a><a href="#runtime"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>runtime</span></a><a href="#typename"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>type<wbr/>Name</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
 <div><a href="#clone" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone</span></a><a href="#equals" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>equals</span></a><a href="#frombinary" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Binary</span></a><a href="#fromjson" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json</span></a><a href="#fromjsonstring" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json<wbr/>String</span></a><a href="#gettype" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Type</span></a><a href="#tobinary" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>Binary</span></a><a href="#tojson" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>Json</span></a><a href="#tojson-2" class="tsd-is-protected tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>JSON</span></a><a href="#tojsonstring" class="tsd-is-inherited tsd-is-external"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>to<wbr/>Json<wbr/>String</span></a><a href="#equals-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>equals</span></a><a href="#frombinary-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Binary</span></a><a href="#fromjson-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json</span></a><a href="#fromjsonstring-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>from<wbr/>Json<wbr/>String</span></a></div></details></div></details></div>
 <div class="site-menu">

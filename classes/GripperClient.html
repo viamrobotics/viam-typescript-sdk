@@ -139,7 +139,7 @@ which will be converted automatically.</p>
 <h4 class="tsd-anchor-link" id="example-2">Example<a href="#example-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">gripper</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">GripperClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_gripper&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the geometries of this component</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">geometries</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">gripper</span><span class="hl-1">.</span><span class="hl-6">getGeometries</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Geometries:&#39;</span><span class="hl-1">, </span><span class="hl-0">geometries</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/gripper/#getgeometries">Gripper
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/gripper/#getgeometries">Gripper
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Gripper.html">Gripper</a>.<a href="../interfaces/Gripper.html#getgeometries">getGeometries</a></p></aside></div></li></ul></section>
@@ -200,7 +200,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-4">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">gripper</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">GripperClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_gripper&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Close the gripper to grab</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">gripper</span><span class="hl-1">.</span><span class="hl-6">grab</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/gripper/#grab">Gripper
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/gripper/#grab">Gripper
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Gripper.html">Gripper</a>.<a href="../interfaces/Gripper.html#grab">grab</a></p></aside></div></li></ul></section>
@@ -223,7 +223,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-5">Example<a href="#example-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">gripper</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">GripperClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_gripper&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Check if the gripper is holding something</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">holding</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">gripper</span><span class="hl-1">.</span><span class="hl-6">isHoldingSomething</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Gripper is holding something:&#39;</span><span class="hl-1">, </span><span class="hl-0">holding</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/gripper/#isholdingsomething">Gripper
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/gripper/#isholdingsomething">Gripper
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Gripper.html">Gripper</a>.<a href="../interfaces/Gripper.html#isholdingsomething">isHoldingSomething</a></p></aside></div></li></ul></section>
@@ -245,7 +245,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-6">Example<a href="#example-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">gripper</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">GripperClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_gripper&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Check if the gripper is currently moving</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">moving</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">gripper</span><span class="hl-1">.</span><span class="hl-6">isMoving</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Gripper is moving:&#39;</span><span class="hl-1">, </span><span class="hl-0">moving</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/gripper/#ismoving">Gripper
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/gripper/#ismoving">Gripper
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Gripper.html">Gripper</a>.<a href="../interfaces/Gripper.html#ismoving">isMoving</a></p></aside></div></li></ul></section>
@@ -268,7 +268,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-7">Example<a href="#example-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">gripper</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">GripperClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_gripper&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Open the gripper</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">gripper</span><span class="hl-1">.</span><span class="hl-6">open</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/gripper/#open">Gripper
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/gripper/#open">Gripper
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Gripper.html">Gripper</a>.<a href="../interfaces/Gripper.html#open">open</a></p></aside></div></li></ul></section>
@@ -291,7 +291,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-8">Example<a href="#example-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">gripper</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">GripperClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_gripper&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Stop the gripper&#39;s current motion</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">gripper</span><span class="hl-1">.</span><span class="hl-6">stop</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/gripper/#stop">Gripper
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/gripper/#stop">Gripper
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Gripper.html">Gripper</a>.<a href="../interfaces/Gripper.html#stop">stop</a></p></aside></div></li></ul></section></section></details></div>

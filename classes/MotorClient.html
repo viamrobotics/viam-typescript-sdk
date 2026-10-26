@@ -121,7 +121,7 @@ which will be converted automatically.</p>
 <h4 class="tsd-anchor-link" id="example-1">Example<a href="#example-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">geometries</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">getGeometries</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#getgeometries">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#getgeometries">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#getgeometries">getGeometries</a></p></aside></div></li></ul></section>
@@ -145,7 +145,7 @@ reporting is not supported.</p>
 <h4 class="tsd-anchor-link" id="example-2">Example<a href="#example-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the current position of the motor</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">position</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">getPosition</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Position:&#39;</span><span class="hl-1">, </span><span class="hl-0">position</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#getposition">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#getposition">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#getposition">getPosition</a></p></aside></div></li></ul></section>
@@ -168,7 +168,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-3">Example<a href="#example-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Report a dictionary mapping optional properties to whether it is supported by</span><br/><span class="hl-2">// this motor</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">properties</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">getProperties</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Properties:&#39;</span><span class="hl-1">, </span><span class="hl-0">properties</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#getproperties">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#getproperties">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#getproperties">getProperties</a></p></aside></div></li></ul></section>
@@ -215,7 +215,7 @@ in.</p>
 <h4 class="tsd-anchor-link" id="example-4">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Turn the motor 7.2 revolutions at 60 RPM</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">goFor</span><span class="hl-1">(</span><span class="hl-8">60</span><span class="hl-1">, </span><span class="hl-8">7.2</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#gofor">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#gofor">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#gofor">goFor</a></p></aside></div></li></ul></section>
@@ -245,7 +245,7 @@ an error if position reporting is not supported.</p>
 <h4 class="tsd-anchor-link" id="example-5">Example<a href="#example-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Turn the motor to 8.3 revolutions from home at 75 RPM</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">goTo</span><span class="hl-1">(</span><span class="hl-8">75</span><span class="hl-1">, </span><span class="hl-8">8.3</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#goto">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#goto">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#goto">goTo</a></p></aside></div></li></ul></section>
@@ -267,7 +267,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-6">Example<a href="#example-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Check whether the motor is currently moving</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">moving</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">isMoving</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Moving:&#39;</span><span class="hl-1">, </span><span class="hl-0">moving</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#ismoving">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#ismoving">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#ismoving">isMoving</a></p></aside></div></li></ul></section>
@@ -290,7 +290,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-7">Example<a href="#example-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Check whether the motor is currently running</span><br/><span class="hl-3">const</span><span class="hl-1"> [</span><span class="hl-4">isPowered</span><span class="hl-1">, </span><span class="hl-4">powerPct</span><span class="hl-1">] = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">isPowered</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Powered:&#39;</span><span class="hl-1">, </span><span class="hl-0">isPowered</span><span class="hl-1">);</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Power percentage:&#39;</span><span class="hl-1">, </span><span class="hl-0">powerPct</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#ispowered">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#ispowered">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#ispowered">isPowered</a></p></aside></div></li></ul></section>
@@ -317,7 +317,7 @@ Raise an error if position reporting is not supported.</p>
 <h4 class="tsd-anchor-link" id="example-8">Example<a href="#example-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Set the current position as the new home position with no offset</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">resetZeroPosition</span><span class="hl-1">(</span><span class="hl-8">0.0</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#resetzeroposition">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#resetzeroposition">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#resetzeroposition">resetZeroPosition</a></p></aside></div></li></ul></section>
@@ -344,7 +344,7 @@ and positive values a forward direction.</p>
 <h4 class="tsd-anchor-link" id="example-9">Example<a href="#example-9" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Set the power to 40% forwards</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">setPower</span><span class="hl-1">(</span><span class="hl-8">0.4</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#setpower">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#setpower">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#setpower">setPower</a></p></aside></div></li></ul></section>
@@ -371,7 +371,7 @@ supported.</p>
 <h4 class="tsd-anchor-link" id="example-10">Example<a href="#example-10" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Spin the motor at 75 RPM</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">setRPM</span><span class="hl-1">(</span><span class="hl-8">75</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#setrpm">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#setrpm">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#setrpm">setRPM</a></p></aside></div></li></ul></section>
@@ -394,7 +394,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-11">Example<a href="#example-11" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">motor</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">MotorClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_motor&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Stop the motor</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">motor</span><span class="hl-1">.</span><span class="hl-6">stop</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/motor/#stop">Motor
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/motor/#stop">Motor
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Motor.html">Motor</a>.<a href="../interfaces/Motor.html#stop">stop</a></p></aside></div></li></ul></section></section></details></div>

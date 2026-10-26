@@ -113,7 +113,7 @@ which will be converted automatically.</p>
 <h4 class="tsd-anchor-link" id="example-1">Example<a href="#example-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">slam</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">SlamClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_slam&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the internal state of the SLAM algorithm</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">internalState</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">slam</span><span class="hl-1">.</span><span class="hl-6">getInternalState</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/services/slam/#getinternalstate">SLAM
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/services/slam/#getinternalstate">SLAM
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of Slam.getInternalState</p></aside></div></li></ul></section>
@@ -136,7 +136,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-2">Example<a href="#example-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">slam</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">SlamClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_slam&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the point cloud map</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">pointCloudMap</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">slam</span><span class="hl-1">.</span><span class="hl-6">getPointCloudMap</span><span class="hl-1">();</span><br/><br/><span class="hl-2">// Get the edited point cloud map</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">editedMap</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">slam</span><span class="hl-1">.</span><span class="hl-6">getPointCloudMap</span><span class="hl-1">(</span><span class="hl-3">true</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/services/slam/#getpointcloudmap">SLAM
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/services/slam/#getpointcloudmap">SLAM
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of Slam.getPointCloudMap</p></aside></div></li></ul></section>
@@ -158,7 +158,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-3">Example<a href="#example-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">slam</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">SlamClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_slam&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the current position of the robot in the SLAM map</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">position</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">slam</span><span class="hl-1">.</span><span class="hl-6">getPosition</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;Current position:&#39;</span><span class="hl-1">, </span><span class="hl-0">position</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/services/slam/#getposition">SLAM
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/services/slam/#getposition">SLAM
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of Slam.getPosition</p></aside></div></li></ul></section>
@@ -180,7 +180,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-4">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">slam</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">SlamClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_slam&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the properties of the SLAM service</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">properties</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">slam</span><span class="hl-1">.</span><span class="hl-6">getProperties</span><span class="hl-1">();</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;SLAM properties:&#39;</span><span class="hl-1">, </span><span class="hl-0">properties</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/services/slam/#getproperties">SLAM
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/services/slam/#getproperties">SLAM
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of Slam.getProperties</p></aside></div></li></ul></section>

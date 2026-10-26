@@ -114,7 +114,7 @@ which will be converted automatically.</p>
 <h4 class="tsd-anchor-link" id="example-1">Example<a href="#example-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">encoder</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">EncoderClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_encoder&#39;</span><span class="hl-1">);</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">geometries</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">encoder</span><span class="hl-1">.</span><span class="hl-6">getGeometries</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/encoder/#getgeometries">Encoder
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/encoder/#getgeometries">Encoder
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Encoder.html">Encoder</a>.<a href="../interfaces/Encoder.html#getgeometries">getGeometries</a></p></aside></div></li></ul></section>
@@ -141,7 +141,7 @@ absolute units (degrees along a circle).</p>
 <h4 class="tsd-anchor-link" id="example-2">Example<a href="#example-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">encoder</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">EncoderClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_encoder&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get the position of the encoder in ticks</span><br/><span class="hl-3">const</span><span class="hl-1"> [</span><span class="hl-4">position</span><span class="hl-1">, </span><span class="hl-4">posType</span><span class="hl-1">] = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">encoder</span><span class="hl-1">.</span><span class="hl-6">getPosition</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-0">EncoderPositionType</span><span class="hl-1">.</span><span class="hl-4">POSITION_TYPE_TICKS_COUNT</span><span class="hl-1">,</span><br/><span class="hl-1">);</span><br/><span class="hl-0">console</span><span class="hl-1">.</span><span class="hl-6">log</span><span class="hl-1">(</span><span class="hl-7">&#39;The encoder position is currently&#39;</span><span class="hl-1">, </span><span class="hl-0">position</span><span class="hl-1">, </span><span class="hl-0">posType</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/encoder/#getposition">Encoder
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/encoder/#getposition">Encoder
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Encoder.html">Encoder</a>.<a href="../interfaces/Encoder.html#getposition">getPosition</a></p></aside></div></li></ul></section>
@@ -164,7 +164,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-3">Example<a href="#example-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">encoder</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">EncoderClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_encoder&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Get whether the encoder returns position in ticks or degrees</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">properties</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">encoder</span><span class="hl-1">.</span><span class="hl-6">getProperties</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/encoder/#getproperties">Encoder
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/encoder/#getproperties">Encoder
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Encoder.html">Encoder</a>.<a href="../interfaces/Encoder.html#getproperties">getProperties</a></p></aside></div></li></ul></section>
@@ -201,7 +201,7 @@ API</a>.</p>
 <h4 class="tsd-anchor-link" id="example-4">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">encoder</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-4">VIAM</span><span class="hl-1">.</span><span class="hl-6">EncoderClient</span><span class="hl-1">(</span><span class="hl-0">machine</span><span class="hl-1">, </span><span class="hl-7">&#39;my_encoder&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-2">// Reset the zero position of the encoder</span><br/><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-0">encoder</span><span class="hl-1">.</span><span class="hl-6">resetPosition</span><span class="hl-1">();</span>
 </code><button type="button">Copy</button></pre>
 
-<p>For more information, see <a href="https://docs.viam.com/dev/reference/apis/components/encoder/#resetposition">Encoder
+<p>For more information, see <a href="https://docs.viam.com/reference/apis/components/encoder/#resetposition">Encoder
 API</a>.</p>
 </div></div><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/Encoder.html">Encoder</a>.<a href="../interfaces/Encoder.html#resetposition">resetPosition</a></p></aside></div></li></ul></section></section></details></div>
