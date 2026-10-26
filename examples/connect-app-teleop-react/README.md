@@ -19,7 +19,7 @@ VITE_APP_API_KEY_SECRET=somesecret
 
 ### FusionAuth
 
-For FusionAuth, you'll need to have set up the [Viam CLI](https://docs.viam.com/cli/). Using the CLI, set up an auth app:
+For FusionAuth, you'll need to have set up the [Viam CLI](https://docs.viam.com/cli/overview/). Using the CLI, set up an auth app:
 
 ```shell
 BASE_DEV_URI="http://localhost:5173"

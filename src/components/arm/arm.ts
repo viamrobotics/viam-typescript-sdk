@@ -24,7 +24,7 @@ export interface Arm extends Resource {
    * ```
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#getendposition).
+   * API](https://docs.viam.com/reference/apis/components/arm/#getendposition).
    */
   getEndPosition: (extra?: Struct) => Promise<Pose>;
 
@@ -40,7 +40,7 @@ export interface Arm extends Resource {
    * ```
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/arm/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -68,7 +68,7 @@ export interface Arm extends Resource {
    * console.log(kinematics);
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#getkinematics).
+   * API](https://docs.viam.com/reference/apis/components/arm/#getkinematics).
    * ```
    *
    * @returns The legacy kinematics data shape or the newer object containing kinematics data plus a
@@ -100,7 +100,7 @@ export interface Arm extends Resource {
    * ```
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#movetoposition).
+   * API](https://docs.viam.com/reference/apis/components/arm/#movetoposition).
    *
    * @param pose - The destination pose for the arm.
    */
@@ -119,7 +119,7 @@ export interface Arm extends Resource {
    * ```
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#movetojointpositions).
+   * API](https://docs.viam.com/reference/apis/components/arm/#movetojointpositions).
    *
    * @param jointPositionsList - List of angles (0-360) to move each joint to.
    */
@@ -136,7 +136,7 @@ export interface Arm extends Resource {
    * ```
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#getjointpositions).
+   * API](https://docs.viam.com/reference/apis/components/arm/#getjointpositions).
    */
   getJointPositions: (extra?: Struct) => Promise<ArmJointPositions>;
 
@@ -150,8 +150,7 @@ export interface Arm extends Resource {
    * await arm.stop();
    * ```
    *
-   * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#stop).
+   * For more information, see [Arm API](https://docs.viam.com/reference/apis/components/arm/#stop).
    */
   stop: (extra?: Struct) => Promise<void>;
 
@@ -167,7 +166,7 @@ export interface Arm extends Resource {
    * ```
    *
    * For more information, see [Arm
-   * API](https://docs.viam.com/dev/reference/apis/components/arm/#ismoving).
+   * API](https://docs.viam.com/reference/apis/components/arm/#ismoving).
    */
   isMoving: () => Promise<boolean>;
 

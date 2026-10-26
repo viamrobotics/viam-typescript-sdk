@@ -24,7 +24,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetectionsfromcamera).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getdetectionsfromcamera).
    *
    * @param cameraName - The name of the camera to use for detection.
    * @returns - The list of Detections.
@@ -50,7 +50,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetections).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getdetections).
    *
    * @param image - The image from which to get detections.
    * @param width - The width of the image.
@@ -77,7 +77,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getclassificationsfromcamera).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getclassificationsfromcamera).
    *
    * @param cameraName - The name of the camera to use for classification.
    * @param count - The number of Classifications requested.
@@ -109,7 +109,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getclassifications).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getclassifications).
    *
    * @param image - The image from which to get classifications.
    * @param width - The width of the image.
@@ -139,7 +139,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getobjectpointclouds).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getobjectpointclouds).
    *
    * @param cameraName - The name of the camera.
    * @returns - The list of PointCloudObjects
@@ -160,7 +160,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getdetections3d).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getdetections3d).
    *
    * @param cameraName - The name of the camera.
    * @returns - The list of Detection3Ds
@@ -179,7 +179,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#getproperties).
+   * API](https://docs.viam.com/reference/apis/services/vision/#getproperties).
    *
    * @returns - The properties of the vision service
    */
@@ -203,7 +203,7 @@ export interface Vision extends Resource {
    * ```
    *
    * For more information, see [Vision
-   * API](https://docs.viam.com/dev/reference/apis/services/vision/#captureallfromcamera).
+   * API](https://docs.viam.com/reference/apis/services/vision/#captureallfromcamera).
    *
    * @param cameraName - The name of the camera to use for classification, detection, and
    *   segmentation.

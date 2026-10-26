@@ -20,7 +20,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#getgeometries).
+   * API](https://docs.viam.com/reference/apis/components/motor/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
 
@@ -37,7 +37,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#setpower).
+   * API](https://docs.viam.com/reference/apis/components/motor/#setpower).
    *
    * @param power - A value between -1 and 1 where negative values indicate a backwards direction
    *   and positive values a forward direction.
@@ -58,7 +58,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#gofor).
+   * API](https://docs.viam.com/reference/apis/components/motor/#gofor).
    *
    * @param rpm - Speed in revolutions per minute.
    * @param revolutions - Number of revolutions relative to the motor's starting position. If this
@@ -82,7 +82,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#goto).
+   * API](https://docs.viam.com/reference/apis/components/motor/#goto).
    *
    * @param rpm - Speed in revolutions per minute.
    * @param positionRevolutions - Number of revolutions relative to the motor's home position.
@@ -103,7 +103,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#setrpm).
+   * API](https://docs.viam.com/reference/apis/components/motor/#setrpm).
    *
    * @param rpm - Speed in revolutions per minute.
    */
@@ -123,7 +123,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#resetzeroposition).
+   * API](https://docs.viam.com/reference/apis/components/motor/#resetzeroposition).
    *
    * @param offset - Position from which to offset the current position.
    */
@@ -142,7 +142,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#stop).
+   * API](https://docs.viam.com/reference/apis/components/motor/#stop).
    */
   stop(extra?: Struct): Promise<void>;
 
@@ -161,7 +161,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#getproperties).
+   * API](https://docs.viam.com/reference/apis/components/motor/#getproperties).
    */
   getProperties(extra?: Struct): Promise<Properties>;
 
@@ -180,7 +180,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#getposition).
+   * API](https://docs.viam.com/reference/apis/components/motor/#getposition).
    */
   getPosition(extra?: Struct): Promise<number>;
 
@@ -199,7 +199,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#ispowered).
+   * API](https://docs.viam.com/reference/apis/components/motor/#ispowered).
    */
   isPowered(extra?: Struct): Promise<readonly [boolean, number]>;
 
@@ -217,7 +217,7 @@ export interface Motor extends Resource {
    * ```
    *
    * For more information, see [Motor
-   * API](https://docs.viam.com/dev/reference/apis/components/motor/#ismoving).
+   * API](https://docs.viam.com/reference/apis/components/motor/#ismoving).
    */
   isMoving(): Promise<boolean>;
 }

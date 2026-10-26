@@ -24,7 +24,7 @@ export class BillingClient {
    * ```
    *
    * For more information, see [Billing
-   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getcurrentmonthusage).
+   * API](https://docs.viam.com/reference/apis/billing-client/#getcurrentmonthusage).
    *
    * @param orgId - The organization ID.
    */
@@ -47,7 +47,7 @@ export class BillingClient {
    * ```
    *
    * For more information, see [Billing
-   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getorgbillinginformation).
+   * API](https://docs.viam.com/reference/apis/billing-client/#getorgbillinginformation).
    *
    * @param orgId - The organization ID.
    */
@@ -66,8 +66,7 @@ export class BillingClient {
    * const invoicesSummary = await billing.getInvoicesSummary('<organization-id>');
    * ```
    *
-   * For more information, see [Billing
-   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getinvoicesummary).
+   * For more information, see [Billing API](https://docs.viam.com/reference/apis/billing-client/).
    *
    * @param orgId - The organization ID.
    */
@@ -87,7 +86,7 @@ export class BillingClient {
    * ```
    *
    * For more information, see [Billing
-   * API](https://docs.viam.com/dev/reference/apis/billing-client/#getinvoicepdf).
+   * API](https://docs.viam.com/reference/apis/billing-client/#getinvoicepdf).
    *
    * @param id - The invoice ID.
    * @param orgId - The organization ID.
