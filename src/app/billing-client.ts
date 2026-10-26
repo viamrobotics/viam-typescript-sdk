@@ -66,7 +66,8 @@ export class BillingClient {
    * const invoicesSummary = await billing.getInvoicesSummary('<organization-id>');
    * ```
    *
-   * For more information, see [Billing API](https://docs.viam.com/reference/apis/billing-client/).
+   * For more information, see [Billing
+   * API](https://docs.viam.com/reference/apis/billing-client/#getinvoicessummary).
    *
    * @param orgId - The organization ID.
    */
