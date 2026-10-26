@@ -1,6 +1,6 @@
 import * as pb from '../gen/app/v1/app_pb';
 
-import { Struct, Timestamp, type PartialMessage } from '@bufbuild/protobuf';
+import { Struct, Timestamp, Value, type PartialMessage } from '@bufbuild/protobuf';
 import { createRouterTransport, type Transport } from '@connectrpc/connect';
 import { createWritableIterable } from '@connectrpc/connect/protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -912,6 +912,52 @@ describe('AppClient tests', () => {
     it('updateRobotPart', async () => {
       const response = await subject().updateRobotPart('id', 'name', new Struct());
       expect(response).toEqual(robotPart);
+    });
+  });
+
+  describe('setConfigProperty tests', () => {
+    const expectedRequest = new pb.SetConfigPropertyRequest({
+      robotPartId: 'partId',
+      propertyChanges: [
+        { path: 'components.arm.frame', value: Value.fromJson({ parent: 'world' }) },
+        { path: 'components.arm.attributes.speed', value: Value.fromJson(50) },
+      ],
+    });
+    const expectedResults = [
+      new pb.ConfigPropertyChangeResult({
+        path: 'components.arm.frame',
+        value: Value.fromJson({ parent: 'world' }),
+        success: true,
+      }),
+      new pb.ConfigPropertyChangeResult({
+        path: 'components.arm.attributes.speed',
+        value: Value.fromJson(50),
+        success: false,
+        error: 'component "arm" not found',
+      }),
+    ];
+
+    let capReq: pb.SetConfigPropertyRequest;
+    beforeEach(() => {
+      mockTransport = createRouterTransport(({ service }) => {
+        service(AppService, {
+          setConfigProperty: (req) => {
+            capReq = req;
+            return new pb.SetConfigPropertyResponse({
+              propertyChanges: expectedResults,
+            });
+          },
+        });
+      });
+    });
+
+    it('setConfigProperty', async () => {
+      const response = await subject().setConfigProperty('partId', [
+        { path: 'components.arm.frame', value: { parent: 'world' } },
+        { path: 'components.arm.attributes.speed', value: 50 },
+      ]);
+      expect(capReq).toStrictEqual(expectedRequest);
+      expect(response).toEqual(expectedResults);
     });
   });
 
