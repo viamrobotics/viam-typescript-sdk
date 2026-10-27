@@ -126,6 +126,32 @@ describe('ViamClient', () => {
       );
     });
 
+    it('passes an api key credential through to the robot client', async () => {
+      options = { credentials: testCredential };
+      const client = await subject();
+      await client.connectToMachine({ host: 'test.machine.host' });
+
+      expect(createRobotClient).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          host: 'test.machine.host',
+          credentials: testCredential,
+        }),
+      );
+    });
+
+    it('passes an access token through to the robot client', async () => {
+      options = { credentials: testAccessToken };
+      const client = await subject();
+      await client.connectToMachine({ host: 'test.machine.host' });
+
+      expect(createRobotClient).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          host: 'test.machine.host',
+          credentials: testAccessToken,
+        }),
+      );
+    });
+
     it('errors if no address could be found', async () => {
       options = { credentials: testCredential };
       const client = await subject();
