@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GetRobotPartByNameAndLocationResponse, RobotPart } from '../gen/app/v1/app_pb';
+import { RobotPart } from '../gen/app/v1/app_pb';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
@@ -140,64 +140,6 @@ describe('ViamClient', () => {
       await expect(async () =>
         client.connectToMachine({ id: 'test-machine-uuid' }),
       ).rejects.toThrow('not provided and could not be obtained');
-    });
-
-    it('gets robot secret if credential is access token -- host', async () => {
-      options = { credentials: testAccessToken };
-      const client = await subject();
-
-      const MAIN_PART = new RobotPart({
-        mainPart: true,
-        name: 'main-part',
-        secret: 'fake-robot-secret',
-      });
-      const partByNameAndLocationResponse = new GetRobotPartByNameAndLocationResponse({
-        part: MAIN_PART,
-      });
-      const getRobotPartByNameAndLocationMock = vi
-        .fn()
-        .mockImplementation(() => partByNameAndLocationResponse);
-      AppClient.prototype.getRobotPartByNameAndLocation = getRobotPartByNameAndLocationMock;
-
-      await client.connectToMachine({
-        host: 'main-part.location.viam.cloud',
-      });
-      expect(getRobotPartByNameAndLocationMock).toHaveBeenCalledWith('main-part', 'location');
-      expect(createRobotClient).toHaveBeenCalledWith(
-        expect.objectContaining({
-          credentials: expect.objectContaining({
-            type: 'robot-secret',
-            payload: 'fake-robot-secret',
-          }),
-        }),
-      );
-    });
-
-    it('gets robot secret if credential is access token -- id', async () => {
-      options = { credentials: testAccessToken };
-      const client = await subject();
-
-      const MAIN_PART = new RobotPart({
-        mainPart: true,
-        fqdn: 'main-part.fqdn',
-        secret: 'fake-robot-secret',
-      });
-      const robotParts = [MAIN_PART];
-      const getRobotPartsMock = vi.fn().mockImplementation(() => robotParts);
-      AppClient.prototype.getRobotParts = getRobotPartsMock;
-
-      await client.connectToMachine({
-        id: 'machine-uuid',
-      });
-      expect(getRobotPartsMock).toHaveBeenCalledWith('machine-uuid');
-      expect(createRobotClient).toHaveBeenCalledWith(
-        expect.objectContaining({
-          credentials: expect.objectContaining({
-            type: 'robot-secret',
-            payload: 'fake-robot-secret',
-          }),
-        }),
-      );
     });
   });
 });

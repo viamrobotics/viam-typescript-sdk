@@ -10,8 +10,11 @@ import {
 import { backOff, type IBackOffOptions } from 'exponential-backoff';
 import { UuidTool } from 'uuid-tool';
 import { isCredential, type Credentials } from '../app/viam-transport';
+import { assertExists } from '../assert';
 import { DIAL_TIMEOUT } from '../constants';
+import { writeDebugLog } from '../debug';
 import { EventDispatcher, MachineConnectionEvent } from '../events';
+import type { UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
 import type { PoseInFrame, Transform } from '../gen/common/v1/common_pb';
 import { ArmService } from '../gen/component/arm/v1/arm_connect';
 import { BaseService } from '../gen/component/base/v1/base_connect';
@@ -33,23 +36,29 @@ import {
   TransformPCDRequest,
   TransformPoseRequest,
   UploadDataFromPathRequest,
+  type FrameSystemConfig,
+  type GetCloudMetadataResponse,
+  type GetMachineStatusResponse,
+  type GetVersionResponse,
+  type ModuleModel,
+  type Operation,
+  type ResourceRPCSubtype,
+  type Session,
+  type UploadDataFromPathResponse,
 } from '../gen/robot/v1/robot_pb';
 import { DiscoveryService } from '../gen/service/discovery/v1/discovery_connect';
+import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
 import { MotionService } from '../gen/service/motion/v1/motion_connect';
 import { NavigationService } from '../gen/service/navigation/v1/navigation_connect';
 import { SLAMService } from '../gen/service/slam/v1/slam_connect';
 import { VisionService } from '../gen/service/vision/v1/vision_connect';
-import { writeDebugLog } from '../debug';
+import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
 import { dialDirect, dialWebRTC, wrapTransportWithDebugLogging, type DialOptions } from '../rpc';
+import { type ResourceName } from '../types';
 import { clientHeaders } from '../utils';
 import GRPCConnectionManager from './grpc-connection-manager';
 import type { Robot } from './robot';
 import SessionManager from './session-manager';
-import { MLModelService } from '../gen/service/mlmodel/v1/mlmodel_connect';
-import type { AccessToken, Credential } from '../main';
-import { WorldStateStoreService } from '../gen/service/worldstatestore/v1/world_state_store_connect';
-import { assertExists } from '../assert';
-import type { UploadMetadata } from '../gen/app/datasync/v1/data_sync_pb';
 
 const DIAL_ABORTED_ERROR_MESSAGE = 'Dial operation aborted';
 
@@ -62,7 +71,7 @@ interface ICEServer {
 /** Options required to dial a robot via WebRTC. */
 export interface DialWebRTCConf {
   host: string;
-  credentials?: Credential | AccessToken;
+  credentials?: Credentials;
   disableSessions?: boolean;
   noReconnect?: boolean;
   /** @default 10. */
@@ -122,14 +131,6 @@ export interface DialWebRTCConf {
   /**
    * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
    * disables the timeout.
-   *
-   * @deprecated Use `dialTimeoutMs` instead.
-   */
-  dialTimeout?: number;
-
-  /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
-   * disables the timeout.
    */
   dialTimeoutMs?: number;
   extraHeaders?: Record<string, string>;
@@ -138,7 +139,7 @@ export interface DialWebRTCConf {
 /** Options required to dial a robot via gRPC. */
 export interface DialDirectConf {
   host: string;
-  credentials?: Credential | AccessToken;
+  credentials?: Credentials;
   disableSessions?: boolean;
   noReconnect?: boolean;
   reconnectMaxAttempts?: number;
@@ -151,14 +152,6 @@ export interface DialDirectConf {
    * limit.
    */
   shouldRetryOnError?: () => boolean;
-
-  /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
-   * disables the timeout.
-   *
-   * @deprecated Use `dialTimeoutMs` instead.
-   */
-  dialTimeout?: number;
 
   /**
    * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
@@ -203,14 +196,6 @@ interface SessionOptions {
 export interface ConnectOptions {
   creds?: Credentials;
   priority?: number;
-
-  /**
-   * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
-   * disables the timeout.
-   *
-   * @deprecated Use `dialTimeoutMs` instead.
-   */
-  dialTimeout?: number;
 
   /**
    * Set timeout in milliseconds for dialing. Default is defined by DIAL_TIMEOUT. A value of 0
@@ -274,7 +259,7 @@ const isRetryableError = (error: unknown): boolean => {
 };
 
 /** Validates a DialConf passed to createRobotClient. Throws an error for invalid configs. */
-export const validateDialConf = (conf: DialConf) => {
+export const validateDialConf = (conf: DialConf): void => {
   if (conf.credentials && isCredential(conf.credentials)) {
     try {
       conf.credentials.authEntity = new URL(conf.credentials.authEntity).host;
@@ -298,7 +283,7 @@ export const validateDialConf = (conf: DialConf) => {
   }
 };
 
-const throwOnAbortError = (error: unknown) => {
+const throwOnAbortError = (error: unknown): void => {
   if (error instanceof Error && error.message === DIAL_ABORTED_ERROR_MESSAGE) {
     throw error;
   }
@@ -462,7 +447,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     this.closed = false;
   }
 
-  private cleanupEventListeners() {
+  private cleanupEventListeners(): void {
     if (this.peerConn && this.onICEConnectionStateChange) {
       this.peerConn.removeEventListener(
         'iceconnectionstatechange',
@@ -483,7 +468,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     }
   }
 
-  private onDisconnect(event?: Event) {
+  private onDisconnect(event?: Event): void {
     if (this.noReconnect !== undefined && this.noReconnect) {
       this.emit(MachineConnectionEvent.DISCONNECTED, event ?? {});
       return;
@@ -556,126 +541,126 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
       });
   }
 
-  private get noReconnect() {
+  private get noReconnect(): boolean | undefined {
     return this.webrtcOptions.noReconnect ?? this.directOptions.noReconnect;
   }
 
-  private get reconnectMaxAttempts() {
+  private get reconnectMaxAttempts(): number | undefined {
     return this.webrtcOptions.reconnectMaxAttempts ?? this.directOptions.reconnectMaxAttempts;
   }
 
-  private get reconnectMaxWait() {
+  private get reconnectMaxWait(): number | undefined {
     return this.webrtcOptions.reconnectMaxWait ?? this.directOptions.reconnectMaxWait;
   }
 
-  private get shouldRetryOnError() {
+  private get shouldRetryOnError(): (() => boolean) | undefined {
     return this.webrtcOptions.shouldRetryOnError ?? this.directOptions.shouldRetryOnError;
   }
 
-  get sessionId() {
+  get sessionId(): string {
     return this.sessionManager.sessionID;
   }
 
   private static readonly notConnectedYetStr = 'not connected yet';
 
-  get robotService() {
+  get robotService(): Client<typeof RobotService> {
     if (!this.robotServiceClient) {
       throw new Error(RobotClient.notConnectedYetStr);
     }
     return this.robotServiceClient;
   }
 
-  get armService() {
+  get armService(): Client<typeof ArmService> {
     this.armServiceClient ??= this.createServiceClient(ArmService);
     return this.armServiceClient;
   }
 
-  get baseService() {
+  get baseService(): Client<typeof BaseService> {
     this.baseServiceClient ??= this.createServiceClient(BaseService);
     return this.baseServiceClient;
   }
 
-  get boardService() {
+  get boardService(): Client<typeof BoardService> {
     this.boardServiceClient ??= this.createServiceClient(BoardService);
     return this.boardServiceClient;
   }
 
-  get encoderService() {
+  get encoderService(): Client<typeof EncoderService> {
     this.encoderServiceClient ??= this.createServiceClient(EncoderService);
     return this.encoderServiceClient;
   }
 
-  get gantryService() {
+  get gantryService(): Client<typeof GantryService> {
     this.gantryServiceClient ??= this.createServiceClient(GantryService);
     return this.gantryServiceClient;
   }
 
-  get genericService() {
+  get genericService(): Client<typeof GenericService> {
     this.genericServiceClient ??= this.createServiceClient(GenericService);
     return this.genericServiceClient;
   }
 
-  get gripperService() {
+  get gripperService(): Client<typeof GripperService> {
     this.gripperServiceClient ??= this.createServiceClient(GripperService);
     return this.gripperServiceClient;
   }
 
-  get mlModelService() {
+  get mlModelService(): Client<typeof MLModelService> {
     this.mlModelServiceClient ??= this.createServiceClient(MLModelService);
     return this.mlModelServiceClient;
   }
 
-  get movementSensorService() {
+  get movementSensorService(): Client<typeof MovementSensorService> {
     this.movementSensorServiceClient ??= this.createServiceClient(MovementSensorService);
     return this.movementSensorServiceClient;
   }
 
-  get powerSensorService() {
+  get powerSensorService(): Client<typeof PowerSensorService> {
     this.powerSensorServiceClient ??= this.createServiceClient(PowerSensorService);
     return this.powerSensorServiceClient;
   }
 
-  get inputControllerService() {
+  get inputControllerService(): Client<typeof InputControllerService> {
     this.inputControllerServiceClient ??= this.createServiceClient(InputControllerService);
     return this.inputControllerServiceClient;
   }
 
-  get motorService() {
+  get motorService(): Client<typeof MotorService> {
     this.motorServiceClient ??= this.createServiceClient(MotorService);
     return this.motorServiceClient;
   }
 
-  get navigationService() {
+  get navigationService(): Client<typeof NavigationService> {
     this.navigationServiceClient ??= this.createServiceClient(NavigationService);
     return this.navigationServiceClient;
   }
 
-  get discoveryService() {
+  get discoveryService(): Client<typeof DiscoveryService> {
     this.discoveryServiceClient ??= this.createServiceClient(DiscoveryService);
     return this.discoveryServiceClient;
   }
 
-  get motionService() {
+  get motionService(): Client<typeof MotionService> {
     this.motionServiceClient ??= this.createServiceClient(MotionService);
     return this.motionServiceClient;
   }
 
-  get visionService() {
+  get visionService(): Client<typeof VisionService> {
     this.visionServiceClient ??= this.createServiceClient(VisionService);
     return this.visionServiceClient;
   }
 
-  get servoService() {
+  get servoService(): Client<typeof ServoService> {
     this.servoServiceClient ??= this.createServiceClient(ServoService);
     return this.servoServiceClient;
   }
 
-  get slamService() {
+  get slamService(): Client<typeof SLAMService> {
     this.slamServiceClient ??= this.createServiceClient(SLAMService);
     return this.slamServiceClient;
   }
 
-  get worldStateStoreService() {
+  get worldStateStoreService(): Client<typeof WorldStateStoreService> {
     this.worldStateStoreServiceClient ??= this.createServiceClient(WorldStateStoreService);
     return this.worldStateStoreServiceClient;
   }
@@ -685,15 +670,18 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     return createClient(svcType, this.clientTransport);
   }
 
-  get peerConnection() {
+  get peerConnection(): RTCPeerConnection | undefined {
     return this.peerConn;
   }
 
-  private get clientTransport() {
+  private get clientTransport(): Transport | undefined {
     return this.sessionOptions.disabled ? this.transport : this.sessionManager.transport;
   }
 
-  private async dialWebRTC(conf: DialWebRTCConf, abortSignal?: DialAbortSignal) {
+  private async dialWebRTC(
+    conf: DialWebRTCConf,
+    abortSignal?: DialAbortSignal,
+  ): Promise<RobotClient> {
     // Check if aborted before starting
     if (abortSignal?.abort === true) {
       throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
@@ -727,8 +715,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
     await this.connect({
       priority: conf.priority,
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
+      dialTimeoutMs: conf.dialTimeoutMs ?? DIAL_TIMEOUT,
       creds: conf.credentials,
       extraHeaders: conf.extraHeaders,
     });
@@ -736,7 +723,10 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     return this;
   }
 
-  private async dialDirect(conf: DialDirectConf, abortSignal?: DialAbortSignal) {
+  private async dialDirect(
+    conf: DialDirectConf,
+    abortSignal?: DialAbortSignal,
+  ): Promise<RobotClient> {
     // Check if aborted before starting
     if (abortSignal?.abort === true) {
       throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
@@ -766,22 +756,22 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
     await this.connect({
       creds: conf.credentials,
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      dialTimeoutMs: conf.dialTimeoutMs ?? conf.dialTimeout ?? DIAL_TIMEOUT,
+
+      dialTimeoutMs: conf.dialTimeoutMs ?? DIAL_TIMEOUT,
       extraHeaders: conf.extraHeaders,
     });
 
     return this;
   }
 
-  private resetDialing(dialPromise: Promise<RobotClient>) {
+  private resetDialing(dialPromise: Promise<RobotClient>): void {
     if (this.dialing === dialPromise) {
       this.dialing = undefined;
       this.currentDialAbortSignal = undefined;
     }
   }
 
-  public async dial(conf: DialConf) {
+  public async dial(conf: DialConf): Promise<RobotClient> {
     validateDialConf(conf);
 
     if (this.dialing && this.currentDialAbortSignal) {
@@ -822,7 +812,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     { abort: userAbort }: DialAbortSignal,
   ): Partial<IBackOffOptions> {
     return {
-      retry: (error, attemptNumber) => {
+      retry: (error, attemptNumber): boolean => {
         const aborted = internalAbort || userAbort;
         if (aborted) {
           throw new Error(DIAL_ABORTED_ERROR_MESSAGE);
@@ -954,7 +944,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     return this;
   }
 
-  public async disconnect() {
+  public async disconnect(): Promise<void> {
     writeDebugLog('client_closed', { connectionId: this.connectionId });
     this.emit(MachineConnectionEvent.DISCONNECTING, {});
 
@@ -996,11 +986,9 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
   public async connect({
     creds = this.savedCreds,
     priority,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    dialTimeout,
     dialTimeoutMs,
     extraHeaders,
-  }: ConnectOptions = {}) {
+  }: ConnectOptions = {}): Promise<void> {
     if (!this.isReconnecting) {
       this.emit(MachineConnectionEvent.CONNECTING, {});
     }
@@ -1073,7 +1061,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
           turnPort: this.webrtcOptions.turnPort,
           signalingInsecure: this.webrtcOptions.signalingInsecure,
         },
-        dialTimeoutMs: dialTimeoutMs ?? dialTimeout ?? DIAL_TIMEOUT,
+        dialTimeoutMs: dialTimeoutMs ?? DIAL_TIMEOUT,
         extraHeaders: mergedHeaders,
       };
 
@@ -1113,7 +1101,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
         this.cleanupEventListeners();
 
-        this.onICEConnectionStateChange = () => {
+        this.onICEConnectionStateChange = (): void => {
           /*
            * TODO: are there any disconnection scenarios where we can reuse the
            * same connection and restart ice?
@@ -1138,14 +1126,14 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
         // There is not an iceconnectionstatechange nor connectionstatechange
         // event when the peerConn closes. Instead, listen to the data channel
         // closing and emit disconnect when that occurs.
-        this.onDataChannelClose = (event: Event) => {
+        this.onDataChannelClose = (event: Event): void => {
           this.onDisconnect(event);
         };
         this.dataChannel.addEventListener('close', this.onDataChannelClose);
 
         this.transport = wrapTransportWithDebugLogging(webRTCConn.transport, connectionId);
 
-        this.onTrack = (event: RTCTrackEvent) => {
+        this.onTrack = (event: RTCTrackEvent): void => {
           const [eventStream] = event.streams;
           if (!eventStream) {
             this.emit('track', event);
@@ -1209,33 +1197,33 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
   // SESSIONS
 
-  async getSessions() {
+  async getSessions(): Promise<Session[]> {
     const resp = await this.robotService.getSessions({});
     return resp.sessions;
   }
 
   // OPERATIONS
 
-  async getOperations() {
+  async getOperations(): Promise<Operation[]> {
     const resp = await this.robotService.getOperations({});
     return resp.operations;
   }
 
-  async cancelOperation(id: string) {
+  async cancelOperation(id: string): Promise<void> {
     await this.robotService.cancelOperation({ id });
   }
 
-  async blockForOperation(id: string) {
+  async blockForOperation(id: string): Promise<void> {
     await this.robotService.blockForOperation({ id });
   }
 
-  async stopAll() {
+  async stopAll(): Promise<void> {
     await this.robotService.stopAll({});
   }
 
   // FRAME SYSTEM
 
-  async frameSystemConfig(transforms: Transform[]) {
+  async frameSystemConfig(transforms: Transform[]): Promise<FrameSystemConfig[]> {
     const resp = await this.robotService.frameSystemConfig({
       supplementalTransforms: transforms,
     });
@@ -1247,7 +1235,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     destination: string,
     supplementalTransforms: Transform[],
     callOptions?: CallOptions,
-  ) {
+  ): Promise<PoseInFrame> {
     const request = new TransformPoseRequest({
       source,
       destination,
@@ -1262,7 +1250,11 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     return result;
   }
 
-  async transformPCD(pointCloudPCD: Uint8Array, source: string, destination: string) {
+  async transformPCD(
+    pointCloudPCD: Uint8Array,
+    source: string,
+    destination: string,
+  ): Promise<Uint8Array> {
     const request = new TransformPCDRequest({
       pointCloudPcd: pointCloudPCD,
       source,
@@ -1274,7 +1266,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
   // GET MODELS FROM MODULES
 
-  async getModelsFromModules() {
+  async getModelsFromModules(): Promise<ModuleModel[]> {
     const request = new GetModelsFromModulesRequest({});
     const resp = await this.robotService.getModelsFromModules(request);
     return resp.models;
@@ -1282,37 +1274,37 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
   // GET CLOUD METADATA
 
-  async getCloudMetadata() {
+  async getCloudMetadata(): Promise<GetCloudMetadataResponse> {
     return this.robotService.getCloudMetadata({});
   }
 
   // RESOURCES
 
-  async resourceNames() {
+  async resourceNames(): Promise<ResourceName[]> {
     const resp = await this.robotService.resourceNames({});
     return resp.resources;
   }
 
-  async resourceRPCSubtypes() {
+  async resourceRPCSubtypes(): Promise<ResourceRPCSubtype[]> {
     const resp = await this.robotService.resourceRPCSubtypes({});
     return resp.resourceRpcSubtypes;
   }
 
   // MACHINE STATUS
 
-  async getMachineStatus() {
+  async getMachineStatus(): Promise<GetMachineStatusResponse> {
     return this.robotService.getMachineStatus({});
   }
 
   // VERSION INFO
 
-  async getVersion() {
+  async getVersion(): Promise<GetVersionResponse> {
     return this.robotService.getVersion({});
   }
 
   // MODULES
 
-  async restartModule(moduleId?: string, moduleName?: string) {
+  async restartModule(moduleId?: string, moduleName?: string): Promise<void> {
     const request = new RestartModuleRequest();
     if (moduleId !== undefined) {
       request.idOrName.case = 'moduleId';
@@ -1331,7 +1323,7 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
     componentName: string,
     destinationFrame: string,
     supplementalTransforms: Transform[],
-  ) {
+  ): Promise<PoseInFrame> {
     const request = new GetPoseRequest({
       componentName,
       destinationFrame,
@@ -1347,7 +1339,11 @@ export class RobotClient extends EventDispatcher<RobotClientDispatchEvents> impl
 
   // UPLOAD DATA FROM PATH
 
-  async uploadDataFromPath(path: string, uploadMetadata?: UploadMetadata, extra = {}) {
+  async uploadDataFromPath(
+    path: string,
+    uploadMetadata?: UploadMetadata,
+    extra = {},
+  ): Promise<UploadDataFromPathResponse> {
     const request = new UploadDataFromPathRequest({
       path,
       uploadMetadata,
