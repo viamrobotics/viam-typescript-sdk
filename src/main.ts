@@ -27,24 +27,19 @@ export * as robotApi from './gen/robot/v1/robot_pb';
 
 export { createViamClient, type ViamClient, type ViamClientOptions } from './app/viam-client';
 
-export {
-  type AccessToken,
-  type Credential,
-  type Credentials,
-  type CredentialType,
-} from './app/viam-transport';
+export { type AccessToken, type Credential, type Credentials } from './app/viam-transport';
 
 export {
+  DatasetType,
+  SequenceDatasetExportStatus,
   type BinaryDataCaptureUploadOptions,
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   type BinaryID,
   type DataClient,
-  DatasetType,
   type FilterOptions,
   type GetSequenceDatasetExportResponse,
   type IndexableCollection,
   type Sequence,
-  SequenceDatasetExportStatus,
   type SequenceResourceFilter,
 } from './app/data-client';
 /**
@@ -107,10 +102,10 @@ export { type BillingClient } from './app/billing-client';
  */
 export * as billingApi from './gen/app/v1/billing_pb';
 
-export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
-export { AudioInClient, type AudioIn, type AudioChunk } from './components/audioin';
-export { AudioOutClient, type AudioOut } from './components/audioout';
 export { AudioCodec, type AudioCodecType, type AudioProperties } from './audio-common';
+export { ArmClient, ArmJointPositions, type Arm } from './components/arm';
+export { AudioInClient, type AudioChunk, type AudioIn } from './components/audioin';
+export { AudioOutClient, type AudioOut } from './components/audioout';
 /**
  * Raw Protobuf interfaces for an Arm component.
  *
@@ -356,15 +351,15 @@ export { DataManagerClient, type DataManager } from './services/data-manager';
 export * as dataManagerApi from './gen/service/datamanager/v1/data_manager_pb';
 
 export {
-  NavigationClient,
-  type Costmap,
   GoalState,
+  MapType,
+  NavErrorCode,
+  NavigationClient,
+  NavMode,
+  type Costmap,
   type GoalStatus,
   type Location,
-  MapType,
   type NavError,
-  NavErrorCode,
-  NavMode,
   type NavigateRouteOptions,
   type Plan,
   type Position,

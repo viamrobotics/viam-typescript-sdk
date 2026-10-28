@@ -9,11 +9,9 @@ export type Credentials = Credential | AccessToken;
 /** A credential that can be exchanged to obtain an access token */
 export interface Credential {
   authEntity: string;
-  type: CredentialType;
+  type: 'api-key';
   payload: string;
 }
-
-export type CredentialType = 'api-key' | 'robot-secret';
 
 /** An access token used to access protected resources. */
 export interface AccessToken {
@@ -28,7 +26,7 @@ export const isCredential = (object: Credentials | undefined): object is Credent
 /** Initialize an authenticated transport that can access protected resources. */
 export const createViamTransport = async (
   serviceHost: string,
-  credential: Credential | AccessToken,
+  credential: Credentials,
 ): Promise<Transport> => {
   if (credential.type === 'access-token') {
     return dialDirect(serviceHost, {

@@ -1,11 +1,12 @@
 import type { Transport } from '@connectrpc/connect';
+import { type RobotClient } from '../robot';
 import { createRobotClient } from '../robot/dial';
 import { AppClient } from './app-client';
 import { BillingClient } from './billing-client';
 import { DataClient } from './data-client';
 import { MlTrainingClient } from './ml-training-client';
 import { ProvisioningClient } from './provisioning-client';
-import { createViamTransport, isCredential, type Credentials } from './viam-transport';
+import { createViamTransport, type Credentials } from './viam-transport';
 
 export interface ViamClientOptions {
   serviceHost?: string;
@@ -65,45 +66,33 @@ export class ViamClient {
     return undefined;
   }
 
-  public async connectToMachine({ host, id }: ViamClientMachineConnectionOpts) {
-    if (host === undefined && id === undefined) {
+  public async connectToMachine({
+    host,
+    id,
+  }: ViamClientMachineConnectionOpts): Promise<RobotClient> {
+    if (!(host ?? '') && !(id ?? '')) {
       throw new Error('Either a machine address or ID must be provided');
     }
-    let address = host;
-    let robotSecret: string | undefined = undefined;
+    let address = host ?? '';
 
     // Get address if only ID was provided
-    if (id !== undefined && host === undefined) {
-      const parts = await this.appClient.getRobotParts(id);
+    if ((id ?? '') && !address) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const parts = await this.appClient.getRobotParts(id!);
       const mainPart = parts.find((part) => part.mainPart);
       if (!mainPart) {
         throw new Error(`Could not find a main part for the machine with UUID: ${id}`);
       }
       address = mainPart.fqdn;
-      robotSecret = mainPart.secret;
     }
 
-    if (address === undefined || address === '') {
+    if (!address) {
       throw new Error('Host was not provided and could not be obtained from the machine ID');
-    }
-
-    // If credentials is AccessToken, then attempt to use the robot part secret
-    let creds = this.credentials;
-    if (!isCredential(creds)) {
-      robotSecret ??= await this.getRobotSecretFromHost(address);
-      creds =
-        robotSecret === undefined
-          ? creds
-          : {
-              type: 'robot-secret',
-              payload: robotSecret,
-              authEntity: address,
-            };
     }
 
     return createRobotClient({
       host: address,
-      credentials: creds,
+      credentials: this.credentials,
       signalingAddress: 'https://app.viam.com:443',
       reconnectMaxAttempts: 1,
     });
