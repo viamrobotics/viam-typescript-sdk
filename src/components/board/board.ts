@@ -123,7 +123,8 @@ export interface Board extends Resource {
    * const freq = await board.getPWMFrequency('15');
    * ```
    *
-   * For more information, see [Board API](https://docs.viam.com/reference/apis/components/board/).
+   * For more information, see [Board
+   * API](https://docs.viam.com/reference/apis/components/board/#pwmfrequency).
    *
    * @param pin - The pin.
    */
