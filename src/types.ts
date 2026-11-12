@@ -44,6 +44,10 @@ export type GeoGeometry = PlainMessage<commonApi.GeoGeometry>;
 export type GeoPoint = PlainMessage<commonApi.GeoPoint>;
 export type GeometriesInFrame = PlainMessage<commonApi.GeometriesInFrame>;
 export type Geometry = PlainMessage<commonApi.Geometry>;
+export type JointType = commonApi.JointType;
+export type KinematicJoint = PlainMessage<commonApi.KinematicJoint>;
+export type KinematicLink = PlainMessage<commonApi.KinematicLink>;
+export type KinematicModel = PlainMessage<commonApi.KinematicModel>;
 export type Orientation = PlainMessage<commonApi.Orientation>;
 export type PointCloud = PlainMessage<commonApi.PointCloud>;
 export type Pose = PlainMessage<commonApi.Pose>;
@@ -61,6 +65,10 @@ export const {
   GeoPoint,
   GeometriesInFrame,
   Geometry,
+  JointType,
+  KinematicJoint,
+  KinematicLink,
+  KinematicModel,
   Orientation,
   PointCloud,
   Pose,

@@ -1,7 +1,7 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
-import type { Geometry } from '../../gen/common/v1/common_pb';
-import type { GetKinematicsResult } from '../../utils';
+import type { Geometry, KinematicModel } from '../../gen/common/v1/common_pb';
+import type { GetKinematicsOptions, GetKinematicsResult } from '../../utils';
 
 /** Represents a physical gantry that exists in three-dimensional space. */
 export interface Gantry extends Resource {
@@ -25,6 +25,8 @@ export interface Gantry extends Resource {
   /**
    * Get the kinematics information associated with the gantry.
    *
+   * @deprecated Use getKinematicModel, which returns the typed model. This reads the deprecated
+   *   file bytes of the response.
    * @example
    *
    * ```ts
@@ -41,6 +43,34 @@ export interface Gantry extends Resource {
    *   map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
+
+  /**
+   * Get the typed kinematic model of the gantry. Link translations are in mm, revolute limits in
+   * degrees and prismatic limits in mm, and joint limits carry velocity and acceleration.
+   *
+   * @example
+   *
+   * ```ts
+   * const gantry = new VIAM.GantryClient(machine, 'my_gantry');
+   *
+   * const model = await gantry.getKinematicModel();
+   * console.log(model.joints.map((joint) => joint.limits));
+   *
+   * // Ask for the mesh bytes as well, which are left out by default
+   * const withMeshes = await gantry.getKinematicModel({
+   *   includeVisualMeshes: true,
+   * });
+   * ```
+   *
+   * For more information, see [Gantry
+   * API](https://docs.viam.com/reference/apis/components/gantry/#getkinematics).
+   *
+   * @param options - Set includeCollisionMeshes or includeVisualMeshes to get those mesh bytes.
+   *   Without them a mesh carries its path only.
+   * @throws When the server sends no typed model, or one with no links and no joints, which is what
+   *   a server or module that predates it sends.
+   */
+  getKinematicModel: (options?: GetKinematicsOptions, extra?: Struct) => Promise<KinematicModel>;
 
   /**
    * Move each axis of the gantry to the positionsMm at the speeds in speedsMmPerSec.

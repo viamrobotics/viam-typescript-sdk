@@ -13,6 +13,11 @@ import {
   OpenResponse,
   StopResponse,
 } from '../../gen/component/gripper/v1/gripper_pb';
+import {
+  type GetKinematicsRequest,
+  GetKinematicsResponse,
+  JointType,
+} from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { GripperClient } from './client';
 vi.mock('../../robot');
@@ -21,9 +26,12 @@ let gripper: GripperClient;
 const testIsMoving = true;
 const testIsHoldingSomething = true;
 const testCurrentInputs = [0.5, 1];
+let kinematicsRequest: GetKinematicsRequest | undefined;
 
 describe('GripperClient tests', () => {
   beforeEach(() => {
+    kinematicsRequest = undefined;
+
     const mockTransport = createRouterTransport(({ service }) => {
       service(GripperService, {
         open: () => {
@@ -49,6 +57,21 @@ describe('GripperClient tests', () => {
         goToInputs: () => {
           return new GoToInputsResponse();
         },
+        getKinematics: (request) => {
+          kinematicsRequest = request;
+          return new GetKinematicsResponse({
+            model: {
+              name: request.name,
+              joints: [
+                {
+                  id: 'finger',
+                  type: JointType.PRISMATIC,
+                  limits: { min: 0, max: 80, maxVelocity: 100 },
+                },
+              ],
+            },
+          });
+        },
       });
     });
 
@@ -61,6 +84,17 @@ describe('GripperClient tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('getKinematicModel', async () => {
+    const model = await gripper.getKinematicModel({ includeCollisionMeshes: true });
+
+    expect(kinematicsRequest?.name).toBe('test-gripper');
+    expect(kinematicsRequest?.includeCollisionMeshes).toBe(true);
+    expect(kinematicsRequest?.includeVisualMeshes).toBe(false);
+
+    expect(model.name).toBe('test-gripper');
+    expect(model.joints[0]?.limits?.maxVelocity).toBe(100);
   });
 
   it('open', async () => {

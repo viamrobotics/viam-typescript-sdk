@@ -17,13 +17,14 @@ import type { RobotClient } from '../../robot';
 import type { Options, Pose } from '../../types';
 import {
   doCommandFromClient,
+  getKinematicModelFromClient,
   getKinematicsFromClient,
   getGeometriesFromClient,
   getStatusFromClient,
 } from '../../utils';
 import type { Arm } from './arm';
-import { Get3DModelsRequest, type Mesh } from '../../gen/common/v1/common_pb';
-import type { GetKinematicsResult } from '../../utils';
+import { Get3DModelsRequest, type KinematicModel, type Mesh } from '../../gen/common/v1/common_pb';
+import type { GetKinematicsOptions, GetKinematicsResult } from '../../utils';
 
 /**
  * A gRPC-web client for the Arm component.
@@ -62,6 +63,20 @@ export class ArmClient implements Arm {
     return getGeometriesFromClient(
       this.client.getGeometries,
       this.name,
+      Struct.fromJson(extra),
+      callOptions,
+    );
+  }
+
+  async getKinematicModel(
+    options: GetKinematicsOptions = {},
+    extra = {},
+    callOptions = this.callOptions,
+  ): Promise<KinematicModel> {
+    return getKinematicModelFromClient(
+      this.client.getKinematics,
+      this.name,
+      options,
       Struct.fromJson(extra),
       callOptions,
     );

@@ -12,9 +12,14 @@ import {
 } from '../../gen/component/gripper/v1/gripper_pb';
 import type { RobotClient } from '../../robot';
 import type { Options } from '../../types';
-import { doCommandFromClient, getStatusFromClient } from '../../utils';
+import {
+  doCommandFromClient,
+  getKinematicModelFromClient,
+  getStatusFromClient,
+  type GetKinematicsOptions,
+} from '../../utils';
 import type { Gripper } from './gripper';
-import { GetGeometriesRequest } from '../../gen/common/v1/common_pb';
+import { GetGeometriesRequest, type KinematicModel } from '../../gen/common/v1/common_pb';
 
 /**
  * A gRPC-web client for the Gripper component.
@@ -41,6 +46,20 @@ export class GripperClient implements Gripper {
 
     const response = await this.client.getGeometries(request, callOptions);
     return response.geometries;
+  }
+
+  async getKinematicModel(
+    options: GetKinematicsOptions = {},
+    extra = {},
+    callOptions = this.callOptions,
+  ): Promise<KinematicModel> {
+    return getKinematicModelFromClient(
+      this.client.getKinematics,
+      this.name,
+      options,
+      Struct.fromJson(extra),
+      callOptions,
+    );
   }
 
   async open(extra = {}, callOptions = this.callOptions) {
