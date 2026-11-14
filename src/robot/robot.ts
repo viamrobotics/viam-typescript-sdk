@@ -12,6 +12,7 @@ export type FrameSystemConfig = PlainMessage<proto.FrameSystemConfig>;
 export type JobStatus = PlainMessage<proto.JobStatus>;
 export type MachineStatus = PlainMessage<proto.GetMachineStatusResponse>;
 export type MachineStatusState = proto.GetMachineStatusResponse_State;
+export type MaintenanceStatus = PlainMessage<proto.MaintenanceStatus>;
 export type ModuleModel = PlainMessage<proto.ModuleModel>;
 export type ModuleStatus = PlainMessage<proto.ModuleStatus>;
 export type ModuleStatusState = proto.ModuleStatus_State;
