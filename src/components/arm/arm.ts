@@ -2,8 +2,8 @@ import type { PlainMessage, Struct } from '@bufbuild/protobuf';
 import type { Pose, Resource } from '../../types';
 
 import * as armApi from '../../gen/component/arm/v1/arm_pb';
-import type { Geometry, Mesh } from '../../gen/common/v1/common_pb';
-import type { GetKinematicsResult } from '../../utils';
+import type { Geometry, KinematicModel, Mesh } from '../../gen/common/v1/common_pb';
+import type { GetKinematicsOptions, GetKinematicsResult } from '../../utils';
 
 export type ArmJointPositions = PlainMessage<armApi.JointPositions>;
 
@@ -60,6 +60,8 @@ export interface Arm extends Resource {
   /**
    * Get the kinematics information associated with the arm.
    *
+   * @deprecated Use getKinematicModel, which returns the typed model. This reads the deprecated
+   *   file bytes of the response.
    * @example
    *
    * ```ts
@@ -75,6 +77,34 @@ export interface Arm extends Resource {
    *   map of URDF mesh file paths to mesh data.
    */
   getKinematics: (extra?: Struct) => Promise<GetKinematicsResult>;
+
+  /**
+   * Get the typed kinematic model of the arm. Link translations are in mm, revolute limits in
+   * degrees and prismatic limits in mm, and joint limits carry velocity and acceleration.
+   *
+   * @example
+   *
+   * ```ts
+   * const arm = new VIAM.ArmClient(machine, 'my_arm');
+   *
+   * const model = await arm.getKinematicModel();
+   * console.log(model.joints.map((joint) => joint.limits));
+   *
+   * // Ask for the mesh bytes as well, which are left out by default
+   * const withMeshes = await arm.getKinematicModel({
+   *   includeVisualMeshes: true,
+   * });
+   * ```
+   *
+   * For more information, see [Arm
+   * API](https://docs.viam.com/reference/apis/components/arm/#getkinematics).
+   *
+   * @param options - Set includeCollisionMeshes or includeVisualMeshes to get those mesh bytes.
+   *   Without them a mesh carries its path only.
+   * @throws When the server sends no typed model, or one with no links and no joints, which is what
+   *   a server or module that predates it sends.
+   */
+  getKinematicModel: (options?: GetKinematicsOptions, extra?: Struct) => Promise<KinematicModel>;
 
   /**
    * Move the end of the arm to the pose.
