@@ -7,8 +7,10 @@ import { createClient, createRouterTransport } from '@connectrpc/connect';
 import { GetReadingsResponse } from '../../gen/common/v1/common_pb';
 import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_connect';
 import {
+  GetBatteryPercentResponse,
   GetCurrentResponse,
   GetPowerResponse,
+  GetPropertiesResponse,
   GetVoltageResponse,
 } from '../../gen/component/powersensor/v1/powersensor_pb';
 import { RobotClient } from '../../robot';
@@ -19,6 +21,8 @@ const testPower = 0.5;
 const testVoltage = 1.5;
 const testCurrent = 1;
 const testIsAc = true;
+const testBatteryPercent = 75;
+const testIsBatteryPercentSupported = true;
 
 describe('PowerSensorClient tests', () => {
   beforeEach(() => {
@@ -39,6 +43,16 @@ describe('PowerSensorClient tests', () => {
         getPower: () => {
           return new GetPowerResponse({
             watts: testPower,
+          });
+        },
+        getBatteryPercent: () => {
+          return new GetBatteryPercentResponse({
+            percent: testBatteryPercent,
+          });
+        },
+        getProperties: () => {
+          return new GetPropertiesResponse({
+            isBatteryPercentSupported: testIsBatteryPercentSupported,
           });
         },
         getReadings: () => {
@@ -66,6 +80,13 @@ describe('PowerSensorClient tests', () => {
     await expect(sensor.getVoltage()).resolves.toStrictEqual([testVoltage, testIsAc]);
     await expect(sensor.getCurrent()).resolves.toStrictEqual([testCurrent, testIsAc]);
     await expect(sensor.getPower()).resolves.toStrictEqual(testPower);
+    await expect(sensor.getBatteryPercent()).resolves.toStrictEqual(testBatteryPercent);
+  });
+
+  it('gets properties', async () => {
+    await expect(sensor.getProperties()).resolves.toMatchObject({
+      isBatteryPercentSupported: testIsBatteryPercentSupported,
+    });
   });
 
   it('get readings', async () => {

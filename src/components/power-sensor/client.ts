@@ -3,8 +3,10 @@ import type { CallOptions, Client } from '@connectrpc/connect';
 import { GetReadingsRequest } from '../../gen/common/v1/common_pb';
 import { PowerSensorService } from '../../gen/component/powersensor/v1/powersensor_connect';
 import {
+  GetBatteryPercentRequest,
   GetCurrentRequest,
   GetPowerRequest,
+  GetPropertiesRequest,
   GetVoltageRequest,
 } from '../../gen/component/powersensor/v1/powersensor_pb';
 import type { RobotClient } from '../../robot';
@@ -66,6 +68,29 @@ export class PowerSensorClient implements PowerSensor {
 
     const resp = await this.client.getPower(request, callOptions);
     return resp.watts;
+  }
+
+  async getBatteryPercent(extra = {}, callOptions = this.callOptions) {
+    const request = new GetBatteryPercentRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    const resp = await this.client.getBatteryPercent(request, callOptions);
+    return resp.percent;
+  }
+
+  async getProperties(extra = {}, callOptions = this.callOptions) {
+    const request = new GetPropertiesRequest({
+      name: this.name,
+      extra: Struct.fromJson(extra),
+    });
+
+    this.options.requestLogger?.(request);
+
+    return this.client.getProperties(request, callOptions);
   }
 
   async getReadings(extra = {}, callOptions = this.callOptions) {
