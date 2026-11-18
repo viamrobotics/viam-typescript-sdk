@@ -234,7 +234,11 @@ export {
  */
 export * as movementSensorApi from './gen/component/movementsensor/v1/movementsensor_pb';
 
-export { PowerSensorClient, type PowerSensor } from './components/powersensor';
+export {
+  PowerSensorClient,
+  PowerSensorProperties,
+  type PowerSensor,
+} from './components/powersensor';
 /**
  * Raw Protobuf interfaces for a PowerSensor component.
  *
