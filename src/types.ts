@@ -40,6 +40,7 @@ export interface Resource {
 import * as commonApi from './gen/common/v1/common_pb';
 
 export type Capsule = PlainMessage<commonApi.Capsule>;
+export type Cylinder = PlainMessage<commonApi.Cylinder>;
 export type GeoGeometry = PlainMessage<commonApi.GeoGeometry>;
 export type GeoPoint = PlainMessage<commonApi.GeoPoint>;
 export type GeometriesInFrame = PlainMessage<commonApi.GeometriesInFrame>;
@@ -57,6 +58,7 @@ export type WorldState = PlainMessage<commonApi.WorldState>;
 
 export const {
   Capsule,
+  Cylinder,
   GeoGeometry,
   GeoPoint,
   GeometriesInFrame,
