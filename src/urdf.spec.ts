@@ -93,6 +93,22 @@ describe('parseUrdf', () => {
     });
   });
 
+  it('maps a cylinder to a Cylinder, not a capsule', () => {
+    const { links } = parseUrdf(`<robot name="r">
+  <link name="post">
+    <collision>
+      <geometry>
+        <cylinder radius="0.05" length="0.4"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>`);
+    const geometry = links[0]?.geometry?.geometryType;
+    expect(geometry?.case).toBe('cylinder');
+    // 0.05 m radius and 0.4 m length -> mm.
+    expect(geometry?.value).toMatchObject({ radiusMm: 50, lengthMm: 400 });
+  });
+
   it('throws on a document with no <robot> element', () => {
     expect(() => parseUrdf('<nope/>')).toThrow('missing <robot> element');
   });

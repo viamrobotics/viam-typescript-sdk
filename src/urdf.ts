@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import { Frame } from './gen/app/v1/robot_pb';
-import { Capsule, Geometry, Mesh, RectangularPrism, Sphere } from './gen/common/v1/common_pb';
+import { Cylinder, Geometry, Mesh, RectangularPrism, Sphere } from './gen/common/v1/common_pb';
 import type { Vector3 } from './types';
 import type { KinematicsData } from './utils';
 
@@ -141,12 +141,11 @@ const processGeometry = (link: XMLNode, label: string): Geometry | undefined => 
     });
   }
   if (geometry.cylinder !== undefined) {
-    // Viam has no cylinder primitive; a capsule is the closest approximation.
     return new Geometry({
       label,
       geometryType: {
-        case: 'capsule',
-        value: new Capsule({
+        case: 'cylinder',
+        value: new Cylinder({
           radiusMm: metersToMm(parseNumber(getAttribute(geometry.cylinder, 'radius'))),
           lengthMm: metersToMm(parseNumber(getAttribute(geometry.cylinder, 'length'))),
         }),
