@@ -22,6 +22,7 @@ const testVoltage = 1.5;
 const testCurrent = 1;
 const testIsAc = true;
 const testBatteryPercent = 72.5;
+const testIsCharging = true;
 
 describe('PowerSensorClient tests', () => {
   beforeEach(() => {
@@ -47,6 +48,7 @@ describe('PowerSensorClient tests', () => {
         getBatteryPercent: () => {
           return new GetBatteryPercentResponse({
             percent: testBatteryPercent,
+            isCharging: testIsCharging,
           });
         },
         getProperties: () => {
@@ -83,9 +85,10 @@ describe('PowerSensorClient tests', () => {
   });
 
   it('get battery percent', async () => {
-    await expect(sensor.getBatteryPercent()).resolves.toStrictEqual(
-      testBatteryPercent
-    );
+    await expect(sensor.getBatteryPercent()).resolves.toStrictEqual([
+      testBatteryPercent,
+      testIsCharging,
+    ]);
   });
 
   it('get properties', async () => {
