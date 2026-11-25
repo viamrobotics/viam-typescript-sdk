@@ -51,23 +51,21 @@ export interface PowerSensor extends Sensor {
    */
   getPower(extra?: Struct): Promise<number>;
   /**
-   * Get the remaining battery charge as a percentage from 0 to 100, and a boolean indicating
-   * whether the battery is charging.
+   * Get the remaining battery charge as a percentage from 0 to 100.
    *
-   * Check `isBatteryPercentSupported` from {@link getProperties} first. The charging boolean is only
-   * meaningful when `isChargingSupported` is true.
+   * Check `isBatteryPercentSupported` from {@link getProperties} first.
    *
    * @example
    *
    * ```ts
    * const powerSensor = new VIAM.PowerSensorClient(machine, 'my_power_sensor');
-   * const [percent, isCharging] = await powerSensor.getBatteryPercent();
+   * const percent = await powerSensor.getBatteryPercent();
    * ```
    *
    * For more information, see [Power Sensor
    * API](https://docs.viam.com/reference/apis/components/power-sensor/#getbatterypercent).
    */
-  getBatteryPercent(extra?: Struct): Promise<readonly [number, boolean]>;
+  getBatteryPercent(extra?: Struct): Promise<number>;
   /**
    * Get the properties of the power sensor, such as whether it supports {@link getBatteryPercent}.
    *

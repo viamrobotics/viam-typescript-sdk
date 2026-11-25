@@ -79,7 +79,7 @@ export class PowerSensorClient implements PowerSensor {
     this.options.requestLogger?.(request);
 
     const resp = await this.client.getBatteryPercent(request, callOptions);
-    return [resp.percent, resp.isCharging] as const;
+    return resp.percent;
   }
 
   async getProperties(extra = {}, callOptions = this.callOptions) {
