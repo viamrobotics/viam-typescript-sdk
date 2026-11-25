@@ -54,8 +54,8 @@ export interface PowerSensor extends Sensor {
    * Get the remaining battery charge as a percentage from 0 to 100, and a boolean indicating
    * whether the battery is charging.
    *
-   * Check `isBatteryPercentSupported` from {@link getProperties} first. The charging status is
-   * only meaningful when `isChargingSupported` is true.
+   * Check `isBatteryPercentSupported` from {@link getProperties} first. The charging status is only
+   * meaningful when `isChargingSupported` is true.
    *
    * @example
    *
