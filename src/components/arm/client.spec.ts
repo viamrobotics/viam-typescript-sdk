@@ -12,6 +12,11 @@ import {
   type SetManualModeRequest,
   SetManualModeResponse,
 } from '../../gen/component/arm/v1/arm_pb';
+import {
+  type GetKinematicsRequest,
+  GetKinematicsResponse,
+  JointType,
+} from '../../gen/common/v1/common_pb';
 import { RobotClient } from '../../robot';
 import { ArmClient } from './client';
 vi.mock('../../robot');
@@ -24,12 +29,14 @@ const testManualMode = true;
 let capturedSetManualModeRequest: SetManualModeRequest | undefined;
 let capturedGetManualModeRequest: GetManualModeRequest | undefined;
 let capturedGetPropertiesRequest: GetPropertiesRequest | undefined;
+let capturedGetKinematicsRequest: GetKinematicsRequest | undefined;
 
 describe('ArmClient tests', () => {
   beforeEach(() => {
     capturedSetManualModeRequest = undefined;
     capturedGetManualModeRequest = undefined;
     capturedGetPropertiesRequest = undefined;
+    capturedGetKinematicsRequest = undefined;
 
     const mockTransport = createRouterTransport(({ service }) => {
       service(ArmService, {
@@ -48,6 +55,21 @@ describe('ArmClient tests', () => {
           capturedGetManualModeRequest = request;
           return new GetManualModeResponse({ manualMode: testManualMode });
         },
+        getKinematics: (request) => {
+          capturedGetKinematicsRequest = request;
+          return new GetKinematicsResponse({
+            model: {
+              name: request.name,
+              joints: [
+                {
+                  id: 'shoulder',
+                  type: JointType.REVOLUTE,
+                  limits: { min: -180, max: 180, maxVelocity: 90, maxAcceleration: 45 },
+                },
+              ],
+            },
+          });
+        },
       });
     });
 
@@ -60,6 +82,18 @@ describe('ArmClient tests', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('getKinematicModel', async () => {
+    const model = await arm.getKinematicModel({ includeVisualMeshes: true }, { foo: 'bar' });
+
+    expect(capturedGetKinematicsRequest?.name).toBe('test-arm');
+    expect(capturedGetKinematicsRequest?.includeCollisionMeshes).toBe(false);
+    expect(capturedGetKinematicsRequest?.includeVisualMeshes).toBe(true);
+    expect(capturedGetKinematicsRequest?.extra?.toJson()).toStrictEqual({ foo: 'bar' });
+
+    expect(model.name).toBe('test-arm');
+    expect(model.joints[0]?.limits).toMatchObject({ maxVelocity: 90, maxAcceleration: 45 });
   });
 
   it('getProperties', async () => {

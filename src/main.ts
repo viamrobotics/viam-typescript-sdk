@@ -461,6 +461,7 @@ export {
   doCommandFromClient,
   enableDebugLogging,
   getStatusFromClient,
+  type GetKinematicsOptions,
   type GetKinematicsResult,
   type GetKinematicsResultWithMeshes,
   type KinematicsData,

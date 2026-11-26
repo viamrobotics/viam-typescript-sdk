@@ -1,6 +1,7 @@
 import type { Struct } from '@bufbuild/protobuf';
 import type { Resource } from '../../types';
-import type { Geometry } from '../../gen/common/v1/common_pb';
+import type { Geometry, KinematicModel } from '../../gen/common/v1/common_pb';
+import type { GetKinematicsOptions } from '../../utils';
 
 /** Represents a physical robotic gripper. */
 export interface Gripper extends Resource {
@@ -21,6 +22,34 @@ export interface Gripper extends Resource {
    * API](https://docs.viam.com/reference/apis/components/gripper/#getgeometries).
    */
   getGeometries: (extra?: Struct) => Promise<Geometry[]>;
+
+  /**
+   * Get the typed kinematic model of the gripper. Link translations are in mm, revolute limits in
+   * degrees and prismatic limits in mm, and joint limits carry velocity and acceleration.
+   *
+   * @example
+   *
+   * ```ts
+   * const gripper = new VIAM.GripperClient(machine, 'my_gripper');
+   *
+   * const model = await gripper.getKinematicModel();
+   * console.log(model.joints.map((joint) => joint.limits));
+   *
+   * // Ask for the mesh bytes as well, which are left out by default
+   * const withMeshes = await gripper.getKinematicModel({
+   *   includeVisualMeshes: true,
+   * });
+   * ```
+   *
+   * For more information, see [Gripper
+   * API](https://docs.viam.com/reference/apis/components/gripper/#getkinematics).
+   *
+   * @param options - Set includeCollisionMeshes or includeVisualMeshes to get those mesh bytes.
+   *   Without them a mesh carries its path only.
+   * @throws When the server sends no typed model, or one with no links and no joints, which is what
+   *   a server or module that predates it sends.
+   */
+  getKinematicModel: (options?: GetKinematicsOptions, extra?: Struct) => Promise<KinematicModel>;
 
   /**
    * Open a gripper of the underlying robot.

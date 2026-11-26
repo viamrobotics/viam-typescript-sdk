@@ -5,12 +5,20 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   type DoCommandRequest,
   DoCommandResponse,
+  type GetKinematicsRequest,
   GetKinematicsResponse,
   type GetStatusRequest,
   GetStatusResponse,
+  JointType,
+  KinematicModel,
   KinematicsFileFormat,
 } from './gen/common/v1/common_pb';
-import { doCommandFromClient, getKinematicsFromClient, getStatusFromClient } from './utils';
+import {
+  doCommandFromClient,
+  getKinematicModelFromClient,
+  getKinematicsFromClient,
+  getStatusFromClient,
+} from './utils';
 
 const encode = (value: string) => new TextEncoder().encode(value);
 
@@ -201,5 +209,79 @@ describe('getKinematicsFromClient', () => {
       joints: [],
       links: [],
     });
+  });
+});
+
+describe('getKinematicModelFromClient', () => {
+  const typedModel = new KinematicModel({
+    name: 'test',
+    links: [{ id: 'base', pose: { translation: { x: 0, y: 0, z: 100 } } }],
+    joints: [
+      {
+        id: 'j0',
+        parent: 'base',
+        type: JointType.REVOLUTE,
+        axis: { x: 0, y: 0, z: 1 },
+        limits: { min: -90, max: 90, maxVelocity: 180, maxAcceleration: 360 },
+      },
+    ],
+  });
+
+  it('returns the typed model with velocity and acceleration limits', async () => {
+    const getKinematicsMethod = vi
+      .fn()
+      .mockResolvedValue(new GetKinematicsResponse({ model: typedModel }));
+
+    const model = await getKinematicModelFromClient(getKinematicsMethod, 'test');
+
+    expect(model.joints[0]?.limits).toMatchObject({
+      min: -90,
+      max: 90,
+      maxVelocity: 180,
+      maxAcceleration: 360,
+    });
+  });
+
+  it('sends no include flags by default and the ones it is given', async () => {
+    const getKinematicsMethod = vi
+      .fn()
+      .mockResolvedValue(new GetKinematicsResponse({ model: typedModel }));
+
+    await getKinematicModelFromClient(getKinematicsMethod, 'test');
+    await getKinematicModelFromClient(getKinematicsMethod, 'test', { includeVisualMeshes: true });
+
+    const [[first], [second]] = getKinematicsMethod.mock.calls as [
+      [GetKinematicsRequest],
+      [GetKinematicsRequest],
+    ];
+    expect(first.includeCollisionMeshes).toBe(false);
+    expect(first.includeVisualMeshes).toBe(false);
+    expect(second.includeCollisionMeshes).toBe(false);
+    expect(second.includeVisualMeshes).toBe(true);
+  });
+
+  it('throws when the server sends only the deprecated bytes', async () => {
+    const getKinematicsMethod = vi.fn().mockResolvedValue(
+      new GetKinematicsResponse({
+        format: KinematicsFileFormat.SVA,
+        kinematicsData: encode('{}'),
+      }),
+    );
+
+    await expect(getKinematicModelFromClient(getKinematicsMethod, 'test')).rejects.toThrow(
+      'test did not return a kinematic model',
+    );
+  });
+
+  it('throws on a model with no links or joints', async () => {
+    const getKinematicsMethod = vi
+      .fn()
+      .mockResolvedValue(
+        new GetKinematicsResponse({ model: new KinematicModel({ name: 'test' }) }),
+      );
+
+    await expect(getKinematicModelFromClient(getKinematicsMethod, 'test')).rejects.toThrow(
+      'test did not return a kinematic model',
+    );
   });
 });

@@ -13,6 +13,7 @@ import {
   KinematicsFileFormat,
   GetStatusRequest,
   type GetStatusResponse,
+  type KinematicModel,
   type Mesh,
 } from './gen/common/v1/common_pb';
 import type { Options, Vector3 } from './types';
@@ -187,6 +188,47 @@ export const getKinematicsFromClient = async function getKinematicsFromClient(
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     meshesByUrdfFilepath: response.meshesByUrdfFilepath,
   };
+};
+
+/**
+ * Which mesh bytes a GetKinematics call asks for. Without a flag every mesh in the model comes back
+ * with its path and no bytes, which keeps a polled response small.
+ */
+export interface GetKinematicsOptions {
+  includeCollisionMeshes?: boolean;
+  includeVisualMeshes?: boolean;
+}
+
+/**
+ * Get the typed kinematic model using a resource client. Link translations are in mm, revolute
+ * limits in degrees and prismatic limits in mm.
+ *
+ * Throws when the response has no model, or one with no links and no joints, which is what a server
+ * or module that predates the typed model sends. getKinematicsFromClient still reads the deprecated
+ * bytes from those.
+ */
+export const getKinematicModelFromClient = async function getKinematicModelFromClient(
+  getKinematicsMethod: getKinematics,
+  name: string,
+  options: GetKinematicsOptions = {},
+  extra: Struct = Struct.fromJson({}),
+  callOptions: CallOptions = {},
+): Promise<KinematicModel> {
+  const request = new GetKinematicsRequest({
+    name,
+    extra,
+    ...options,
+  });
+
+  const { model } = await getKinematicsMethod(request, callOptions);
+
+  if (model === undefined || (model.links.length === 0 && model.joints.length === 0)) {
+    throw new Error(
+      `${name} did not return a kinematic model with any links or joints, its server or module may predate the typed model`,
+    );
+  }
+
+  return model;
 };
 
 type getGeometries = (
